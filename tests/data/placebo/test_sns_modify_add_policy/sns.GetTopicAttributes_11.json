@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "SubscriptionsConfirmed": "0", 
+            "DisplayName": "", 
+            "SubscriptionsDeleted": "0", 
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
+            "Owner": "644160558196", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:test_sns_modify_add_policy\"}]}", 
+            "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_add_policy", 
+            "SubscriptionsPending": "0"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "00661568-f24e-5eda-9403-4795bd6be073", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "00661568-f24e-5eda-9403-4795bd6be073", 
+                "date": "Tue, 13 Feb 2018 20:39:00 GMT", 
+                "content-length": "1739", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

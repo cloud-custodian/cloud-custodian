@@ -2,23 +2,23 @@
     "status_code": 200, 
     "data": {
         "Attributes": {
-            "SubscriptionsConfirmed": "1", 
+            "SubscriptionsConfirmed": "0", 
             "DisplayName": "", 
             "SubscriptionsDeleted": "0", 
             "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
             "Owner": "644160558196", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"CrossAccountSubscriber\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::859967345373:root\",\"arn:aws:iam::913831209578:root\",\"arn:aws:iam::958067445020:root\",\"arn:aws:iam::093937234853:root\"]},\"Action\":\"sns:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify\"}]}", 
-            "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:test_sns_modify_replace_policy\"},{\"Sid\":\"RemoveMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:test_sns_modify_replace_policy\"}]}", 
+            "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_replace_policy", 
             "SubscriptionsPending": "0"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "44a21ea7-a8eb-5577-ba78-4c5ae1cb7cde", 
+            "RequestId": "94537f8a-3e4f-58ce-9fbb-2d77776f1167", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "44a21ea7-a8eb-5577-ba78-4c5ae1cb7cde", 
+                "x-amzn-requestid": "94537f8a-3e4f-58ce-9fbb-2d77776f1167", 
                 "date": "Tue, 13 Feb 2018 20:13:19 GMT", 
-                "content-length": "1930", 
+                "content-length": "2012", 
                 "content-type": "text/xml"
             }
         }

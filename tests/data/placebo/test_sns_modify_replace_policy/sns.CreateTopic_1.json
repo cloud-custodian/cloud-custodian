@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "152ebf90-9fdb-5f1e-915d-ed6dd6ae67a9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "152ebf90-9fdb-5f1e-915d-ed6dd6ae67a9", 
+                "date": "Tue, 13 Feb 2018 20:14:44 GMT", 
+                "content-length": "337", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_replace_policy"
+    }
+}

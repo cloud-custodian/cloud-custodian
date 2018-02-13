@@ -130,7 +130,7 @@ class ReplacePolicyStatement(BaseAction):
               - name: force-sns-policy
                 resource: sns
                 actions:
-                  - type: set-statements
+                  - type: replace-statements
                     statements:
                       - Sid: "SNSAccessPolicy"
                         Effect: "Deny"
@@ -166,7 +166,6 @@ class ReplacePolicyStatement(BaseAction):
 
         replacement = {"Statement": s for s in self.data.get('statements', [])}
         base.update(replacement)
-        print(base)
 
         if current == base:
             return
@@ -178,3 +177,79 @@ class ReplacePolicyStatement(BaseAction):
         )
         return {'Name': resource['TopicArn'],
                 'State': 'PolicyReplaced'}
+
+
+@SNS.action_registry.register('modify-statements')
+class ModifyPolicyStatement(ModifyPolicyBase):
+    permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
+
+    def process(self, resources):
+        replace = False
+        results = []
+        client = local_session(self.manager.session_factory).client('sns')
+        additions = self.data.get('add-statements', [])
+        deletions = self.data.get('remove-statements', [])
+
+        
+        if unicode == type(deletions) and deletions == "*":
+            replace = True
+
+        for r in resources:
+            new_policy = {}
+            try:
+                print(deletions)
+                print(replace)
+                if replace:
+                    new_policy = self.process_replace(client, r)
+                if len(additions) and not replace:
+                    new_policy.update(
+                        self.process_addition(client, r)
+                    )
+                if len(deletions) and not replace:
+                    new_policy.update(
+                        self.process_deletion(client, r)
+                    )
+                results += {
+                    'Name': r['TopicArn'],
+                    'State': 'PolicyModified',
+                    'Statements': new_policy
+                }
+            except Exception:
+                self.log.exception(
+                    "Error processing sns:%s", r['TopicArn'])
+            else:
+                print('new_policy')
+                print(new_policy)
+                client.set_topic_attributes(
+                    TopicArn=r['TopicArn'],
+                    AttributeName='Policy',
+                    AttributeValue=json.dumps(new_policy)
+                )
+        return results
+
+    def process_addition(self, client, resource):
+        policy = resource.get('Policy') or '{}'
+        policy = json.loads(policy)
+        new_policy = self.add_policy(policy, resource)
+        # new_policy = json.dumps(new_policy)
+        if policy == new_policy:
+            return policy
+        return new_policy
+
+    def process_deletion(self, client, resource):
+        policy = resource.get('Policy') or '{}'
+        policy = json.loads(policy)
+        new_policy, found = self.remove_policy(
+            policy, resource, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        return new_policy
+
+    def process_replace(self, client, resource):
+        base = {
+            "Version": "2012-10-17"
+        }
+        new_policy = self.replace_policy(base)
+        return new_policy

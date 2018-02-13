@@ -822,3 +822,68 @@ class RemovePolicyBase(BaseAction):
         if not found:
             return None, found
         return statements, found
+
+class ModifyPolicyBase(BaseAction):
+
+    schema = utils.type_schema(
+        'set-statements',
+        **{
+            'statements': {
+                'type': 'array',
+                'required': True,
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'Sid': {'type': 'string'},
+                        'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+                        'Principal': {'anyOf': [{'type': 'string'},
+                            {'type': 'object'}, {'type': 'array'}]},
+                        'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                        'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                        'Condition': {'type': 'object'}
+                    },
+                    'required': ['Sid', 'Effect'],
+                    'oneOf': [
+                        {'enum': ['matched']},
+                        {'type': 'array', 'items': {'type': 'string'}}
+                    ]
+                }
+            }
+        }
+    )
+
+    def add_policy(self, policy, resource):
+        current = {s['Sid']: s for s in policy.get('Statement', [])}
+        new = copy.deepcopy(current)
+        additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
+        new.update(additional)
+        statements = list(new.values())
+        policy['Statement'] = statements
+        return policy
+    
+    def remove_policy(self, policy, resource, matched_key):
+        statement_ids = self.data.get('remove-statements', [])
+
+        found = []
+        statements = policy.get('Statement', [])
+        resource_statements = resource.get(matched_key, ())
+
+        for s in list(statements):
+            if statement_ids == 'matched':
+                if s in resource_statements:
+                    found.append(s)
+                    statements.remove(s)
+            elif s['Sid'] in self.data['remove-statements']:
+                found.append(s)
+                statements.remove(s)
+        if not found:
+            return None, found
+        return statements, found
+
+    def replace_policy(self, policy):        
+        replacement = {"Statement": s for s in self.data.get('add-statements', [])}
+        policy.update(replacement)
+        return policy
