@@ -334,6 +334,60 @@ class TestSNS(BaseTest):
             TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
         self.assertTrue('AddMe' in
             [s['Sid'] for s in data.get('Statement', ())])
+
+    @functional
+    def test_sns_modify_add_and_remove_policy(self):
+        session_factory = self.replay_flight_data('test_sns_modify_add_and_remove_policy')
+        client = session_factory().client('sns')
+        name = 'test_sns_modify_add_and_remove_policy'
+        topic_arn = client.create_topic(Name=name)['TopicArn']
+        self.addCleanup(client.delete_topic, TopicArn=topic_arn)
+
+        client.set_topic_attributes(
+            TopicArn=topic_arn,
+            AttributeName="Policy",
+            AttributeValue=json.dumps({
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:Subscribe"],
+                        "Resource": topic_arn
+                    },
+                    {
+                        "Sid": "RemoveMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:GetTopicAttributes"],
+                        "Resource": topic_arn
+                    }
+                ]
+            })
+        )
+
+        p = self.load_policy({
+            'name': 'sns-replace-policy',
+            'resource': 'sns',
+            'filters': [{'TopicArn': topic_arn}],
+            'actions': [
+                {'type': 'modify-statements',
+                    'add-statements': [{
+                        "Sid": "AddMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:GetTopicAttributes"],
+                        "Resource": topic_arn
+                    }],
+                    'remove-statements': ['RemoveMe']
+                }]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
         data = json.loads(client.get_topic_attributes(
             TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
         self.assertTrue('AddMe' in

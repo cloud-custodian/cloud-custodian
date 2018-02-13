@@ -7,20 +7,20 @@
             "SubscriptionsDeleted": "0", 
             "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
             "Owner": "644160558196", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"S3Publisher\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":\"SNS:Publish\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify\",\"Condition\":{\"ArnLike\":{\"aws:SourceArn\":\"arn:aws:s3:::c7n-guard-duty-dev\"}}},{\"Sid\":\"CrossAccountSubscriber\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::913831209578:root\",\"arn:aws:iam::859967345373:root\",\"arn:aws:iam::958067445020:root\",\"arn:aws:iam::093937234853:root\"]},\"Action\":\"sns:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify\"}]}", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"S3Publisher\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Action\":\"SNS:Publish\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify\",\"Condition\":{\"ArnLike\":{\"aws:SourceArn\":\"arn:aws:s3:::c7n-guard-duty-dev\"}}},{\"Sid\":\"CrossAccountSubscriber\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::913831209578:root\",\"arn:aws:iam::093937234853:root\",\"arn:aws:iam::859967345373:root\",\"arn:aws:iam::958067445020:root\"]},\"Action\":\"sns:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify\"}]}", 
             "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify", 
             "SubscriptionsPending": "0"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "9affafb0-38e9-5f46-9521-fd4d5a5b21b3", 
+            "RequestId": "11a94dcf-de78-5b0e-a26d-1f32b9619ba1", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "9affafb0-38e9-5f46-9521-fd4d5a5b21b3", 
+                "x-amzn-requestid": "11a94dcf-de78-5b0e-a26d-1f32b9619ba1", 
                 "vary": "Accept-Encoding", 
                 "content-length": "2341", 
                 "content-type": "text/xml", 
-                "date": "Tue, 13 Feb 2018 22:02:26 GMT"
+                "date": "Tue, 13 Feb 2018 22:21:12 GMT"
             }
         }
     }

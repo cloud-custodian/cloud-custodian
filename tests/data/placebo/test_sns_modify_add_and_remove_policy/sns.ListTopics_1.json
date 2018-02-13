@@ -31,19 +31,16 @@
             }, 
             {
                 "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_add_and_remove_policy"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_add_policy"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "710021e0-12c5-5d40-a65f-731d707756d8", 
+            "RequestId": "0b3d78aa-3512-585a-a51e-2a57520a4780", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "710021e0-12c5-5d40-a65f-731d707756d8", 
-                "date": "Tue, 13 Feb 2018 22:02:26 GMT", 
-                "content-length": "1557", 
+                "x-amzn-requestid": "0b3d78aa-3512-585a-a51e-2a57520a4780", 
+                "date": "Tue, 13 Feb 2018 22:21:12 GMT", 
+                "content-length": "1435", 
                 "content-type": "text/xml"
             }
         }

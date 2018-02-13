@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 
-from c7n.actions import RemovePolicyBase, BaseAction
+from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
 from c7n.filters import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -195,20 +195,20 @@ class ModifyPolicyStatement(ModifyPolicyBase):
             replace = True
 
         for r in resources:
-            new_policy = {}
+            new_policy = {u'Version': u'2012-10-17', u'Statement': [] }
             try:
                 print(deletions)
                 print(replace)
                 if replace:
                     new_policy = self.process_replace(client, r)
-                if len(additions) and not replace:
-                    new_policy.update(
-                        self.process_addition(client, r)
-                    )
-                if len(deletions) and not replace:
-                    new_policy.update(
-                        self.process_deletion(client, r)
-                    )
+                if len(additions) and len(deletions) and not replace:
+                    tmp_policy = self.process_add_and_delete(client, r)
+                    print(tmp_policy)
+                    new_policy['Statement'] += tmp_policy
+                if len(additions) and not len(deletions) and not replace:
+                    new_policy['Statement'] += self.process_addition(client, r).get('Statement')
+                if not len(additions) and len(deletions) and not replace:
+                    new_policy['Statement'] += self.process_deletion(client, r)
                 results += {
                     'Name': r['TopicArn'],
                     'State': 'PolicyModified',
@@ -227,6 +227,14 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 )
         return results
 
+    def process_add_and_delete(self, client, resource):
+        policy = resource.get('Policy') or '{}'
+        policy = json.loads(policy)
+        new_policy = self.add_policy(policy, resource)
+        new_policy, found = self.remove_policy(
+            policy, resource, CrossAccountAccessFilter.annotation_key)
+        return new_policy
+
     def process_addition(self, client, resource):
         policy = resource.get('Policy') or '{}'
         policy = json.loads(policy)
@@ -241,10 +249,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
         policy = json.loads(policy)
         new_policy, found = self.remove_policy(
             policy, resource, CrossAccountAccessFilter.annotation_key)
-
-        if not found:
-            return
-
         return new_policy
 
     def process_replace(self, client, resource):
