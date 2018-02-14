@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version = u"0.8.27.3"
+version = u"0.8.28.0"

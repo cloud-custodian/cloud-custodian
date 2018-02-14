@@ -25,7 +25,7 @@ except ImportError:
 
 setup(
     name="c7n_mailer",
-    version='0.2',
+    version='0.3',
     description="Cloud Custodian - Reference Mailer",
     classifiers=[
         "Topic :: System :: Systems Administration",
