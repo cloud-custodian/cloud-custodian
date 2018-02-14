@@ -329,3 +329,26 @@ class TestSqsAction(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_sqs_set_retention(self):
+        session = self.replay_flight_data('test_sqs_set_retention')
+        client = session(region='us-east-1').client('sqs')
+        p = self.load_policy({
+            'name': 'sqs-reduce-long-retentions',
+            'resource': 'sqs',
+            'filters': [{
+                'type': 'value',
+                'value_type': 'integer',
+                'key': 'MessageRetentionPeriod',
+                'value': 345600,
+                'op': 'ge'}],
+            'actions': [{
+                'type': 'set-retention-period',
+                'period': 86400}]}, session_factory=session)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        retention = client.get_queue_attributes(
+            QueueUrl=resources[0]['QueueUrl'],
+            AttributeNames=['MessageRetentionPeriod'])['Attributes']
+        self.assertEqual(int(retention['MessageRetentionPeriod']), 86400)
