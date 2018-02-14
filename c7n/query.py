@@ -178,9 +178,6 @@ class QueryMeta(type):
                 attrs['filter_registry'].register('metrics', MetricsFilter)
             # EC2 Service boilerplate ...
             if m.service == 'ec2':
-                # Generic ec2 retry
-                attrs['retry'] = staticmethod(get_retry((
-                    'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
                 # Generic ec2 resource tag support
                 if getattr(m, 'taggable', True):
                     register_ec2_tags(
@@ -355,6 +352,14 @@ class QueryResourceManager(ResourceManager):
     permissions = ()
 
     _generate_arn = None
+
+    retry = staticmethod(
+        get_retry((
+            'ThrottlingException',
+            'RequestLimitExceeded',
+            'Throttled',
+            'ThorttlingException',
+            'Client.RequestLimitExceeded')))
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
