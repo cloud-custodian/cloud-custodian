@@ -16,7 +16,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n_guardian",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Multi Account Guard Duty Setup",
     classifiers=[
         "Topic :: System :: Systems Administration",
