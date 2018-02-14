@@ -139,7 +139,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                     add-statements: [statement]
                     remove-statements: [statement] or *
     """
-    
+
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
 
     def process(self, resources):
@@ -150,12 +150,11 @@ class ModifyPolicyStatement(ModifyPolicyBase):
         deletions = self.data.get('remove-statements', [])
         remove_all = self.data.get('remove-statements-all', [])
 
-        
-        if unicode == type(remove_all) and remove_all == "*":
+        if remove_all == "*":
             replace = True
 
         for r in resources:
-            new_policy = {u'Version': u'2012-10-17', u'Statement': [] }
+            new_policy = {u'Version': u'2012-10-17', u'Statement': []}
             try:
                 if replace:
                     new_policy = self.process_replace(client, r)

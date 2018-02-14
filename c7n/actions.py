@@ -823,6 +823,7 @@ class RemovePolicyBase(BaseAction):
             return None, found
         return statements, found
 
+
 class ModifyPolicyBase(BaseAction):
 
     schema = utils.type_schema(
@@ -847,34 +848,24 @@ class ModifyPolicyBase(BaseAction):
                     },
                     'required': ['Sid', 'Effect'],
                     'oneOf': [
-                        {'enum': ['matched']},
-                        {'type': 'array', 'items': {'type': 'string'}}
+                        {'required': ['Principal', 'Action', 'Resource']},
+                        {'required': ['NotPrincipal', 'Action', 'Resource']},
+                        {'required': ['Principal', 'NotAction', 'Resource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'Resource']},
+                        {'required': ['Principal', 'Action', 'NotResource']},
+                        {'required': ['NotPrincipal', 'Action', 'NotResource']},
+                        {'required': ['Principal', 'NotAction', 'NotResource']},
+                        {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
                     ]
                 }
             },
             'remove-statements': {
                 'type': 'array',
-                'required': True,
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'Sid': {'type': 'string'},
-                        'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                        'Principal': {'anyOf': [{'type': 'string'},
-                            {'type': 'object'}, {'type': 'array'}]},
-                        'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
-                        'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'Condition': {'type': 'object'}
-                    },
-                    'required': ['Sid', 'Effect'],
-                    'oneOf': [
-                        {'enum': ['matched']},
-                        {'type': 'array', 'items': {'type': 'string'}}
-                    ]
-                }
+                'oneOf': [
+                    {'enum': ['matched']},
+                    {'type': 'array', 'items': {'type': 'string'}}
+                ],
+                'required': True
             },
             'remove-statements-all': {
                 'type': 'string'
@@ -890,7 +881,7 @@ class ModifyPolicyBase(BaseAction):
         statements = list(new.values())
         policy['Statement'] = statements
         return policy
-    
+
     def remove_policy(self, policy, resource, matched_key):
         statement_ids = self.data.get('remove-statements', [])
 
@@ -910,7 +901,7 @@ class ModifyPolicyBase(BaseAction):
             return None, found
         return statements, found
 
-    def replace_policy(self, policy):        
+    def replace_policy(self, policy):
         replacement = {"Statement": s for s in self.data.get('add-statements', [])}
         policy.update(replacement)
         return policy
