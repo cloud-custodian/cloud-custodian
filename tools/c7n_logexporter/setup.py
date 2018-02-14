@@ -16,7 +16,7 @@ from setuptools import setup
 
 setup(
     name="c7n_logexporter",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Cloud Watch Log S3 exporter",
     classifiers=[
         "Topic :: System :: Systems Administration",
