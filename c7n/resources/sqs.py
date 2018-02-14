@@ -412,7 +412,7 @@ class SetRetentionPeriod(BaseAction):
 
         if self.retention > 1209600 or self.retention < 60:
             raise ValueError(
-                'Invalid retention value! Retention period cannot exceed '
+                'Invalid retention value. Retention period cannot exceed '
                 '14 days (1,209,600 seconds) or be less than 1 minute '
                 '(60 seconds)')
 

@@ -340,7 +340,7 @@ class TestSqsAction(BaseTest):
                 'type': 'value',
                 'value_type': 'integer',
                 'key': 'MessageRetentionPeriod',
-                'value': 432000,
+                'value': 345600,
                 'op': 'ge'}],
             'actions': [{
                 'type': 'set-retention-period',
