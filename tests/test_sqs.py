@@ -344,7 +344,7 @@ class TestSqsAction(BaseTest):
                 'op': 'ge'}],
             'actions': [{
                 'type': 'set-retention-period',
-                'days': 1}]}, session_factory=session)
+                'period': 86400}]}, session_factory=session)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
