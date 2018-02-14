@@ -359,6 +359,7 @@ class SetEncryption(BaseAction):
             self.log.exception(
                 "Exception modifying queue:\n %s" % e)
 
+
 @SQS.action_registry.register('set-retention-period')
 class SetRetentionPeriod(BaseAction):
     """Action to set the retention period on an SQS queue (in seconds)
