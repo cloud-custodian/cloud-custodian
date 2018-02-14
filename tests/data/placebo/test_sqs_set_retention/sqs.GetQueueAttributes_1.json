@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "ApproximateNumberOfMessagesNotVisible": "0", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"arn:aws:sqs:us-east-1:644160558196:asdf/SQSDefaultPolicy\",\"Statement\":[{\"Sid\":\"Sid1513194978457\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"SQS:SendMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:asdf\",\"Condition\":{\"ArnEquals\":{\"aws:SourceArn\":\"arn:aws:sns:us-east-1:644160558196:asdf\"}}}]}", 
+            "MessageRetentionPeriod": "345600", 
+            "ApproximateNumberOfMessagesDelayed": "0", 
+            "MaximumMessageSize": "262144", 
+            "CreatedTimestamp": "1513194956", 
+            "ApproximateNumberOfMessages": "0", 
+            "ReceiveMessageWaitTimeSeconds": "0", 
+            "DelaySeconds": "0", 
+            "VisibilityTimeout": "30", 
+            "LastModifiedTimestamp": "1513194978", 
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:asdf"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "92f76525-4c5a-503d-b57d-37db1f9f737a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "92f76525-4c5a-503d-b57d-37db1f9f737a", 
+                "content-length": "1751", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 14 Feb 2018 15:11:01 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
