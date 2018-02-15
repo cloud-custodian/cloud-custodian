@@ -393,8 +393,8 @@ class RemoveTag(RemoveTag):
 class SetConcurrency(BaseAction):
     """Set lambda function concurrency to the desired level.
 
-    Can be used to set the reserved function concurrency to an exact value, 
-    to delete reserved concurrency, or to set the value to an attribute of 
+    Can be used to set the reserved function concurrency to an exact value,
+    to delete reserved concurrency, or to set the value to an attribute of
     the resource.
     """
 
@@ -440,8 +440,8 @@ class SetConcurrency(BaseAction):
                 client.put_function_concurrency(
                     FunctionName=function['FunctionName'],
                     ReservedConcurrentExecutions=fvalue)
-                    
-    
+
+
 @actions.register('delete')
 class Delete(BaseAction):
     """Delete a lambda function (including aliases and older versions).
