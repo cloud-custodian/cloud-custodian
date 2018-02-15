@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import jmespath
 import json
+import six
 import types
 
 from botocore.exceptions import ClientError
@@ -412,7 +413,7 @@ class SetConcurrency(BaseAction):
                    'lambda:PutFunctionConcurrency')
 
     def validate(self):
-        if self.data.get('expr', False) and not isinstance(self.data['value'], basestring):
+        if self.data.get('expr', False) and not isinstance(self.data['value'], six.text_type):
             raise ValueError("invalid value expression %s" % self.data['value'])
         return self
 
