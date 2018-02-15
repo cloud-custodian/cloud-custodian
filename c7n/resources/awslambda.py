@@ -13,7 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import jmespath
 import json
+
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, RemovePolicyBase
@@ -110,6 +112,40 @@ class SubnetFilter(net_filters.SubnetFilter):
 filters.register('network-location', net_filters.NetworkLocation)
 
 
+@filters.register('reserved-concurrency')
+class ReservedConcurrency(ValueFilter):
+
+    annotation_key = "c7n:FunctionInfo"
+    value_key = '"c7n:FunctionInfo".Concurrency.ReservedConcurrentExecutions'
+    schema = type_schema('reserved-concurrency', rinherit=ValueFilter.schema)
+    permission = ('lambda:GetFunction',)
+
+    def validate(self):
+        self.data['key'] = self.value_key
+        return super(ReservedConcurrency, self).validate()
+
+    def process(self, resources, event=None):
+        self.data['key'] = self.value_key
+        client = local_session(self.manager.session_factory).client('lambda')
+
+        def _augment(r):
+            try:
+                r[self.annotation_key] = self.manager.retry(
+                    client.get_function, FunctionName=r['FunctionArn'])
+                r[self.annotation_key].pop('ResponseMetadata')
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied getting lambda:%s",
+                        r['FunctionName'])
+                raise
+            return r
+
+        with self.executor_factory(max_workers=3) as w:
+            resources = list(filter(None, w.map(_augment, resources)))
+            return super(ReservedConcurrency, self).process(resources, event)
+
+
 @filters.register('event-source')
 class LambdaEventSource(ValueFilter):
     # this uses iam policy, it should probably use
@@ -134,6 +170,7 @@ class LambdaEventSource(ValueFilter):
                     self.log.warning(
                         "Access denied getting policy lambda:%s",
                         r['FunctionName'])
+                raise
 
         self.log.debug("fetching policy for %d lambdas" % len(resources))
         self.data['key'] = self.annotation_key
@@ -352,6 +389,59 @@ class RemoveTag(RemoveTag):
             client.untag_resource(Resource=arn, TagKeys=tag_keys)
 
 
+@actions.register('set-concurrency')
+class SetConcurrency(BaseAction):
+    """Set lambda function concurrency to the desired level.
+
+    Can be used to set the reserved function concurrency to an exact value, 
+    to delete reserved concurrency, or to set the value to an attribute of 
+    the resource.
+    """
+
+    schema = type_schema(
+        'set-concurrency',
+        required=('value',),
+        **{'expr': {'type': 'boolean'},
+           'value': {'oneOf': [
+               {'type': 'string'},
+               {'type': 'integer'},
+               {'type': 'null'}]}})
+
+    permissions = ('lambda:DeleteFunctionConcurrency',
+                   'lambda:PutFunctionConcurrency')
+
+    def validate(self):
+        if self.data.get('expr', False) and not isinstance(self.data['value'], basestring):
+            raise ValueError("invalid value expression %s" % self.data['value'])
+        return self
+
+    def process(self, functions):
+        client = local_session(self.manager.session_factory).client('lambda')
+        is_expr = self.data.get('expr', False)
+        value = self.data['value']
+        if is_expr:
+            value = jmespath.compile(value)
+
+        for function in functions:
+            fvalue = value
+            if is_expr:
+                fvalue = value.search(function)
+                if isinstance(fvalue, float):
+                    fvalue = int(fvalue)
+                if isinstance(value, int) or isinstance(value, None):
+                    self.policy.log.warning(
+                        "Function: %s Invalid expression value for concurrency: %s",
+                        function['FunctionName'], fvalue)
+                    continue
+            if fvalue is None:
+                client.delete_function_concurrency(
+                    FunctionName=function['FunctionName'])
+            else:
+                client.put_function_concurrency(
+                    FunctionName=function['FunctionName'],
+                    ReservedConcurrentExecutions=fvalue)
+                    
+    
 @actions.register('delete')
 class Delete(BaseAction):
     """Delete a lambda function (including aliases and older versions).
