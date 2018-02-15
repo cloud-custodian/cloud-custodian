@@ -860,15 +860,13 @@ class ModifyPolicyBase(BaseAction):
                 }
             },
             'remove-statements': {
-                'type': 'array',
+                'type': ['array', 'string'],
                 'oneOf': [
                     {'enum': ['matched']},
-                    {'type': 'array', 'items': {'type': 'string'}}
+                    {'type': 'array', 'items': {'type': 'string'}},
+                    {'type': 'string'}
                 ],
                 'required': True
-            },
-            'remove-statements-all': {
-                'type': 'string'
             }
         }
     )

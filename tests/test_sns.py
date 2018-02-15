@@ -169,8 +169,7 @@ class TestSNS(BaseTest):
                         "Action": ["SNS:GetTopicAttributes"],
                         "Resource": topic_arn
                     }],
-                    'remove-statements': [],
-                    'remove-statements-all': "*"
+                    'remove-statements': "*"
                 }]
             },
             session_factory=session_factory)
@@ -341,5 +340,10 @@ class TestSNS(BaseTest):
 
         data = json.loads(client.get_topic_attributes(
             TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
-        self.assertTrue('AddMe' in
-            [s['Sid'] for s in data.get('Statement', ())])
+        self.assertTrue(
+            'AddMe' in
+                [s['Sid'] for s in data.get('Statement', ())]
+            and 
+            'RemoveMe' not in
+                [s['Sid'] for s in data.get('Statement', ())]
+        )
