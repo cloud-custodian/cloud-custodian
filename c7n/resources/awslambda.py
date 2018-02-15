@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import jmespath
 import json
+import types
 
 from botocore.exceptions import ClientError
 
@@ -428,7 +429,7 @@ class SetConcurrency(BaseAction):
                 fvalue = value.search(function)
                 if isinstance(fvalue, float):
                     fvalue = int(fvalue)
-                if isinstance(value, int) or isinstance(value, None):
+                if isinstance(value, int) or isinstance(value, types.NoneType):
                     self.policy.log.warning(
                         "Function: %s Invalid expression value for concurrency: %s",
                         function['FunctionName'], fvalue)
