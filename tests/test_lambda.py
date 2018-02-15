@@ -171,7 +171,7 @@ class LambdaTest(BaseTest):
 
         client = factory().client('lambda')
         info = client.get_function(FunctionName=resources[0]['FunctionName'])
-        self.assertEqual(info['Concurrency']['ReservedConcurrentExecutions'], 2)
+        self.assertEqual(info['Concurrency']['ReservedConcurrentExecutions'], 5)
 
     def test_set_filter_concurrency(self):
         self.patch(ReservedConcurrency, 'executor_factory', MainThreadExecutor)

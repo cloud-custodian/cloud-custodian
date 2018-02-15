@@ -119,7 +119,7 @@ class ReservedConcurrency(ValueFilter):
     annotation_key = "c7n:FunctionInfo"
     value_key = '"c7n:FunctionInfo".Concurrency.ReservedConcurrentExecutions'
     schema = type_schema('reserved-concurrency', rinherit=ValueFilter.schema)
-    permission = ('lambda:GetFunction',)
+    permissions = ('lambda:GetFunction',)
 
     def validate(self):
         self.data['key'] = self.value_key
