@@ -13,11 +13,18 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+import os
+
+description = ""
+if os.path.exists('readme.md'):
+   description = open('readme.md').read()
+
 
 setup(
     name="c7n_guardian",
     version='0.2',
     description="Cloud Custodian - Multi Account Guard Duty Setup",
+    long_description=description,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"

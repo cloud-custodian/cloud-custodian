@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from setuptools import setup, find_packages
+import os
 
 requires = ["Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15"]
 try:
@@ -23,10 +24,15 @@ except ImportError:
     # https://github.com/agronholm/pythonfutures/issues/41
     requires += ['futures']
 
+description = ""
+if os.path.exists('README.md'):
+    description = open('README.md').read()
+
 setup(
     name="c7n_mailer",
     version='0.3',
     description="Cloud Custodian - Reference Mailer",
+    long_description=description,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"

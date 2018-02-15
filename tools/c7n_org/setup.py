@@ -13,16 +13,22 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+import os
+
+description = ""
+if os.path.exists('README.md'):
+   description = open('README.md', 'r').read()
 
 setup(
     name="c7n_org",
-    version='0.2',
+    version='0.2.2',
     description="Cloud Custodian - Multi Account",
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
+    long_description=description,
     author="Kapil Thangavelu",
     author_email="kapil.foss@gmail.com",
     license="Apache-2.0",
