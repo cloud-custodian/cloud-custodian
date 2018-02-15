@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import jmespath
 import json
 import six
-import types
 
 from botocore.exceptions import ClientError
 
@@ -424,13 +423,15 @@ class SetConcurrency(BaseAction):
         if is_expr:
             value = jmespath.compile(value)
 
+        none_type = type(None)
+
         for function in functions:
             fvalue = value
             if is_expr:
                 fvalue = value.search(function)
                 if isinstance(fvalue, float):
                     fvalue = int(fvalue)
-                if isinstance(value, int) or isinstance(value, types.NoneType):
+                if isinstance(value, int) or isinstance(value, none_type):
                     self.policy.log.warning(
                         "Function: %s Invalid expression value for concurrency: %s",
                         function['FunctionName'], fvalue)
