@@ -75,15 +75,14 @@ class UpdateAccount(BaseAction):
     .. code-block:: yaml
 
         policies:
-          - name: reduce-account-burst-limie
+          - name: correct-rest-account-log-role
             resource: rest-account
             filters:
               - cloudwatchRoleArn: arn:aws:iam::000000000000:role/GatewayLogger
             actions:
               - type: update
                 patch:
-                  -
-                    op: replace
+                  - op: replace
                     path: /cloudwatchRoleArn
                     value: arn:aws:iam::000000000000:role/BetterGatewayLogger
     """
@@ -166,8 +165,7 @@ class UpdateStage(BaseAction):
             actions:
               - type: update
                 patch:
-                  -
-                    op: replace
+                  - op: replace
                     path: /*/*/caching/enabled
                     value: 'false'
     """
@@ -319,8 +317,7 @@ class UpdateRestMethod(BaseAction):
             actions:
               - type: update-method
                 patch:
-                  -
-                    op: replace
+                  - op: replace
                     path: /authorizationType
                     value: AWS_IAM
     """
