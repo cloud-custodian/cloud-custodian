@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }, 
+                "Version": "$LATEST", 
+                "CodeSha256": "8M2BSmxZu6Z8+V8ywJPG+JoRlAhYjSmoauKd8DqMZrY=", 
+                "FunctionName": "envcheck", 
+                "VpcConfig": {
+                    "SubnetIds": [], 
+                    "SecurityGroupIds": []
+                }, 
+                "MemorySize": 128, 
+                "CodeSize": 260, 
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:envcheck", 
+                "Handler": "lambda_function.lambda_handler", 
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+                "Timeout": 3, 
+                "LastModified": "2016-12-24T13:51:31.006+0000", 
+                "Runtime": "python2.7", 
+                "Description": ""
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "45f45fc2-1265-11e8-9406-fbe4a90c6843", 
+            "HTTPHeaders": {
+                "date": "Thu, 15 Feb 2018 15:31:20 GMT", 
+                "x-amzn-requestid": "45f45fc2-1265-11e8-9406-fbe4a90c6843", 
+                "content-length": "680", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}
