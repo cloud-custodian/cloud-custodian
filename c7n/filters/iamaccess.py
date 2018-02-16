@@ -84,10 +84,6 @@ class PolicyChecker(object):
         return self.checker_config.get('whitelist_conditions', ())
 
     @property
-    def allowed_strings(self):
-        return self.checker_config.get('allowed_strings', ())
-
-    @property
     def allowed_vpce(self):
         return self.checker_config.get('allowed_vpce', ())
 
@@ -177,10 +173,6 @@ class PolicyChecker(object):
             return False
         if c['key'] in self.whitelist_conditions:
             return True
-        # check if any of the allowed_strings are a substring
-        # to any of the values in the condition
-        if any(s in v for s in self.allowed_strings for v in c['values']):
-            return True
         handler_name = "handle_%s" % c['key'].replace('-', '_').replace(':', '_')
         handler = getattr(self, handler_name, None)
         if handler is None:
@@ -264,8 +256,6 @@ class CrossAccountAccessFilter(Filter):
         # white list accounts
         whitelist_from=ValuesFrom.schema,
         whitelist={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_strings={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_strings_from=ValuesFrom.schema,
         whitelist_vpce_from=ValuesFrom.schema,
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpc_from=ValuesFrom.schema,
@@ -283,12 +273,10 @@ class CrossAccountAccessFilter(Filter):
             ("aws:userid", "aws:username")))
         self.actions = self.data.get('actions', ())
         self.accounts = self.get_accounts()
-        self.strings = self.get_strings()
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
         self.checker = self.checker_factory(
             {'allowed_accounts': self.accounts,
-             'allowed_strings' : self.strings,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
              'check_actions': self.actions,
@@ -304,13 +292,6 @@ class CrossAccountAccessFilter(Filter):
             accounts = accounts.union(values.get_values())
         accounts.add(owner_id)
         return accounts
-
-    def get_strings(self):
-        strings = set(self.data.get('whitelist_strings', ()))
-        if 'whitelist_strings_from' in self.data:
-            values = ValuesFrom(self.data['whitelist_strings_from'], self.manager)
-            strings = strings.union(values.get_values())
-        return strings
 
     def get_vpcs(self):
         vpc = set(self.data.get('whitelist_vpc', ()))

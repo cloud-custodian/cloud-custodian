@@ -24,6 +24,6 @@ from .core import (
     ValueFilter,
     AgeFilter,
     EventFilter)
-from .iamaccess import CrossAccountAccessFilter
+from .iamaccess import CrossAccountAccessFilter, PolicyChecker
 from .metrics import MetricsFilter, ShieldMetrics
 from .vpc import DefaultVpcBase
