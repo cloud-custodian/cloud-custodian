@@ -317,10 +317,12 @@ class Backup(query.QueryResourceManager):
 
 @Backup.filter_registry.register('age')
 class BackupAge(AgeFilter):
-    """DynamoDB Table Backup Age Filter
-    Filters a DynamoDB table backup based on the age of the backup (in days)
+    """Filters a DynamoDB table backup based on the age of the backup (in days)
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: dynamodb-table-week-old
                 resource: dynamodb-backup
