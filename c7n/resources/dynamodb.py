@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, AgeFilter, OPERATORS
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
@@ -313,6 +313,28 @@ class Backup(query.QueryResourceManager):
         date = 'BackupCreationDateTime'
         dimension = 'TableName'
         config_type = 'AWS::DynamoDB::Table'
+
+
+@Backup.filter_registry.register('age')
+class BackupAge(AgeFilter):
+    """DynamoDB Table Backup Age Filter
+    Filters a DynamoDB table backup based on the age of the backup (in days)
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: dynamodb-table-week-old
+                resource: dynamodb-backup
+                filters:
+                  - type: age
+                    days: 7
+                    op: ge
+    """
+
+    schema = type_schema(
+        'age',
+        days={'type': 'number'},
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+    date_attribute = 'BackupCreationDateTime'
 
 
 @Backup.action_registry.register('delete')
