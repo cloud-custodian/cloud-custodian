@@ -137,6 +137,16 @@ class DynamodbTest(BaseTest):
         tags = client.list_tags_of_resource(ResourceArn=arn)
         self.assertFalse('test_key' in tags)
 
+    def test_dynamodb_backup_age_filter(self):
+        factory = self.replay_flight_data('test_dynamodb_backup_age_filter')
+        p = self.load_policy({
+            'name': 'dynamodb-backup-age-filter',
+            'resource': 'dynamodb-backup',
+            'filters': [{'type': 'age', 'days': 0}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_dynamodb_create_backup(self):
         dt = datetime.datetime.now().replace(
             year=2018, month=1, day=16, hour=19, minute=39)
