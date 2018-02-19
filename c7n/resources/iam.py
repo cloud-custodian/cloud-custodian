@@ -178,8 +178,7 @@ class IamRoleUsage(Filter):
         results = set()
         results.update(self.scan_lambda_roles())
         results.update(self.scan_ecs_roles())
-        results.update(self.scan_asg_roles())
-        results.update(self.scan_ec2_roles())
+        results.update(self.collect_profile_roles())
         return results
 
     def instance_profile_usage(self):
@@ -206,21 +205,39 @@ class IamRoleUsage(Filter):
                         results.append(service['roleArn'])
         return results
 
+    def collect_profile_roles(self):
+        # Collect iam roles attached to instance profiles of EC2/ASG resources
+        profiles = set()
+        profiles.update(self.scan_asg_roles())
+        profiles.update(self.scan_ec2_roles())
+
+        manager = self.manager.get_resource_manager('iam-profile')
+        iprofiles = manager.resources()
+        results = []
+        for p in iprofiles:
+            if p['InstanceProfileName'] not in profiles:
+                continue
+            for role in p.get('Roles', []):
+                results.append(role['RoleName'])
+        return results
+
     def scan_asg_roles(self):
         manager = self.manager.get_resource_manager('launch-config')
-        return [r['IamInstanceProfile'] for r in manager.resources()
-                if 'IamInstanceProfile' in r]
+        return [r['IamInstanceProfile'] for r in manager.resources() if (
+            'IamInstanceProfile' in r)]
 
     def scan_ec2_roles(self):
         manager = self.manager.get_resource_manager('ec2')
         results = []
         for e in manager.resources():
-            if 'Instances' not in e:
+            # do not include instances that have been recently terminated
+            if e['State']['Name'] == 'terminated':
                 continue
-            for i in e['Instances']:
-                if 'IamInstanceProfile' not in i:
-                    continue
-                results.append(i['IamInstanceProfile']['Arn'])
+            profile_arn = e.get('IamInstanceProfile', {}).get('Arn', None)
+            if not profile_arn:
+                continue
+            # split arn to get the profile name
+            results.append(profile_arn.split('/')[-1])
         return results
 
 
@@ -228,10 +245,9 @@ class IamRoleUsage(Filter):
 #    IAM Roles    #
 ###################
 
-
 @Role.filter_registry.register('used')
 class UsedIamRole(IamRoleUsage):
-    """Filter IAM roles that are currently being used
+    """Filter IAM roles that are either being used or not
 
     :example:
 
@@ -242,24 +258,29 @@ class UsedIamRole(IamRoleUsage):
             resource: iam-role
             filters:
               - type: used
+                state: true
     """
 
-    schema = type_schema('used')
+    schema = type_schema(
+        'used',
+        state={'type': 'boolean'})
 
     def process(self, resources, event=None):
         roles = self.service_role_usage()
-        results = []
-        for r in resources:
-            if r['Arn'] in roles or r['RoleName'] in roles:
-                results.append(r)
-        self.log.info(
-            "%d of %d iam roles currently used.", len(results), len(resources))
-        return results
+        if self.data.get('state', True):
+            return [r for r in resources if (
+                r['Arn'] in roles or r['RoleName'] in roles)]
+
+        return [r for r in resources if (
+            r['Arn'] not in roles and r['RoleName'] not in roles)]
 
 
 @Role.filter_registry.register('unused')
 class UnusedIamRole(IamRoleUsage):
-    """Filter IAM roles that are currently not used
+    """Filter IAM roles that are either being used or not
+
+    This filter has been deprecated. Please use the 'used' filter
+    with the 'state' attribute to get unused iam roles
 
     :example:
 
@@ -269,19 +290,14 @@ class UnusedIamRole(IamRoleUsage):
           - name: iam-roles-not-in-use
             resource: iam-role
             filters:
-              - type: unused
+              - type: used
+                state: false
     """
+
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
-        roles = self.service_role_usage()
-        results = []
-        for r in resources:
-            if r['Arn'] not in roles and r['RoleName'] not in roles:
-                results.append(r)
-        self.log.info("%d of %d iam roles not currently used.",
-                      len(results), len(resources))
-        return results
+        return UsedIamRole({'state': False}, self.manager).process(resources)
 
 
 @Role.filter_registry.register('has-inline-policy')
