@@ -674,7 +674,7 @@ class CredentialReport(Filter):
         data = self.fetch_credential_report()
         report = {}
         if isinstance(data, six.binary_type):
-            reader = csv.reader(io.BytesIO(data))
+            reader = csv.reader(io.StringIO(data.decode('utf-8')))
         else:
             reader = csv.reader(io.StringIO(data))
         headers = next(reader)
