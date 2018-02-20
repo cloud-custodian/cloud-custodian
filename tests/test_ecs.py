@@ -214,10 +214,8 @@ class TestEcsContainerInstance(BaseTest):
              session_factory=session_factory)
         resources = p.run()
         client = session_factory().client('ecs')
-        c_instances = client.list_container_instances(
-                cluster='default').get('containerInstanceArns')
         state = client.describe_container_instances(cluster='default',
-                containerInstances=c_instances)['containerInstances'][0]['status']
+                containerInstances=[resources[0]['containerInstanceArn']])['containerInstances'][0]['status']
         self.assertEqual(state, 'DRAINING')
 
     def test_container_instance_activate(self):
@@ -232,10 +230,8 @@ class TestEcsContainerInstance(BaseTest):
              session_factory=session_factory)
         resources = p.run()
         client = session_factory().client('ecs')
-        c_instances = client.list_container_instances(
-                cluster='default').get('containerInstanceArns')
         state = client.describe_container_instances(cluster='default',
-                containerInstances=c_instances)['containerInstances'][0]['status']
+                containerInstances=[resources[0]['containerInstanceArn']])['containerInstances'][0]['status']
         self.assertEqual(state, 'ACTIVE')
 
 
