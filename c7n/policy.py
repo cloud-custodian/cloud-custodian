@@ -697,6 +697,7 @@ class Policy(object):
                 options.region,
                 options.profile,
                 options.assume_role,
+                options.role_session_name,
                 options.external_id)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)

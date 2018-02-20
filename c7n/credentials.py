@@ -26,23 +26,28 @@ from c7n.utils import get_retry
 
 class SessionFactory(object):
 
-    def __init__(self, region, profile=None, assume_role=None, external_id=None):
+    def __init__(self, region, profile=None, assume_role=None, role_session_name=None, external_id=None):
         self.region = region
         self.profile = profile
         self.assume_role = assume_role
+        self.role_session_name = role_session_name
         self.external_id = external_id
+        if role_session_name:
+            self.role_session_name = role_session_name
+        else:
+            self.role_session_name = 'CloudCustodian'
 
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
-                self.assume_role, "CloudCustodian", session,
+                self.assume_role, self.role_session_name, session,
                 region or self.region, self.external_id)
         else:
             session = Session(
                 region_name=region or self.region, profile_name=self.profile)
 
-        session._session.user_agent_name = "CloudCustodian"
+        session._session.user_agent_name = self.role_session_name
         session._session.user_agent_version = version
         return session
 
