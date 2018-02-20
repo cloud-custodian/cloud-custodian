@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,11 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.utils import local_session, type_schema
 
 from .core import Filter, ValueFilter, FilterValidationError
 from .related import RelatedResourceFilter
+
+import jmespath
 
 
 class SecurityGroupFilter(RelatedResourceFilter):
@@ -74,9 +77,9 @@ class NetworkLocation(Filter):
             'type': 'boolean',
             'default': False,
             'description': (
-                "How to handle missing keys on elements, by default this causes "
+                "How to handle missing keys on elements, by default this causes"
                 "resources to be considered not-equal")},
-           'match': {'type': 'string', 'enum': ['equal', 'non-equal'],
+           'match': {'type': 'string', 'enum': ['equal', 'not-equal'],
                      'default': 'non-equal'},
            'compare': {
             'type': 'array',
@@ -92,7 +95,9 @@ class NetworkLocation(Filter):
            'max-cardinality': {
                'type': 'integer', 'default': 1,
                'title': ''},
-           'required': ['key']
+           'ignore': {'type': 'array', 'items': {'type': 'object'}},
+           'required': ['key'],
+
            })
 
     permissions = ('ec2:DescribeSecurityGroups', 'ec2:DescribeSubnets')
@@ -128,13 +133,31 @@ class NetworkLocation(Filter):
         results = []
 
         for r in resources:
-            resource_sgs = [related_sg[sid] for sid in self.sg.get_related_ids([r])]
-            resource_subnets = [
-                related_subnet[sid] for sid in self.subnet.get_related_ids([r])]
+            resource_sgs = self.filter_ignored(
+                [related_sg[sid] for sid in self.sg.get_related_ids([r])])
+            resource_subnets = self.filter_ignored([
+                related_subnet[sid] for sid in self.subnet.get_related_ids([r])])
             found = self.process_resource(r, resource_sgs, resource_subnets, key)
             if found:
                 results.append(found)
 
+        return results
+
+    def filter_ignored(self, resources):
+        ignores = self.data.get('ignore', ())
+        results = []
+
+        for r in resources:
+            found = False
+            for i in ignores:
+                for k, v in i.items():
+                    if jmespath.search(k, r) == v:
+                        found = True
+                if found is True:
+                    break
+            if found is True:
+                continue
+            results.append(r)
         return results
 
     def process_resource(self, r, resource_sgs, resource_subnets, key):

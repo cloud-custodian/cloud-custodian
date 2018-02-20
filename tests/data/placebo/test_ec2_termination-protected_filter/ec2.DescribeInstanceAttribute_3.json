@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InstanceId": "i-02117c13e1d21b229", 
+        "DisableApiTermination": {
+            "Value": false
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7f7f48f4-153b-4e38-91d4-20374a4ae3d2", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 04 Dec 2017 15:42:55 GMT"
+            }
+        }
+    }
+}

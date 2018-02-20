@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 """
 Resource Filtering Logic
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 import fnmatch
 import logging
 import operator
@@ -24,8 +26,9 @@ import re
 from dateutil.tz import tzutc
 from dateutil.parser import parse
 import jmespath
-import ipaddress
+import six
 
+from c7n import ipaddress
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
@@ -41,13 +44,13 @@ ANNOTATION_KEY = "c7n:MatchedFilters"
 
 
 def glob_match(value, pattern):
-    if not isinstance(value, basestring):
+    if not isinstance(value, six.string_types):
         return False
     return fnmatch.fnmatch(value, pattern)
 
 
 def regex_match(value, regex):
-    if not isinstance(value, basestring):
+    if not isinstance(value, six.string_types):
         return False
     # Note python 2.5+ internally cache regex
     # would be nice to use re2
@@ -60,6 +63,10 @@ def operator_in(x, y):
 
 def operator_ni(x, y):
     return x not in y
+
+
+def intersect(x, y):
+    return bool(set(x).intersection(y))
 
 
 OPERATORS = {
@@ -80,7 +87,8 @@ OPERATORS = {
     'in': operator_in,
     'ni': operator_ni,
     'not-in': operator_ni,
-    'contains': operator.contains}
+    'contains': operator.contains,
+    'intersect': intersect}
 
 
 class FilterRegistry(PluginRegistry):
@@ -108,14 +116,15 @@ class FilterRegistry(PluginRegistry):
 
         # Make the syntax a little nicer for common cases.
         if isinstance(data, dict) and len(data) == 1 and 'type' not in data:
-            if data.keys()[0] == 'or':
+            op = list(data.keys())[0]
+            if op == 'or':
                 return Or(data, self, manager)
-            elif data.keys()[0] == 'and':
+            elif op == 'and':
                 return And(data, self, manager)
-            elif data.keys()[0] == 'not':
+            elif op == 'not':
                 return Not(data, self, manager)
             return ValueFilter(data, manager).validate()
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             filter_type = data
             data = {'type': data}
         else:
@@ -126,7 +135,7 @@ class FilterRegistry(PluginRegistry):
                     self.plugin_type, data))
         filter_class = self.get(filter_type)
         if filter_class is not None:
-            return filter_class(data, manager).validate()
+            return filter_class(data, manager)
         else:
             raise FilterValidationError(
                 "%s Invalid filter type %s" % (
@@ -159,7 +168,7 @@ class Filter(object):
 
     def process(self, resources, event=None):
         """ Bulk process resources and return filtered set."""
-        return filter(self, resources)
+        return list(filter(self, resources))
 
 
 class Or(Filter):
@@ -167,7 +176,7 @@ class Or(Filter):
     def __init__(self, data, registry, manager):
         super(Or, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
     def process(self, resources, event=None):
@@ -197,7 +206,7 @@ class And(Filter):
     def __init__(self, data, registry, manager):
         super(And, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
 
     def process(self, resources, events=None):
         for f in self.filters:
@@ -210,7 +219,7 @@ class Not(Filter):
     def __init__(self, data, registry, manager):
         super(Not, self).__init__(data)
         self.registry = registry
-        self.filters = registry.parse(self.data.values()[0], manager)
+        self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
     def process(self, resources, event=None):
@@ -267,7 +276,7 @@ class ValueFilter(Filter):
                 {'type': 'boolean'},
                 {'type': 'number'},
                 {'type': 'null'}]},
-            'op': {'enum': OPERATORS.keys()}}}
+            'op': {'enum': list(OPERATORS.keys())}}}
 
     annotate = True
 
@@ -414,7 +423,7 @@ class ValueFilter(Filter):
         return False
 
     def process_value_type(self, sentinel, value, resource):
-        if self.vtype == 'normalize' and isinstance(value, basestring):
+        if self.vtype == 'normalize' and isinstance(value, six.string_types):
             return sentinel, value.strip().lower()
 
         elif self.vtype == 'expr':
@@ -433,14 +442,14 @@ class ValueFilter(Filter):
         elif self.vtype == 'swap':
             return value, sentinel
         elif self.vtype == 'age':
-            if not isinstance(sentinel, datetime):
-                sentinel = datetime.now(tz=tzutc()) - timedelta(sentinel)
+            if not isinstance(sentinel, datetime.datetime):
+                sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
 
-            if not isinstance(value, datetime):
+            if not isinstance(value, datetime.datetime):
                 # EMR bug when testing ages in EMR. This is due to
                 # EMR not having more functionality.
                 try:
-                    value = parse(value, default=datetime.now(tz=tzutc()))
+                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
                 except (AttributeError, TypeError, ValueError):
                     value = 0
 
@@ -463,12 +472,12 @@ class ValueFilter(Filter):
         # Allows for expiration filtering, for events in the future as opposed
         # to events in the past which age filtering allows for.
         elif self.vtype == 'expiration':
-            if not isinstance(sentinel, datetime):
-                sentinel = datetime.now(tz=tzutc()) + timedelta(sentinel)
+            if not isinstance(sentinel, datetime.datetime):
+                sentinel = datetime.datetime.now(tz=tzutc()) + timedelta(sentinel)
 
-            if not isinstance(value, datetime):
+            if not isinstance(value, datetime.datetime):
                 try:
-                    value = parse(value, default=datetime.now(tz=tzutc()))
+                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
                 except (AttributeError, TypeError, ValueError):
                     value = 0
 
@@ -494,7 +503,7 @@ class AgeFilter(Filter):
 
     def get_resource_date(self, i):
         v = i[self.date_attribute]
-        if not isinstance(v, datetime):
+        if not isinstance(v, datetime.datetime):
             v = parse(v)
         if not v.tzinfo:
             v = v.replace(tzinfo=tzutc())
@@ -513,9 +522,9 @@ class AgeFilter(Filter):
             minutes = self.data.get('minutes', 0)
             # Work around placebo issues with tz
             if v.tzinfo:
-                n = datetime.now(tz=tzutc())
+                n = datetime.datetime.now(tz=tzutc())
             else:
-                n = datetime.now()
+                n = datetime.datetime.now()
             self.threshold_date = n - timedelta(days=days, hours=hours, minutes=minutes)
 
         return op(self.threshold_date, v)

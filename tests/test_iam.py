@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,18 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import json
 import datetime
 import os
 import tempfile
 
 from unittest import TestCase
-from common import load_data, BaseTest
-from test_offhours import mock_datetime_now
+from .common import load_data, BaseTest, functional
+from .test_offhours import mock_datetime_now
 
 from dateutil import parser
 
-from c7n.filters.iamaccess import check_cross_account, CrossAccountAccessFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (
@@ -31,7 +33,7 @@ from c7n.resources.iam import (
     UsedInstanceProfiles,
     UnusedInstanceProfiles,
     UsedIamRole, UnusedIamRole,
-    IamGroupUsers, UserPolicy,
+    IamGroupUsers, UserPolicy, GroupMembership,
     UserCredentialReport, UserAccessKey,
     IamRoleInlinePolicy, IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy, NoSpecificIamRoleManagedPolicy)
@@ -168,7 +170,9 @@ class IamRoleFilterUsage(BaseTest):
         p = self.load_policy({
             'name': 'iam-inuse-role',
             'resource': 'iam-role',
-            'filters': ['used']}, session_factory=session_factory)
+            'filters': [{
+                'type': 'used',
+                'state': True}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
 
@@ -181,10 +185,40 @@ class IamRoleFilterUsage(BaseTest):
             'resource': 'iam-role',
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 1)
 
 
-class IamUserFilterUsage(BaseTest):
+class IamUserTest(BaseTest):
+
+    @functional
+    def test_iam_user_delete(self):
+        # To get this test to work against live AWS I had to attach the
+        # following explicit policy.  Even root accounts don't work
+        # without this policy:
+        #
+        # {
+        #     "Version": "2012-10-17",
+        #     "Statement": [{
+        #         "Effect": "Allow",
+        #         "Action": ["iam:*"],
+        #         "Resource": "*"
+        #     }]
+        # }
+
+        factory = self.replay_flight_data('test_iam_user_delete')
+        name = 'alice'
+        client = factory().client('iam')
+        client.create_user(UserName=name, Path="/test/")
+        p = self.load_policy({
+            'name': 'iam-user-delete',
+            'resource': 'iam-user',
+            'filters': [{'UserName': name}],
+            'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        users = client.list_users(PathPrefix="/test/").get('Users', [])
+        self.assertEqual(users, [])
 
     def test_iam_user_policy(self):
         session_factory = self.replay_flight_data(
@@ -217,6 +251,27 @@ class IamUserFilterUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['UserName'], 'alphabet_soup')
+
+
+class IamUserGroupMembership(BaseTest):
+
+    def test_iam_user_group_membership(self):
+        session_factory = self.replay_flight_data(
+            'test_iam_user_group_membership')
+        self.patch(
+            GroupMembership, 'executor_factory', MainThreadExecutor)
+        p = self.load_policy({
+            'name': 'iam-admin-users',
+            'resource': 'iam-user',
+            'filters': [{
+                'type': 'group',
+                'key': 'GroupName',
+                'value': 'QATester'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserName'], 'kapil')
+        self.assertTrue(resources[0]['c7n:Groups'])
 
 
 class IamInstanceProfileFilterUsage(BaseTest):
@@ -329,6 +384,7 @@ class IamGroupFilterUsage(BaseTest):
                 'value': False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
 
 class IamManagedPolicyUsage(BaseTest):
 
@@ -653,7 +709,6 @@ class SNSCrossAccount(BaseTest):
         arn = client.create_topic(Name=topic_name)['TopicArn']
         self.addCleanup(client.delete_topic, TopicArn=arn)
 
-
         policy = {
             'Id': 'Foo',
             "Version": "2012-10-17",
@@ -691,13 +746,62 @@ class CrossAccountChecker(TestCase):
                 {'Action': 'SQS:SendMessage',
                  'Effect': 'Allow',
                  'NotPrincipal': '90120'}]}
-        self.assertTrue(
-            bool(check_cross_account(policy, set(['221800032964']))))
+
+        checker = PolicyChecker(
+            {'allowed_accounts': set(['221800032964'])})
+
+        self.assertTrue(bool(checker.check(policy)))
 
     def test_sqs_policies(self):
         policies = load_data('iam/sqs-policies.json')
+
+        checker = PolicyChecker(
+            {'allowed_accounts': set(['221800032964'])})
         for p, expected in zip(
                 policies, [False, True, True, False,
                            False, False, False, False]):
-            violations = check_cross_account(p, set(['221800032964']))
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies(self):
+        policies = load_data('iam/s3-policies.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012']),
+            'allowed_vpc': set(['vpc-12345678']),
+            'allowed_vpce': set(['vpce-12345678', 'vpce-87654321'])})
+        for p, expected in zip(
+                policies, [True, False, False, True, False,
+                           True, False, True, False, True, False,
+                           True, False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_vpc(self):
+        policies = load_data('iam/s3-policies.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012'])})
+        for p, expected in zip(
+                policies, [True, False, False, True, False,
+                           True, False, False, False, False, False,
+                           True, False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_multiple_conditions(self):
+        policies = load_data('iam/s3-conditions.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012']),
+            'allowed_vpc': set(['vpc-12345678'])})
+        for p, expected in zip(
+                policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_everyone_only(self):
+        policies = load_data('iam/s3-principal.json')
+        checker = PolicyChecker({
+            'everyone_only': True})
+        for p, expected in zip(
+                policies, [True, True, False, False, False, False]):
+            violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

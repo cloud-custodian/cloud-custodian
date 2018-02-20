@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"RemoveMe\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a953a8c9-06cb-11e8-96a3-61eda9c2b1e6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a953a8c9-06cb-11e8-96a3-61eda9c2b1e6", 
+                "content-length": "373", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

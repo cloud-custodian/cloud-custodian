@@ -3,45 +3,28 @@
     "data": {
         "Subnets": [
             {
-                "VpcId": "vpc-d2d616b5", 
-                "CidrBlock": "172.31.48.0/20", 
-                "MapPublicIpOnLaunch": true, 
-                "DefaultForAz": true, 
-                "State": "available", 
-                "AvailabilityZone": "us-east-1d", 
-                "SubnetId": "subnet-3a334610", 
-                "AvailableIpAddressCount": 4086
-            }, 
-            {
-                "VpcId": "vpc-d2d616b5", 
-                "CidrBlock": "172.31.32.0/20", 
-                "MapPublicIpOnLaunch": true, 
-                "DefaultForAz": true, 
-                "State": "available", 
-                "AvailabilityZone": "us-east-1e", 
-                "SubnetId": "subnet-e3b194de", 
-                "AvailableIpAddressCount": 4090
-            }, 
-            {
-                "VpcId": "vpc-885c83ee", 
-                "CidrBlock": "10.4.8.0/24", 
-                "MapPublicIpOnLaunch": false, 
+                "AvailabilityZone": "us-east-1c", 
+                "AvailableIpAddressCount": 250, 
                 "DefaultForAz": false, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-c3c27aba", 
                 "State": "available", 
-                "AvailabilityZone": "us-east-1e", 
-                "SubnetId": "subnet-ed02abd1", 
-                "AvailableIpAddressCount": 250
+                "MapPublicIpOnLaunch": false, 
+                "SubnetId": "subnet-55061130", 
+                "CidrBlock": "10.4.8.0/24", 
+                "AssignIpv6AddressOnCreation": false
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "ef1370c8-b601-41d0-8b6c-540473838182", 
+            "RequestId": "ef63665d-a972-4d37-abad-6bf38f68283a", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Fri, 16 Dec 2016 22:06:11 GMT"
+                "date": "Tue, 27 Jun 2017 15:38:05 GMT"
             }
         }
     }

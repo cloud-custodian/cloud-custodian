@@ -1,56 +1,11 @@
 {
     "status_code": 200, 
     "data": {
-        "ETag": "ECV5UDKDP4MAI", 
+        "ETag": "E27DQSWE12IQQF", 
         "DistributionConfig": {
             "Comment": "", 
             "CacheBehaviors": {
-                "Items": [
-                    {
-                        "TrustedSigners": {
-                            "Enabled": false, 
-                            "Quantity": 0
-                        }, 
-                        "LambdaFunctionAssociations": {
-                            "Quantity": 0
-                        }, 
-                        "TargetOriginId": "S3-test", 
-                        "ViewerProtocolPolicy": "allow-all", 
-                        "ForwardedValues": {
-                            "Headers": {
-                                "Quantity": 0
-                            }, 
-                            "Cookies": {
-                                "Forward": "none"
-                            }, 
-                            "QueryStringCacheKeys": {
-                                "Quantity": 0
-                            }, 
-                            "QueryString": false
-                        }, 
-                        "MaxTTL": 31536000, 
-                        "PathPattern": "allowpath", 
-                        "SmoothStreaming": false, 
-                        "DefaultTTL": 86400, 
-                        "AllowedMethods": {
-                            "Items": [
-                                "HEAD", 
-                                "GET"
-                            ], 
-                            "CachedMethods": {
-                                "Items": [
-                                    "HEAD", 
-                                    "GET"
-                                ], 
-                                "Quantity": 2
-                            }, 
-                            "Quantity": 2
-                        }, 
-                        "MinTTL": 0, 
-                        "Compress": false
-                    }
-                ], 
-                "Quantity": 1
+                "Quantity": 0
             }, 
             "IsIPV6Enabled": true, 
             "Logging": {
@@ -66,19 +21,19 @@
                         "S3OriginConfig": {
                             "OriginAccessIdentity": ""
                         }, 
-                        "OriginPath": "", 
+                        "OriginPath": "/distribution", 
                         "CustomHeaders": {
                             "Quantity": 0
                         }, 
-                        "Id": "S3-test", 
-                        "DomainName": "test.s3.amazonaws.com"
+                        "Id": "S3-c7n-cloudfront-test/distribution", 
+                        "DomainName": "c7n-cloudfront-test.s3.amazonaws.com"
                     }
                 ], 
                 "Quantity": 1
             }, 
             "DefaultRootObject": "", 
             "PriceClass": "PriceClass_All", 
-            "Enabled": true, 
+            "Enabled": false, 
             "DefaultCacheBehavior": {
                 "TrustedSigners": {
                     "Enabled": false, 
@@ -87,7 +42,7 @@
                 "LambdaFunctionAssociations": {
                     "Quantity": 0
                 }, 
-                "TargetOriginId": "S3-test", 
+                "TargetOriginId": "S3-c7n-cloudfront-test/distribution", 
                 "ViewerProtocolPolicy": "allow-all", 
                 "ForwardedValues": {
                     "Headers": {
@@ -121,7 +76,7 @@
                 "MinTTL": 0, 
                 "Compress": false
             }, 
-            "CallerReference": "1495213368662", 
+            "CallerReference": "0.438098291625", 
             "ViewerCertificate": {
                 "CloudFrontDefaultCertificate": true, 
                 "MinimumProtocolVersion": "SSLv3", 
@@ -144,13 +99,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "e5e9da08-3cd8-11e7-9937-956ff2dbf698", 
+            "RequestId": "cf51252f-587c-11e7-a75d-2de839db865d", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "e5e9da08-3cd8-11e7-9937-956ff2dbf698", 
-                "content-length": "3057", 
+                "x-amzn-requestid": "cf51252f-587c-11e7-a75d-2de839db865d", 
+                "content-length": "2233", 
                 "vary": "Accept-Encoding", 
-                "etag": "ECV5UDKDP4MAI", 
-                "date": "Fri, 19 May 2017 21:19:52 GMT", 
+                "etag": "E27DQSWE12IQQF", 
+                "date": "Sat, 24 Jun 2017 01:31:13 GMT", 
                 "content-type": "text/xml"
             }
         }

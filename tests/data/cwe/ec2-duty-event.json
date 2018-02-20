@@ -1,0 +1,51 @@
+{
+    "account": "101010101111",
+    "region": "us-east-1",
+    "detail": {
+        "description": "EC2 instance i-99999999 is querying a domain name associated with a known Command & Control server.",
+        "resource": {
+            "resourceType": "Instance",
+            "instanceDetails": {
+                "instanceId": "i-99999999"
+            }
+        },
+        "severity": 5,
+        "service": {
+            "count": 1,
+            "additionalInfo": {
+                "sample": true
+            },
+            "archived": false,
+            "resourceRole": "TARGET",
+            "eventFirstSeen": "2017-12-08T15:32:49Z",
+            "detectorId": "c0b018e3eb2130078632d999e41d4f02",
+            "action": {
+                "actionType": "DNS_REQUEST",
+                "dnsRequestAction": {
+                    "domain": "example.com",
+                    "protocol": "TCP",
+                    "blocked": false
+                }
+            },
+            "serviceName": "guardduty",
+            "eventLastSeen": "2017-12-08T15:32:49Z"
+        },
+        "title": "Command and Control server domain name queried by EC2 instance i-99999999.",
+        "region": "us-east-1",
+        "partition": "aws",
+        "createdAt": "2017-12-08T15:32:49.865Z",
+        "updatedAt": "2017-12-08T15:32:49.865Z",
+        "schemaVersion": "2.0",
+        "type": "Backdoor:EC2/C&CActivity.B!DNS",
+        "id": "b4b01b60fc24a199139f8f5f490edd81",
+        "arn": "arn:aws:guardduty:us-east-1:883606788610:detector/883606788610/finding/b4b01b60fc24a199139f8f5f490edd81",
+        "accountId": "883606788610"
+    },
+    "detail-type": "GuardDuty Finding",
+    "source": "aws.guardduty",
+    "version": "0",
+    "time": "1970-01-01T00:00:00Z",
+    "debug": true,
+    "id": "8f5fa7d9-5558-33dc-449c-c890a0c38127",
+    "resources": []
+}

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
@@ -33,6 +35,7 @@ class Alarm(QueryResourceManager):
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
         dimension = None
+        config_type = 'AWS::CloudWatch::Alarm'
 
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -43,7 +46,7 @@ class AlarmDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-delete-stale-alarms
@@ -107,7 +110,7 @@ class Retention(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-set-log-group-retention
@@ -135,7 +138,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-delete-stale-log-group
@@ -162,7 +165,7 @@ class LastWriteDays(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: cloudwatch-stale-groups

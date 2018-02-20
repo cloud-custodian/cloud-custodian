@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from dateutil import tz
 
 from datetime import datetime, timedelta
@@ -19,7 +21,7 @@ import unittest
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
-from common import instance, event_data, Bag
+from .common import instance, event_data, Bag
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -33,7 +35,7 @@ class BaseFilterTest(unittest.TestCase):
         try:
             self.assertEqual(filters.factory(f)(i), v)
         except AssertionError:
-            print f, i['LaunchTime'], i['Tags'], v
+            print(f, i['LaunchTime'], i['Tags'], v)
             raise
 
 
@@ -217,11 +219,11 @@ class TestRegexValue(unittest.TestCase):
     def test_regex_validate(self):
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {'type': 'value',
-             'key': 'Color',
-             'value': '*green',
-             'op': 'regex'})
+            filters.factory({
+                'type': 'value',
+                'key': 'Color',
+                'value': '*green',
+                'op': 'regex'}).validate)
 
     def test_regex_match(self):
         f = filters.factory(
@@ -363,7 +365,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 1,
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
         # Bad `value`
         f = {
@@ -373,7 +375,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 'foo',
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
         # Missing `op`
         f = {
@@ -382,7 +384,7 @@ class TestValueTypes(BaseFilterTest):
             'value': 1,
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, {})
+            base_filters.FilterValidationError, filters.factory(f, {}).validate)
 
 
 class TestInstanceAge(BaseFilterTest):
@@ -486,8 +488,9 @@ class EventFilterTest(BaseFilterTest):
         f = {'type': 'event',
              'key': 'detail.state',
              'value': 'pending'}
+        f = filters.factory(f, b)
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory, f, b)
+            base_filters.FilterValidationError,  f.validate)
 
 
 class TestInstanceValue(BaseFilterTest):
@@ -542,21 +545,20 @@ class TestInstanceValue(BaseFilterTest):
     def test_complex_validator(self):
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"key": "xyz",
-             "type": "value"})
+            filters.factory({
+                "key": "xyz", "type": "value"}).validate)
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"value": "xyz",
-             "type": "value"})
+            filters.factory({
+                "value": "xyz", "type": "value"}).validate)
+
         self.assertRaises(
             base_filters.FilterValidationError,
-            filters.factory,
-            {"key": "xyz",
-             "value": "xyz",
-             "op": "oo",
-             "type": "value"})
+            filters.factory({
+                "key": "xyz",
+                "value": "xyz",
+                "op": "oo",
+                "type": "value"}).validate)
 
     def test_complex_value_filter(self):
         self.assertFilter(

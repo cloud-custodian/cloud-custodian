@@ -1,14 +1,14 @@
 {
     "status_code": 200, 
     "data": {
-        "ETag": "E3T6C0WOHPJBPM", 
+        "ETag": "ESQV6E7LIJQXR", 
         "StreamingDistribution": {
             "Status": "InProgress", 
-            "DomainName": "sjvgg4ushszuv.cloudfront.net", 
+            "DomainName": "s2evvobv5w5jln.cloudfront.net", 
             "StreamingDistributionConfig": {
                 "S3Origin": {
                     "OriginAccessIdentity": "", 
-                    "DomainName": "test.s3.amazonaws.com"
+                    "DomainName": "rando20170506.s3.amazonaws.com"
                 }, 
                 "Comment": "", 
                 "Logging": {
@@ -22,7 +22,7 @@
                     "Enabled": false, 
                     "Quantity": 0
                 }, 
-                "CallerReference": "1495228375713", 
+                "CallerReference": "1498268099518", 
                 "Aliases": {
                     "Quantity": 0
                 }
@@ -32,27 +32,27 @@
                 "Quantity": 0
             }, 
             "LastModifiedTime": {
-                "hour": 21, 
+                "hour": 1, 
                 "__class__": "datetime", 
-                "month": 5, 
-                "second": 11, 
-                "microsecond": 852000, 
+                "month": 6, 
+                "second": 3, 
+                "microsecond": 787000, 
                 "year": 2017, 
-                "day": 19, 
-                "minute": 16
+                "day": 24, 
+                "minute": 36
             }, 
-            "Id": "E1MC9NC81TK286", 
-            "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E1MC9NC81TK286"
+            "Id": "E3R1TPTJ12ZQLQ", 
+            "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E3R1TPTJ12ZQLQ"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "624c00ef-3cd8-11e7-af79-07e1379b8dee", 
+            "RequestId": "7c47b5d7-587d-11e7-a2d0-c7d9d46d8e4d", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "624c00ef-3cd8-11e7-af79-07e1379b8dee", 
-                "date": "Fri, 19 May 2017 21:16:11 GMT", 
-                "content-length": "959", 
-                "etag": "E3T6C0WOHPJBPM", 
+                "x-amzn-requestid": "7c47b5d7-587d-11e7-a2d0-c7d9d46d8e4d", 
+                "date": "Sat, 24 Jun 2017 01:36:03 GMT", 
+                "content-length": "969", 
+                "etag": "ESQV6E7LIJQXR", 
                 "content-type": "text/xml"
             }
         }

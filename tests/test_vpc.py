@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from common import BaseTest, Bag, functional
+from .common import BaseTest, functional, event_data
 from c7n.filters import FilterValidationError
 
 
@@ -35,7 +36,7 @@ class VpcTest(BaseTest):
             'resource': 'vpc',
             'filters': [
                 {'VpcId': vpc_id},
-                'flow-logs']},
+                 'flow-logs']},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -67,42 +68,43 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @functional
     def test_flow_logs_absent(self):
-        """Test that ONLY vpcs with no flow logs are retained
-
-        'vpc-4a9ff72e' - has no flow logs
-        'vpc-d0e386b7' - has flow logs
-        """
+        # Test that ONLY vpcs with no flow logs are retained
+        #
+        # 'vpc-4a9ff72e' - has no flow logs
+        # 'vpc-d0e386b7' - has flow logs
         factory = self.replay_flight_data(
             'test_vpc_flow_logs_absent')
-
-        vpc_id1 = 'vpc-4a9ff72e'
+        session = factory()
+        ec2 = session.client('ec2')
+        vpc_id = ec2.create_vpc(CidrBlock="10.4.0.0/24")['Vpc']['VpcId']
+        self.addCleanup(ec2.delete_vpc, VpcId=vpc_id)
 
         p = self.load_policy({
             'name': 'net-find',
             'resource': 'vpc',
             'filters': [
-                {'VpcId': vpc_id1},
+                {'VpcId': vpc_id},
                 'flow-logs']},
             session_factory=factory)
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['VpcId'], vpc_id1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id)
 
-    @functional
     def test_flow_logs_misconfiguration(self):
-        """Validate that each VPC has at least one valid configuration
-
-        In terms of filters, we then want to flag VPCs for which every
-        flow log configuration has at least one invalid value
-
-        Here - have 2 vpcs ('vpc-4a9ff72e','vpc-d0e386b7')
-        The first has three flow logs which each have different misconfigured properties
-        The second has one correctly configured flow log, and one where all config is bad
-
-        Only the first should be returned by the filter"""
+        # Validate that each VPC has at least one valid configuration
+        #
+        # In terms of filters, we then want to flag VPCs for which every
+        # flow log configuration has at least one invalid value
+        #
+        # Here - have 2 vpcs ('vpc-4a9ff72e','vpc-d0e386b7')
+        #
+        # The first has three flow logs which each have different
+        # misconfigured properties The second has one correctly
+        # configured flow log, and one where all config is bad
+        #
+        # Only the first should be returned by the filter
 
         factory = self.replay_flight_data(
             'test_vpc_flow_logs_misconfigured')
@@ -133,12 +135,42 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
+    def test_attributes_filter_all(self):
+        self.session_factory = self.replay_flight_data('test_vpc_attributes')
+        p = self.load_policy({
+            'name': 'dns-hostnames-and-support-enabled',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'vpc-attributes',
+                'dnshostnames': True,
+                'dnssupport': True
+            }]
+        }, session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
+    def test_attributes_filter_hostnames(self):
+        self.session_factory = self.replay_flight_data(
+            'test_vpc_attributes_hostnames')
+        p = self.load_policy({
+            'name': 'dns-hostnames-enabled',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'vpc-attributes',
+                'dnshostnames': True
+            }]
+        }, session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
 
 class NetworkLocationTest(BaseTest):
 
-    @functional
     def test_network_location_sg_missing(self):
-        self.factory = self.replay_flight_data('test_network_location_sg_missing_loc')
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_missing_loc')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -162,8 +194,10 @@ class NetworkLocationTest(BaseTest):
 
         nic = client.create_network_interface(
             SubnetId=web_sub_id,
-            Groups=[sg_id, web_sg_id])['NetworkInterface']['NetworkInterfaceId']
-        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+            Groups=[sg_id, web_sg_id]
+            )['NetworkInterface']['NetworkInterfaceId']
+        self.addCleanup(
+            client.delete_network_interface, NetworkInterfaceId=nic)
 
         client.create_tags(
             Resources=[nic, web_sg_id, web_sub_id],
@@ -187,8 +221,64 @@ class NetworkLocationTest(BaseTest):
             }])
 
     @functional
+    def test_network_location_ignore(self):
+        # if we use network-location-with ignore we won't find any resources.
+
+        # Note we're reusing another tests data set, with the exact same
+        # resource creation, just altering our policy filter to examine
+        # a different parameter on results.
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_cardinality')
+        client = self.factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+                'Subnet']['SubnetId']
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier",
+            VpcId=vpc_id,
+            Description="for apps")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        db_sg_id = client.create_security_group(
+            GroupName="db-tier",
+            VpcId=vpc_id,
+            Description="for dbs")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=db_sg_id)
+
+        nic = client.create_network_interface(
+            SubnetId=web_sub_id,
+            Groups=[web_sg_id, db_sg_id])['NetworkInterface']['NetworkInterfaceId']
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id, web_sub_id, nic],
+            Tags=[{'Key': 'Location', 'Value': 'web'}])
+        client.create_tags(
+            Resources=[db_sg_id],
+            Tags=[{'Key': 'Location', 'Value': 'db'}])
+
+        p = self.load_policy({
+            'name': 'netloc',
+            'resource': 'eni',
+            'filters': [
+                {'NetworkInterfaceId': nic},
+                {'type': 'network-location',
+                 'ignore': [
+                     {'GroupName': 'db-tier'}],
+                 'key': 'tag:Location'}]
+            }, session_factory=self.factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
     def test_network_location_sg_cardinality(self):
-        self.factory = self.replay_flight_data('test_network_location_sg_cardinality')
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_cardinality')
         client = self.factory().client('ec2')
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -321,7 +411,6 @@ class NetworkLocationTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
 
-
 class NetworkAclTest(BaseTest):
 
     @functional
@@ -422,6 +511,82 @@ class NetworkInterfaceTest(BaseTest):
         results = client.describe_network_interfaces(
             NetworkInterfaceIds=[net_id])['NetworkInterfaces']
         self.assertEqual([g['GroupId'] for g in results[0]['Groups']], [qsg_id])
+
+
+class RouteTableTest(BaseTest):
+
+    def test_rt_subnet_filter(self):
+        factory = self.replay_flight_data('test_rt_subnet_filter')
+        p = self.load_policy({
+            'name': 'subnet-find',
+            'resource': 'route-table',
+            'filters': [
+                {'RouteTableId': 'rtb-309e3d5b'},
+                {'type': 'subnet',
+                 'key': 'tag:Name',
+                 'value': 'Somewhere'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-389e3d53'])
+
+    def test_rt_route_filter(self):
+        factory = self.replay_flight_data('test_rt_route_filter')
+        p = self.load_policy({
+            'name': 'subnet-find',
+            'resource': 'route-table',
+            'filters': [
+                {'RouteTableId': 'rtb-309e3d5b'},
+                {'type': 'route',
+                 'key': 'GatewayId',
+                 'op': 'glob',
+                 'value': 'igw*'}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(
+            resources[0]['c7n:matched-routes'],
+            [{u'DestinationCidrBlock': '0.0.0.0/0',
+              u'GatewayId': 'igw-3d9e3d56',
+              u'Origin': 'CreateRoute',
+              u'State': 'active'}])
+
+
+class PeeringConnectionTest(BaseTest):
+
+    def test_peer_missing_route(self):
+        # peer from all routes
+        factory = self.replay_flight_data('test_peer_miss_route_filter')
+        p = self.load_policy({
+            'name': 'route-miss',
+            'resource': 'peering-connection',
+            'filters': [
+                {'type': 'missing-route'}]
+             }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['VpcPeeringConnectionId'], 'pcx-36096b5f')
+
+    def test_peer_missing_one_route(self):
+        # peer in one route table, with both sides in the same account
+        factory = self.replay_flight_data('test_peer_miss_route_filter_one')
+        p = self.load_policy({
+            'name': 'route-miss',
+            'resource': 'peering-connection',
+            'filters': [
+                {'type': 'missing-route'}]
+             }, session_factory=factory, config=dict(account_id='619193117841'))
+        resources = p.run()
+        self.assertEqual(resources[0]['VpcPeeringConnectionId'], 'pcx-36096b5f')
+
+    def test_peer_missing_not_found(self):
+        # peer in all sides in a single account.
+        factory = self.replay_flight_data('test_peer_miss_route_filter_not_found')
+        p = self.load_policy({
+            'name': 'route-miss',
+            'resource': 'peering-connection',
+            'filters': [
+                {'type': 'missing-route'}]
+             }, session_factory=factory, config=dict(account_id='619193117841'))
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
 
 class SecurityGroupTest(BaseTest):
@@ -561,7 +726,7 @@ class SecurityGroupTest(BaseTest):
               u'UserIdGroupPairs': []}])
 
     @functional
-    def test_self_reference(self):
+    def test_self_reference_once(self):
         factory = self.replay_flight_data(
             'test_security_group_self_reference')
         client = factory().client('ec2')
@@ -627,12 +792,14 @@ class SecurityGroupTest(BaseTest):
             'name': 'sg-find0',
             'resource': 'security-group',
             'filters': [
+                {'GroupName': 'sg1'},
                 {'type': 'ingress',
-                 'SelfReference': False},
-                {'GroupName': 'sg1'}]
+                 'match-operator': 'and',
+                 'Ports': [80],
+                 'SelfReference': False}]
             }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
 
         p = self.load_policy({
             'name': 'sg-find1',
@@ -791,15 +958,56 @@ class SecurityGroupTest(BaseTest):
             'test_security_group_config_source')
         p = self.load_policy({
             'name': 'sg-test',
+            'resource': 'security-group',
+            'filters': [{'GroupId': 'sg-6c7fa917'}]},
+            session_factory=factory)
+        d_resources = p.run()
+        self.assertEqual(len(d_resources), 1)
+
+        p = self.load_policy({
+            'name': 'sg-test',
             'source': 'config',
             'resource': 'security-group',
             'filters': [
                 {'type': 'default-vpc'},
-                {'GroupName': 'default'}]},
+                {'GroupId': 'sg-6c7fa917'}]},
             session_factory=factory)
-        resources = p.run()
+        c_resources = p.run()
+
+        self.assertEqual(len(c_resources), 1)
+        self.assertEqual(c_resources[0]['GroupId'], 'sg-6c7fa917')
+        self.maxDiff = None
+        self.assertEqual(c_resources, d_resources)
+
+        p = self.load_policy({
+            'name': 'sg-test',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Cidr': {'value': '108.56.181.242/32'},
+                 }]},
+            session_factory=factory)
+        c_resources = p.run()
+        self.assertEqual(len(c_resources), 1)
+        self.assertEqual(c_resources[0]['GroupId'], 'sg-6c7fa917')
+
+    def test_config_rule(self):
+        factory = self.replay_flight_data(
+            'test_security_group_config_rule')
+        p = self.load_policy({
+            'name': 'sg-test',
+            'mode': {'type': 'config-rule'},
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Cidr': {'value': '0.0.0.0/0'},
+                 }]},
+            session_factory=factory)
+        mode = p.get_execution_mode()
+        event = event_data('event-config-rule-security-group.json')
+        resources = mode.run(event, None)
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
+        self.assertEqual(resources[0]['GroupId'], 'sg-e2fb6999')
 
     def test_only_ports_ingress(self):
         p = self.load_policy({
@@ -881,6 +1089,149 @@ class SecurityGroupTest(BaseTest):
                       {'Key': 'Key', 'Value': 'Name'}],
              'VpcId': 'vpc-1234abcd'}
         ]
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    def test_self_reference_ingress_false_positives(self):
+        resources = [
+            {'Description': 'Typical Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestSG',
+             'IpPermissions': [{'FromPort': 22,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': [],
+                                'PrefixListIds': [],
+                                'ToPort': 22,
+                                'UserIdGroupPairs': [
+                                {'UserId': '123456789012', 'GroupId': 'sg-abcd1234'}]}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'TypicalSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'match-operator': 'and',
+                 'SelfReference': True}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'match-operator': 'and',
+                 'SelfReference': False}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'match-operator': 'and',
+                 'Cidr': {
+                    'value': '0.0.0.0/0',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        resources = [
+            {'Description': 'Typical Security Group',
+             'GroupId': 'sg-abcd1234',
+             'GroupName': 'TestSG',
+             'IpPermissions': [{'FromPort': 22,
+                                'IpProtocol': 'tcp',
+                                'IpRanges': [
+                                    {'CidrIp': '10.42.2.0/24'},
+                                    {'CidrIp': '10.42.4.0/24'},
+                                ],
+                                'PrefixListIds': [],
+                                'ToPort': 22,
+                                'UserIdGroupPairs': [
+                                {'UserId': '123456789012', 'GroupId': 'sg-abcd5678'}]}],
+             'IpPermissionsEgress': [],
+             'OwnerId': '123456789012',
+             'Tags': [{'Key': 'Value',
+                       'Value': 'TypicalSecurityGroup'},
+                      {'Key': 'Key', 'Value': 'Name'}],
+             'VpcId': 'vpc-1234abcd'}
+        ]
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.4.0/24',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'match-operator': 'and',
+                 'Cidr': {
+                    'value': '10.42.3.0/24',
+                    'op': 'eq',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 0)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '10.42.3.0/24',
+                    'op': 'ne',
+                    'value_type': 'cidr'
+                 }}
+                ]})
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+        p = self.load_policy({
+            'name': 'ingress-access',
+            'resource': 'security-group',
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': {
+                    'value': '0.0.0.0/0',
+                    'op': 'in',
+                    'value_type': 'cidr'
+                 }}
+                ]})
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
@@ -1049,6 +1400,109 @@ class SecurityGroupTest(BaseTest):
             {'name': 'sg-find2',
              'resource': 'security-group',
              'filters': [
-                {'type': 'egress',
-                 'InvalidKey': True},
-                {'GroupName': 'sg2'}]})
+                 {'type': 'egress',
+                  'InvalidKey': True},
+                 {'GroupName': 'sg2'}]})
+
+    def test_vpc_by_security_group(self):
+        factory = self.replay_flight_data('test_vpc_by_security_group')
+        p = self.load_policy(
+            {
+                'name': 'vpc-sg',
+                'resource': 'vpc',
+                'filters': [
+                    {
+                        'type': 'security-group',
+                        'key': 'tag:Name',
+                        'value': 'FancyTestGroupPublic',
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Tags'][0]['Value'], 'FancyTestVPC')
+
+
+class EndpointTest(BaseTest):
+
+    def test_endpoint_subnet(self):
+        factory = self.replay_flight_data('test_vpce_subnet_filter')
+        p = self.load_policy({
+            'name': 'endpoint-subnet',
+            'resource': 'vpc-endpoint',
+            'filters': [
+                {'VpcEndpointType': 'Interface'},
+                {'type': 'subnet',
+                 'key': 'tag:Name',
+                 'value': 'Pluto'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-914763e7'])
+
+    def test_endpoint_sg(self):
+        factory = self.replay_flight_data('test_vpce_sg_filter')
+        p = self.load_policy({
+            'name': 'endpoint-subnet',
+            'resource': 'vpc-endpoint',
+            'filters': [
+                {'VpcEndpointType': 'Interface'},
+                {'type': 'security-group',
+                 'key': 'tag:c7n-test-tag',
+                 'value': 'c7n-test-val'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-security-groups'], ['sg-6c7fa917'])
+
+
+class NATGatewayTest(BaseTest):
+
+    def test_query_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_query')
+        p = self.load_policy({
+            'name': 'get-nat-gateways',
+            'resource': 'nat-gateway',
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['State'],
+            "available")
+
+    def test_tag_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_tag')
+        p = self.load_policy({
+            'name': 'tag-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:Name': 'c7n_test'}],
+            'actions': [
+                {'type': 'tag', 'key': 'xyz', 'value': 'hello world'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'get-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:xyz': 'hello world'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_nat_gateways(self):
+        factory = self.replay_flight_data('test_nat_gateways_delete')
+        p = self.load_policy({
+            'name': 'delete-nat-gateways',
+            'resource': 'nat-gateway',
+            'filters': [
+                {'tag:Name': 'c7n_test'}],
+            'actions': [
+                {'type': 'delete'}],
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

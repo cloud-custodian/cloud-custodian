@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ def resources_gc_prefix(options, policy_collection):
         options.region, options.profile, options.assume_role)
 
     manager = mu.LambdaManager(session_factory)
-    funcs = list(manager.list_functions('custodian-'))
+    funcs = list(manager.list_functions(options.prefix))
 
     client = session_factory().client('lambda')
 
@@ -81,6 +81,9 @@ def resources_gc_prefix(options, policy_collection):
                 if principal == {'Service': 'events.amazonaws.com'}:
                     events.append(
                         mu.CloudWatchEventSource({}, session_factory))
+                elif principal == {'Service': 'config.amazonaws.com'}:
+                    events.append(
+                        mu.ConfigRule({}, session_factory))
 
         f = mu.LambdaFunction({
             'name': n['FunctionName'],
@@ -113,6 +116,9 @@ def setup_parser():
         "--profile", default=os.environ.get('AWS_PROFILE'),
         help="AWS Account Config File Profile to utilize")
     parser.add_argument(
+        "--prefix", default="custodian-",
+        help="AWS Account Config File Profile to utilize")
+    parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")
     parser.add_argument(
@@ -126,6 +132,7 @@ def main():
     options = parser.parse_args()
     options.policy_filter = None
     options.log_group = None
+    options.external_id = None
     options.cache_period = 0
     options.cache = None
     log_level = logging.INFO

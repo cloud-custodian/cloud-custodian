@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,12 +11,41 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from common import BaseTest
+from .common import BaseTest
 from c7n.resources.vpc import SecurityGroupDiff, SecurityGroupPatch
 
 
 class SGDiffLibTest(BaseTest):
+
+    def test_sg_diff_remove_ingress(self):
+        factory = self.replay_flight_data('test_sg_config_ingres_diff')
+        p = self.load_policy({
+            'name': 'sg-differ',
+            'resource': 'security-group',
+            'filters': [
+                {'GroupId': 'sg-65229a0c'},
+                {'type': 'diff',
+                 'selector': 'date',
+                 'selector_value': '2017/01/27 00:40Z'}],
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.maxDiff = None
+        self.assertEqual(
+            resources[0]['c7n:diff'],
+            {'ingress': {
+                'removed': [{u'FromPort': 0,
+                             u'IpProtocol': u'tcp',
+                             u'IpRanges': [],
+                             u'Ipv6Ranges': [],
+                             u'PrefixListIds': [],
+                             u'ToPort': 0,
+                             u'UserIdGroupPairs': [
+                                 {u'GroupId': u'sg-aa6c90c3',
+                                  u'UserId': u'644160558196'}]}]}})
 
     def test_sg_diff_pitr(self):
         factory = self.replay_flight_data('test_sg_config_diff')
@@ -48,7 +77,14 @@ class SGDiffLibTest(BaseTest):
                              u'PrefixListIds': [],
                              u'UserIdGroupPairs': []}]},
              'ingress': {
-                 'added': [{u'FromPort': 8485,
+                 'added': [{u'FromPort': 22,
+                            u'IpProtocol': u'tcp',
+                            u'IpRanges': [{u'CidrIp': u'10.0.0.0/24'}],
+                            u'Ipv6Ranges': [],
+                            u'PrefixListIds': [],
+                            u'ToPort': 22,
+                            u'UserIdGroupPairs': []},
+                           {u'FromPort': 8485,
                             u'IpProtocol': u'tcp',
                             u'IpRanges': [],
                             u'Ipv6Ranges': [],
@@ -56,13 +92,7 @@ class SGDiffLibTest(BaseTest):
                             u'ToPort': 8485,
                             u'UserIdGroupPairs': [{u'GroupId': u'sg-a38ed1de',
                                                    u'UserId': u'644160558196'}]},
-                           {u'FromPort': 22,
-                            u'IpProtocol': u'tcp',
-                            u'IpRanges': [{u'CidrIp': u'10.0.0.0/24'}],
-                            u'Ipv6Ranges': [],
-                            u'PrefixListIds': [],
-                            u'ToPort': 22,
-                            u'UserIdGroupPairs': []}]},
+                        ]},
              'tags': {'added': {u'Scope': u'account'}}})
 
     def test_sg_patch_pitr(self):
@@ -88,7 +118,7 @@ class SGDiffLibTest(BaseTest):
         self.assertEqual(
             current_resource,
             resources[0]['c7n:previous-revision']['resource'])
-                
+
     def test_sg_diff_patch(self):
         factory = self.replay_flight_data(
             'test_security_group_revisions_delta')

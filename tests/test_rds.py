@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 import json
 import logging
@@ -20,19 +22,67 @@ import time
 import uuid
 from collections import OrderedDict
 
+from botocore.exceptions import ClientError
 import boto3
-from common import BaseTest
+from .common import BaseTest, event_data
 
 from c7n.executor import MainThreadExecutor
 from c7n.filters import FilterValidationError
 from c7n.resources import rds
 from c7n import tags
 
-from common import BaseTest
-
 logger = logging.getLogger(name='c7n.tests')
 
+
 class RDSTest(BaseTest):
+
+    def test_rds_config_event(self):
+        event = event_data('rds-from-rule.json', 'config')        
+        p = self.load_policy({'name': 'rds', 'resource': 'rds'})
+        source = p.resource_manager.get_source('config')
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource['Tags'],
+            [{u'Key': u'workload-type', u'Value': u'other'}])
+        
+    def test_rds_stop(self):
+        session_factory = self.replay_flight_data('test_rds_stop')
+        db_instance_id = 'rds-test-instance-1'
+        client = session_factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-stop',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': db_instance_id}],
+            'actions': ['stop']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceStatus'], 'available')
+        result = client.describe_db_instances(
+            DBInstanceIdentifier=db_instance_id)
+        self.assertEqual(
+            result['DBInstances'][0]['DBInstanceStatus'], 'stopping')
+
+    def test_rds_start(self):
+        session_factory = self.replay_flight_data('test_rds_start')
+        db_instance_id = 'rds-test-instance-2'
+        client = session_factory().client('rds')
+        p = self.load_policy({
+            'name': 'rds-start',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': db_instance_id}],
+            'actions': ['start']},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceStatus'], 'stopped')
+        result = client.describe_db_instances(
+            DBInstanceIdentifier=db_instance_id)
+        self.assertEqual(
+            result['DBInstances'][0]['DBInstanceStatus'], 'starting')
 
     def test_rds_autopatch(self):
         session_factory = self.replay_flight_data('test_rds_auto_patch')
@@ -156,7 +206,7 @@ class RDSTest(BaseTest):
             'resource': 'rds',
             'filters': [
                 {'type': 'marked-for-op', 'tag': 'custodian_next',
-                 'op': 'delete'}]},
+                 'op': 'delete', 'skew': 1}]},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -190,15 +240,26 @@ class RDSTest(BaseTest):
 
     def test_rds_snapshot(self):
         session_factory = self.replay_flight_data('test_rds_snapshot')
+        dt = datetime.datetime.now().replace(
+            year=2017, month=12, day=11, hour=14, minute=9)
+        suffix = dt.strftime('%Y-%m-%d-%H-%M')
         p = self.load_policy(
             {'name': 'rds-snapshot',
              'resource': 'rds',
+             'filters': [{
+                 'DBInstanceIdentifier': 'c7n-snapshot-test'}],
              'actions': [
                  {'type':'snapshot'}]},
-            config={'region': 'us-west-2'},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+        client = session_factory(region='us-east-1').client('rds')
+        snapshot = client.describe_db_snapshots(
+            DBInstanceIdentifier=resources[0][
+                'DBInstanceIdentifier'])['DBSnapshots'][0]
+        self.assertEqual(snapshot['DBSnapshotIdentifier'], 'backup-%s-%s' % (
+            resources[0]['DBInstanceIdentifier'], suffix))
 
     def test_rds_retention(self):
         session_factory = self.replay_flight_data('test_rds_retention')
@@ -224,13 +285,67 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 6)
 
+    def test_rds_restore(self):
+        self.patch(rds.RestoreInstance, 'executor_factory', MainThreadExecutor)
+        self.change_environment(AWS_DEFAULT_REGION='us-east-2')
+        session_factory = self.replay_flight_data('test_rds_restore')
+        client = session_factory().client('rds')
+        instance_id = 'mxtest'
+        self.assertRaises(
+            ClientError,
+            client.describe_db_instances,
+            DBInstanceIdentifier=instance_id)
+
+        p = self.load_policy({
+            'name': 'rds-restore',
+            'resource': 'rds-snapshot',
+            'filters': [
+                {'MasterUsername': 'mxtester'},
+                'latest'],
+            'actions': [
+                {'type': 'restore',
+                 'restore_options': {'DBInstanceIdentifier': instance_id}}]
+                }, session_factory=session_factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        try:
+            client.describe_db_instances(
+                DBInstanceIdentifier=instance_id)
+        except ClientError:
+            self.fail("DB Not found")
+
+    def test_rds_delete_copy(self):
+        session_factory = self.replay_flight_data('test_rds_delete_copy_restore')
+        client = session_factory().client('rds')
+        instance_id = 'mxtest'
+        db_info = client.describe_db_instances(DBInstanceIdentifier=instance_id)
+        self.assertFalse(db_info['DBInstances'][0]['CopyTagsToSnapshot'])
+        p = self.load_policy(
+            {'name': 'rds-delete',
+             'resource': 'rds',
+             'filters': [
+                 {'DBInstanceIdentifier': instance_id}],
+             'actions': [
+                 {'type': 'delete',
+                  'copy-restore-info': True}]},
+            config={'region': 'us-east-2'},
+            session_factory=session_factory)
+        resources = p.run()
+        db_info = client.describe_db_instances(DBInstanceIdentifier=instance_id)
+        self.assertTrue(db_info['DBInstances'][0]['CopyTagsToSnapshot'])
+        snaps = p.resource_manager.get_resource_manager(
+            'rds-snapshot').get_resources(('final-mxtest-2017-05-25',))
+        snap_keys = {t['Key'] for t in snaps[0]['Tags']}
+        self.assertTrue(snap_keys.issuperset(rds.RestoreInstance.restore_keys))
+
     def test_rds_delete(self):
         session_factory = self.replay_flight_data('test_rds_delete')
         p = self.load_policy(
             {'name': 'rds-delete',
              'resource': 'rds',
              'filters': [
-                 {'tag:Target': 'test'}],
+                 {'tag:Owner': 'test'}],
              'actions': [
                  {'type': 'delete',
                   'skip-snapshot': True}]},
@@ -300,22 +415,56 @@ class RDSTest(BaseTest):
              'resource': 'rds',
              'filters': [
                  {'type': 'marked-for-op', 'tag': 'custodian_upgrade',
-                  'op': 'upgrade'}],
+                  'op': 'upgrade', 'skew': 4}],
              'actions': [{
                  'type': 'upgrade',
                  'immediate': False}]}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(
             {r['EngineVersion']: r.get('c7n-rds-engine-upgrade')
              for r in resources},
-            {u'5.7.10': None, u'5.6.23': u'5.6.29'})
+            {u'5.6.29': u'5.6.35'})
         self.assertEqual(
-            resources[1]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
+            resources[0]['DBInstanceIdentifier'], 'c7n-mysql-test-03')
         self.assertEqual(
-            resources[1]['EngineVersion'], '5.6.23')
+            resources[0]['EngineVersion'], '5.6.29')
         self.assertEqual(
-            resources[1]['c7n-rds-engine-upgrade'], '5.6.29')
+            resources[0]['c7n-rds-engine-upgrade'], '5.6.35')
+
+    def test_rds_eligible_start_stop(self):
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+        }
+        self.assertTrue(rds._eligible_start_stop(resource, 'available'))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'stopped',
+        }
+        self.assertFalse(rds._eligible_start_stop(resource, 'available'))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'MultiAZ': True,
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaDBInstanceIdentifiers': ["sbbdevslave"],
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            'DBInstanceIdentifier': 'ABC',
+            'DBInstanceStatus': 'available',
+            'ReadReplicaSourceDBInstanceIdentifier': 'sbbdev',
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
 
     def test_rds_db_instance_eligible_for_backup(self):
         resource = {
@@ -446,8 +595,88 @@ class RDSTest(BaseTest):
         }
         self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
 
+    def test_rds_db_subnetgroup_delete(self):
+        session_factory = self.replay_flight_data('test_rdssubnetgroup_delete')
+
+        policy = self.load_policy({
+            'name': 'db-subnet-group-delete',
+            'resource': 'rds-subnet-group',
+            'actions': [{'type': 'delete'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Test should delete db subnetgroup")
+
+    def test_rds_db_subnetgroup_unused(self):
+        session_factory = self.replay_flight_data('test_rdssubnetgroup_unused')
+
+        policy = self.load_policy({
+            'name': 'db-subnet-group-unused',
+            'resource': 'rds-subnet-group',
+            'filters': [{'type': 'unused'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertEquals(len(resources), 1, "Resources should be unused")
+
 
 class RDSSnapshotTest(BaseTest):
+
+    def test_rds_snapshot_copy_tags_enable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_snapshot_copy_tags_enable')
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+        p = self.load_policy({
+            'name': 'rds-enable-snapshot-tag-copy',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'mysql',
+                 'op': 'eq'}],
+            'actions': [{
+                'type': 'set-snapshot-copy-tags',
+                'enable': True}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
+
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+    def test_rds_snapshot_copy_tags_disable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_snapshot_copy_tags_disable')
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+        p = self.load_policy({
+            'name': 'rds-enable-snapshot-tag-copy',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'mysql',
+                 'op': 'eq'}],
+            'actions': [{
+                'type': 'set-snapshot-copy-tags',
+                'enable': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
+
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
 
     def test_rds_snapshot_access(self):
         factory = self.replay_flight_data('test_rds_snapshot_access')
@@ -681,6 +910,26 @@ class RDSSnapshotTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertFalse('maid_status' in tag_map)
 
+    def test_rds_public_accessible_disable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_public_accessible_disable')
+        client = session_factory(region='us-east-1').client('rds')
+        policy = self.load_policy({
+            'name': 'disable-publicly-accessibility',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': "c7n-test-pa"},
+                {'PubliclyAccessible': True}],
+            'actions': [{
+                'type': 'set-public-access',
+                'state': False}]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'c7n-test-pa')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='c7n-test-pa')[
+                             'DBInstances'][0]['PubliclyAccessible'])
+
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
     def test_rds_remove_matched_security_groups(self):
@@ -804,15 +1053,12 @@ class TestHealthEventsFilter(BaseTest):
 
 
 class TestRDSParameterGroupFilter(BaseTest):
-    """ This test assumes two parameter groups have been created and
-        assigned to two different RDS instances.
-    """
 
     PARAMGROUP_PARAMETER_FILTER_TEST_CASES = [
         # filter_struct, test_func, err_message
         ({'key': 'log_destination', 'op': 'eq', 'value': 'stderr'},
          lambda r: len(r) == 1,
-         "instances with log_destination == stderr should be 2"),
+         "instances with log_destination == stderr should be 1"),
         ({'key': 'log_destination', 'op': 'eq', 'value': 's3'},
          lambda r: len(r) == 0,
          "instances with log_destination == s3 should be 0"),
@@ -821,7 +1067,7 @@ class TestRDSParameterGroupFilter(BaseTest):
          "instances with log_destination != stderr should be 0"),
         ({'key': 'log_destination', 'op': 'ne', 'value': 's3'},
          lambda r: len(r) == 1,
-         "instances with log_destination != s3 should be 2"),
+         "instances with log_destination != s3 should be 1"),
         ({'key': 'full_page_writes', 'op': 'eq', 'value': True},
          lambda r: len(r) == 1,
          "full_page_writes ( a boolean ) should be on"),
@@ -840,7 +1086,7 @@ class TestRDSParameterGroupFilter(BaseTest):
                 'db-parameter')(fdata, policy.resource_manager)
             f_resources = f.process(resources)
             if not assertion(f_resources):
-                print len(f_resources), fdata, assertion
+                print(len(f_resources), fdata, assertion)
                 self.fail(err_msg)
 
 class Resize(BaseTest):

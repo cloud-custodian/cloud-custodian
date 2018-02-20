@@ -4,11 +4,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "dea04a2d-b4ac-11e6-aa7f-051ab4a3ccd7", 
+            "RequestId": "f2556363-bf15-11e7-84fa-b30901b7673b", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "dea04a2d-b4ac-11e6-aa7f-051ab4a3ccd7", 
-                "date": "Sun, 27 Nov 2016 14:22:04 GMT", 
-                "content-length": "348", 
+                "x-amzn-requestid": "f2556363-bf15-11e7-84fa-b30901b7673b", 
+                "date": "Wed, 01 Nov 2017 15:04:23 GMT", 
+                "content-length": "673", 
                 "content-type": "application/json"
             }
         }, 
@@ -17,21 +17,45 @@
                 "SizeInBytes": {
                     "Value": 6144
                 }, 
-                "Name": "MyDocs", 
-                "CreationToken": "console-43c2e0a4-487f-4a6c-b699-a8523911dbf2", 
+                "Name": "Somewhere", 
+                "CreationToken": "b2bf7400-c02d-4b31-9f88-5691cb3db076", 
+                "Encrypted": false, 
                 "CreationTime": {
-                    "hour": 8, 
+                    "hour": 10, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 34, 
+                    "second": 18, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 27, 
-                    "minute": 46
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 4
                 }, 
                 "PerformanceMode": "generalPurpose", 
-                "FileSystemId": "fs-5e7fac17", 
-                "NumberOfMountTargets": 4, 
+                "FileSystemId": "fs-f2603dbb", 
+                "NumberOfMountTargets": 0, 
+                "LifeCycleState": "available", 
+                "OwnerId": "644160558196"
+            }, 
+            {
+                "SizeInBytes": {
+                    "Value": 6144
+                }, 
+                "Name": "Somewhere", 
+                "CreationToken": "d190f154-f783-460e-a8a8-c1783b86aa85", 
+                "Encrypted": false, 
+                "CreationTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 41
+                }, 
+                "PerformanceMode": "generalPurpose", 
+                "FileSystemId": "fs-fd673ab4", 
+                "NumberOfMountTargets": 0, 
                 "LifeCycleState": "available", 
                 "OwnerId": "644160558196"
             }

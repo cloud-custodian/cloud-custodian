@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from .common import BaseTest
 
 
 class TestRedshift(BaseTest):
@@ -228,6 +230,27 @@ class TestRedshift(BaseTest):
             cluster['ClusterStatus'], 'modifying')
         self.assertTrue(
             cluster['PendingModifiedValues']['EnhancedVpcRouting'])
+
+    def test_redshift_public_access(self):
+        session_factory = self.replay_flight_data(
+            'test_redshift_public_access')
+        client = session_factory().client('redshift')
+        p = self.load_policy({
+            'name': 'redshift-set-public-access',
+            'resource': 'redshift',
+            'filters': [{
+                'PubliclyAccessible': True}],
+            'actions': [{
+                'type': 'set-public-access',
+                'state': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        cluster = client.describe_clusters(
+            ClusterIdentifier='c7n-rs')['Clusters'][0]
+        self.assertEqual(
+            cluster['ClusterIdentifier'], resources[0]['ClusterIdentifier'])
+        self.assertFalse(cluster['PubliclyAccessible'])
 
 
 class TestRedshiftSnapshot(BaseTest):

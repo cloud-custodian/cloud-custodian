@@ -1,0 +1,93 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "517e84d8-be26-11e7-a0f2-376813db7035", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "517e84d8-be26-11e7-a0f2-376813db7035", 
+                "date": "Tue, 31 Oct 2017 10:29:04 GMT", 
+                "content-length": "1811", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "ReplicationInstances": [
+            {
+                "MultiAZ": false, 
+                "AvailabilityZone": "us-east-1b", 
+                "ReplicationInstancePrivateIpAddress": "172.31.27.105", 
+                "ReplicationInstanceArn": "arn:aws:dms:us-east-1:644160558196:rep:NNH7KJHLE6R7HAL7BZWOVUQHZY", 
+                "ReplicationInstancePrivateIpAddresses": [
+                    "172.31.27.105"
+                ], 
+                "ReplicationInstanceClass": "dms.t2.medium", 
+                "ReplicationSubnetGroup": {
+                    "ReplicationSubnetGroupDescription": "default group created by console for vpc id vpc-d2d616b5", 
+                    "Subnets": [
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-3a334610", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1d"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-efbcccb7", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1b"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-e3b194de", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1e"
+                            }
+                        }, 
+                        {
+                            "SubnetStatus": "Active", 
+                            "SubnetIdentifier": "subnet-914763e7", 
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1a"
+                            }
+                        }
+                    ], 
+                    "VpcId": "vpc-d2d616b5", 
+                    "SubnetGroupStatus": "Complete", 
+                    "ReplicationSubnetGroupIdentifier": "default-vpc-d2d616b5"
+                }, 
+                "AutoMinorVersionUpgrade": true, 
+                "ReplicationInstanceStatus": "available", 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-c63712b4"
+                    }
+                ], 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0", 
+                "InstanceCreateTime": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 18, 
+                    "microsecond": 283000, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 6
+                }, 
+                "ReplicationInstancePublicIpAddress": "54.156.233.85", 
+                "AllocatedStorage": 50, 
+                "EngineVersion": "2.3.0", 
+                "ReplicationInstancePublicIpAddresses": [
+                    "54.156.233.85"
+                ], 
+                "ReplicationInstanceIdentifier": "replication-instance-1", 
+                "PubliclyAccessible": true, 
+                "PreferredMaintenanceWindow": "wed:23:08-wed:23:38", 
+                "PendingModifiedValues": {}
+            }
+        ]
+    }
+}

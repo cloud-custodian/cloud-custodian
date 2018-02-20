@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from .common import BaseTest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.elb import ELB
 from c7n.filters import FilterValidationError
@@ -192,8 +194,8 @@ class SSLPolicyTest(BaseTest):
             LoadBalancerName='test-elb',
             PolicyNames=['testpolicy-1493768308000']
         )
-        curr_pol = [t.encode('UTF8') for t in response_pol[
-            'LoadBalancerDescriptions'][0]['ListenerDescriptions'][0]['PolicyNames']]
+        curr_pol = response_pol['LoadBalancerDescriptions'][0]\
+            ['ListenerDescriptions'][0]['PolicyNames']
 
         curr_ciphers = []
         for x in response_ciphers['PolicyDescriptions'][0]['PolicyAttributeDescriptions']:
@@ -226,35 +228,37 @@ class SSLPolicyTest(BaseTest):
             'test-elb-invalid-policy')
 
     def test_filter_validation_no_blacklist(self):
-        self.assertRaises(FilterValidationError,
-            self.load_policy, {
-                'name': 'test-ssl-ciphers',
-                'resource': 'elb',
-                'filters': [
-                    {'type': 'ssl-policy'}
-                ]},
-                session_factory=None, validate=False)
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'test-ssl-ciphers',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'ssl-policy'}
+             ]},
+            session_factory=None, validate=False)
 
     def test_filter_validation_blacklist_not_iterable(self):
-        self.assertRaises(FilterValidationError,
-            self.load_policy, {
-                'name': 'test-ssl-ciphers',
-                'resource': 'elb',
-                'filters': [
-                    {'type': 'ssl-policy', 'blacklist': 'single-value'}
-                ]},
-                session_factory=None, validate=False)
+        self.assertRaises(
+            FilterValidationError,
+            self.load_policy,
+            {'name': 'test-ssl-ciphers',
+             'resource': 'elb',
+             'filters': [
+                 {'type': 'ssl-policy', 'blacklist': 'single-value'}
+             ]},
+            session_factory=None, validate=False)
 
 
 class TestDefaultVpc(BaseTest):
 
     def test_elb_default_vpc(self):
         session_factory = self.replay_flight_data('test_elb_default_vpc')
-        p = self.load_policy(
-            {'name': 'elb-default-filters',
-             'resource': 'elb',
-             'filters': [
-                 {'type': 'default-vpc'}]},
+        p = self.load_policy({
+            'name': 'elb-default-filters',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'default-vpc'}]},
             config={'region': 'us-west-2'},
             session_factory=session_factory)
 
@@ -386,3 +390,113 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         # Check that it is indeed the isolation group on the ELB
         self.assertEqual(
             after_resources[0]['SecurityGroups'][0], default_sg_id)
+
+
+class TestElbLogging(BaseTest):
+
+    def test_enable_s3_logging(self):
+        session_factory = self.replay_flight_data('test_elb_enable_s3_logging')
+        policy = self.load_policy({
+            'name': 'test-enable-s3-logging',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'value', 'key': 'LoadBalancerName',
+                 'value': 'elb1'}],
+            'actions': [
+                {'type': 'enable-s3-logging',
+                 'bucket': 'elbv2logtest',
+                 'prefix': 'elblogs',
+                 'emit_interval': 5
+                 },
+            ]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        client = session_factory().client('elb')
+        for elb in resources:
+            elb_name = elb['LoadBalancerName']
+            results = client.describe_load_balancer_attributes(
+                            LoadBalancerName=elb_name)
+            elb['Attributes'] = results['LoadBalancerAttributes']
+
+        self.assertEqual(resources[0]['Attributes']['AccessLog']['EmitInterval'], 5)
+        self.assertEqual(resources[0]['Attributes']['AccessLog']['S3BucketName'], 'elbv2logtest')
+        self.assertEqual(resources[0]['Attributes']['AccessLog']['S3BucketPrefix'], 'elblogs')
+        self.assertTrue(resources[0]['Attributes']['AccessLog']['Enabled'])
+
+
+    def test_disable_s3_logging(self):
+        session_factory = self.replay_flight_data('test_elb_disable_s3_logging')
+        policy = self.load_policy({
+            'name': 'test-disable-s3-logging',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'value', 'key': 'LoadBalancerName',
+                 'value': 'elb1'}],
+            'actions': [{'type': 'disable-s3-logging'}, ]
+        },
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        client = session_factory().client('elb')
+        for elb in resources:
+            elb_name = elb['LoadBalancerName']
+            results = client.describe_load_balancer_attributes(
+                            LoadBalancerName=elb_name)
+            elb['Attributes'] = results['LoadBalancerAttributes']
+
+        self.assertFalse(resources[0]['Attributes']['AccessLog']['Enabled'])
+
+
+class TestElbIsLoggingFilter(BaseTest):
+    """ replicate
+        - name: elb-is-logging-to-bucket-test
+          resource: elb
+          filters:
+            - type: is-logging
+            bucket: elbv2logtest
+    """
+    def test_is_logging_to_bucket(self):
+        session_factory = self.replay_flight_data('test_elb_is_logging_filter')
+        policy = self.load_policy({
+            'name': 'elb-is-logging-to-bucket-test',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'is-logging',
+                 'bucket': 'elbv2logtest',
+                 },
+            ]
+        }, session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Test should find elbs logging "
+                                              "to elbv2logtest")
+
+
+class TestElbIsNotLoggingFilter(BaseTest):
+    """ replicate
+        - name: elb-is-not-logging-to-bucket-test
+          resource: elb
+          filters:
+            - type: is-not-logging
+            bucket: otherbucket
+    """
+    def test_is_logging_to_bucket(self):
+        session_factory = self.replay_flight_data('test_elb_is_logging_filter')
+        policy = self.load_policy({
+            'name': 'elb-is-not-logging-to-bucket-test',
+            'resource': 'elb',
+            'filters': [
+                {'type': 'is-not-logging',
+                 'bucket': 'otherbucket',
+                 },
+            ]
+        }, session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Should find elb not logging "
+                                              "to otherbucket")

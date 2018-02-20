@@ -30,6 +30,7 @@ Query
        'tag-key': str,
        'tag-value': str,
        'tag:': str,
+       'tenancy': ('dedicated', 'default', 'host'),
        'vpc-id': str}
 
 Filters
@@ -88,6 +89,12 @@ Filter by State Transition Filter
   Filter based on the ``AttachTime`` of the EBS Volumes in days
 
   .. c7n-schema:: InstanceAgeFilter
+      :module: c7n.resources.ec2
+
+``termination-protected``
+  Filter based on the ``disableApiTermination`` instance attribute.
+
+  .. c7n-schema:: DisableApiTermination
       :module: c7n.resources.ec2
 
 Actions

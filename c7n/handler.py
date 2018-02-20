@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ Cloud-Custodian Lambda Entry Point
 Mostly this serves to load up the policy and dispatch
 an event.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 import os
@@ -44,12 +45,14 @@ class Config(dict):
 
     @classmethod
     def empty(cls, **kw):
-        try:
-            import boto3
-            session = boto3.Session()
-            account_id = get_account_id_from_sts(session)
-        except:
-            account_id = None
+        account_id = None
+        if 'AWS_LAMBDA_FUNCTION_NAME' in os.environ:
+            try:
+                import boto3
+                session = boto3.Session()
+                account_id = get_account_id_from_sts(session)
+            except Exception:
+                pass
 
         d = {}
         d.update({
@@ -58,6 +61,7 @@ class Config(dict):
             'profile': None,
             'account_id': account_id,
             'assume_role': None,
+            'external_id': None,
             'log_group': None,
             'metrics_enabled': True,
             'output_dir': os.environ.get(
@@ -67,7 +71,11 @@ class Config(dict):
             'dryrun': False})
         d.update(kw)
         if not os.path.exists(d['output_dir']):
-            os.mkdir(d['output_dir'])
+            try:
+                os.mkdir(d['output_dir'])
+            except OSError as error:
+                log.warning("Unable to make output directory: {}".format(error))
+
         return cls(d)
 
 

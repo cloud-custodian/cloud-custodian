@@ -1,0 +1,125 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Truncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a308c514-9de2-11e7-9598-f132b9810559", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a308c514-9de2-11e7-9598-f132b9810559", 
+                "content-length": "3191", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 20 Sep 2017 09:03:58 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Aliases": [
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/BlockStorageKey", 
+                "AliasName": "alias/BlockStorageKey", 
+                "TargetKeyId": "82645407-2faa-4d93-be71-7d6a8d59a5fc"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/CalTestS3", 
+                "AliasName": "alias/CalTestS3", 
+                "TargetKeyId": "662c9918-50cb-4644-bf82-e34fd4ae710c"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/CalTestS3-new", 
+                "AliasName": "alias/CalTestS3-new", 
+                "TargetKeyId": "cdd2c7da-f5f8-4aff-9542-241ac8e4d621"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/albtestkey", 
+                "AliasName": "alias/albtestkey", 
+                "TargetKeyId": "53947b7f-905f-45e8-947b-c1cb1b32a283"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/acm", 
+                "AliasName": "alias/aws/acm", 
+                "TargetKeyId": "7efe5f36-5599-4a81-97b9-4c4aa4b64f93"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/codecommit", 
+                "AliasName": "alias/aws/codecommit", 
+                "TargetKeyId": "aaac6583-1d5f-44a2-b535-0823b47ed00e"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/ebs", 
+                "AliasName": "alias/aws/ebs", 
+                "TargetKeyId": "798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/elasticfilesystem", 
+                "AliasName": "alias/aws/elasticfilesystem", 
+                "TargetKeyId": "d38e6df4-3a19-4516-9f4b-ab568e9bccc5"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/kinesis", 
+                "AliasName": "alias/aws/kinesis", 
+                "TargetKeyId": "f0108d2e-e1df-4a94-b1b6-9144085093cb"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/lambda", 
+                "AliasName": "alias/aws/lambda", 
+                "TargetKeyId": "f4441361-1c8d-4710-8d6d-0b6d7cd0be11"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/lightsail", 
+                "AliasName": "alias/aws/lightsail", 
+                "TargetKeyId": "7147f795-71ee-4b59-8dd1-2fa32a55423c"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/rds", 
+                "AliasName": "alias/aws/rds", 
+                "TargetKeyId": "b10f842a-feb7-4318-92d5-0640a75b7688"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/redshift", 
+                "AliasName": "alias/aws/redshift", 
+                "TargetKeyId": "e39ed135-2a46-4d5e-8c05-41b8d900d0c7"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3", 
+                "AliasName": "alias/aws/s3", 
+                "TargetKeyId": "d1305425-4cde-46ee-be31-e2043dd4df39"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/ssm", 
+                "AliasName": "alias/aws/ssm"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/dhruv-test", 
+                "AliasName": "alias/dhruv-test", 
+                "TargetKeyId": "c8723291-0eea-4321-b354-b63c83b39b66"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/s3-custom", 
+                "AliasName": "alias/s3-custom", 
+                "TargetKeyId": "3f2ab3af-cc4e-427b-b96d-d4356f9764c4"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/scot-test", 
+                "AliasName": "alias/scot-test", 
+                "TargetKeyId": "5fd9f6d6-4294-4926-8719-1e85695e2ad6"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/skunk-s3", 
+                "AliasName": "alias/skunk-s3", 
+                "TargetKeyId": "845ab6f1-744c-4edc-b702-efae6836818a"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/skunk/trails", 
+                "AliasName": "alias/skunk/trails", 
+                "TargetKeyId": "36812ccf-daaf-49b1-a24b-0eef254ffe41"
+            }, 
+            {
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/wyp927-test-2", 
+                "AliasName": "alias/wyp927-test-2", 
+                "TargetKeyId": "e7b1b4bf-35cc-4ab5-9372-4c5c9be94eb3"
+            }
+        ]
+    }
+}

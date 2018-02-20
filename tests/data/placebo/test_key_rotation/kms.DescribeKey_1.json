@@ -3,34 +3,32 @@
     "data": {
         "KeyMetadata": {
             "Origin": "AWS_KMS", 
-            "KeyId": "845ab6f1-744c-4edc-b702-efae6836818a", 
-            "Description": "s3 skunkworks key", 
+            "KeyId": "ffb1402c-040a-4b1f-b1e5-9918a0238aa7", 
+            "Description": "d1", 
+            "KeyManager": "CUSTOMER", 
             "Enabled": true, 
             "KeyUsage": "ENCRYPT_DECRYPT", 
             "KeyState": "Enabled", 
             "CreationDate": {
-                "hour": 21, 
+                "hour": 15, 
                 "__class__": "datetime", 
-                "month": 2, 
-                "second": 50, 
-                "microsecond": 642000, 
-                "year": 2017, 
-                "day": 18, 
-                "minute": 9
+                "month": 1, 
+                "second": 19, 
+                "microsecond": 13000, 
+                "year": 2018, 
+                "day": 30, 
+                "minute": 44
             }, 
-            "Arn": "arn:aws:kms:us-east-1:644160558196:key/845ab6f1-744c-4edc-b702-efae6836818a", 
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/ffb1402c-040a-4b1f-b1e5-9918a0238aa7", 
             "AWSAccountId": "644160558196"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "3d423f4a-36bd-11e7-a841-d71a61ae25c8", 
+            "RequestId": "24f8a546-06a7-11e8-ba23-d1734408c8cd", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "3d423f4a-36bd-11e7-a841-d71a61ae25c8", 
-                "content-length": "328", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Fri, 12 May 2017 02:46:46 GMT", 
+                "x-amzn-requestid": "24f8a546-06a7-11e8-ba23-d1734408c8cd", 
+                "content-length": "337", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

@@ -1,3 +1,17 @@
+# Copyright 2017 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import datetime
 import logging
 import math
@@ -8,15 +22,17 @@ import boto3
 import click
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
-from elasticsearch import Elasticsearch, helpers
+from elasticsearch import Elasticsearch, helpers, RequestsHttpConnection
 import jsonschema
 from influxdb import InfluxDBClient
 
 import yaml
 
-
-from c7n.credentials import assumed_session
+from c7n import schema
+from c7n.credentials import assumed_session, SessionFactory
 from c7n.registry import PluginRegistry
+from c7n.reports import csvout as s3_resource_parser
+from c7n.resources import load_resources
 from c7n.utils import chunks, dumps, get_retry, local_session
 
 # from c7n.executor import MainThreadExecutor
@@ -32,12 +48,54 @@ log = logging.getLogger('c7n.metrics')
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': True,
+    'required': ['indexer', 'accounts'],
     'properties': {
+        'indexer': {
+            'oneOf': [
+                {
+                    'type': 'object',
+                    'required': ['host', 'port', 'idx_name'],
+                    'properties': {
+                        'type': {'enum': ['es']},
+                        'host': {'type': 'string'},
+                        'port': {'type': 'number'},
+                        'user': {'type': 'string'},
+                        'password': {'type': 'string'},
+                        'idx_name': {'type': 'string'},
+                        'query': {'type': 'string'}
+                    }
+                },
+                {
+                    'type': 'object',
+                    'required': ['host', 'db', 'user', 'password'],
+                    'properties': {
+                        'type': {'enum': ['influx']},
+                        'host': {'type': 'string'},
+                        'db': {'type': 'string'},
+                        'user': {'type': 'string'},
+                        'password': {'type': 'string'}
+                    }
+                },
+                {
+                    'type': 'object',
+                    'required': ['template', 'Bucket'],
+                    'properties': {
+                        'type': {'enum': ['s3']},
+                        'template': {'type': 'string'},
+                        'Bucket': {'type': 'string'}
+                    }
+                }
+            ]
+        },
         'accounts': {
             'type': 'array',
             'items': {
                 'type': 'object',
-                'required': ['name', 'bucket', 'regions', 'title'],
+                'anyOf': [
+                    {"required": ['profile']},
+                    {"required": ['role']}
+                ],
+                'required': ['name', 'bucket', 'regions', 'title', 'id'],
                 'properties': {
                     'name': {'type': 'string'},
                     'title': {'type': 'string'},
@@ -61,23 +119,40 @@ class Indexer(object):
     """
 
 
-def get_indexer(config):
+def get_indexer(config, **kwargs):
     itype = config['indexer']['type']
     klass = indexers.get(itype)
-    return klass(config)
+    return klass(config, **kwargs)
 
 
 @indexers.register('es')
 class ElasticSearchIndexer(Indexer):
 
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         self.config = config
-        self.client = Elasticsearch()
+        self.es_type = kwargs.get('type', 'policy-metric')
+
+        host = [config['indexer'].get('host', 'localhost')]
+        kwargs = {}
+        kwargs['connection_class'] = RequestsHttpConnection
+
+        user = config['indexer'].get('user', False)
+        password = config['indexer'].get('password', False)
+        if user and password:
+            kwargs['http_auth'] = (user, password)
+
+        kwargs['port'] = config['indexer'].get('port', 9200)
+
+        self.client = Elasticsearch(
+            host,
+            **kwargs
+        )
 
     def index(self, points):
         for p in points:
             p['_index'] = self.config['indexer']['idx_name']
-            p['_type'] = 'policy-metric'
+            p['_type'] = self.es_type
+
         results = helpers.streaming_bulk(self.client, points)
         for status, r in results:
             if not status:
@@ -87,7 +162,7 @@ class ElasticSearchIndexer(Indexer):
 @indexers.register('s3')
 class S3Archiver(Indexer):
 
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         self.config = config
         self.client = boto3.client('s3')
 
@@ -104,7 +179,7 @@ class S3Archiver(Indexer):
 @indexers.register('influx')
 class InfluxIndexer(Indexer):
 
-    def __init__(self, config):
+    def __init__(self, config, **kwargs):
         self.config = config
         self.client = InfluxDBClient(
             username=config['indexer']['user'],
@@ -176,7 +251,7 @@ def index_metric_set(indexer, account, region, metric_set, start, end, period):
     return time.time() - t, point_count
 
 
-def index_account(config, idx_name, region, account, start, end, period):
+def index_account_metrics(config, idx_name, region, account, start, end, period):
     session = assumed_session(account['role'], 'PolicyIndex')
     indexer = get_indexer(config)
 
@@ -229,6 +304,37 @@ def index_account(config, idx_name, region, account, start, end, period):
     return region_time, region_points
 
 
+def index_account_resources(config, account, region, policy, date):
+    indexer = get_indexer(config, type=policy['resource'])
+    bucket = account['bucket']
+    key_prefix = "accounts/{}/{}/policies/{}".format(
+        account['name'], region, policy['name'])
+
+    # Look for AWS profile in config before Instance role
+    records = s3_resource_parser.record_set(
+        lambda: SessionFactory(
+            region, profile=account.get('profile'),
+            assume_role=account.get('role'))(),
+        bucket,
+        key_prefix,
+        date,
+        specify_hour=True)
+
+    for r in records:
+        # Adding Custodian vars to each record
+        r['c7n:MatchedPolicy'] = policy['name']
+        r['c7n:AccountNumber'] = account['id']
+
+        # Reformat tags for ease of index/search
+        # Tags are stored in the following format:
+        # Tags: [ {'key': 'mykey', 'val': 'myval'}, {'key': 'mykey2', 'val': 'myval2'} ]
+        # and this makes searching for tags difficult. We will convert them to:
+        # Tags: ['mykey': 'myval', 'mykey2': 'myval2']
+        r['Tags'] = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+
+    indexer.index(records)
+
+
 def get_periods(start, end, period):
     days_delta = (start - end)
 
@@ -263,6 +369,17 @@ def get_date_range(start, end):
     if not end and not start:
         raise ValueError("Missing start and end")
     return start, end
+
+
+def valid_date(date, delta=0):
+    # optional input, use default time delta if not provided
+    # delta is 1 hour for resources
+    if not date:
+        date = datetime.datetime.utcnow() - datetime.timedelta(hours=delta)
+    elif date and not isinstance(date, datetime.datetime):
+        date = parse_date(date)
+
+    return date
 
 
 @click.group()
@@ -335,7 +452,7 @@ def index_metrics(
         for j in jobs:
             log.debug("submit account:%s region:%s start:%s end:%s" % (
                 j[3]['name'], j[2], j[4], j[5]))
-            futures[w.submit(index_account, *j)] = j
+            futures[w.submit(index_account_metrics, *j)] = j
 
         # Process completed
         for f in as_completed(futures):
@@ -361,17 +478,70 @@ def index_metrics(
 
 @cli.command(name='index-resources')
 @click.option('-c', '--config', required=True, help="Config file")
-@click.option('--start', required=True, help="Start date")
-@click.option('--end', required=False, help="End Date")
-@click.option('--incremental/--no-incremental', default=False,
-              help="Sync from last indexed timestamp")
+@click.option('-p', '--policies', required=True, help="Policy file")
+@click.option('--date', required=False, help="Start date")
 @click.option('--concurrency', default=5)
 @click.option('-a', '--accounts', multiple=True)
+@click.option('-t', '--tag')
 @click.option('--verbose/--no-verbose', default=False)
 def index_resources(
-        config, start, end, incremental=False, concurrency=5, accounts=None,
-        verbose=False):
+        config, policies, date=None, concurrency=5,
+        accounts=None, tag=None, verbose=False):
     """index policy resources"""
+    logging.basicConfig(level=(verbose and logging.DEBUG or logging.INFO))
+    logging.getLogger('botocore').setLevel(logging.WARNING)
+    logging.getLogger('elasticsearch').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+    logging.getLogger('requests').setLevel(logging.WARNING)
+    logging.getLogger('c7n.worker').setLevel(logging.INFO)
+
+    # validating the config and policy files.
+    with open(config) as fh:
+        config = yaml.safe_load(fh.read())
+    jsonschema.validate(config, CONFIG_SCHEMA)
+
+    with open(policies) as fh:
+        policies = yaml.safe_load(fh.read())
+    load_resources()
+    schema.validate(policies)
+
+    date = valid_date(date, delta=1)
+
+    with ProcessPoolExecutor(max_workers=concurrency) as w:
+        futures = {}
+        jobs = []
+
+        for account in config.get('accounts'):
+            if accounts and account['name'] not in accounts:
+                continue
+            if tag:
+                found = False
+                for t in account['tags'].values():
+                    if tag == t:
+                        found = True
+                        break
+                if not found:
+                    continue
+            for region in account.get('regions'):
+                for policy in policies.get('policies'):
+                    p = (config, account, region, policy, date)
+                    jobs.append(p)
+
+        for j in jobs:
+            log.debug("submit account:{} region:{} policy:{} date:{}".format(
+                j[1]['name'], j[2], j[3]['name'], j[4]))
+            futures[w.submit(index_account_resources, *j)] = j
+
+        # Process completed
+        for f in as_completed(futures):
+            config, account, region, policy, date = futures[f]
+            if f.exception():
+                log.warning(
+                    "error account:{} region:{} policy:{} error:{}".format(
+                        account['name'], region, policy['name'], f.exception()))
+                continue
+            log.info("complete account:{} region:{} policy:{}".format(
+                account['name'], region, policy['name']))
 
 
 if __name__ == '__main__':
