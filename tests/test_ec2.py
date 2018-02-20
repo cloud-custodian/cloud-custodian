@@ -573,7 +573,7 @@ class TestTag(BaseTest):
     def test_ec2_mark_hours(self):
         localtz = zoneinfo.gettz('America/New_York')
         dt = datetime.now(localtz)
-        dt = dt.replace(year=2018, month=2, day=14, hour=20, minute=00)
+        dt = dt.replace(year=2018, month=2, day=20, hour=18, minute=00)
         session_factory = self.replay_flight_data('test_ec2_mark_hours')
         session = session_factory(region='us-east-1')
         ec2 = session.client('ec2')
@@ -599,7 +599,7 @@ class TestTag(BaseTest):
         tags = [
             t['Value'] for t in resource['Tags'] if t['Key'] == 'hourly-mark']
         result = datetime.strptime(
-            tags[0].strip().split('@', 1)[-1], '%Y/%m/%d %H:%M').replace(
+            tags[0].strip().split('@', 1)[-1], '%Y/%m/%d %H%M %Z').replace(
             tzinfo=localtz)
         self.assertEqual(result.date(), dt.date())
 
@@ -617,7 +617,7 @@ class TestTag(BaseTest):
         }, session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['InstanceId'], 'i-0355ea744f092ac89')
+        self.assertEqual(resources[0]['InstanceId'], 'i-098dae2615acb5809')
 
 
 class TestStop(BaseTest):

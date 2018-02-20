@@ -291,14 +291,14 @@ class TagActionFilter(Filter):
         if ':' not in v or '@' not in v:
             return False
 
-        msg, tgt = v.split(':', 1)
+        msg, tgt = v.rsplit(':', 1)
         action, action_date_str = tgt.strip().split('@', 1)
 
         if action != op:
             return False
 
         try:
-            action_date = parse(action_date_str, tzinfos=tzutc)
+            action_date = parse(action_date_str).astimezone(tz)
         except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
@@ -580,7 +580,7 @@ class TagDelayedAction(Action):
             # maintains default value of days being 4 if nothing is provided
             days = 4
         action_date = (n + timedelta(days=days, hours=hours))
-        return action_date.strftime('%Y/%m/%d %H:%M')
+        return action_date.strftime('%Y/%m/%d %H%M %Z')
 
     def process(self, resources):
         self.tz = zoneinfo.gettz(
