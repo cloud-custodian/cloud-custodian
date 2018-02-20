@@ -3,44 +3,20 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify"
+                "TopicArn": "arn:aws:sns:us-west-1:644160558196:config-topic"
             }, 
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:config-topic"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:custodian-test-data-22"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:dynamodb"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-lock-notifications"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-revert-notifications"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test-topic"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_replace_policy"
+                "TopicArn": "arn:aws:sns:us-west-1:644160558196:test_sns_modify_replace_policy"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c5c358b1-98be-5372-8bd8-0a4cd1c8ab98", 
+            "RequestId": "71034cc0-df05-51f4-9122-1fc69e13e362", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "c5c358b1-98be-5372-8bd8-0a4cd1c8ab98", 
-                "date": "Tue, 13 Feb 2018 20:14:45 GMT", 
-                "content-length": "1428", 
+                "x-amzn-requestid": "71034cc0-df05-51f4-9122-1fc69e13e362", 
+                "date": "Tue, 20 Feb 2018 15:29:26 GMT", 
+                "content-length": "503", 
                 "content-type": "text/xml"
             }
         }

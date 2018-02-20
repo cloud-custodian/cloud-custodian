@@ -2,23 +2,23 @@
     "status_code": 200, 
     "data": {
         "Attributes": {
-            "SubscriptionsConfirmed": "1", 
+            "SubscriptionsConfirmed": "0", 
             "DisplayName": "", 
             "SubscriptionsDeleted": "0", 
             "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
             "Owner": "644160558196", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"CrossAccountSubscriber\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::958067445020:root\",\"arn:aws:iam::093937234853:root\",\"arn:aws:iam::913831209578:root\",\"arn:aws:iam::859967345373:root\"]},\"Action\":\"sns:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify\"}]}", 
-            "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-west-1:644160558196:test_sns_modify_replace_policy\"}]}", 
+            "TopicArn": "arn:aws:sns:us-west-1:644160558196:test_sns_modify_replace_policy", 
             "SubscriptionsPending": "0"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "da1648a3-44a1-51a8-bf42-1a5e0dd73d51", 
+            "RequestId": "87927619-c4af-5619-9c55-251f85b8166e", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "da1648a3-44a1-51a8-bf42-1a5e0dd73d51", 
-                "date": "Tue, 13 Feb 2018 20:14:46 GMT", 
-                "content-length": "1930", 
+                "x-amzn-requestid": "87927619-c4af-5619-9c55-251f85b8166e", 
+                "date": "Tue, 20 Feb 2018 15:29:26 GMT", 
+                "content-length": "1747", 
                 "content-type": "text/xml"
             }
         }

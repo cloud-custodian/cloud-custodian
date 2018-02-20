@@ -3,47 +3,20 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify"
+                "TopicArn": "arn:aws:sns:us-west-1:644160558196:config-topic"
             }, 
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:config-topic"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:custodian-test-data-22"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:dynamodb"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-lock-notifications"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-revert-notifications"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test-topic"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_add_and_remove_policy"
-            }, 
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test_sns_modify_remove_policy"
+                "TopicArn": "arn:aws:sns:us-west-1:644160558196:test_sns_modify_remove_policy"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "0b8c7e94-1aa5-521f-8542-2c69781087d6", 
+            "RequestId": "962199cf-608c-5ab0-b03b-cac9219fd243", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "0b8c7e94-1aa5-521f-8542-2c69781087d6", 
-                "date": "Tue, 13 Feb 2018 22:02:28 GMT", 
-                "content-length": "1560", 
+                "x-amzn-requestid": "962199cf-608c-5ab0-b03b-cac9219fd243", 
+                "date": "Tue, 20 Feb 2018 15:29:22 GMT", 
+                "content-length": "502", 
                 "content-type": "text/xml"
             }
         }
