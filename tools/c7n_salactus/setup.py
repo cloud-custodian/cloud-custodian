@@ -13,11 +13,17 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+import os
+
+description = ""
+if os.path.exists('README.md'):
+   description = open('README.md').read()
 
 setup(
     name="c7n_salactus",
     version='0.3.0',
     description="Cloud Custodian - Salactus S3",
+    long_description=description,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
