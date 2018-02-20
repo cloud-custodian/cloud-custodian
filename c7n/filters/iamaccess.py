@@ -275,13 +275,15 @@ class CrossAccountAccessFilter(Filter):
         self.accounts = self.get_accounts()
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
-        self.checker = self.checker_factory(
+        self.checker_config = getattr(self, 'checker_config', None) or {}
+        self.checker_config.update(
             {'allowed_accounts': self.accounts,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions})
+        self.checker = self.checker_factory(self.checker_config)
         return super(CrossAccountAccessFilter, self).process(resources, event)
 
     def get_accounts(self):

@@ -60,6 +60,7 @@ class SNSPolicyChecker(PolicyChecker):
     # check if any of the allowed_endpoints are a substring
     # to any of the values in the condition
     def handle_sns_endpoint(self, s, c):
+        # TODO: if aws:sourceowner is present and allowed_endpoints is () pass True?
         for value in c['values']:
             if not any(endpoint in value for endpoint in self.allowed_endpoints):
                 return False
@@ -114,26 +115,16 @@ class SNSCrossAccount(CrossAccountAccessFilter):
     checker_factory = SNSPolicyChecker
 
     def process(self, resources, event=None):
-        self.everyone_only = self.data.get('everyone_only', False)
-        self.conditions = set(self.data.get(
-            'whitelist_conditions',
-            ("aws:userid", "aws:username")))
-        self.actions = self.data.get('actions', ())
-        self.accounts = self.get_accounts()
         self.endpoints = self.get_endpoints()
         self.protocols = self.get_protocols()
-        self.vpcs = self.get_vpcs()
-        self.vpces = self.get_vpces()
-        self.checker = self.checker_factory(
-            {'allowed_accounts': self.accounts,
-             'allowed_endpoints': self.endpoints,
-             'allowed_protocols': self.protocols,
-             'allowed_vpc': self.vpcs,
-             'allowed_vpce': self.vpces,
-             'check_actions': self.actions,
-             'everyone_only': self.everyone_only,
-             'whitelist_conditions': self.conditions})
-        return list(filter(self, resources))
+        self.checker_config = getattr(self, 'checker_config', None) or {}
+        self.checker_config.update(
+            {
+                'allowed_endpoints': self.endpoints,
+                'allowed_protocols': self.protocols
+            }
+        )
+        return super(SNSCrossAccount, self).process(resources, event)
 
     def get_endpoints(self):
         endpoints = set(self.data.get('whitelist_endpoints', ()))
