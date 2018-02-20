@@ -184,4 +184,61 @@ class TestEcsContainerInstance(BaseTest):
              session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+<<<<<<< HEAD
+=======
+
+    def test_container_instance_update_agent(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_update_agent')
+        p = self.load_policy(
+            {'name': 'container-instance-update-agent',
+             'resource': 'ecs-container-instance',
+             'actions':[
+                 {'type': 'update-agent'}
+                 ]},
+             session_factory=session_factory)
+        resources = p.run()
+        client = session_factory().client('ecs')
+        c_instances = client.list_container_instances(
+                cluster='default').get('containerInstanceArns')
+        version = client.describe_container_instances(cluster='default',
+                containerInstances=c_instances)['containerInstances'][0]['versionInfo']['agentVersion']
+        self.assertEqual(version, '1.17.0')
+
+    def test_container_instance_drain(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_drain')
+        p = self.load_policy(
+            {'name': 'container-instance-update-agent',
+             'resource': 'ecs-container-instance',
+             'actions':[
+                 {'type': 'update-state',
+                     'state': 'DRAINING'}
+                 ]},
+             session_factory=session_factory)
+        resources = p.run()
+        client = session_factory().client('ecs')
+        c_instances = client.list_container_instances(
+                cluster='default').get('containerInstanceArns')
+        state = client.describe_container_instances(cluster='default',
+                containerInstances=c_instances)['containerInstances'][0]['status']
+        self.assertEqual(state, 'DRAINING')
+
+    def test_container_instance_activate(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_activate')
+        p = self.load_policy(
+            {'name': 'container-instance-update-agent',
+             'resource': 'ecs-container-instance',
+             'actions':[
+                 {'type': 'update-state',
+                     'state': 'ACTIVE'}
+                 ]},
+             session_factory=session_factory)
+        resources = p.run()
+        client = session_factory().client('ecs')
+        c_instances = client.list_container_instances(
+                cluster='default').get('containerInstanceArns')
+        state = client.describe_container_instances(cluster='default',
+                containerInstances=c_instances)['containerInstances'][0]['status']
+        self.assertEqual(state, 'ACTIVE')
+
+>>>>>>> ecs-container-instance
 

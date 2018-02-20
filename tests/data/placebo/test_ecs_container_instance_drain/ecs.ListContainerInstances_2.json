@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "containerInstanceArns": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8b3f1127-1679-11e8-b706-43df02b6c50d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8b3f1127-1679-11e8-b706-43df02b6c50d", 
+                "content-length": "28", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Tue, 20 Feb 2018 20:06:31 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
