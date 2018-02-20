@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
@@ -41,16 +43,20 @@ class RestAccount(ResourceManager):
 
     def _get_account(self):
         client = utils.local_session(self.session_factory).client('apigateway')
-        account = client.get_account()
+        try:
+            account = client.get_account()
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NotFoundException':
+                return []
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'apigw-settings'
-        return account
+        return [account]
 
     def resources(self):
-        return self.filter_resources([self._get_account()])
+        return self.filter_resources(self._get_account())
 
     def get_resources(self, resource_ids):
-        return [self._get_account()]
+        return self._get_account()
 
 
 OP_SCHEMA = {

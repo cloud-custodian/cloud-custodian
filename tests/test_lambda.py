@@ -18,7 +18,7 @@ import json
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
 from c7n.executor import MainThreadExecutor
-from c7n.resources.awslambda import AWSLambda
+from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
 from c7n.mu import PythonPackageArchive
 
 
@@ -127,6 +127,72 @@ class LambdaTest(BaseTest):
         client = factory().client('lambda')
         self.assertEqual(client.list_functions()['Functions'], [])
 
+    def test_delete_reserved_concurrency(self):
+        self.patch(ReservedConcurrency, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_aws_lambda_delete_concurrency')
+        p = self.load_policy({
+            'name': 'lambda-concurrency',
+            'resource': 'lambda',
+            'filters': [
+                {'FunctionName': 'envcheck'},
+                {'type': 'reserved-concurrency', 'value': 'present'}],
+            'actions': [
+                {'type': 'set-concurrency',
+                 'value': None}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'envcheck')
+
+        client = factory().client('lambda')
+        info = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertFalse('Concurrency' in info)
+
+    def test_set_expr_concurrency(self):
+        self.patch(ReservedConcurrency, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_aws_lambda_set_concurrency_expr')
+        p = self.load_policy({
+            'name': 'lambda-concurrency',
+            'resource': 'lambda',
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'Invocations',
+                 'statistics': 'Sum',
+                 'op': 'greater-than',
+                 'value': 0}],
+            'actions': [
+                {'type': 'set-concurrency',
+                 'expr': True,
+                 'value':  "\"c7n.metrics\".\"AWS/Lambda.Invocations.Sum\"[0].Sum"}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'envcheck')
+
+        client = factory().client('lambda')
+        info = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(info['Concurrency']['ReservedConcurrentExecutions'], 5)
+
+    def test_set_filter_concurrency(self):
+        self.patch(ReservedConcurrency, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_aws_lambda_set_concurrency')
+        p = self.load_policy({
+            'name': 'lambda-concurrency',
+            'resource': 'lambda',
+            'filters': [
+                {'type': 'reserved-concurrency',
+                 'value': 'absent'}],
+            'actions': [
+                {'type': 'set-concurrency',
+                 'value': 10}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'envcheck')
+
+        client = factory().client('lambda')
+        info = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(info['Concurrency']['ReservedConcurrentExecutions'], 10)
+                 
     def test_event_source(self):
         factory = self.replay_flight_data('test_aws_lambda_source')
         p = self.load_policy({

@@ -175,4 +175,13 @@ class TestEcsTask(BaseTest):
 
 
         
+class TestEcsContainerInstance(BaseTest):
+    def test_container_instance_resource(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance')
+        p = self.load_policy(
+            {'name': 'container-instances',
+             'resource': 'ecs-container-instance'},
+             session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
