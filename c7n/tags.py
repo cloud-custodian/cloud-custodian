@@ -298,12 +298,17 @@ class TagActionFilter(Filter):
             return False
 
         try:
-            action_date = parse(action_date_str).astimezone(tz)
+            action_date = parse(action_date_str)
         except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
 
         if self.current_date is None:
+            self.current_date = datetime.now()
+
+        if action_date.tzinfo:
+            # if action_date is timezone aware, set to timezone provided
+            action_date = action_date.astimezone(tz)
             self.current_date = datetime.now(tz=tz).replace(minute=0)
 
         return self.current_date >= (
