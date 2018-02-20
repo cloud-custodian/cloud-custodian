@@ -184,8 +184,6 @@ class TestEcsContainerInstance(BaseTest):
              session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-<<<<<<< HEAD
-=======
 
     def test_container_instance_update_agent(self):
         session_factory = self.replay_flight_data('test_ecs_container_instance_update_agent')
@@ -240,5 +238,4 @@ class TestEcsContainerInstance(BaseTest):
                 containerInstances=c_instances)['containerInstances'][0]['status']
         self.assertEqual(state, 'ACTIVE')
 
->>>>>>> ecs-container-instance
 
