@@ -170,7 +170,9 @@ class IamRoleFilterUsage(BaseTest):
         p = self.load_policy({
             'name': 'iam-inuse-role',
             'resource': 'iam-role',
-            'filters': ['used']}, session_factory=session_factory)
+            'filters': [{
+                'type': 'used',
+                'state': True}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
 
@@ -183,7 +185,7 @@ class IamRoleFilterUsage(BaseTest):
             'resource': 'iam-role',
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 1)
 
 
 class IamUserTest(BaseTest):
