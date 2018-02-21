@@ -164,11 +164,11 @@ class PolicyChecker(object):
 
         results = []
         for c in conditions:
-            results.append(self.handle_condition(s, c))
+            results.append(self.handle_condition(conditions, c))
 
         return all(results)
 
-    def handle_condition(self, s, c):
+    def handle_condition(self, conditions, c):
         if not c['op']:
             return False
         if c['key'] in self.whitelist_conditions:
@@ -179,7 +179,7 @@ class PolicyChecker(object):
             log.warning("no handler:%s op:%s key:%s values:%s" % (
                 handler_name, c['op'], c['key'], c['values']))
             return
-        return not handler(s, c)
+        return not handler(conditions, c)
 
     def normalize_conditions(self, s):
         s_cond = []
@@ -216,26 +216,26 @@ class PolicyChecker(object):
     # Condition handlers
 
     # kms specific
-    def handle_kms_calleraccount(self, s, c):
+    def handle_kms_calleraccount(self, conditions, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # sns default policy
-    def handle_aws_sourceowner(self, s, c):
+    def handle_aws_sourceowner(self, conditions, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # s3 logging
-    def handle_aws_sourcearn(self, s, c):
+    def handle_aws_sourcearn(self, conditions, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
-    def handle_aws_sourceip(self, s, c):
+    def handle_aws_sourceip(self, conditions, c):
         return False
 
-    def handle_aws_sourcevpce(self, s, c):
+    def handle_aws_sourcevpce(self, conditions, c):
         if not self.allowed_vpce:
             return False
         return bool(set(map(_account, c['values'])).difference(self.allowed_vpce))
 
-    def handle_aws_sourcevpc(self, s, c):
+    def handle_aws_sourcevpc(self, conditions, c):
         if not self.allowed_vpc:
             return False
         return bool(set(map(_account, c['values'])).difference(self.allowed_vpc))
