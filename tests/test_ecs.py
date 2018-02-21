@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 
+from botocore.exceptions import ClientError
 from .common import BaseTest
 
 import fnmatch
@@ -195,12 +196,38 @@ class TestEcsContainerInstance(BaseTest):
                  ]},
              session_factory=session_factory)
         resources = p.run()
+        if self.recording:
+            time.sleep(60)
         client = session_factory().client('ecs')
         c_instances = client.list_container_instances(
                 cluster='default').get('containerInstanceArns')
-        version = client.describe_container_instances(cluster='default',
+        updated_version = client.describe_container_instances(cluster='default',
                 containerInstances=c_instances)['containerInstances'][0]['versionInfo']['agentVersion']
-        self.assertEqual(version, '1.17.0')
+        self.assertNotEqual(updated_version, resources[0]['versionInfo']['agentVersion'])
+
+    def test_container_instance_update_in_progress(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_update_in_progress')
+        p = self.load_policy(
+            {'name': 'container-instance-update-agent',
+             'resource': 'ecs-container-instance',
+             'actions':[
+                 {'type': 'update-agent'}
+                 ]},
+             session_factory=session_factory)
+        with self.assertRaises(ClientError):
+            resources = p.run()
+
+    def test_container_instance_update_unavailable(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_update_unavailable')
+        p = self.load_policy(
+            {'name': 'container-instance-update-agent',
+             'resource': 'ecs-container-instance',
+             'actions':[
+                 {'type': 'update-agent'}
+                 ]},
+             session_factory=session_factory)
+        with self.assertRaises(ClientError):
+            resources = p.run()
 
     def test_container_instance_drain(self):
         session_factory = self.replay_flight_data('test_ecs_container_instance_drain')

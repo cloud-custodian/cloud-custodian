@@ -4,16 +4,16 @@
         "failures": [], 
         "containerInstances": [
             {
-                "status": "DRAINING", 
+                "status": "ACTIVE", 
                 "registeredAt": {
-                    "hour": 14, 
+                    "hour": 11, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 42, 
-                    "microsecond": 150000, 
+                    "second": 29, 
+                    "microsecond": 431000, 
                     "year": 2018, 
-                    "day": 20, 
-                    "minute": 42
+                    "day": 21, 
+                    "minute": 15
                 }, 
                 "registeredResources": [
                     {
@@ -53,9 +53,9 @@
                         "integerValue": 0
                     }
                 ], 
-                "ec2InstanceId": "i-0e172d4548d312ee0", 
+                "ec2InstanceId": "i-0efbe8e0a73bc95b9", 
                 "agentConnected": true, 
-                "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/56bb7569-6318-458e-882b-7a631df643d0", 
+                "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/a8a469ef-009f-40f8-9639-3a0d9c6a9b9e", 
                 "pendingTasksCount": 0, 
                 "remainingResources": [
                     {
@@ -95,14 +95,15 @@
                         "integerValue": 0
                     }
                 ], 
-                "version": 20, 
+                "version": 12, 
+                "agentUpdateStatus": "UPDATED", 
                 "attributes": [
                     {
                         "name": "com.amazonaws.ecs.capability.logging-driver.syslog"
                     }, 
                     {
                         "name": "ecs.ami-id", 
-                        "value": "ami-5e414e24"
+                        "value": "ami-97785bed"
                     }, 
                     {
                         "name": "com.amazonaws.ecs.capability.logging-driver.none"
@@ -188,11 +189,11 @@
                         "name": "com.amazonaws.ecs.capability.ecr-auth"
                     }, 
                     {
-                        "name": "ecs.os-type", 
-                        "value": "linux"
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.20"
                     }, 
                     {
-                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.20"
+                        "name": "ecs.os-type", 
+                        "value": "linux"
                     }, 
                     {
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
@@ -201,10 +202,10 @@
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.22"
                     }, 
                     {
-                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.23"
+                        "name": "com.amazonaws.ecs.capability.task-iam-role"
                     }, 
                     {
-                        "name": "com.amazonaws.ecs.capability.task-iam-role"
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.23"
                     }
                 ], 
                 "versionInfo": {
@@ -219,13 +220,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "22063d37-167c-11e8-bdd0-0f82b06535b3", 
+            "RequestId": "a8c21a93-1722-11e8-a625-8170ff055591", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "22063d37-167c-11e8-bdd0-0f82b06535b3", 
-                "content-length": "3292", 
+                "x-amzn-requestid": "a8c21a93-1722-11e8-a625-8170ff055591", 
+                "content-length": "3321", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "date": "Tue, 20 Feb 2018 20:25:03 GMT", 
+                "date": "Wed, 21 Feb 2018 16:17:06 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

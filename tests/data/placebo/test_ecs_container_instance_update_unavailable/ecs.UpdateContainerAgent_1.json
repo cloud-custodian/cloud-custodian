@@ -1,0 +1,22 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "33e1a454-1723-11e8-8726-bbbcb84b9fb0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "33e1a454-1723-11e8-8726-bbbcb84b9fb0", 
+                "content-length": "106", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 21 Feb 2018 16:20:59 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Error": {
+            "Message": "There is no update available for your container agent.", 
+            "Code": "NoUpdateAvailableException"
+        }
+    }
+}

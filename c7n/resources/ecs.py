@@ -398,4 +398,12 @@ class UpdateAgent(BaseAction):
                 cluster = cluster,
                 containerInstance = instance)
         except ClientError as e:
-            self.manager.log.error('Error in updating Container Instance Agent: %s' % e)
+            if e.response['Error']['Code'] == 'NoUpdateAvailableException':
+                self.manager.log.warning(
+                    'No update available for Container Instance: %s, cluster: %s'
+                    % (instance, cluster))
+            if e.response['Error']['Code'] == 'UpdateInProgressException':
+                self.manager.log.warning(
+                    'Container Instance Agent update already in progress: %s, cluster %s' %
+                    (instance, cluster))
+            raise

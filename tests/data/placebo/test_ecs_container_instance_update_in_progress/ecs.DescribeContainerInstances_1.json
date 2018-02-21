@@ -6,14 +6,14 @@
             {
                 "status": "ACTIVE", 
                 "registeredAt": {
-                    "hour": 11, 
+                    "hour": 10, 
                     "__class__": "datetime", 
                     "month": 2, 
-                    "second": 29, 
-                    "microsecond": 431000, 
+                    "second": 56, 
+                    "microsecond": 847000, 
                     "year": 2018, 
                     "day": 21, 
-                    "minute": 15
+                    "minute": 52
                 }, 
                 "registeredResources": [
                     {
@@ -53,9 +53,9 @@
                         "integerValue": 0
                     }
                 ], 
-                "ec2InstanceId": "i-0efbe8e0a73bc95b9", 
+                "ec2InstanceId": "i-02f064c3fdde57534", 
                 "agentConnected": true, 
-                "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/a8a469ef-009f-40f8-9639-3a0d9c6a9b9e", 
+                "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/d6d66c23-4bf0-414d-a06d-7387464036e8", 
                 "pendingTasksCount": 0, 
                 "remainingResources": [
                     {
@@ -95,10 +95,16 @@
                         "integerValue": 0
                     }
                 ], 
-                "version": 3, 
+                "version": 7, 
+                "agentUpdateStatus": "PENDING", 
                 "attributes": [
                     {
-                        "name": "com.amazonaws.ecs.capability.logging-driver.syslog"
+                        "name": "ecs.availability-zone", 
+                        "value": "us-east-1d"
+                    }, 
+                    {
+                        "name": "ecs.instance-type", 
+                        "value": "t2.micro"
                     }, 
                     {
                         "name": "ecs.ami-id", 
@@ -108,14 +114,16 @@
                         "name": "com.amazonaws.ecs.capability.logging-driver.none"
                     }, 
                     {
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.24"
+                    }, 
+                    {
                         "name": "com.amazonaws.ecs.capability.logging-driver.json-file"
                     }, 
                     {
-                        "name": "ecs.vpc-id", 
-                        "value": "vpc-d2d616b5"
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
                     }, 
                     {
-                        "name": "ecs.capability.execution-role-awslogs"
+                        "name": "com.amazonaws.ecs.capability.privileged-container"
                     }, 
                     {
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
@@ -127,50 +135,10 @@
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
                     }, 
                     {
-                        "name": "ecs.capability.task-cpu-mem-limit"
-                    }, 
-                    {
-                        "name": "ecs.capability.task-eni"
+                        "name": "com.amazonaws.ecs.capability.ecr-auth"
                     }, 
                     {
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.30"
-                    }, 
-                    {
-                        "name": "ecs.capability.execution-role-ecr-pull"
-                    }, 
-                    {
-                        "name": "ecs.subnet-id", 
-                        "value": "subnet-3a334610"
-                    }, 
-                    {
-                        "name": "ecs.availability-zone", 
-                        "value": "us-east-1d"
-                    }, 
-                    {
-                        "name": "ecs.instance-type", 
-                        "value": "t2.micro"
-                    }, 
-                    {
-                        "name": "com.amazonaws.ecs.capability.task-iam-role-network-host"
-                    }, 
-                    {
-                        "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-                    }, 
-                    {
-                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.24"
-                    }, 
-                    {
-                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
-                    }, 
-                    {
-                        "name": "com.amazonaws.ecs.capability.privileged-container"
-                    }, 
-                    {
-                        "name": "ecs.capability.cni-plugin-version", 
-                        "value": "2392753-2018.01.1"
-                    }, 
-                    {
-                        "name": "com.amazonaws.ecs.capability.ecr-auth"
                     }, 
                     {
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.20"
@@ -186,15 +154,15 @@
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.22"
                     }, 
                     {
-                        "name": "com.amazonaws.ecs.capability.task-iam-role"
+                        "name": "ecs.capability.execution-role-ecr-pull"
                     }, 
                     {
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.23"
                     }
                 ], 
                 "versionInfo": {
-                    "agentVersion": "1.16.2", 
-                    "agentHash": "998c9b5", 
+                    "agentVersion": "1.16.0", 
+                    "agentHash": "1ca656c", 
                     "dockerVersion": "DockerVersion: 17.09.1-ce"
                 }, 
                 "runningTasksCount": 0, 
@@ -204,13 +172,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "84969c90-1722-11e8-ba26-8fff99455a76", 
+            "RequestId": "4e555f15-1720-11e8-8dcc-0f51300037f1", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "84969c90-1722-11e8-ba26-8fff99455a76", 
-                "content-length": "2988", 
+                "x-amzn-requestid": "4e555f15-1720-11e8-8dcc-0f51300037f1", 
+                "content-length": "2474", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "date": "Wed, 21 Feb 2018 16:16:05 GMT", 
+                "date": "Wed, 21 Feb 2018 16:00:15 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

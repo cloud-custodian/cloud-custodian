@@ -1,0 +1,22 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "4e7cbd55-1720-11e8-8997-6b855814dd43", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4e7cbd55-1720-11e8-8997-6b855814dd43", 
+                "content-length": "87", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 21 Feb 2018 16:00:15 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Error": {
+            "Message": "Agent update is already in progress.", 
+            "Code": "UpdateInProgressException"
+        }
+    }
+}

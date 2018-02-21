@@ -95,7 +95,8 @@
                         "integerValue": 0
                     }
                 ], 
-                "version": 3, 
+                "version": 12, 
+                "agentUpdateStatus": "UPDATED", 
                 "attributes": [
                     {
                         "name": "com.amazonaws.ecs.capability.logging-driver.syslog"
@@ -139,6 +140,9 @@
                         "name": "ecs.capability.execution-role-ecr-pull"
                     }, 
                     {
+                        "name": "ecs.capability.container-health-check"
+                    }, 
+                    {
                         "name": "ecs.subnet-id", 
                         "value": "subnet-3a334610"
                     }, 
@@ -163,7 +167,19 @@
                         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
                     }, 
                     {
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.26"
+                    }, 
+                    {
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.27"
+                    }, 
+                    {
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
+                    }, 
+                    {
                         "name": "com.amazonaws.ecs.capability.privileged-container"
+                    }, 
+                    {
+                        "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
                     }, 
                     {
                         "name": "ecs.capability.cni-plugin-version", 
@@ -193,8 +209,8 @@
                     }
                 ], 
                 "versionInfo": {
-                    "agentVersion": "1.16.2", 
-                    "agentHash": "998c9b5", 
+                    "agentVersion": "1.17.0", 
+                    "agentHash": "761937f7", 
                     "dockerVersion": "DockerVersion: 17.09.1-ce"
                 }, 
                 "runningTasksCount": 0, 
@@ -204,13 +220,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "84969c90-1722-11e8-ba26-8fff99455a76", 
+            "RequestId": "33bb30c6-1723-11e8-b714-19018e1a2ee6", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "84969c90-1722-11e8-ba26-8fff99455a76", 
-                "content-length": "2988", 
+                "x-amzn-requestid": "33bb30c6-1723-11e8-b714-19018e1a2ee6", 
+                "content-length": "3321", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "date": "Wed, 21 Feb 2018 16:16:05 GMT", 
+                "date": "Wed, 21 Feb 2018 16:20:59 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
