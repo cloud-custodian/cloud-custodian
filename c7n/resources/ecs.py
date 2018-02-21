@@ -373,7 +373,10 @@ class UpdateState(BaseAction):
                     containerInstances = service_set,
                     status = self.data.get('state'))
             except ClientError as e:
-                self.manager.log.error('Error in setting Container Instance State: %s' % e)
+                self.manager.log.warning(
+                    'Failed to update Container Instances State: %s, cluster %s' %
+                    (service_set, cluster))
+                raise
 
 
 @ContainerInstance.action_registry.register('update-agent')
