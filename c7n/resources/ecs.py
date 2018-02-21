@@ -372,7 +372,7 @@ class UpdateState(BaseAction):
                     cluster = cluster,
                     containerInstances = service_set,
                     status = self.data.get('state'))
-            except ClientError as e:
+            except ClientError:
                 self.manager.log.warning(
                     'Failed to update Container Instances State: %s, cluster %s' %
                     (service_set, cluster))
