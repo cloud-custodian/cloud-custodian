@@ -871,16 +871,15 @@ class ModifyPolicyBase(BaseAction):
         }
     )
 
-    def add_policy(self, policy, resource):
+    def add_statements(self, policy, resource):
         current = {s['Sid']: s for s in policy.get('Statement', [])}
-        new = copy.deepcopy(current)
         additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
-        new.update(additional)
-        statements = list(new.values())
+        current.update(additional)
+        statements = list(current.values())
         policy['Statement'] = statements
         return policy
 
-    def remove_policy(self, policy, resource, matched_key):
+    def remove_statements(self, policy, resource, matched_key):
         statement_ids = self.data.get('remove-statements', [])
 
         found = []
@@ -899,7 +898,7 @@ class ModifyPolicyBase(BaseAction):
             return None, found
         return statements, found
 
-    def replace_policy(self, policy):
+    def replace_statements(self, policy):
         replacement = {"Statement": s for s in self.data.get('add-statements', [])}
         policy.update(replacement)
         return policy
