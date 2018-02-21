@@ -857,16 +857,17 @@ class ModifyPolicyBase(BaseAction):
                         {'required': ['Principal', 'NotAction', 'NotResource']},
                         {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
                     ]
-                }
+                },
+                'additionalProperties': False
             },
             'remove-statements': {
                 'type': ['array', 'string'],
                 'oneOf': [
-                    {'enum': ['matched']},
-                    {'type': 'array', 'items': {'type': 'string'}},
-                    {'type': 'string'}
+                    {'enum': ['matched', '*']},
+                    {'type': 'array', 'items': {'type': 'string'}}
                 ],
-                'required': True
+                'required': True,
+                'additionalProperties': False
             }
         }
     )
@@ -874,16 +875,21 @@ class ModifyPolicyBase(BaseAction):
     def add_statements(self, policy, resource):
         current = {s['Sid']: s for s in policy.get('Statement', [])}
         additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
-        current.update(additional)
+        if len(current) != 0:
+            current.update(additional)
+        else:
+            current = additional
         statements = list(current.values())
         policy['Statement'] = statements
         return policy
 
     def remove_statements(self, policy, resource, matched_key):
         statement_ids = self.data.get('remove-statements', [])
-
         found = []
         statements = policy.get('Statement', [])
+        if len(statement_ids) == 0:
+            return statements, found
+
         resource_statements = resource.get(matched_key, ())
 
         for s in list(statements):
@@ -897,8 +903,3 @@ class ModifyPolicyBase(BaseAction):
         if not found:
             return None, found
         return statements, found
-
-    def replace_statements(self, policy):
-        replacement = {"Statement": s for s in self.data.get('add-statements', [])}
-        policy.update(replacement)
-        return policy

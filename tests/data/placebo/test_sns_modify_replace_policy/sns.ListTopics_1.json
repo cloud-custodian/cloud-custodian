@@ -3,20 +3,17 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-west-1:644160558196:config-topic"
-            }, 
-            {
                 "TopicArn": "arn:aws:sns:us-west-1:644160558196:test_sns_modify_replace_policy"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "71034cc0-df05-51f4-9122-1fc69e13e362", 
+            "RequestId": "02e6a715-c044-546a-a79e-f4121549a0bf", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "71034cc0-df05-51f4-9122-1fc69e13e362", 
-                "date": "Tue, 20 Feb 2018 15:29:26 GMT", 
-                "content-length": "503", 
+                "x-amzn-requestid": "02e6a715-c044-546a-a79e-f4121549a0bf", 
+                "date": "Wed, 21 Feb 2018 20:13:00 GMT", 
+                "content-length": "395", 
                 "content-type": "text/xml"
             }
         }

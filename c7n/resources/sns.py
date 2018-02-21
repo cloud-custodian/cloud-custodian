@@ -146,42 +146,31 @@ class ModifyPolicyStatement(ModifyPolicyBase):
         replace = False
         results = []
         client = local_session(self.manager.session_factory).client('sns')
-        additions = self.data.get('add-statements', [])
-        deletions = self.data.get('remove-statements', [])
 
-        if deletions == "*":
+        if self.data.get('remove-statements', []) == "*":
             replace = True
 
         for r in resources:
-            new_policy = {u'Version': u'2012-10-17', u'Statement': []}
-            old_policy = r.get('Policy') or '{}'
-            old_policy = json.loads(old_policy)
+            policy = r.get('Policy') or '{}'
+            policy = json.loads(policy)
 
             if replace:
-                new_policy = self.process_replace(old_policy, r)
-            if len(additions) and len(deletions) and not replace:
-                new_policy['Statement'] += self.process_add_and_delete(old_policy, r)
-            if len(additions) and not len(deletions) and not replace:
-                new_policy['Statement'] += self.process_addition(old_policy, r).get('Statement')
-            if not len(additions) and len(deletions) and not replace:
-                new_policy['Statement'] += self.process_deletion(old_policy, r)
+                policy['Statement'] = []
+                policy['Statement'] = self.process_addition(policy, r).get('Statement')
+            else:
+                policy['Statement'] = self.process_deletion(policy, r)
+                policy['Statement'] = self.process_addition(policy, r).get('Statement')
             results += {
                 'Name': r['TopicArn'],
                 'State': 'PolicyModified',
-                'Statements': new_policy
+                'Statements': policy
             }
             client.set_topic_attributes(
                 TopicArn=r['TopicArn'],
                 AttributeName='Policy',
-                AttributeValue=json.dumps(new_policy)
+                AttributeValue=json.dumps(policy)
             )
         return results
-
-    def process_add_and_delete(self, old_policy, resource):
-        new_policy = self.add_statements(old_policy, resource)
-        new_policy, found = self.remove_statements(
-            old_policy, resource, CrossAccountAccessFilter.annotation_key)
-        return new_policy
 
     def process_addition(self, old_policy, resource):
         new_policy = self.add_statements(old_policy, resource)
@@ -192,8 +181,4 @@ class ModifyPolicyStatement(ModifyPolicyBase):
     def process_deletion(self, old_policy, resource):
         new_policy, found = self.remove_statements(
             old_policy, resource, CrossAccountAccessFilter.annotation_key)
-        return new_policy
-
-    def process_replace(self, old_policy, resource):
-        new_policy = self.replace_statements(old_policy)
         return new_policy

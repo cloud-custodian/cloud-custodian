@@ -7,18 +7,18 @@
             "SubscriptionsDeleted": "0", 
             "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
             "Owner": "644160558196", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-west-1:644160558196:test_sns_modify_add_policy\"}]}", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AddMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:us-west-1:644160558196:test_sns_modify_add_policy\"},{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:Subscribe\",\"Resource\":\"arn:aws:sns:us-west-1:644160558196:test_sns_modify_add_policy\"}]}", 
             "TopicArn": "arn:aws:sns:us-west-1:644160558196:test_sns_modify_add_policy", 
             "SubscriptionsPending": "0"
         }, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "6e67def5-11b7-54fd-8569-8df350a7be6f", 
+            "RequestId": "b49c91ff-c380-5eac-89da-c2f81a769074", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "6e67def5-11b7-54fd-8569-8df350a7be6f", 
-                "date": "Tue, 20 Feb 2018 15:29:19 GMT", 
-                "content-length": "1739", 
+                "x-amzn-requestid": "b49c91ff-c380-5eac-89da-c2f81a769074", 
+                "date": "Wed, 21 Feb 2018 20:33:57 GMT", 
+                "content-length": "1997", 
                 "content-type": "text/xml"
             }
         }
