@@ -249,6 +249,70 @@ class DeleteTable(BaseAction, StatusFilter):
                         % (f.exception()))
 
 
+@Table.action_registry.register('set-stream')
+class SetStream(BaseAction, StatusFilter):
+    """Action to enable/disable streams on table. Defaults to false.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: stream-update
+                resource: dynamodb-table
+                filters:
+                  - TableName: 'test'
+                actions:
+                  - type: set-stream
+                    state: True
+                    stream_view_type: 'NEW_IMAGE'
+
+    """
+
+    valid_status = ('ACTIVE',)
+    schema = type_schema('set-stream',
+                         state={'type': 'boolean'},
+                         stream_view_type={'type': 'string'})
+    permissions = ("dynamodb:UpdateTable",)
+
+    def process(self, tables):
+        tables = self.filter_table_state(
+            tables, self.valid_status)
+        if not len(tables):
+            return
+
+        state = self.data.get('state')
+        type = self.data.get('stream_view_type')
+
+        stream_spec = {"StreamEnabled": state}
+
+        if self.data.get('stream_view_type') is not None:
+            stream_spec.update({"StreamViewType": type})
+
+        c = local_session(self.manager.session_factory).client('dynamodb')
+
+        futures = {}
+
+        with self.executor_factory(max_workers=2) as w:
+            for t in tables:
+                futures[w.submit(
+                    c.update_table,
+                    TableName=t['TableName'],
+                    StreamSpecification=stream_spec)] = t
+
+        for f in as_completed(futures):
+            t = futures[f]
+            if f.exception():
+                self.log.error(
+                    "Exception updating dynamodb table set \n %s"
+                    % (f.exception()))
+
+            if self.data.get('stream_view_type') is not None:
+                stream_state = \
+                    f.result()['TableDescription']['StreamSpecification']['StreamEnabled']
+                t['c7n:StreamState'] = stream_state
+
+
 @Table.action_registry.register('backup')
 class CreateBackup(BaseAction, StatusFilter):
     """Creates a manual backup of a DynamoDB table. Use of the optional
@@ -301,7 +365,6 @@ class CreateBackup(BaseAction, StatusFilter):
 
 @resources.register('dynamodb-backup')
 class Backup(query.QueryResourceManager):
-
     class resource_type(object):
         service = 'dynamodb'
         type = 'table'
