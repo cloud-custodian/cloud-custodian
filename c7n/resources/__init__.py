@@ -42,6 +42,7 @@ def load_resources():
     import c7n.resources.cloudtrail
     import c7n.resources.code
     import c7n.resources.cognito
+    import c7n.resources.config
     import c7n.resources.cw
     import c7n.resources.directory
     import c7n.resources.directconnect

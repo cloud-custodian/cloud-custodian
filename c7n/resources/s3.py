@@ -770,12 +770,11 @@ class HasStatementFilter(Filter):
         required_statements = list(self.data.get('statements', []))
         for required_statement in required_statements:
             for statement in statements:
-                found = False
+                found = 0
                 for key, value in required_statement.items():
                     if key in statement and value == statement[key]:
-                        found = True
-                        break
-                if found:
+                        found += 1
+                if found and found == len(required_statement):
                     required_statements.remove(required_statement)
 
         if (self.data.get('statement_ids', []) and not required) or \

@@ -6,64 +6,27 @@
                 "UserData": "", 
                 "IamInstanceProfile": "root_joshua", 
                 "EbsOptimized": false, 
-                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:b400be77-3ccc-4cb1-ae2a-9f52a00d94ed:launchConfigurationName/Test-ASG-001", 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:25aac0eb-2089-4f08-bb63-33364f6d74aa:launchConfigurationName/asg-c7n-tag-check", 
                 "InstanceMonitoring": {
                     "Enabled": false
                 }, 
                 "ClassicLinkVPCSecurityGroups": [], 
                 "CreatedTime": {
-                    "hour": 16, 
+                    "hour": 4, 
                     "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 19, 
-                    "microsecond": 825000, 
-                    "year": 2016, 
-                    "day": 27, 
-                    "minute": 19
-                }, 
-                "BlockDeviceMappings": [
-                    {
-                        "DeviceName": "/dev/xvda", 
-                        "Ebs": {
-                            "DeleteOnTermination": true, 
-                            "VolumeSize": 8, 
-                            "VolumeType": "gp2"
-                        }
-                    }
-                ], 
-                "KeyName": "", 
-                "SecurityGroups": [
-                    "sg-6c7fa917"
-                ], 
-                "LaunchConfigurationName": "Test-ASG-001", 
-                "KernelId": "", 
-                "RamdiskId": "", 
-                "ImageId": "ami-6869aa05", 
-                "InstanceType": "t2.micro"
-            }, 
-            {
-                "UserData": "", 
-                "EbsOptimized": false, 
-                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:98077f50-089f-4455-b54b-b88674f5a641:launchConfigurationName/Test-ASG-002", 
-                "InstanceMonitoring": {
-                    "Enabled": false
-                }, 
-                "ClassicLinkVPCSecurityGroups": [], 
-                "CreatedTime": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 9, 
+                    "month": 11, 
                     "second": 32, 
-                    "microsecond": 356000, 
-                    "year": 2016, 
-                    "day": 27, 
-                    "minute": 21
+                    "microsecond": 673000, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 13
                 }, 
                 "BlockDeviceMappings": [
                     {
                         "DeviceName": "/dev/xvda", 
                         "Ebs": {
                             "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-089ba67abbc06b72a", 
                             "VolumeSize": 8, 
                             "VolumeType": "gp2"
                         }
@@ -71,25 +34,24 @@
                 ], 
                 "KeyName": "", 
                 "SecurityGroups": [
-                    "sg-6c7fa917"
+                    "sg-4b9ada34"
                 ], 
-                "LaunchConfigurationName": "Test-ASG-002", 
+                "LaunchConfigurationName": "asg-c7n-tag-check", 
                 "KernelId": "", 
                 "RamdiskId": "", 
-                "ImageId": "ami-6869aa05", 
+                "ImageId": "ami-6057e21a", 
                 "InstanceType": "t2.micro"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "027319e9-84ea-11e6-9823-274bc48aa80f", 
+            "RequestId": "d1b8770b-1190-11e8-9c20-9b951d9f8823", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "027319e9-84ea-11e6-9823-274bc48aa80f", 
-                "vary": "Accept-Encoding", 
-                "content-length": "2678", 
-                "content-type": "text/xml", 
-                "date": "Tue, 27 Sep 2016 19:38:47 GMT"
+                "x-amzn-requestid": "d1b8770b-1190-11e8-9c20-9b951d9f8823", 
+                "date": "Wed, 14 Feb 2018 14:10:31 GMT", 
+                "content-length": "1630", 
+                "content-type": "text/xml"
             }
         }
     }
