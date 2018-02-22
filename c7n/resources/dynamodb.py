@@ -365,6 +365,7 @@ class CreateBackup(BaseAction, StatusFilter):
 
 @resources.register('dynamodb-backup')
 class Backup(query.QueryResourceManager):
+
     class resource_type(object):
         service = 'dynamodb'
         type = 'table'
