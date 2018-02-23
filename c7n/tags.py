@@ -268,6 +268,11 @@ class TagActionFilter(Filter):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError("Invalid marked-for-op op:%s" % op)
+
+        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'gmt')))
+        if not tz:
+            raise FilterValidationError(
+                "Invalid timezone specified '%s'" % self.data.get('tz'))
         return self
 
     def __call__(self, i):
@@ -276,9 +281,6 @@ class TagActionFilter(Filter):
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
         tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'gmt')))
-        if not tz:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.data.get('tz'))
 
         v = None
         for n in i.get('Tags', ()):
