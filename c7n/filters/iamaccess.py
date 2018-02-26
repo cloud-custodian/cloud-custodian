@@ -168,7 +168,7 @@ class PolicyChecker(object):
 
         return all(results)
 
-    def handle_condition(self, conditions, c):
+    def handle_condition(self, s, c):
         if not c['op']:
             return False
         if c['key'] in self.whitelist_conditions:
@@ -179,7 +179,7 @@ class PolicyChecker(object):
             log.warning("no handler:%s op:%s key:%s values:%s" % (
                 handler_name, c['op'], c['key'], c['values']))
             return
-        return not handler(conditions, c)
+        return not handler(s, c)
 
     def normalize_conditions(self, s):
         s_cond = []
