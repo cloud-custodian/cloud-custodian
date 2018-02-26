@@ -1,14 +1,15 @@
 {
     "status_code": 200, 
     "data": {
+        "TrainingJobSummaries": [], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "41502cc6-cfc8-4cca-a598-69f4f0bff955", 
+            "RequestId": "8255920f-2e4e-4dd3-887e-012a0ffcb0b1", 
             "HTTPHeaders": {
-                "date": "Wed, 31 Jan 2018 14:08:31 GMT", 
-                "x-amzn-requestid": "41502cc6-cfc8-4cca-a598-69f4f0bff955", 
-                "content-length": "0", 
+                "date": "Wed, 31 Jan 2018 14:08:07 GMT", 
+                "x-amzn-requestid": "8255920f-2e4e-4dd3-887e-012a0ffcb0b1", 
+                "content-length": "27", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
