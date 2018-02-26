@@ -325,7 +325,6 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
     def process_cluster_resources(self, client, cluster_id, container_instances):
         results = []
         for service_set in chunks(container_instances, self.manager.chunk_size):
-            self.manager.log.info(container_instances)
             r = client.describe_container_instances(cluster=cluster_id,
                     containerInstances=container_instances).get('containerInstances', [])
             # Many Container Instance API calls require the cluster_id, adding as a
@@ -336,8 +335,8 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
         return results
 
 
-@ContainerInstance.action_registry.register('update-state')
-class UpdateState(BaseAction):
+@ContainerInstance.action_registry.register('set-state')
+class SetState(BaseAction):
     """Updates a container instance to either ACTIVE or DRAINING
 
     :example:
@@ -348,16 +347,19 @@ class UpdateState(BaseAction):
             - name: drain-container-instances
               resource: ecs-container-instance
               actions:
-                - type: update-state
+                - type: set-state
                   state: DRAINING
     """
-    schema = type_schema('update-state', state={"type": "string"})
+    schema = type_schema(
+        'set-state',
+        state={"type": "string",'enum': ['DRAINING', 'ACTIVE']})
     permissions = ('ecs:UpdateContainerInstancesState',)
 
     def process(self, resources):
         cluster_map = group_by(resources, 'c7n:cluster')
         for cluster in cluster_map:
-            c_instances = [i['containerInstanceArn'] for i in cluster_map[cluster]]
+            c_instances = [i['containerInstanceArn'] for i in cluster_map[cluster]
+                if i['status'] != self.data.get('state')]
             results = self.process_cluster(cluster, c_instances)
             return results
 
@@ -405,8 +407,9 @@ class UpdateAgent(BaseAction):
                 self.manager.log.warning(
                     'No update available for Container Instance: %s, cluster: %s'
                     % (instance, cluster))
-            if e.response['Error']['Code'] == 'UpdateInProgressException':
+            elif e.response['Error']['Code'] == 'UpdateInProgressException':
                 self.manager.log.warning(
                     'Container Instance Agent update already in progress: %s, cluster %s' %
                     (instance, cluster))
-            raise
+            else:
+                raise

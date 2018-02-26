@@ -199,43 +199,17 @@ class TestEcsContainerInstance(BaseTest):
         if self.recording:
             time.sleep(60)
         client = session_factory().client('ecs')
-        c_instances = client.list_container_instances(
-                cluster='default').get('containerInstanceArns')
         updated_version = client.describe_container_instances(cluster='default',
-                containerInstances=c_instances)['containerInstances'][0]['versionInfo']['agentVersion']
+                containerInstances=['a8a469ef-009f-40f8-9639-3a0d9c6a9b9e'])['containerInstances'][0]['versionInfo']['agentVersion']
         self.assertNotEqual(updated_version, resources[0]['versionInfo']['agentVersion'])
 
-    def test_container_instance_update_in_progress(self):
-        session_factory = self.replay_flight_data('test_ecs_container_instance_update_in_progress')
+    def test_container_instance_set_state(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_set_state')
         p = self.load_policy(
             {'name': 'container-instance-update-agent',
              'resource': 'ecs-container-instance',
              'actions':[
-                 {'type': 'update-agent'}
-                 ]},
-             session_factory=session_factory)
-        with self.assertRaises(ClientError):
-            resources = p.run()
-
-    def test_container_instance_update_unavailable(self):
-        session_factory = self.replay_flight_data('test_ecs_container_instance_update_unavailable')
-        p = self.load_policy(
-            {'name': 'container-instance-update-agent',
-             'resource': 'ecs-container-instance',
-             'actions':[
-                 {'type': 'update-agent'}
-                 ]},
-             session_factory=session_factory)
-        with self.assertRaises(ClientError):
-            resources = p.run()
-
-    def test_container_instance_drain(self):
-        session_factory = self.replay_flight_data('test_ecs_container_instance_drain')
-        p = self.load_policy(
-            {'name': 'container-instance-update-agent',
-             'resource': 'ecs-container-instance',
-             'actions':[
-                 {'type': 'update-state',
+                 {'type': 'set-state',
                      'state': 'DRAINING'}
                  ]},
              session_factory=session_factory)
@@ -244,21 +218,3 @@ class TestEcsContainerInstance(BaseTest):
         state = client.describe_container_instances(cluster='default',
                 containerInstances=[resources[0]['containerInstanceArn']])['containerInstances'][0]['status']
         self.assertEqual(state, 'DRAINING')
-
-    def test_container_instance_activate(self):
-        session_factory = self.replay_flight_data('test_ecs_container_instance_activate')
-        p = self.load_policy(
-            {'name': 'container-instance-update-agent',
-             'resource': 'ecs-container-instance',
-             'actions':[
-                 {'type': 'update-state',
-                     'state': 'ACTIVE'}
-                 ]},
-             session_factory=session_factory)
-        resources = p.run()
-        client = session_factory().client('ecs')
-        state = client.describe_container_instances(cluster='default',
-                containerInstances=[resources[0]['containerInstanceArn']])['containerInstances'][0]['status']
-        self.assertEqual(state, 'ACTIVE')
-
-
