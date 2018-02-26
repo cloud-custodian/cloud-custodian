@@ -200,3 +200,24 @@ class DynamodbTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_dynamodb_enable_stream(self):
+        factory = self.replay_flight_data('test_dynamodb_enable_stream')
+        p = self.load_policy({
+            'name': 'c7n-dynamodb-enable-stream',
+            'resource': 'dynamodb-table',
+            'filters': [{'TableName': 'c7n-test'},
+                        {'TableStatus': 'ACTIVE'}],
+            'actions': [{
+                'type': 'set-stream',
+                'state': True,
+                'stream_view_type': 'NEW_IMAGE'}]
+        },
+            session_factory=factory)
+        resources = p.run()
+        stream_field = resources[0]['c7n:StreamState']
+        stream_type = resources[0]['c7n:StreamType']
+
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(stream_field)
+        self.assertEqual("NEW_IMAGE", stream_type)
