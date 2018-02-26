@@ -4,17 +4,15 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "05eac87e-2771-11e7-b9ab-7d2494e890ee", 
+            "RequestId": "c73e1f6b-1190-11e8-9553-c7fc731c69ce", 
             "HTTPHeaders": {
-                "date": "Sat, 22 Apr 2017 15:33:23 GMT", 
-                "x-amzn-requestid": "05eac87e-2771-11e7-b9ab-7d2494e890ee", 
-                "content-length": "30", 
+                "date": "Wed, 14 Feb 2018 14:10:15 GMT", 
+                "x-amzn-requestid": "c73e1f6b-1190-11e8-9553-c7fc731c69ce", 
+                "content-length": "11", 
                 "content-type": "application/json", 
                 "connection": "keep-alive"
             }
         }, 
-        "Tags": {
-            "Language": "Python"
-        }
+        "Tags": {}
     }
 }

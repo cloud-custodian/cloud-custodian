@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleState": "DELETING", 
+                "Description": "cloud-custodian lambda policy", 
+                "ConfigRuleName": "custodian-db-tags", 
+                "ConfigRuleArn": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-whifsj", 
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA", 
+                    "SourceIdentifier": "arn:aws:lambda:us-east-2:644160558196:function:custodian-db-tags", 
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config", 
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                }, 
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::RDS::DBInstance"
+                    ]
+                }, 
+                "ConfigRuleId": "config-rule-whifsj"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0d251dca-13d8-11e8-883f-69b119912d1e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0d251dca-13d8-11e8-883f-69b119912d1e", 
+                "date": "Sat, 17 Feb 2018 11:45:28 GMT", 
+                "content-length": "535", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

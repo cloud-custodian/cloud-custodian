@@ -297,3 +297,37 @@ class DeleteTaskDefinition(BaseAction):
                 if e.response['Error'][
                         'Message'] != 'The specified task definition does not exist.':
                     raise
+
+
+@resources.register('ecs-container-instance')
+class ContainerInstance(query.ChildResourceManager):
+
+    chunk_size = 100
+
+    class resource_type(object):
+        service = 'ecs'
+        id = name = 'containerInstance'
+        enum_spec = ('list_container_instances', 'containerInstanceArns', None)
+        parent_spec = ('ecs', 'cluster')
+        dimension = None
+
+    @property
+    def source_type(self):
+        source = self.data.get('source', 'describe')
+        if source in ('describe', 'describe-child'):
+            source = 'describe-ecs-container-instance'
+        return source
+
+
+@query.sources.register('describe-ecs-container-instance')
+class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
+
+    def process_cluster_resources(self, client, cluster_id, container_instances):
+        results = []
+        for service_set in chunks(container_instances, self.manager.chunk_size):
+            self.manager.log.info(container_instances)
+            results.extend(
+                client.describe_container_instances(
+                    cluster=cluster_id,
+                    containerInstances=container_instances).get('containerInstances', []))
+        return results

@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 1, 
+                    "minute": 27
+                }, 
+                "Sum": 5.0, 
+                "Unit": "Count"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c4b69664-1264-11e8-b8b8-b1099c700db2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c4b69664-1264-11e8-b8b8-b1099c700db2", 
+                "date": "Thu, 15 Feb 2018 15:27:43 GMT", 
+                "content-length": "484", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Label": "Invocations"
+    }
+}
