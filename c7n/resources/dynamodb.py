@@ -37,7 +37,7 @@ class Table(query.QueryResourceManager):
         type = 'table'
         enum_spec = ('list_tables', 'TableNames', None)
         detail_spec = ("describe_table", "TableName", None, "Table")
-        id = 'Table'
+        id = 'TableName'
         filter_name = None
         name = 'TableName'
         date = 'CreationDateTime'
@@ -262,6 +262,7 @@ class SetStream(BaseAction, StatusFilter):
                 resource: dynamodb-table
                 filters:
                   - TableName: 'test'
+                  - TableStatus: 'ACTIVE'
                 actions:
                   - type: set-stream
                     state: True
@@ -279,6 +280,7 @@ class SetStream(BaseAction, StatusFilter):
         tables = self.filter_table_state(
             tables, self.valid_status)
         if not len(tables):
+            self.log.warning("Table not in ACTIVE state.")
             return
 
         state = self.data.get('state')
@@ -291,14 +293,10 @@ class SetStream(BaseAction, StatusFilter):
 
         c = local_session(self.manager.session_factory).client('dynamodb')
 
-        futures = {}
-
         with self.executor_factory(max_workers=2) as w:
-            for t in tables:
-                futures[w.submit(
-                    c.update_table,
-                    TableName=t['TableName'],
-                    StreamSpecification=stream_spec)] = t
+            futures = {w.submit(c.update_table,
+                                TableName=t['TableName'],
+                                StreamSpecification=stream_spec): t for t in tables}
 
         for f in as_completed(futures):
             t = futures[f]
@@ -306,11 +304,16 @@ class SetStream(BaseAction, StatusFilter):
                 self.log.error(
                     "Exception updating dynamodb table set \n %s"
                     % (f.exception()))
+                continue
 
             if self.data.get('stream_view_type') is not None:
                 stream_state = \
                     f.result()['TableDescription']['StreamSpecification']['StreamEnabled']
+                stream_type = \
+                    f.result()['TableDescription']['StreamSpecification']['StreamViewType']
+
                 t['c7n:StreamState'] = stream_state
+                t['c7n:StreamType'] = stream_type
 
 
 @Table.action_registry.register('backup')
@@ -333,7 +336,7 @@ class CreateBackup(BaseAction, StatusFilter):
 
     valid_status = ('ACTIVE',)
     schema = type_schema('backup',
-                prefix={'type': 'string'})
+                         prefix={'type': 'string'})
     permissions = ('dynamodb:CreateBackup',)
 
     def process(self, resources):
@@ -365,7 +368,6 @@ class CreateBackup(BaseAction, StatusFilter):
 
 @resources.register('dynamodb-backup')
 class Backup(query.QueryResourceManager):
-
     class resource_type(object):
         service = 'dynamodb'
         type = 'table'
@@ -428,7 +430,6 @@ class DeleteBackup(BaseAction, StatusFilter):
 
 @resources.register('dynamodb-stream')
 class Stream(query.QueryResourceManager):
-
     # Note stream management takes place on the table resource
 
     class resource_type(object):
