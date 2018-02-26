@@ -251,7 +251,7 @@ class DeleteTable(BaseAction, StatusFilter):
 
 @Table.action_registry.register('set-stream')
 class SetStream(BaseAction, StatusFilter):
-    """Action to enable/disable streams on table. Defaults to false.
+    """Action to enable/disable streams on table.
 
     :example:
 
