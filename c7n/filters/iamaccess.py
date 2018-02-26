@@ -164,7 +164,7 @@ class PolicyChecker(object):
 
         results = []
         for c in conditions:
-            results.append(self.handle_condition(conditions, c))
+            results.append(self.handle_condition(s, c))
 
         return all(results)
 
@@ -216,26 +216,26 @@ class PolicyChecker(object):
     # Condition handlers
 
     # kms specific
-    def handle_kms_calleraccount(self, conditions, c):
+    def handle_kms_calleraccount(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # sns default policy
-    def handle_aws_sourceowner(self, conditions, c):
+    def handle_aws_sourceowner(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # s3 logging
-    def handle_aws_sourcearn(self, conditions, c):
+    def handle_aws_sourcearn(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
-    def handle_aws_sourceip(self, conditions, c):
+    def handle_aws_sourceip(self, s, c):
         return False
 
-    def handle_aws_sourcevpce(self, conditions, c):
+    def handle_aws_sourcevpce(self, s, c):
         if not self.allowed_vpce:
             return False
         return bool(set(map(_account, c['values'])).difference(self.allowed_vpce))
 
-    def handle_aws_sourcevpc(self, conditions, c):
+    def handle_aws_sourcevpc(self, s, c):
         if not self.allowed_vpc:
             return False
         return bool(set(map(_account, c['values'])).difference(self.allowed_vpc))

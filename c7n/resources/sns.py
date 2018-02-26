@@ -57,11 +57,12 @@ class SNSPolicyChecker(PolicyChecker):
     def allowed_protocols(self):
         return self.checker_config.get('allowed_protocols', ())
 
-    def handle_sns_endpoint(self, conditions, c):
+    def handle_sns_endpoint(self, s, c):
+        conditions = self.normalize_conditions(s)
         # yield to aws:sourceowner
         if not self.allowed_endpoints:
             return not any(
-                single_condition['key'] == 'aws:sourceowner' for single_condition in conditions
+                single_condition.get('key',None) == 'aws:sourceowner' for single_condition in conditions
             )
         # check if any of the allowed_endpoints are a substring
         # to any of the values in the condition
@@ -70,7 +71,7 @@ class SNSPolicyChecker(PolicyChecker):
                 return True
         return False
 
-    def handle_sns_protocol(self, conditions, c):
+    def handle_sns_protocol(self, s, c):
         return bool(set(c['values']).difference(self.allowed_protocols))
 
 
