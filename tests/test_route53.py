@@ -273,14 +273,10 @@ class Route53DomainTest(BaseTest):
         p = self.load_policy({
              'name': 'r53domain-auto-renew',
              'resource': 'r53domain',
-             'filters': [
-                {
-                'type': 'value',
-                'key': 'AutoRenew',
-                'value': False
-                }
-                ]},
-             session_factory=session_factory)
+             'filters': [{
+                 'type': 'value',
+                 'key': 'AutoRenew',
+                 'value': True}]},session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -289,13 +285,44 @@ class Route53DomainTest(BaseTest):
         p = self.load_policy({
              'name': 'r53domain-transfer-lock',
              'resource': 'r53domain',
-             'filters': [
-                {
-                'type': 'value',
-                'key': 'TransferLock',
-                'value': False
-                }
-                ]},
-             session_factory=session_factory)
+             'filters': [{
+                 'type': 'value',
+                 'key': 'TransferLock',
+                 'value': False}]},session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_route53_domain_add_tag(self):
+        session_factory = self.replay_flight_data('test_route53_domain_add_tag')
+        p = self.load_policy({
+            'name': 'r53domain-add-tag',
+            'resource': 'r53domain',
+            'filters': [{'tag:TestTag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'TestTag',
+                'value': 'TestValue'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('route53domains')
+        tags = client.list_tags_for_domain(
+            DomainName=resources[0]['DomainName'])['TagList']
+        self.assertEqual(
+            [tags[0]['Key'], tags[0]['Value']], ['TestTag', 'TestValue'])
+
+    def test_route53_domain_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            'test_route53_domain_remove_tag')
+        p = self.load_policy({
+            'name': 'r53domain-add-tag',
+            'resource': 'r53domain',
+            'filters': [{'tag:TestTag': 'present'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['TestTag']}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('route53domains')
+        tags = client.list_tags_for_domain(
+            DomainName=resources[0]['DomainName'])['TagList']
+        self.assertEqual(len(tags), 0)
