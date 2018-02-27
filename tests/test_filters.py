@@ -13,9 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from dateutil import tz
-
+import calendar
 from datetime import datetime, timedelta
+from dateutil import tz
 import unittest
 
 from c7n import filters as base_filters
@@ -98,7 +98,7 @@ class TestAndFilter(unittest.TestCase):
 
 
 class TestNotFilter(unittest.TestCase):
-    
+
     def test_not(self):
 
         results = [
@@ -112,7 +112,7 @@ class TestNotFilter(unittest.TestCase):
                 {'Architecture': 'x86_64'},
                 {'Color': 'green'}]})
         self.assertEqual(len(f.process(results)), 2)
-        
+
         """
         f = filters.factory({
             'not': [
@@ -154,9 +154,6 @@ class TestValueFilter(unittest.TestCase):
         vf.vtype = 'size'
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (sentinel, 0))
-        vf.vtype = 'age'
-        res = vf.process_value_type(sentinel, value, resource)
-        self.assertEqual(res, (0, sentinel))
         vf.vtype = 'cidr'
         sentinel = '10.0.0.0/16'
         value = '10.10.10.10'
@@ -316,6 +313,8 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(one_month), True)
         self.assertFilter(fdata, i(now), True)
         self.assertFilter(fdata, i(now.isoformat()), True)
+        self.assertFilter(fdata, i(now.isoformat()), True)
+        self.assertFilter(fdata, i(calendar.timegm(now.timetuple())), True)
 
     def test_expiration(self):
 
