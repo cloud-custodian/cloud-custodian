@@ -753,6 +753,63 @@ class TestNotInList(unittest.TestCase):
             False)
 
 
+class TestContains(unittest.TestCase):
+
+    def test_contains(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Thing',
+                'value': 'D',
+                'op': 'contains'
+            })
+        self.assertEqual(
+            f(instance(Thing=['A', 'B', 'C'])),
+            False)
+        self.assertEqual(
+            f(instance(Thing=['D', 'E', 'F'])),
+            True)
+
+
+class TestDifference(unittest.TestCase):
+
+    def test_difference(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Thing',
+                'value': ['A','B','C'],
+                'op': 'difference'
+            })
+        self.assertEqual(
+            f(instance(Thing=['A', 'B', 'C'])),
+            False)
+        self.assertEqual(
+            f(instance(Thing=['D', 'E', 'F'])),
+            True)
+        self.assertEqual(
+            f(instance(Thing=['A', 'B', 'D'])),
+            True)
+
+
+class TestIntersect(unittest.TestCase):
+
+    def test_intersect(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Thing',
+                'value': ['A','B','C'],
+                'op': 'intersect'
+            })
+        self.assertEqual(
+            f(instance(Thing=['D', 'E', 'F'])),
+            False)
+        self.assertEqual(
+            f(instance(Thing=['C', 'D', 'E'])),
+            True)
+
+
 class TestFilterRegistry(unittest.TestCase):
 
     def test_filter_registry(self):
