@@ -271,14 +271,14 @@ class TestModelInstance(BaseTest):
         self.assertEqual(len(resources), 1)
     
 class TestSagemakerJob(BaseTest):
-    def test_list_jobs(self):
+
+    def test_sagemaker_training_job_query(self):
         session_factory = self.replay_flight_data(
-            'test_sagemaker_training_jobs')
+            'test_sagemaker_training_job_query')
         p = self.load_policy({
-            'name': 'list-training-jobs',
-            'filters': [{
-                'TrainingJobStatus': 'Completed'}],
-            'resource': 'sagemaker-job'
+            'name': 'query-training-jobs',
+            'resource': 'sagemaker-job',
+            'query': [{'StatusEquals': 'Failed'}]
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -286,25 +286,61 @@ class TestSagemakerJob(BaseTest):
     def test_stop_job(self):
         session_factory = self.replay_flight_data(
             'test_sagemaker_training_job_stop')
+        client = session_factory(region='us-east-1').client('sagemaker')
         p = self.load_policy({
             'name': 'stop-training-job',
             'resource': 'sagemaker-job',
-            'filters': [
-                {'TrainingJobStatus': 'InProgress'},
-                {'type': 'value',
-                 'key': 'InputDataConfig[].ChannelName',
-                 'value': 'train',
-                 'op': 'contains'}],
+            'filters': [{
+                'type': 'value',
+                'key': 'InputDataConfig[].ChannelName',
+                'value': 'train',
+                'op': 'contains'}],
             'actions': [{
                 'type': 'stop'}]
         }, session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 1)
+        job = client.describe_training_job(
+            TrainingJobName=resources[0]['TrainingJobName'])
+        self.assertEqual(job['TrainingJobStatus'], 'Stopping')
+
+    def test_tag_job(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_training_job_tag')
+        p = self.load_policy({
+            'name': 'tag-training-job',
+            'resource': 'sagemaker-job',
+            'filters': [{'tag:JobTag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'JobTag',
+                'value': 'JobTagValue'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
         client = session_factory(region='us-east-1').client('sagemaker')
-        status = client.describe_training_job(
-            TrainingJobName='kmeans-2018-01-18-19-21-19-098'
-        )['TrainingJobStatus']
-        self.assertEqual(status, 'Stopping')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['TrainingJobArn'])['Tags']
+        self.assertEqual(
+            [tags[0]['Key'], tags[0]['Value']], ['JobTag', 'JobTagValue'])
+
+    def test_untag_job(self):
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_training_job_remove_tag')
+        p = self.load_policy({
+            'name': 'remove-training-job-tag',
+            'resource': 'sagemaker-job',
+            'filters': [{'tag:JobTag': 'JobTagValue'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['JobTag']}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region='us-east-1').client('sagemaker')
+        tags = client.list_tags(
+            ResourceArn=resources[0]['TrainingJobArn'])['Tags']
+        self.assertEqual(len(tags), 0)
 
 
 class TestSagemakerEndpoint(BaseTest):

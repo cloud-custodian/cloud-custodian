@@ -1,20 +1,20 @@
 {
     "status_code": 200, 
     "data": {
-        "TrainingJobName": "kmeans-2018-01-18-19-21-19-098", 
+        "TrainingJobName": "kmeans-2018-01-31-14-07-29-021", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "26f36277-c1a2-4621-b8e9-fe356dbb9776", 
+            "RequestId": "4eb02e44-4eaa-4449-a052-ce3ec6b53992", 
             "HTTPHeaders": {
-                "date": "Thu, 18 Jan 2018 19:23:22 GMT", 
-                "x-amzn-requestid": "26f36277-c1a2-4621-b8e9-fe356dbb9776", 
+                "date": "Wed, 31 Jan 2018 14:08:30 GMT", 
+                "x-amzn-requestid": "4eb02e44-4eaa-4449-a052-ce3ec6b53992", 
                 "content-length": "1140", 
                 "content-type": "application/x-amz-json-1.1", 
                 "connection": "keep-alive"
             }
         }, 
-        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-18-19-21-19-098", 
+        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-31-14-07-29-021", 
         "InputDataConfig": [
             {
                 "CompressionType": "None", 
@@ -23,7 +23,7 @@
                     "S3DataSource": {
                         "S3DataType": "ManifestFile", 
                         "S3DataDistributionType": "ShardedByS3Key", 
-                        "S3Uri": "s3://c7n-sm-test/kmeans_highlevel_example/data/KMeans-2018-01-18-19-20-52-198/.amazon.manifest"
+                        "S3Uri": "s3://c7n-sm-test/kmeans_highlevel_example/data/KMeans-2018-01-31-14-07-05-862/.amazon.manifest"
                     }
                 }, 
                 "RecordWrapperType": "None"
@@ -41,14 +41,14 @@
         }, 
         "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
         "CreationTime": {
-            "hour": 14, 
+            "hour": 9, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 19, 
-            "microsecond": 378000, 
+            "second": 29, 
+            "microsecond": 294000, 
             "year": 2018, 
-            "day": 18, 
-            "minute": 21
+            "day": 31, 
+            "minute": 7
         }, 
         "TrainingJobStatus": "InProgress", 
         "OutputDataConfig": {
@@ -64,14 +64,14 @@
             "InstanceType": "ml.c4.8xlarge"
         }, 
         "LastModifiedTime": {
-            "hour": 14, 
+            "hour": 9, 
             "__class__": "datetime", 
             "month": 1, 
-            "second": 19, 
-            "microsecond": 984000, 
+            "second": 29, 
+            "microsecond": 712000, 
             "year": 2018, 
-            "day": 18, 
-            "minute": 21
+            "day": 31, 
+            "minute": 7
         }, 
         "SecondaryStatus": "Starting"
     }

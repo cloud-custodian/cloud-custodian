@@ -444,7 +444,11 @@ class ValueFilter(Filter):
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
-
+            if isinstance(value, (int, float)):
+                try:
+                    value = datetime.datetime.fromtimestamp(value).replace(tzinfo=tzutc())
+                except ValueError:
+                    value = 0
             if not isinstance(value, datetime.datetime):
                 # EMR bug when testing ages in EMR. This is due to
                 # EMR not having more functionality.
@@ -452,7 +456,6 @@ class ValueFilter(Filter):
                     value = parse(value, default=datetime.datetime.now(tz=tzutc()))
                 except (AttributeError, TypeError, ValueError):
                     value = 0
-
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
