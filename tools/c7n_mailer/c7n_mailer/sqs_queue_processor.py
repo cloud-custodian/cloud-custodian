@@ -115,7 +115,7 @@ class MailerSqsQueueProcessor(object):
             msg_kind = sqs_message.get('MessageAttributes', {}).get('mtype')
             if msg_kind:
                 msg_kind = msg_kind['StringValue']
-            if not msg_kind == DATA_MESSAGE and not json.loads(sqs_message['Body']).get('Type', None) == 'Notification':
+            if not msg_kind == DATA_MESSAGE:
                 warning_msg = 'Unknown sqs_message or sns format %s' % (sqs_message['Body'][:50])
                 self.logger.warning(warning_msg)
             if parallel:
@@ -135,14 +135,12 @@ class MailerSqsQueueProcessor(object):
     # in the ldap_uid_tags section of your mailer.yml, we'll do a lookup of those emails
     # (and their manager if that option is on) and also send emails there.
     def process_sqs_messsage(self, encoded_sqs_message):
-        if json.loads(encoded_sqs_message['Body']).get('Type', None) == 'Notification':
-            sqs_message = json.loads(zlib.decompress(base64.b64decode(
-                json.dumps(
-                    json.loads(encoded_sqs_message['Body'])['Message']
-                    )
-                )))
-        else:
-            sqs_message = json.loads(zlib.decompress(base64.b64decode(encoded_sqs_message['Body'])))
+        body = encoded_sqs_message['Body']
+        try:
+            body = json.dumps(json.loads(body)['Message'])
+        except ValueError:
+            pass
+        sqs_message = json.loads(zlib.decompress(base64.b64decode(body)))
         self.logger.debug("Got account:%s message:%s %s:%d policy:%s recipients:%s" % (
             sqs_message.get('account', 'na'),
             encoded_sqs_message['MessageId'],
