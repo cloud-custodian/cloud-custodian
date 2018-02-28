@@ -415,7 +415,7 @@ class RemoveTag(Action):
         return self.manager.retry(
             client.delete_tags,
             Resources=[v[self.id_key] for v in vol_set],
-            Tags=[{'Key': k for k in tag_keys}],
+            Tags=[{'Key': k} for k in tag_keys],
             DryRun=self.manager.config.dryrun)
 
 
