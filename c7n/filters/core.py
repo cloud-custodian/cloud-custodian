@@ -65,6 +65,10 @@ def operator_ni(x, y):
     return x not in y
 
 
+def difference(x, y):
+    return bool(set(x).difference(y))
+
+
 def intersect(x, y):
     return bool(set(x).intersection(y))
 
@@ -88,6 +92,7 @@ OPERATORS = {
     'ni': operator_ni,
     'not-in': operator_ni,
     'contains': operator.contains,
+    'difference': difference,
     'intersect': intersect}
 
 
