@@ -115,7 +115,7 @@ class MailerSqsQueueProcessor(object):
             msg_kind = sqs_message.get('MessageAttributes', {}).get('mtype')
             if msg_kind:
                 msg_kind = msg_kind['StringValue']
-            if not msg_kind == DATA_MESSAGE and not json.loads(sqs_message['Body']).get('Type', None) == 'Notification':
+            if not msg_kind == DATA_MESSAGE:
                 warning_msg = 'Unknown sqs_message or sns format %s' % (sqs_message['Body'][:50])
                 self.logger.warning(warning_msg)
             if parallel:
@@ -138,7 +138,7 @@ class MailerSqsQueueProcessor(object):
         body = encoded_sqs_message['Body']
         try:
             body = json.dumps(json.loads(body)['Message'])
-        except:
+        except ValueError:
             pass
         sqs_message = json.loads(zlib.decompress(base64.b64decode(body)))
         self.logger.debug("Got account:%s message:%s %s:%d policy:%s recipients:%s" % (
