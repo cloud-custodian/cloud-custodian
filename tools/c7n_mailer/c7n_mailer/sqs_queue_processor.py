@@ -135,17 +135,12 @@ class MailerSqsQueueProcessor(object):
     # in the ldap_uid_tags section of your mailer.yml, we'll do a lookup of those emails
     # (and their manager if that option is on) and also send emails there.
     def process_sqs_messsage(self, encoded_sqs_message):
-        if isinstance(encoded_sqs_message['Body'], six.string_types):
-            sqs_message = json.loads(zlib.decompress(base64.b64decode(encoded_sqs_message['Body'])))
-        elif json.loads(encoded_sqs_message['Body']).get('Type', None) == 'Notification':
-            sqs_message = json.loads(zlib.decompress(base64.b64decode(
-                json.dumps(
-                    json.loads(encoded_sqs_message['Body'])['Message']
-                    )
-                )))
-        else:
-            self.logger.error('sqs_message not decoded')
-            raise Exception
+        body = encoded_sqs_message['Body']
+        try:
+            body = json.dumps(json.loads(body)['Message'])
+        except:
+            pass
+        sqs_message = json.loads(zlib.decompress(base64.b64decode(body)))
         self.logger.debug("Got account:%s message:%s %s:%d policy:%s recipients:%s" % (
             sqs_message.get('account', 'na'),
             encoded_sqs_message['MessageId'],
