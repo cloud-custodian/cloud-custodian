@@ -20,6 +20,7 @@ from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+from c7n.tags import RemoveTag, Tag
 
 
 class Route53Base(object):
@@ -138,3 +139,76 @@ class Route53Domain(QueryResourceManager):
         filter_name = None
         date = None
         dimension = None
+
+    permissions = ('route53domains:ListTagsForDomain',)
+
+    def augment(self, domains):
+        client = local_session(self.session_factory).client('route53domains')
+
+        def _list_tags(d):
+            tags = client.list_tags_for_domain(
+                DomainName=d['DomainName'])['TagList']
+            d['Tags'] = tags
+            return d
+
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_list_tags, domains)))
+
+
+@Route53Domain.action_registry.register('tag')
+class Route53DomainAddTag(Tag):
+    """Adds tags to a route53 domain
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: route53-tag
+            resource: r53domain
+            filters:
+              - "tag:DesiredTag": absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('route53domains:UpdateTagsForDomain',)
+
+    def process_resource_set(self, domains, tags):
+        client = local_session(
+            self.manager.session_factory).client('route53domains')
+
+        for d in domains:
+            client.update_tags_for_domain(
+                DomainName=d[self.id_key],
+                TagsToUpdate=tags)
+
+
+@Route53Domain.action_registry.register('remove-tag')
+class Route53DomainRemoveTag(RemoveTag):
+    """Remove tags from a route53 domain
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: route53-expired-tag
+            resource: r53domain
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
+    """
+    permissions = ('route53domains:DeleteTagsForDomain',)
+
+    def process_resource_set(self, domains, keys):
+        client = local_session(
+            self.manager.session_factory).client('route53domains')
+
+        for d in domains:
+            client.delete_tags_for_domain(
+                DomainName=d[self.id_key],
+                TagsToDelete=keys)
