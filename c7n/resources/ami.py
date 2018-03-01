@@ -195,3 +195,32 @@ class ImageUnusedFilter(Filter):
         if self.data.get('value', True):
             return [r for r in resources if r['ImageId'] not in images]
         return [r for r in resources if r['ImageId'] in images]
+
+
+@filters.register('encrypted')
+class Encrypted(Filter):
+    """Filters images on encryption status
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-is-unencrypted
+                resource: ami
+                filters:
+                  - not:
+                    - type: encrypted
+    """
+
+    permissions = ('ec2:DescribeImages',)
+    schema = type_schema('encrypted')
+
+    def __call__(self, i):
+        for block_device in i['BlockDeviceMappings']:
+            if not block_device['Ebs']:
+                continue
+            if not block_device['Ebs']['Encrypted']:
+                return False
+
+        return True
