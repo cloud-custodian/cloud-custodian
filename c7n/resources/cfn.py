@@ -102,7 +102,7 @@ class CloudFormationAddTag(Tag):
                 UsePreviousTemplate=True,
                 Tags=tags)
 
-        with self.executor_factory(max_workers=5) as w:
+        with self.executor_factory(max_workers=2) as w:
             list(w.map(_tag_stacks, stacks))
 
 
@@ -135,5 +135,5 @@ class CloudFormationRemoveTag(RemoveTag):
                 UsePreviousTemplate=True,
                 Tags=tags)
 
-        with self.executor_factory(max_workers=5) as w:
+        with self.executor_factory(max_workers=2) as w:
             list(w.map(_remove_tag, stacks))
