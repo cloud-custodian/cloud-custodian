@@ -194,7 +194,9 @@ def enable(config, master, tags, accounts, debug, message, region):
     master_client = master_session.client('guardduty')
     detector_id = get_or_create_detector_id(master_client)
 
-    extant_members = master_client.list_members(DetectorId=detector_id).get('Members', ())
+    results = master_client.get_paginator(
+        'list_members').paginate(DetectorId=detector_id)
+    extant_members = results.build_full_result().get('Members', ())
     extant_ids = {m['AccountId'] for m in extant_members}
 
     # Find extant members not currently enabled
@@ -270,8 +272,9 @@ def enable_account(account, master_account_id, region):
         region=region)
     member_client = member_session.client('guardduty')
     m_detector_id = get_or_create_detector_id(member_client)
+    all_invitations = member_client.list_invitations().get('Invitations', [])
     invitations = [
-        i for i in member_client.list_invitations().get('Invitations', [])
+        i for i in all_invitations
         if i['AccountId'] == master_account_id]
     invitations.sort(key=operator.itemgetter('InvitedAt'))
     if not invitations:
