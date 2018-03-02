@@ -61,6 +61,20 @@ class ReplicationInstance(QueryResourceManager):
         return resources
 
 
+@resources.register('dms-endpoint')
+class DmsEndpoints(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'dms'
+        enum_spec = ('describe_endpoints', 'Endpoints', None)
+        detail_spec = None
+        id = 'EndpointArn'
+        name = 'EndpointIdentifier'
+        date = None
+        dimension = None
+        filter_name = None
+
+
 class InstanceDescribe(DescribeSource):
 
     def get_resources(self, resource_ids):
@@ -220,6 +234,43 @@ class InstanceMarkForOp(TagDelayedAction):
                 client.add_tags_to_resource(
                     ResourceArn=r['ReplicationInstanceArn'],
                     Tags=tags_list)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
+                    continue
+                raise
+
+
+@DmsEndpoints.action_registry.register('set-endpoint-ssl')
+class SetEndpointSsl(BaseAction):
+    """Configured the SslMode attribute on a dms endpoint
+
+    :example:
+
+    .. code-block: yaml
+
+        - policies:
+            - name: dms-endpoint-require-ssl
+              resource: dms-endpoint
+              filters:
+                - SslMode: none
+              actions:
+                - type: set-endpoint-ssl
+                  mode: require
+    """
+    schema = type_schema(
+        'set-endpoint-ssl',
+        mode={'type': 'string', 'enum': [
+            'none', 'require', 'verify-ca', 'verify-full']},
+        required=['mode'])
+    permissions = ('dms:ModifyEndpoint',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dms')
+        for r in resources:
+            try:
+                client.modify_endpoint(
+                    EndpointArn=r['EndpointArn'],
+                    SslMode=self.data.get('mode'))
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceNotFoundFault':
                     continue
