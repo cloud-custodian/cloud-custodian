@@ -160,6 +160,7 @@ class Copy(BaseAction):
             'type': {'enum': ['copy']},
             'name': {'type': 'string'},
             'description': {'type': 'string'},
+            'region': {'type': 'string'},
             'encrypt': {'type': 'boolean'},
             'key-id': {'type': 'string'}
         }
@@ -167,7 +168,9 @@ class Copy(BaseAction):
 
     def process(self, images):
         session = local_session(self.manager.session_factory)
-        client = session.client('ec2')
+        client = session.client(
+            'ec2',
+            region_name=self.data.get('region', None))
 
         for image in images:
             client.copy_image(
