@@ -129,6 +129,56 @@ class RemoveLaunchPermissions(BaseAction):
             ImageId=image['ImageId'], Attribute="launchPermission")
 
 
+@actions.register('copy')
+class Copy(BaseAction):
+    """Action to copy AMIs with optional encryption
+
+    This action can copy AMIs while optionally encrypting or decrypting
+    the target AMI. It is advised to use in conjunction with a filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-ensure-encrypted
+                resource: ami
+                filters:
+                  - not:
+                    - type: encrypted
+                actions:
+                  - type: copy
+                    encrypt: true
+                    key-id: 00000000-0000-0000-0000-000000000000
+    """
+
+    permissions = ('ec2:CopyImage',)
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['copy']},
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+            'encrypt': {'type': 'boolean'},
+            'key-id': {'type': 'string'}
+        }
+    }
+
+    def process(self, images):
+        session = local_session(self.manager.session_factory)
+        client = session.client('ec2')
+
+        for image in images:
+            client.copy_image(
+                Name=self.data.get('name', image['Name']),
+                Description=self.data.get('description', image['Description']),
+                SourceRegion=session.region_name,
+                SourceImageId=image['ImageId'],
+                Encrypted=self.data.get('encrypt', False),
+                KmsKeyId=self.data.get('key-id', ''))
+
+
 @filters.register('image-age')
 class ImageAgeFilter(AgeFilter):
     """Filters images based on the age (in days)
@@ -195,3 +245,32 @@ class ImageUnusedFilter(Filter):
         if self.data.get('value', True):
             return [r for r in resources if r['ImageId'] not in images]
         return [r for r in resources if r['ImageId'] in images]
+
+
+@filters.register('encrypted')
+class Encrypted(Filter):
+    """Filters images on encryption status
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-is-unencrypted
+                resource: ami
+                filters:
+                  - not:
+                    - type: encrypted
+    """
+
+    permissions = ('ec2:DescribeImages',)
+    schema = type_schema('encrypted')
+
+    def __call__(self, i):
+        for block_device in i['BlockDeviceMappings']:
+            if not block_device['Ebs']:
+                continue
+            if not block_device['Ebs']['Encrypted']:
+                return False
+
+        return True

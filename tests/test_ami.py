@@ -51,3 +51,14 @@ class TestAMI(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ami_encrypted_filter(self):
+        factory = self.replay_flight_data('test_ami_encrypted_filter')
+        p = self.load_policy({
+            'name': 'test-encrypted-ami',
+            'resource': 'ami',
+            'filters': [{
+                'type': 'encrypted'}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
