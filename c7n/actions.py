@@ -811,53 +811,38 @@ class RemovePolicyBase(BaseAction):
         statements = policy.get('Statement', [])
         resource_statements = resource.get(matched_key, ())
 
-        for s in list(statements):
-            if statement_ids == 'matched':
-                if s in resource_statements:
-                    found.append(s)
-                    statements.remove(s)
-            elif s['Sid'] in self.data['statement_ids']:
-                found.append(s)
-                statements.remove(s)
-        if not found:
-            return None, found
-        return statements, found
+        return remove_statements(
+            self.data['statement_ids'], statements, resource_statements)
+
+
+def remove_statements(match_ids, statements, matched=()):
+    found = []
+    for s in list(statements):
+        s_found = False
+        if match_ids == '*':
+            s_found = True
+        elif match_ids == 'matched':
+            if s in matched:
+                s_found = True
+        elif s['Sid'] in match_ids:
+            s_found = True
+        if s_found:
+            found.append(s)
+            statements.remove(s)
+    if not found:
+        return None, found
+    return statements, found
 
 
 class ModifyPolicyBase(BaseAction):
 
     schema = utils.type_schema(
-        'modify-statements',
+        'modify-policy',
         **{
             'add-statements': {
                 'type': 'array',
                 'required': True,
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'Sid': {'type': 'string'},
-                        'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                        'Principal': {'anyOf': [{'type': 'string'},
-                            {'type': 'object'}, {'type': 'array'}]},
-                        'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
-                        'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                        'Condition': {'type': 'object'}
-                    },
-                    'required': ['Sid', 'Effect'],
-                    'oneOf': [
-                        {'required': ['Principal', 'Action', 'Resource']},
-                        {'required': ['NotPrincipal', 'Action', 'Resource']},
-                        {'required': ['Principal', 'NotAction', 'Resource']},
-                        {'required': ['NotPrincipal', 'NotAction', 'Resource']},
-                        {'required': ['Principal', 'Action', 'NotResource']},
-                        {'required': ['NotPrincipal', 'Action', 'NotResource']},
-                        {'required': ['Principal', 'NotAction', 'NotResource']},
-                        {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
-                    ]
-                },
+                'items': {'$ref': '#/definitions/iam-statement'},
                 'additionalProperties': False
             },
             'remove-statements': {
@@ -872,34 +857,17 @@ class ModifyPolicyBase(BaseAction):
         }
     )
 
-    def add_statements(self, policy, resource):
-        current = {s['Sid']: s for s in policy.get('Statement', [])}
+    def add_statements(self, policy_statements):
+        current = {s['Sid']: s for s in policy_statements}
         additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
-        if len(current) != 0:
-            current.update(additional)
-        else:
-            current = additional
-        statements = list(current.values())
-        policy['Statement'] = statements
-        return policy
+        current.update(additional)
+        return list(current.values()), bool(additional)
 
-    def remove_statements(self, policy, resource, matched_key):
+    def remove_statements(self, policy_statements, resource, matched_key):
         statement_ids = self.data.get('remove-statements', [])
         found = []
-        statements = policy.get('Statement', [])
         if len(statement_ids) == 0:
-            return statements, found
-
+            return policy_statements, found
         resource_statements = resource.get(matched_key, ())
-
-        for s in list(statements):
-            if statement_ids == 'matched':
-                if s in resource_statements:
-                    found.append(s)
-                    statements.remove(s)
-            elif s['Sid'] in self.data['remove-statements']:
-                found.append(s)
-                statements.remove(s)
-        if not found:
-            return None, found
-        return statements, found
+        return remove_statements(
+            statement_ids, policy_statements, resource_statements)

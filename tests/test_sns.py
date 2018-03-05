@@ -161,7 +161,7 @@ class TestSNS(BaseTest):
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
-                {'type': 'modify-statements',
+                {'type': 'modify-policy',
                     'add-statements': [{
                         "Sid": "ReplaceWithMe",
                         "Effect": "Allow",
@@ -219,7 +219,7 @@ class TestSNS(BaseTest):
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
-                {'type': 'modify-statements',
+                {'type': 'modify-policy',
                     'add-statements': [],
                     'remove-statements': ['RemoveMe']
                 }]
@@ -264,7 +264,7 @@ class TestSNS(BaseTest):
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
-                {'type': 'modify-statements',
+                {'type': 'modify-policy',
                     'add-statements': [{
                         "Sid": "AddMe",
                         "Effect": "Allow",
@@ -322,7 +322,7 @@ class TestSNS(BaseTest):
             'resource': 'sns',
             'filters': [{'TopicArn': topic_arn}],
             'actions': [
-                {'type': 'modify-statements',
+                {'type': 'modify-policy',
                     'add-statements': [{
                         "Sid": "AddMe",
                         "Effect": "Allow",
@@ -340,10 +340,7 @@ class TestSNS(BaseTest):
 
         data = json.loads(client.get_topic_attributes(
             TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
-        self.assertTrue(
-            'AddMe' in
-                [s['Sid'] for s in data.get('Statement', ())]
-            and 
-            'RemoveMe' not in
-                [s['Sid'] for s in data.get('Statement', ())]
-        )
+        statement_ids = {s['Sid'] for s in data.get('Statement', ())}
+        self.assertTrue('AddMe' in statement_ids)
+        self.assertTrue('RemoveMe' not in statement_ids)
+        self.assertTrue('SpecificAllow' in statement_ids)
