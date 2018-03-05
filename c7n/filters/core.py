@@ -32,7 +32,7 @@ from c7n import ipaddress
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema, parse_cidr
+from c7n.utils import set_annotation, type_schema, parse_cidr, format_string_values
 
 
 class FilterValidationError(Exception):
@@ -286,6 +286,14 @@ class ValueFilter(Filter):
     annotate = True
 
     def __init__(self, data, manager=None):
+        try:
+            config_args = {
+                'account_id': manager.config.account_id,
+                'region': manager.config.region
+            }
+            self.data = format_string_values(data, **config_args)
+        except AttributeError:
+            pass
         super(ValueFilter, self).__init__(data, manager)
         self.expr = {}
 
