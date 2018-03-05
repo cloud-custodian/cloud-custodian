@@ -805,9 +805,6 @@ class RemovePolicyBase(BaseAction):
             {'type': 'array', 'items': {'type': 'string'}}]})
 
     def process_policy(self, policy, resource, matched_key):
-        statement_ids = self.data.get('statement_ids')
-
-        found = []
         statements = policy.get('Statement', [])
         resource_statements = resource.get(matched_key, ())
 
