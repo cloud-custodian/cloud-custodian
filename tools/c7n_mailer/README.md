@@ -285,7 +285,7 @@ Install dependencies (with virtualenv):
 ```
 $ virtualenv c7n_mailer
 $ source c7n_mailer/bin/activate
-$ cd c7n_mailer
+$ cd tools/c7n_mailer
 $ pip install -r requirements.txt
 ```
 Install the extensions:

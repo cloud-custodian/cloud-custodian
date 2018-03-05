@@ -518,7 +518,17 @@ class Notify(EventAction):
                 message['region'], message['account_id'], topic)
         client = self.manager.session_factory(
             region=region, assume=self.assume_role).client('sns')
-        client.publish(TopicArn=topic_arn, Message=self.pack(message))
+        attrs = {
+            'mtype': {
+                'DataType': 'String',
+                'StringValue': self.C7N_DATA_MESSAGE,
+            },
+        }
+        client.publish(
+            TopicArn=topic_arn,
+            Message=self.pack(message),
+            MessageAttributes=attrs
+        )
 
     def send_sqs(self, message):
         queue = self.data['transport']['queue'].format(**message)
