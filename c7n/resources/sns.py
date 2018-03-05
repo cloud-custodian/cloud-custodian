@@ -15,7 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 
-from c7n.actions import RemovePolicyBase
+
+from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, PolicyChecker
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -200,3 +201,54 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': resource['TopicArn'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
+
+
+@SNS.action_registry.register('modify-policy')
+class ModifyPolicyStatement(ModifyPolicyBase):
+    """Action to modify policy statements from SNS
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: sns-cross-account
+                resource: sns
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: modify-policy
+                    add-statements: [statement]
+                    remove-statements: [statement_id] or * or 'matched'
+    """
+
+    permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('sns')
+        for r in resources:
+            policy = json.loads(r.get('Policy') or '{}')
+            policy_statements = policy.setdefault('Statement', [])
+
+            new_policy, removed = self.remove_statements(
+                policy_statements, r, CrossAccountAccessFilter.annotation_key)
+            if new_policy is None:
+                new_policy = policy_statements
+            new_policy, added = self.add_statements(new_policy)
+
+            if not removed or not added:
+                continue
+
+            results += {
+                'Name': r['TopicArn'],
+                'State': 'PolicyModified',
+                'Statements': new_policy
+            }
+            policy['Statement'] = new_policy
+            client.set_topic_attributes(
+                TopicArn=r['TopicArn'],
+                AttributeName='Policy',
+                AttributeValue=json.dumps(policy)
+            )
+        return results
