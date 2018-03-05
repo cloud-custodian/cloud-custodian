@@ -422,7 +422,7 @@ class DeleteBackup(BaseAction, StatusFilter):
                 c.delete_backup(
                     BackupArn=t['BackupArn'])
             except ClientError as e:
-                while e.response['Error']['Code'] in \
+                if e.response['Error']['Code'] in \
                         ('ResourceNotFoundException', 'AccessDeniedException'):
                     self.log.warning("Could not complete DynamoDB backup table:%s", t)
                     continue
