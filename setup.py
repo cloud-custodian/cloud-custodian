@@ -27,7 +27,7 @@ setup(
         "botocore>=1.7.37",
         "pyyaml",
         "jsonschema",
-        "jsondiff",
+        "jsondiff>=1.21",
         "argcomplete",
         "tabulate",
     ],

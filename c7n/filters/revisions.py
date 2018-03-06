@@ -34,6 +34,12 @@ try:
 except ImportError:
     HAVE_JSONPATH = False
 
+try:
+    import jsonpatch
+    HAVE_JSONPATH = True
+except ImportError:
+    HAVE_JSONPATH = False
+
 ErrNotFound = "ResourceNotDiscoveredException"
 
 UTC = tzutc()
@@ -162,8 +168,15 @@ class Diff(Filter):
 class JsonDiff(Diff):
 
     def diff(self, source, target):
+        source, target = self.sanitize_revision(source), self.sanitize_revision(target)
         patch = jsonpatch.JsonPatch.from_diff(source, target)
         return list(patch)
+
+    def sanitize_revision(self, rev):
+        sanitized = dict(rev)
+        for k in [k for k in sanitized if 'c7n' in k]:
+            sanitized.pop(k)
+        return sanitized
 
     @classmethod
     def register_resources(klass, name, resource_class):

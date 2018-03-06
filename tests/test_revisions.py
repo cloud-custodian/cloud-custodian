@@ -47,7 +47,7 @@ class SGDiffLibTest(BaseTest):
                                  {u'GroupId': u'sg-aa6c90c3',
                                   u'UserId': u'644160558196'}]}]}})
 
-    def xtest_json_diff_pitr(self):
+    def test_json_diff_pitr(self):
         factory = self.replay_flight_data('test_sg_config_diff')
         p = self.load_policy({
             'name': 'sg-differ',
@@ -61,8 +61,50 @@ class SGDiffLibTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        import pdb; pdb.set_trace()
-        
+        self.assertEqual(
+            resources[0]['c7n:diff'],
+            [{u'op': u'add',
+                 u'path': u'/IpPermissionsEgress/0/UserIdGroupPairs/0',
+                 u'value': {u'GroupId': u'sg-a08ed1dd',
+                            u'UserId': u'644160558196'}},
+                {u'op': u'replace',
+                 u'path': u'/Tags/1/Key',
+                 u'value': u'Scope'},
+                {u'op': u'replace',
+                 u'path': u'/Tags/1/Value',
+                 u'value': u'account'},
+                {u'op': u'add',
+                 u'path': u'/Tags/2',
+                 u'value': {u'Key': u'NetworkLocation', u'Value': u'DMZ'}},
+                {u'op': u'replace',
+                 u'path': u'/IpPermissions/1/FromPort',
+                 u'value': 22},
+                {u'op': u'replace',
+                 u'path': u'/IpPermissions/1/IpRanges/0/CidrIp',
+                 u'value': u'10.0.0.0/24'},
+                {u'op': u'replace',
+                 u'path': u'/IpPermissions/1/ToPort',
+                 u'value': 22},
+                {u'op': u'add',
+                 u'path': u'/IpPermissions/2',
+                 u'value': {u'FromPort': 8485,
+                            u'IpProtocol': u'tcp',
+                            u'IpRanges': [],
+                            u'Ipv6Ranges': [],
+                            u'PrefixListIds': [],
+                            u'ToPort': 8485,
+                            u'UserIdGroupPairs': [{u'GroupId': u'sg-a38ed1de',
+                                                   u'UserId': u'644160558196'}]}},
+                {u'op': u'add',
+                 u'path': u'/IpPermissions/3',
+                 u'value': {u'FromPort': 443,
+                            u'IpProtocol': u'tcp',
+                            u'IpRanges': [{u'CidrIp': u'10.42.1.0/24'}],
+                            u'Ipv6Ranges': [],
+                            u'PrefixListIds': [],
+                            u'ToPort': 443,
+                            u'UserIdGroupPairs': []}}])
+
     def test_sg_diff_pitr(self):
         factory = self.replay_flight_data('test_sg_config_diff')
         p = self.load_policy({
