@@ -112,6 +112,9 @@ class CrossAccountFilter(CrossAccountAccessFilter):
         whitelist_from=ValuesFrom.schema,
         whitelist={'type': 'array', 'items': {'type': 'string'}})
 
+    # dummy permission
+    permissions = ('events:ListTargetsByRule',)
+
     def __call__(self, r):
         account_id = r['Arn'].split(':', 5)[4]
         return account_id not in self.accounts
@@ -121,6 +124,7 @@ class CrossAccountFilter(CrossAccountAccessFilter):
 class DeleteTarget(BaseAction):
 
     schema = type_schema('delete')
+    permissions = ('events:RemoveTargets',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('events')
