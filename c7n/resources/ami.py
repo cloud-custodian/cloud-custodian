@@ -129,6 +129,59 @@ class RemoveLaunchPermissions(BaseAction):
             ImageId=image['ImageId'], Attribute="launchPermission")
 
 
+@actions.register('copy')
+class Copy(BaseAction):
+    """Action to copy AMIs with optional encryption
+
+    This action can copy AMIs while optionally encrypting or decrypting
+    the target AMI. It is advised to use in conjunction with a filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-ensure-encrypted
+                resource: ami
+                filters:
+                  - not:
+                    - type: encrypted
+                actions:
+                  - type: copy
+                    encrypt: true
+                    key-id: 00000000-0000-0000-0000-000000000000
+    """
+
+    permissions = ('ec2:CopyImage',)
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['copy']},
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+            'region': {'type': 'string'},
+            'encrypt': {'type': 'boolean'},
+            'key-id': {'type': 'string'}
+        }
+    }
+
+    def process(self, images):
+        session = local_session(self.manager.session_factory)
+        client = session.client(
+            'ec2',
+            region_name=self.data.get('region', None))
+
+        for image in images:
+            client.copy_image(
+                Name=self.data.get('name', image['Name']),
+                Description=self.data.get('description', image['Description']),
+                SourceRegion=session.region_name,
+                SourceImageId=image['ImageId'],
+                Encrypted=self.data.get('encrypt', False),
+                KmsKeyId=self.data.get('key-id', ''))
+
+
 @filters.register('image-age')
 class ImageAgeFilter(AgeFilter):
     """Filters images based on the age (in days)

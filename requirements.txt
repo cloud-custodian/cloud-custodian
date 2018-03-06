@@ -1,6 +1,6 @@
 argcomplete>=1.8.2
 boto3>=1.5.15
-botocore>=1.8.29
+botocore>=1.8.35
 jsonschema>=2.5.1
 PyYAML>=3.12
 tabulate>=0.7.7

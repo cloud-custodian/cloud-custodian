@@ -19,6 +19,7 @@ from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
+from c7n.tags import RemoveTag, Tag
 
 log = logging.getLogger('custodian.cfn')
 
@@ -69,3 +70,70 @@ class Delete(BaseAction):
         client = local_session(
             self.manager.session_factory).client('cloudformation')
         client.delete_stack(StackName=stack['StackName'])
+
+
+@CloudFormation.action_registry.register('tag')
+class CloudFormationAddTag(Tag):
+    """Action to tag a cloudformation stack
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: add-cfn-tag
+            resource: cfn
+            filters:
+              - 'tag:DesiredTag': absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('cloudformation:UpdateStack',)
+
+    def process_resource_set(self, stacks, tags):
+        client = local_session(
+            self.manager.session_factory).client('cloudformation')
+
+        def _tag_stacks(s):
+            client.update_stack(
+                StackName=s['StackName'],
+                UsePreviousTemplate=True,
+                Tags=tags)
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(_tag_stacks, stacks))
+
+
+@CloudFormation.action_registry.register('remove-tag')
+class CloudFormationRemoveTag(RemoveTag):
+    """Action to remove tags from a cloudformation stack
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: add-cfn-tag
+            resource: cfn
+            filters:
+              - 'tag:DesiredTag': present
+            actions:
+              - type: remove-tag
+                tags: ['DesiredTag']
+    """
+
+    def process_resource_set(self, stacks, keys):
+        client = local_session(
+            self.manager.session_factory).client('cloudformation')
+
+        def _remove_tag(s):
+            tags = [t for t in s['Tags'] if t['Key'] not in keys]
+            client.update_stack(
+                StackName=s['StackName'],
+                UsePreviousTemplate=True,
+                Tags=tags)
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(_remove_tag, stacks))

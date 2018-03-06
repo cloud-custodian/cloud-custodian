@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.exceptions import ClientError
 
+import six
+
 from c7n.manager import resources
 from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager
@@ -66,13 +68,104 @@ class SagemakerJob(QueryResourceManager):
         service = 'sagemaker'
         enum_spec = ('list_training_jobs', 'TrainingJobSummaries', None)
         detail_spec = (
-            'describe_training_job', 'TrainingJobName',
-            'TrainingJobName', None)
+            'describe_training_job', 'TrainingJobName', 'TrainingJobName', None)
         id = 'TrainingJobArn'
         name = 'TrainingJobName'
         date = 'CreationTime'
         dimension = None
         filter_name = None
+
+    permissions = (
+        'sagemaker:ListTrainingJobs', 'sagemaker:DescribeTrainingJobs',
+        'sagemaker:ListTags')
+
+    def __init__(self, ctx, data):
+        super(SagemakerJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+            return super(SagemakerJob, self).resources(query=query)
+
+    def augment(self, jobs):
+        client = local_session(self.session_factory).client('sagemaker')
+
+        def _augment(j):
+            tags = client.list_tags(ResourceArn=j['TrainingJobArn'])['Tags']
+            j['Tags'] = tags
+            return j
+
+        jobs = super(SagemakerJob, self).augment(jobs)
+        with self.executor_factory(max_workers=1) as w:
+            return list(filter(None, w.map(_augment, jobs)))
+
+
+JOB_FILTERS = ('StatusEquals', 'NameContains',)
+
+
+class QueryFilter(object):
+    @classmethod
+    def parse(cls, data):
+        results = []
+        names = set()
+        for d in data:
+            if not isinstance(d, dict):
+                raise ValueError(
+                    "Training-Job Query Filter Invalid structure %s" % d)
+            for k, v in d.items():
+                if isinstance(v, list):
+                    raise ValueError(
+                        'Training-job query filter invalid structure %s' % v)
+            query = cls(d).validate().query()
+            if query['Name'] in names:
+                # Cannot filter multiple times on the same key
+                continue
+            names.add(query['Name'])
+            if isinstance(query['Value'], list):
+                results.append({query['Name']: query['Value'][0]})
+                continue
+            results.append({query['Name']: query['Value']})
+        if 'StatusEquals' not in names:
+            # add default StatusEquals if not included
+            results.append({'Name': 'StatusEquals', 'Value': 'InProgress'})
+        return results
+
+    def __init__(self, data):
+        self.data = data
+        self.key = None
+        self.value = None
+
+    def validate(self):
+        if not len(list(self.data.keys())) == 1:
+            raise ValueError(
+                "Training-Job Query Filter Invalid %s" % self.data)
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
+
+        if self.key not in JOB_FILTERS and not self.key.startswith('tag:'):
+            raise ValueError(
+                "Training-Job Query Filter invalid filter name %s" % (
+                    self.data))
+
+        if self.value is None:
+            raise ValueError(
+                "Training-Job Query Filters must have a value, use tag-key"
+                " w/ tag name as value for tag present checks"
+                " %s" % self.data)
+        return self
+
+    def query(self):
+        value = self.value
+        if isinstance(self.value, six.string_types):
+            value = [self.value]
+        return {'Name': self.key, 'Value': value}
 
 
 @resources.register('sagemaker-endpoint')
@@ -199,6 +292,7 @@ class StateTransitionFilter(object):
 @SagemakerEndpoint.action_registry.register('tag')
 @SagemakerEndpointConfig.action_registry.register('tag')
 @NotebookInstance.action_registry.register('tag')
+@SagemakerJob.action_registry.register('tag')
 @Model.action_registry.register('tag')
 class TagNotebookInstance(Tag):
     """Action to create tag(s) on a SageMaker resource
@@ -235,6 +329,15 @@ class TagNotebookInstance(Tag):
                   - type: tag
                     key: required-tag
                     value: required-value
+
+              - name: tag-sagemaker-job
+                resource: sagemaker-job
+                filters:
+                    - "tag:required-tag": absent
+                actions:
+                  - type: tag
+                    key: required-tag
+                    value: required-value
     """
     permissions = ('sagemaker:AddTags',)
 
@@ -252,6 +355,7 @@ class TagNotebookInstance(Tag):
 @SagemakerEndpoint.action_registry.register('remove-tag')
 @SagemakerEndpointConfig.action_registry.register('remove-tag')
 @NotebookInstance.action_registry.register('remove-tag')
+@SagemakerJob.action_registry.register('remove-tag')
 @Model.action_registry.register('remove-tag')
 class RemoveTagNotebookInstance(RemoveTag):
     """Remove tag(s) from SageMaker resources
@@ -280,6 +384,14 @@ class RemoveTagNotebookInstance(RemoveTag):
 
               - name: sagemaker-endpoint-config-remove-tag
                 resource: sagemaker-endpoint-config
+                filters:
+                  - "tag:expired-tag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["expired-tag"]
+
+              - name: sagemaker-job-remove-tag
+                resource: sagemaker-job
                 filters:
                   - "tag:expired-tag": present
                 actions:
