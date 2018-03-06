@@ -16,6 +16,8 @@ Authentication utilities
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
+
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session
@@ -31,12 +33,14 @@ class SessionFactory(object):
         self.profile = profile
         self.assume_role = assume_role
         self.external_id = external_id
+        self.session_name = ("Cloud Custodian %s" % (
+            os.environ.get('C7N_SESSION_SUFFIX', ''))).strip()
 
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
-                self.assume_role, "CloudCustodian", session,
+                self.assume_role, self.session_name, session,
                 region or self.region, self.external_id)
         else:
             session = Session(
