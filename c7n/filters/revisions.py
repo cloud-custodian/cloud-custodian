@@ -179,4 +179,4 @@ class JsonDiff(Diff):
 
 
 if HAVE_JSONPATH:
-    resources.subscribe(JsonDiff.register_resources)
+    resources.subscribe(resources.EVENT_REGISTER, JsonDiff.register_resources)

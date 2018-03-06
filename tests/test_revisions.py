@@ -47,6 +47,22 @@ class SGDiffLibTest(BaseTest):
                                  {u'GroupId': u'sg-aa6c90c3',
                                   u'UserId': u'644160558196'}]}]}})
 
+    def xtest_json_diff_pitr(self):
+        factory = self.replay_flight_data('test_sg_config_diff')
+        p = self.load_policy({
+            'name': 'sg-differ',
+            'resource': 'security-group',
+            'filters': [
+                {'GroupId': 'sg-a38ed1de'},
+                {'type': 'json-diff',
+                 'selector': 'date',
+                 'selector_value': '2016/12/11 17:25Z'}],
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        import pdb; pdb.set_trace()
+        
     def test_sg_diff_pitr(self):
         factory = self.replay_flight_data('test_sg_config_diff')
         p = self.load_policy({
