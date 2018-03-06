@@ -167,8 +167,15 @@ class Diff(Filter):
 
 class JsonDiff(Diff):
 
+    schema = type_schema(
+        'json-diff',
+        selector={'enum': ['previous', 'date', 'locked']},
+        # For date selectors allow value specification
+        selector_value={'type': 'string'})
+
     def diff(self, source, target):
-        source, target = self.sanitize_revision(source), self.sanitize_revision(target)
+        source, target = (
+            self.sanitize_revision(source), self.sanitize_revision(target))
         patch = jsonpatch.JsonPatch.from_diff(source, target)
         return list(patch)
 
@@ -179,7 +186,7 @@ class JsonDiff(Diff):
         return sanitized
 
     @classmethod
-    def register_resources(klass, name, resource_class):
+    def register_resources(klass, registry, resource_class):
         """ meta model subscriber on resource registration.
 
         We watch for new resource types being registered and if they
