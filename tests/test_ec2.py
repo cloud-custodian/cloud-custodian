@@ -444,6 +444,21 @@ class TestTag(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ec2_untag_array(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_untag_array')
+        policy = self.load_policy({
+            'name': 'ec2-test-unmark-array',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Testing': 'not-null'}],
+            'actions': [
+                {'type': 'remove-tag',
+                 'tags': ['Testing', 'TestingTwo', 'TestingThree']}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
     def test_ec2_normalize_tag(self):
         session_factory = self.replay_flight_data(
             'test_ec2_normalize_tag')

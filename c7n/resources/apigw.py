@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
@@ -41,16 +43,20 @@ class RestAccount(ResourceManager):
 
     def _get_account(self):
         client = utils.local_session(self.session_factory).client('apigateway')
-        account = client.get_account()
+        try:
+            account = client.get_account()
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NotFoundException':
+                return []
         account.pop('ResponseMetadata', None)
         account['account_id'] = 'apigw-settings'
-        return account
+        return [account]
 
     def resources(self):
-        return self.filter_resources([self._get_account()])
+        return self.filter_resources(self._get_account())
 
     def get_resources(self, resource_ids):
-        return [self._get_account()]
+        return self._get_account()
 
 
 OP_SCHEMA = {
@@ -68,6 +74,24 @@ OP_SCHEMA = {
 
 @RestAccount.action_registry.register('update')
 class UpdateAccount(BaseAction):
+    """Update the cloudwatch role associated to a rest account
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: correct-rest-account-log-role
+            resource: rest-account
+            filters:
+              - cloudwatchRoleArn: arn:aws:iam::000000000000:role/GatewayLogger
+            actions:
+              - type: update
+                patch:
+                  - op: replace
+                    path: /cloudwatchRoleArn
+                    value: arn:aws:iam::000000000000:role/BetterGatewayLogger
+    """
 
     permissions = ('apigateway:PATCH',)
     schema = utils.type_schema(
@@ -133,6 +157,24 @@ class DescribeRestStage(query.ChildDescribeSource):
 
 @RestStage.action_registry.register('update')
 class UpdateStage(BaseAction):
+    """Update/remove values of an api stage
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: disable-stage-caching
+            resource: rest-stage
+            filters:
+              - methodSettings."*/*".cachingEnabled: true
+            actions:
+              - type: update
+                patch:
+                  - op: replace
+                    path: /*/*/caching/enabled
+                    value: 'false'
+    """
 
     permissions = ('apigateway:PATCH',)
     schema = utils.type_schema(
@@ -186,6 +228,20 @@ ANNOTATION_KEY = 'c7n-matched-resource-methods'
 
 @RestResource.filter_registry.register('rest-method')
 class FilterRestMethod(ValueFilter):
+    """Filter rest resources based on a key value for the rest method of the api
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: api-without-key-required
+            resource: rest-resource
+            filters:
+              - type: rest-method
+                key: apiKeyRequired
+                value: false
+    """
 
     schema = utils.type_schema(
         'rest-method',
@@ -250,6 +306,27 @@ class FilterRestMethod(ValueFilter):
 
 @RestResource.action_registry.register('update-method')
 class UpdateRestMethod(BaseAction):
+    """Change or remove api method behaviors based on key value
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: enforce-iam-permissions-on-api
+            resource: rest-resource
+            filters:
+              - type: rest-method
+                key: authorizationType
+                value: NONE
+                op: eq
+            actions:
+              - type: update-method
+                patch:
+                  - op: replace
+                    path: /authorizationType
+                    value: AWS_IAM
+    """
 
     schema = utils.type_schema(
         'update-method',

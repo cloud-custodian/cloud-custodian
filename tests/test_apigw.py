@@ -18,6 +18,15 @@ from .common import BaseTest
 
 class TestRestAccount(BaseTest):
 
+    def test_missing_rest_account(self):
+        session_factory = self.replay_flight_data('test_rest_account_missing')
+        p = self.load_policy({
+            'name': 'api-account',
+            'resource': 'rest-account'},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources, [])
+
     def test_rest_api_update(self):
         session_factory = self.replay_flight_data('test_rest_account_update')
         log_role = 'arn:aws:iam::644160558196:role/OtherApiGatewayLogger'
@@ -31,7 +40,7 @@ class TestRestAccount(BaseTest):
                       'path': '/cloudwatchRoleArn',
                       'value': log_role}
                  ]}]}, session_factory=session_factory)
-        before_account = p.resource_manager._get_account()
+        before_account, = p.resource_manager._get_account()
         self.assertEqual(
             before_account['cloudwatchRoleArn'],
             'arn:aws:iam::644160558196:role/ApiGwLogger')
@@ -39,7 +48,7 @@ class TestRestAccount(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        after_account = p.resource_manager._get_account()
+        after_account, = p.resource_manager._get_account()
         self.assertEqual(
             after_account['cloudwatchRoleArn'], log_role)
 

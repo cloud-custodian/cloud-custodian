@@ -38,3 +38,38 @@ class TestCFN(BaseTest):
             'resource': 'cfn'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(resources, [])
+
+    def test_cfn_add_tag(self):
+        session_factory = self.replay_flight_data('test_cfn_add_tag')
+        p = self.load_policy({
+            'name': 'cfn-add-tag',
+            'resource': 'cfn',
+            'filters': [{
+                'tag:DesiredTag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'DesiredTag',
+                'value': 'DesiredValue'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('cloudformation')
+        tags = client.describe_stacks(
+            StackName=resources[0]['StackName'])['Stacks'][0]['Tags']
+        self.assertEqual(
+            [tags[0]['Key'], tags[0]['Value']], ['DesiredTag', 'DesiredValue'])
+
+    def test_cfn_remove_tag(self):
+        session_factory = self.replay_flight_data('test_cfn_remove_tag')
+        p = self.load_policy({
+            'name': 'cfn-remove-tag',
+            'resource': 'cfn',
+            'filters': [{'tag:DesiredTag': 'present'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['DesiredTag']}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('cloudformation')
+        tags = client.describe_stacks(
+            StackName=resources[0]['StackName'])['Stacks'][0]['Tags']
+        self.assertEqual(len(tags), 0)

@@ -303,6 +303,7 @@ def enable_account(account, master_account_id, region):
             "Region:%s No guard duty invitation found account:%s id:%s aid:%s",
             region, account['name'], m_detector_id, account['account_id'])
         return
+
     member_client.accept_invitation(
         DetectorId=m_detector_id,
         InvitationId=invitations[-1]['InvitationId'],
@@ -347,4 +348,3 @@ def guardian_init(config, debug, master, accounts, tags):
 #  get detectors
 #  delete detector
 #  disassociate from master
-

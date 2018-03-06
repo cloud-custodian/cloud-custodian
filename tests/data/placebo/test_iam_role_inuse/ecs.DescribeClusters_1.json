@@ -1,31 +1,23 @@
 {
-    "status_code": 200,
+    "status_code": 200, 
     "data": {
-        "clusters": [{
-          "status": "ACTIVE",
-          "clusterName": "cluster1",
-          "registeredContainerInstancesCount": 1,
-          "pendingTasksCount": 0,
-          "runningTasksCount": 1,
-          "activeServicesCount": 1,
-          "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/cluster1"
-        }],
+        "clusters": [], 
         "ResponseMetadata": {
-            "RetryAttempts": 0,
-            "HTTPStatusCode": 200,
-            "RequestId": "023092b9-84ea-11e6-97f3-6d147e4917ed",
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cb70300b-1190-11e8-9a67-ed2b5e35d5ab", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "023092b9-84ea-11e6-97f3-6d147e4917ed",
-                "content-length": "108",
-                "server": "Server",
-                "connection": "keep-alive",
-                "date": "Tue, 27 Sep 2016 19:38:47 GMT",
+                "x-amzn-requestid": "cb70300b-1190-11e8-9a67-ed2b5e35d5ab", 
+                "content-length": "108", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 14 Feb 2018 14:10:22 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
-        },
+        }, 
         "failures": [
             {
-                "reason": "MISSING",
+                "reason": "MISSING", 
                 "arn": "arn:aws:ecs:us-east-1:644160558196:cluster/default"
             }
         ]

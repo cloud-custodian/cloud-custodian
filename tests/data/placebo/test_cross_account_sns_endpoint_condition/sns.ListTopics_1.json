@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-endpoint-condition-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a128c675-d59b-5168-bdf9-957cee720b16", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a128c675-d59b-5168-bdf9-957cee720b16", 
+                "date": "Thu, 22 Feb 2018 21:44:08 GMT", 
+                "content-length": "1319", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
