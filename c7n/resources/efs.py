@@ -69,7 +69,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
 
     class resource_type(object):
         service = 'efs'
-        parent_spec = ('efs', 'FileSystemId')
+        parent_spec = ('efs', 'FileSystemId', None)
         enum_spec = ('describe_mount_targets', 'MountTargets', None)
         name = id = 'MountTargetId'
         date = None
