@@ -33,7 +33,7 @@ class SessionFactory(object):
         self.profile = profile
         self.assume_role = assume_role
         self.external_id = external_id
-        self.session_name = ("Cloud Custodian %s" % (
+        self.session_name = ("CloudCustodian@%s" % (
             os.environ.get('C7N_SESSION_SUFFIX', ''))).strip()
 
     def __call__(self, assume=True, region=None):
