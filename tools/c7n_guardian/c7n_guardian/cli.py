@@ -174,7 +174,9 @@ def get_session(role, session_name, profile, region):
 
 
 def expand_regions(regions, partition='aws'):
-    return boto3.Session().get_available_regions('ec2')
+    if 'all' in regions:
+        return boto3.Session().get_available_regions('ec2')
+    return regions
 
 
 @cli.command()
@@ -195,6 +197,7 @@ def enable(config, master, tags, accounts, debug, message, region):
         config, debug, master, accounts, tags)
     regions = expand_regions(region)
     for r in regions:
+        log.info("Processing Region:%s", r)
         enable_region(master_info, accounts_config, executor, message, r)
 
 
@@ -235,7 +238,7 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     if not members:
         if not suspended_ids:
-            log.info("All accounts already enabled")
+            log.info("Region:%s All accounts already enabled", region)
         return
 
     if (len(members) + len(extant_ids)) > 1000:
@@ -251,19 +254,23 @@ def enable_region(master_info, accounts_config, executor, message, region):
             DetectorId=detector_id,
             AccountDetails=account_set).get('UnprocessedAccounts', []))
     if unprocessed:
-        log.warning("Region:%s Following accounts where unprocessed\n %s",
-                    region, format_event(unprocessed))
+        log.warning(
+            "Region:%s accounts where unprocessed - member create\n %s",
+            region, format_event(unprocessed))
 
     log.info("Region:%s Inviting %d member accounts", region, len(members))
-    params = {'AccountIds': [m['AccountId'] for m in members],
-              'DetectorId': detector_id}
-    if message:
-        params['Message'] = message
-    unprocessed = master_client.invite_members(
-        **params).get('UnprocessedAccounts')
+    unprocessed = []
+    for account_set in chunks(members, 25):
+        params = {'AccountIds': [m['AccountId'] for m in account_set],
+                  'DetectorId': detector_id}
+        if message:
+            params['Message'] = message
+        unprocessed.extend(master_client.invite_members(
+            **params).get('UnprocessedAccounts', []))
     if unprocessed:
-        log.warning("Region:%s Following accounts where unprocessed\n %s",
-                    region, format_event(unprocessed))
+        log.warning(
+            "Region:%s accounts where unprocessed invite-members\n %s",
+            region, format_event(unprocessed))
 
     log.info("Region:%s Accepting invitations in members", region)
     with executor(max_workers=WORKER_COUNT) as w:
