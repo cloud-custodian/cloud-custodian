@@ -17,8 +17,10 @@ from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
 from c7n.filters import Filter
-from c7n.query import QueryResourceManager
+from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
+from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session, chunks, get_retry
 
 
@@ -87,6 +89,53 @@ class EventRule(QueryResourceManager):
         filter_name = "NamePrefix"
         filer_type = "scalar"
         dimension = "RuleName"
+
+
+@resources.register('event-rule-target')
+class EventRuleTarget(ChildResourceManager):
+
+    class resource_type(object):
+        service = 'events'
+        type = 'event-rule-target'
+        enum_spec = ('list_targets_by_rule', 'Targets', None)
+        parent_spec = ('event-rule', 'Rule', True)
+        dimension = None
+        filter_type = filter_name = None
+
+
+@EventRuleTarget.filter_registry.register('cross-account')
+class CrossAccountFilter(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    # dummy permission
+    permissions = ('events:ListTargetsByRule',)
+
+    def __call__(self, r):
+        account_id = r['Arn'].split(':', 5)[4]
+        return account_id not in self.accounts
+
+
+@EventRuleTarget.action_registry.register('delete')
+class DeleteTarget(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('events:RemoveTargets',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('events')
+        rule_targets = {}
+        for r in resources:
+            rule_targets.setdefault(r['c7n:parent-id'], []).append(r['Id'])
+
+        for rule_id, target_ids in rule_targets.items():
+            client.remove_targets(
+                Ids=target_ids,
+                Rule=rule_id)
 
 
 @resources.register('log-group')

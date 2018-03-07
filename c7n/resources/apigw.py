@@ -126,7 +126,7 @@ class RestStage(query.ChildResourceManager):
 
     class resource_type(object):
         service = 'apigateway'
-        parent_spec = ('rest-api', 'restApiId')
+        parent_spec = ('rest-api', 'restApiId', None)
         enum_spec = ('get_stages', 'item', None)
         name = id = 'stageName'
         date = 'createdDate'
@@ -199,7 +199,7 @@ class RestResource(query.ChildResourceManager):
 
     class resource_type(object):
         service = 'apigateway'
-        parent_spec = ('rest-api', 'restApiId')
+        parent_spec = ('rest-api', 'restApiId', None)
         enum_spec = ('get_resources', 'items', None)
         id = 'id'
         name = 'path'

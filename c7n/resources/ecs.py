@@ -110,7 +110,7 @@ class Service(query.ChildResourceManager):
         name = 'serviceName'
         id = 'serviceArn'
         enum_spec = ('list_services', 'serviceArns', None)
-        parent_spec = ('ecs', 'cluster')
+        parent_spec = ('ecs', 'cluster', None)
         dimension = None
 
     @property
@@ -210,7 +210,7 @@ class Task(query.ChildResourceManager):
         service = 'ecs'
         id = name = 'taskArn'
         enum_spec = ('list_tasks', 'taskArns', None)
-        parent_spec = ('ecs', 'cluster')
+        parent_spec = ('ecs', 'cluster', None)
         dimension = None
 
     @property
@@ -308,7 +308,7 @@ class ContainerInstance(query.ChildResourceManager):
         service = 'ecs'
         id = name = 'containerInstance'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
-        parent_spec = ('ecs', 'cluster')
+        parent_spec = ('ecs', 'cluster', None)
         dimension = None
 
     @property
