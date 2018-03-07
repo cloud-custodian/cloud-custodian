@@ -34,11 +34,6 @@ try:
 except ImportError:
     HAVE_JSONPATH = False
 
-try:
-    import jsonpatch
-    HAVE_JSONPATH = True
-except ImportError:
-    HAVE_JSONPATH = False
 
 ErrNotFound = "ResourceNotDiscoveredException"
 
