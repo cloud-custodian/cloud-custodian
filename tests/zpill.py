@@ -240,10 +240,10 @@ class PillTest(unittest.TestCase):
     def cleanUp(self):
         pass
 
-    def record_flight_data(self, test_case, zdata=False):
+    def record_flight_data(self, test_case, zdata=False, augment=False):
         self.recording = True
-        if not zdata:
-            test_dir = os.path.join(self.placebo_dir, test_case)
+        test_dir = os.path.join(self.placebo_dir, test_case)
+        if not (zdata or augment):
             if os.path.exists(test_dir):
                 shutil.rmtree(test_dir)
             os.makedirs(test_dir)
@@ -271,10 +271,15 @@ class PillTest(unittest.TestCase):
 
         return factory
 
-    def replay_flight_data(self, test_case, zdata=False):
+    def replay_flight_data(self, test_case, zdata=False, region=None):
+        """
+        The `region` argument is to allow functional tests to override the
+        default region. It is unused when replaying stored data.
+        """
+
         if os.environ.get('C7N_FUNCTIONAL') == 'yes':
             self.recording = True
-            return lambda region=None, assume=None: boto3.Session(
+            return lambda region=region, assume=None: boto3.Session(
                 region_name=region)
 
         if not zdata:

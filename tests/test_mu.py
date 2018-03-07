@@ -29,11 +29,11 @@ import unittest
 import zipfile
 
 from c7n.mu import (
-    custodian_archive, LambdaFunction, LambdaManager, PolicyLambda, PythonPackageArchive,
-    CloudWatchLogSubscription, SNSSubscription)
+    custodian_archive, LambdaFunction, LambdaManager, PolicyLambda,
+    PythonPackageArchive, CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, Config, event_data
+from .common import BaseTest, Config, event_data, functional, Bag
 from .data import helloworld
 
 
@@ -58,9 +58,7 @@ class Publish(BaseTest):
             '''def handler(*a, **kw):\n    print("Greetings, program!")''')
         archive.close()
         self.addCleanup(archive.remove)
-
         return LambdaFunction(func_data, archive)
-
 
     def test_publishes_a_lambda(self):
         session_factory = self.replay_flight_data('test_publishes_a_lambda')
@@ -149,9 +147,11 @@ class PolicyLambdaProvision(BaseTest):
         #params['sns_topic'] = "arn:123"
         #manager.publish(func)
 
-    def test_sns_subscriber(self):
+    @functional
+    def test_sns_subscriber_and_ipaddress(self):
         self.patch(SNSSubscription, 'iam_delay', 0.01)
-        session_factory = self.replay_flight_data('test_sns_subscriber')
+        session_factory = self.replay_flight_data(
+            'test_sns_subscriber_and_ipaddress')
         session = session_factory()
         client = session.client('sns')
 
@@ -174,8 +174,9 @@ class PolicyLambdaProvision(BaseTest):
 
         # now publish to the topic and look for lambda log output
         client.publish(TopicArn=topic_arn, Message='Greetings, program!')
-        #time.sleep(15) -- turn this back on when recording flight data
-        log_events = manager.logs(func, '1970-1-1', '9170-1-1')
+        if self.recording:
+            time.sleep(30)
+        log_events = manager.logs(func, '1970-1-1 UTC', '9170-1-1')
         messages = [e['message'] for e in log_events
                     if e['message'].startswith('{"Records')]
         self.addCleanup(
@@ -521,6 +522,72 @@ class PolicyLambdaProvision(BaseTest):
         tags = mgr.client.list_tags(Resource=result['FunctionArn'])['Tags']
         self.assert_items(tags, {'Foo': 'Baz', 'Bah': 'Bug'})
 
+    def test_optional_packages(self):
+        p = Policy({
+            'resources': 's3',
+            'name': 's3-lambda-extra',
+            'resource': 's3',
+            'mode': {
+                'type': 'cloudtrail',
+                'packages': ['boto3', 'botocore'],
+                'events': ['CreateBucket'],
+                }}, Config.empty())
+        pl = PolicyLambda(p)
+        pl.archive.close()
+        self.assertTrue('boto3/utils.py' in pl.archive.get_filenames())
+        self.assertTrue('botocore/utils.py' in pl.archive.get_filenames())
+
+    def test_delta_config_diff(self):
+        delta = LambdaManager.delta_function
+        self.assertFalse(
+            delta({'VpcConfig': {'SubnetIds': ['s-1', 's-2'],
+                                 'SecurityGroupIds': ['sg-1', 'sg-2']}},
+                  {'VpcConfig': {'SubnetIds': ['s-2', 's-1'],
+                                 'SecurityGroupIds': ['sg-2', 'sg-1']}})
+            )
+        self.assertTrue(
+            delta({'VpcConfig': {'SubnetIds': ['s-1', 's-2'],
+                                 'SecurityGroupIds': ['sg-1', 'sg-2']}},
+                  {'VpcConfig': {'SubnetIds': ['s-2', 's-1'],
+                                 'SecurityGroupIds': ['sg-3', 'sg-1']}})
+            )
+        self.assertFalse(
+            delta({}, {'DeadLetterConfig': {}}))
+
+        self.assertTrue(
+            delta({}, {'DeadLetterConfig': {'TargetArn': 'arn'}}))
+
+        self.assertFalse(
+            delta({}, {'Environment': {'Variables': {}}}))
+
+        self.assertTrue(
+            delta({}, {'Environment': {'Variables': {'k': 'v'}}}))
+
+        self.assertFalse(
+            delta({}, {'KMSKeyArn': ''}))
+
+        self.assertFalse(
+            delta({}, {'VpcConfig': {'SecurityGroupIds': [], 'SubnetIds': []}}))
+
+    def test_config_defaults(self):
+        p = PolicyLambda(Bag({'name': 'hello', 'data': {'mode': {}}}))
+        self.maxDiff = None
+        self.assertEqual(
+            p.get_config(),
+            {'DeadLetterConfig': {},
+             'Description': 'cloud-custodian lambda policy',
+             'Environment': {'Variables': {}},
+             'FunctionName': 'custodian-hello',
+             'Handler': 'custodian_policy.run',
+             'KMSKeyArn': '',
+             'MemorySize': 512,
+             'Role': '',
+             'Runtime': 'python2.7',
+             'Tags': {},
+             'Timeout': 60,
+             'TracingConfig': {'Mode': 'PassThrough'},
+             'VpcConfig': {'SecurityGroupIds': [], 'SubnetIds': []}})
+
 
 class PythonArchiveTest(unittest.TestCase):
 
@@ -537,14 +604,13 @@ class PythonArchiveTest(unittest.TestCase):
     def get_filenames(self, *a, **kw):
         return self.make_archive(*a, **kw).get_filenames()
 
-
     def test_handles_stdlib_modules(self):
         filenames = self.get_filenames('webbrowser')
         self.assertTrue('webbrowser.py' in filenames)
 
     def test_handles_third_party_modules(self):
-        filenames = self.get_filenames('ipaddress')
-        self.assertTrue('ipaddress.py' in filenames)
+        filenames = self.get_filenames('botocore')
+        self.assertTrue('botocore/__init__.py' in filenames)
 
     def test_handles_packages(self):
         filenames = self.get_filenames('c7n')
@@ -638,7 +704,6 @@ class PythonArchiveTest(unittest.TestCase):
         filenames = archive.get_filenames()
         self.assertTrue('c7n/__init__.py' in filenames)
         self.assertTrue('pkg_resources/__init__.py' in filenames)
-        self.assertTrue('ipaddress.py' in filenames)
 
 
     def make_file(self):

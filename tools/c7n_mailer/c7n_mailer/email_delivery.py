@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import base64
 import smtplib
 
+from botocore.exceptions import ClientError
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 
@@ -28,11 +30,28 @@ class EmailDelivery(object):
     def __init__(self, config, session, logger):
         self.config      = config
         self.logger      = logger
+        self.session     = session
         self.aws_ses     = session.client('ses', region_name=config.get('ses_region'))
         self.ldap_lookup = self.get_ldap_connection()
 
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
+            try:
+                if self.config.get('ldap_bind_password', None):
+                    kms = self.session.client('kms')
+                    self.config['ldap_bind_password'] = kms.decrypt(
+                        CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
+                            'Plaintext']
+            except (TypeError, base64.binascii.Error) as e:
+                self.logger.warning(
+                    "Error: %s Unable to base64 decode ldap_bind_password, will assume plaintext." % (e)
+                )
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidCiphertextException':
+                    raise
+                self.logger.warning(
+                    "Error: %s Unable to decrypt ldap_bind_password with kms, will assume plaintext." % (e)
+                )
             return LdapLookup(self.config, self.logger)
         return None
 
@@ -102,6 +121,9 @@ class EmailDelivery(object):
         # or it's an email from an aws event username from an ldap_lookup
         email_to_addrs_to_resources_map = {}
         targets = sqs_message['action']['to']
+        no_owner_targets = self.get_valid_emails_from_list(
+            sqs_message['action'].get('owner_absent_contact', [])
+        )
         # policy_to_emails includes event-owner if that's set in the policy notify to section
         policy_to_emails = self.get_valid_emails_from_list(targets)
         # if event-owner is set, and the aws_username has an ldap_lookup email
@@ -118,10 +140,15 @@ class EmailDelivery(object):
             )
             resource_emails = resource_emails + policy_to_emails
             # add in any emails from resource-owners to resource_owners
-            resource_emails = resource_emails + self.get_resource_owner_emails_from_resource(
+            ro_emails = self.get_resource_owner_emails_from_resource(
                 sqs_message,
                 resource
             )
+            resource_emails = resource_emails + ro_emails
+            # if 'owner_absent_contact' was specified in the policy and no resource
+            # owner emails were found, add those addresses
+            if len(ro_emails) < 1 and len(no_owner_targets) > 0:
+                resource_emails = resource_emails + no_owner_targets
             # we allow multiple emails from various places, we'll unique with set to not have any
             # duplicates, and we'll also sort it so we always have the same key for other resources
             # and finally we'll make it a tuple, since that is hashable and can be a key in a dict

@@ -34,6 +34,7 @@ References
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import fnmatch
+import logging
 import json
 
 import six
@@ -41,6 +42,8 @@ import six
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
+
+log = logging.getLogger('custodian.iamaccess')
 
 
 def _account(arn):
@@ -104,7 +107,7 @@ class PolicyChecker(object):
     def handle_statement(self, s):
         if (all((self.handle_principal(s),
                  self.handle_effect(s),
-                 self.handle_action(s))) and not self.handle_condition(s)):
+                 self.handle_action(s))) and not self.handle_conditions(s)):
             return s
 
     def handle_action(self, s):
@@ -132,6 +135,8 @@ class PolicyChecker(object):
             if not s['Principal']:
                 return False
 
+        assert len(s['Principal']) == 1, "Too many principals %s" % s
+
         if isinstance(s['Principal'], six.string_types):
             p = s['Principal']
         else:
@@ -152,23 +157,34 @@ class PolicyChecker(object):
                     principal_ok = False
         return not principal_ok
 
-    def handle_condition(self, s):
-        op, key, value = self.normalize_condition(s)
-        if not op:
+    def handle_conditions(self, s):
+        conditions = self.normalize_conditions(s)
+        if not conditions:
             return False
-        if key in self.whitelist_conditions:
+
+        results = []
+        for c in conditions:
+            results.append(self.handle_condition(s, c))
+
+        return all(results)
+
+    def handle_condition(self, s, c):
+        if not c['op']:
+            return False
+        if c['key'] in self.whitelist_conditions:
             return True
-        handler_name = "handle_%s" % key.replace('-', '_').replace(':', '_')
+        handler_name = "handle_%s" % c['key'].replace('-', '_').replace(':', '_')
         handler = getattr(self, handler_name, None)
         if handler is None:
-            print("no handler:%s op:%s key:%s value:%s" % (
-                handler_name, op, key, value))
+            log.warning("no handler:%s op:%s key:%s values:%s" % (
+                handler_name, c['op'], c['key'], c['values']))
             return
-        return not handler(s, op, key, value)
+        return not handler(s, c)
 
-    def normalize_condition(self, s):
+    def normalize_conditions(self, s):
+        s_cond = []
         if 'Condition' not in s:
-            return None, None, None
+            return s_cond
 
         conditions = (
             'StringEquals',
@@ -180,48 +196,49 @@ class PolicyChecker(object):
             'NotIpAddress')
         set_conditions = ('ForAllValues', 'ForAnyValues')
 
-        assert len(s.get('Condition').keys()) == 1, "Multiple conditions present in iam statement"
-        s_cond_op = list(s['Condition'].keys())[0]
+        for s_cond_op in list(s['Condition'].keys()):
+            cond = {'op': s_cond_op}
 
-        if s_cond_op not in conditions:
-            if not any(s_cond_op.startswith(c) for c in set_conditions):
-                return None, None, None
+            if s_cond_op not in conditions:
+                if not any(s_cond_op.startswith(c) for c in set_conditions):
+                    continue
 
-        assert len(s['Condition'][s_cond_op]) == 1, "Multiple keys on condition"
-        s_cond_key = list(s['Condition'][s_cond_op].keys())[0]
+            cond['key'] = list(s['Condition'][s_cond_op].keys())[0]
+            cond['values'] = s['Condition'][s_cond_op][cond['key']]
+            cond['values'] = (
+                isinstance(cond['values'],
+                           six.string_types) and (cond['values'],) or cond['values'])
+            cond['key'] = cond['key'].lower()
+            s_cond.append(cond)
 
-        s_cond_value = s['Condition'][s_cond_op][s_cond_key]
-        s_cond_value = (
-            isinstance(s_cond_value, six.string_types) and (s_cond_value,) or s_cond_value)
-
-        return s_cond_op, s_cond_key.lower(), s_cond_value
+        return s_cond
 
     # Condition handlers
 
     # kms specific
-    def handle_kms_calleraccount(self, s, op, key, values):
-        return bool(set(map(_account, values)).difference(self.allowed_accounts))
+    def handle_kms_calleraccount(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # sns default policy
-    def handle_aws_sourceowner(self, s, op, key, values):
-        return bool(set(map(_account, values)).difference(self.allowed_accounts))
+    def handle_aws_sourceowner(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # s3 logging
-    def handle_aws_sourcearn(self, s, op, key, values):
-        return bool(set(map(_account, values)).difference(self.allowed_accounts))
+    def handle_aws_sourcearn(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
-    def handle_aws_sourceip(self, s, op, key, values):
+    def handle_aws_sourceip(self, s, c):
         return False
 
-    def handle_aws_sourcevpce(self, s, op, key, values):
+    def handle_aws_sourcevpce(self, s, c):
         if not self.allowed_vpce:
             return False
-        return bool(set(map(_account, values)).difference(self.allowed_vpce))
+        return bool(set(map(_account, c['values'])).difference(self.allowed_vpce))
 
-    def handle_aws_sourcevpc(self, s, op, key, values):
+    def handle_aws_sourcevpc(self, s, c):
         if not self.allowed_vpc:
             return False
-        return bool(set(map(_account, values)).difference(self.allowed_vpc))
+        return bool(set(map(_account, c['values'])).difference(self.allowed_vpc))
 
 
 class CrossAccountAccessFilter(Filter):
@@ -241,7 +258,7 @@ class CrossAccountAccessFilter(Filter):
         whitelist={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpce_from=ValuesFrom.schema,
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
-        whitepist_vpc_from=ValuesFrom.schema,
+        whitelist_vpc_from=ValuesFrom.schema,
         whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
@@ -258,13 +275,15 @@ class CrossAccountAccessFilter(Filter):
         self.accounts = self.get_accounts()
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
-        self.checker = self.checker_factory(
+        self.checker_config = getattr(self, 'checker_config', None) or {}
+        self.checker_config.update(
             {'allowed_accounts': self.accounts,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions})
+        self.checker = self.checker_factory(self.checker_config)
         return super(CrossAccountAccessFilter, self).process(resources, event)
 
     def get_accounts(self):

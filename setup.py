@@ -9,7 +9,7 @@ def read(fname):
 
 setup(
     name="c7n",
-    version='0.8.27.1',
+    version='0.8.28.0',
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.rst'),
     classifiers=[
@@ -27,7 +27,7 @@ setup(
         "botocore>=1.7.37",
         "pyyaml",
         "jsonschema",
-        "ipaddress",
+        "jsonpatch>=1.21",
         "argcomplete",
         "tabulate",
     ],

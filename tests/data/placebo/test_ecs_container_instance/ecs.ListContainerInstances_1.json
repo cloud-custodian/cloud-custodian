@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "containerInstanceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:container-instance/c6cd3a4a-0ea2-46b5-9628-7b9ebdcd1bb9"
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b5a97740-14d2-11e8-a559-818c696f2a8f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b5a97740-14d2-11e8-a559-818c696f2a8f", 
+                "content-length": "120", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 18 Feb 2018 17:39:45 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

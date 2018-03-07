@@ -155,15 +155,15 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: launch-config-public-ip
-                resource: asg
-                filters:
-                  - type: launch-config
-                    key: AssociatePublicIpAddress
-                    value: true
+        policies:
+          - name: launch-configs-with-public-address
+            resource: asg
+            filters:
+              - type: launch-config
+                key: AssociatePublicIpAddress
+                value: true
     """
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
@@ -404,7 +404,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unencrypted
@@ -543,7 +543,7 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-older-image
@@ -588,16 +588,16 @@ class ImageFilter(ValueFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: asg-image-tag
-                resource: asg
-                filters:
-                  - type: image
-                    value: "tag:ImageTag"
-                    key: "TagValue"
-                    op: eq
+        policies:
+          - name: non-windows-asg
+            resource: asg
+            filters:
+              - type: image
+                key: Platform
+                value: Windows
+                op: ne
     """
     permissions = (
         "ec2:DescribeImages",
@@ -645,14 +645,14 @@ class VpcIdFilter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: asg-vpc-xyz
-                resource: asg
-                filters:
-                  - type: vpc-id
-                    value: vpc-12ab34cd
+        policies:
+          - name: asg-vpc-xyz
+            resource: asg
+            filters:
+              - type: vpc-id
+                value: vpc-12ab34cd
     """
 
     schema = type_schema(
@@ -689,13 +689,66 @@ class VpcIdFilter(ValueFilter):
         return super(VpcIdFilter, self).process(asgs)
 
 
+@filters.register('progagated-tags')
+class PropagatedTagFilter(Filter):
+    """Filter ASG based on propagated tags
+
+    This filter is designed to find all autoscaling groups that have a list
+    of tag keys (provided) that are set to propagate to new instances. Using
+    this will allow for easy validation of asg tag sets are in place across an
+    account for compliance.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-non-propagated-tags
+                resource: asg
+                filters:
+                  - type: propagated-tags
+                    keys: ["ABC", "BCD"]
+                    match: false
+                    propagate: true
+    """
+    schema = type_schema(
+        'progagated-tags',
+        keys={'type': 'array', 'items': {'type': 'string'}},
+        match={'type': 'boolean'},
+        propagate={'type': 'boolean'})
+    permissions = (
+        "autoscaling:DescribeLaunchConfigurations",
+        "autoscaling:DescribeAutoScalingGroups")
+
+    def process(self, asgs, event=None):
+        keys = self.data.get('keys', [])
+        match = self.data.get('match', True)
+        results = []
+        for asg in asgs:
+            if self.data.get('propagate', True):
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
+            else:
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and not t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
+        return results
+
+
 @actions.register('tag-trim')
 class GroupTagTrim(TagTrim):
     """Action to trim the number of tags to avoid hitting tag limits
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-tag-trim
@@ -731,7 +784,7 @@ class CapacityDelta(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-capacity-delta
@@ -756,7 +809,7 @@ class Resize(Action):
 
     1. set min/desired to current running instances
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-resize
@@ -770,7 +823,7 @@ class Resize(Action):
     2. apply a fixed resize of min, max or desired, optionally saving the
        previous values to a named tag (for restoring later):
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: offhours-asg-off
@@ -787,7 +840,7 @@ class Resize(Action):
 
     3. restore previous values for min/max/desired from a tag:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: offhours-asg-on
@@ -914,7 +967,7 @@ class RemoveTag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-remove-unnecessary-tags
@@ -973,7 +1026,7 @@ class Tag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-add-owner-tag
@@ -1049,7 +1102,7 @@ class PropagateTags(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-propagate-required
@@ -1157,7 +1210,7 @@ class RenameTag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-rename-owner-tag
@@ -1254,7 +1307,7 @@ class MarkForOp(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-suspend-schedule
@@ -1311,7 +1364,7 @@ class Suspend(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-suspend-processes
@@ -1393,7 +1446,7 @@ class Resume(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-resume-processes
@@ -1470,7 +1523,7 @@ class Delete(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unencrypted
@@ -1526,6 +1579,8 @@ class LaunchConfig(query.QueryResourceManager):
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::LaunchConfiguration'
 
+    retry = staticmethod(get_retry(('Throttling',)))
+
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeLaunchConfig(self)
@@ -1548,7 +1603,7 @@ class LaunchConfigAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-launch-config-old
@@ -1572,7 +1627,7 @@ class UnusedLaunchConfig(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unused-launch-config
@@ -1603,7 +1658,7 @@ class LaunchConfigDelete(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unused-launch-config-delete

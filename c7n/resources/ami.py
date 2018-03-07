@@ -21,7 +21,7 @@ from c7n.filters import FilterRegistry, AgeFilter, Filter, OPERATORS
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 
 
 log = logging.getLogger('custodian.ami')
@@ -66,7 +66,7 @@ class Deregister(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-deregister-old
@@ -86,8 +86,11 @@ class Deregister(BaseAction):
             list(w.map(self.process_image, images))
 
     def process_image(self, image):
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+
         client = local_session(self.manager.session_factory).client('ec2')
-        client.deregister_image(ImageId=image['ImageId'])
+        retry(client.deregister_image, ImageId=image['ImageId'])
 
 
 @actions.register('remove-launch-permissions')
@@ -100,7 +103,7 @@ class RemoveLaunchPermissions(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-remove-launch-permissions
@@ -126,13 +129,66 @@ class RemoveLaunchPermissions(BaseAction):
             ImageId=image['ImageId'], Attribute="launchPermission")
 
 
+@actions.register('copy')
+class Copy(BaseAction):
+    """Action to copy AMIs with optional encryption
+
+    This action can copy AMIs while optionally encrypting or decrypting
+    the target AMI. It is advised to use in conjunction with a filter.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-ensure-encrypted
+                resource: ami
+                filters:
+                  - not:
+                    - type: encrypted
+                actions:
+                  - type: copy
+                    encrypt: true
+                    key-id: 00000000-0000-0000-0000-000000000000
+    """
+
+    permissions = ('ec2:CopyImage',)
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['copy']},
+            'name': {'type': 'string'},
+            'description': {'type': 'string'},
+            'region': {'type': 'string'},
+            'encrypt': {'type': 'boolean'},
+            'key-id': {'type': 'string'}
+        }
+    }
+
+    def process(self, images):
+        session = local_session(self.manager.session_factory)
+        client = session.client(
+            'ec2',
+            region_name=self.data.get('region', None))
+
+        for image in images:
+            client.copy_image(
+                Name=self.data.get('name', image['Name']),
+                Description=self.data.get('description', image['Description']),
+                SourceRegion=session.region_name,
+                SourceImageId=image['ImageId'],
+                Encrypted=self.data.get('encrypt', False),
+                KmsKeyId=self.data.get('key-id', ''))
+
+
 @filters.register('image-age')
 class ImageAgeFilter(AgeFilter):
     """Filters images based on the age (in days)
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-remove-launch-permissions
@@ -158,7 +214,7 @@ class ImageUnusedFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ami-unused

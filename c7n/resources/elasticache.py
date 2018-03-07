@@ -89,7 +89,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elasticache-in-subnet-x
@@ -130,7 +130,7 @@ class DeleteElastiCacheCluster(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elasticache-delete-stale-clusters
@@ -198,7 +198,7 @@ class SnapshotElastiCacheCluster(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elasticache-cluster-snapshot
@@ -324,7 +324,7 @@ class ElastiCacheSnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elasticache-stale-snapshots
@@ -365,7 +365,7 @@ class DeleteElastiCacheSnapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elasticache-stale-snapshots
@@ -407,7 +407,7 @@ class CopyClusterTags(BaseAction):
     Copy specified tags from Elasticache cluster to Snapshot
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             - name: elasticache-test
               resource: cache-snapshot

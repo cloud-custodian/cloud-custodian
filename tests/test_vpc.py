@@ -135,6 +135,36 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
+    def test_attributes_filter_all(self):
+        self.session_factory = self.replay_flight_data('test_vpc_attributes')
+        p = self.load_policy({
+            'name': 'dns-hostnames-and-support-enabled',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'vpc-attributes',
+                'dnshostnames': True,
+                'dnssupport': True
+            }]
+        }, session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
+    def test_attributes_filter_hostnames(self):
+        self.session_factory = self.replay_flight_data(
+            'test_vpc_attributes_hostnames')
+        p = self.load_policy({
+            'name': 'dns-hostnames-enabled',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'vpc-attributes',
+                'dnshostnames': True
+            }]
+        }, session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
 
 class NetworkLocationTest(BaseTest):
 
@@ -189,6 +219,61 @@ class NetworkLocationTest(BaseTest):
                 'reason': 'SecurityGroupLocationAbsent',
                 'security-groups': {sg_id: None, web_sg_id: 'web'}
             }])
+
+    @functional
+    def test_network_location_ignore(self):
+        # if we use network-location-with ignore we won't find any resources.
+
+        # Note we're reusing another tests data set, with the exact same
+        # resource creation, just altering our policy filter to examine
+        # a different parameter on results.
+        self.factory = self.replay_flight_data(
+            'test_network_location_sg_cardinality')
+        client = self.factory().client('ec2')
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")['Vpc']['VpcId']
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(
+            VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+                'Subnet']['SubnetId']
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier",
+            VpcId=vpc_id,
+            Description="for apps")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        db_sg_id = client.create_security_group(
+            GroupName="db-tier",
+            VpcId=vpc_id,
+            Description="for dbs")['GroupId']
+        self.addCleanup(client.delete_security_group, GroupId=db_sg_id)
+
+        nic = client.create_network_interface(
+            SubnetId=web_sub_id,
+            Groups=[web_sg_id, db_sg_id])['NetworkInterface']['NetworkInterfaceId']
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id, web_sub_id, nic],
+            Tags=[{'Key': 'Location', 'Value': 'web'}])
+        client.create_tags(
+            Resources=[db_sg_id],
+            Tags=[{'Key': 'Location', 'Value': 'db'}])
+
+        p = self.load_policy({
+            'name': 'netloc',
+            'resource': 'eni',
+            'filters': [
+                {'NetworkInterfaceId': nic},
+                {'type': 'network-location',
+                 'ignore': [
+                     {'GroupName': 'db-tier'}],
+                 'key': 'tag:Location'}]
+            }, session_factory=self.factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     @functional
     def test_network_location_sg_cardinality(self):
@@ -641,7 +726,7 @@ class SecurityGroupTest(BaseTest):
               u'UserIdGroupPairs': []}])
 
     @functional
-    def test_self_reference(self):
+    def test_self_reference_once(self):
         factory = self.replay_flight_data(
             'test_security_group_self_reference')
         client = factory().client('ec2')
@@ -707,12 +792,14 @@ class SecurityGroupTest(BaseTest):
             'name': 'sg-find0',
             'resource': 'security-group',
             'filters': [
+                {'GroupName': 'sg1'},
                 {'type': 'ingress',
-                 'SelfReference': False},
-                {'GroupName': 'sg1'}]
+                 'match-operator': 'and',
+                 'Ports': [80],
+                 'SelfReference': False}]
             }, session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
 
         p = self.load_policy({
             'name': 'sg-find1',
@@ -1031,6 +1118,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'SelfReference': True}
                 ]})
         manager = p.get_resource_manager()
@@ -1042,6 +1130,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'SelfReference': False}
                 ]})
         manager = p.get_resource_manager()
@@ -1053,6 +1142,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'Cidr': {
                     'value': '0.0.0.0/0',
                     'op': 'eq',
@@ -1105,6 +1195,7 @@ class SecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'Ports': [22],
+                 'match-operator': 'and',
                  'Cidr': {
                     'value': '10.42.3.0/24',
                     'op': 'eq',
@@ -1332,6 +1423,39 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Tags'][0]['Value'], 'FancyTestVPC')
+
+
+class EndpointTest(BaseTest):
+
+    def test_endpoint_subnet(self):
+        factory = self.replay_flight_data('test_vpce_subnet_filter')
+        p = self.load_policy({
+            'name': 'endpoint-subnet',
+            'resource': 'vpc-endpoint',
+            'filters': [
+                {'VpcEndpointType': 'Interface'},
+                {'type': 'subnet',
+                 'key': 'tag:Name',
+                 'value': 'Pluto'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-subnets'], ['subnet-914763e7'])
+
+    def test_endpoint_sg(self):
+        factory = self.replay_flight_data('test_vpce_sg_filter')
+        p = self.load_policy({
+            'name': 'endpoint-subnet',
+            'resource': 'vpc-endpoint',
+            'filters': [
+                {'VpcEndpointType': 'Interface'},
+                {'type': 'security-group',
+                 'key': 'tag:c7n-test-tag',
+                 'value': 'c7n-test-val'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:matched-security-groups'], ['sg-6c7fa917'])
 
 
 class NATGatewayTest(BaseTest):

@@ -23,40 +23,13 @@ from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag
+from c7n.tags import universal_augment
 
 log = logging.getLogger('custodian.kms')
 
 
-class KeyBase(object):
-
-    permissions = ('kms:ListResourceTags',)
-
-    def augment(self, resources):
-        client = local_session(
-            self.session_factory).client('kms')
-        for r in resources:
-            key_id = r.get('AliasArn') or r.get('KeyArn')
-            info = client.describe_key(KeyId=key_id)['KeyMetadata']
-            r.update(info)
-
-            try:
-                tags = client.list_resource_tags(KeyId=key_id)['Tags']
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
-                        "Access denied getting tags for key:%s",
-                        key_id)
-
-            tag_list = []
-            for t in tags:
-                tag_list.append({'Key': t['TagKey'], 'Value': t['TagValue']})
-            r['Tags'] = tag_list
-        return resources
-
-
 @resources.register('kms')
-class KeyAlias(KeyBase, QueryResourceManager):
+class KeyAlias(QueryResourceManager):
 
     class resource_type(object):
         service = 'kms'
@@ -72,7 +45,7 @@ class KeyAlias(KeyBase, QueryResourceManager):
 
 
 @resources.register('kms-key')
-class Key(KeyBase, QueryResourceManager):
+class Key(QueryResourceManager):
 
     class resource_type(object):
         service = 'kms'
@@ -82,6 +55,27 @@ class Key(KeyBase, QueryResourceManager):
         id = "KeyArn"
         dimension = None
         filter_name = None
+        universal_taggable = True
+
+    def augment(self, resources):
+        client = local_session(
+            self.session_factory).client('kms')
+
+        for r in resources:
+            try:
+                key_id = r.get('KeyArn')
+                info = client.describe_key(KeyId=key_id)['KeyMetadata']
+                r.update(info)
+
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied when describing key:%s",
+                        key_id)
+                else:
+                    raise
+
+        return universal_augment(self, resources)
 
 
 @Key.filter_registry.register('key-rotation-status')
@@ -90,7 +84,7 @@ class KeyRotationStatus(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: kms-key-disabled-rotation
@@ -108,8 +102,16 @@ class KeyRotationStatus(ValueFilter):
 
         def _key_rotation_status(resource):
             client = local_session(self.manager.session_factory).client('kms')
-            resource['KeyRotationEnabled'] = client.get_key_rotation_status(
-                KeyId=resource['KeyId'])
+            try:
+                resource['KeyRotationEnabled'] = client.get_key_rotation_status(
+                    KeyId=resource['KeyId'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDeniedException':
+                    self.log.warning(
+                        "Access denied when getting rotation status on key:%s",
+                        resource.get('KeyArn'))
+                else:
+                    raise
 
         with self.executor_factory(max_workers=2) as w:
             query_resources = [
@@ -118,7 +120,7 @@ class KeyRotationStatus(ValueFilter):
                 "Querying %d kms-keys' rotation status" % len(query_resources))
             list(w.map(_key_rotation_status, query_resources))
 
-        return [r for r in resources if self.match(r['KeyRotationEnabled'])]
+        return [r for r in resources if self.match(r.get('KeyRotationEnabled',{}))]
 
 
 @Key.filter_registry.register('cross-account')
@@ -128,7 +130,7 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: kms-key-cross-account
@@ -164,7 +166,7 @@ class GrantCount(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: kms-grants
@@ -230,7 +232,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
            policies:
               - name: kms-key-cross-account
@@ -288,67 +290,3 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': key_id,
                 'State': 'PolicyRemoved',
                 'Statements': found}
-
-
-@Key.action_registry.register('tag')
-class TagKmsKey(Tag):
-    """Action to create tag(s) on KMS keys
-
-        :example:
-
-            .. code-block: yaml
-
-                policies:
-                  - name: tag-kms-keys
-                    resource: kms-key
-                    filters:
-                      - "tag:RequiredTag": absent
-                    actions:
-                      - type: tag
-                        key: RequiredTag
-                        value: tag-value
-        """
-
-    permissions = ('kms:TagResource',)
-
-    def process_resource_set(self, keys, tags):
-        client = local_session(self.manager.session_factory).client('kms')
-        add_tags = []
-        for t in tags:
-            add_tags.append({'TagKey': t['Key'], 'TagValue': t['Value']})
-        for k in keys:
-            try:
-                client.tag_resource(KeyId=k['KeyId'], Tags=add_tags)
-            except ClientError as e:
-                self.log.exception('Error tagging key: %s: %s' % (
-                    k['KeyId'], e))
-
-
-@Key.action_registry.register('remove-tag')
-class RemoveTagKmsKey(RemoveTag):
-    """Action to remove tag(s) on KMS keys
-
-        :example:
-
-            .. code-block: yaml
-
-                policies:
-                  - name: kms-key-remove-tag
-                    resource: kms-key
-                    filters:
-                      - "tag:ExpiredTag": present
-                    actions:
-                      - type: remove-tag
-                        tags: ["ExpiredTag"]
-        """
-
-    permissions = ('kms:UntagResource',)
-
-    def process_resource_set(self, keys, tags):
-        client = local_session(self.manager.session_factory).client('kms')
-        for k in keys:
-            try:
-                client.untag_resource(KeyId=k['KeyId'], TagKeys=tags)
-            except ClientError as e:
-                self.log.exception('Error removing tag(s) %s from key: %s: %s' % (
-                    tags, k['KeyId'], e))

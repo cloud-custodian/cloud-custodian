@@ -14,8 +14,8 @@
 
 from .common import BaseTest
 
-class ReplInstance(BaseTest):
 
+class ReplInstance(BaseTest):
     def test_describe_augment_no_tags(self):
         session_factory = self.replay_flight_data(
             'test_dms_repl_instance_describe_sans_tags')
@@ -57,6 +57,80 @@ class ReplInstance(BaseTest):
         instances = client.describe_replication_instances().get(
             'ReplicationInstances')
         self.assertEqual(instances[0]['ReplicationInstanceStatus'], 'deleting')
-        
-        
 
+
+class ReplicationInstanceTagging(BaseTest):
+    def test_replication_instance_tag(self):
+        session_factory = self.replay_flight_data('test_dms_tag')
+        p = self.load_policy({
+            'name': 'tag-dms-instance',
+            'resource': 'dms-instance',
+            'filters': [{
+                'tag:RequiredTag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'RequiredTag',
+                'value': 'RequiredValue'
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dms')
+        tag_list = client.list_tags_for_resource(
+            ResourceArn=resources[0]['ReplicationInstanceArn'])['TagList']
+        tag_value = [t['Value'] for t in tag_list if t['Key'] == 'RequiredTag']
+        self.assertEqual(tag_value[0], 'RequiredValue')
+
+    def test_remove_replication_instance_tag(self):
+        session_factory = self.replay_flight_data('test_dms_tag_remove')
+        p = self.load_policy({
+            'name': 'remove-dms-tag',
+            'resource': 'dms-instance',
+            'filters': [{
+                'tag:RequiredTag': 'RequiredValue'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ["RequiredTag"]
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dms')
+        tag_list = client.list_tags_for_resource(
+           ResourceArn=resources[0]['ReplicationInstanceArn'])['TagList']
+        self.assertFalse([t for t in tag_list if t['Key'] == 'RequiredTag'])
+
+    def test_replication_instance_markforop(self):
+        session_factory = self.replay_flight_data('test_dms_mark_for_op')
+        p = self.load_policy({
+            'name': 'dms-instance-markforop',
+            'resource': 'dms-instance',
+            'filters': [{
+                'tag:RequiredTag': 'absent'}],
+            'actions': [{
+                'type': 'mark-for-op',
+                'tag': 'custodian_cleanup',
+                'op': 'delete',
+                'days': 2}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dms')
+        tag_list = client.list_tags_for_resource(
+            ResourceArn=resources[0]['ReplicationInstanceArn'])['TagList']
+        self.assertTrue(
+            [t['Value'] for t in tag_list if t['Key'] == 'custodian_cleanup'])
+
+    def test_replication_instance_markedforop(self):
+        session_factory = self.replay_flight_data('test_dms_marked_for_op')
+        p = self.load_policy({
+            'name': 'dms-instance-markedforop',
+            'resource': 'dms-instance',
+            'filters': [{
+                'type': 'marked-for-op',
+                'tag': 'custodian_cleanup',
+                'op': 'delete',
+                'skew': 2}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['ReplicationInstanceIdentifier'],
+            'replication-instance-1')

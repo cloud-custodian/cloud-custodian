@@ -17,6 +17,7 @@ from .common import BaseTest, functional
 
 import base64
 import json
+import time
 import tempfile
 import time
 import zlib
@@ -31,7 +32,11 @@ class NotifyTest(BaseTest):
         client = session_factory().client('sqs')
         queue_url = client.create_queue(
             QueueName='c7n-notify-test')['QueueUrl']
-        self.addCleanup(client.delete_queue, QueueUrl=queue_url)
+        def cleanup():
+            client.delete_queue(QueueUrl=queue_url)
+            if self.recording:
+                time.sleep(60)
+        self.addCleanup(cleanup)
         temp_file = tempfile.NamedTemporaryFile(mode='w')
         json.dump({'emails': ['me@example.com']}, temp_file)
         temp_file.flush()
@@ -44,6 +49,7 @@ class NotifyTest(BaseTest):
                 {'QueueUrl': queue_url}],
             'actions': [{
                 'type': 'notify',
+                'to': ['to@example.com'],
                 'to_from': {
                     'url': 'file://%s' % temp_file.name,
                     'format': 'json',
@@ -57,6 +63,7 @@ class NotifyTest(BaseTest):
                     'queue': queue_url}}]
             }, session_factory=session_factory)
         resources = policy.run()
+        self.assertEqual(policy.data.get('actions')[0].get('to'), ['to@example.com'])
         self.assertEqual(len(resources), 1)
         messages = client.receive_message(
             QueueUrl=queue_url,
@@ -68,7 +75,7 @@ class NotifyTest(BaseTest):
             set(body.keys()),
             set(('account_id', 'action', 'event', 'policy', 'region', 'account',
                 'resources')))
-        
+
     def test_sns_notify(self):
         session_factory = self.replay_flight_data(
             'test_sns_notify_action')

@@ -2,28 +2,27 @@
     "status_code": 200, 
     "data": {
         "ApplicationName": "re-jenkins", 
-        "EnvironmentName": "c7n-eb-term-test", 
+        "EnvironmentName": "c7n-eb-tag-test-inactive", 
         "Status": "Terminating", 
-        "Description": "test for c7n EB termination", 
-        "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-term-test", 
-        "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
-        "EndpointURL": "awseb-e-c-AWSEBLoa-VDPIGTI558U-1484559782.us-east-1.elb.amazonaws.com", 
-        "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
-        "EnvironmentId": "e-cpvmgjjyip", 
-        "CNAME": "c7n-eb-term-test.us-east-1.elasticbeanstalk.com", 
-        "AbortableOperationInProgress": false, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "083c0d61-d925-11e7-bfa4-d11ccdba1b03", 
+            "RequestId": "028dc2bd-d9f1-11e7-9d29-e15fb5867d66", 
             "HTTPHeaders": {
-                "date": "Mon, 04 Dec 2017 18:57:52 GMT", 
-                "x-amzn-requestid": "083c0d61-d925-11e7-bfa4-d11ccdba1b03", 
-                "content-length": "1387", 
+                "date": "Tue, 05 Dec 2017 19:18:00 GMT", 
+                "x-amzn-requestid": "028dc2bd-d9f1-11e7-9d29-e15fb5867d66", 
+                "content-length": "1352", 
                 "content-type": "text/xml", 
                 "connection": "keep-alive"
             }
         }, 
+        "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test-inactive", 
+        "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+        "EndpointURL": "awseb-e-p-AWSEBLoa-IQDCP9T34J0M-804037053.us-east-1.elb.amazonaws.com", 
+        "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+        "EnvironmentId": "e-pmpgbxpgsc", 
+        "CNAME": "c7n-eb-tag-test-inactive.us-east-1.elasticbeanstalk.com", 
+        "AbortableOperationInProgress": false, 
         "Tier": {
             "Version": " ", 
             "Type": "Standard", 
@@ -31,24 +30,24 @@
         }, 
         "Health": "Grey", 
         "DateUpdated": {
-            "hour": 18, 
+            "hour": 19, 
             "__class__": "datetime", 
             "month": 12, 
-            "second": 53, 
-            "microsecond": 569000, 
+            "second": 1, 
+            "microsecond": 350000, 
             "year": 2017, 
-            "day": 4, 
-            "minute": 57
+            "day": 5, 
+            "minute": 18
         }, 
         "DateCreated": {
             "hour": 18, 
             "__class__": "datetime", 
             "month": 12, 
-            "second": 38, 
-            "microsecond": 330000, 
+            "second": 35, 
+            "microsecond": 235000, 
             "year": 2017, 
-            "day": 4, 
-            "minute": 52
+            "day": 5, 
+            "minute": 17
         }
     }
 }

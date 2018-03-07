@@ -1,0 +1,83 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VpcEndpoints": [
+            {
+                "PolicyDocument": "{\n  \"Statement\": [\n    {\n      \"Action\": \"*\", \n      \"Effect\": \"Allow\", \n      \"Principal\": \"*\", \n      \"Resource\": \"*\"\n    }\n  ]\n}", 
+                "VpcId": "vpc-d2d616b5", 
+                "NetworkInterfaceIds": [
+                    "eni-cc659531", 
+                    "eni-8365465c", 
+                    "eni-8452083f", 
+                    "eni-726667bf"
+                ], 
+                "SubnetIds": [
+                    "subnet-3a334610", 
+                    "subnet-efbcccb7", 
+                    "subnet-e3b194de", 
+                    "subnet-914763e7"
+                ], 
+                "PrivateDnsEnabled": true, 
+                "State": "available", 
+                "ServiceName": "com.amazonaws.us-east-1.ec2", 
+                "RouteTableIds": [], 
+                "Groups": [
+                    {
+                        "GroupName": "default", 
+                        "GroupId": "sg-6c7fa917"
+                    }
+                ], 
+                "VpcEndpointId": "vpce-0dc9e00c02ffbab17", 
+                "VpcEndpointType": "Interface", 
+                "CreationTimestamp": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 37, 
+                    "microsecond": 265000, 
+                    "year": 2018, 
+                    "day": 12, 
+                    "minute": 20
+                }, 
+                "DnsEntries": [
+                    {
+                        "HostedZoneId": "Z1D6KF4YOT5W1I", 
+                        "DnsName": "ec2.us-east-1.amazonaws.com"
+                    }, 
+                    {
+                        "HostedZoneId": "Z7HUB22UULQXV", 
+                        "DnsName": "vpce-0dc9e00c02ffbab17-gxv49128.ec2.us-east-1.vpce.amazonaws.com"
+                    }, 
+                    {
+                        "HostedZoneId": "Z7HUB22UULQXV", 
+                        "DnsName": "vpce-0dc9e00c02ffbab17-gxv49128-us-east-1d.ec2.us-east-1.vpce.amazonaws.com"
+                    }, 
+                    {
+                        "HostedZoneId": "Z7HUB22UULQXV", 
+                        "DnsName": "vpce-0dc9e00c02ffbab17-gxv49128-us-east-1b.ec2.us-east-1.vpce.amazonaws.com"
+                    }, 
+                    {
+                        "HostedZoneId": "Z7HUB22UULQXV", 
+                        "DnsName": "vpce-0dc9e00c02ffbab17-gxv49128-us-east-1e.ec2.us-east-1.vpce.amazonaws.com"
+                    }, 
+                    {
+                        "HostedZoneId": "Z7HUB22UULQXV", 
+                        "DnsName": "vpce-0dc9e00c02ffbab17-gxv49128-us-east-1a.ec2.us-east-1.vpce.amazonaws.com"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f7959fcd-e714-4094-855b-e137813abd72", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 12 Feb 2018 15:17:35 GMT"
+            }
+        }
+    }
+}

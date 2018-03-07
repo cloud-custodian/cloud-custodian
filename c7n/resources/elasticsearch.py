@@ -17,9 +17,10 @@ import functools
 import logging
 import itertools
 
-from c7n.actions import Action
-from c7n.manager import resources
+from c7n.actions import Action, ModifyVpcSecurityGroupsAction
 from c7n.filters import MetricsFilter, FilterRegistry
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
     chunks, local_session, get_retry, type_schema, generate_arn)
@@ -83,6 +84,18 @@ class ElasticSearchDomain(QueryResourceManager):
                 *w.map(_augment, chunks(domains, 5))))
 
 
+@ElasticSearchDomain.filter_registry.register('subnet')
+class Subnet(SubnetFilter):
+
+    RelatedIdsExpression = "VPCOptions.SubnetIds[]"
+
+
+@ElasticSearchDomain.filter_registry.register('security-group')
+class SecurityGroup(SecurityGroupFilter):
+
+    RelatedIdsExpression = "VPCOptions.SecurityGroupIds[]"
+
+
 @ElasticSearchDomain.filter_registry.register('metrics')
 class Metrics(MetricsFilter):
 
@@ -91,6 +104,23 @@ class Metrics(MetricsFilter):
                  'Value': self.manager.account_id},
                 {'Name': 'DomainName',
                  'Value': resource['DomainName']}]
+
+
+@ElasticSearchDomain.action_registry.register('modify-security-groups')
+class ElasticSearchModifySG(ModifyVpcSecurityGroupsAction):
+    """Modify security groups on an Elasticsearch domain"""
+
+    permissions = ('es:UpdateElasticsearchDomainConfig',)
+
+    def process(self, domains):
+        groups = super(ElasticSearchModifySG, self).get_groups(domains)
+        client = local_session(self.manager.session_factory).client('es')
+
+        for dx, d in enumerate(domains):
+            client.update_elasticsearch_domain_config(
+                DomainName=d['DomainName'],
+                VPCOptions={
+                    'SecurityGroupIds': groups[dx]})
 
 
 @ElasticSearchDomain.action_registry.register('delete')
@@ -109,9 +139,9 @@ class Delete(Action):
 class ElasticSearchAddTag(Tag):
     """Action to create tag(s) on an existing elasticsearch domain
 
-        :example:
+    :example:
 
-            .. code-block: yaml
+    .. code-block:: yaml
 
                 policies:
                   - name: es-add-tag
@@ -144,18 +174,18 @@ class ElasticSearchAddTag(Tag):
 class ElasticSearchRemoveTag(RemoveTag):
     """Removes tag(s) on an existing elasticsearch domain
 
-            :example:
+    :example:
 
-                .. code-block: yaml
+    .. code-block:: yaml
 
-                    policies:
-                      - name: es-remove-tag
-                        resource: elasticsearch
-                        filters:
-                          - "tag:ExpiredTag": present
-                        actions:
-                          - type: remove-tag
-                            tags: ['ExpiredTag']
+        policies:
+          - name: es-remove-tag
+            resource: elasticsearch
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
         """
     permissions = ('es:RemoveTags',)
 
@@ -175,9 +205,9 @@ class ElasticSearchRemoveTag(RemoveTag):
 class ElasticSearchMarkForOp(TagDelayedAction):
     """Tag an elasticsearch domain for action later
 
-        :example:
+    :example:
 
-            .. code-block: yaml
+    .. code-block:: yaml
 
                 policies:
                   - name: es-delete-missing

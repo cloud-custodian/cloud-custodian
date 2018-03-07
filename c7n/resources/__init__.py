@@ -42,6 +42,7 @@ def load_resources():
     import c7n.resources.cloudtrail
     import c7n.resources.code
     import c7n.resources.cognito
+    import c7n.resources.config
     import c7n.resources.cw
     import c7n.resources.directory
     import c7n.resources.directconnect
@@ -74,6 +75,7 @@ def load_resources():
     import c7n.resources.redshift
     import c7n.resources.route53
     import c7n.resources.s3
+    import c7n.resources.sagemaker
     import c7n.resources.sfn
     import c7n.resources.shield
     import c7n.resources.simpledb

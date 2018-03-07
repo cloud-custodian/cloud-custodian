@@ -103,7 +103,7 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-cross-account
@@ -120,7 +120,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
            policies:
               - name: sqs-cross-account
@@ -173,7 +173,7 @@ class MarkForOpQueue(TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-delete-unused
@@ -213,7 +213,7 @@ class TagQueue(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: tag-sqs
@@ -251,7 +251,7 @@ class UntagQueue(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-remove-tag
@@ -288,7 +288,7 @@ class DeleteSqsQueue(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-delete
@@ -321,7 +321,7 @@ class SetEncryption(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: sqs-set-encrypt
@@ -358,3 +358,44 @@ class SetEncryption(BaseAction):
         except ClientError as e:
             self.log.exception(
                 "Exception modifying queue:\n %s" % e)
+
+
+@SQS.action_registry.register('set-retention-period')
+class SetRetentionPeriod(BaseAction):
+    """Action to set the retention period on an SQS queue (in seconds)
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sqs-reduce-long-retention-period
+            resource: sqs
+            filters:
+              - type: value
+                key: MessageRetentionPeriod
+                value_type: integer
+                value: 345600
+                op: ge
+            actions:
+              - type: set-retention-period
+                period: 86400
+    """
+    schema = type_schema(
+        'set-retention-period',
+        period={'type': 'integer',
+                'minimum': 60, 'exclusiveMinimum': True,
+                'maximum': 1209600, 'exclusiveMaximum': True})
+
+    permissions = ('sqs:SetQueueAttributes',)
+
+    def process_queue(self, q):
+        client = local_session(self.manager.session_factory).client('sqs')
+        client.set_queue_attributes(
+            QueueUrl=q['QueueUrl'],
+            Attributes={'MessageRetentionPeriod': str(self.period)})
+
+    def process(self, queues):
+        self.period = self.data.get('period', 345600)
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_queue, queues))

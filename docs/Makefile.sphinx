@@ -55,7 +55,7 @@ clean:
 	rm -rf $(SRCDIR)/generated
 
 html:
-	$(SPHINXBINS)/sphinx-apidoc -o $(SRCDIR)/generated $(SRCDIR)/../../c7n $(SRCDIR)/../../tests
+	$(SPHINXBINS)/sphinx-apidoc -o $(SRCDIR)/generated $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

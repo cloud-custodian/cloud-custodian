@@ -1,0 +1,45 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e212f7d7-d477-11e7-81e4-a7e35a529114", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e212f7d7-d477-11e7-81e4-a7e35a529114", 
+                "date": "Tue, 28 Nov 2017 20:08:21 GMT", 
+                "content-length": "677", 
+                "content-type": "application/json"
+            }
+        }, 
+        "MountTargets": [
+            {
+                "MountTargetId": "fsmt-a47385dd", 
+                "NetworkInterfaceId": "eni-771c4828", 
+                "FileSystemId": "fs-66f3051f", 
+                "LifeCycleState": "available", 
+                "SubnetId": "subnet-5cd42634", 
+                "OwnerId": "117134021140", 
+                "IpAddress": "172.31.3.4"
+            }, 
+            {
+                "MountTargetId": "fsmt-a67385df", 
+                "NetworkInterfaceId": "eni-3e8b2915", 
+                "FileSystemId": "fs-66f3051f", 
+                "LifeCycleState": "available", 
+                "SubnetId": "subnet-28116065", 
+                "OwnerId": "117134021140", 
+                "IpAddress": "172.31.34.199"
+            }, 
+            {
+                "MountTargetId": "fsmt-a77385de", 
+                "NetworkInterfaceId": "eni-e72ebfb2", 
+                "FileSystemId": "fs-66f3051f", 
+                "LifeCycleState": "available", 
+                "SubnetId": "subnet-3f447544", 
+                "OwnerId": "117134021140", 
+                "IpAddress": "172.31.20.211"
+            }
+        ]
+    }
+}

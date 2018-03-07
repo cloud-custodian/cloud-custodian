@@ -170,7 +170,9 @@ class IamRoleFilterUsage(BaseTest):
         p = self.load_policy({
             'name': 'iam-inuse-role',
             'resource': 'iam-role',
-            'filters': ['used']}, session_factory=session_factory)
+            'filters': [{
+                'type': 'used',
+                'state': True}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 3)
 
@@ -183,7 +185,7 @@ class IamRoleFilterUsage(BaseTest):
             'resource': 'iam-role',
             'filters': ['unused']}, session_factory=session_factory)
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 1)
 
 
 class IamUserTest(BaseTest):
@@ -730,6 +732,64 @@ class SNSCrossAccount(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['TopicArn'], arn)
 
+    @functional
+    def test_sns_cross_account_endpoint_condition(self):
+        self.patch(SNS, 'executor_factory', MainThreadExecutor)
+
+        session_factory = self.replay_flight_data('test_cross_account_sns_endpoint_condition')
+        client = session_factory().client('sns')
+        topic_name = 'c7n-endpoint-condition-test'
+        arn = client.create_topic(Name=topic_name)['TopicArn']
+        self.addCleanup(client.delete_topic, TopicArn=arn)
+
+        policy = {
+            'Id': 'Foo',
+            "Version": "2012-10-17",
+            'Statement': [
+                {'Action': 'SNS:Publish',
+                 'Effect': 'Allow',
+                 'Resource': arn,
+                 'Principal': '*',
+                 'Condition': {
+                      'StringLike': {
+                        'SNS:Endpoint': "@capitalone.com"
+                      },
+                      'StringEquals': {
+                        "AWS:SourceOwner": "644160558196"
+                      }
+                    }
+                }]}
+
+        client.set_topic_attributes(
+            TopicArn=arn, AttributeName='Policy',
+            AttributeValue=json.dumps(policy))
+
+        p = self.load_policy(
+            {'name': 'sns-cross',
+             'resource': 'sns',
+             'filters': [
+                {'TopicArn': arn},
+                'cross-account'
+                ]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {'name': 'sns-cross',
+             'resource': 'sns',
+             'filters': [
+                {'TopicArn': arn},
+                {'type':'cross-account',
+                 'whitelist_endpoints':['@whitelist.com']}
+                ]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 class CrossAccountChecker(TestCase):
 
@@ -782,5 +842,24 @@ class CrossAccountChecker(TestCase):
                 policies, [True, False, False, True, False,
                            True, False, False, False, False, False,
                            True, False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_policies_multiple_conditions(self):
+        policies = load_data('iam/s3-conditions.json')
+        checker = PolicyChecker({
+            'allowed_accounts': set(['123456789012']),
+            'allowed_vpc': set(['vpc-12345678'])})
+        for p, expected in zip(
+                policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)
+
+    def test_s3_everyone_only(self):
+        policies = load_data('iam/s3-principal.json')
+        checker = PolicyChecker({
+            'everyone_only': True})
+        for p, expected in zip(
+                policies, [True, True, False, False, False, False]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)

@@ -30,7 +30,7 @@ import yaml
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
 from c7n.utils import Bag, dumps, load_file
-from c7n.manager import resources
+from c7n import provider
 from c7n.resources import load_resources
 from c7n import schema
 
@@ -279,14 +279,23 @@ def schema_completer(prefix):
     load_resources()
     components = prefix.split('.')
 
+    if components[0] in provider.clouds.keys():
+        cloud_provider = components.pop(0)
+        provider_resources = provider.resources(cloud_provider)
+    else:
+        cloud_provider = 'aws'
+        provider_resources = provider.resources('aws')
+        components[0] = "aws.%s" % components[0]
+
     # Completions for resource
     if len(components) == 1:
-        choices = [r for r in resources.keys() if r.startswith(prefix)]
+        choices = [r for r in provider.resources().keys()
+                   if r.startswith(components[0])]
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
 
-    if components[0] not in resources.keys():
+    if components[0] not in provider_resources.keys():
         return []
 
     # Completions for category
@@ -299,7 +308,7 @@ def schema_completer(prefix):
 
     # Completions for item
     elif len(components) == 3:
-        resource_mapping = schema.resource_vocabulary()
+        resource_mapping = schema.resource_vocabulary(cloud_provider)
         return ['{}.{}.{}'.format(components[0], components[1], x)
                 for x in resource_mapping[components[0]][components[1]]]
 
@@ -314,7 +323,6 @@ def schema_cmd(options):
 
     load_resources()
     resource_mapping = schema.resource_vocabulary()
-
     if options.summary:
         schema.summary(resource_mapping)
         return
@@ -334,13 +342,21 @@ def schema_cmd(options):
     #   - Show class doc string and schema for supplied filter
 
     if not options.resource:
-        resource_list = {'resources': sorted(resources.keys())}
+        resource_list = {'resources': sorted(provider.resources().keys())}
         print(yaml.safe_dump(resource_list, default_flow_style=False))
         return
 
-    # Format is RESOURCE.CATEGORY.ITEM
+    # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
+    # optional provider defaults to aws for compatibility
     components = options.resource.split('.')
-
+    if components[0] in provider.clouds.keys():
+        cloud_provider = components.pop(0)
+        resource_mapping = schema.resource_vocabulary(
+            cloud_provider)
+        components[0] = '%s.%s' % (cloud_provider, components[0])
+    else:
+        resource_mapping = schema.resource_vocabulary('aws')
+        components[0] = 'aws.%s' % components[0]
     #
     # Handle resource
     #

@@ -43,7 +43,7 @@ class DeleteIdentityPool(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: identity-pool-delete
@@ -91,7 +91,7 @@ class DeleteUserPool(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: user-pool-delete

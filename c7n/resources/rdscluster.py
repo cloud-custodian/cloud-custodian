@@ -102,7 +102,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: mark-for-delete
@@ -137,7 +137,7 @@ class Tag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-owner-tag
@@ -169,7 +169,7 @@ class RemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-unmark-cluster
@@ -236,7 +236,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-delete-unused
@@ -303,7 +303,7 @@ class RetentionWindow(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-backup-retention
@@ -377,7 +377,7 @@ class Snapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-snapshot
@@ -439,7 +439,7 @@ class RDSSnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-snapshots-expired
@@ -466,7 +466,7 @@ class RDSClusterSnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-snapshots-expired-delete

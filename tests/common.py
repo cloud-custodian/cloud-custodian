@@ -27,6 +27,7 @@ import six
 import yaml
 
 from c7n import policy
+from c7n.filters import revisions
 from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
@@ -175,11 +176,6 @@ class BaseTest(PillTest):
     @property
     def account_id(self):
         return ACCOUNT_ID
-
-    @property
-    def current_user_arn(self):
-        iam = boto3.resource('iam')
-        current_user_arn = iam.CurrentUser().arn
 
 
 class ConfigTest(BaseTest):

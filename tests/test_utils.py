@@ -21,10 +21,9 @@ import tempfile
 import time
 
 from botocore.exceptions import ClientError
-import ipaddress
 import six
 
-from c7n import utils
+from c7n import ipaddress, utils
 
 from .common import BaseTest
 
@@ -242,7 +241,7 @@ class UtilTest(unittest.TestCase):
     def test_snapshot_identifier(self):
         identifier = utils.snapshot_identifier('bkup', 'abcdef')
         # e.g. bkup-2016-07-27-abcdef
-        self.assertEqual(len(identifier), 22)
+        self.assertEqual(len(identifier), 28)
 
     def test_load_error(self):
         original_yaml = utils.yaml
