@@ -864,6 +864,15 @@ class ModifyPolicyBase(BaseAction):
         }
     )
 
+    def __init__(self, data=None, manager=None, log_dir=None):
+        config_args = {
+            'account_id': manager.config.account_id,
+            'region': manager.config.region
+        }
+        self.data = utils.format_string_values(data, **config_args)
+        self.manager = manager
+        self.log_dir = log_dir
+
     def add_statements(self, policy_statements):
         current = {s['Sid']: s for s in policy_statements}
         additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
