@@ -184,7 +184,7 @@ class TestSNS(BaseTest):
 
     @functional
     def test_sns_account_id_template(self):
-        session_factory = self.record_flight_data('test_sns_account_id_template')
+        session_factory = self.replay_flight_data('test_sns_account_id_template')
         client = session_factory().client('sns')
         name = 'test_sns_account_id_template'
         topic_arn = client.create_topic(Name=name)['TopicArn']
