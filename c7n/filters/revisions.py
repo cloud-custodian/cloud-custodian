@@ -25,7 +25,14 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzlocal, tzutc
 
 from c7n.filters import Filter, FilterValidationError
+from c7n.manager import resources
 from c7n.utils import local_session, type_schema
+
+try:
+    import jsonpatch
+    HAVE_JSONPATH = True
+except ImportError:
+    HAVE_JSONPATH = False
 
 
 ErrNotFound = "ResourceNotDiscoveredException"
@@ -151,3 +158,40 @@ class Diff(Filter):
 
     def diff(self, source, target):
         raise NotImplementedError("Subclass responsibility")
+
+
+class JsonDiff(Diff):
+
+    schema = type_schema(
+        'json-diff',
+        selector={'enum': ['previous', 'date', 'locked']},
+        # For date selectors allow value specification
+        selector_value={'type': 'string'})
+
+    def diff(self, source, target):
+        source, target = (
+            self.sanitize_revision(source), self.sanitize_revision(target))
+        patch = jsonpatch.JsonPatch.from_diff(source, target)
+        return list(patch)
+
+    def sanitize_revision(self, rev):
+        sanitized = dict(rev)
+        for k in [k for k in sanitized if 'c7n' in k]:
+            sanitized.pop(k)
+        return sanitized
+
+    @classmethod
+    def register_resources(klass, registry, resource_class):
+        """ meta model subscriber on resource registration.
+
+        We watch for new resource types being registered and if they
+        support aws config, automatically register the jsondiff filter.
+        """
+        config_type = getattr(resource_class.resource_type, 'config_type', None)
+        if config_type is None:
+            return
+        resource_class.filter_registry.register('json-diff', klass)
+
+
+if HAVE_JSONPATH:
+    resources.subscribe(resources.EVENT_REGISTER, JsonDiff.register_resources)
