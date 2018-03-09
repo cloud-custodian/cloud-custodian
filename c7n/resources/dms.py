@@ -363,7 +363,7 @@ class ModifyDmsEndpoint(BaseAction):
             raise KeyError('mongodbsettings not provided')
 
         nest = settings.get(
-            'nestinglevel', e['MongoDbSettings']['NestingLevel'])
+            'nestinglevel', e['MongoDbSettings']['NestingLevel']).lower()
         auth = settings.get('authtype', e['MongoDbSettings']['AuthType'])
         params['MongoDbSettings'] = {
             'ServerName': settings.get(
@@ -373,13 +373,15 @@ class ModifyDmsEndpoint(BaseAction):
             'AuthType': auth,
             'AuthMechanism': settings.get(
                 'authmechanism', e['MongoDbSettings']['AuthMechanism'])}
-        params['MongoDbSettings']['ExtractDocId'] = settings.get(
-            'extractdocid', e['MongoDbSettings']['ExtractDocId']) or False
 
         if nest == 'one':
             params['MongoDbSettings']['DocsToInvestigate'] = str(settings.get(
                 'extractdocid',
                 e['MongoDbSettings']['DocsToInvestigate'])) or '1000'
+        else:
+            params['MongoDbSettings']['ExtractDocId'] = settings.get(
+                'extractdocid', e['MongoDbSettings']['ExtractDocId']) or False
+
         if auth == 'password':
             params['MongoDbSettings']['Username'] = settings.get(
                 'username', e['MongoDbSettings']['Username'])
