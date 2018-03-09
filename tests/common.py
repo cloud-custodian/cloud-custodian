@@ -27,6 +27,7 @@ import six
 import yaml
 
 from c7n import policy
+from c7n.filters import revisions
 from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
