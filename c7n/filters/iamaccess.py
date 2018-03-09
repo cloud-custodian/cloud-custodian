@@ -34,6 +34,7 @@ References
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import fnmatch
+import logging
 import json
 
 import six
@@ -41,6 +42,8 @@ import six
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
+
+log = logging.getLogger('custodian.iamaccess')
 
 
 def _account(arn):
@@ -173,7 +176,7 @@ class PolicyChecker(object):
         handler_name = "handle_%s" % c['key'].replace('-', '_').replace(':', '_')
         handler = getattr(self, handler_name, None)
         if handler is None:
-            print("no handler:%s op:%s key:%s values:%s" % (
+            log.warning("no handler:%s op:%s key:%s values:%s" % (
                 handler_name, c['op'], c['key'], c['values']))
             return
         return not handler(s, c)
@@ -272,13 +275,15 @@ class CrossAccountAccessFilter(Filter):
         self.accounts = self.get_accounts()
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
-        self.checker = self.checker_factory(
+        self.checker_config = getattr(self, 'checker_config', None) or {}
+        self.checker_config.update(
             {'allowed_accounts': self.accounts,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions})
+        self.checker = self.checker_factory(self.checker_config)
         return super(CrossAccountAccessFilter, self).process(resources, event)
 
     def get_accounts(self):
