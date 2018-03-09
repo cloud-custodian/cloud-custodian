@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 from c7n.executor import MainThreadExecutor
 from c7n.filters import FilterValidationError
@@ -36,6 +36,16 @@ logger = logging.getLogger(name='c7n.tests')
 
 class RDSTest(BaseTest):
 
+    def test_rds_config_event(self):
+        event = event_data('rds-from-rule.json', 'config')        
+        p = self.load_policy({'name': 'rds', 'resource': 'rds'})
+        source = p.resource_manager.get_source('config')
+        resource_config = json.loads(event['invokingEvent'])['configurationItem']
+        resource = source.load_resource(resource_config)
+        self.assertEqual(
+            resource['Tags'],
+            [{u'Key': u'workload-type', u'Value': u'other'}])
+        
     def test_rds_stop(self):
         session_factory = self.replay_flight_data('test_rds_stop')
         db_instance_id = 'rds-test-instance-1'
@@ -230,15 +240,26 @@ class RDSTest(BaseTest):
 
     def test_rds_snapshot(self):
         session_factory = self.replay_flight_data('test_rds_snapshot')
+        dt = datetime.datetime.now().replace(
+            year=2017, month=12, day=11, hour=14, minute=9)
+        suffix = dt.strftime('%Y-%m-%d-%H-%M')
         p = self.load_policy(
             {'name': 'rds-snapshot',
              'resource': 'rds',
+             'filters': [{
+                 'DBInstanceIdentifier': 'c7n-snapshot-test'}],
              'actions': [
                  {'type':'snapshot'}]},
-            config={'region': 'us-west-2'},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+        client = session_factory(region='us-east-1').client('rds')
+        snapshot = client.describe_db_snapshots(
+            DBInstanceIdentifier=resources[0][
+                'DBInstanceIdentifier'])['DBSnapshots'][0]
+        self.assertEqual(snapshot['DBSnapshotIdentifier'], 'backup-%s-%s' % (
+            resources[0]['DBInstanceIdentifier'], suffix))
 
     def test_rds_retention(self):
         session_factory = self.replay_flight_data('test_rds_retention')
@@ -574,8 +595,88 @@ class RDSTest(BaseTest):
         }
         self.assertTrue(rds._db_instance_eligible_for_final_snapshot(resource))
 
+    def test_rds_db_subnetgroup_delete(self):
+        session_factory = self.replay_flight_data('test_rdssubnetgroup_delete')
+
+        policy = self.load_policy({
+            'name': 'db-subnet-group-delete',
+            'resource': 'rds-subnet-group',
+            'actions': [{'type': 'delete'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0, "Test should delete db subnetgroup")
+
+    def test_rds_db_subnetgroup_unused(self):
+        session_factory = self.replay_flight_data('test_rdssubnetgroup_unused')
+
+        policy = self.load_policy({
+            'name': 'db-subnet-group-unused',
+            'resource': 'rds-subnet-group',
+            'filters': [{'type': 'unused'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertEquals(len(resources), 1, "Resources should be unused")
+
 
 class RDSSnapshotTest(BaseTest):
+
+    def test_rds_snapshot_copy_tags_enable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_snapshot_copy_tags_enable')
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+        p = self.load_policy({
+            'name': 'rds-enable-snapshot-tag-copy',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'mysql',
+                 'op': 'eq'}],
+            'actions': [{
+                'type': 'set-snapshot-copy-tags',
+                'enable': True}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
+
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+    def test_rds_snapshot_copy_tags_disable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_snapshot_copy_tags_disable')
+        client = session_factory(region='us-east-1').client('rds')
+        self.assertTrue(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
+
+        p = self.load_policy({
+            'name': 'rds-enable-snapshot-tag-copy',
+            'resource': 'rds',
+            'filters': [
+                {'type': 'value',
+                 'key': 'Engine',
+                 'value': 'mysql',
+                 'op': 'eq'}],
+            'actions': [{
+                'type': 'set-snapshot-copy-tags',
+                'enable': False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'mydbinstance')
+
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='mydbinstance'
+        )['DBInstances'][0]['CopyTagsToSnapshot'])
 
     def test_rds_snapshot_access(self):
         factory = self.replay_flight_data('test_rds_snapshot_access')
@@ -808,6 +909,26 @@ class RDSSnapshotTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceName=arn)
         tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
         self.assertFalse('maid_status' in tag_map)
+
+    def test_rds_public_accessible_disable(self):
+        session_factory = self.replay_flight_data(
+            'test_rds_public_accessible_disable')
+        client = session_factory(region='us-east-1').client('rds')
+        policy = self.load_policy({
+            'name': 'disable-publicly-accessibility',
+            'resource': 'rds',
+            'filters': [
+                {'DBInstanceIdentifier': "c7n-test-pa"},
+                {'PubliclyAccessible': True}],
+            'actions': [{
+                'type': 'set-public-access',
+                'state': False}]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'c7n-test-pa')
+        self.assertFalse(client.describe_db_instances(
+            DBInstanceIdentifier='c7n-test-pa')[
+                             'DBInstances'][0]['PubliclyAccessible'])
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

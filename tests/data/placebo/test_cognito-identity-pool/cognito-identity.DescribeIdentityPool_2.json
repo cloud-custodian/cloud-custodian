@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IdentityPoolId": "us-east-1:dee8f727-00d8-468d-9309-cf1ef485b96c", 
+        "AllowUnauthenticatedIdentities": true, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4eef7e40-c959-11e7-b2f9-e1decb997368", 
+            "HTTPHeaders": {
+                "date": "Tue, 14 Nov 2017 16:31:46 GMT", 
+                "x-amzn-requestid": "4eef7e40-c959-11e7-b2f9-e1decb997368", 
+                "content-length": "146", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "IdentityPoolName": "test_delete_id_pool"
+    }
+}

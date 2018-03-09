@@ -4,13 +4,13 @@
         "trailList": [
             {
                 "IncludeGlobalServiceEvents": true, 
-                "Name": "S3-DataEvents", 
+                "Name": "S3-DataEvents-test2", 
                 "S3KeyPrefix": "DataEvents", 
-                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents-test2", 
                 "LogFileValidationEnabled": true, 
                 "IsMultiRegionTrail": true, 
                 "HasCustomEventSelectors": true, 
-                "S3BucketName": "custodian-skunk-trails", 
+                "S3BucketName": "skunk-trails-test-us-east-1", 
                 "HomeRegion": "us-east-1"
             }, 
             {
@@ -28,11 +28,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2ff6a2e0-a759-11e7-a699-03b05d10b302", 
+            "RequestId": "3f3a290e-a337-4dec-9bfd-1d9b22fff991", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "2ff6a2e0-a759-11e7-a699-03b05d10b302", 
-                "date": "Mon, 02 Oct 2017 10:05:14 GMT", 
-                "content-length": "706", 
+                "x-amzn-requestid": "3f3a290e-a337-4dec-9bfd-1d9b22fff991", 
+                "date": "Thu, 02 Nov 2017 04:45:02 GMT", 
+                "content-length": "723", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

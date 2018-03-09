@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MD5OfMessageBody": "86d8d1926435ddf0503b9593b254ca3f", 
+        "MD5OfMessageAttributes": "cd44329f02ab950a07225de4475134e7", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7e4e890a-591d-5098-a004-db841241c8e4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7e4e890a-591d-5098-a004-db841241c8e4", 
+                "content-length": "459", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Tue, 21 Nov 2017 15:41:16 GMT", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "MessageId": "c78e1ea3-e9b3-4aa4-a0e1-29494c1ff851"
+    }
+}

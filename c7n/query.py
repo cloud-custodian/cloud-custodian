@@ -116,13 +116,16 @@ class ChildResourceQuery(ResourceQuery):
     parents identifiers. ie. efs mount targets (parent efs), route53 resource
     records (parent hosted zone), ecs services (ecs cluster).
     """
+
+    capture_parent_id = False
+    parent_key = 'c7n:parent-id'
+
     def __init__(self, session_factory, manager):
         self.session_factory = session_factory
         self.manager = manager
 
     def filter(self, resource_manager, **params):
         """Query a set of resources."""
-
         m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(m.service)
 
@@ -130,7 +133,7 @@ class ChildResourceQuery(ResourceQuery):
         if extra_args:
             params.update(extra_args)
 
-        parent_type, parent_key = m.parent_spec
+        parent_type, parent_key, annotate_parent = m.parent_spec
         parents = self.manager.get_resource_manager(parent_type)
         parent_ids = [p[parents.resource_type.id] for p in parents.resources()]
 
@@ -149,9 +152,13 @@ class ChildResourceQuery(ResourceQuery):
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
                 client, enum_op, merged_params, path)
-            if subset:
+            if annotate_parent:
+                for r in subset:
+                    r[self.parent_key] = parent_id
+            if subset and self.capture_parent_id:
+                results.extend([(parent_id, s) for s in subset])
+            elif subset:
                 results.extend(subset)
-
         return results
 
 
@@ -166,7 +173,7 @@ class QueryMeta(type):
                 '%s.filters' % name.lower())
         if 'action_registry' not in attrs:
             attrs['action_registry'] = ActionRegistry(
-                '%s.filters' % name.lower())
+                '%s.actions' % name.lower())
 
         if attrs['resource_type']:
             m = ResourceQuery.resolve(attrs['resource_type'])
@@ -175,9 +182,6 @@ class QueryMeta(type):
                 attrs['filter_registry'].register('metrics', MetricsFilter)
             # EC2 Service boilerplate ...
             if m.service == 'ec2':
-                # Generic ec2 retry
-                attrs['retry'] = staticmethod(get_retry((
-                    'RequestLimitExceeded', 'Client.RequestLimitExceeded')))
                 # Generic ec2 resource tag support
                 if getattr(m, 'taggable', True):
                     register_ec2_tags(
@@ -214,6 +218,8 @@ class DescribeSource(object):
         perms = ['%s:%s' % (m.service, _napi(m.enum_spec[0]))]
         if getattr(m, 'detail_spec', None):
             perms.append("%s:%s" % (m.service, _napi(m.detail_spec[0])))
+        if getattr(m, 'batch_detail_spec', None):
+            perms.append("%s:%s" % (m.service, _napi(m.batch_detail_spec[0])))
         return perms
 
     def augment(self, resources):
@@ -238,9 +244,14 @@ class DescribeSource(object):
 @sources.register('describe-child')
 class ChildDescribeSource(DescribeSource):
 
+    resource_query_factory = ChildResourceQuery
+
     def __init__(self, manager):
         self.manager = manager
-        self.query = ChildResourceQuery(
+        self.query = self.get_query()
+
+    def get_query(self):
+        return self.resource_query_factory(
             self.manager.session_factory, self.manager)
 
 
@@ -346,6 +357,14 @@ class QueryResourceManager(ResourceManager):
 
     _generate_arn = None
 
+    retry = staticmethod(
+        get_retry((
+            'ThrottlingException',
+            'RequestLimitExceeded',
+            'Throttled',
+            'ThorttlingException',
+            'Client.RequestLimitExceeded')))
+
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
         self.source = self.get_source(self.source_type)
@@ -375,11 +394,16 @@ class QueryResourceManager(ResourceManager):
             perms.extend(self.permissions)
         return perms
 
-    def resources(self, query=None):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': query}
+    def get_cache_key(self, query):
+        return {
+            'account': self.account_id,
+            'region': self.config.region,
+            'resource': str(self.__class__.__name__),
+            'q': query
+        }
 
+    def resources(self, query=None):
+        key = self.get_cache_key(query)
         if self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
@@ -396,17 +420,22 @@ class QueryResourceManager(ResourceManager):
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
-    def get_resources(self, ids, cache=True):
-        key = {'region': self.config.region,
-               'resource': str(self.__class__.__name__),
-               'q': None}
-        if cache and self._cache.load():
+    def _get_cached_resources(self, ids):
+        key = self.get_cache_key(None)
+        if self._cache.load():
             resources = self._cache.get(key)
             if resources is not None:
                 self.log.debug("Using cached results for get_resources")
                 m = self.get_model()
                 id_set = set(ids)
                 return [r for r in resources if r[m.id] in id_set]
+        return None
+
+    def get_resources(self, ids, cache=True):
+        if cache:
+            resources = self._get_cached_resources(ids)
+            if resources is not None:
+                return resources
         try:
             resources = self.augment(self.source.get_resources(ids))
             return resources
@@ -459,12 +488,17 @@ class QueryResourceManager(ResourceManager):
 
 class ChildResourceManager(QueryResourceManager):
 
+    child_source = 'describe-child'
+
     @property
     def source_type(self):
-        source = self.data.get('source', 'describe-child')
+        source = self.data.get('source', self.child_source)
         if source == 'describe':
-            source = 'describe-child'
+            source = self.child_source
         return source
+
+    def get_parent_manager(self):
+        return self.get_resource_manager(self.resource_type.parent_spec[0])
 
 
 def _batch_augment(manager, model, detail_spec, resource_set):

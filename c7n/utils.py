@@ -26,8 +26,9 @@ import os
 import random
 import threading
 import time
-import ipaddress
 import six
+
+from c7n import ipaddress
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
@@ -219,6 +220,12 @@ def get_account_id_from_sts(session):
     return response.get('Account')
 
 
+def get_account_alias_from_sts(session):
+    response = session.client('iam').list_account_aliases()
+    aliases = response.get('AccountAliases', ())
+    return aliases and aliases[0] or ''
+
+
 def query_instances(session, client=None, **query):
     """Return a list of ec2 instances for the query.
     """
@@ -311,7 +318,7 @@ def snapshot_identifier(prefix, db_identifier):
     """Return an identifier for a snapshot of a database or cluster.
     """
     now = datetime.now()
-    return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d'))
+    return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d-%H-%M'))
 
 
 def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
@@ -401,7 +408,7 @@ def worker(f):
     def _f(*args, **kw):
         try:
             return f(*args, **kw)
-        except:
+        except Exception:
             worker_log.exception(
                 'Error invoking %s',
                 "%s.%s" % (f.__module__, f.__name__))
@@ -441,3 +448,24 @@ def get_profile_session(options):
     profile = getattr(options, 'profile', None)
     _profile_session = boto3.Session(profile_name=profile)
     return _profile_session
+
+
+def format_string_values(obj, *args, **kwargs):
+    """
+    Format all string values in an object.
+    Return the updated object
+    """
+    if isinstance(obj, dict):
+        new = {}
+        for key in obj.keys():
+            new[key] = format_string_values(obj[key], *args, **kwargs)
+        return new
+    elif isinstance(obj, list):
+        new = []
+        for item in obj:
+            new.append(format_string_values(item, *args, **kwargs))
+        return new
+    elif isinstance(obj, six.string_types):
+        return obj.format(*args, **kwargs)
+    else:
+        return obj

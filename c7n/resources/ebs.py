@@ -92,7 +92,7 @@ class SnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ebs-snapshots-week-old
@@ -176,8 +176,9 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     :example:
 
-        .. implicit with no parameters, 'true' by default
-        .. code-block: yaml
+    implicit with no parameters, 'true' by default
+
+    .. code-block:: yaml
 
             policies:
               - name: delete-stale-snapshots
@@ -190,8 +191,9 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     :example:
 
-        .. explicit with parameter
-        .. code-block: yaml
+    explicit with parameter
+
+    .. code-block:: yaml
 
             policies:
               - name: delete-snapshots
@@ -202,6 +204,7 @@ class SnapshotSkipAmiSnapshots(Filter):
                     op: ge
                   - type: skip-ami-snapshots
                     value: false
+
     """
 
     schema = type_schema('skip-ami-snapshots', value={'type': 'boolean'})
@@ -226,11 +229,11 @@ class SnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
@@ -268,12 +271,15 @@ class SnapshotDelete(BaseAction):
 
     @worker
     def process_snapshot_set(self, snapshots_set):
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+
         c = local_session(self.manager.session_factory).client('ec2')
         for s in snapshots_set:
             if s['SnapshotId'] in self.image_snapshots:
                 continue
             try:
-                c.delete_snapshot(
+                retry(c.delete_snapshot,
                     SnapshotId=s['SnapshotId'],
                     DryRun=self.manager.config.dryrun)
             except ClientError as e:
@@ -290,7 +296,7 @@ class CopySnapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: copy-snapshot-east-west
@@ -302,7 +308,7 @@ class CopySnapshot(BaseAction):
                 actions:
                   - type: copy
                     target_region: us-west-2
-                    target_key: *target_kms_key*
+                    target_key: target_kms_key
                     encrypted: true
     """
 
@@ -403,7 +409,7 @@ class AttachedInstanceFilter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: instance-ebs-volumes
@@ -553,7 +559,7 @@ class CopyInstanceTags(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ebs-copy-instance-tags
@@ -704,7 +710,7 @@ class EncryptInstanceVolumes(BaseAction):
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: encrypt-unencrypted-ebs
@@ -967,7 +973,7 @@ class CreateSnapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: snapshot-volumes
@@ -999,7 +1005,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-unattached-volumes
@@ -1145,7 +1151,7 @@ class ModifyVolume(BaseAction):
       Find under utilized provisioned iops volumes older than a week
       and change their type.
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
            policies:
             - name: ebs-remove-piops
@@ -1179,7 +1185,7 @@ class ModifyVolume(BaseAction):
 
       Double storage and quadruple iops for all io1 volumes.
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
            policies:
             - name: ebs-remove-piops

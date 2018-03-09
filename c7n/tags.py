@@ -283,7 +283,7 @@ class TagActionFilter(Filter):
 
         try:
             action_date = parse(action_date_str)
-        except:
+        except Exception:
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
 
@@ -415,7 +415,7 @@ class RemoveTag(Action):
         return self.manager.retry(
             client.delete_tags,
             Resources=[v[self.id_key] for v in vol_set],
-            Tags=[{'Key': k for k in tag_keys}],
+            Tags=[{'Key': k} for k in tag_keys],
             DryRun=self.manager.config.dryrun)
 
 
@@ -534,7 +534,7 @@ class TagDelayedAction(Action):
         'mark-for-op',
         tag={'type': 'string'},
         msg={'type': 'string'},
-        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': True},
+        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
         op={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)

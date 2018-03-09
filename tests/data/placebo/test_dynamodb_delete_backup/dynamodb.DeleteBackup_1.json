@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "BackupDescription": {
+            "BackupDetails": {
+                "BackupCreationDateTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 2, 
+                    "microsecond": 9000, 
+                    "year": 2018, 
+                    "day": 16, 
+                    "minute": 39
+                }, 
+                "BackupSizeBytes": 0, 
+                "BackupArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup/backup/01516149542009-0bbfb894", 
+                "BackupStatus": "DELETED", 
+                "BackupName": "Backup-c7n-dynamodb-backup-2018-01-16-19-39"
+            }, 
+            "SourceTableDetails": {
+                "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup", 
+                "ProvisionedThroughput": {
+                    "WriteCapacityUnits": 5, 
+                    "ReadCapacityUnits": 5
+                }, 
+                "TableSizeBytes": 0, 
+                "TableName": "c7n-dynamodb-backup", 
+                "TableId": "d4f0100b-96ea-4429-8cf4-53cce61719dd", 
+                "KeySchema": [
+                    {
+                        "KeyType": "HASH", 
+                        "AttributeName": "test"
+                    }
+                ], 
+                "ItemCount": 0, 
+                "TableCreationDateTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 40, 
+                    "microsecond": 237000, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 56
+                }
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "UVS934F732NHF6T19OMH46HMEJVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "UVS934F732NHF6T19OMH46HMEJVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "684", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "954322717", 
+                "date": "Wed, 17 Jan 2018 00:39:03 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}

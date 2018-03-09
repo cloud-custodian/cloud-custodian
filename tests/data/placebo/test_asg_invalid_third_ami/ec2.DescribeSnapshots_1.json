@@ -1,0 +1,131 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "04eb9a7a-2268-43d3-8bfb-adc23e5fca5b", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 31 Oct 2017 08:45:29 GMT"
+            }
+        }, 
+        "Snapshots": [
+            {
+                "Description": "Created by CreateImage(i-03e133224641146ae) for ami-0749e67d from vol-055ec795ddbff496a", 
+                "Encrypted": false, 
+                "VolumeId": "vol-055ec795ddbff496a", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "StartTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 19
+                }, 
+                "Progress": "100%", 
+                "OwnerId": "644160558196", 
+                "SnapshotId": "snap-031e6c09f6598d374"
+            }, 
+            {
+                "Description": "Created by CreateImage(i-059c99fe889f7593b) for ami-c772ddbd from vol-085e11f8bf260e467", 
+                "Encrypted": false, 
+                "VolumeId": "vol-085e11f8bf260e467", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "StartTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 14
+                }, 
+                "Progress": "100%", 
+                "OwnerId": "644160558196", 
+                "SnapshotId": "snap-03215737c84137756"
+            }, 
+            {
+                "Description": "Copied for DestinationAmi ami-3848e742 from SourceAmi ami-c772ddbd for SourceSnapshot snap-03215737c84137756. Task created on 1,509,437,824,580.", 
+                "Encrypted": false, 
+                "VolumeId": "vol-ffffffff", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "StartTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 17
+                }, 
+                "Progress": "100%", 
+                "OwnerId": "644160558196", 
+                "SnapshotId": "snap-07be51844bd81659c"
+            }, 
+            {
+                "Description": "", 
+                "Tags": [
+                    {
+                        "Value": "dev-2", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeId": "vol-09ae1ffb76a5334b5", 
+                "State": "completed", 
+                "VolumeSize": 100, 
+                "StartTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 55, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 1
+                }, 
+                "Progress": "100%", 
+                "OwnerId": "644160558196", 
+                "SnapshotId": "snap-0849969e30adfb2bf"
+            }, 
+            {
+                "Description": "", 
+                "Tags": [
+                    {
+                        "Value": "c7n-dev", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeId": "vol-085e11f8bf260e467", 
+                "State": "completed", 
+                "VolumeSize": 8, 
+                "StartTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 0
+                }, 
+                "Progress": "100%", 
+                "OwnerId": "644160558196", 
+                "SnapshotId": "snap-0ee44da6abc3a536f"
+            }
+        ]
+    }
+}

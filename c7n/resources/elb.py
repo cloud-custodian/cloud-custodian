@@ -31,7 +31,7 @@ from datetime import datetime
 from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource
 from c7n.utils import local_session, chunks, type_schema, get_retry, worker
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -63,7 +63,7 @@ class ELB(QueryResourceManager):
         name = 'DNSName'
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
-
+        config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
         default_report_fields = (
             'LoadBalancerName',
             'DNSName',
@@ -87,9 +87,20 @@ class ELB(QueryResourceManager):
             self.config.account_id,
             r[self.resource_type.id])
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeELB(self)
+        return super(ELB, self).get_source(source_type)
+
+
+class DescribeELB(DescribeSource):
+
     def augment(self, resources):
         _elb_tags(
-            resources, self.session_factory, self.executor_factory, self.retry)
+            resources,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry)
         return resources
 
 
@@ -128,7 +139,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-delete-unused
@@ -160,7 +171,7 @@ class Tag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-add-owner-tag
@@ -190,7 +201,7 @@ class RemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-remove-old-tag
@@ -222,7 +233,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-delete-unused
@@ -253,7 +264,7 @@ class SetSslListenerPolicy(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-set-listener-policy
@@ -322,7 +333,7 @@ class SetSslListenerPolicy(BaseAction):
                 policy_names.extend(ld.get('PolicyNames', ()))
                 # Remove extant ssl listener policy
                 if ssl_policies:
-                    policy_names.remove(ssl_policies[0])
+                    policy_names = list(set(policy_names).difference(ssl_policies))
                 client.set_load_balancer_policies_of_listener(
                     LoadBalancerName=lb_name,
                     LoadBalancerPort=ld['Listener']['LoadBalancerPort'],
@@ -351,7 +362,7 @@ class EnableS3Logging(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-test
@@ -396,7 +407,7 @@ class DisableS3Logging(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: turn-off-elb-logs
@@ -452,7 +463,7 @@ class Instance(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-image-filter
@@ -497,7 +508,7 @@ class IsSSLFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-using-ssl
@@ -529,7 +540,7 @@ class SSLPolicyFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-ssl-policies
@@ -716,7 +727,7 @@ class HealthCheckProtocolMismatch(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-healthcheck-mismatch
@@ -750,7 +761,7 @@ class DefaultVpc(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elb-default-vpc
@@ -789,7 +800,7 @@ class IsLoggingFilter(Filter, ELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
             - name: elb-is-logging-test
@@ -832,7 +843,7 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: elb-is-not-logging-test

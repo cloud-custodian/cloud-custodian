@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "theli", 
+            "ID": "0c1a762e1e05a612e78266a2fa632bb0d3ccb108f8df1d1862670073065a6db7"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 15
+                }, 
+                "Name": "custodian-delete-bucket-encryption-aes256"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "eUOSFwc09xpiUxekv9Zwp7E9GxA/kzzlEwEv4aWbwX6skrd1BjZVAqmAc1T+xwyshS7mOFWKcm8=", 
+            "RequestId": "0C646578A5588F7A", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "eUOSFwc09xpiUxekv9Zwp7E9GxA/kzzlEwEv4aWbwX6skrd1BjZVAqmAc1T+xwyshS7mOFWKcm8=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "0C646578A5588F7A", 
+                "date": "Wed, 15 Nov 2017 16:15:23 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

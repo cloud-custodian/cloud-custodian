@@ -23,7 +23,8 @@ import logging
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import (
-    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter)
+    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase,
+    MetricsFilter, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -101,7 +102,7 @@ class ConfigAppElb(ConfigSource):
     def load_resource(self, item):
         resource = super(ConfigAppElb, self).load_resource(item)
         resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in json.loads(item['Tags'])]
+          for t in json.loads(item['supplementaryConfiguration']['Tags'])]
         return resource
 
 
@@ -136,6 +137,23 @@ def _remove_appelb_tags(albs, session_factory, tag_keys):
 
 filters.register('shield-enabled', IsShieldProtected)
 actions.register('set-shield', SetShieldProtection)
+
+
+@filters.register('metrics')
+class AppElbMetrics(MetricsFilter):
+    """Filter app load balancer by metric values.
+
+    See available metrics here: https://goo.gl/TLQ9Fr
+    Custodian defaults to specifying dimensions for the app elb only.
+    Target Group dimension not supported atm.
+    """
+
+    def get_dimensions(self, resource):
+        return [{
+            'Name': self.model.dimension,
+            'Value': 'app/%s/%s' % (
+                resource[self.model.name],
+                resource[self.model.id].rsplit('/')[-1])}]
 
 
 @filters.register('security-group')
@@ -270,7 +288,7 @@ class SetS3Logging(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: elbv2-test
@@ -336,7 +354,7 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-failed-mark-for-op
@@ -368,7 +386,7 @@ class AppELBTagAction(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-create-required-tag
@@ -397,7 +415,7 @@ class AppELBRemoveTagAction(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-delete-expired-tag
@@ -428,7 +446,7 @@ class AppELBDeleteAction(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-delete-failed-elb
@@ -524,7 +542,7 @@ class IsLoggingFilter(Filter, AppELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: alb-is-logging-test
@@ -567,7 +585,7 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
                 - name: alb-is-not-logging-test
@@ -624,7 +642,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: app-elb-invalid-ciphers
@@ -685,7 +703,7 @@ class AppELBModifyListenerPolicy(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-modify-listener
@@ -750,7 +768,7 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-healthcheck-mismatch
@@ -797,7 +815,7 @@ class AppELBDefaultVpcFilter(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-in-default-vpc
@@ -920,7 +938,7 @@ class AppELBTargetGroupTagAction(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-targetgroup-add-required-tag
@@ -949,7 +967,7 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-targetgroup-remove-expired-tag
@@ -977,7 +995,7 @@ class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: appelb-targetgroups-default-vpc
@@ -991,3 +1009,37 @@ class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
     def __call__(self, target_group):
         return (target_group.get('VpcId') and
                 self.match(target_group.get('VpcId')) or False)
+
+
+@AppELBTargetGroup.action_registry.register('delete')
+class AppELBTargetGroupDeleteAction(BaseAction):
+    """Action to delete ELB target group
+
+    It is recommended to apply a filter to the delete policy to avoid unwanted
+    deletion of any app elb target groups.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: appelb-targetgroups-delete-unused
+                resource: app-elb-target-group
+                filters:
+                  - "tag:SomeTag": absent
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('elasticloadbalancing:DeleteTargetGroup',)
+
+    def process(self, target_group):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.process_targetgroup, target_group))
+
+    def process_targetgroup(self, target_group):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        self.manager.retry(
+            client.delete_target_group,
+            TargetGroupArn=target_group['TargetGroupArn'])

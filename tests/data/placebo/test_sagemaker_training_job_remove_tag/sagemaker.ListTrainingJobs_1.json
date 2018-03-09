@@ -1,0 +1,45 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TrainingJobSummaries": [
+            {
+                "TrainingJobStatus": "InProgress", 
+                "TrainingJobName": "kmeans-2018-01-31-14-07-29-021", 
+                "LastModifiedTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 29, 
+                    "microsecond": 712000, 
+                    "year": 2018, 
+                    "day": 31, 
+                    "minute": 7
+                }, 
+                "CreationTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 29, 
+                    "microsecond": 294000, 
+                    "year": 2018, 
+                    "day": 31, 
+                    "minute": 7
+                }, 
+                "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/kmeans-2018-01-31-14-07-29-021"
+            }
+        ], 
+        "NextToken": "cIws2QhTXUIa8bi8W4KJm/zACPIpHoLNRxTv7W3NFKbmximanFGgVL2EKbKzFbKr/2WX1B8BT6rC0Nsk1ulJDI3CNPEMaJy7DPvYrcciUrSQonmfza6Ogm3vu2GYPHGENI7wprLhDNhiL1Evp+ulCY2hi4U+inyiF7M1B4tc3mcwaFhnGDyYxYOHMm8r9rROajE2fuNlbsYPH2EgSC9OXrkcWVExNOIjDefGNOfgWwmCrf60K2ZeBZin4qxXu1j2nwoi3F0kZOU61oyKeoHRQsOfF1XTUWAFc0cLffHK9Rbe89zXiA6Ui3A8+teRmaLeWxcqmCxCE9iqCCHh3iW0qfK7SalvgvvRbfvYI51omSaX1B4CrDPD3/7+DQ6LlsAz4fqt8vgT0hiSicq+asOWFUAv/k/ruxRqlwTynsc18ZAbyD53Ac/CBYvCvYHA7HlVafXjZTzQJ2SyQtx8/djPPeZHAJzyyXk7zAWboOXqDUZbzTEJnRl9viCJnnbLY+kVMeRQI9F7RJobWLxSXUNduB4vZd/zZNCjZu3Nu+KpCODHIZ5+Pztb6o186i0k0w==", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2611d1a4-0ee8-4e75-a119-0816f58db106", 
+            "HTTPHeaders": {
+                "date": "Wed, 31 Jan 2018 14:08:07 GMT", 
+                "x-amzn-requestid": "2611d1a4-0ee8-4e75-a119-0816f58db106", 
+                "content-length": "875", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

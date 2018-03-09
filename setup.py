@@ -1,14 +1,15 @@
 import os
+from io import open
 from setuptools import setup, find_packages
 
 
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    return open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8').read()
 
 
 setup(
     name="c7n",
-    version='0.8.27.0',
+    version='0.8.28.0',
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.rst'),
     classifiers=[
@@ -22,11 +23,11 @@ setup(
         'console_scripts': [
             'custodian = c7n.cli:main']},
     install_requires=[
-        "boto3>=1.4.6",
-        "botocore>=1.6.1",
+        "boto3>=1.4.7",
+        "botocore>=1.7.37",
         "pyyaml",
         "jsonschema",
-        "ipaddress",
+        "jsonpatch>=1.21",
         "argcomplete",
         "tabulate",
     ],

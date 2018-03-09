@@ -155,15 +155,15 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: launch-config-public-ip
-                resource: asg
-                filters:
-                  - type: launch-config
-                    key: AssociatePublicIpAddress
-                    value: true
+        policies:
+          - name: launch-configs-with-public-address
+            resource: asg
+            filters:
+              - type: launch-config
+                key: AssociatePublicIpAddress
+                value: true
     """
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
@@ -202,7 +202,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
         self.elbs = self.get_elbs()
         self.appelb_target_groups = self.get_appelb_target_groups()
         self.snapshots = self.get_snapshots()
-        self.images = self.get_images()
+        self.images, self.image_snaps = self.get_images()
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
@@ -227,21 +227,49 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
     def get_images(self):
         manager = self.manager.get_resource_manager('ami')
         images = set()
-        # Verify image snapshot validity, i've been told by a TAM this
-        # is a possibility, but haven't seen evidence of it, since
-        # snapshots are strongly ref'd by amis, but its negible cost
-        # to verify.
-        for a in manager.resources():
-            found = True
+        image_snaps = set()
+        image_ids = list({lc['ImageId'] for lc in self.configs.values()})
+
+        # Pull account images, we should be able to utilize cached values,
+        # drawn down the image population to just images not in the account.
+        account_images = [
+            i for i in manager.resources() if i['ImageId'] in image_ids]
+        account_image_ids = {i['ImageId'] for i in account_images}
+        image_ids = [image_id for image_id in image_ids
+                     if image_id not in account_image_ids]
+
+        # To pull third party images, we explicitly use a describe
+        # source without any cache.
+        #
+        # Can't use a config source since it won't have state for
+        # third party ami, we auto propagate source normally, so we
+        # explicitly pull a describe source. Can't use a cache either
+        # as their not in the account.
+        #
+        while image_ids:
+            try:
+                amis = manager.get_source('describe').get_resources(
+                    image_ids, cache=False)
+                account_images.extend(amis)
+                break
+            except ClientError as e:
+                msg = e.response['Error']['Message']
+                if e.response['Error']['Code'] != 'InvalidAMIID.NotFound':
+                    raise
+                for n in msg[msg.find('[') + 1: msg.find(']')].split(','):
+                    image_ids.remove(n.strip())
+
+        for a in account_images:
+            images.add(a['ImageId'])
+            # Capture any snapshots, images strongly reference their
+            # snapshots, and some of these will be third party in the
+            # case of a third party image.
             for bd in a.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
-                if bd['Ebs']['SnapshotId'].strip() not in self.snapshots:
-                    found = False
-                    break
-            if found:
-                images.add(a['ImageId'])
-        return images
+                image_snaps.add(bd['Ebs']['SnapshotId'].strip())
+
+        return images, image_snaps
 
     def get_snapshots(self):
         manager = self.manager.get_resource_manager('ebs-snapshot')
@@ -298,6 +326,8 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
             snapshot_id = bd['Ebs']['SnapshotId'].strip()
+            if snapshot_id in self.image_snaps:
+                continue
             if snapshot_id not in self.snapshots:
                 errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
         return errors
@@ -374,7 +404,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unencrypted
@@ -513,7 +543,7 @@ class ImageAgeFilter(AgeFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-older-image
@@ -558,16 +588,16 @@ class ImageFilter(ValueFilter, LaunchConfigFilterBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: asg-image-tag
-                resource: asg
-                filters:
-                  - type: image
-                    value: "tag:ImageTag"
-                    key: "TagValue"
-                    op: eq
+        policies:
+          - name: non-windows-asg
+            resource: asg
+            filters:
+              - type: image
+                key: Platform
+                value: Windows
+                op: ne
     """
     permissions = (
         "ec2:DescribeImages",
@@ -615,14 +645,14 @@ class VpcIdFilter(ValueFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: asg-vpc-xyz
-                resource: asg
-                filters:
-                  - type: vpc-id
-                    value: vpc-12ab34cd
+        policies:
+          - name: asg-vpc-xyz
+            resource: asg
+            filters:
+              - type: vpc-id
+                value: vpc-12ab34cd
     """
 
     schema = type_schema(
@@ -659,13 +689,66 @@ class VpcIdFilter(ValueFilter):
         return super(VpcIdFilter, self).process(asgs)
 
 
+@filters.register('progagated-tags')
+class PropagatedTagFilter(Filter):
+    """Filter ASG based on propagated tags
+
+    This filter is designed to find all autoscaling groups that have a list
+    of tag keys (provided) that are set to propagate to new instances. Using
+    this will allow for easy validation of asg tag sets are in place across an
+    account for compliance.
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-non-propagated-tags
+                resource: asg
+                filters:
+                  - type: propagated-tags
+                    keys: ["ABC", "BCD"]
+                    match: false
+                    propagate: true
+    """
+    schema = type_schema(
+        'progagated-tags',
+        keys={'type': 'array', 'items': {'type': 'string'}},
+        match={'type': 'boolean'},
+        propagate={'type': 'boolean'})
+    permissions = (
+        "autoscaling:DescribeLaunchConfigurations",
+        "autoscaling:DescribeAutoScalingGroups")
+
+    def process(self, asgs, event=None):
+        keys = self.data.get('keys', [])
+        match = self.data.get('match', True)
+        results = []
+        for asg in asgs:
+            if self.data.get('propagate', True):
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
+            else:
+                tags = [t['Key'] for t in asg.get('Tags', []) if t[
+                    'Key'] in keys and not t['PropagateAtLaunch']]
+                if match and all(k in tags for k in keys):
+                    results.append(asg)
+                if not match and not all(k in tags for k in keys):
+                    results.append(asg)
+        return results
+
+
 @actions.register('tag-trim')
 class GroupTagTrim(TagTrim):
     """Action to trim the number of tags to avoid hitting tag limits
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-tag-trim
@@ -701,7 +784,7 @@ class CapacityDelta(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-capacity-delta
@@ -720,14 +803,13 @@ class CapacityDelta(Filter):
 
 @actions.register('resize')
 class Resize(Action):
-    """Action to resize the min/max instances in an ASG
+    """Action to resize the min/max/desired instances in an ASG
 
-    **Note:** Resizing of scaling groups desired/minimum size is limited to the
-    current size of the autoscaling group(s).
+    There are several ways to use this action:
 
-    :example:
+    1. set min/desired to current running instances
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-resize
@@ -736,16 +818,69 @@ class Resize(Action):
                   - capacity-delta
                 actions:
                   - type: resize
-                    desired_size: current
+                    desired-size: "current"
+
+    2. apply a fixed resize of min, max or desired, optionally saving the
+       previous values to a named tag (for restoring later):
+
+    .. code-block:: yaml
+
+            policies:
+              - name: offhours-asg-off
+                resource: asg
+                filters:
+                  - type: offhour
+                    offhour: 19
+                    default_tz: bst
+                actions:
+                  - type: resize
+                    min-size: 0
+                    desired-size: 0
+                    save-options-tag: OffHoursPrevious
+
+    3. restore previous values for min/max/desired from a tag:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: offhours-asg-on
+                resource: asg
+                filters:
+                  - type: onhour
+                    onhour: 8
+                    default_tz: bst
+                actions:
+                  - type: resize
+                    restore-options-tag: OffHoursPrevious
+
     """
 
     schema = type_schema(
         'resize',
-        # min_size={'type': 'string'},
-        # max_size={'type': 'string'},
-        desired_size={'type': 'string'},
-        required=('desired_size',))
-    permissions = ('autoscaling:UpdateAutoScalingGroup',)
+        **{
+            'min-size': {'type': 'integer', 'minimum': 0},
+            'max-size': {'type': 'integer', 'minimum': 0},
+            'desired-size': {
+                "anyOf": [
+                    {'enum': ["current"]},
+                    {'type': 'integer', 'minimum': 0}
+                ]
+            },
+            # support previous key name with underscore
+            'desired_size': {
+                "anyOf": [
+                    {'enum': ["current"]},
+                    {'type': 'integer', 'minimum': 0}
+                ]
+            },
+            'save-options-tag': {'type': 'string'},
+            'restore-options-tag': {'type': 'string'},
+        }
+    )
+    permissions = (
+        'autoscaling:UpdateAutoScalingGroup',
+        'autoscaling:CreateOrUpdateTags'
+    )
 
     def validate(self):
         # if self.data['desired_size'] != 'current':
@@ -754,22 +889,74 @@ class Resize(Action):
         return self
 
     def process(self, asgs):
+        # ASG parameters to save to/restore from a tag
+        asg_params = ['MinSize', 'MaxSize', 'DesiredCapacity']
+
+        # support previous param desired_size when desired-size is not present
+        if 'desired_size' in self.data and 'desired-size' not in self.data:
+            self.data['desired-size'] = self.data['desired_size']
+
         client = local_session(self.manager.session_factory).client(
             'autoscaling')
         for a in asgs:
+            tag_map = {t['Key']: t['Value'] for t in a.get('Tags', [])}
+            update = {}
             current_size = len(a['Instances'])
-            min_size = a['MinSize']
-            if self.data['desired_size'] is 'current':
-                desired = min((current_size, a['DesiredCapacity']))
+
+            if 'restore-options-tag' in self.data:
+                # we want to restore all ASG size params from saved data
+                log.debug('Want to restore ASG %s size from tag %s' %
+                    (a['AutoScalingGroupName'], self.data['restore-options-tag']))
+                if self.data['restore-options-tag'] in tag_map:
+                    for field in tag_map[self.data['restore-options-tag']].split(';'):
+                        (param, value) = field.split('=')
+                        if param in asg_params:
+                            update[param] = int(value)
+
             else:
-                desired = int(self.data['desired_size'])
-            log.debug('desired %d to %s, min %d to %d',
-                      desired, current_size, min_size, current_size)
-            self.manager.retry(
-                client.update_auto_scaling_group,
-                AutoScalingGroupName=a['AutoScalingGroupName'],
-                DesiredCapacity=desired,
-                MinSize=min((current_size, min_size)))
+                # we want to resize, parse provided params
+                if 'min-size' in self.data:
+                    update['MinSize'] = self.data['min-size']
+
+                if 'max-size' in self.data:
+                    update['MaxSize'] = self.data['max-size']
+
+                if 'desired-size' in self.data:
+                    if self.data['desired-size'] == 'current':
+                        update['DesiredCapacity'] = min(current_size, a['DesiredCapacity'])
+                        if 'MinSize' not in update:
+                            # unless we were given a new value for min_size then
+                            # ensure it is at least as low as current_size
+                            update['MinSize'] = min(current_size, a['MinSize'])
+                    elif type(self.data['desired-size']) == int:
+                        update['DesiredCapacity'] = self.data['desired-size']
+
+            if update:
+                log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
+                    % (a['AutoScalingGroupName'], current_size, a['MinSize'],
+                    a['MaxSize'], a['DesiredCapacity']))
+
+                if 'save-options-tag' in self.data:
+                    # save existing ASG params to a tag before changing them
+                    log.debug('Saving ASG %s size to tag %s' %
+                        (a['AutoScalingGroupName'], self.data['save-options-tag']))
+                    tags = [dict(
+                        Key=self.data['save-options-tag'],
+                        PropagateAtLaunch=False,
+                        Value=';'.join({'%s=%d' % (param, a[param]) for param in asg_params}),
+                        ResourceId=a['AutoScalingGroupName'],
+                        ResourceType='auto-scaling-group',
+                    )]
+                    self.manager.retry(client.create_or_update_tags, Tags=tags)
+
+                log.debug('Resizing ASG %s with %s' % (a['AutoScalingGroupName'],
+                    str(update)))
+                self.manager.retry(
+                    client.update_auto_scaling_group,
+                    AutoScalingGroupName=a['AutoScalingGroupName'],
+                    **update)
+            else:
+                log.debug('nothing to resize')
 
 
 @actions.register('remove-tag')
@@ -780,7 +967,7 @@ class RemoveTag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-remove-unnecessary-tags
@@ -839,7 +1026,7 @@ class Tag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-add-owner-tag
@@ -915,7 +1102,7 @@ class PropagateTags(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-propagate-required
@@ -1023,7 +1210,7 @@ class RenameTag(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-rename-owner-tag
@@ -1120,7 +1307,7 @@ class MarkForOp(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-suspend-schedule
@@ -1177,7 +1364,7 @@ class Suspend(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-suspend-processes
@@ -1259,7 +1446,7 @@ class Resume(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-resume-processes
@@ -1336,7 +1523,7 @@ class Delete(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unencrypted
@@ -1392,6 +1579,8 @@ class LaunchConfig(query.QueryResourceManager):
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::LaunchConfiguration'
 
+    retry = staticmethod(get_retry(('Throttling',)))
+
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeLaunchConfig(self)
@@ -1414,7 +1603,7 @@ class LaunchConfigAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-launch-config-old
@@ -1438,7 +1627,7 @@ class UnusedLaunchConfig(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unused-launch-config
@@ -1469,7 +1658,7 @@ class LaunchConfigDelete(Action):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: asg-unused-launch-config-delete

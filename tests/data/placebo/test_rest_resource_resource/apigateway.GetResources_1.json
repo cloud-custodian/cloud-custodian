@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "422a2e71-ff95-11e7-8290-fba8696b2fbb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 22 Jan 2018 16:56:58 GMT",
+                "content-type": "application/json",
+                "content-length": "181",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "422a2e71-ff95-11e7-8290-fba8696b2fbb"
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "5m14zq",
+                "parentId": "yxv4xe21ka",
+                "pathPart": "{proxy+}",
+                "path": "/{proxy+}",
+                "resourceMethods": {
+                    "ANY": {}
+                }
+            },
+            {
+                "id": "yxv4xe21ka",
+                "path": "/",
+                "resourceMethods": {
+                    "ANY": {}
+                }
+            }
+        ]
+    }
+}

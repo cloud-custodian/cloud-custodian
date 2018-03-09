@@ -57,7 +57,6 @@ class PluginRegistry(object):
     def subscribe(self, event, func):
         if event not in self.EVENTS:
             raise ValueError('Invalid event')
-
         self._subscribers[event].append(func)
 
     def register(self, name, klass=None):

@@ -1,0 +1,59 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "01de4947-d9f1-11e7-82f2-bb1560a969a3", 
+            "HTTPHeaders": {
+                "date": "Tue, 05 Dec 2017 19:18:00 GMT", 
+                "x-amzn-requestid": "01de4947-d9f1-11e7-82f2-bb1560a969a3", 
+                "content-length": "1636", 
+                "content-type": "text/xml", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Environments": [
+            {
+                "ApplicationName": "re-jenkins", 
+                "EnvironmentName": "c7n-eb-tag-test-inactive", 
+                "VersionLabel": "app-477e-170601_115505", 
+                "Status": "Ready", 
+                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test-inactive", 
+                "EnvironmentLinks": [], 
+                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+                "EndpointURL": "awseb-e-p-AWSEBLoa-IQDCP9T34J0M-804037053.us-east-1.elb.amazonaws.com", 
+                "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+                "EnvironmentId": "e-pmpgbxpgsc", 
+                "CNAME": "c7n-eb-tag-test-inactive.us-east-1.elasticbeanstalk.com", 
+                "AbortableOperationInProgress": false, 
+                "Tier": {
+                    "Version": " ", 
+                    "Type": "Standard", 
+                    "Name": "WebServer"
+                }, 
+                "Health": "Green", 
+                "DateUpdated": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 21, 
+                    "microsecond": 77000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 15
+                }, 
+                "DateCreated": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 35, 
+                    "microsecond": 235000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 17
+                }
+            }
+        ]
+    }
+}

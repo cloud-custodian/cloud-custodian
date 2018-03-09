@@ -1,0 +1,99 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9ba5e567-d9e8-11e7-8ca2-f73bf96b095d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9ba5e567-d9e8-11e7-8ca2-f73bf96b095d", 
+                "content-length": "2816", 
+                "vary": "Accept-Encoding", 
+                "connection": "keep-alive", 
+                "date": "Tue, 05 Dec 2017 18:17:52 GMT", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Environments": [
+            {
+                "ApplicationName": "re-jenkins", 
+                "EnvironmentName": "c7n-eb-tag-test-inactive", 
+                "Status": "Launching", 
+                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test-inactive", 
+                "EnvironmentLinks": [], 
+                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+                "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+                "CNAME": "c7n-eb-tag-test-inactive.us-east-1.elasticbeanstalk.com", 
+                "Health": "Grey", 
+                "AbortableOperationInProgress": false, 
+                "Tier": {
+                    "Version": " ", 
+                    "Type": "Standard", 
+                    "Name": "WebServer"
+                }, 
+                "DateUpdated": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 41, 
+                    "microsecond": 758000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 17
+                }, 
+                "DateCreated": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 35, 
+                    "microsecond": 235000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 17
+                }, 
+                "EnvironmentId": "e-pmpgbxpgsc"
+            }, 
+            {
+                "ApplicationName": "re-jenkins", 
+                "EnvironmentName": "c7n-eb-tag-test", 
+                "VersionLabel": "app-477e-170601_115505", 
+                "Status": "Ready", 
+                "Description": "Test for c7n EB Env tagging PR", 
+                "EnvironmentLinks": [], 
+                "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.8.0", 
+                "EndpointURL": "awseb-e-r-AWSEBLoa-1AP6BTJDB7GEL-1575897575.us-east-1.elb.amazonaws.com", 
+                "SolutionStackName": "64bit Amazon Linux 2017.09 v2.8.0 running Docker 17.06.2-ce", 
+                "EnvironmentId": "e-rdthyjww23", 
+                "CNAME": "c7n-eb-tag-test.us-east-1.elasticbeanstalk.com", 
+                "AbortableOperationInProgress": false, 
+                "Tier": {
+                    "Version": " ", 
+                    "Type": "Standard", 
+                    "Name": "WebServer"
+                }, 
+                "Health": "Green", 
+                "DateUpdated": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 34, 
+                    "microsecond": 561000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 2
+                }, 
+                "DateCreated": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 48, 
+                    "microsecond": 789000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 57
+                }, 
+                "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test"
+            }
+        ]
+    }
+}

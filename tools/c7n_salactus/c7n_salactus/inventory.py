@@ -50,8 +50,7 @@ def load_manifest_file(client, bucket, schema, versioned, ifilters, key_info):
                 k = kr[1]
                 if inventory_filter(ifilters, schema, kr):
                     continue
-                if '%' in k:
-                    k = unquote_plus(k)
+                k = unquote_plus(k)
                 if versioned:
                     if kr[3] == 'true':
                         keys.append((k, kr[2], True))
@@ -63,6 +62,9 @@ def load_manifest_file(client, bucket, schema, versioned, ifilters, key_info):
 
 
 def inventory_filter(ifilters, ischema, kr):
+    if 'IsDeleteMarker' in ischema and kr[ischema['IsDeleteMarker']] == 'true':
+        return True
+
     for f in ifilters:
         if f(ischema, kr):
             return True

@@ -17,6 +17,7 @@ Actions to take on resources
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import base64
+import copy
 from datetime import datetime
 import jmespath
 import logging
@@ -247,15 +248,25 @@ class ModifyVpcSecurityGroupsAction(Action):
                 else:
                     rgroups = [g['GroupId'] for g in r['Groups']]
             elif r.get('SecurityGroups'):
+                # elb, ec2, elasticache, efs, vpc resource security groups
                 if metadata_key and isinstance(r['SecurityGroups'][0], dict):
                     rgroups = [g[metadata_key] for g in r['SecurityGroups']]
                 else:
                     rgroups = [g for g in r['SecurityGroups']]
             elif r.get('VpcSecurityGroups'):
+                # rds resource security groups
                 if metadata_key and isinstance(r['VpcSecurityGroups'][0], dict):
                     rgroups = [g[metadata_key] for g in r['VpcSecurityGroups']]
                 else:
                     rgroups = [g for g in r['VpcSecurityGroups']]
+            elif r.get('VPCOptions', {}).get('SecurityGroupIds', []):
+                # elasticsearch resource security groups
+                if metadata_key and isinstance(
+                        r['VPCOptions']['SecurityGroupIds'][0], dict):
+                    rgroups = [g[metadata_key] for g in r[
+                        'VPCOptions']['SecurityGroupIds']]
+                else:
+                    rgroups = [g for g in r['VPCOptions']['SecurityGroupIds']]
             # use as substitution for 'Groups' or '[Vpc]SecurityGroups'
             # unsure if necessary - defer to coverage report
             elif metadata_key and r.get(metadata_key):
@@ -389,6 +400,8 @@ class Notify(EventAction):
               - event-user
               - resource-creator
               - email@address
+             owner_absent_contact:
+              - other_email@address
              # which template for the email should we use
              template: policy-template
              transport:
@@ -407,6 +420,7 @@ class Notify(EventAction):
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
+            'owner_absent_contact': {'type': 'array', 'items': {'type': 'string'}},
             'to_from': ValuesFrom.schema,
             'cc': {'type': 'array', 'items': {'type': 'string'}},
             'cc_from': ValuesFrom.schema,
@@ -448,7 +462,7 @@ class Notify(EventAction):
     def expand_variables(self, message):
         """expand any variables in the action to_from/cc_from fields.
         """
-        p = self.data.copy()
+        p = copy.deepcopy(self.data)
         if 'to_from' in self.data:
             to_from = self.data['to_from'].copy()
             to_from['url'] = to_from['url'].format(**message)
@@ -464,13 +478,12 @@ class Notify(EventAction):
         return p
 
     def process(self, resources, event=None):
-        aliases = self.manager.session_factory().client(
-            'iam').list_account_aliases().get('AccountAliases', ())
-        account_name = aliases and aliases[0] or ''
+        alias = utils.get_account_alias_from_sts(
+            utils.local_session(self.manager.session_factory))
         message = {
             'event': event,
             'account_id': self.manager.config.account_id,
-            'account': account_name,
+            'account': alias,
             'region': self.manager.config.region,
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
@@ -495,7 +508,7 @@ class Notify(EventAction):
         return b64encoded.decode('ascii')
 
     def send_sns(self, message):
-        topic = self.data['transport']['topic']
+        topic = self.data['transport']['topic'].format(**message)
         if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
@@ -505,17 +518,30 @@ class Notify(EventAction):
                 message['region'], message['account_id'], topic)
         client = self.manager.session_factory(
             region=region, assume=self.assume_role).client('sns')
-        client.publish(TopicArn=topic_arn, Message=self.pack(message))
+        attrs = {
+            'mtype': {
+                'DataType': 'String',
+                'StringValue': self.C7N_DATA_MESSAGE,
+            },
+        }
+        client.publish(
+            TopicArn=topic_arn,
+            Message=self.pack(message),
+            MessageAttributes=attrs
+        )
 
     def send_sqs(self, message):
-        queue = self.data['transport']['queue']
+        queue = self.data['transport']['queue'].format(**message)
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
+            queue_url = queue
+        elif 'queue.amazonaws.com' in queue:
+            region = queue[len('https://'):].split('.', 1)[0]
             queue_url = queue
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif queue.startswith('arn:sqs'):
+        elif queue.startswith('arn:aws:sqs'):
             queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]
@@ -679,7 +705,7 @@ class PutMetric(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: track-attached-ebs
@@ -789,21 +815,66 @@ class RemovePolicyBase(BaseAction):
             {'type': 'array', 'items': {'type': 'string'}}]})
 
     def process_policy(self, policy, resource, matched_key):
-        statement_ids = self.data.get('statement_ids')
-
-        found = []
         statements = policy.get('Statement', [])
-        resource_statements = resource.get(
-            matched_key, ())
+        resource_statements = resource.get(matched_key, ())
 
-        for s in list(statements):
-            if statement_ids == 'matched':
-                if s in resource_statements:
-                    found.append(s)
-                    statements.remove(s)
-            elif s['Sid'] in self.data['statement_ids']:
-                found.append(s)
-                statements.remove(s)
-        if not found:
-            return None, found
-        return statements, found
+        return remove_statements(
+            self.data['statement_ids'], statements, resource_statements)
+
+
+def remove_statements(match_ids, statements, matched=()):
+    found = []
+    for s in list(statements):
+        s_found = False
+        if match_ids == '*':
+            s_found = True
+        elif match_ids == 'matched':
+            if s in matched:
+                s_found = True
+        elif s['Sid'] in match_ids:
+            s_found = True
+        if s_found:
+            found.append(s)
+            statements.remove(s)
+    if not found:
+        return None, found
+    return statements, found
+
+
+class ModifyPolicyBase(BaseAction):
+
+    schema = utils.type_schema(
+        'modify-policy',
+        **{
+            'add-statements': {
+                'type': 'array',
+                'required': True,
+                'items': {'$ref': '#/definitions/iam-statement'},
+                'additionalProperties': False
+            },
+            'remove-statements': {
+                'type': ['array', 'string'],
+                'oneOf': [
+                    {'enum': ['matched', '*']},
+                    {'type': 'array', 'items': {'type': 'string'}}
+                ],
+                'required': True,
+                'additionalProperties': False
+            }
+        }
+    )
+
+    def add_statements(self, policy_statements):
+        current = {s['Sid']: s for s in policy_statements}
+        additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
+        current.update(additional)
+        return list(current.values()), bool(additional)
+
+    def remove_statements(self, policy_statements, resource, matched_key):
+        statement_ids = self.data.get('remove-statements', [])
+        found = []
+        if len(statement_ids) == 0:
+            return policy_statements, found
+        resource_statements = resource.get(matched_key, ())
+        return remove_statements(
+            statement_ids, policy_statements, resource_statements)

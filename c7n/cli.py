@@ -123,7 +123,7 @@ def _default_region(options):
 
     try:
         options.regions = [utils.get_profile_session(options).region_name]
-    except:
+    except Exception:
         log.warning('Could not determine default region')
         options.regions = [None]
 
@@ -145,7 +145,7 @@ def _default_account_id(options):
     try:
         session = utils.get_profile_session(options)
         options.account_id = get_account_id_from_sts(session)
-    except:
+    except Exception:
         options.account_id = None
 
 
@@ -170,7 +170,7 @@ def _report_options(p):
     p.add_argument(
         '--format', default='csv', choices=['csv', 'grid', 'simple'],
         help="Format to output data in (default: %(default)s). "
-        "Options include simple, grid, rst")
+        "Options include simple, grid, csv")
 
 
 def _metrics_options(p):

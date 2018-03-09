@@ -23,8 +23,8 @@ import zlib
 
 import six
 
-from email_delivery import EmailDelivery
-from sns_delivery import SnsDelivery
+from .email_delivery import EmailDelivery
+from .sns_delivery import SnsDelivery
 
 DATA_MESSAGE = "maidmsg/1.0"
 
@@ -45,12 +45,7 @@ class MailerSqsQueueIterator(object):
     def __iter__(self):
         return self
 
-    def ack(self, m):
-        self.aws_sqs.delete_message(
-            QueueUrl=self.queue_url,
-            ReceiptHandle=m['ReceiptHandle'])
-
-    def next(self):
+    def __next__(self):
         if self.messages:
             return self.messages.pop(0)
         response = self.aws_sqs.receive_message(
@@ -66,6 +61,13 @@ class MailerSqsQueueIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
+
+    next = __next__  # python2.7
+
+    def ack(self, m):
+        self.aws_sqs.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=m['ReceiptHandle'])
 
 
 class MailerSqsQueueProcessor(object):
@@ -114,7 +116,7 @@ class MailerSqsQueueProcessor(object):
             if msg_kind:
                 msg_kind = msg_kind['StringValue']
             if not msg_kind == DATA_MESSAGE:
-                warning_msg = 'Unknown sqs_message format %s' % (sqs_message['Body'][:50])
+                warning_msg = 'Unknown sqs_message or sns format %s' % (sqs_message['Body'][:50])
                 self.logger.warning(warning_msg)
             if parallel:
                 process_pool.apply_async(self.process_sqs_messsage, args=sqs_message)
@@ -133,7 +135,12 @@ class MailerSqsQueueProcessor(object):
     # in the ldap_uid_tags section of your mailer.yml, we'll do a lookup of those emails
     # (and their manager if that option is on) and also send emails there.
     def process_sqs_messsage(self, encoded_sqs_message):
-        sqs_message = json.loads(zlib.decompress(base64.b64decode(encoded_sqs_message['Body'])))
+        body = encoded_sqs_message['Body']
+        try:
+            body = json.dumps(json.loads(body)['Message'])
+        except ValueError:
+            pass
+        sqs_message = json.loads(zlib.decompress(base64.b64decode(body)))
         self.logger.debug("Got account:%s message:%s %s:%d policy:%s recipients:%s" % (
             sqs_message.get('account', 'na'),
             encoded_sqs_message['MessageId'],

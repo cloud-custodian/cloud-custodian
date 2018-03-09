@@ -34,6 +34,7 @@ from c7n.manager import resources
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n import mu
+from c7n import query
 from c7n import utils
 from c7n.logs_support import (
     normalized_log_entries,
@@ -398,7 +399,33 @@ class LambdaMode(PolicyExecutionMode):
             super(LambdaMode, self).get_metrics(start, end, period))
         return values
 
+    def get_member_account_id(self, event):
+        return event.get('account')
+
+    def get_member_region(self, event):
+        return event.get('region')
+
+    def assume_member(self, event):
+        # if a member role is defined we're being run out of the master, and we need
+        # to assume back into the member for policy execution.
+        member_role = self.policy.data['mode'].get('member-role')
+        member_id = self.get_member_account_id(event)
+        region = self.get_member_region(event)
+        if member_role and member_id and region:
+            # In the master account we might be multiplexing a hot lambda across
+            # multiple member accounts for each event/invocation.
+            member_role = member_role.format(account_id=member_id)
+            utils.reset_session_cache()
+            self.policy.options['account_id'] = member_id
+            self.policy.session_factory.region = region
+            self.policy.session_factory.assume_role = member_role
+            self.policy.log.info(
+                "Assuming member role: %s", member_role)
+            return True
+        return False
+
     def resolve_resources(self, event):
+        self.assume_member(event)
         mode = self.policy.data.get('mode', {})
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
@@ -536,6 +563,12 @@ class CloudTrailMode(LambdaMode):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
                 jmespath.compile(e['ids'])
+        if isinstance(self.policy.resource_manager, query.ChildResourceManager):
+            if not getattr(self.policy.resource_manager.resource_type,
+                           'supports_trailevents', False):
+                raise ValueError(
+                    "resource:%s does not support cloudtrail mode policies" % (
+                        self.policy.resource_type))
 
 
 class EC2InstanceState(LambdaMode):
@@ -544,6 +577,45 @@ class EC2InstanceState(LambdaMode):
 
 class ASGInstanceState(LambdaMode):
     """a lambda policy that executes on an asg's ec2 instance state changes."""
+
+
+class GuardDutyMode(LambdaMode):
+    """Incident Response for AWS Guard Duty"""
+
+    supported_resources = ('account', 'ec2', 'iam-user')
+
+    id_exprs = {
+        'account': jmespath.compile('detail.accountId'),
+        'ec2': jmespath.compile('detail.resource.instanceDetails.instanceId'),
+        'iam-user': jmespath.compile('detail.resource.accessKeyDetails.userName')}
+
+    def get_member_account_id(self, event):
+        return event['detail']['accountId']
+
+    def resolve_resources(self, event):
+        self.assume_member(event)
+        rid = self.id_exprs[self.policy.resource_type].search(event)
+        resources = self.policy.resource_manager.get_resources([rid])
+        # For iam users annotate with the access key specified in the finding event
+        if resources and self.policy.resource_type == 'iam-user':
+            resources[0]['c7n:AccessKeys'] = {
+                'AccessKeyId': event['detail']['resource']['accessKeyDetails']['accessKeyId']}
+        return resources
+
+    def validate(self):
+        if self.policy.data['resource'] not in self.supported_resources:
+            raise ValueError(
+                "Policy:%s resource:%s Guard duty mode only supported for %s" % (
+                    self.policy.data['name'],
+                    self.policy.data['resource'],
+                    self.supported_resources))
+
+    def provision(self):
+        if self.policy.data['resource'] == 'ec2':
+            self.policy.data['mode']['resource-filter'] = 'Instance'
+        elif self.policy.data['resource'] == 'iam-user':
+            self.policy.data['mode']['resource-filter'] = 'AccessKey'
+        return super(GuardDutyMode, self).provision()
 
 
 class ConfigRuleMode(LambdaMode):
@@ -611,6 +683,7 @@ class Policy(object):
         'cloudtrail': CloudTrailMode,
         'ec2-instance-state': EC2InstanceState,
         'asg-instance-state': ASGInstanceState,
+        'guard-duty': GuardDutyMode,
         'config-rule': ConfigRuleMode}
 
     log = logging.getLogger('custodian.policy')
