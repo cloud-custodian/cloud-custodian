@@ -1046,7 +1046,8 @@ class Terminate(BaseAction, StateTransitionFilter):
             return
         if self.data.get('force'):
             self.log.info("Disabling termination protection on instances")
-            self.disable_deletion_protection(instances)
+            self.disable_deletion_protection(
+                [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         # limit batch sizes to avoid api limits
