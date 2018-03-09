@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 
+from botocore.exceptions import ClientError
 from .common import BaseTest
 
 import fnmatch
@@ -185,3 +186,35 @@ class TestEcsContainerInstance(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_container_instance_update_agent(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_update_agent')
+        p = self.load_policy(
+            {'name': 'container-instance-update-agent',
+             'resource': 'ecs-container-instance',
+             'actions':[
+                 {'type': 'update-agent'}
+                 ]},
+             session_factory=session_factory)
+        resources = p.run()
+        if self.recording:
+            time.sleep(60)
+        client = session_factory().client('ecs')
+        updated_version = client.describe_container_instances(cluster='default',
+                containerInstances=['a8a469ef-009f-40f8-9639-3a0d9c6a9b9e'])['containerInstances'][0]['versionInfo']['agentVersion']
+        self.assertNotEqual(updated_version, resources[0]['versionInfo']['agentVersion'])
+
+    def test_container_instance_set_state(self):
+        session_factory = self.replay_flight_data('test_ecs_container_instance_set_state')
+        p = self.load_policy(
+            {'name': 'container-instance-update-agent',
+             'resource': 'ecs-container-instance',
+             'actions':[
+                 {'type': 'set-state',
+                     'state': 'DRAINING'}
+                 ]},
+             session_factory=session_factory)
+        resources = p.run()
+        client = session_factory().client('ecs')
+        state = client.describe_container_instances(cluster='default',
+                containerInstances=[resources[0]['containerInstanceArn']])['containerInstances'][0]['status']
+        self.assertEqual(state, 'DRAINING')
