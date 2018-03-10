@@ -17,11 +17,11 @@ import os
 
 description = ""
 if os.path.exists('README.md'):
-   description = open('README.md', 'r').read()
+    description = open('README.md', 'r').read()
 
 setup(
     name="c7n_org",
-    version='0.2.2',
+    version='0.3.0',
     description="Cloud Custodian - Multi Account",
     classifiers=[
         "Topic :: System :: Systems Administration",
