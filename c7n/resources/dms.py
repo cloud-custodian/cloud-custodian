@@ -61,6 +61,20 @@ class ReplicationInstance(QueryResourceManager):
         return resources
 
 
+@resources.register('dms-endpoint')
+class DmsEndpoints(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'dms'
+        enum_spec = ('describe_endpoints', 'Endpoints', None)
+        detail_spec = None
+        id = 'EndpointArn'
+        name = 'EndpointIdentifier'
+        date = None
+        dimension = None
+        filter_name = None
+
+
 class InstanceDescribe(DescribeSource):
 
     def get_resources(self, resource_ids):
@@ -222,5 +236,203 @@ class InstanceMarkForOp(TagDelayedAction):
                     Tags=tags_list)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceNotFoundFault':
+                    continue
+                raise
+
+
+@DmsEndpoints.action_registry.register('modify-endpoint')
+class ModifyDmsEndpoint(BaseAction):
+    """Modify the attributes of a DMS endpoint
+
+    :example:
+
+    .. code-block: yaml
+
+        - policies:
+            - name: dms-endpoint-modify
+              resource: dms-endpoint
+              filters:
+                - EngineName: sqlserver
+                - SslMode: none
+              actions:
+                - type: modify-endpoint
+                  sslmode: require
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['modify-endpoint']},
+            'port': {'type': 'integer', 'minimum': 1, 'maximum': 65536},
+            'servername': {'type': 'string'},
+            'sslmode': {'type': 'string', 'enum': [
+                'none', 'require', 'verify-ca', 'verify-full']},
+            'certificatearn': {'type': 'string'},
+            'databasename': {'type': 'string'},
+            'endpointidentifier': {'type': 'string'},
+            'extraconnectionattributes': {'type': 'string'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'dynamodbsettings': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {'serviceaccessrolearn': {'type': 'string'}}
+            },
+            's3settings': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'bucketfolder': {'type': 'string'},
+                    'bucketname': {'type': 'string'},
+                    'compressiontype': {
+                        'type': 'string', 'enum': ['none', 'gzip']
+                    },
+                    'csvdelimiter': {'type': 'string'},
+                    'csvrowdelimiter': {'type': 'string'},
+                    'externaltabledefinition': {'type': 'string'},
+                    'serviceaccessrolearn': {'type': 'string'}
+                }
+            },
+            'mongodbsettings': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'authmechanism': {
+                        'type': 'string', 'enum': [
+                            'default', 'mongodb_cr', 'scram_sha_1']
+                    },
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'databasename': {'type': 'string'},
+                    'docstoinvestigate': {'type': 'integer', 'minimum': 1},
+                    'extractdocid': {'type': 'boolean'},
+                    'nestinglevel': {
+                        'type': 'string', 'enum': ['none', 'one']},
+                    'port': {
+                        'type': 'integer', 'minimum': 1, 'maximum': 65535},
+                    'servername': {'type': 'string'}
+                }
+            }
+        }
+    }
+    permissions = ('dms:ModifyEndpoint',)
+
+    def configure_s3_params(self, e, params):
+        settings = self.data.get('s3settings')
+        if not settings:
+            raise KeyError('s3settings not provided')
+
+        params['S3Settings'] = {
+            'BucketName': settings.get(
+                'bucketname', e['S3Settings']['BucketName']),
+            'CsvDelimiter': settings.get(
+                'csvdelimiter', e.get('S3Settings', {}).get(
+                    'CsvDelimiter')) or ',',
+            'CsvRowDelimiter': settings.get(
+                'csvrowdelimiter', e.get('S3Settings', {}).get(
+                    'CsvRowDelimiter')) or '\n',
+            'CompressionType': settings.get(
+                'compressiontype', e.get('S3Settings', {}).get(
+                    'CompressionType')) or 'none'}
+
+        if settings.get('serviceaccessrolearn'):
+            params['S3Settings']['ServiceAccessRoleArn'] = settings.get(
+                'serviceaccessrolearn')
+        if settings.get('bucketfolder'):
+            params['S3Settings']['BucketFolder'] = settings.get(
+                'bucketfolder')
+        if settings.get('externaltabledefinition'):
+            params['S3Settings']['ExternalTableDefinition'] = settings.get(
+                'externaltabledefinition')
+        return params
+
+    def configure_dynamodb_params(self, e, params):
+        settings = self.data.get('dynamodbsettings')
+        if not settings:
+            raise KeyError('dynamodbsettings not provided')
+
+        rolearn = self.data.get(
+            'serviceaccessrolearn',
+            e['DynamoDbSettings']['ServiceAccessRoleArn'])
+        params['DynamoDbSettings']['ServiceAccessRoleArn'] = rolearn
+        return params
+
+    def configure_mongodb_params(self, e, params):
+        settings = self.data.get('mongodbsettings')
+        if not settings:
+            raise KeyError('mongodbsettings not provided')
+
+        nest = settings.get(
+            'nestinglevel', e['MongoDbSettings']['NestingLevel']).lower()
+        auth = settings.get('authtype', e['MongoDbSettings']['AuthType'])
+        params['MongoDbSettings'] = {
+            'ServerName': settings.get(
+                'servername', e['MongoDbSettings']['ServerName']),
+            'Port': settings.get('port', e['MongoDbSettings']['Port']),
+            'NestingLevel': nest,
+            'AuthType': auth,
+            'AuthMechanism': settings.get(
+                'authmechanism', e['MongoDbSettings']['AuthMechanism'])}
+
+        if nest == 'one':
+            params['MongoDbSettings']['DocsToInvestigate'] = str(settings.get(
+                'extractdocid',
+                e['MongoDbSettings']['DocsToInvestigate'])) or '1000'
+        else:
+            params['MongoDbSettings']['ExtractDocId'] = settings.get(
+                'extractdocid', e['MongoDbSettings']['ExtractDocId']) or False
+
+        if auth == 'password':
+            params['MongoDbSettings']['Username'] = settings.get(
+                'username', e['MongoDbSettings']['Username'])
+            params['MongoDbSettings']['Password'] = settings.get(
+                'password', e['MongoDbSettings']['Password'])
+        return params
+
+    def configure_generic_params(self, e, params):
+        params['Port'] = self.data.get('port', e['Port'])
+        params['DatabaseName'] = self.data.get(
+            'databasename', e['DatabaseName'])
+        params['SslMode'] = self.data.get('sslmode', e['SslMode'])
+
+        if self.data.get('certificatearn') or e.get('CertificateArn'):
+            params['CertificateArn'] = self.data.get(
+                'certificatearn', e['CertificateArn'])
+        if self.data.get(
+                'extraconnectionattributes') or e.get(
+                    'ExtraConnectionAttributes'):
+            params['ExtraConnectionAttributes'] = self.data.get(
+                'extraconnectionattributes', e['ExtraConnectionAttributes'])
+        if self.data.get('username'):
+            params['Username'] = self.data['username']
+        if self.data.get('password'):
+            params['Password'] = self.data['password']
+        return params
+
+    def process(self, endpoints):
+        client = local_session(self.manager.session_factory).client('dms')
+        for e in endpoints:
+            params = dict(
+                EndpointArn=e['EndpointArn'],
+                EndpointIdentifier=self.data.get(
+                    'endpointidentifier', e['EndpointIdentifier']),
+                EngineName=self.data.get('enginename', e['EngineName']))
+
+            if params['EngineName'] == 's3':
+                params = self.configure_s3_params(e, params)
+            elif params['EngineName'] == 'dynamodb':
+                params = self.configure_dynamodb_params(e, params)
+            elif params['EngineName'] == 'mongodb':
+                params = self.configure_mongodb_params(e, params)
+            else:
+                params = self.configure_generic_params(e, params)
+
+            try:
+                client.modify_endpoint(**params)
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'InvalidResourceStateFault',
+                        'ResourceAlreadyExistsFault',
+                        'ResourceNotFoundFault'):
                     continue
                 raise

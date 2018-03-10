@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Endpoints": [
+            {
+                "Username": "madmin", 
+                "Status": "active", 
+                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:PMO5DDJPAIFYF2F6NM2SZTVRAM", 
+                "ServerName": "c7n-mysql-db", 
+                "EndpointType": "SOURCE", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0", 
+                "DatabaseName": "c7nmysqldb", 
+                "SslMode": "require", 
+                "EngineName": "sqlserver", 
+                "EndpointIdentifier": "c7n-test-dms-ep", 
+                "Port": 3305
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c5bb01f7-22f1-11e8-a76e-c90a03e7fd2f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c5bb01f7-22f1-11e8-a76e-c90a03e7fd2f", 
+                "date": "Thu, 08 Mar 2018 16:57:23 GMT", 
+                "content-length": "504", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
