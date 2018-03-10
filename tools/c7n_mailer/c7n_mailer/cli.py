@@ -56,7 +56,10 @@ CONFIG_SCHEMA = {
         # SDK Config
         'profile': {'type': 'string'},
         'http_proxy': {'type': 'string'},
-        'https_proxy': {'type': 'string'}
+        'https_proxy': {'type': 'string'},
+
+        # Mapping account / emails
+        'account_emails': {'type': 'object'}
     }
 }
 
