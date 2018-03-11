@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import functools
 import jmespath
 import json
 import six
@@ -26,7 +27,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import (
     RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment)
-from c7n.utils import get_retry, local_session, type_schema
+from c7n.utils import get_retry, local_session, type_schema, generate_arn
 
 filters = FilterRegistry('lambda.filters')
 actions = ActionRegistry('lambda.actions')
@@ -52,6 +53,20 @@ class AWSLambda(QueryResourceManager):
     def augment(self, functions):
         resources = super(AWSLambda, self).augment(functions)
         return universal_augment(self, functions)
+
+    @property
+    def generate_arn(self):
+        """ Generates generic arn if ID is not already arn format.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.get_model().service,
+                region=self.config.region,
+                account_id=self.account_id,
+                resource_type=self.get_model().type,
+                separator=':')
+        return self._generate_arn
 
 
 def tag_function(session_factory, functions, tags, log):
