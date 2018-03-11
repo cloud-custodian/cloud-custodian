@@ -57,7 +57,7 @@ CONFIG_SCHEMA = {
         'account': {
             'type': 'object',
             'additionalProperties': True,
-            'oneOf': [
+            'anyOf': [
                 {'required': ['role', 'account_id']},
                 {'required': ['profile', 'account_id']}],
             'properties': {
