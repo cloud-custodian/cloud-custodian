@@ -50,9 +50,9 @@ class AWSLambda(QueryResourceManager):
     action_registry = actions
     retry = staticmethod(get_retry(('Throttled',)))
 
-    def augment(self, functions):
-        resources = super(AWSLambda, self).augment(functions)
-        return universal_augment(self, functions)
+    def augment(self, resources):
+        return universal_augment(
+            self,  super(AWSLambda, self).augment(resources))
 
     @property
     def generate_arn(self):
