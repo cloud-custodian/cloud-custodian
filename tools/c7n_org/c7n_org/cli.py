@@ -195,7 +195,7 @@ def report_account(account, region, policies_config, output_path, debug):
 
 @cli.command()
 @click.option('-c', '--config', required=True, help="Accounts config file")
-@click.option('-f', '--output', type=click.File('wb'), default='-', help="Output File")
+@click.option('-f', '--output', type=click.File('w'), default='-', help="Output File")
 @click.option('-u', '--use', required=True)
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
