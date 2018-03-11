@@ -15,7 +15,6 @@
 """
 
 from collections import Counter
-import csv
 import logging
 import os
 import multiprocessing
@@ -43,6 +42,7 @@ from c7n.manager import resources as resource_registry
 from c7n.utils import CONN_CACHE, dumps
 
 from c7n_org.utils import environ, account_tags
+from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
 
@@ -264,7 +264,7 @@ def report(config, output, use, output_dir, accounts, field, no_default_fields, 
         fields=prefix_fields)
 
     rows = formatter.to_csv(records, unique=False)
-    writer = csv.writer(output, formatter.headers())
+    writer = UnicodeWriter(output, formatter.headers())
     writer.writerow(formatter.headers())
     writer.writerows(rows)
 
