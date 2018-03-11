@@ -32,7 +32,7 @@ log = logging.getLogger('c7n-guardian')
 
 # make email required in org schema
 CONFIG_SCHEMA['definitions']['account']['properties']['email'] = {'type': 'string'}
-for el in CONFIG_SCHEMA['definitions']['account']['oneOf']:
+for el in CONFIG_SCHEMA['definitions']['account']['anyOf']:
     el['required'].append('email')
 
 

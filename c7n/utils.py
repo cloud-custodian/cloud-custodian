@@ -28,6 +28,7 @@ import random
 import threading
 import time
 import six
+import sys
 
 
 from c7n import ipaddress
@@ -56,6 +57,9 @@ class UnicodeWriter:
 
     def __init__(self, f, dialect=csv.excel, **kwds):
         self.writer = csv.writer(f, dialect=dialect, **kwds)
+        if sys.version_info.major == 3:
+            self.writerows = self.writer.writerows
+            self.writerow = self.writer.writerow
 
     def writerow(self, row):
         self.writer.writerow([s.encode("utf-8") for s in row])
