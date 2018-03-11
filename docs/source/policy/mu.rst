@@ -13,6 +13,4 @@ run.
 
 Mu will evaluate if a policy has changed by comparing the
 compiled Lambda function to the current Lambda function. Mu will also
-update the event sources if the policy has been updated. Mu can
-be used independently for managing Lambda functions with event
-sources.
+update the event sources if the policy has been updated.

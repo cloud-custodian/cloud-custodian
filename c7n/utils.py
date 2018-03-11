@@ -17,6 +17,7 @@ from botocore.exceptions import ClientError
 
 import boto3
 import copy
+import csv
 from datetime import datetime
 import functools
 import json
@@ -27,6 +28,7 @@ import random
 import threading
 import time
 import six
+
 
 from c7n import ipaddress
 
@@ -47,6 +49,20 @@ else:
             SafeLoader = None
 
 log = logging.getLogger('custodian.utils')
+
+
+class UnicodeWriter:
+    """utf8 encoding csv writer."""
+
+    def __init__(self, f, dialect=csv.excel, **kwds):
+        self.writer = csv.writer(f, dialect=dialect, **kwds)
+
+    def writerow(self, row):
+        self.writer.writerow([s.encode("utf-8") for s in row])
+
+    def writerows(self, rows):
+        for row in rows:
+            self.writerow(row)
 
 
 class VarsSubstitutionError(Exception):
