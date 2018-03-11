@@ -52,7 +52,7 @@ class AWSLambda(QueryResourceManager):
 
     def augment(self, resources):
         return universal_augment(
-            self,  super(AWSLambda, self).augment(resources))
+            self, super(AWSLambda, self).augment(resources))
 
     @property
     def generate_arn(self):
