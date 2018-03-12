@@ -6,13 +6,13 @@
             "Status": "active", 
             "MongoDbSettings": {
                 "Username": "c7nmongo", 
-                "NestingLevel": "none", 
+                "NestingLevel": "one", 
                 "AuthType": "PASSWORD", 
                 "ServerName": "c7n-mongo-db", 
                 "AuthMechanism": "default", 
-                "DocsToInvestigate": "null", 
+                "DocsToInvestigate": "500", 
                 "DatabaseName": "mongodb", 
-                "ExtractDocId": "false", 
+                "ExtractDocId": "null", 
                 "AuthSource": "null", 
                 "Port": 27017
             }, 
@@ -20,7 +20,7 @@
             "ServerName": "c7n-mongo-db", 
             "EndpointType": "SOURCE", 
             "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0", 
-            "ExtraConnectionAttributes": "authSource=null;nestingLevel=none;extractDocId=false;authMechanism=default;authType=PASSWORD;docsToInvestigate=null;", 
+            "ExtraConnectionAttributes": "authSource=null;nestingLevel=one;extractDocId=null;authMechanism=default;authType=PASSWORD;docsToInvestigate=500;", 
             "DatabaseName": "mongodb", 
             "SslMode": "none", 
             "EngineName": "mongodb", 
@@ -30,11 +30,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "603491fd-2605-11e8-a76e-c90a03e7fd2f", 
+            "RequestId": "9b13ad86-2605-11e8-8019-531c4ec63182", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "603491fd-2605-11e8-a76e-c90a03e7fd2f", 
-                "date": "Mon, 12 Mar 2018 14:55:16 GMT", 
-                "content-length": "966", 
+                "x-amzn-requestid": "9b13ad86-2605-11e8-8019-531c4ec63182", 
+                "date": "Mon, 12 Mar 2018 14:56:54 GMT", 
+                "content-length": "960", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

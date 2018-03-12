@@ -157,8 +157,8 @@ class DmsEndpointTests(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                'port': 3305,
-                'sslmode': 'require'
+                'Port': 3305,
+                'SslMode': 'require'
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -178,9 +178,10 @@ class DmsEndpointTests(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                's3settings': {
-                    'bucketname': 'c7n-sm-test',
-                    'bucketfolder': 's3_dms'}
+                'S3Settings': {
+                    'BucketName': 'c7n-sm-test',
+                    'BucketFolder': 's3_dms',
+                }
                 }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -195,11 +196,18 @@ class DmsEndpointTests(BaseTest):
             'resource': 'dms-endpoint',
             'filters': [
                 {'EndpointIdentifier': 'c7n-dms-mdb-ep'},
-                {'MongoDbSettings.NestingLevel': 'one'}
+                {'or': [
+                    {'MongoDbSettings.NestingLevel': 'ONE'},
+                    {'MongoDbSettings.NestingLevel': 'one'}
+                ]}
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                'mongodbsettings': {'nestinglevel': 'none'}
+                'MongoDbSettings': {
+                    'NestingLevel': 'none',
+                    'Username': 'mongouser',
+                    'Password': 'mongopassword',
+                }
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -219,11 +227,60 @@ class DmsEndpointTests(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                'username': 'madmin1',
-                'password': 'generic_password'
+                'Username': 'madmin1',
+                'Password': 'generic_password'
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory(region='us-east-1').client('dms')
         endpoint = client.describe_endpoints()['Endpoints'][0]
         self.assertEqual(endpoint['Username'], 'madmin1')
+
+    def test_endpoint_modify_5(self):
+        session_factory = self.replay_flight_data('test_dms_modify_endpoint_5')
+        p = self.load_policy({
+            'name': 'dms-mongodb-nesting',
+            'resource': 'dms-endpoint',
+            'filters': [
+                {'EndpointIdentifier': 'c7n-dms-mdb-ep'},
+                {'or': [
+                    {'MongoDbSettings.NestingLevel': 'NONE'},
+                    {'MongoDbSettings.NestingLevel': 'none'}
+                ]}
+            ],
+            'actions': [{
+                'type': 'modify-endpoint',
+                'MongoDbSettings': {
+                    'NestingLevel': 'one',
+                    'DocsToInvestigate': 500
+                }
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dms')
+        endpoint = client.describe_endpoints()['Endpoints'][0]
+        self.assertEqual(
+            endpoint['MongoDbSettings']['NestingLevel'], 'one')
+
+    def test_endpoint_modify_6(self):
+        session_factory = self.replay_flight_data('test_dms_modify_endpoint_6')
+        p = self.load_policy({
+            'name': 'dms-mongodb-nesting',
+            'resource': 'dms-endpoint',
+            'filters': [
+                {'EndpointIdentifier': 'c7n-dms-dyn-db'},
+                {'DynamoDbSettings.ServiceAccessRoleArn': 'arn:aws:iam::644160558196:role/DMS-Test'}
+            ],
+            'actions': [{
+                'type': 'modify-endpoint',
+                'DynamoDbSettings': {
+                    'ServiceAccessRoleArn': 'arn:aws:iam::644160558196:role/DMS-Test2'
+                }
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dms')
+        endpoint = client.describe_endpoints()['Endpoints'][0]
+        self.assertEqual(
+            endpoint['DynamoDbSettings']['ServiceAccessRoleArn'],
+            'arn:aws:iam::644160558196:role/DMS-Test2')

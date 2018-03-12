@@ -3,23 +3,25 @@
     "data": {
         "Endpoints": [
             {
+                "Username": "c7nmongo", 
                 "Status": "active", 
                 "MongoDbSettings": {
-                    "NestingLevel": "one", 
-                    "AuthType": "NO", 
+                    "Username": "c7nmongo", 
+                    "NestingLevel": "ONE", 
+                    "AuthType": "PASSWORD", 
                     "ServerName": "c7n-mongo-db", 
                     "AuthMechanism": "default", 
-                    "DocsToInvestigate": "null", 
-                    "DatabaseName": "c7nmondgo", 
-                    "ExtractDocId": "N", 
-                    "AuthSource": "null", 
+                    "DocsToInvestigate": "1000", 
+                    "DatabaseName": "mongodb", 
+                    "AuthSource": "c7ndb", 
                     "Port": 27017
                 }, 
+                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:3VLGZJN5AURBOIHJ3KHR6ZCOAQ", 
                 "ServerName": "c7n-mongo-db", 
                 "EndpointType": "SOURCE", 
-                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:4MIVMMNBWMSCUPGAIPFVRLHRGQ", 
-                "ExtraConnectionAttributes": "authSource=null;nestingLevel=one;extractDocId=N;authMechanism=default;authType=NO;docsToInvestigate=null;", 
-                "DatabaseName": "c7nmondgo", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0", 
+                "ExtraConnectionAttributes": "authType=PASSWORD;authSource=c7ndb;authMechanism=default;nestingLevel=ONE;docsToInvestigate=1000", 
+                "DatabaseName": "mongodb", 
                 "SslMode": "none", 
                 "EngineName": "mongodb", 
                 "EndpointIdentifier": "c7n-dms-mdb-ep", 
@@ -29,11 +31,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a9a9dad1-2310-11e8-a9c5-7d920a0c2d5c", 
+            "RequestId": "5fef999a-2605-11e8-8019-531c4ec63182", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "a9a9dad1-2310-11e8-a9c5-7d920a0c2d5c", 
-                "date": "Thu, 08 Mar 2018 20:38:30 GMT", 
-                "content-length": "729", 
+                "x-amzn-requestid": "5fef999a-2605-11e8-8019-531c4ec63182", 
+                "date": "Mon, 12 Mar 2018 14:55:15 GMT", 
+                "content-length": "926", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
