@@ -1,18 +1,18 @@
 {
-    "status_code": 201, 
+    "status_code": 201,
     "data": {
-        "Statement": "{\"Sid\":\"SharedInvoke\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::185106417252:root\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-west-1:644160558196:function:func-b\"}", 
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 201, 
-            "RequestId": "fe879f84-932a-11e7-9aee-2baee057a3c6", 
+            "RequestId": "92e35abb-251e-11e8-be7f-933d99967cbe",
+            "HTTPStatusCode": 201,
             "HTTPHeaders": {
-                "date": "Wed, 06 Sep 2017 17:44:11 GMT", 
-                "x-amzn-requestid": "fe879f84-932a-11e7-9aee-2baee057a3c6", 
-                "content-length": "230", 
-                "content-type": "application/json", 
-                "connection": "keep-alive"
-            }
-        }
+                "date": "Sun, 11 Mar 2018 11:23:07 GMT",
+                "content-type": "application/json",
+                "content-length": "230",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "92e35abb-251e-11e8-be7f-933d99967cbe"
+            },
+            "RetryAttempts": 0
+        },
+        "Statement": "{\"Sid\":\"SharedInvoke\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::185106417252:root\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-2:644160558196:function:func-b\"}"
     }
 }
