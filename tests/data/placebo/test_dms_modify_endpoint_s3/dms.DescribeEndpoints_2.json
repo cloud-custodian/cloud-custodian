@@ -1,0 +1,35 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Endpoints": [
+            {
+                "Status": "active", 
+                "S3Settings": {
+                    "CompressionType": "GZIP", 
+                    "BucketFolder": "s3_dms", 
+                    "CsvRowDelimiter": "\\n", 
+                    "CsvDelimiter": ",", 
+                    "ServiceAccessRoleArn": "arn:aws:iam::644160558196:role/DMS-Test-Role-02", 
+                    "ExternalTableDefinition": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n       {\n            \"Effect\": \"Allow\",\n            \"Action\": [\n                \"s3:PutObject\",\n                \"s3:DeleteObject\"\n            ],\n            \"Resource\": [\n                \"arn:aws:s3:::buckettest2*\"\n            ]\n        },\n        {\n            \"Effect\": \"Allow\",\n            \"Action\": [\n                \"s3:ListBucket\"\n            ],\n            \"Resource\": [\n                \"arn:aws:s3:::buckettest2*\"\n            ]\n        }\n    ]\n}"
+                }, 
+                "EndpointType": "SOURCE", 
+                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:DRE53WPQSPHJGW44MAC3O4AH2E", 
+                "ExtraConnectionAttributes": "csvRowDelimiter=\\n;bucketName=;compressionType=GZIP;csvDelimiter=,;bucketFolder=s3_dms;", 
+                "SslMode": "none", 
+                "EngineName": "s3", 
+                "EndpointIdentifier": "c7n-dms-s3-ep"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2baee7d7-261d-11e8-88cd-99f955e90edb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2baee7d7-261d-11e8-88cd-99f955e90edb", 
+                "date": "Mon, 12 Mar 2018 17:45:35 GMT", 
+                "content-length": "1850", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

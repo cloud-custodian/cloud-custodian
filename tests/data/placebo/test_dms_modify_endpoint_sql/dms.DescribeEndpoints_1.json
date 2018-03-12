@@ -5,25 +5,25 @@
             {
                 "Username": "madmin", 
                 "Status": "active", 
-                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:PMO5DDJPAIFYF2F6NM2SZTVRAM", 
-                "ServerName": "c7n-mysql-db", 
+                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:XNUBIZJM2WRWOEEOZJHNEM6IYE", 
+                "ServerName": "c7n-sql-db", 
                 "EndpointType": "SOURCE", 
                 "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0", 
-                "DatabaseName": "c7nmysqldb", 
+                "DatabaseName": "c7n-db", 
                 "SslMode": "none", 
                 "EngineName": "sqlserver", 
-                "EndpointIdentifier": "c7n-test-dms-ep", 
-                "Port": 3306
+                "EndpointIdentifier": "c7n-dms-sql-ep", 
+                "Port": 1443
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c5756d51-22f1-11e8-8019-531c4ec63182", 
+            "RequestId": "06c89b3a-261c-11e8-807c-61ba73499dd1", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "c5756d51-22f1-11e8-8019-531c4ec63182", 
-                "date": "Thu, 08 Mar 2018 16:57:22 GMT", 
-                "content-length": "501", 
+                "x-amzn-requestid": "06c89b3a-261c-11e8-807c-61ba73499dd1", 
+                "date": "Mon, 12 Mar 2018 17:37:24 GMT", 
+                "content-length": "494", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }
