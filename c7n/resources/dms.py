@@ -353,9 +353,9 @@ class ModifyDmsEndpoint(BaseAction):
             raise KeyError('MongoDbSettings not provided')
         params['MongoDbSettings'] = {}
 
-        keys = ('AuthMechanism', 'AuthSource', 'DocsToInvestigate',
-                'ExtractDocId', 'NestingLevel', 'Password', 'Port',
-                'ServerName', 'Username')
+        keys = ('AuthMechanism', 'AuthSource', 'DatabaseName',
+                'DocsToInvestigate', 'ExtractDocId', 'NestingLevel', 'Password',
+                'Port', 'ServerName', 'Username')
         auth = e['MongoDbSettings']['AuthType']
         params['MongoDbSettings'] = {'AuthType': auth}
         for k in keys:
