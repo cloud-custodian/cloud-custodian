@@ -1092,11 +1092,28 @@ class Snapshot(BaseAction):
             - type: snapshot
               copy-tags:
                 - Name
+              tags:
+                - Key: newtag
+                  Value: newvalue
     """
 
-    schema = type_schema(
-        'snapshot',
-        **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}}})
+    schema = {
+        'copy-tags': {
+            'type': 'array',
+            'items': {'type': 'string'}
+        },
+        'tags': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'Key': {'type': 'string'},
+                    'Value': {'type': 'string'}
+                }
+            }
+        }
+    }
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def process(self, resources):
@@ -1140,6 +1157,11 @@ class Snapshot(BaseAction):
                 {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
                 {'Key': 'custodian_snapshot', 'Value': ''}
             ]
+            new_tags = self.data.get('tags', [])
+            for t in new_tags:
+                if t['Key'] in tags:
+                    continue
+                tags.append({'Key': t['Key'], 'Value': t['Value']})
 
             copy_keys = self.data.get('copy-tags', [])
             copy_tags = []

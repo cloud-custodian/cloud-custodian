@@ -729,6 +729,29 @@ class TestSnapshot(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ec2_snapshot_new_tags(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_snapshot_tag')
+        policy = self.load_policy({
+            'name': 'ec2-test-snapshot',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'c7n-ec2-test'}],
+            'actions': [{
+                'type': 'snapshot',
+                'tags': [
+                    {'Key': 'TestKey1', 'Value': 'TestValue1'},
+                    {'Key': 'TestKey2', 'Value': 'TestValue2'}
+                ]}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        client = session_factory(region='us-east-1').client('ec2')
+        snapshots = client.describe_snapshots(
+            Filters=[{'Name': 'tag-key', 'Values': ['TestKey1']}],
+            OwnerIds=['644160558196'])['Snapshots']
+        self.assertEqual(len(snapshots), 1)
+
+
 class TestSetInstanceProfile(BaseTest):
 
     def test_ec2_set_instance_profile_assocation(self):
