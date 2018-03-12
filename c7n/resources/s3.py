@@ -40,6 +40,7 @@ Actions:
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import copy
+import fnmatch
 import functools
 import json
 import itertools
@@ -47,6 +48,7 @@ import logging
 import math
 import os
 import time
+import re
 import ssl
 
 import six
@@ -781,6 +783,165 @@ class HasStatementFilter(Filter):
            (self.data.get('statements', []) and not required_statements):
             return b
         return None
+
+
+@filters.register('has-policy-permission')
+class HasPermissionFilter(Filter):
+    """Filters buckets with certain permissions.
+
+    A bucket is filtered if any of the given actions and any of the given principals match
+    the bucket's policy.
+
+    This allows matching bucket policies that contain wildcards.  For example, if you
+    specify `s3:PutObject` in a filter and a bucket policy has a `s3:Put*` action, the
+    bucket will match.
+
+    Conversely, if you specify a wildcard in a filter (e.g `*`), this will match all bucket
+    policy permissions.
+
+    Special considerations:
+
+    * Principals should be specified as "prefix:value" where prefix is one of AWS,
+      Federated, Service, etc.
+    * Partial wildcards (e.g. s3:Put*) cannot be used in filter definition.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-public-writable-policy
+                resource: s3
+                filters:
+                  - type: has-policy-permission
+                    actions:
+                      - s3:PutObject
+                      - s3:PutObjectAcl
+                      - s3:PutBucketPolicy
+                    principals:
+                      - 'AWS:*'
+
+            policies:
+              - name: s3-public-access-policy
+                resource: s3
+                filters:
+                  - type: has-policy-permission
+                    actions:
+                      - '*'
+                    principals:
+                      - '*'
+    """
+    schema = type_schema(
+        'has-policy-permission',
+        actions={'type': 'array', 'items': {'type': 'string'}},
+        principals={'type': 'array', 'items': {'type': 'string'}}
+    )
+
+    def process(self, buckets, event=None):
+        return list(filter(None, map(self.process_bucket, buckets)))
+
+    def process_bucket(self, b):
+        p = b.get('Policy')
+        if p is None:
+            return None
+        p = json.loads(p)
+
+        required_actions = list(self.data.get('actions', []))
+        for required_action in required_actions:
+            if ("*" in required_action and len(required_action) > 1):
+                raise ValueError(
+                    "partial wildcards in action filters are not supported: %s" %
+                    required_action)
+
+        required_principals = list(self.data.get('principals', []))
+        for required_principal in required_principals:
+            if ("*" in required_principal and len(required_principal) > 1 and
+                    not re.match('^[^:]+:\*$', required_principal)):
+                raise ValueError(
+                    "partial wildcards in principal filters are not supported: %s" %
+                    required_principal)
+
+        statements = p.get('Statement', [])
+        for statement in statements:
+            if statement.get('Effect', 'Allow').lower() == 'deny':
+                continue
+
+            matched_actions = self.__get_action_matches(statement, required_actions)
+            matched_principals = self.__get_principal_matches(statement, required_principals)
+
+            if ((len(required_actions) == 0 or matched_actions) and
+                    (len(required_principals) == 0 or matched_principals)):
+                return b
+
+        return None
+
+    def __get_action_matches(self, statement, required_actions):
+        matches = []
+        if 'Action' in statement:
+            actions = statement.get('Action')
+            if isinstance(actions, six.string_types):
+                actions = [actions]
+            for action in actions:
+                regex = re.compile(fnmatch.translate(action), re.IGNORECASE)
+                for required_action in required_actions:
+                    if (required_action == '*' or
+                            required_action.lower() == action.lower() or
+                            regex.match(required_action)):
+                        matches.append(required_action)
+
+        elif 'NotAction' in statement:
+            not_actions = statement.get('NotAction')
+            if isinstance(not_actions, six.string_types):
+                not_actions = [not_actions]
+            matches.extend(required_actions)
+            for not_action in not_actions:
+                regex = re.compile(fnmatch.translate(not_action), re.IGNORECASE)
+                for required_action in required_actions:
+                    if (required_action.lower() == not_action.lower() or
+                            regex.match(required_action)):
+                        matches.remove(required_action)
+
+        return list(set(matches))
+
+    def __get_principal_matches(self, statement, required_principals):
+        matches = []
+        wildcard_regex = re.compile('[^:]+:\*')
+        if 'Principal' in statement:
+            principals = self.__normalize_principals(statement.get('Principal'))
+            for principal in principals:
+                for required_principal in required_principals:
+                    if principal == '*' and wildcard_regex.match(required_principal):
+                        matches.append(required_principal)
+                    elif required_principal == '*' and wildcard_regex.match(principal):
+                        matches.append(required_principal)
+                    elif required_principal == principal:
+                        matches.append(required_principal)
+
+        elif 'NotPrincipal' in statement:
+            not_principals = self.__normalize_principals(statement.get('NotPrincipal'))
+            matches.externd(required_principals)
+            for not_principal in not_principals:
+                for required_principal in required_principals:
+                    if required_principal == not_principal:
+                        matches.remove(required_principal)
+
+        return list(set(matches))
+
+    def __normalize_principals(self, principals):
+        if not principals:
+            return []
+
+        if isinstance(principals, six.string_types):
+            return [principals]
+
+        normalized = []
+        for key, values in principals.items():
+            if isinstance(values, six.string_types):
+                values = [values]
+            for val in values:
+                normalized.append("{}:{}".format(key, val))
+
+        return normalized
 
 
 ENCRYPTION_STATEMENT_GLOB = {
