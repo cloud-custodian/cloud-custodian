@@ -70,6 +70,7 @@ CONFIG_SCHEMA = {
                 'role': {'oneOf': [
                     {'type': 'array', 'items': {'type': 'string'}},
                     {'type': 'string'}]},
+                'external_id': {'type': 'string'},
             }
         }
     },
@@ -139,7 +140,7 @@ def resolve_regions(regions, partition='aws'):
 
 def get_session(account, session_name, region):
     if account.get('role'):
-        return assumed_session(account['role'], session_name, region=region)
+        return assumed_session(account['role'], session_name, region=region, external_id=account.get('external_id'))
     elif account.get('profile'):
         return SessionFactory(region, account['profile'])()
     else:
@@ -169,10 +170,16 @@ def report_account(account, region, policies_config, output_path, debug):
     cache_path = os.path.join(output_path, "c7n.cache")
     output_path = os.path.join(output_path, account['name'], region)
     bag = Bag.empty(
-        region=region, assume_role=account['role'],
+        region=region,
         output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=False,
         cache=cache_path, log_group=None, profile=None, external_id=None)
+
+    if account['role']:
+        bag['assume_role'] = account['role']
+        bag['external_id'] = account.get('external_id')
+    elif account['profile']:
+        bag['profile'] = account['profile']
 
     policies = PolicyCollection.from_data(policies_config, bag)
     records = []
@@ -371,6 +378,7 @@ def run_account(account, region, policies_config, output_path,
 
     if account['role']:
         bag['assume_role'] = account['role']
+        bag['external_id'] = account.get('external_id')
     elif account['profile']:
         bag['profile'] = account['profile']
 
