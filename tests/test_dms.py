@@ -157,8 +157,8 @@ class DmsEndpointTests(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                'port': 3305,
-                'sslmode': 'require'
+                'Port': 3305,
+                'SslMode': 'require'
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -178,9 +178,9 @@ class DmsEndpointTests(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                's3settings': {
-                    'bucketname': 'c7n-sm-test',
-                    'bucketfolder': 's3_dms'}
+                'S3Settings': {
+                    'BucketName': 'c7n-sm-test',
+                    'BucketFolder': 's3_dms'}
                 }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -199,7 +199,7 @@ class DmsEndpointTests(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                'mongodbsettings': {'nestinglevel': 'none'}
+                'MongoDbSettings': {'NestingLevel': 'none'}
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -219,8 +219,8 @@ class DmsEndpointTests(BaseTest):
             ],
             'actions': [{
                 'type': 'modify-endpoint',
-                'username': 'madmin1',
-                'password': 'generic_password'
+                'Username': 'madmin1',
+                'Password': 'generic_password'
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
