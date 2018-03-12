@@ -370,19 +370,13 @@ class ModifyDmsEndpoint(BaseAction):
             params['MongoDbSettings']['Port'] = p['Port']
         if p.get('AuthMechanism'):
             params['MongoDbSettings']['AuthMechanism'] = p['AuthMechanism']
-
-        nest = p.get('NestingLevel')
-        if nest:
-            params['MongoDbSettings']['NestingLevel'] = nest
-            if nest.lower() == 'one':
-                if p.get('DocsToInvestigate'):
-                    params['MongoDbSettings']['DocsToInvestigate'] = str(
-                        p['DocsToInvestigate'])
-            else:
-                if p.get('ExtractDocId'):
-                    params['MongoDbSettings']['ExtractDocId'] = p[
-                        'ExtractDocId']
-
+        if p.get('NestingLevel'):
+            params['MongoDbSettings']['NestingLevel'] = p['NestingLevel']
+        if p.get('DocsToInvestigate'):
+            params['MongoDbSettings']['DocsToInvestigate'] = p[
+                'DocsToInvestigate']
+        if p.get('ExtractDocId'):
+            params['MongoDbSettings']['ExtractDocId'] = p['ExtractDocId']
         if auth.lower() == 'password':
             if p.get('Username'):
                 params['MongoDbSettings']['Username'] = p['Username']
