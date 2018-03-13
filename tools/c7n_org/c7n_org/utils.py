@@ -23,4 +23,3 @@ def environ(**kw):
     for k in kw.keys():
         del os.environ[k]
     os.environ.update(current_env)
-
