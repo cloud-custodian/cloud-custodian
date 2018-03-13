@@ -272,12 +272,18 @@ class ModifyDmsEndpoint(BaseAction):
             'CertificateArn': {'type': 'string'},
             'DatabaseName': {'type': 'string'},
             'EndpointIdentifier': {'type': 'string'},
+            'EngineName': {'enum': [
+                'mysql', 'oracle', 'postgres',
+                'mariadb', 'aurora', 'redshift',
+                'S3', 'sybase', 'dynamodb', 'mongodb',
+                'sqlserver']},
             'ExtraConnectionAttributes': {'type': 'string'},
             'Username': {'type': 'string'},
             'Password': {'type': 'string'},
             'DynamoDbSettings': {
                 'type': 'object',
                 'additionalProperties': False,
+                'required': ['ServiceAccessRoleArn'],
                 'properties': {'ServiceAccessRoleArn': {'type': 'string'}}
             },
             'S3Settings': {
@@ -321,74 +327,15 @@ class ModifyDmsEndpoint(BaseAction):
     }
     permissions = ('dms:ModifyEndpoint',)
 
-    def configure_s3_params(self, e, params):
-        p = self.data.get('S3Settings')
-        if not p:
-            raise KeyError('S3Settings not provided')
-        params['S3Settings'] = {}
-
-        keys = ('BucketFolder', 'BucketName', 'CompressionType',
-                'CsvDelimiter', 'CsvRowDelimiter',
-                'ExternalTableDefinition', 'ServiceAccessRoleArn')
-        for k in keys:
-            if p.get(k):
-                params['S3Settings'][k] = p[k]
-        return params
-
-    def configure_dynamodb_params(self, e, params):
-        p = self.data.get('DynamoDbSettings')
-        if not p:
-            raise KeyError('DynamoDbSettings not provided')
-        params['DynamoDbSettings'] = {}
-
-        keys = ('ServiceAccessRoleArn',)
-        for k in keys:
-            if p.get(k):
-                params['DynamoDbSettings'][k] = p[k]
-        return params
-
-    def configure_mongodb_params(self, e, params):
-        p = self.data.get('MongoDbSettings')
-        if not p:
-            raise KeyError('MongoDbSettings not provided')
-        params['MongoDbSettings'] = {}
-
-        keys = ('AuthMechanism', 'AuthSource', 'DatabaseName',
-                'DocsToInvestigate', 'ExtractDocId', 'NestingLevel', 'Password',
-                'Port', 'ServerName', 'Username')
-        auth = e['MongoDbSettings']['AuthType']
-        params['MongoDbSettings'] = {'AuthType': auth}
-        for k in keys:
-            if p.get(k):
-                params['MongoDbSettings'][k] = p[k]
-        return params
-
-    def configure_generic_params(self, params):
-        keys = ('CertificateArn', 'DatabaseName', 'ExtraConnectionAttributes',
-                'Password', 'Port', 'Username', 'ServerName', 'SslMode')
-        for k in keys:
-            if self.data.get(k):
-                params[k] = self.data[k]
-        return params
-
     def process(self, endpoints):
         client = local_session(self.manager.session_factory).client('dms')
+        params = dict(self.data)
+        params.pop('type')
         for e in endpoints:
-            params = dict(
-                EndpointArn=e['EndpointArn'],
-                EndpointIdentifier=self.data.get(
-                    'EndpointIdentifier', e['EndpointIdentifier']),
-                EngineName=e['EngineName'])
-
-            if params['EngineName'] == 's3':
-                params = self.configure_s3_params(e, params)
-            elif params['EngineName'] == 'dynamodb':
-                params = self.configure_dynamodb_params(e, params)
-            elif params['EngineName'] == 'mongodb':
-                params = self.configure_mongodb_params(e, params)
-            else:
-                params = self.configure_generic_params(params)
-
+            params['EndpointArn'] = e['EndpointArn']
+            params['EndpointIdentifier'] = params.get(
+                'EndpointIdentifier', e['EndpointIdentifier'])
+            params['EngineName'] = params.get('EngineName', e['EngineName'])
             try:
                 client.modify_endpoint(**params)
             except ClientError as e:
