@@ -745,9 +745,12 @@ class TestSnapshot(BaseTest):
                 ]}]},
             session_factory=session_factory)
         resources = policy.run()
+        self.assertEqual(len(resources), 1)
         client = session_factory(region='us-east-1').client('ec2')
         snapshots = client.describe_snapshots(
-            Filters=[{'Name': 'tag-key', 'Values': ['TestKey1']}],
+            Filters=[
+                {'Name': 'tag-key', 'Values': ['TestKey1']},
+                {'Name': 'tag-key', 'Values': ['TestKey2']}],
             OwnerIds=['644160558196'])['Snapshots']
         self.assertEqual(len(snapshots), 1)
 

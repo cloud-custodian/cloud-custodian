@@ -1098,18 +1098,23 @@ class Snapshot(BaseAction):
     """
 
     schema = {
-        'copy-tags': {
-            'type': 'array',
-            'items': {'type': 'string'}
-        },
-        'tags': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'additionalProperties': False,
-                'properties': {
-                    'Key': {'type': 'string'},
-                    'Value': {'type': 'string'}
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['snapshot']},
+            'copy-tags': {
+                'type': 'array',
+                'items': {'type': 'string'}},
+            'tags': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['Key', 'Value'],
+                    'properties': {
+                        'Key': {'type': 'string'},
+                        'Value': {'type': 'string'}
+                    }
                 }
             }
         }
