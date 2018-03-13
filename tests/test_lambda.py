@@ -277,6 +277,7 @@ class LambdaTagTest(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'CloudCustodian')
 
     def test_mark_and_match(self):
         session_factory = self.replay_flight_data(

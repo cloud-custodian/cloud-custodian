@@ -1,0 +1,43 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Endpoints": [
+            {
+                "Username": "admin", 
+                "Status": "active", 
+                "MongoDbSettings": {
+                    "Username": "admin", 
+                    "NestingLevel": "NONE", 
+                    "AuthType": "PASSWORD", 
+                    "ServerName": "c7n-mongo-db-01", 
+                    "AuthMechanism": "null", 
+                    "DatabaseName": "c7n-db", 
+                    "ExtractDocId": "N", 
+                    "AuthSource": "c7n-users-01", 
+                    "Port": 3304
+                }, 
+                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:SZIYWDQRDY7ENCOB7D4L7KCRW4", 
+                "ServerName": "c7n-mongo-db-01", 
+                "EndpointType": "SOURCE", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0", 
+                "ExtraConnectionAttributes": "extractDocId=null;authType=PASSWORD;authSource=c7n-users-01;authMechanism=null;nestingLevel=NONE;extractDocID=N", 
+                "DatabaseName": "c7n-db", 
+                "SslMode": "none", 
+                "EngineName": "mongodb", 
+                "EndpointIdentifier": "c7n-dms-mongo-ep", 
+                "Port": 3304
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bdbfd4fb-261e-11e8-930f-2b4d2300af1b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bdbfd4fb-261e-11e8-930f-2b4d2300af1b", 
+                "date": "Mon, 12 Mar 2018 17:56:50 GMT", 
+                "content-length": "936", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
