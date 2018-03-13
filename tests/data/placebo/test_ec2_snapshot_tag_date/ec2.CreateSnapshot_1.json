@@ -5,9 +5,9 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "f122ea02-ceb3-4127-a9c5-d6b5c121091a", 
+            "RequestId": "3ab85cc6-079f-4473-a711-378c6f679b86", 
             "HTTPHeaders": {
-                "date": "Tue, 13 Mar 2018 17:55:10 GMT", 
+                "date": "Tue, 13 Mar 2018 17:53:39 GMT", 
                 "content-length": "613", 
                 "content-type": "text/xml;charset=UTF-8", 
                 "server": "AmazonEC2"
@@ -22,14 +22,14 @@
             "hour": 17, 
             "__class__": "datetime", 
             "month": 3, 
-            "second": 10, 
+            "second": 39, 
             "microsecond": 0, 
             "year": 2018, 
             "day": 13, 
-            "minute": 55
+            "minute": 53
         }, 
         "Progress": "", 
         "OwnerId": "644160558196", 
-        "SnapshotId": "snap-0d606a352ae1f6a8a"
+        "SnapshotId": "snap-0372e30fabb1b95ad"
     }
 }
