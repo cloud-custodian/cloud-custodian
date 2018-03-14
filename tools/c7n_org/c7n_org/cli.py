@@ -47,7 +47,7 @@ from c7n.utils import UnicodeWriter
 log = logging.getLogger('c7n_org')
 
 
-WORKER_COUNT = os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4)
+WORKER_COUNT = int(os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
 
 
 CONFIG_SCHEMA = {
