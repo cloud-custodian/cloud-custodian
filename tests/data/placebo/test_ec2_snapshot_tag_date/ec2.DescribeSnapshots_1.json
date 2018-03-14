@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1dc95cf0-ed9b-4c79-acc6-81a7f8ff6d30", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 13 Mar 2018 17:53:39 GMT"
+            }
+        }, 
+        "Snapshots": [
+            {
+                "Description": "Automated,Backup,i-0b0b1d965a2aefc12,vol-097ffe23b86c94d81", 
+                "Tags": [
+                    {
+                        "Value": "vol-097ffe23b86c94d81", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "2018/03/20", 
+                        "Key": "TestKey"
+                    }, 
+                    {
+                        "Value": "i-0b0b1d965a2aefc12", 
+                        "Key": "InstanceId"
+                    }, 
+                    {
+                        "Value": "/dev/xvda", 
+                        "Key": "DeviceName"
+                    }, 
+                    {
+                        "Value": "", 
+                        "Key": "custodian_snapshot"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeId": "vol-097ffe23b86c94d81", 
+                "State": "pending", 
+                "VolumeSize": 8, 
+                "StartTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 13, 
+                    "minute": 53
+                }, 
+                "Progress": "90%", 
+                "OwnerId": "644160558196", 
+                "SnapshotId": "snap-0372e30fabb1b95ad"
+            }
+        ]
+    }
+}

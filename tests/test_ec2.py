@@ -17,7 +17,7 @@ import logging
 import unittest
 import time
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import tz, zoneinfo
 from mock import mock
 from jsonschema.exceptions import ValidationError
@@ -728,6 +728,55 @@ class TestSnapshot(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ec2_snapshot_new_tags(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_snapshot_tag')
+        policy = self.load_policy({
+            'name': 'ec2-test-snapshot',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'c7n-ec2-test'},
+                {'tag:TestKey': 'absent'}],
+            'actions': [{
+                'type': 'snapshot',
+                'create-tags': [
+                    {'key': 'TestKey', 'value': 'TestValue'}]}]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('ec2')
+        ss_tags = client.describe_snapshots(
+            Filters=[{'Name': 'tag-key', 'Values': ['TestKey']}],
+            OwnerIds=['644160558196'])['Snapshots'][0]['Tags']
+        self.assertEqual(
+            [s['Value'] for s in ss_tags if s['Key'] == 'TestKey'],
+            ['TestValue'])
+
+    def test_ec2_snapshot_new_tag_date(self):
+        dt_now = datetime.now().replace(year=2018, month=3, day=13)
+        session_factory = self.replay_flight_data(
+            'test_ec2_snapshot_tag_date')
+        policy = self.load_policy({
+            'name': 'ec2-test-snapshot',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Name': 'c7n-ec2-test'},
+                {'tag:TestKey': 'absent'}],
+            'actions': [{
+                'type': 'snapshot',
+                'create-tags': [{'key': 'TestKey', 'days': 7}]}]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('ec2')
+        ss_tags = client.describe_snapshots(
+            Filters=[{'Name': 'tag-key', 'Values': ['TestKey']}],
+            OwnerIds=['644160558196'])['Snapshots'][0]['Tags']
+        self.assertEqual(
+            [s['Value'] for s in ss_tags if s['Key'] == 'TestKey'],
+            [(dt_now + timedelta(days=7)).strftime('%Y/%m/%d')])
+
 
 class TestSetInstanceProfile(BaseTest):
 

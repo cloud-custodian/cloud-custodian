@@ -22,6 +22,7 @@ import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
+from datetime import datetime, timedelta
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
@@ -1092,11 +1093,40 @@ class Snapshot(BaseAction):
             - type: snapshot
               copy-tags:
                 - Name
+              create-tags:
+                - key: newtag
+                  value: newvalue
+                - key: expire
+                  days: 7
     """
 
-    schema = type_schema(
-        'snapshot',
-        **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}}})
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['snapshot']},
+            'copy-tags': {
+                'type': 'array',
+                'items': {'type': 'string'}},
+            'create-tags': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'properties': {
+                        'key': {'type': 'string'},
+                        'value': {'type': 'string'},
+                        'days': {'type': 'integer', 'minimum': 1}
+                    },
+                    'required': ['key'],
+                    'oneOf': [
+                        {'required': ['value']},
+                        {'required': ['days']}
+                    ]
+                }
+            }
+        }
+    }
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def process(self, resources):
@@ -1140,6 +1170,15 @@ class Snapshot(BaseAction):
                 {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
                 {'Key': 'custodian_snapshot', 'Value': ''}
             ]
+            new_tags = self.data.get('create-tags', [])
+            for t in new_tags:
+                if t['key'] in tags:
+                    # tag already exists in tag set
+                    continue
+                if 'days' in t:
+                    t['value'] = (datetime.now() + timedelta(
+                        days=t['days'])).strftime('%Y/%m/%d')
+                tags.append({'Key': t['key'], 'Value': t['value']})
 
             copy_keys = self.data.get('copy-tags', [])
             copy_tags = []
