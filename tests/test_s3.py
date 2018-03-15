@@ -1230,6 +1230,77 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_has_policy_permission(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
+        ])
+        session_factory = self.replay_flight_data('test_s3_has_policy_permission')
+        bname = "custodian-policy-permission-test"
+        session = session_factory()
+        client = session.client('s3')
+        client.create_bucket(Bucket=bname)
+        self.addCleanup(destroyBucket, client, bname)
+        client.put_bucket_policy(
+            Bucket=bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17',
+                'Statement': [{
+                    'Sid': 'Wildcard',
+                    'Effect': 'Allow',
+                    'Principal': '*',
+                    'Action': 's3:Put*',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname}]}))
+        client.put_bucket_policy(
+            Bucket="%s-notaction" % bname,
+            Policy=json.dumps({
+                'Version': '2012-10-17',
+                'Statement': [{
+                    'Sid': 'WildcardNotAction',
+                    'Effect': 'Allow',
+                    'Principal': '*',
+                    'NotAction': 's3:Put*',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname}]}))
+        p = self.load_policy({
+            'name': 's3-has-policy-permission',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'has-policy-permission',
+                 'actions': ['s3:PutObject'],
+                 'principals': ['AWS:*']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], bname)
+
+    def test_has_policy_permission_notaction(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
+        ])
+        session_factory = self.replay_flight_data('test_s3_has_policy_permission')
+        bname = "custodian-policy-permission-test"
+        session = session_factory()
+        p = self.load_policy({
+            'name': 's3-has-policy-permission',
+            'resource': 's3',
+            'filters': [
+                {'Name': '%s-notaction' % bname},
+                {'type': 'has-policy-permission',
+                 'actions': ['s3:GetObject'],
+                 'principals': ['AWS:*']}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], '%s-notaction' % bname)
+
     def test_no_encryption_statement(self):
         self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
         self.patch(

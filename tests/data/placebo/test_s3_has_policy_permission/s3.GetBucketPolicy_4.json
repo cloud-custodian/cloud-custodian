@@ -1,0 +1,10 @@
+{    "status_code": 200, 
+    "data": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"WildcardNotAction\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"NotAction\":\"s3:Put*\",\"Resource\":\"arn:aws:s3:::custodian-policy-permission-test-notaction/*\"}]}", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "HostId": "jL1IZT8BmFaliIyAn7834ng9hk11JPgxBLJYNMg2IPtcu8A6MVtzs/Yz6FMO5IVe4exEBQIGvGg=", 
+            "RequestId": "2592899758274ED6"
+        }
+    }
+}

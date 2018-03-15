@@ -182,7 +182,7 @@ class PolicyPermissions(BaseTest):
                          'capacity-delta', 'is-ssl', 'global-grants',
                          'missing-policy-statement', 'missing-statement',
                          'healthcheck-protocol-mismatch', 'image-age',
-                         'has-statement', 'no-access',
+                         'has-statement', 'has-policy-permission', 'no-access',
                          'instance-age', 'ephemeral', 'instance-uptime'):
                     continue
                 qk = "%s.filters.%s" % (k, n)
