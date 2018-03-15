@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyRotationEnabled": true, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "618ac78b-2880-11e8-a1a6-69df904a38d0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "618ac78b-2880-11e8-a1a6-69df904a38d0", 
+                "content-length": "27", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
