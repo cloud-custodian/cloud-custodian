@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyMetadata": {
+            "Origin": "AWS_KMS", 
+            "KeyId": "a476e533-b970-4c74-a341-707420ecf59b", 
+            "Description": "test key for cmk rotation", 
+            "KeyManager": "CUSTOMER", 
+            "Enabled": true, 
+            "KeyUsage": "ENCRYPT_DECRYPT", 
+            "KeyState": "Enabled", 
+            "CreationDate": {
+                "hour": 14, 
+                "__class__": "datetime", 
+                "month": 3, 
+                "second": 6, 
+                "microsecond": 914000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 28
+            }, 
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b", 
+            "AWSAccountId": "644160558196"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5fe5070e-2880-11e8-a0fb-fbc3af4f1c98", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5fe5070e-2880-11e8-a0fb-fbc3af4f1c98", 
+                "content-length": "360", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
