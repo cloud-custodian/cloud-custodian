@@ -801,8 +801,8 @@ class HasPermissionFilter(Filter):
 
     Special considerations:
 
-    * Principals should be specified as "prefix:value" where prefix is one of AWS,
-      Federated, Service, etc.
+    * Principals should be specified as "prefix:value" where prefix an acceptable prefix from
+      https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html
     * Partial wildcards (e.g. s3:Put*) cannot be used in filter definition.
 
     :example:
@@ -866,8 +866,8 @@ class HasPermissionFilter(Filter):
             if statement.get('Effect', 'Allow').lower() == 'deny':
                 continue
 
-            matched_actions = self.__get_action_matches(statement, required_actions)
-            matched_principals = self.__get_principal_matches(statement, required_principals)
+            matched_actions = self._get_action_matches(statement, required_actions)
+            matched_principals = self._get_principal_matches(statement, required_principals)
 
             if ((len(required_actions) == 0 or matched_actions) and
                     (len(required_principals) == 0 or matched_principals)):
@@ -875,7 +875,7 @@ class HasPermissionFilter(Filter):
 
         return None
 
-    def __get_action_matches(self, statement, required_actions):
+    def _get_action_matches(self, statement, required_actions):
         matches = []
         if 'Action' in statement:
             actions = statement.get('Action')
@@ -903,11 +903,11 @@ class HasPermissionFilter(Filter):
 
         return list(set(matches))
 
-    def __get_principal_matches(self, statement, required_principals):
+    def _get_principal_matches(self, statement, required_principals):
         matches = []
         wildcard_regex = re.compile('[^:]+:\*')
         if 'Principal' in statement:
-            principals = self.__normalize_principals(statement.get('Principal'))
+            principals = self._normalize_principals(statement.get('Principal'))
             for principal in principals:
                 for required_principal in required_principals:
                     if principal == '*' and wildcard_regex.match(required_principal):
@@ -918,7 +918,7 @@ class HasPermissionFilter(Filter):
                         matches.append(required_principal)
 
         elif 'NotPrincipal' in statement:
-            not_principals = self.__normalize_principals(statement.get('NotPrincipal'))
+            not_principals = self._normalize_principals(statement.get('NotPrincipal'))
             matches.externd(required_principals)
             for not_principal in not_principals:
                 for required_principal in required_principals:
@@ -927,7 +927,7 @@ class HasPermissionFilter(Filter):
 
         return list(set(matches))
 
-    def __normalize_principals(self, principals):
+    def _normalize_principals(self, principals):
         if not principals:
             return []
 
