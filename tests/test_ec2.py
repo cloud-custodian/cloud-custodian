@@ -17,7 +17,7 @@ import logging
 import unittest
 import time
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import tz, zoneinfo
 from mock import mock
 from jsonschema.exceptions import ValidationError
@@ -547,6 +547,33 @@ class TestTag(BaseTest):
                 ]}, session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 3)
+
+    def test_ec2_multiple_tags(self):
+        localtz = zoneinfo.gettz('America/New_York')
+        dt = datetime.now(localtz).replace(year=2018, month=3, day=15)
+        session_factory = self.replay_flight_data('test_ec2_multiple_tags')
+        policy = self.load_policy({
+            'name': 'multiple-tags-ec2',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:Tag1': 'absent'},
+                {'tag:Date1': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'Tags': [
+                    {'Key': 'Tag1', 'Value': 'Val1'},
+                    {'Key': 'Date1', 'Days': 7}]
+            }]}, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('ec2')
+        ec2 = client.describe_instances(InstanceIds=['i-0445ec054b87bd8dd'])[
+            'Reservations'][0]['Instances'][0]
+        self.assertEqual(
+            [t['Value'] for t in ec2['Tags'] if t['Key'] == 'Tag1'], ['Val1'])
+        self.assertEqual(
+            [t['Value'] for t in ec2['Tags'] if t['Key'] == 'Date1'],
+            [(dt + timedelta(days=7)).strftime('%Y/%m/%d')])
 
     def test_ec2_mark_zero(self):
         localtz = zoneinfo.gettz('America/New_York')
