@@ -1196,7 +1196,7 @@ class S3Test(BaseTest):
                                 'AES256', 'aws:kms']}}},
                    {'Sid': 'Zebra2',
                     'Effect': 'Deny',
-                    'Principal': 'arn:aws:iam::086441151436:root',
+                    'Principal': 'arn:aws:iam::644160558196:root',
                     'Action': 's3:PutObject',
                     'Resource': 'arn:aws:s3:::%s/*' % bname}]}))
         p = self.load_policy({
