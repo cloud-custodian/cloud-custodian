@@ -11,13 +11,13 @@ setup(
         "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
-    author="Kapil Thangavelu",
-    author_email="kapil.foss@gmail.com",
+    maintainer="Kapil Thangavelu",
+    maintainer_email="kapil.foss@gmail.com",
     license="Apache-2.0",
     packages=find_packages(),
     entry_points={
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
             },
-    install_requires=["c7n", "click", "google-api-python-client", "ratelimiter", "retrying"]
+    install_requires=["c7n", "click", "azure"]
 )
