@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,48 +31,19 @@ References
 - IAM Policy Reference - http://goo.gl/U0a06y
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import fnmatch
+import logging
 import json
+
+import six
 
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
-from c7n.utils import get_account_id, local_session, type_schema
+from c7n.utils import type_schema
 
-
-class CrossAccountAccessFilter(Filter):
-    """Check a resource's embedded iam policy for cross account access.
-    """
-
-    schema = type_schema(
-        'cross-account',
-        whitelist_from=ValuesFrom.schema,
-        whitelist={'type': 'array', 'items': {'type': 'string'}})
-
-    policy_attribute = 'Policy'
-
-    def process(self, resources, event=None):
-        self.accounts = self.get_accounts()
-        return super(CrossAccountAccessFilter, self).process(resources, event)
-
-    def get_accounts(self):
-        owner_id = get_account_id(local_session(self.manager.session_factory))
-        accounts = set(self.data.get('whitelist', ()))
-        if 'whitelist_from' in self.data:
-            values = ValuesFrom(self.data['whitelist_from'], self.manager)
-            accounts = accounts.union(values.get_values())
-        accounts.add(owner_id)
-        return accounts
-
-    def get_resource_policy(self, r):
-        return r.get(self.policy_attribute, None)
-
-    def __call__(self, r):
-        p = self.get_resource_policy(r)
-        if p is None:
-            return False
-        violations = check_cross_account(p, self.accounts)
-        if violations:
-            r['CrossAccountViolations'] = violations
-            return True
+log = logging.getLogger('custodian.iamaccess')
 
 
 def _account(arn):
@@ -83,135 +54,269 @@ def _account(arn):
     return arn.split(':', 5)[4]
 
 
-def check_cross_account(policy_text, allowed_accounts):
-    """Find cross account access policy grant not explicitly allowed
+class PolicyChecker(object):
     """
-    if isinstance(policy_text, basestring):
-        policy = json.loads(policy_text)
-    else:
-        policy = policy_text
+    checker_config:
+      - check_actions: only check one of the specified actions
+      - everyone_only: only check for wildcard permission grants
+      - allowed_accounts: permission grants to these accounts are okay
+      - whitelist_conditions: a list of conditions that are considered
+            sufficient enough to whitelist the statement.
+    """
+    def __init__(self, checker_config):
+        self.checker_config = checker_config
 
-    violations = []
-    for s in policy['Statement']:
+    # Config properties
+    @property
+    def allowed_accounts(self):
+        return self.checker_config.get('allowed_accounts', ())
 
-        principal_ok = True
+    @property
+    def everyone_only(self):
+        return self.checker_config.get('everyone_only', False)
 
-        if s['Effect'] != 'Allow':
-            continue
+    @property
+    def check_actions(self):
+        return self.checker_config.get('check_actions', ())
 
-        # Highly suspect in an allow
+    @property
+    def whitelist_conditions(self):
+        return self.checker_config.get('whitelist_conditions', ())
+
+    @property
+    def allowed_vpce(self):
+        return self.checker_config.get('allowed_vpce', ())
+
+    @property
+    def allowed_vpc(self):
+        return self.checker_config.get('allowed_vpc', ())
+
+    # Policy statement handling
+    def check(self, policy_text):
+        if isinstance(policy_text, six.string_types):
+            policy = json.loads(policy_text)
+        else:
+            policy = policy_text
+
+        violations = []
+        for s in policy.get('Statement', ()):
+            if self.handle_statement(s):
+                violations.append(s)
+        return violations
+
+    def handle_statement(self, s):
+        if (all((self.handle_principal(s),
+                 self.handle_effect(s),
+                 self.handle_action(s))) and not self.handle_conditions(s)):
+            return s
+
+    def handle_action(self, s):
+        if self.check_actions:
+            actions = s.get('Action')
+            actions = isinstance(actions, six.string_types) and (actions,) or actions
+            for a in actions:
+                if fnmatch.filter(self.check_actions, a):
+                    return True
+            return False
+        return True
+
+    def handle_effect(self, s):
+        if s['Effect'] == 'Allow':
+            return True
+
+    def handle_principal(self, s):
         if 'NotPrincipal' in s:
-            violations.append(s)
-            continue
-        # Does this wildcard
+            return True
         if 'Principal' not in s:
-            violations.append(s)
-            continue
-
-        # Skip relays for events to sns
+            return True
+        # Skip service principals
         if 'Service' in s['Principal']:
             s['Principal'].pop('Service')
             if not s['Principal']:
-                continue
+                return False
 
         assert len(s['Principal']) == 1, "Too many principals %s" % s
 
-        # At this point principal is required?
-        p = (
-            isinstance(s['Principal'], basestring) and s['Principal']
-            or s['Principal']['AWS'])
+        if isinstance(s['Principal'], six.string_types):
+            p = s['Principal']
+        else:
+            p = s['Principal']['AWS']
 
-        p = isinstance(p, basestring) and (p,) or p
+        principal_ok = True
+        p = isinstance(p, six.string_types) and (p,) or p
         for pid in p:
             if pid == '*':
                 principal_ok = False
+            elif self.everyone_only:
+                continue
             elif pid.startswith('arn:aws:iam::cloudfront:user'):
                 continue
             else:
                 account_id = _account(pid)
-                if account_id not in allowed_accounts:
+                if account_id not in self.allowed_accounts:
                     principal_ok = False
+        return not principal_ok
 
-        if principal_ok:
-            continue
+    def handle_conditions(self, s):
+        conditions = self.normalize_conditions(s)
+        if not conditions:
+            return False
 
+        results = []
+        for c in conditions:
+            results.append(self.handle_condition(s, c))
+
+        return all(results)
+
+    def handle_condition(self, s, c):
+        if not c['op']:
+            return False
+        if c['key'] in self.whitelist_conditions:
+            return True
+        handler_name = "handle_%s" % c['key'].replace('-', '_').replace(':', '_')
+        handler = getattr(self, handler_name, None)
+        if handler is None:
+            log.warning("no handler:%s op:%s key:%s values:%s" % (
+                handler_name, c['op'], c['key'], c['values']))
+            return
+        return not handler(s, c)
+
+    def normalize_conditions(self, s):
+        s_cond = []
         if 'Condition' not in s:
-            violations.append(s)
-            continue
+            return s_cond
 
-        if 'StringEquals' in s['Condition']:
-            # Default SNS Policy does this
-            if 'AWS:SourceOwner' in s['Condition']['StringEquals']:
-                so = s['Condition']['StringEquals']['AWS:SourceOwner']
-                if not isinstance(so, list):
-                    so = [so]
-                so = [pso for pso in so if pso not in allowed_accounts]
-                if not so:
-                    principal_ok = True
+        conditions = (
+            'StringEquals',
+            'StringEqualsIgnoreCase',
+            'StringLike',
+            'ArnEquals',
+            'ArnLike',
+            'IpAddress',
+            'NotIpAddress')
+        set_conditions = ('ForAllValues', 'ForAnyValues')
 
-            # Default keys in kms do this
-            if 'kms:CallerAccount' in s['Condition']['StringEquals']:
-                so = s['Condition']['StringEquals']['kms:CallerAccount']
-                if so in allowed_accounts:
-                    principal_ok = True
+        for s_cond_op in list(s['Condition'].keys()):
+            cond = {'op': s_cond_op}
 
-        ## BEGIN S3 WhiteList
-        ## Note these are transient white lists for s3
-        ## we need to refactor this to verify ip against a
-        ## cidr white list, and verify vpce/vpc against the
-        ## accounts.
+            if s_cond_op not in conditions:
+                if not any(s_cond_op.startswith(c) for c in set_conditions):
+                    continue
 
-            # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition']['StringEquals'].keys()[0] in (
-                    "aws:sourceVpce", "aws:sourceVpce"):
-                principal_ok = True
+            cond['key'] = list(s['Condition'][s_cond_op].keys())[0]
+            cond['values'] = s['Condition'][s_cond_op][cond['key']]
+            cond['values'] = (
+                isinstance(cond['values'],
+                           six.string_types) and (cond['values'],) or cond['values'])
+            cond['key'] = cond['key'].lower()
+            s_cond.append(cond)
 
-        if 'StringLike' in s['Condition']:
-            # For now allow vpce/vpc conditions as sufficient on s3
-            if s['Condition'][
-                    'StringLike'].keys()[0].lower() == "aws:sourcevpce":
-                principal_ok = True
+        return s_cond
 
-        if 'ForAnyValue:StringLike' in s['Condition']:
-            if s['Condition']['ForAnyValue:StringLike'].keys()[
-                    0].lower() == 'aws:sourcevpce':
-                principal_ok = True
+    # Condition handlers
 
-        if 'IpAddress' in s['Condition']:
-            principal_ok = True
+    # kms specific
+    def handle_kms_calleraccount(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
-        ## END S3 WhiteList
+    # sns default policy
+    def handle_aws_sourceowner(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
-        if 'ArnEquals' in s['Condition']:
-            # Other valid arn equals? / are invalids allowed?
-            # duplicate block from below, inline closure func
-            # would remove, but slower, else move to class eval
-            principal_ok = True
+    # s3 logging
+    def handle_aws_sourcearn(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
-            keys = ('aws:SourceArn', 'AWS:SourceArn')
-            for k in keys:
-                if k in s['Condition']['ArnEquals']:
-                    v = s['Condition']['ArnEquals'][k]
-            if v is None:
-                violations.append(s)
-            else:
-                v = isinstance(v, basestring) and (v,) or v
-                for arn in v:
-                    aid = _account(arn)
-                    if aid not in allowed_accounts:
-                        violations.append(s)
-        if 'ArnLike' in s['Condition']:
-            # Other valid arn equals? / are invalids allowed?
-            for k in ('aws:SourceArn', 'AWS:SourceArn'):
-                v = s['Condition']['ArnLike'].get(k)
-                if v:
-                    break
-            v = isinstance(v, basestring) and (v,) or v
-            principal_ok = True
-            for arn in v:
-                aid = _account(arn)
-                if aid not in allowed_accounts:
-                    violations.append(s)
-        if not principal_ok:
-            violations.append(s)
-    return violations
+    def handle_aws_sourceip(self, s, c):
+        return False
+
+    def handle_aws_sourcevpce(self, s, c):
+        if not self.allowed_vpce:
+            return False
+        return bool(set(map(_account, c['values'])).difference(self.allowed_vpce))
+
+    def handle_aws_sourcevpc(self, s, c):
+        if not self.allowed_vpc:
+            return False
+        return bool(set(map(_account, c['values'])).difference(self.allowed_vpc))
+
+
+class CrossAccountAccessFilter(Filter):
+    """Check a resource's embedded iam policy for cross account access.
+    """
+
+    schema = type_schema(
+        'cross-account',
+        # only consider policies that grant one of the given actions.
+        actions={'type': 'array', 'items': {'type': 'string'}},
+        # only consider policies which grant to *
+        everyone_only={'type': 'boolean'},
+        # disregard statements using these conditions.
+        whitelist_conditions={'type': 'array', 'items': {'type': 'string'}},
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_vpce_from=ValuesFrom.schema,
+        whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_vpc_from=ValuesFrom.schema,
+        whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
+
+    policy_attribute = 'Policy'
+    annotation_key = 'CrossAccountViolations'
+
+    checker_factory = PolicyChecker
+
+    def process(self, resources, event=None):
+        self.everyone_only = self.data.get('everyone_only', False)
+        self.conditions = set(self.data.get(
+            'whitelist_conditions',
+            ("aws:userid", "aws:username")))
+        self.actions = self.data.get('actions', ())
+        self.accounts = self.get_accounts()
+        self.vpcs = self.get_vpcs()
+        self.vpces = self.get_vpces()
+        self.checker_config = getattr(self, 'checker_config', None) or {}
+        self.checker_config.update(
+            {'allowed_accounts': self.accounts,
+             'allowed_vpc': self.vpcs,
+             'allowed_vpce': self.vpces,
+             'check_actions': self.actions,
+             'everyone_only': self.everyone_only,
+             'whitelist_conditions': self.conditions})
+        self.checker = self.checker_factory(self.checker_config)
+        return super(CrossAccountAccessFilter, self).process(resources, event)
+
+    def get_accounts(self):
+        owner_id = self.manager.config.account_id
+        accounts = set(self.data.get('whitelist', ()))
+        if 'whitelist_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_from'], self.manager)
+            accounts = accounts.union(values.get_values())
+        accounts.add(owner_id)
+        return accounts
+
+    def get_vpcs(self):
+        vpc = set(self.data.get('whitelist_vpc', ()))
+        if 'whitelist_vpc_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_vpc_from'], self.manager)
+            vpc = vpc.union(values.get_values())
+        return vpc
+
+    def get_vpces(self):
+        vpce = set(self.data.get('whitelist_vpce', ()))
+        if 'whitelist_vpce_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_vpce_from'], self.manager)
+            vpce = vpce.union(values.get_values())
+        return vpce
+
+    def get_resource_policy(self, r):
+        return r.get(self.policy_attribute, None)
+
+    def __call__(self, r):
+        p = self.get_resource_policy(r)
+        if p is None:
+            return False
+        violations = self.checker.check(p)
+        if violations:
+            r[self.annotation_key] = violations
+            return True

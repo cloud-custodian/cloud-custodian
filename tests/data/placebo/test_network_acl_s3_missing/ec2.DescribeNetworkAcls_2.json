@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "NetworkAcls": [
+            {
+                "Associations": [], 
+                "NetworkAclId": "acl-6c9db915", 
+                "VpcId": "vpc-cc5ae4b5", 
+                "Tags": [], 
+                "Entries": [
+                    {
+                        "RuleNumber": 32767, 
+                        "Protocol": "-1", 
+                        "Egress": true, 
+                        "CidrBlock": "0.0.0.0/0", 
+                        "RuleAction": "deny"
+                    }, 
+                    {
+                        "RuleNumber": 100, 
+                        "Protocol": "-1", 
+                        "Egress": false, 
+                        "CidrBlock": "0.0.0.0/0", 
+                        "RuleAction": "allow"
+                    }, 
+                    {
+                        "RuleNumber": 32767, 
+                        "Protocol": "-1", 
+                        "Egress": false, 
+                        "CidrBlock": "0.0.0.0/0", 
+                        "RuleAction": "deny"
+                    }
+                ], 
+                "IsDefault": true
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4a50d1d6-9bf4-487e-b722-1d10cb303060", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 26 Jun 2017 18:49:42 GMT"
+            }
+        }
+    }
+}

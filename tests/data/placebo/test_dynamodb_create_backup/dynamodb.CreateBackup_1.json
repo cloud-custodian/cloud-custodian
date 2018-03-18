@@ -1,0 +1,34 @@
+{
+    "status_code": 200, 
+    "data": {
+        "BackupDetails": {
+            "BackupCreationDateTime": {
+                "hour": 19, 
+                "__class__": "datetime", 
+                "month": 1, 
+                "second": 2, 
+                "microsecond": 9000, 
+                "year": 2018, 
+                "day": 16, 
+                "minute": 39
+            }, 
+            "BackupArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup/backup/01516149542009-0bbfb894", 
+            "BackupStatus": "CREATING", 
+            "BackupName": "Backup-c7n-dynamodb-backup-2018-01-16-19-39"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "C2DI00CD4O0A1FG2Q17NF3RL33VV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "C2DI00CD4O0A1FG2Q17NF3RL33VV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "257", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "1175837975", 
+                "date": "Wed, 17 Jan 2018 00:39:01 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}

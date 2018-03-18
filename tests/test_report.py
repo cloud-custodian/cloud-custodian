@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import unittest
 
 from dateutil.parser import parse as date_parse
 
 from c7n.policy import Policy
 from c7n.reports.csvout import Formatter
-from common import Config, load_data
+from .common import Config, load_data
 
 
 EC2_POLICY = Policy(
@@ -34,6 +36,13 @@ ASG_POLICY = Policy(
     },
     Config.empty(),
 )
+ELB_POLICY = Policy(
+    {
+        'name': 'report-test-elb',
+        'resource': 'elb',
+    },
+    Config.empty(),
+)
 
 
 class TestEC2Report(unittest.TestCase):
@@ -44,7 +53,7 @@ class TestEC2Report(unittest.TestCase):
         self.rows = data['ec2']['rows']
 
     def test_csv(self):
-        formatter = Formatter(EC2_POLICY.resource_manager)
+        formatter = Formatter(EC2_POLICY.resource_manager.resource_type)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
@@ -52,8 +61,8 @@ class TestEC2Report(unittest.TestCase):
             (['full', 'duplicate', 'minimal'], ['full', 'minimal']),
         ]
         for rec_ids, row_ids in tests:
-            recs = map(lambda x: self.records[x], rec_ids)
-            rows = map(lambda x: self.rows[x], row_ids)
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
             self.assertEqual(formatter.to_csv(recs), rows)
 
     def test_custom_fields(self):
@@ -66,7 +75,7 @@ class TestEC2Report(unittest.TestCase):
 
         # First do a test with adding custom fields to the normal ones
         formatter = Formatter(
-            EC2_POLICY.resource_manager,
+            EC2_POLICY.resource_manager.resource_type,
             extra_fields=extra_fields,
         )
         recs = [self.records['full']]
@@ -75,9 +84,9 @@ class TestEC2Report(unittest.TestCase):
 
         # Then do a test with only having custom fields
         formatter = Formatter(
-            EC2_POLICY.resource_manager,
+            EC2_POLICY.resource_manager.resource_type,
             extra_fields=extra_fields,
-            no_default_fields=True,
+            include_default_fields=False,
         )
         recs = [self.records['full']]
         rows = [self.rows['minimal_custom']]
@@ -92,13 +101,54 @@ class TestASGReport(unittest.TestCase):
         self.rows = data['asg']['rows']
 
     def test_csv(self):
-        formatter = Formatter(ASG_POLICY.resource_manager)
+        formatter = Formatter(ASG_POLICY.resource_manager.resource_type)
         tests = [
             (['full'], ['full']),
             (['minimal'], ['minimal']),
             (['full', 'minimal'], ['full', 'minimal']),
             (['full', 'duplicate', 'minimal'], ['full', 'minimal'])]
         for rec_ids, row_ids in tests:
-            recs = map(lambda x: self.records[x], rec_ids)
-            rows = map(lambda x: self.rows[x], row_ids)
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
+            self.assertEqual(formatter.to_csv(recs), rows)
+
+
+class TestELBReport(unittest.TestCase):
+    def setUp(self):
+        data = load_data('report.json')
+        self.records = data['elb']['records']
+        self.headers = data['elb']['headers']
+        self.rows = data['elb']['rows']
+
+    def test_csv(self):
+        formatter = Formatter(ELB_POLICY.resource_manager.resource_type)
+        tests = [
+            (['full'], ['full']),
+            (['minimal'], ['minimal']),
+            (['full', 'minimal'], ['full', 'minimal']),
+            (['full', 'duplicate', 'minimal'], ['full', 'minimal'])]
+        for rec_ids, row_ids in tests:
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
+            self.assertEqual(formatter.to_csv(recs), rows)
+
+
+class TestMultiReport(unittest.TestCase):
+
+    def setUp(self):
+        data = load_data('report.json')
+        self.records = data['ec2']['records']
+        self.headers = data['ec2']['headers']
+        self.rows = data['ec2']['rows']
+
+    def test_csv(self):
+        # Test the extra headers for multi-policy
+        formatter = Formatter(EC2_POLICY.resource_manager.resource_type,
+                              include_region=True, include_policy=True)
+        tests = [
+            (['minimal'], ['minimal_multipolicy']),
+        ]
+        for rec_ids, row_ids in tests:
+            recs = list(map(lambda x: self.records[x], rec_ids))
+            rows = list(map(lambda x: self.rows[x], row_ids))
             self.assertEqual(formatter.to_csv(recs), rows)

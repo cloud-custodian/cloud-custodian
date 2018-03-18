@@ -1,0 +1,222 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:f5fefcf9-47da-41c9-b032-1e551c6c6fd9:launchConfigurationName/c7n-launchconfig-01", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 37, 
+                    "microsecond": 490000, 
+                    "year": 2016, 
+                    "day": 10, 
+                    "minute": 55
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-6c7fa917"
+                ], 
+                "LaunchConfigurationName": "c7n-launchconfig-01", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-b73b63a0", 
+                "InstanceType": "t2.micro", 
+                "AssociatePublicIpAddress": false
+            }, 
+            {
+                "UserData": "", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:4b2500da-4b48-4318-817f-dfc04eee1318:launchConfigurationName/c7n-launchconfig-test-fail-01", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 31, 
+                    "microsecond": 736000, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 9
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-04eef27e"
+                ], 
+                "LaunchConfigurationName": "c7n-launchconfig-test-fail-01", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-b73b63a0", 
+                "InstanceType": "t2.micro", 
+                "AssociatePublicIpAddress": false
+            }, 
+            {
+                "UserData": "", 
+                "IamInstanceProfile": "CloudCustodianRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:2aeeb230-2482-4abc-8f5e-bab45fec5ef1:launchConfigurationName/dev-cluster", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 7, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 12, 
+                    "microsecond": 590000, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 44
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "SnapshotId": "snap-0cfc17b071e696816", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "sonny", 
+                "SecurityGroups": [
+                    "sg-c63712b4"
+                ], 
+                "LaunchConfigurationName": "dev-cluster", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-cd0f5cb6", 
+                "InstanceType": "t2.micro"
+            }, 
+            {
+                "UserData": "", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:c27ada55-9bc6-4444-ab8c-c3b01d57dfd5:launchConfigurationName/foo-bar ", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 56, 
+                    "microsecond": 885000, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 13
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "calvin-east-1", 
+                "SecurityGroups": [
+                    "sg-0b3d3377"
+                ], 
+                "LaunchConfigurationName": "foo-bar ", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-0b33d91d", 
+                "InstanceType": "t2.micro"
+            }, 
+            {
+                "UserData": "", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:7134ab7e-c1af-4711-bc2d-69351fbf2a24:launchConfigurationName/scot-test2", 
+                "InstanceMonitoring": {
+                    "Enabled": false
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 10, 
+                    "microsecond": 756000, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 26
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "Ebs": {
+                            "DeleteOnTermination": false, 
+                            "SnapshotId": "snap-5d72a050 ", 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "VolumeSize": 8, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "calvin-east-1", 
+                "SecurityGroups": [
+                    "sg-deafbda2"
+                ], 
+                "LaunchConfigurationName": "scot-test2", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-0b33d91d", 
+                "InstanceType": "t2.micro"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d861263a-be17-11e7-a049-697ce7b086e0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d861263a-be17-11e7-a049-697ce7b086e0", 
+                "vary": "Accept-Encoding", 
+                "content-length": "6656", 
+                "content-type": "text/xml", 
+                "date": "Tue, 31 Oct 2017 08:45:27 GMT"
+            }
+        }
+    }
+}

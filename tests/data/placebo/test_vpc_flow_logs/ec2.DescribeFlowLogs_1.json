@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "FlowLogs": [
+            {
+                "ResourceId": "vpc-d2d616b5", 
+                "CreationTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 52
+                }, 
+                "LogGroupName": "flow-logs", 
+                "TrafficType": "ALL", 
+                "FlowLogStatus": "ACTIVE", 
+                "FlowLogId": "fl-a41befcd", 
+                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/CloudCustodianRole", 
+                "DeliverLogsErrorMessage": "Access error"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "775085c6-a7bc-4925-b877-03ff1a8e4b70", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 26 Jun 2017 18:27:39 GMT"
+            }
+        }
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Domains": [
+            {
+                "TransferLock": false, 
+                "AutoRenew": true, 
+                "Expiry": {
+                    "hour": 12,
+                    "__class__": "datetime", 
+                    "month": 8,
+                    "second": 41, 
+                    "microsecond": 0, 
+                    "year": 2020,
+                    "day": 18,
+                    "minute": 36
+                }, 
+                "DomainName": "genericdomain.com"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4bf08177-1bdf-11e8-abc0-69c02ad78dc6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4bf08177-1bdf-11e8-abc0-69c02ad78dc6", 
+                "date": "Tue, 27 Feb 2018 16:57:30 GMT", 
+                "content-length": "108", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

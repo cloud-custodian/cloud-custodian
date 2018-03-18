@@ -1,0 +1,17 @@
+policies:
+
+ - name: ec2-guard-remediate
+   resource: ec2
+   mode:
+     role: arn:aws:iam::{account_id}:role/CustodianPolicyExecution
+     type: guard-duty
+   actions:
+     - stop
+
+ - name: iam-guard-remediate
+   resource: iam-user
+   mode:
+     role: arn:aws:iam::{account_id}:role/CustodianPolicyExecution
+     type: guard-duty
+   actions:
+     - remove-keys

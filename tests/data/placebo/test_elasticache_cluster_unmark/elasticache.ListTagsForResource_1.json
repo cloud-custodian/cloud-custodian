@@ -2,28 +2,16 @@
     "status_code": 200, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "deab54a0-7512-11e6-8c33-e95c27c07d8a", 
+            "RequestId": "c0857b7d-5884-11e7-8486-bd266f2dd683", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "deab54a0-7512-11e6-8c33-e95c27c07d8a", 
-                "date": "Wed, 07 Sep 2016 15:50:58 GMT", 
-                "content-length": "461", 
+                "x-amzn-requestid": "c0857b7d-5884-11e7-8486-bd266f2dd683", 
+                "date": "Sat, 24 Jun 2017 02:28:04 GMT", 
+                "content-length": "301", 
                 "content-type": "text/xml"
             }
         }, 
-        "TagList": [
-            {
-                "Value": "V1", 
-                "Key": "K1"
-            }, 
-            {
-                "Value": "V2", 
-                "Key": "K2"
-            }, 
-            {
-                "Value": "maid_status", 
-                "Key": "Resource does not meet policy: delete@2002/02/02"
-            }
-        ]
+        "TagList": []
     }
 }

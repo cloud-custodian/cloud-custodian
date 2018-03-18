@@ -8,58 +8,6 @@
         "Buckets": [
             {
                 "CreationDate": {
-                    "hour": 19, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 4, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 16, 
-                    "minute": 34
-                }, 
-                "Name": "c7n-test"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 52, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 14, 
-                    "minute": 7
-                }, 
-                "Name": "c7n-test-front"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 20, 
-                    "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 57, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 7, 
-                    "minute": 8
-                }, 
-                "Name": "calvin-encryption-test"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 18, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 15, 
-                    "minute": 0
-                }, 
-                "Name": "cf-templates-9c4kee3xbart-us-west-2"
-            }, 
-            {
-                "CreationDate": {
                     "hour": 10, 
                     "__class__": "datetime", 
                     "month": 7, 
@@ -73,29 +21,29 @@
             }, 
             {
                 "CreationDate": {
-                    "hour": 14, 
+                    "hour": 0, 
                     "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 30, 
+                    "month": 5, 
+                    "second": 3, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 11, 
-                    "minute": 56
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 35
                 }, 
-                "Name": "custodian-demo"
+                "Name": "custodian-encrypt-test"
             }, 
             {
                 "CreationDate": {
-                    "hour": 23, 
+                    "hour": 19, 
                     "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 2, 
+                    "month": 4, 
+                    "second": 38, 
                     "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 20, 
-                    "minute": 33
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 14
                 }, 
-                "Name": "custodian-encrypt-test"
+                "Name": "custodian-log-archive"
             }, 
             {
                 "CreationDate": {
@@ -122,45 +70,19 @@
                     "minute": 50
                 }, 
                 "Name": "custodian-skunk-trails"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 12, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 45, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 5, 
-                    "minute": 31
-                }, 
-                "Name": "scot-test"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 10, 
-                    "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 14, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 20, 
-                    "minute": 35
-                }, 
-                "Name": "sphere11-dev"
             }
         ], 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "Cc5ADB67mvUyL3YdPcst9/GI/Q4rdCpL4IUE1+UjWEkjhVT4zgk5cgEOB20q9XrDpXmMZniAkoU=", 
-            "RequestId": "7B586B36C7D70145", 
+            "HostId": "pb91IBPFSSsST9hFBXglcbXszNO9KSBKMGy/iCBc80ZEUWA8EL9gk96mpDsn9n0YTkz4lVqmQZ8=", 
+            "RequestId": "424FEDAA2CD6A92A", 
             "HTTPHeaders": {
-                "x-amz-id-2": "Cc5ADB67mvUyL3YdPcst9/GI/Q4rdCpL4IUE1+UjWEkjhVT4zgk5cgEOB20q9XrDpXmMZniAkoU=", 
+                "x-amz-id-2": "pb91IBPFSSsST9hFBXglcbXszNO9KSBKMGy/iCBc80ZEUWA8EL9gk96mpDsn9n0YTkz4lVqmQZ8=", 
                 "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "7B586B36C7D70145", 
-                "date": "Tue, 20 Dec 2016 23:33:04 GMT", 
+                "x-amz-request-id": "424FEDAA2CD6A92A", 
+                "date": "Mon, 29 May 2017 00:35:04 GMT", 
                 "content-type": "application/xml"
             }
         }

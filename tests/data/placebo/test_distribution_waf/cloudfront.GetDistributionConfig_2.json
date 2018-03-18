@@ -1,0 +1,169 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ETag": "E1EVXEPYWN6Q0Y", 
+        "DistributionConfig": {
+            "Comment": "", 
+            "CacheBehaviors": {
+                "Items": [
+                    {
+                        "TrustedSigners": {
+                            "Enabled": false, 
+                            "Quantity": 0
+                        }, 
+                        "LambdaFunctionAssociations": {
+                            "Quantity": 0
+                        }, 
+                        "TargetOriginId": "Custom-google.com", 
+                        "ViewerProtocolPolicy": "allow-all", 
+                        "ForwardedValues": {
+                            "Headers": {
+                                "Quantity": 0
+                            }, 
+                            "Cookies": {
+                                "Forward": "none"
+                            }, 
+                            "QueryStringCacheKeys": {
+                                "Quantity": 0
+                            }, 
+                            "QueryString": false
+                        }, 
+                        "MaxTTL": 31536000, 
+                        "PathPattern": "sadf", 
+                        "SmoothStreaming": false, 
+                        "DefaultTTL": 86400, 
+                        "AllowedMethods": {
+                            "Items": [
+                                "HEAD", 
+                                "GET"
+                            ], 
+                            "CachedMethods": {
+                                "Items": [
+                                    "HEAD", 
+                                    "GET"
+                                ], 
+                                "Quantity": 2
+                            }, 
+                            "Quantity": 2
+                        }, 
+                        "MinTTL": 0, 
+                        "Compress": false
+                    }
+                ], 
+                "Quantity": 1
+            }, 
+            "IsIPV6Enabled": true, 
+            "Logging": {
+                "Bucket": "", 
+                "Prefix": "", 
+                "Enabled": false, 
+                "IncludeCookies": false
+            }, 
+            "WebACLId": "", 
+            "Origins": {
+                "Items": [
+                    {
+                        "OriginPath": "", 
+                        "CustomOriginConfig": {
+                            "OriginSslProtocols": {
+                                "Items": [
+                                    "TLSv1.1", 
+                                    "TLSv1.2"
+                                ], 
+                                "Quantity": 2
+                            }, 
+                            "OriginProtocolPolicy": "http-only", 
+                            "OriginReadTimeout": 30, 
+                            "HTTPPort": 80, 
+                            "HTTPSPort": 443, 
+                            "OriginKeepaliveTimeout": 5
+                        }, 
+                        "CustomHeaders": {
+                            "Quantity": 0
+                        }, 
+                        "Id": "Custom-google.com", 
+                        "DomainName": "google.com"
+                    }
+                ], 
+                "Quantity": 1
+            }, 
+            "DefaultRootObject": "", 
+            "PriceClass": "PriceClass_All", 
+            "Enabled": true, 
+            "DefaultCacheBehavior": {
+                "TrustedSigners": {
+                    "Enabled": false, 
+                    "Quantity": 0
+                }, 
+                "LambdaFunctionAssociations": {
+                    "Quantity": 0
+                }, 
+                "TargetOriginId": "Custom-google.com", 
+                "ViewerProtocolPolicy": "https-only", 
+                "ForwardedValues": {
+                    "Headers": {
+                        "Quantity": 0
+                    }, 
+                    "Cookies": {
+                        "Forward": "none"
+                    }, 
+                    "QueryStringCacheKeys": {
+                        "Quantity": 0
+                    }, 
+                    "QueryString": false
+                }, 
+                "MaxTTL": 31536000, 
+                "SmoothStreaming": false, 
+                "DefaultTTL": 86400, 
+                "AllowedMethods": {
+                    "Items": [
+                        "HEAD", 
+                        "GET"
+                    ], 
+                    "CachedMethods": {
+                        "Items": [
+                            "HEAD", 
+                            "GET"
+                        ], 
+                        "Quantity": 2
+                    }, 
+                    "Quantity": 2
+                }, 
+                "MinTTL": 0, 
+                "Compress": false
+            }, 
+            "CallerReference": "1504899429750", 
+            "ViewerCertificate": {
+                "CloudFrontDefaultCertificate": true, 
+                "MinimumProtocolVersion": "TLSv1", 
+                "CertificateSource": "cloudfront"
+            }, 
+            "CustomErrorResponses": {
+                "Quantity": 0
+            }, 
+            "HttpVersion": "http2", 
+            "Restrictions": {
+                "GeoRestriction": {
+                    "RestrictionType": "none", 
+                    "Quantity": 0
+                }
+            }, 
+            "Aliases": {
+                "Quantity": 0
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "07a6019f-a9c9-11e7-82fd-ed12cccaa8d8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "07a6019f-a9c9-11e7-82fd-ed12cccaa8d8", 
+                "content-length": "3375", 
+                "vary": "Accept-Encoding", 
+                "etag": "E1EVXEPYWN6Q0Y", 
+                "date": "Thu, 05 Oct 2017 12:30:53 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

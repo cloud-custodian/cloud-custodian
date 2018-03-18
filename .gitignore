@@ -1,5 +1,7 @@
 *.pyc
 *.egg-info/
+*.swp
+src/
 deps/
 include/
 lib/
@@ -9,7 +11,7 @@ man/
 lib64
 .Python
 pip-selfcheck.json
-cover/
+coverage/
 .coverage
 tmp/
 docs/source/generated/
@@ -20,3 +22,7 @@ local/
 *~
 share/
 out/
+.DS_STORE
+.tox/
+results.xml
+.idea/

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,23 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
 import itertools
+import operator
 import zlib
+
+import jmespath
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 import c7n.filters.vpc as net_filters
+from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
-from c7n.query import QueryResourceManager
+from c7n.filters.locked import Locked
+from c7n import query
 from c7n.manager import resources
-from c7n.utils import local_session, type_schema, get_retry, camelResource
+from c7n.utils import (
+    chunks, local_session, type_schema, get_retry, parse_cidr)
 
 
 @resources.register('vpc')
-class Vpc(QueryResourceManager):
+class Vpc(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -42,8 +48,201 @@ class Vpc(QueryResourceManager):
         id_prefix = "vpc-"
 
 
+@Vpc.filter_registry.register('flow-logs')
+class FlowLogFilter(Filter):
+    """Are flow logs enabled on the resource.
+
+    ie to find all vpcs with flows logs disabled we can do this
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: flow-logs-enabled
+                resource: vpc
+                filters:
+                  - flow-logs
+
+    or to find all vpcs with flow logs but that don't match a
+    particular configuration.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: flow-mis-configured
+                resource: vpc
+                filters:
+                  - not:
+                    - type: flow-logs
+                      enabled: true
+                      set-op: or
+                      op: equal
+                      # equality operator applies to following keys
+                      traffic-type: all
+                      status: active
+                      log-group: vpc-logs
+
+    """
+
+    schema = type_schema(
+        'flow-logs',
+        **{'enabled': {'type': 'boolean', 'default': False},
+           'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
+           'set-op': {'enum': ['or', 'and'], 'default': 'or'},
+           'status': {'enum': ['active']},
+           'traffic-type': {'enum': ['accept', 'reject', 'all']},
+           'log-group': {'type': 'string'}})
+
+    permissions = ('ec2:DescribeFlowLogs',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        # TODO given subnet/nic level logs, we should paginate, but we'll
+        # need to add/update botocore pagination support.
+        logs = client.describe_flow_logs().get('FlowLogs', ())
+
+        m = self.manager.get_model()
+        resource_map = {}
+
+        for fl in logs:
+            resource_map.setdefault(fl['ResourceId'], []).append(fl)
+
+        enabled = self.data.get('enabled', False)
+        log_group = self.data.get('log-group')
+        traffic_type = self.data.get('traffic-type')
+        status = self.data.get('status')
+        op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
+        set_op = self.data.get('set-op', 'or')
+
+        results = []
+        # looping over vpc resources
+        for r in resources:
+
+            if r[m.id] not in resource_map:
+                # we didn't find a flow log for this vpc
+                if enabled:
+                    # vpc flow logs not enabled so exclude this vpc from results
+                    continue
+                results.append(r)
+                continue
+            flogs = resource_map[r[m.id]]
+            r['c7n:flow-logs'] = flogs
+
+            # config comparisons are pointless if we only want vpcs with no flow logs
+            if enabled:
+                fl_matches = []
+                for fl in flogs:
+                    status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
+                    traffic_type_match = (
+                        traffic_type is None) or op(
+                        fl['TrafficType'],
+                        traffic_type.upper())
+                    log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
+
+                    # combine all conditions to check if flow log matches the spec
+                    fl_match = status_match and traffic_type_match and log_group_match
+                    fl_matches.append(fl_match)
+
+                if set_op == 'or':
+                    if any(fl_matches):
+                        results.append(r)
+                elif set_op == 'and':
+                    if all(fl_matches):
+                        results.append(r)
+
+        return results
+
+
+@Vpc.filter_registry.register('security-group')
+class VpcSecurityGroupFilter(RelatedResourceFilter):
+    """Filter VPCs based on Security Group attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: security-group
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'security-group', rinherit=ValueFilter.schema,
+        **{'match-resource':{'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.SecurityGroup"
+    RelatedIdsExpression = '[SecurityGroups][].GroupId'
+    AnnotationKey = "matched-vpcs"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_group_ids = {
+            g['GroupId'] for g in
+            self.manager.get_resource_manager('security-group').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        return vpc_group_ids
+
+
+@Vpc.filter_registry.register('vpc-attributes')
+class AttributesFilter(Filter):
+    """Filters VPCs based on their DNS attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dns-hostname-enabled
+                resource: vpc
+                filters:
+                  - type: vpc-attributes
+                    dnshostnames: True
+    """
+    schema = type_schema(
+        'vpc-attributes',
+        dnshostnames={'type': 'boolean'},
+        dnssupport={'type': 'boolean'})
+    permissions = ('ec2:DescribeVpcAttributes',)
+
+    def process(self, resources, event=None):
+        results = []
+        client = local_session(self.manager.session_factory).client('ec2')
+        dns_hostname = self.data.get('dnshostnames', None)
+        dns_support = self.data.get('dnssupport', None)
+
+        for r in resources:
+            if dns_hostname is not None:
+                hostname = client.describe_vpc_attribute(
+                    VpcId=r['VpcId'],
+                    Attribute='enableDnsHostnames'
+                )['EnableDnsHostnames']['Value']
+            if dns_support is not None:
+                support = client.describe_vpc_attribute(
+                    VpcId=r['VpcId'],
+                    Attribute='enableDnsSupport'
+                )['EnableDnsSupport']['Value']
+            if dns_hostname is not None and dns_support is not None:
+                if dns_hostname == hostname and dns_support == support:
+                    results.append(r)
+            elif dns_hostname is not None and dns_support is None:
+                if dns_hostname == hostname:
+                    results.append(r)
+            elif dns_support is not None and dns_hostname is None:
+                if dns_support == support:
+                    results.append(r)
+        return results
+
+
 @resources.register('subnet')
-class Subnet(QueryResourceManager):
+class Subnet(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -58,8 +257,11 @@ class Subnet(QueryResourceManager):
         id_prefix = "subnet-"
 
 
+Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+
+
 @resources.register('security-group')
-class SecurityGroup(QueryResourceManager):
+class SecurityGroup(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -74,6 +276,44 @@ class SecurityGroup(QueryResourceManager):
         config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
 
+    def get_source(self, source_type):
+        if source_type == 'config':
+            return ConfigSG(self)
+        return super(SecurityGroup, self).get_source(source_type)
+
+
+class ConfigSG(query.ConfigSource):
+
+    def load_resource(self, item):
+        r = super(ConfigSG, self).load_resource(item)
+        for rset in ('IpPermissions', 'IpPermissionsEgress'):
+            for p in r.get(rset, ()):
+                if p.get('FromPort', '') is None:
+                    p.pop('FromPort')
+                if p.get('ToPort', '') is None:
+                    p.pop('ToPort')
+                if 'Ipv6Ranges' not in p:
+                    p[u'Ipv6Ranges'] = []
+                for i in p.get('UserIdGroupPairs', ()):
+                    for k, v in list(i.items()):
+                        if v is None:
+                            i.pop(k)
+                # legacy config form, still version 1.2
+                for attribute, element_key in (('IpRanges', u'CidrIp'),):
+                    if attribute not in p:
+                        continue
+                    p[attribute] = [{element_key: v} for v in p[attribute]]
+                if 'Ipv4Ranges' in p:
+                    p['IpRanges'] = p.pop('Ipv4Ranges')
+        return r
+
+
+@SecurityGroup.filter_registry.register('locked')
+class SecurityGroupLockedFilter(Locked):
+
+    def get_parent_id(self, resource, account_id):
+        return resource.get('VpcId', account_id)
+
 
 @SecurityGroup.filter_registry.register('diff')
 class SecurityGroupDiffFilter(Diff):
@@ -81,24 +321,6 @@ class SecurityGroupDiffFilter(Diff):
     def diff(self, source, target):
         differ = SecurityGroupDiff()
         return differ.diff(source, target)
-
-    def transform_revision(self, revision):
-        # config does some odd transforms, walk them back
-        resource = camelResource(json.loads(revision['configuration']))
-        for rset in ('IpPermissions', 'IpPermissionsEgress'):
-            for p in resource.get(rset, ()):
-                if p.get('FromPort', '') is None:
-                    p.pop('FromPort')
-                if p.get('ToPort', '') is None:
-                    p.pop('ToPort')
-                if 'Ipv6Ranges' not in p:
-                    p[u'Ipv6Ranges'] = []
-                for attribute, element_key in (
-                        ('IpRanges', u'CidrIp'),):
-                    if attribute not in p:
-                        continue
-                    p[attribute] = [{element_key: v} for v in p[attribute]]
-        return resource
 
 
 class SecurityGroupDiff(object):
@@ -124,8 +346,8 @@ class SecurityGroupDiff(object):
             return delta
 
     def get_tag_delta(self, source, target):
-        source_tags = {t['Key']: t['Value'] for t in source['Tags']}
-        target_tags = {t['Key']: t['Value'] for t in target['Tags']}
+        source_tags = {t['Key']: t['Value'] for t in source.get('Tags', ())}
+        target_tags = {t['Key']: t['Value'] for t in target.get('Tags', ())}
         target_keys = set(target_tags.keys())
         source_keys = set(source_tags.keys())
         removed = source_keys.difference(target_keys)
@@ -164,7 +386,7 @@ class SecurityGroupDiff(object):
             rule.get('FromPort', 0) or 0,
             rule.get('ToPort', 0) or 0,
             rule.get('IpProtocol', '-1') or '-1'
-            )
+        )
         for a, ke in self.RULE_ATTRS:
             if a not in rule:
                 continue
@@ -172,7 +394,8 @@ class SecurityGroupDiff(object):
             ev.sort()
             for e in ev:
                 buf += "%s-" % e
-        return abs(zlib.crc32(buf))
+        # mask to generate the same numeric value across all Python versions
+        return zlib.crc32(buf.encode('ascii')) & 0xffffffff
 
 
 @SecurityGroup.action_registry.register('patch')
@@ -279,10 +502,11 @@ class SGUsage(Filter):
         # Check that groups are not referenced across accounts
         client = local_session(self.manager.session_factory).client('ec2')
         peered_ids = set()
-        for sg_ref in client.describe_security_group_references(
-                GroupId=[r['GroupId'] for r in resources]
-        )['SecurityGroupReferenceSet']:
-            peered_ids.add(sg_ref['GroupId'])
+        for resource_set in chunks(resources, 200):
+            for sg_ref in client.describe_security_group_references(
+                    GroupId=[r['GroupId'] for r in resource_set]
+            )['SecurityGroupReferenceSet']:
+                peered_ids.add(sg_ref['GroupId'])
         self.log.debug(
             "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
         return [r for r in resources if r['GroupId'] not in peered_ids]
@@ -356,7 +580,7 @@ class UnusedSecurityGroup(SGUsage):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-groups-unused
@@ -370,8 +594,7 @@ class UnusedSecurityGroup(SGUsage):
         used = self.scan_groups()
         unused = [
             r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            if r['GroupId'] not in used and 'VpcId' in r]
         return unused and self.filter_peered_refs(unused) or []
 
 
@@ -384,7 +607,7 @@ class UsedSecurityGroup(SGUsage):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-groups-in-use
@@ -398,8 +621,7 @@ class UsedSecurityGroup(SGUsage):
         used = self.scan_groups()
         unused = [
             r for r in resources
-            if r['GroupId'] not in used
-            and 'VpcId' in r]
+            if r['GroupId'] not in used and 'VpcId' in r]
         unused = set([g['GroupId'] for g in self.filter_peered_refs(unused)])
         return [r for r in resources if r['GroupId'] not in unused]
 
@@ -415,7 +637,7 @@ class Stale(Filter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: stale-security-groups
@@ -426,7 +648,7 @@ class Stale(Filter):
     schema = type_schema('stale')
     permissions = ('ec2:DescribeStaleSecurityGroups',)
 
-    def process(self, resources, events):
+    def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ec2')
         vpc_ids = set([r['VpcId'] for r in resources if 'VpcId' in r])
         group_map = {r['GroupId']: r for r in resources}
@@ -457,7 +679,7 @@ class SGDefaultVpc(DefaultVpcBase):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-group-default-vpc
@@ -494,7 +716,7 @@ class SGPermission(Filter):
     permission From/To range. The following example matches on ingress
     rules which allow for a range that includes all of the given ports.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         Ports: [22, 443, 80]
@@ -505,7 +727,7 @@ class SGPermission(Filter):
     then the rule will match. ie. OnlyPorts is a negative assertion match,
     it matches when a permission includes ports outside of the specified set.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         OnlyPorts: [22]
@@ -515,7 +737,7 @@ class SGPermission(Filter):
     against each of the rules. If any iprange cidr match then the permission
     matches.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         IpProtocol: -1
@@ -525,7 +747,7 @@ class SGPermission(Filter):
     ingress/egress permissions. The following example matches on ingress
     rules which allow traffic its own same security group.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: ingress
         SelfReference: True
@@ -533,16 +755,16 @@ class SGPermission(Filter):
     As well for assertions that a ingress/egress permission only matches
     a given set of ports, *note* OnlyPorts is an inverse match.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
       - type: egress
         OnlyPorts: [22, 443, 80]
 
       - type: egress
-        IpRanges:
-          - value_type: cidr
-          - op: in
-          - value: x.y.z
+        Cidr:
+          value_type: cidr
+          op: in
+          value: x.y.z
 
     """
 
@@ -551,6 +773,7 @@ class SGPermission(Filter):
         'IpRanges', 'PrefixListIds'))
     filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts', 'SelfReference'))
     attrs = perm_attrs.union(filter_attrs)
+    attrs.add('match-operator')
 
     def validate(self):
         delta = set(self.data.keys()).difference(self.attrs)
@@ -594,12 +817,16 @@ class SGPermission(Filter):
 
     def process_cidrs(self, perm):
         found = None
-        if 'IpRanges' in perm and 'Cidr' in self.data:
+        if 'Cidr' in self.data:
+            ip_perms = perm.get('IpRanges', [])
+            if not ip_perms:
+                return False
+
             match_range = self.data['Cidr']
             match_range['key'] = 'CidrIp'
             vf = ValueFilter(match_range)
             vf.annotate = False
-            for ip_range in perm.get('IpRanges', []):
+            for ip_range in ip_perms:
                 found = vf(ip_range)
                 if found:
                     break
@@ -609,10 +836,16 @@ class SGPermission(Filter):
 
     def process_self_reference(self, perm, sg_id):
         found = None
+        ref_match = self.data.get('SelfReference')
+        if ref_match is not None:
+            found = False
         if 'UserIdGroupPairs' in perm and 'SelfReference' in self.data:
             self_reference = sg_id in [p['GroupId']
                                        for p in perm['UserIdGroupPairs']]
-            found = self_reference & self.data['SelfReference']
+            if ref_match is False and not self_reference:
+                found = True
+            if ref_match is True and self_reference:
+                found = True
         return found
 
     def expand_permissions(self, permissions):
@@ -642,34 +875,24 @@ class SGPermission(Filter):
     def __call__(self, resource):
         matched = []
         sg_id = resource['GroupId']
-
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
         for perm in self.expand_permissions(resource[self.ip_permissions_key]):
-            found = None
-            for f in self.vfilters:
-                if f(perm):
-                    found = True
-                else:
-                    found = False
-                    break
-            if found is None or found:
-                port_found = self.process_ports(perm)
-                if port_found is not None:
-                    found = (
-                        found is not None and port_found & found or port_found)
-            if found is None or found:
-                cidr_found = self.process_cidrs(perm)
-                if cidr_found is not None:
-                    found = (
-                        found is not None and cidr_found & found or cidr_found)
-            if found is None or found:
-                self_reference_found = self.process_self_reference(perm, sg_id)
-                if self_reference_found is not None:
-                    found = (
-                        found is not None and
-                        self_reference_found & found or self_reference_found)
-            if not found:
+            perm_matches = {}
+            for idx, f in enumerate(self.vfilters):
+                perm_matches[idx] = bool(f(perm))
+            perm_matches['ports'] = self.process_ports(perm)
+            perm_matches['cidrs'] = self.process_cidrs(perm)
+            perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
+            perm_match_values = list(filter(
+                lambda x: x is not None, perm_matches.values()))
+
+            # account for one python behavior any([]) == False, all([]) == True
+            if match_op == all and not perm_match_values:
                 continue
-            matched.append(perm)
+
+            match = match_op(perm_match_values)
+            if match:
+                matched.append(perm)
 
         if matched:
             resource['Matched%s' % self.ip_permissions_key] = matched
@@ -678,59 +901,32 @@ class SGPermission(Filter):
 
 @SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
-    """Filter security groups by ingress (inbound) port(s)
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: security-groups-ingress-https
-                resource: security-group
-                filters:
-                  - type: ingress
-                    OnlyPorts: [443]
-    """
 
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['ingress']},
+            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'SelfReference': {'type': 'boolean'}
-            },
+        },
         'required': ['type']}
 
 
 @SecurityGroup.filter_registry.register('egress')
 class IPPermissionEgress(SGPermission):
-    """Filter security groups by egress (outbound) port(s)
-
-    :example:
-
-        .. code-block: yaml
-
-            policies:
-              - name: security-groups-egress-https
-                resource: security-group
-                filters:
-                  - type: egress
-                    Cidr:
-                      value: 24
-                      op: lt
-                      value_type: cidr_size
-    """
 
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
         'type': 'object',
-        #'additionalProperties': True,
+        # 'additionalProperties': True,
         'properties': {
             'type': {'enum': ['egress']},
+            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
             'SelfReference': {'type': 'boolean'}
-            },
+        },
         'required': ['type']}
 
 
@@ -743,7 +939,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-groups-unused-delete
@@ -769,7 +965,7 @@ class RemovePermissions(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: security-group-revoke-8080
@@ -818,7 +1014,7 @@ class RemovePermissions(BaseAction):
 
 
 @resources.register('eni')
-class NetworkInterface(QueryResourceManager):
+class NetworkInterface(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -832,6 +1028,26 @@ class NetworkInterface(QueryResourceManager):
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeENI(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError("invalid source %s" % source_type)
+
+
+class DescribeENI(query.DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = r.pop('TagSet', [])
+        return resources
+
+
+NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
+NetworkInterface.filter_registry.register(
+    'network-location', net_filters.NetworkLocation)
+
 
 @NetworkInterface.filter_registry.register('subnet')
 class InterfaceSubnetFilter(net_filters.SubnetFilter):
@@ -839,7 +1055,7 @@ class InterfaceSubnetFilter(net_filters.SubnetFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: network-interface-in-subnet
@@ -859,7 +1075,7 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: network-interface-ssh
@@ -889,7 +1105,7 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: network-interface-remove-group
@@ -917,7 +1133,7 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
 
 @resources.register('route-table')
-class RouteTable(QueryResourceManager):
+class RouteTable(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -931,8 +1147,65 @@ class RouteTable(QueryResourceManager):
         id_prefix = "rtb-"
 
 
+@RouteTable.filter_registry.register('subnet')
+class SubnetRoute(net_filters.SubnetFilter):
+    """Filter a route table by its associated subnet attributes."""
+
+    RelatedIdsExpression = "Associations[].SubnetId"
+
+    RelatedMapping = None
+
+    def get_related_ids(self, resources):
+        if self.RelatedIdMapping is None:
+            return super(SubnetRoute, self).get_related_ids(resources)
+        return list(itertools.chain(*[self.RelatedIdMapping[r['RouteTableId']] for r in resources]))
+
+    def get_related(self, resources):
+        rt_subnet_map = {}
+        main_tables = {}
+
+        manager = self.get_resource_manager()
+        for r in resources:
+            rt_subnet_map[r['RouteTableId']] = []
+            for a in r.get('Associations', ()):
+                if 'SubnetId' in a:
+                    rt_subnet_map[r['RouteTableId']].append(a['SubnetId'])
+                elif a.get('Main'):
+                    main_tables[r['VpcId']] = r['RouteTableId']
+        explicit_subnet_ids = set(itertools.chain(*rt_subnet_map.values()))
+        subnets = manager.resources()
+        for s in subnets:
+            if s['SubnetId'] in explicit_subnet_ids:
+                continue
+            if s['VpcId'] not in main_tables:
+                continue
+            rt_subnet_map.setdefault(main_tables[s['VpcId']], []).append(s['SubnetId'])
+        related_subnets = set(itertools.chain(*rt_subnet_map.values()))
+        self.RelatedIdMapping = rt_subnet_map
+        return {s['SubnetId']: s for s in subnets if s['SubnetId'] in related_subnets}
+
+
+@RouteTable.filter_registry.register('route')
+class Route(ValueFilter):
+    """Filter a route table by its routes' attributes."""
+
+    schema = type_schema('route', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            matched = []
+            for route in r['Routes']:
+                if self.match(route):
+                    matched.append(route)
+            if matched:
+                r.setdefault('c7n:matched-routes', []).extend(matched)
+                results.append(r)
+        return results
+
+
 @resources.register('peering-connection')
-class PeeringConnection(QueryResourceManager):
+class PeeringConnection(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -947,8 +1220,46 @@ class PeeringConnection(QueryResourceManager):
         id_prefix = "pcx-"
 
 
+@PeeringConnection.filter_registry.register('missing-route')
+class MissingRoute(Filter):
+    """Return peers which are missing a route in route tables.
+
+    If the peering connection is between two vpcs in the same account,
+    the connection is returned unless it is in present route tables in
+    each vpc.
+
+    If the peering connection is between accounts, then the local vpc's
+    route table is checked.
+    """
+
+    schema = type_schema('missing-route')
+    permissions = ('ec2:DescribeRouteTables',)
+
+    def process(self, resources, event=None):
+        tables = self.manager.get_resource_manager(
+            'route-table').resources()
+        routed_vpcs = {}
+        mid = 'VpcPeeringConnectionId'
+        for t in tables:
+            for r in t.get('Routes', ()):
+                if mid in r:
+                    routed_vpcs.setdefault(r[mid], []).append(t['VpcId'])
+        results = []
+        for r in resources:
+            if r[mid] not in routed_vpcs:
+                results.append(r)
+                continue
+            for k in ('AccepterVpcInfo', 'RequesterVpcInfo'):
+                if r[k]['OwnerId'] != self.manager.config.account_id:
+                    continue
+                if r[k]['VpcId'] not in routed_vpcs[r['VpcPeeringConnectionId']]:
+                    results.append(r)
+                    break
+        return results
+
+
 @resources.register('network-acl')
-class NetworkAcl(QueryResourceManager):
+class NetworkAcl(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -963,8 +1274,85 @@ class NetworkAcl(QueryResourceManager):
         id_prefix = "acl-"
 
 
+@NetworkAcl.filter_registry.register('subnet')
+class AclSubnetFilter(net_filters.SubnetFilter):
+    """Filter network acls by the attributes of their attached subnets.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: subnet-acl
+                resource: network-acl
+                filters:
+                  - type: subnet
+                    key: "tag:Location"
+                    value: Public
+    """
+
+    RelatedIdsExpression = "Associations[].SubnetId"
+
+
+@NetworkAcl.filter_registry.register('s3-cidr')
+class AclAwsS3Cidrs(Filter):
+    """Filter network acls by those that allow access to s3 cidrs.
+
+    Defaults to filtering those nacls that do not allow s3 communication.
+
+    :example:
+
+        Find all nacls that do not allow communication with s3.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-not-allowed-nacl
+                resource: network-acl
+                filters:
+                  - s3-cidr
+    """
+    # TODO allow for port specification as range
+    schema = type_schema(
+        's3-cidr',
+        egress={'type': 'boolean', 'default': True},
+        ingress={'type': 'boolean', 'default': True},
+        present={'type': 'boolean', 'default': False})
+
+    permissions = ('ec2:DescribePrefixLists',)
+
+    def process(self, resources, event=None):
+        ec2 = local_session(self.manager.session_factory).client('ec2')
+        cidrs = jmespath.search(
+            "PrefixLists[].Cidrs[]", ec2.describe_prefix_lists())
+        cidrs = [parse_cidr(cidr) for cidr in cidrs]
+        results = []
+
+        check_egress = self.data.get('egress', True)
+        check_ingress = self.data.get('ingress', True)
+        present = self.data.get('present', False)
+
+        for r in resources:
+            matched = {cidr: None for cidr in cidrs}
+            for entry in r['Entries']:
+                if entry['Egress'] and not check_egress:
+                    continue
+                if not entry['Egress'] and not check_ingress:
+                    continue
+                entry_cidr = parse_cidr(entry['CidrBlock'])
+                for c in matched:
+                    if c in entry_cidr and matched[c] is None:
+                        matched[c] = (
+                            entry['RuleAction'] == 'allow' and True or False)
+            if present and all(matched.values()):
+                results.append(r)
+            elif not present and not all(matched.values()):
+                results.append(r)
+        return results
+
+
 @resources.register('network-addr')
-class Address(QueryResourceManager):
+class Address(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -980,12 +1368,12 @@ class Address(QueryResourceManager):
 
 
 @resources.register('customer-gateway')
-class CustomerGateway(QueryResourceManager):
+class CustomerGateway(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
         type = 'customer-gateway'
-        enum_spec = ('describe_customer_gateways', 'CustomerGateway', None)
+        enum_spec = ('describe_customer_gateways', 'CustomerGateways', None)
         detail_spec = None
         id = 'CustomerGatewayId'
         filter_name = 'CustomerGatewayIds'
@@ -997,7 +1385,7 @@ class CustomerGateway(QueryResourceManager):
 
 
 @resources.register('internet-gateway')
-class InternetGateway(QueryResourceManager):
+class InternetGateway(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1012,8 +1400,35 @@ class InternetGateway(QueryResourceManager):
         id_prefix = "igw-"
 
 
+@resources.register('nat-gateway')
+class NATGateway(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'nat-gateway'
+        enum_spec = ('describe_nat_gateways', 'NatGateways', None)
+        name = id = 'NatGatewayId'
+        filter_name = 'NatGatewayIds'
+        filter_type = 'list'
+        dimension = None
+        date = 'CreateTime'
+        id_prefix = "nat-"
+
+
+@NATGateway.action_registry.register('delete')
+class DeleteNATGateway(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteNatGateway',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_nat_gateway(NatGatewayId=r['NatGatewayId'])
+
+
 @resources.register('vpn-connection')
-class VPNConnection(QueryResourceManager):
+class VPNConnection(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1029,7 +1444,7 @@ class VPNConnection(QueryResourceManager):
 
 
 @resources.register('vpn-gateway')
-class VPNGateway(QueryResourceManager):
+class VPNGateway(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1044,8 +1459,35 @@ class VPNGateway(QueryResourceManager):
         id_prefix = "vgw-"
 
 
+@resources.register('vpc-endpoint')
+class VpcEndpoint(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'vpc-endpoint'
+        enum_spec = ('describe_vpc_endpoints', 'VpcEndpoints', None)
+        id = 'VpcEndpointId'
+        date = 'CreationTimestamp'
+        filter_name = 'VpcEndpointIds'
+        filter_type = 'list'
+        dimension = None
+        id_prefix = "vpce-"
+
+
+@VpcEndpoint.filter_registry.register('security-group')
+class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "Groups[].GroupId"
+
+
+@VpcEndpoint.filter_registry.register('subnet')
+class EndpointSubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "SubnetIds[]"
+
+
 @resources.register('key-pair')
-class KeyPair(QueryResourceManager):
+class KeyPair(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1057,5 +1499,3 @@ class KeyPair(QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
-
-

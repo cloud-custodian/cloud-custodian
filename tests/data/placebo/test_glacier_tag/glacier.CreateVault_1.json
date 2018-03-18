@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "location": "/644160558196/vaults/c7n-glacier-test", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "xsvV8OfCP3660ic5CZBUEzsLScgwyNCqg78eFSBRwJhVG0o", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "xsvV8OfCP3660ic5CZBUEzsLScgwyNCqg78eFSBRwJhVG0o", 
+                "date": "Fri, 12 May 2017 00:43:03 GMT", 
+                "content-length": "2", 
+                "content-type": "application/json", 
+                "location": "/644160558196/vaults/c7n-glacier-test"
+            }
+        }
+    }
+}

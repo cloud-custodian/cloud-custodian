@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,21 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from cStringIO import StringIO
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import csv
 import datetime
+import io
 from datetime import timedelta
-from dateutil.parser import parse
-from dateutil.tz import tzutc
 import itertools
 import time
+
+from concurrent.futures import as_completed
+from dateutil.tz import tzutc
+import six
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.query import QueryResourceManager, DescribeSource
+from c7n.utils import local_session, type_schema, chunks
 
 
 @resources.register('iam-group')
@@ -67,12 +71,31 @@ class User(QueryResourceManager):
         service = 'iam'
         type = 'user'
         enum_spec = ('list_users', 'Users', None)
-        id = 'UserId'
         filter_name = None
-        name = 'UserName'
+        id = name = 'UserName'
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::User"
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeUser(self)
+        return super(User, self).get_source(source_type)
+
+
+class DescribeUser(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('iam')
+        resources = []
+        for rid in resource_ids:
+            try:
+                resources.append(client.get_user(UserName=rid).get('User'))
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchEntityException':
+                    continue
+                raise
+        return resources
 
 
 @resources.register('iam-policy')
@@ -87,18 +110,28 @@ class Policy(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Policy"
+        filter_name = None
 
     arn_path_prefix = "aws:policy/"
 
-    def get_resources(self, resource_ids):
-        client = local_session(self.session_factory).client('iam')
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribePolicy(self)
+        return super(Policy, self).get_source(source_type)
+
+
+class DescribePolicy(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('iam')
         results = []
-        try:
-            for r in resource_ids:
+
+        for r in resource_ids:
+            try:
                 results.append(client.get_policy(PolicyArn=r)['Policy'])
-        except Exception as e:
-            self.log.warning("unable to resolve ids %s, err: %s",
-                             resource_ids, e)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchEntityException':
+                    continue
         return results
 
 
@@ -145,8 +178,7 @@ class IamRoleUsage(Filter):
         results = set()
         results.update(self.scan_lambda_roles())
         results.update(self.scan_ecs_roles())
-        results.update(self.scan_asg_roles())
-        results.update(self.scan_ec2_roles())
+        results.update(self.collect_profile_roles())
         return results
 
     def instance_profile_usage(self):
@@ -163,29 +195,49 @@ class IamRoleUsage(Filter):
         results = []
         client = local_session(self.manager.session_factory).client('ecs')
         for cluster in client.describe_clusters()['clusters']:
-            svcs = client.list_services(cluster=cluster)['serviceArns']
-            for svc in client.describe_services(
-                    cluster=cluster, services=svcs)['services']:
-                if 'roleArn' not in svc:
-                    continue
-                results.append(svc['roleArn'])
+            services = client.list_services(
+                cluster=cluster['clusterName'])['serviceArns']
+            if services:
+                for service in client.describe_services(
+                        cluster=cluster['clusterName'],
+                        services=services)['services']:
+                    if 'roleArn' in service:
+                        results.append(service['roleArn'])
+        return results
+
+    def collect_profile_roles(self):
+        # Collect iam roles attached to instance profiles of EC2/ASG resources
+        profiles = set()
+        profiles.update(self.scan_asg_roles())
+        profiles.update(self.scan_ec2_roles())
+
+        manager = self.manager.get_resource_manager('iam-profile')
+        iprofiles = manager.resources()
+        results = []
+        for p in iprofiles:
+            if p['InstanceProfileName'] not in profiles:
+                continue
+            for role in p.get('Roles', []):
+                results.append(role['RoleName'])
         return results
 
     def scan_asg_roles(self):
         manager = self.manager.get_resource_manager('launch-config')
-        return [r['IamInstanceProfile'] for r in manager.resources()
-                if 'IamInstanceProfile' in r]
+        return [r['IamInstanceProfile'] for r in manager.resources() if (
+            'IamInstanceProfile' in r)]
 
     def scan_ec2_roles(self):
         manager = self.manager.get_resource_manager('ec2')
         results = []
         for e in manager.resources():
-            if 'Instances' not in e:
+            # do not include instances that have been recently terminated
+            if e['State']['Name'] == 'terminated':
                 continue
-            for i in e['Instances']:
-                if 'IamInstanceProfile' not in i:
-                    continue
-                results.append(i['IamInstanceProfile']['Arn'])
+            profile_arn = e.get('IamInstanceProfile', {}).get('Arn', None)
+            if not profile_arn:
+                continue
+            # split arn to get the profile name
+            results.append(profile_arn.split('/')[-1])
         return results
 
 
@@ -193,46 +245,77 @@ class IamRoleUsage(Filter):
 #    IAM Roles    #
 ###################
 
-
 @Role.filter_registry.register('used')
 class UsedIamRole(IamRoleUsage):
+    """Filter IAM roles that are either being used or not
 
-    schema = type_schema('used')
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-role-in-use
+            resource: iam-role
+            filters:
+              - type: used
+                state: true
+    """
+
+    schema = type_schema(
+        'used',
+        state={'type': 'boolean'})
 
     def process(self, resources, event=None):
         roles = self.service_role_usage()
-        results = []
-        for r in resources:
-            if r['Arn'] in roles or r['RoleName'] in roles:
-                results.append(r)
-        self.log.info(
-            "%d of %d iam roles currently used.", len(results), len(resources))
-        return results
+        if self.data.get('state', True):
+            return [r for r in resources if (
+                r['Arn'] in roles or r['RoleName'] in roles)]
+
+        return [r for r in resources if (
+            r['Arn'] not in roles and r['RoleName'] not in roles)]
 
 
 @Role.filter_registry.register('unused')
 class UnusedIamRole(IamRoleUsage):
+    """Filter IAM roles that are either being used or not
+
+    This filter has been deprecated. Please use the 'used' filter
+    with the 'state' attribute to get unused iam roles
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-not-in-use
+            resource: iam-role
+            filters:
+              - type: used
+                state: false
+    """
 
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
-        roles = self.service_role_usage()
-        results = []
-        for r in resources:
-            if r['Arn'] not in roles or r['RoleName'] not in roles:
-                results.append(r)
-        self.log.info("%d of %d iam roles not currently used.",
-                      len(results), len(resources))
-        return results
+        return UsedIamRole({'state': False}, self.manager).process(resources)
 
 
 @Role.filter_registry.register('has-inline-policy')
 class IamRoleInlinePolicy(Filter):
-    """
-        Filter IAM roles that have an inline-policy attached
+    """Filter IAM roles that have an inline-policy attached
+    True: Filter roles that have an inline-policy
+    False: Filter roles that do not have an inline-policy
 
-        True: Filter roles that have an inline-policy
-        False: Filter roles that do not have an inline-policy
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-inline-policies
+            resource: iam-role
+            filters:
+              - type: has-inline-policy
+                value: True
     """
 
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
@@ -249,6 +332,71 @@ class IamRoleInlinePolicy(Filter):
         return [r for r in resources if self._inline_policies(c, r) == 0]
 
 
+@Role.filter_registry.register('has-specific-managed-policy')
+class SpecificIamRoleManagedPolicy(Filter):
+    """Filter IAM roles that has a specific policy attached
+
+    For example, if the user wants to check all roles with 'admin-policy':
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-have-admin
+            resource: iam-role
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+    """
+
+    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_role_policies(
+            RoleName=resource['RoleName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            return [r for r in resources if self.data.get('value') in self._managed_policies(c, r)]
+        return []
+
+
+@Role.filter_registry.register('no-specific-managed-policy')
+class NoSpecificIamRoleManagedPolicy(Filter):
+    """Filter IAM roles that do not have a specific policy attached
+
+    For example, if the user wants to check all roles without 'ip-restriction':
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-no-ip-restriction
+            resource: iam-role
+            filters:
+              - type: no-specific-managed-policy
+                value: ip-restriction
+    """
+
+    schema = type_schema('no-specific-managed-policy', value={'type': 'string'})
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def _managed_policies(self, client, resource):
+        return [r['PolicyName'] for r in client.list_attached_role_policies(
+            RoleName=resource['RoleName'])['AttachedPolicies']]
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value'):
+            return [r for r in resources if not self.data.get('value') in
+            self._managed_policies(c, r)]
+        return []
+
+
 ######################
 #    IAM Policies    #
 ######################
@@ -256,6 +404,18 @@ class IamRoleInlinePolicy(Filter):
 
 @Policy.filter_registry.register('used')
 class UsedIamPolicies(Filter):
+    """Filter IAM policies that are being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-policy-used
+            resource: iam-policy
+            filters:
+              - type: used
+    """
 
     schema = type_schema('used')
     permissions = ('iam:ListPolicies',)
@@ -266,6 +426,18 @@ class UsedIamPolicies(Filter):
 
 @Policy.filter_registry.register('unused')
 class UnusedIamPolicies(Filter):
+    """Filter IAM policies that are not being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-policy-unused
+            resource: iam-policy
+            filters:
+              - type: unused
+    """
 
     schema = type_schema('unused')
     permissions = ('iam:ListPolicies',)
@@ -302,7 +474,7 @@ class AllowAllIamPolicies(Filter):
     For example, if the user wants to check all used policies and filter on
     allow all:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-no-used-all-all-policy
        resource: iam-policy
@@ -329,9 +501,9 @@ class AllowAllIamPolicies(Filter):
         for s in statements:
             if ('Condition' not in s and
                     'Action' in s and
-                    isinstance(s['Action'], basestring) and
+                    isinstance(s['Action'], six.string_types) and
                     s['Action'] == "*" and
-                    isinstance(s['Resource'], basestring) and
+                    isinstance(s['Resource'], six.string_types) and
                     s['Resource'] == "*" and
                     s['Effect'] == "Allow"):
                 return True
@@ -352,6 +524,18 @@ class AllowAllIamPolicies(Filter):
 
 @InstanceProfile.filter_registry.register('used')
 class UsedInstanceProfiles(IamRoleUsage):
+    """Filter IAM profiles that are being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-instance-profiles-in-use
+            resource: iam-profile
+            filters:
+              - type: used
+    """
 
     schema = type_schema('used')
 
@@ -369,6 +553,18 @@ class UsedInstanceProfiles(IamRoleUsage):
 
 @InstanceProfile.filter_registry.register('unused')
 class UnusedInstanceProfiles(IamRoleUsage):
+    """Filter IAM profiles that are not being used
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-instance-profiles-not-in-use
+            resource: iam-profile
+            filters:
+              - type: unused
+    """
 
     schema = type_schema('unused')
 
@@ -376,8 +572,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
         results = []
         profiles = self.instance_profile_usage()
         for r in resources:
-            if (r['Arn'] not in profiles or
-                        r['InstanceProfileName'] not in profiles):
+            if (r['Arn'] not in profiles or r['InstanceProfileName'] not in profiles):
                 results.append(r)
         self.log.info(
             "%d of %d instance profiles currently not in use." % (
@@ -389,8 +584,7 @@ class UnusedInstanceProfiles(IamRoleUsage):
 #    IAM Users    #
 ###################
 
-@User.filter_registry.register('credential')
-class UserCredentialReport(Filter):
+class CredentialReport(Filter):
     """Use IAM Credential report to filter users.
 
     The IAM Credential report ( https://goo.gl/sbEPtM ) aggregates
@@ -402,7 +596,7 @@ class UserCredentialReport(Filter):
     never used their password but have active access keys from the
     last month
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
      - name: iam-mfa-active-keys-no-login
        resource: iam-user
@@ -454,13 +648,14 @@ class UserCredentialReport(Filter):
                  'certs',
                  'certs.active',
                  'certs.last_rotated',
-                 ]},
+             ]},
         value={'oneOf': [
             {'type': 'array'},
             {'type': 'string'},
             {'type': 'boolean'},
-            {'type': 'number'}]},
-        op={'enum': OPERATORS.keys()},
+            {'type': 'number'},
+            {'type': 'null'}]},
+        op={'enum': list(OPERATORS.keys())},
         report_generate={
             'title': 'Generate a report if none is present.',
             'default': True,
@@ -494,8 +689,11 @@ class UserCredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        reader = csv.reader(StringIO(data))
-        headers = reader.next()
+        if isinstance(data, six.binary_type):
+            reader = csv.reader(io.StringIO(data.decode('utf-8')))
+        else:
+            reader = csv.reader(io.StringIO(data))
+        headers = next(reader)
         for line in reader:
             info = dict(zip(headers, line))
             report[info['user']] = self.process_user_record(info)
@@ -505,7 +703,7 @@ class UserCredentialReport(Filter):
     @classmethod
     def process_user_record(cls, info):
         """Type convert the csv record, modifies in place."""
-        keys = info.keys()
+        keys = list(info.keys())
         # Value conversion
         for k in keys:
             v = info[k]
@@ -551,16 +749,7 @@ class UserCredentialReport(Filter):
         if '.' in self.data['key']:
             self.matcher_config = dict(self.data)
             self.matcher_config['key'] = self.data['key'].split('.', 1)[1]
-        report = self.get_credential_report()
-        if report is None:
-            return []
-        results = []
-        for r in resources:
-            info = report.get(r['UserName'])
-            if self.match(info):
-                r['c7n:credential-report'] = info
-                results.append(r)
-        return results
+        return []
 
     def match(self, info):
         if info is None:
@@ -579,59 +768,150 @@ class UserCredentialReport(Filter):
                 return True
 
 
-@User.filter_registry.register('policy')
-class UserAttachedPolicy(Filter):
-
-    schema = type_schema('policy')
-    permissions = ('iam:ListAttachedUserPolicies',)
+@User.filter_registry.register('credential')
+class UserCredentialReport(CredentialReport):
 
     def process(self, resources, event=None):
+        super(UserCredentialReport, self).process(resources, event)
+        report = self.get_credential_report()
+        if report is None:
+            return []
+        results = []
+        for r in resources:
+            info = report.get(r['UserName'])
+            if self.match(info):
+                r['c7n:credential-report'] = info
+                results.append(r)
+        return results
 
-        def _user_policies(resource):
-            client = local_session(self.manager.session_factory).client('iam')
-            resource['AttachedPolicies'] = client.list_attached_user_policies(
-                UserName=resource['UserName'])['AttachedPolicies']
 
+@User.filter_registry.register('policy')
+class UserPolicy(ValueFilter):
+    """Filter IAM users based on attached policy values
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-users-with-admin-access
+            resource: iam-user
+            filters:
+              - type: policy
+                key: PolicyName
+                value: AdministratorAccess
+    """
+
+    schema = type_schema('policy', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListAttachedUserPolicies',)
+
+    def user_policies(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            if 'c7n:Policies' not in u:
+                u['c7n:Policies'] = []
+            aps = client.list_attached_user_policies(
+                UserName=u['UserName'])['AttachedPolicies']
+            for ap in aps:
+                u['c7n:Policies'].append(
+                    client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'AttachedPolicies' not in r]
             self.log.debug(
-                "Querying %d users policies" % len(query_resources))
-            list(w.map(_user_policies, query_resources))
+                "Querying %d users policies" % len(resources))
+            list(w.map(self.user_policies, user_set))
 
         matched = []
         for r in resources:
-            for p in r['AttachedPolicies']:
-                if self.match(p):
+            for p in r['c7n:Policies']:
+                if self.match(p) and r not in matched:
                     matched.append(r)
-                    break
+        return matched
+
+
+@User.filter_registry.register('group')
+class GroupMembership(ValueFilter):
+    """Filter IAM users based on attached group values
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-users-in-admin-group
+            resource: iam-user
+            filters:
+              - type: group
+                key: GroupName
+                value: Admins
+    """
+
+    schema = type_schema('group', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListGroupsForUser',)
+
+    def get_user_groups(self, client, user_set):
+        for u in user_set:
+            u['c7n:Groups'] = client.list_groups_for_user(
+                UserName=u['UserName'])['Groups']
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for user_set in chunks(
+                    [r for r in resources if 'c7n:Groups' not in r], size=50):
+                futures.append(
+                    w.submit(self.get_user_groups, client, user_set))
+            for f in as_completed(futures):
+                pass
+
+        matched = []
+        for r in resources:
+            for p in r['c7n:Groups']:
+                if self.match(p) and r not in matched:
+                    matched.append(r)
         return matched
 
 
 @User.filter_registry.register('access-key')
 class UserAccessKey(ValueFilter):
+    """Filter IAM users based on access-key values
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-users-with-active-keys
+            resource: iam-user
+            filters:
+              - type: access-key
+                key: Status
+                value: Active
+    """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAccessKeys',)
 
+    def user_keys(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            u['c7n:AccessKeys'] = client.list_access_keys(
+                UserName=u['UserName'])['AccessKeyMetadata']
+
     def process(self, resources, event=None):
-
-        def _user_keys(resource):
-            client = local_session(self.manager.session_factory).client('iam')
-            resource['AccessKeys'] = client.list_access_keys(
-                UserName=resource['UserName'])['AccessKeyMetadata']
-
+        user_set = chunks(resources, size=50)
         with self.executor_factory(max_workers=2) as w:
-            query_resources = [
-                r for r in resources if 'AccessKeys' not in r]
             self.log.debug(
-                "Querying %d users' api keys" % len(query_resources))
-            list(w.map(_user_keys, query_resources))
+                "Querying %d users' api keys" % len(resources))
+            list(w.map(self.user_keys, user_set))
 
         matched = []
         for r in resources:
-            for p in r['AccessKeys']:
-                if self.match(p):
+            for k in r['c7n:AccessKeys']:
+                if self.match(k):
                     matched.append(r)
                     break
         return matched
@@ -640,6 +920,20 @@ class UserAccessKey(ValueFilter):
 # Mfa-device filter for iam-users
 @User.filter_registry.register('mfa-device')
 class UserMfaDevice(ValueFilter):
+    """Filter iam-users based on mfa-device status
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: mfa-enabled-users
+            resource: iam-user
+            filters:
+              - type: mfa-device
+                key: UserName
+                value: not-null
+    """
 
     schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
     permissions = ('iam:ListMfaDevices',)
@@ -670,13 +964,166 @@ class UserMfaDevice(ValueFilter):
         return matched
 
 
+@User.action_registry.register('delete')
+class UserDelete(BaseAction):
+    """Delete a user.
+
+    For example if you want to have a whitelist of valid (machine-)users
+    and want to ensure that no users have been clicked without documentation.
+
+    You can use both the 'credential' or the 'username'
+    filter. 'credential' will have an SLA of 4h,
+    (http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html),
+    but the added benefit of performing less API calls, whereas
+    'username' will make more API calls, but have a SLA of your cache.
+
+    :example:
+
+      .. code-block:: yaml
+
+        # using a 'credential' filter'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: credential
+              key: user
+              op: not-in
+              value:
+                - valid-user-1
+                - valid-user-2
+          actions:
+            - delete
+
+        # using a 'username' filter with 'UserName'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: username
+              key: UserName
+              op: not-in
+              value:
+                - valid-user-1
+                - valid-user-2
+          actions:
+            - delete
+
+         # using a 'username' filter with 'Arn'
+        - name: iam-only-whitelisted-users
+          resource: iam-user
+          filters:
+            - type: username
+              key: Arn
+              op: not-in
+              value:
+                - arn:aws:iam:123456789012:user/valid-user-1
+                - arn:aws:iam:123456789012:user/valid-user-2
+          actions:
+            - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = (
+        'iam:ListAttachedUserPolicies',
+        'iam:ListAccessKeys',
+        'iam:ListGroupsForUser',
+        'iam:ListMFADevices',
+        'iam:ListServiceSpecificCredentials',
+        'iam:ListSigningCertificates',
+        'iam:ListSSHPublicKeys',
+        'iam:DeactivateMFADevice',
+        'iam:DeleteAccessKey',
+        'iam:DeleteLoginProfile',
+        'iam:DeleteSigningCertificate',
+        'iam:DeleteSSHPublicKey',
+        'iam:DeleteUser',
+        'iam:DetachUserPolicy',
+        'iam:RemoveUserFromGroup')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            self.log.debug('Deleting user %s' % r['UserName'])
+            self.process_user(client, r)
+
+    def process_user(self, client, r):
+        try:
+            client.delete_login_profile(
+                UserName=r['UserName'])
+        except ClientError as e:
+            if e.response['Error']['Code'] not in ('NoSuchEntity',):
+                raise
+
+        # Access Keys
+        response = client.list_access_keys(UserName=r['UserName'])
+        for access_key in response['AccessKeyMetadata']:
+            client.delete_access_key(UserName=r['UserName'],
+                                     AccessKeyId=access_key['AccessKeyId'])
+
+        # User Policies
+        response = client.list_attached_user_policies(UserName=r['UserName'])
+        for user_policy in response['AttachedPolicies']:
+            client.detach_user_policy(
+                UserName=r['UserName'], PolicyArn=user_policy['PolicyArn'])
+
+        # HW MFA Devices
+        response = client.list_mfa_devices(UserName=r['UserName'])
+        for mfa_device in response['MFADevices']:
+            client.deactivate_mfa_device(
+                UserName=r['UserName'], SerialNumber=mfa_device['SerialNumber'])
+
+        # Groups
+        response = client.list_groups_for_user(UserName=r['UserName'])
+        for user_group in response['Groups']:
+            client.remove_user_from_group(
+                UserName=r['UserName'], GroupName=user_group['GroupName'])
+
+        # SSH Keys
+        response = client.list_ssh_public_keys(UserName=r['UserName'])
+        for key in response.get('SSHPublicKeys', ()):
+            client.delete_ssh_public_key(
+                UserName=r['UserName'], SSHPublicKeyId=key['SSHPublicKeyId'])
+
+        # Signing Certificates
+        response = client.list_signing_certificates(UserName=r['UserName'])
+        for cert in response.get('Certificates', ()):
+            client.delete_signing_certificate(
+                UserName=r['UserName'], CertificateId=cert['CertificateId'])
+
+        # Service specific user credentials (codecommit)
+        response = client.list_service_specific_credentials(UserName=r['UserName'])
+        for screds in response.get('ServiceSpecificCredentials', ()):
+            client.delete_service_specific_credential(
+                UserName=r['UserName'],
+                ServiceSpecificCredentialId=screds['ServiceSpecificCredentialId'])
+
+        client.delete_user(UserName=r['UserName'])
+
+
 @User.action_registry.register('remove-keys')
 class UserRemoveAccessKey(BaseAction):
+    """Delete or disable user's access keys.
+
+    For example if we wanted to disable keys after 90 days of non-use and
+    delete them after 180 days of nonuse:
+
+    :example:
+
+        .. code-block:: yaml
+
+         - name: iam-mfa-active-keys-no-login
+           resource: iam-user
+           actions:
+             - type: remove-keys
+               disable: true
+               age: 90
+             - type: remove-keys
+               age: 180
+    """
 
     schema = type_schema(
         'remove-keys', age={'type': 'number'}, disable={'type': 'boolean'})
     permissions = ('iam:ListAccessKeys', 'iam:UpdateAccessKey',
-                   'iam:DeleteAccssKey')
+                   'iam:DeleteAccessKey')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -688,13 +1135,13 @@ class UserRemoveAccessKey(BaseAction):
             threshold_date = datetime.datetime.now(tz=tzutc()) - timedelta(age)
 
         for r in resources:
-            if 'AccessKeys' not in r:
-                r['AccessKeys'] = client.list_access_keys(
+            if 'c7n:AccessKeys' not in r:
+                r['c7n:AccessKeys'] = client.list_access_keys(
                     UserName=r['UserName'])['AccessKeyMetadata']
-            keys = r['AccessKeys']
+            keys = r['c7n:AccessKeys']
             for k in keys:
                 if age:
-                    if not parse(k['CreateDate']) < threshold_date:
+                    if not k['CreateDate'] < threshold_date:
                         continue
                 if disable:
                     client.update_access_key(
@@ -714,11 +1161,19 @@ class UserRemoveAccessKey(BaseAction):
 
 @Group.filter_registry.register('has-users')
 class IamGroupUsers(Filter):
-    """
-        Filter IAM groups that have users attached based on True/False value:
+    """Filter IAM groups that have users attached based on True/False value:
+    True: Filter all IAM groups with users assigned to it
+    False: Filter all IAM groups without any users assigned to it
 
-        True: Filter all IAM groups with users assigned to it
-        False: Filter all IAM groups without any users assigned to it
+    :example:
+
+    .. code-block:: yaml
+
+      - name: empty-iam-group
+        resource: iam-group
+        filters:
+          - type: has-users
+            value: False
     """
     schema = type_schema('has-users', value={'type': 'boolean'})
     permissions = ('iam:GetGroup',)
@@ -728,7 +1183,6 @@ class IamGroupUsers(Filter):
 
     def process(self, resources, events=None):
         c = local_session(self.manager.session_factory).client('iam')
-        value = self.data.get('value')
         if self.data.get('value', True):
             return [r for r in resources if self._user_count(c, r) > 0]
         return [r for r in resources if self._user_count(c, r) == 0]
@@ -736,11 +1190,19 @@ class IamGroupUsers(Filter):
 
 @Group.filter_registry.register('has-inline-policy')
 class IamGroupInlinePolicy(Filter):
-    """
-        Filter IAM groups that have an inline-policy based on boolean value:
+    """Filter IAM groups that have an inline-policy based on boolean value:
+    True: Filter all groups that have an inline-policy attached
+    False: Filter all groups that do not have an inline-policy attached
 
-        True: Filter all groups that have an inline-policy attached
-        False: Filter all groups that do not have an inline-policy attached
+    :example:
+
+    .. code-block:: yaml
+
+      - name: iam-groups-with-inline-policy
+        resource: iam-group
+        filters:
+          - type: has-inline-policy
+            value: True
     """
     schema = type_schema('has-inline-policy', value={'type': 'boolean'})
     permissions = ('iam:ListGroupPolicies',)

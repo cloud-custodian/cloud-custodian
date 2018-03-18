@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Account": "644160558196", 
+        "UserId": "AIDAIF6CSPD4UCWCSYZZ6", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "138ac838-06cb-11e8-9a81-717e49e791ce", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "138ac838-06cb-11e8-9a81-717e49e791ce", 
+                "date": "Wed, 31 Jan 2018 21:09:51 GMT", 
+                "content-length": "413", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Arn": "arn:aws:iam::644160558196:user/AlfredMarcGamulo"
+    }
+}

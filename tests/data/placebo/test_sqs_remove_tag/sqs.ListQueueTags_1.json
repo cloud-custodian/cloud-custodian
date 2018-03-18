@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "77722d0a-9b38-5198-a9a6-7f7845e76b81", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "77722d0a-9b38-5198-a9a6-7f7845e76b81", 
+                "content-length": "327", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Tue, 31 Oct 2017 20:27:11 GMT", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Tags": {
+            "remove-this-tag": "tag to be removed"
+        }
+    }
+}

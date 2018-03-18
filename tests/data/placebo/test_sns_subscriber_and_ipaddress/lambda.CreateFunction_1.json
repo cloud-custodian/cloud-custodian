@@ -1,0 +1,29 @@
+{
+    "status_code": 201, 
+    "data": {
+        "CodeSha256": "DcDjIPC9F9DzQGvb8oVx0kSNO9G21o+1gM0x1sqNXYQ=", 
+        "FunctionName": "c7n-hello-world", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "b81cdd50-ec5a-11e6-82f3-4d8dfdb50093", 
+            "HTTPHeaders": {
+                "date": "Mon, 06 Feb 2017 10:55:05 GMT", 
+                "x-amzn-requestid": "b81cdd50-ec5a-11e6-82f3-4d8dfdb50093", 
+                "content-length": "487", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "CodeSize": 868, 
+        "MemorySize": 512, 
+        "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-hello-world", 
+        "Version": "59", 
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+        "Timeout": 15, 
+        "LastModified": "2017-02-06T10:55:06.174+0000", 
+        "Handler": "helloworld.main", 
+        "Runtime": "python2.7", 
+        "Description": "Hello World"
+    }
+}

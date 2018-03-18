@@ -2,14 +2,12 @@
     "status_code": 200, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "7a1c6d9d-3bc8-11e6-a67d-4771211479a3", 
+            "RequestId": "da4a1e28-06ce-11e8-bd74-85377e02ac8a", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "7a1c6d9d-3bc8-11e6-a67d-4771211479a3", 
+                "x-amzn-requestid": "da4a1e28-06ce-11e8-bd74-85377e02ac8a", 
                 "content-length": "0", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Sun, 26 Jun 2016 18:04:51 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

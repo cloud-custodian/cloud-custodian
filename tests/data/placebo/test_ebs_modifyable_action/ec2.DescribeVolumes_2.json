@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4123bea7-ed36-4451-a3f8-4cf83a61e7ae", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 11 Jul 2017 10:21:25 GMT"
+            }
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-west-2b", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 9, 
+                            "__class__": "datetime", 
+                            "month": 7, 
+                            "second": 19, 
+                            "microsecond": 0, 
+                            "year": 2017, 
+                            "day": 11, 
+                            "minute": 56
+                        }, 
+                        "InstanceId": "i-0557d390667870549", 
+                        "VolumeId": "vol-0073dcd216489ea1b", 
+                        "State": "attached", 
+                        "DeleteOnTermination": false, 
+                        "Device": "/dev/sdf"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "OnlineResizer", 
+                        "Key": "Name"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "io1", 
+                "VolumeId": "vol-0073dcd216489ea1b", 
+                "State": "in-use", 
+                "Iops": 500, 
+                "SnapshotId": "", 
+                "CreateTime": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 38, 
+                    "microsecond": 833000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 55
+                }, 
+                "Size": 64
+            }
+        ]
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "455cd29f-d515-11e7-8fed-d52e8a23b7ff", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "455cd29f-d515-11e7-8fed-d52e8a23b7ff", 
+                "date": "Wed, 29 Nov 2017 14:54:59 GMT", 
+                "content-length": "47", 
+                "content-type": "application/json"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "MyValue", 
+                "Key": "MyTag"
+            }
+        ]
+    }
+}
