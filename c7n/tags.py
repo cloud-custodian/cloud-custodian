@@ -336,6 +336,24 @@ class Tag(Action):
         key={'type': 'string'},
         value={'type': 'string'},
         tag={'type': 'string'},
+        Tags={
+            'type': 'array',
+            'required': False,
+            'items': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'Key': {'type': 'string'},
+                    'Value': {'type': 'string'},
+                    'Days': {'type': 'integer', 'minimum': 1}
+                },
+                'required': ['Key'],
+                'oneOf': [
+                    {'required': ['Value']},
+                    {'required': ['Days']}
+                ]
+            }
+        }
     )
 
     permissions = ('ec2:CreateTags',)
@@ -356,6 +374,8 @@ class Tag(Action):
         tag = self.data.get('tag', DEFAULT_TAG)
         tag = self.data.get('key') or tag
 
+        multi_tags = self.data.get('Tags', [])
+
         # Support setting multiple tags in a single go with a mapping
         tags = self.data.get('tags')
 
@@ -366,6 +386,12 @@ class Tag(Action):
 
         if msg:
             tags.append({'Key': tag, 'Value': msg})
+
+        for t in multi_tags:
+            if 'Days' in t:
+                t['Value'] = (datetime.now() + timedelta(
+                    days=t['Days'])).strftime('%Y/%m/%d')
+            tags.append({'Key': t['Key'], 'Value': t['Value']})
 
         batch_size = self.data.get('batch_size', self.batch_size)
 
