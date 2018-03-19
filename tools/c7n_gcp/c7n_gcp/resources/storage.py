@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2017-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,5 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n_gcp.query import QueryResourceManager
 
-version = u"0.8.28.1"
+from c7n.provider import gcp
+
+
+@gcp.register('bucket')
+class Bucket(object):
+
+    class resource_type(object):
+        service = 'storage'
+        version = 'v1'
+        component = 'buckets'

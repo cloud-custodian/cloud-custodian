@@ -14,11 +14,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.exceptions import ClientError
+from concurrent.futures import as_completed
 
 import json
 import logging
 
-from c7n.actions import RemovePolicyBase
+from c7n.actions import RemovePolicyBase, BaseAction
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -290,3 +291,48 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': key_id,
                 'State': 'PolicyRemoved',
                 'Statements': found}
+
+
+@Key.action_registry.register('set-rotation')
+class KmsKeyRotation(BaseAction):
+    """Toggle KMS key rotation
+
+    :example:
+
+    .. code-block: yaml
+
+        policy:
+          - name: enable-cmk-rotation
+            resource: kms-key
+            filters:
+              - type: key-rotation-status
+                key: KeyRotationEnabled
+                value: False
+            actions:
+              - type: set-rotation
+                state: True
+    """
+    permissions = ('kms:EnableKeyRotation',)
+    schema = type_schema(
+        'set-rotation',
+        state={'type': 'boolean'})
+
+    def set_rotation(self, key):
+        client = local_session(self.manager.session_factory).client('kms')
+        if self.data.get('state', True):
+            client.enable_key_rotation(KeyId=key['KeyId'])
+            return
+        client.disable_key_rotation(KeyId=key['KeyId'])
+
+    def process(self, keys):
+        for k in keys:
+            futures = {}
+
+            with self.executor_factory(max_workers=2) as w:
+                futures[w.submit(self.set_rotation, k)] = k
+
+            for f in as_completed(futures):
+                if f.exception():
+                    key = futures[f]
+                    self.log.error('error setting key rotation on %s: %s' % (
+                        key['Arn'], f.exception()))
