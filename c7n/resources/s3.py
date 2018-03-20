@@ -752,6 +752,8 @@ class HasStatementFilter(Filter):
             }
         })
 
+    annotation_key = 'c7n:MatchedPolicyStatements'
+
     def process(self, buckets, event=None):
         return list(filter(None, map(self.process_bucket, buckets)))
 
@@ -775,8 +777,12 @@ class HasStatementFilter(Filter):
                     if key in statement and value == statement[key]:
                         found += 1
                 if found and found == len(required_statement):
-                    required_statements.remove(required_statement)
-                    break
+                    set_annotation(
+                        b,
+                        HasStatementFilter.annotation_key,
+                        [statement])
+                    if required_statement in required_statements:
+                        required_statements.remove(required_statement)
 
         if (self.data.get('statement_ids', []) and not required) or \
            (self.data.get('statements', []) and not required_statements):
@@ -1113,7 +1119,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         p = json.loads(p)
 
         statements, found = self.process_policy(
-            p, bucket, CrossAccountAccessFilter.annotation_key)
+            p, bucket, HasStatementFilter.annotation_key)
 
         if not found:
             return
