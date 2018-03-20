@@ -1101,4 +1101,3 @@ class SetShieldAdvanced(BaseAction):
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
                     return
                 raise
->>>>>>> upstream
