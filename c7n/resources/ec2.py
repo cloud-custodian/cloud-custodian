@@ -1121,7 +1121,8 @@ class Snapshot(BaseAction):
                 resource['InstanceId'],
                 volume_id)
             try:
-                response = c.create_snapshot(
+                response = self.manager.retry(
+                    c.create_snapshot,
                     DryRun=self.manager.config.dryrun,
                     VolumeId=volume_id,
                     Description=description)
@@ -1156,7 +1157,8 @@ class Snapshot(BaseAction):
                 copy_tags = []
 
             tags.extend(copy_tags)
-            c.create_tags(
+            self.manager.retry(
+                c.create_tags,
                 DryRun=self.manager.config.dryrun,
                 Resources=[
                     response['SnapshotId']],
