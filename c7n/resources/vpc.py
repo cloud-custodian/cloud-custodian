@@ -241,6 +241,79 @@ class AttributesFilter(Filter):
         return results
 
 
+@Vpc.filter_registry.register('dhcp-options')
+class DhcpOptionsFilter(Filter):
+    """Filter VPCs based on their dhcp options
+
+     :example:
+
+     .. code-block: yaml
+
+        - policies:
+             - name: vpcs-in-domain
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   domain-name: ec2.internal
+
+    if an option value is specified as a list, then all elements must be present.
+    if an option value is specified as a string, then that string must be present.
+
+    vpcs not matching a given option value can be found via specifying
+    a `present: false` parameter.
+
+    """
+
+    option_keys = ('domain-name', 'domain-name-servers', 'ntp-servers')
+    schema = type_schema('dhcp-options', **{
+        k: {'oneOf': [
+            {'type': 'array', 'items': {'type': 'string'}},
+            {'type': 'string'}]}
+        for k in option_keys})
+    schema['properties']['present'] = {'type': 'boolean'}
+    permissions = ('ec2:DescribeDhcpOptions',)
+
+    def validate(self):
+        if not any([self.data.get(k) for k in self.option_keys]):
+            raise ValueError("one of %s required" % (self.option_keys,))
+        return self
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        option_ids = [r['DhcpOptionsId'] for r in resources]
+        options_map = {}
+        results = []
+        for options in client.describe_dhcp_options(
+                Filters=[{
+                    'Name': 'dhcp-options-id',
+                    'Values': option_ids}]).get('DhcpOptions', ()):
+            options_map[options['DhcpOptionsId']] = {
+                o['Key']: [v['Value'] for v in o['Values']]
+                for o in options['DhcpConfigurations']}
+
+        for vpc in resources:
+            if self.process_vpc(vpc, options_map[vpc['DhcpOptionsId']]):
+                results.append(vpc)
+        return results
+
+    def process_vpc(self, vpc, dhcp):
+        vpc['c7n:DhcpConfiguration'] = dhcp
+        found = True
+        for k in self.option_keys:
+            if k not in self.data:
+                continue
+            is_list = isinstance(self.data[k], list)
+            if k not in dhcp:
+                found = False
+            elif not is_list and self.data[k] not in dhcp[k]:
+                found = False
+            elif is_list and sorted(self.data[k]) != sorted(dhcp[k]):
+                found = False
+        if not self.data.get('present', True):
+            found = not found
+        return found
+
+
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 

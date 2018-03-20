@@ -166,6 +166,22 @@ class VpcTest(BaseTest):
         self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
 
 
+    def test_dhcp_options_filter(self):
+        session_factory = self.replay_flight_data('test_vpc_dhcp_options')
+        p = self.load_policy({
+            'name': 'c7n-dhcp-options',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'dhcp-options',
+                'ntp-servers': ['128.138.140.44', '128.138.141.172'],
+                'domain-name': 'c7n.internal'
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            [len(resources), resources[0]['VpcId']], [1, 'vpc-7af45101'])
+        self.assertTrue('c7n:DhcpConfiguration' in resources[0])
+
+
 class NetworkLocationTest(BaseTest):
 
     def test_network_location_sg_missing(self):
