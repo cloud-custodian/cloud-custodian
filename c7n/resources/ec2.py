@@ -1046,7 +1046,8 @@ class Terminate(BaseAction, StateTransitionFilter):
             return
         if self.data.get('force'):
             self.log.info("Disabling termination protection on instances")
-            self.disable_deletion_protection(instances)
+            self.disable_deletion_protection(
+                [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         # limit batch sizes to avoid api limits
@@ -1120,7 +1121,8 @@ class Snapshot(BaseAction):
                 resource['InstanceId'],
                 volume_id)
             try:
-                response = c.create_snapshot(
+                response = self.manager.retry(
+                    c.create_snapshot,
                     DryRun=self.manager.config.dryrun,
                     VolumeId=volume_id,
                     Description=description)
@@ -1155,7 +1157,8 @@ class Snapshot(BaseAction):
                 copy_tags = []
 
             tags.extend(copy_tags)
-            c.create_tags(
+            self.manager.retry(
+                c.create_tags,
                 DryRun=self.manager.config.dryrun,
                 Resources=[
                     response['SnapshotId']],

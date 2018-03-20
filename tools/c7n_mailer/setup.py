@@ -30,7 +30,7 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_mailer",
-    version='0.3',
+    version='0.3.1',
     description="Cloud Custodian - Reference Mailer",
     long_description=description,
     classifiers=[

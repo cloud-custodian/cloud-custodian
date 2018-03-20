@@ -1,32 +1,32 @@
 {
-    "status_code": 201, 
+    "status_code": 201,
     "data": {
+        "ResponseMetadata": {
+            "RequestId": "92a8e9eb-251e-11e8-8037-51a8c65753e6",
+            "HTTPStatusCode": 201,
+            "HTTPHeaders": {
+                "date": "Sun, 11 Mar 2018 11:23:07 GMT",
+                "content-type": "application/json",
+                "content-length": "573",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "92a8e9eb-251e-11e8-8037-51a8c65753e6"
+            },
+            "RetryAttempts": 0
+        },
+        "FunctionName": "func-b",
+        "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:func-b",
+        "Runtime": "python2.7",
+        "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
+        "Handler": "index.handler",
+        "CodeSize": 168,
+        "Description": "",
+        "Timeout": 3,
+        "MemorySize": 128,
+        "LastModified": "2018-03-11T11:23:07.544+0000",
+        "CodeSha256": "NLea8ZDC16RKlQpOPkJ3qYnYL4u5eUGsGw9SZGrB910=",
+        "Version": "45",
         "TracingConfig": {
             "Mode": "PassThrough"
-        }, 
-        "CodeSha256": "NLea8ZDC16RKlQpOPkJ3qYnYL4u5eUGsGw9SZGrB910=", 
-        "FunctionName": "func-b", 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 201, 
-            "RequestId": "fe4c4444-932a-11e7-9302-bdb5f1f8f535", 
-            "HTTPHeaders": {
-                "date": "Wed, 06 Sep 2017 17:44:11 GMT", 
-                "x-amzn-requestid": "fe4c4444-932a-11e7-9302-bdb5f1f8f535", 
-                "content-length": "562", 
-                "content-type": "application/json", 
-                "connection": "keep-alive"
-            }
-        }, 
-        "CodeSize": 168, 
-        "MemorySize": 128, 
-        "FunctionArn": "arn:aws:lambda:us-west-1:644160558196:function:func-b", 
-        "Version": "10", 
-        "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
-        "Timeout": 3, 
-        "LastModified": "2017-09-06T17:44:12.272+0000", 
-        "Handler": "index.handler", 
-        "Runtime": "python2.7", 
-        "Description": ""
+        }
     }
 }

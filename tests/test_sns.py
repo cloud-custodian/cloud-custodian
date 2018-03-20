@@ -183,6 +183,67 @@ class TestSNS(BaseTest):
             [s['Sid'] for s in data.get('Statement', ())])
 
     @functional
+    def test_sns_account_id_template(self):
+        session_factory = self.replay_flight_data('test_sns_account_id_template')
+        client = session_factory().client('sns')
+        name = 'test_sns_account_id_template'
+        topic_arn = client.create_topic(Name=name)['TopicArn']
+        self.addCleanup(client.delete_topic, TopicArn=topic_arn)
+
+        client.set_topic_attributes(
+            TopicArn=topic_arn,
+            AttributeName="Policy",
+            AttributeValue=json.dumps({
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "SpecificAllow",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:Subscribe"],
+                        "Resource": topic_arn
+                    }
+                ]
+            })
+        )
+
+        p = self.load_policy({
+            'name': 'sns-modify-replace-policy',
+            'resource': 'sns',
+            'filters': [{'TopicArn': topic_arn}],
+            'actions': [
+                {'type': 'modify-policy',
+                    'add-statements': [{
+                        "Sid": "__default_statement_ID_{account_id}",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "s3.amazonaws.com"
+                        },
+                        "Action": "SNS:Publish",
+                        "Resource": topic_arn,
+                        "Condition": {
+                            "StringEquals": {
+                                "AWS:SourceAccount": "{account_id}"
+                            },
+                            "ArnLike": {
+                                "aws:SourceArn": "arn:aws:s3:*:*:*"
+                            }
+                        }
+                    }],
+                    'remove-statements': "*"
+                }]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        data = json.loads(client.get_topic_attributes(
+            TopicArn=resources[0]['TopicArn'])['Attributes']['Policy'])
+        self.assertTrue('__default_statement_ID_' + self.account_id in
+            [s['Sid'] for s in data.get('Statement', ())])
+
+    @functional
     def test_sns_modify_remove_policy(self):
         session_factory = self.replay_flight_data('test_sns_modify_remove_policy')
         client = session_factory().client('sns')

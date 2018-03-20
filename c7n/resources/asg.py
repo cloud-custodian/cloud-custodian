@@ -105,10 +105,15 @@ class LaunchConfigFilterBase(object):
         self.log.debug(
             "Querying launch configs for filter %s",
             self.__class__.__name__)
-        configs = self.manager.get_resource_manager(
-            'launch-config').resources()
+
+        lc_resources = self.manager.get_resource_manager('launch-config')
+        if len(config_names) < 5:
+            configs = lc_resources.get_resources(list(config_names))
+        else:
+            configs = lc_resources.resources()
         self.configs = {
-            cfg['LaunchConfigurationName']: cfg for cfg in configs}
+            cfg['LaunchConfigurationName']: cfg for cfg in configs
+            if cfg['LaunchConfigurationName'] in config_names}
 
 
 @filters.register('security-group')

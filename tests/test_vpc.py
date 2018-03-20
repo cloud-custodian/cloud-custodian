@@ -456,6 +456,31 @@ class NetworkAclTest(BaseTest):
 
 class NetworkInterfaceTest(BaseTest):
 
+    def test_and_or_nest(self):
+        factory = self.replay_flight_data(
+            'test_network_interface_nested_block_filter')
+
+        p = self.load_policy({
+            'name': 'net-find',
+            'resource': 'eni',
+            'filters': [
+                {'or': [
+                    {'SubnetId': 'subnet-55061130'},
+                    {'and': [
+                        {'type': 'security-group',
+                         'key': 'Description',
+                         'value': 'for apps'},
+                        {'type': 'security-group',
+                         'key': 'Description',
+                         'value': 'i-am-not-here'}]},
+                ]}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            [k for k in resources[0] if k.startswith('c7n')],
+            ['c7n:MatchedFilters'])
+
     @functional
     def test_interface_subnet(self):
         factory = self.replay_flight_data(
@@ -495,9 +520,14 @@ class NetworkInterfaceTest(BaseTest):
                 {'type': 'subnet',
                  'key': 'SubnetId',
                  'value': sub_id},
-                {'type': 'security-group',
-                 'key': 'Description',
-                 'value': 'for apps'}
+                {'or': [
+                 {'type': 'security-group',
+                  'key': 'Description',
+                  'value': 'for apps'},
+                 {'type': 'security-group',
+                  'key': 'Description',
+                  'value': 'i-am-not-here'}
+                ]}
             ],
             'actions': [{
                 'type': 'modify-security-groups',

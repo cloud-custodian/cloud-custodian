@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import functools
 import jmespath
 import json
 import six
@@ -24,8 +25,9 @@ from c7n.filters import CrossAccountAccessFilter, FilterRegistry, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import get_retry, local_session, type_schema
+from c7n.tags import (
+    RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment)
+from c7n.utils import get_retry, local_session, type_schema, generate_arn
 
 filters = FilterRegistry('lambda.filters')
 actions = ActionRegistry('lambda.actions')
@@ -48,38 +50,23 @@ class AWSLambda(QueryResourceManager):
     action_registry = actions
     retry = staticmethod(get_retry(('Throttled',)))
 
-    def augment(self, functions):
-        resources = super(AWSLambda, self).augment(functions)
-        return list(filter(None, _lambda_function_tags(
-            self.get_model(),
-            resources,
-            self.session_factory,
-            self.executor_factory,
-            self.retry,
-            self.log)))
+    def augment(self, resources):
+        return universal_augment(
+            self, super(AWSLambda, self).augment(resources))
 
-
-def _lambda_function_tags(
-        model, functions, session_factory, executor_factory, retry, log):
-    """ Augment Lambda function with their respective tags
-    """
-
-    def process_tags(function):
-        client = local_session(session_factory).client('lambda')
-        arn = function['FunctionArn']
-        try:
-            tag_dict = retry(client.list_tags, Resource=arn)['Tags']
-        except ClientError as e:
-            log.warning("Exception getting Lambda tags  \n %s", e)
-            return None
-        tag_list = []
-        for k, v in tag_dict.items():
-            tag_list.append({'Key': k, 'Value': v})
-        function['Tags'] = tag_list
-        return function
-
-    with executor_factory(max_workers=2) as w:
-        return list(w.map(process_tags, functions))
+    @property
+    def generate_arn(self):
+        """ Generates generic arn if ID is not already arn format.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.get_model().service,
+                region=self.config.region,
+                account_id=self.account_id,
+                resource_type=self.get_model().type,
+                separator=':')
+        return self._generate_arn
 
 
 def tag_function(session_factory, functions, tags, log):

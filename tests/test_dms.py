@@ -134,3 +134,42 @@ class ReplicationInstanceTagging(BaseTest):
         self.assertEqual(
             resources[0]['ReplicationInstanceIdentifier'],
             'replication-instance-1')
+
+
+class DmsEndpointTests(BaseTest):
+
+    def test_resource_query(self):
+        session_factory = self.replay_flight_data('test_dms_resource_query')
+        p = self.load_policy({
+            'name': 'dms-endpoint-query',
+            'resource': 'dms-endpoint'}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_endpoint_modify_sql(self):
+        session_factory = self.replay_flight_data(
+            'test_dms_modify_endpoint_sql')
+        p = self.load_policy({
+            'name': 'dms-sql-ssl',
+            'resource': 'dms-endpoint',
+            'filters': [
+                {'EndpointIdentifier': 'c7n-dms-sql-ep'},
+                {'ServerName': 'c7n-sql-db'}
+            ],
+            'actions': [{
+                'type': 'modify-endpoint',
+                'Port': 3305,
+                'SslMode': 'require',
+                'Username': 'admin',
+                'Password': 'sqlpassword',
+                'ServerName': 'c7n-sql-db-02',
+                'DatabaseName': 'c7n-db-02',
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dms')
+        ep = client.describe_endpoints()['Endpoints'][0]
+        self.assertEqual(
+            [ep['Port'], ep['SslMode'], ep['Username'],
+             ep['ServerName'], ep['DatabaseName']],
+            [3305, 'require', 'admin', 'c7n-sql-db-02', 'c7n-db-02'])

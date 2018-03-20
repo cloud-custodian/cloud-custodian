@@ -86,8 +86,9 @@ class RelatedResourceFilter(ValueFilter):
             if self.match(robj):
                 found.append(rid)
 
-        if self.AnnotationKey is not None:
-            resource['c7n:%s' % self.AnnotationKey] = found
+        if self.AnnotationKey is not None and found:
+            akey = 'c7n:%s' % self.AnnotationKey
+            resource[akey] = list(set(found).union(resource.get(akey, [])))
 
         if op == 'or' and found:
             return True
