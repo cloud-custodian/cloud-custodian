@@ -110,6 +110,14 @@ class UtilTest(unittest.TestCase):
     def test_format_date(self):
         d = parse_date("2018-02-02 12:00")
         self.assertEqual(
+            "{}".format(utils.FormatDate(d)),
+            "2018-02-02 12:00:00")
+
+        self.assertEqual(
+            "{:%Y-%m-%d}".format(utils.FormatDate(d)),
+            "2018-02-02")
+
+        self.assertEqual(
             "{:+5h%H}".format(utils.FormatDate(d)),
             "17")
 
