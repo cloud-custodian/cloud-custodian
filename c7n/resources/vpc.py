@@ -241,6 +241,86 @@ class AttributesFilter(Filter):
         return results
 
 
+@Vpc.filter_registry.register('dhcp-options')
+class DhcpOptionsFilter(Filter):
+    """Filter VPCs based on their dhcp options
+
+    :example:
+
+    .. code-block: yaml
+
+        - policies:
+            - name: vpcs-in-domain
+              resource: vpc
+              filters:
+                - type: dhcp-options
+                  domainname: ec2.internal
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'anyOf': [
+            {'required': ['type', 'domainname']},
+            {'required': ['type', 'nameserver']},
+            {'required': ['type', 'ntpserver']}
+        ],
+        'properties': {
+            'type': {'enum': ['dhcp-options']},
+            'domainname': {'type': 'array', 'items': {'type': 'string'}},
+            'nameserver': {'type': 'array', 'items': {'type': 'string'}},
+            'ntpserver': {'type': 'array', 'items': {'type': 'string'}}
+        }
+    }
+    permissions = ('ec2:DescribeDhcpOptions',)
+
+    def validate(self):
+        keys = ('domainname', 'nameserver', 'ntpserver')
+        if not any(k in self.data for k in keys):
+            raise FilterValidationError(
+                'at least one parameter must be provided')
+
+        for k in keys:
+            if k in self.data and not isinstance(self.data[k], list):
+                raise FilterValidationError('%s must be a list' % k)
+        return self
+
+    def process_vpc(self, r):
+        def _collect(k):
+            results = [[v['Value'] for v in o['Values']]
+                       for o in opts['DhcpConfigurations']
+                       if o['Key'] == k]
+            if results:
+                return sorted(results[0])
+            return []
+
+        client = local_session(self.manager.session_factory).client('ec2')
+        opts = client.describe_dhcp_options(
+            DhcpOptionsIds=[r['DhcpOptionsId']])['DhcpOptions'][0]
+
+        r['c7n:DhcpConfigurations'] = {
+            'id': opts['DhcpOptionsId'],
+            'domainname': (_collect('domain-name') if self.dmn
+                           else []),
+            'nameserver': (_collect('domain-name-servers') if self.dns
+                           else []),
+            'ntpserver': (_collect('ntp-servers') if self.ntp
+                          else [])}
+        return r
+
+    def process(self, resources, event=None):
+        self.dmn = sorted(self.data.get('domainname', []))
+        self.dns = sorted(self.data.get('nameserver', []))
+        self.ntp = sorted(self.data.get('ntpserver', []))
+        results = []
+        for r in resources:
+            r = self.process_vpc(r)
+            if (self.dmn == r['c7n:DhcpConfigurations']['domainname'] and
+                    self.dns == r['c7n:DhcpConfigurations']['nameserver'] and
+                    self.ntp == r['c7n:DhcpConfigurations']['ntpserver']):
+                results.append(r)
+        return results
+
+
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 

@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest, functional, event_data
 from c7n.filters import FilterValidationError
+from c7n.resources.vpc import DhcpOptionsFilter
+from c7n.executor import MainThreadExecutor
 
 
 class VpcTest(BaseTest):
@@ -164,6 +166,20 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
+    def test_dhcp_options_filter(self):
+        self.session_factory = self.replay_flight_data('test_vpc_dhcp_options')
+        p = self.load_policy({
+            'name': 'c7n-dhcp-options-set',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'dhcp-options',
+                'ntpserver': ['128.138.140.44', '128.138.141.172'],
+                'domainname': ['c7n.internal']
+            }]}, session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(
+            [len(resources), resources[0]['VpcId']], [1, 'vpc-7af45101'])
 
 
 class NetworkLocationTest(BaseTest):
