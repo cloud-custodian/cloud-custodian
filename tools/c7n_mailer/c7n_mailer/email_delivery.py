@@ -274,9 +274,9 @@ class EmailDelivery(object):
                 format_struct(event)))
             return None
         if identity['type'] == 'AssumedRole':
-            assume_role_msg = 'No ldap uid is associated with AssumedRole: %s' % identity['arn']
-            self.logger.debug(assume_role_msg)
-            return None
+            self.logger.debug('In some cases there is no ldap uid is associated with AssumedRole: %s' % identity['arn'])
+            self.logger.debug('We will try to assume that identity is in the AssumedRoleSessionName')
+            return identity['arn'].split('/')[-1]
         if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
             return identity['userName']
         if identity['type'] == 'Root':
