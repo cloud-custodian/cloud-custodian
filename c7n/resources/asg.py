@@ -37,7 +37,7 @@ from c7n.manager import resources
 from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
-    local_session, type_schema, chunks, get_retry, worker)
+    local_session, type_schema, chunks, get_retry, worker, get_bad_snapshot)
 
 log = logging.getLogger('custodian.asg')
 
@@ -531,26 +531,14 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
             try:
                 result = ec2.describe_snapshots(SnapshotIds=snap_ids)
             except ClientError as e:
-                bad_snap = self.get_bad_snapshot(e)
+                self.log.info(e)
+                bad_snap = get_bad_snapshot(e)
                 if bad_snap:
                     snap_ids.remove(bad_snap)
                     continue
                 raise
             else:
                 return result.get('Snapshots', ())
-
-    def get_bad_snapshot(self, e):
-        """Handle various client side errors when describing snapshots"""
-        msg = e.response['Error']['Message']
-        error = e.response['Error']['Code']
-        e_snap_id = None
-        if error == 'InvalidSnapshot.NotFound':
-            e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
-            self.log.warning("Snapshot not found %s" % e_snap_id)
-        elif error == 'InvalidSnapshotID.Malformed':
-            e_snap_id = msg[msg.find('"') + 1:msg.rfind('"')]
-            self.log.warning("Snapshot id malformed %s" % e_snap_id)
-        return e_snap_id
 
 
 @filters.register('image-age')

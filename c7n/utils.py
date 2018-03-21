@@ -489,3 +489,18 @@ def format_string_values(obj, *args, **kwargs):
         return obj.format(*args, **kwargs)
     else:
         return obj
+
+def get_bad_snapshot(e):
+    """Handle various client side errors when describing snapshots"""
+    log.info(e.response)
+    msg = e.response['Error']['Message']
+    log.info(msg)
+    error = e.response['Error']['Code']
+    e_snap_id = None
+    if error == 'InvalidSnapshot.NotFound':
+        e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
+        log.warning("Snapshot not found %s" % e_snap_id)
+    elif error == 'InvalidSnapshotID.Malformed':
+        e_snap_id = msg[msg.find('"') + 1:msg.rfind('"')]
+        log.warning("Snapshot id malformed %s" % e_snap_id)
+    return e_snap_id
