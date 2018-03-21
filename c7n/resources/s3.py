@@ -776,6 +776,7 @@ class HasStatementFilter(Filter):
                         found += 1
                 if found and found == len(required_statement):
                     required_statements.remove(required_statement)
+                    break
 
         if (self.data.get('statement_ids', []) and not required) or \
            (self.data.get('statements', []) and not required_statements):
