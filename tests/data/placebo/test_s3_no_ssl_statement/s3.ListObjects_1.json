@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-ssl-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "HostId": "XPHZ3KY+71TRnMIhG4OBNY5oPzmnwBbwH5Csu9FruqEvKol189eXKomb6uaKnD9LASVB1Yy2shk=", 
+            "RequestId": "45A681D9FE4A6DE6"
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

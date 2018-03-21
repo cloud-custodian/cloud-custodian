@@ -1,0 +1,12 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/custodian-ssl-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "V1nOqj1s/5VhjKQhBZZV+sgXQgJK3tGVdyjQeYk6cvBX5qk96lNMOSenjfpMsKV8OaiNN5pPOSs=", 
+            "RequestId": "CF184A75B41ACA24"
+        }
+    }
+}

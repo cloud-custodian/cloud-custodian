@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "tr-aws-sub015", 
+            "ID": "ad16965bc71b0ab830c57f1a914bd9b3293033c3955f050eabe1fc9d64ff1e6a"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 46
+                }, 
+                "Name": "custodian-ssl-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "6Ghhrs+S4RQqfuJr3c8SJrUIrvHV2vpkZ/7VApJ0vNFEZf7NaaFXBwEPfkr4oxDuMeTcg5xpC28=", 
+            "RequestId": "EEACB7F34CE222DF", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "6Ghhrs+S4RQqfuJr3c8SJrUIrvHV2vpkZ/7VApJ0vNFEZf7NaaFXBwEPfkr4oxDuMeTcg5xpC28=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "EEACB7F34CE222DF", 
+                "date": "Tue, 07 Nov 2017 22:46:32 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
