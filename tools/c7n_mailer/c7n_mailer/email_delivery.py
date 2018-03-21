@@ -276,10 +276,12 @@ class EmailDelivery(object):
         if identity['type'] == 'AssumedRole':
             self.logger.debug('In some cases there is no ldap uid is associated with AssumedRole: %s' % identity['arn'])
             self.logger.debug('We will try to assume that identity is in the AssumedRoleSessionName')
-            session_name = identity['arn'].split('/')[-1]
-            if ':' in session_name:
-                session_name = session_name.split(':', 1)[-1]
-            return session_name
+            user = identity['arn'].rsplit('/', 1)[-1]
+            if user is None or user.startswith('i-') or user.startswith('awslambda'):
+                return None
+            if ':' in user:
+                user = user.split(':', 1)[-1]
+            return user
         if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
             return identity['userName']
         if identity['type'] == 'Root':
