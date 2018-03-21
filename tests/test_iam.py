@@ -435,6 +435,7 @@ class IamInlinePolicyUsage(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserName'], 'kapil')
 
     def test_iam_user_no_inline_policy(self):
         session_factory = self.replay_flight_data('test_iam_user_no_inline_policy')
@@ -452,6 +453,9 @@ class IamInlinePolicyUsage(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([r['UserName'] for r in resources]),
+            ['andrewalexander', 'scot@sixfeetup.com'])
 
     def test_iam_role_has_inline_policy(self):
         session_factory = self.replay_flight_data(
