@@ -345,25 +345,3 @@ class UtilTest(unittest.TestCase):
         self.assertEqual(fmt['Key3'], 'aa')
         self.assertEqual(fmt['Key4'][2], 'aa')
         self.assertEqual(fmt['Key4'][1]['K'], 'bb')
-
-    def test_get_bad_snapshot_malformed(self):
-        operation_name = "DescribeSnapshots"
-        error_response = {
-                'Error': {
-                    'Message': 'Invalid id: "snap-malformedsnap"',
-                    'Code': 'InvalidSnapshotID.Malformed'}
-                }
-        e = ClientError(error_response, operation_name)
-        snap = utils.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-malformedsnap")
-
-    def test_get_bad_snapshot_notfound(self):
-        operation_name = "DescribeSnapshots"
-        error_response = {
-                'Error': {
-                    'Message': "The snapshot 'snap-notfound' does not exist.",
-                    'Code': 'InvalidSnapshot.NotFound'}
-                }
-        e = ClientError(error_response, operation_name)
-        snap = utils.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-notfound")
