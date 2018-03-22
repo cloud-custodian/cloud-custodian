@@ -19,11 +19,3 @@ class Session(object):
         return klass(self.credentials, self.subscription_id)
 
 
-        
-        
-        
-
-        
-        
-
-    
