@@ -141,6 +141,16 @@ class PolicyPermissions(BaseTest):
                 "%s have config types but no config source" % (
                     ", ".join(bad)))
 
+    def test_resource_name(self):
+        names = []
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'name', None):
+                names.append(k)
+        if names:
+            self.fail(
+                '%s dont have resource name for reporting' % (
+                    ", ".join(names)))
+
     def test_resource_permissions(self):
         self.capture_logging('c7n.cache')
         missing = []
