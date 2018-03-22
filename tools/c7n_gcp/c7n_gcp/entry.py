@@ -16,5 +16,6 @@ from c7n_gcp.resources import resourcemanager
 from c7n_gcp.resources import compute
 from c7n_gcp.resources import storage
 
+
 def initialize_gcp():
     pass
