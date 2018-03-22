@@ -188,13 +188,16 @@ class ModifyReplicationInstance(BaseAction):
             try:
                 client.modify_replication_instance(**params)
             except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'InsufficientResourceCapacityFault',
+                ecode = e.response['Error']['Code']
+                if ecode in (
                         'InvalidResourceStateFault',
                         'ResourceAlreadyExistsFault',
-                        'ResourceNotFoundFault',
-                        'StorageQuotaExceededFault',
-                        'UpgradeDependencyFailureFault'):
+                        'ResourceNotFoundFault'):
+                    continue
+                elif ecode == 'UpgradeDependencyFailureFault':
+                    self.log.exception(
+                        'Exception modifying instance %s :%s' % (
+                            r['ReplicationInstanceArn'], e))
                     continue
                 raise
 
