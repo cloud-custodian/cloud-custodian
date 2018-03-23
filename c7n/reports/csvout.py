@@ -43,7 +43,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from concurrent.futures import as_completed
 
-import csv
 from datetime import datetime
 import gzip
 import io
@@ -59,7 +58,7 @@ from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session, dumps
-
+from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('custodian.reports')
 
@@ -97,7 +96,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
 
     rows = formatter.to_csv(records)
     if options.format == 'csv':
-        writer = csv.writer(output_fh, formatter.headers())
+        writer = UnicodeWriter(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
     else:

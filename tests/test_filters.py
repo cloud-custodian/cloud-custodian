@@ -113,22 +113,6 @@ class TestNotFilter(unittest.TestCase):
                 {'Color': 'green'}]})
         self.assertEqual(len(f.process(results)), 2)
 
-        """
-        f = filters.factory({
-            'not': [
-                {'Architecture': 'x86'}]})
-        self.assertEqual(len(f.process(results)), 3)
-
-        f = filters.factory({
-            'not': [
-                {'Architecture': 'x86_64'},
-                {'or': [
-                    {'Color': 'green'},
-                    {'Color': 'blue'},
-                    {'Color': 'yellow'},
-                ]}]})
-        self.assertEqual(len(f.process(results)), 0)
-        """
 
 class TestValueFilter(unittest.TestCase):
 

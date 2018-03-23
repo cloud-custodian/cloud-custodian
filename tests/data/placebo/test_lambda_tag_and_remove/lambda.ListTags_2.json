@@ -1,21 +1,18 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "b7f08e83-27bc-11e7-97da-9d98532b8625", 
+            "RequestId": "d2962819-251f-11e8-9d9f-2f8debc17004",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Sun, 23 Apr 2017 00:35:14 GMT", 
-                "x-amzn-requestid": "b7f08e83-27bc-11e7-97da-9d98532b8625", 
-                "content-length": "45", 
-                "content-type": "application/json", 
-                "connection": "keep-alive"
-            }
-        }, 
-        "Tags": {
-            "xyz": "abcdef", 
-            "Language": "Python"
-        }
+                "date": "Sun, 11 Mar 2018 11:32:04 GMT",
+                "content-type": "application/json",
+                "content-length": "11",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d2962819-251f-11e8-9d9f-2f8debc17004"
+            },
+            "RetryAttempts": 0
+        },
+        "Tags": {}
     }
 }

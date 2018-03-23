@@ -1193,7 +1193,12 @@ class S3Test(BaseTest):
                     'Condition': {
                         'StringNotEquals': {
                             's3:x-amz-server-side-encryption': [
-                                'AES256', 'aws:kms']}}}]}))
+                                'AES256', 'aws:kms']}}},
+                   {'Sid': 'Zebra2',
+                    'Effect': 'Deny',
+                    'Principal': 'arn:aws:iam::644160558196:root',
+                    'Action': 's3:PutObject',
+                    'Resource': 'arn:aws:s3:::%s/*' % bname}]}))
         p = self.load_policy({
             'name': 's3-has-policy',
             'resource': 's3',
@@ -1226,6 +1231,30 @@ class S3Test(BaseTest):
                    {'Effect': 'Deny',
                     'Action': 's3:PutObject',
                     'Principal': '*'}]}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_has_statement_similar_policies(self):
+        self.patch(s3.S3, 'executor_factory', MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, 'executor_factory',
+            MainThreadExecutor)
+        self.patch(s3, 'S3_AUGMENT_TABLE', [
+            ('get_bucket_policy',  'Policy', None, 'Policy'),
+        ])
+        session_factory = self.replay_flight_data('test_s3_has_statement')
+        bname = "custodian-policy-test"
+        session = session_factory()
+        p = self.load_policy({
+            'name': 's3-has-policy',
+            'resource': 's3',
+            'filters': [
+                {'Name': bname},
+                {'type': 'has-statement',
+                 'statements': [
+                   {'Effect': 'Deny',
+                    'Action': 's3:PutObject'}]}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

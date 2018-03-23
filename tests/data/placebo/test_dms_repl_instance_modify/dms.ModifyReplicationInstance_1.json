@@ -1,0 +1,92 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ReplicationInstance": {
+            "MultiAZ": false, 
+            "AvailabilityZone": "us-east-1e", 
+            "ReplicationInstancePrivateIpAddress": "172.31.33.51", 
+            "ReplicationInstanceArn": "arn:aws:dms:us-east-1:644160558196:rep:RGF5QFEZKDBSNCIQYF4XPIEFAE", 
+            "ReplicationInstancePrivateIpAddresses": [
+                "172.31.33.51"
+            ], 
+            "ReplicationInstanceClass": "dms.t2.small", 
+            "ReplicationSubnetGroup": {
+                "ReplicationSubnetGroupDescription": "default group created by console for vpc id vpc-d2d616b5", 
+                "Subnets": [
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-3a334610", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1d"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-efbcccb7", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-e3b194de", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1e"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-914763e7", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1a"
+                        }
+                    }
+                ], 
+                "VpcId": "vpc-d2d616b5", 
+                "SubnetGroupStatus": "Complete", 
+                "ReplicationSubnetGroupIdentifier": "default-vpc-d2d616b5"
+            }, 
+            "AutoMinorVersionUpgrade": true, 
+            "ReplicationInstanceStatus": "available", 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-6c7fa917"
+                }
+            ], 
+            "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0", 
+            "InstanceCreateTime": {
+                "hour": 10, 
+                "__class__": "datetime", 
+                "month": 3, 
+                "second": 8, 
+                "microsecond": 348000, 
+                "year": 2018, 
+                "day": 22, 
+                "minute": 29
+            }, 
+            "ReplicationInstancePublicIpAddresses": [
+                null
+            ], 
+            "AllocatedStorage": 50, 
+            "EngineVersion": "2.4.1", 
+            "ReplicationInstanceIdentifier": "rep-inst-1", 
+            "PubliclyAccessible": false, 
+            "PreferredMaintenanceWindow": "mon:23:00-mon:23:59", 
+            "PendingModifiedValues": {
+                "ReplicationInstanceClass": "dms.t2.medium"
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0223f347-2dde-11e8-8fba-9df9abb6a794", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0223f347-2dde-11e8-8fba-9df9abb6a794", 
+                "date": "Thu, 22 Mar 2018 14:33:36 GMT", 
+                "content-length": "1772", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
