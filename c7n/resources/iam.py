@@ -625,8 +625,7 @@ class CredentialReport(Filter):
     """
     schema = type_schema(
         'credential',
-        value_type={'type': 'string', 'enum': [
-            'age', 'expiration', 'size', 'regex']},
+        value_type=ValueFilter.schema['properties']['value_type'],
 
         key={'type': 'string',
              'title': 'report key to search',
