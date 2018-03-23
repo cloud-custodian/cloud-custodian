@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 from c7n.manager import resources
-from c7n.filters import FilterRegistry
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
@@ -30,14 +29,11 @@ class GlueConnection(QueryResourceManager):
         service = 'glue'
         enum_spec = ('get_connections', 'ConnectionList', None)
         detail_spec = None
-        id = 'Name'
-        name = 'Name'
+        id = name = 'Name'
         date = 'CreationTime'
         dimension = None
         filter_name = None
 
-    filters = FilterRegistry('glue-connection.filters')
-    filter_registry = filters
     permissions = ('glue:GetConnections',)
 
 

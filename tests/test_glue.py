@@ -41,6 +41,9 @@ class TestGlueConnections(BaseTest):
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['PhysicalConnectionRequirements']['SubnetId'],
+            'subnet-3a334610')
 
     def test_connection_sg_filter(self):
         session_factory = self.replay_flight_data(
@@ -56,6 +59,10 @@ class TestGlueConnections(BaseTest):
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['PhysicalConnectionRequirements'][
+                'SecurityGroupIdList'],
+            ['sg-6c7fa917'])
 
     def test_connection_delete(self):
         session_factory = self.replay_flight_data(
