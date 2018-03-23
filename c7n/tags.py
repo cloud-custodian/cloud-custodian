@@ -719,6 +719,7 @@ class UniversalTag(Tag):
     """
 
     batch_size = 20
+    concurrency = 1
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
@@ -769,6 +770,7 @@ class UniversalUntag(RemoveTag):
     """
 
     batch_size = 20
+    concurrency = 1
     permissions = ('resourcegroupstaggingapi:UntagResources',)
 
     def process_resource_set(self, resource_set, tag_keys):
