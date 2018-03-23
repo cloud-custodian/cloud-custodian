@@ -71,7 +71,7 @@ class DeleteConnection(BaseAction):
               - type: delete
     """
     schema = type_schema('delete')
-    permissions = ('glue:UpdateConnection',)
+    permissions = ('glue:DeleteConnection',)
 
     def delete_connection(self, r):
         client = local_session(self.manager.session_factory).client('glue')
