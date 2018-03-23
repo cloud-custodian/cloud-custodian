@@ -865,14 +865,11 @@ class ModifyPolicyBase(BaseAction):
     )
 
     def __init__(self, data=None, manager=None):
-        if manager is not None:
-            config_args = {
-                'account_id': manager.config.get('account_id'),
-                'region': manager.config.get('region')
-            }
-            self.data = utils.format_string_values(data, **config_args)
-        else:
-            self.data = utils.format_string_values(data)
+        config_args = {
+            'account_id': manager.config.account_id,
+            'region': manager.config.region
+        }
+        self.data = utils.format_string_values(data, **config_args)
         self.manager = manager
 
     def add_statements(self, policy_statements):
