@@ -15,8 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest
 
-import botocore.exceptions as b_exc
-
 
 class TestGlueConnections(BaseTest):
     def test_connections_query(self):
