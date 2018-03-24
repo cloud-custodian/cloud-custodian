@@ -39,6 +39,17 @@ class TestCFN(BaseTest):
         resources = p.run()
         self.assertEqual(resources, [])
 
+    def test_disable_protection(self):
+        factory = self.replay_flight_data('test_cfn_disable_protection')
+        p = self.load_policy({
+            'name': 'cfn-disable-protection',
+            'resource': 'cfn',
+            'filters': [{'StackStatus': 'CREATE_COMPLETE'}, {'StackName': 'sphere11-db'}],
+            'actions': ['disable-protection']
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_cfn_add_tag(self):
         session_factory = self.replay_flight_data('test_cfn_add_tag')
         p = self.load_policy({

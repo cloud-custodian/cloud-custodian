@@ -72,6 +72,39 @@ class Delete(BaseAction):
         client.delete_stack(StackName=stack['StackName'])
 
 
+@CloudFormation.action_registry.register('disable-protection')
+class DisableProtection(BaseAction):
+    """Action to disable termination protection
+
+    It is recommended to use a filter to avoid unwanted deletion of stacks
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudformation-disable-protection
+                resource: cfn
+                filters:
+                  - StackStatus: CREATE_COMPLETE
+                actions:
+                  - disable-protection
+    """
+
+    permissions = ('cloudformation:UpdateStack',)
+
+    def process(self, stacks):
+        with self.executor_factory(max_workers=10) as w:
+            list(w.map(self.process_stacks, stacks))
+
+    def process_stacks(self, stack):
+        client = local_session(
+            self.manager.session_factory).client('cloudformation')
+        client.update_termination_protection(
+            EnableTerminationProtection=False,
+            StackName=stack['StackName'])
+
+
 @CloudFormation.action_registry.register('tag')
 class CloudFormationAddTag(Tag):
     """Action to tag a cloudformation stack

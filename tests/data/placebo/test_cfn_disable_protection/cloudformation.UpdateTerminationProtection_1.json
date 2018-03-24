@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/sphere11-dev/514b9370-c6b0-11e6-a4cc-50d5cd26c2d2",
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "7df15e4b-c6b1-11e6-b9b8-077e63d75d99",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7df15e4b-c6b1-11e6-b9b8-077e63d75d99",
+                "date": "Tue, 20 Dec 2016 12:40:30 GMT",
+                "content-length": "212",
+                "content-type": "text/xml"
+            }
+        }
+    }
+}
