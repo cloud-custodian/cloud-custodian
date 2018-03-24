@@ -140,7 +140,7 @@ class SetELBShieldProtection(SetShieldProtection):
         # from app load balancer arns. See https://goo.gl/pE7TQb
         super(SetELBShieldProtection, self).clear_stale(
             client,
-            [p for p in protections if p.count('/') == 1])
+            [p for p in protections if p['ResourceArn'].count('/') == 1])
 
 
 
