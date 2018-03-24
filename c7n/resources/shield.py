@@ -56,7 +56,7 @@ def get_protections_paginator(client):
         client.meta.service_model.operation_model('ListProtections'))
 
 
-def get_type_protections(client, model):
+def get_type_protections(client, model, arn_discriminator):
     protections = get_protections_paginator(
         client).paginate().build_full_result().get('Protections')
     return [p for p in protections if model.type in p['ResourceArn']]
@@ -104,14 +104,19 @@ class SetShieldProtection(BaseAction):
             'shield', region_name='us-east-1')
         model = self.manager.get_model()
         protections = get_type_protections(client, self.manager.get_model())
-        protected_resources = {p['ResourceArn'] for p in protections}
+        protected_resources = {p['ResourceArn']: p for p in protections}
+        state = self.data.get('state', True)
 
         if self.data.get('sync', False):
             self.clear_stale(client, protections)
 
         for r in resources:
             arn = self.manager.get_arn(r)
-            if arn in protected_resources:
+            if state and arn in protected_resources:
+                continue
+            if state is False and arn in protected_resources:
+                client.delete_protection(
+                    ProtectionId=protected_resources[arn]['Id'])
                 continue
             try:
                 client.create_protection(
