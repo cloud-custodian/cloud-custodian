@@ -91,6 +91,7 @@ class DisableProtection(BaseAction):
                   - disable-protection
     """
 
+    schema = type_schema('disable-protection')
     permissions = ('cloudformation:UpdateStack',)
 
     def process(self, stacks):
@@ -100,6 +101,7 @@ class DisableProtection(BaseAction):
     def process_stacks(self, stack):
         client = local_session(
             self.manager.session_factory).client('cloudformation')
+
         client.update_termination_protection(
             EnableTerminationProtection=False,
             StackName=stack['StackName'])
