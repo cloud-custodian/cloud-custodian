@@ -56,7 +56,7 @@ def get_protections_paginator(client):
         client.meta.service_model.operation_model('ListProtections'))
 
 
-def get_type_protections(client, model, arn_discriminator):
+def get_type_protections(client, model):
     protections = get_protections_paginator(
         client).paginate().build_full_result().get('Protections')
     return [p for p in protections if model.type in p['ResourceArn']]
