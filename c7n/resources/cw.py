@@ -99,6 +99,7 @@ class EventRuleTarget(ChildResourceManager):
         type = 'event-rule-target'
         enum_spec = ('list_targets_by_rule', 'Targets', None)
         parent_spec = ('event-rule', 'Rule', True)
+        name = id = 'Id'
         dimension = None
         filter_type = filter_name = None
 

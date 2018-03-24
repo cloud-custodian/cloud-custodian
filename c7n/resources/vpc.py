@@ -1539,7 +1539,7 @@ class VpcEndpoint(query.QueryResourceManager):
         service = 'ec2'
         type = 'vpc-endpoint'
         enum_spec = ('describe_vpc_endpoints', 'VpcEndpoints', None)
-        id = 'VpcEndpointId'
+        name = id = 'VpcEndpointId'
         date = 'CreationTimestamp'
         filter_name = 'VpcEndpointIds'
         filter_type = 'list'
