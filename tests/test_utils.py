@@ -21,6 +21,7 @@ import tempfile
 import time
 
 from botocore.exceptions import ClientError
+from dateutil.parser import parse as parse_date
 import six
 
 from c7n import ipaddress, utils
@@ -105,6 +106,28 @@ class WorkerDecorator(BaseTest):
 
 
 class UtilTest(unittest.TestCase):
+
+    def test_format_date(self):
+        d = parse_date("2018-02-02 12:00")
+        self.assertEqual(
+            "{}".format(utils.FormatDate(d)),
+            "2018-02-02 12:00:00")
+
+        self.assertEqual(
+            "{:%Y-%m-%d}".format(utils.FormatDate(d)),
+            "2018-02-02")
+
+        self.assertEqual(
+            "{:+5h%H}".format(utils.FormatDate(d)),
+            "17")
+
+        self.assertEqual(
+            "{:+5d%d}".format(utils.FormatDate(d)),
+            "07")
+
+        self.assertEqual(
+            "{:+5M%M}".format(utils.FormatDate(d)),
+            "05")
 
     def test_group_by(self):
         sorter = lambda x: x
