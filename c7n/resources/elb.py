@@ -143,7 +143,6 @@ class SetELBShieldProtection(SetShieldProtection):
             [p for p in protections if p['ResourceArn'].count('/') == 1])
 
 
-
 @actions.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Action to specify an action to occur at a later date
