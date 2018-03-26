@@ -27,7 +27,6 @@ import six
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
-from c7n.credentials import SessionFactory
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.provider import clouds

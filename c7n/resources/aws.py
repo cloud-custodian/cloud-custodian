@@ -21,6 +21,7 @@ import sys
 
 import boto3
 
+from c7n.credentials import SessionFactory
 from c7n.registry import PluginRegistry
 from c7n import utils
 
@@ -167,4 +168,3 @@ def get_service_region_map(regions, resource_types):
             service_region_map.setdefault(s, []).extend(
                 session.get_available_regions(s, partition_name=partition))
     return service_region_map, resource_service_map
-
