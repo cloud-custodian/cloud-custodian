@@ -49,21 +49,9 @@ class Provider(object):
         region execution and filtering policies for applicable regions.
         """
 
-
-@clouds.register('gcp')
-class GoogleCloud(object):
-
-    resource_prefix = 'gcp'
-    resources = PluginRegistry('%s.resources' % resource_prefix)
-
-    def initialize(self, options):
-        return options
-
-    def initialize_policies(self, policy_collection, options):
-        return policy_collection
-
-
-gcp = GoogleCloud.resources
+    @abc.abstractmethod
+    def get_session_factory(self, options):
+        """Get a credential/session factory for api usage."""
 
 
 @clouds.register('azure')
@@ -77,6 +65,9 @@ class Azure(object):
 
     def initialize_policies(self, policy_collection, options):
         return policy_collection
+
+    def get_session_factory(self, options):
+        pass
 
 
 azure = Azure.resources

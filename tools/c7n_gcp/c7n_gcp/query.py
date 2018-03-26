@@ -46,9 +46,10 @@ class DescribeSource(object):
 
     def __init__(self, manager):
         self.manager = manager
+        self.query = ResourceQuery(manager.session_factory)
 
     def get_resources(self, query):
-        return self.query.filter(self.manager, **query)
+        return self.query.filter(self.manager)
 
     def get_permissions(self):
         return ()
