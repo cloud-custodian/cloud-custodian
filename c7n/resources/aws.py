@@ -64,7 +64,6 @@ def _default_account_id(options):
         options.account_id = None
 
 
-
 @clouds.register('aws')
 class AWS(object):
 
@@ -161,5 +160,4 @@ def get_service_region_map(regions, resource_types):
             service_region_map.setdefault(s, []).extend(
                 session.get_available_regions(s, partition_name=partition))
     return service_region_map, resource_service_map
-
 

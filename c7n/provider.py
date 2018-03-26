@@ -63,7 +63,6 @@ class GoogleCloud(object):
         return policy_collection
 
 
-
 gcp = GoogleCloud.resources
 
 
@@ -78,7 +77,6 @@ class Azure(object):
 
     def initialize_policies(self, policy_collection, options):
         return policy_collection
-
 
 
 azure = Azure.resources
