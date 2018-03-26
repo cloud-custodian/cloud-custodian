@@ -14,6 +14,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.exceptions import ClientError
+from botocore.paginate import Paginator
+
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
@@ -47,6 +49,19 @@ class ShieldAttack(QueryResourceManager):
         filter_type = 'list'
 
 
+def get_protections_paginator(client):
+    return Paginator(
+        client.list_protections,
+        {'input_token': 'NextToken', 'output_token': 'NextToken', 'result_key': 'Protections'},
+        client.meta.service_model.operation_model('ListProtections'))
+
+
+def get_type_protections(client, model):
+    protections = get_protections_paginator(
+        client).paginate().build_full_result().get('Protections')
+    return [p for p in protections if model.type in p['ResourceArn']]
+
+
 class IsShieldProtected(Filter):
 
     permissions = ('shield:ListProtections',)
@@ -55,7 +70,8 @@ class IsShieldProtected(Filter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
-        protections = client.list_protections().get('Protections', ())
+
+        protections = get_type_protections(client, self.manager.get_model())
         protected_resources = {p['ResourceArn'] for p in protections}
 
         state = self.data.get('state', False)
@@ -73,23 +89,34 @@ class IsShieldProtected(Filter):
 
 class SetShieldProtection(BaseAction):
     """Enable shield protection on applicable resource.
+
+    setting `sync` parameter will also clear out stale shield protections
+    for resources that no longer exist.
     """
 
     permissions = ('shield:CreateProtection', 'shield:ListProtections',)
     schema = type_schema(
         'set-shield',
-        state={'type': 'boolean'})
+        state={'type': 'boolean'}, sync={'type': 'boolean'})
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
         model = self.manager.get_model()
-        protections = client.list_protections().get('Protections', ())
-        protected_resources = {p['ResourceArn'] for p in protections}
+        protections = get_type_protections(client, self.manager.get_model())
+        protected_resources = {p['ResourceArn']: p for p in protections}
+        state = self.data.get('state', True)
+
+        if self.data.get('sync', False):
+            self.clear_stale(client, protections)
 
         for r in resources:
             arn = self.manager.get_arn(r)
-            if arn in protected_resources:
+            if state and arn in protected_resources:
+                continue
+            if state is False and arn in protected_resources:
+                client.delete_protection(
+                    ProtectionId=protected_resources[arn]['Id'])
                 continue
             try:
                 client.create_protection(
@@ -99,3 +126,15 @@ class SetShieldProtection(BaseAction):
                 if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
                     continue
                 raise
+
+    def clear_stale(self, client, protections):
+        # Get all resources unfiltered
+        resources = self.manager.get_resource_manager(self.manager.type).resources()
+        resource_arns = set(map(self.manager.get_arn, resources))
+        protections = {p['ResourceArn']: p for p in protections}
+        # Find any protections for resources that don't exist
+        stale = set(protections).difference(resource_arns)
+        self.log.info("clearing %d stale protections", len(stale))
+        for s in stale:
+            client.delete_protection(
+                ProtectionId=protections[s]['Id'])
