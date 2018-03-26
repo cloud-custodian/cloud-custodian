@@ -14,18 +14,40 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import abc
+import six
+
+
 from c7n.registry import PluginRegistry
 
 
 clouds = PluginRegistry('c7n.providers')
 
 
-@clouds.register('aws')
-class AWS(object):
+@six.add_metaclass(abc.ABCMeta)
+class Provider(object):
+    """Provider Base Class"""
 
-    resource_prefix = 'aws'
-    # legacy path for older plugins
-    resources = PluginRegistry('resources')
+    @abc.abstractproperty
+    def resources(self):
+        """resources registry for this cloud provider"""
+
+    @abc.abstractproperty
+    def resource_prefix(self):
+        """resource prefix for this cloud provider in policy files."""
+
+    @abc.abstractmethod
+    def initialize(self, options):
+        """Perform any provider specific initialization
+        """
+
+    @abc.abstractmethod
+    def initialize_policies(self, policy_collection, options):
+        """Perform any initialization of policies.
+
+        Common usage is expanding policy collection for per
+        region execution and filtering policies for applicable regions.
+        """
 
 
 @clouds.register('gcp')
@@ -33,6 +55,13 @@ class GoogleCloud(object):
 
     resource_prefix = 'gcp'
     resources = PluginRegistry('%s.resources' % resource_prefix)
+
+    def initialize(self, options):
+        return options
+
+    def initialize_policies(self, policy_collection, options):
+        return policy_collection
+
 
 
 gcp = GoogleCloud.resources
@@ -43,6 +72,13 @@ class Azure(object):
 
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
+
+    def initialize(self, options):
+        return options
+
+    def initialize_policies(self, policy_collection, options):
+        return policy_collection
+
 
 
 azure = Azure.resources
