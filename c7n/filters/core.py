@@ -311,7 +311,7 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr']},
+                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr', 'unique_size']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -481,6 +481,11 @@ class ValueFilter(Filter):
         elif self.vtype == 'size':
             try:
                 return sentinel, len(value)
+            except TypeError:
+                return sentinel, 0
+        elif self.vtype == 'unique_size':
+            try:
+                return sentinel, len(set(value))
             except TypeError:
                 return sentinel, 0
         elif self.vtype == 'swap':
