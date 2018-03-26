@@ -166,6 +166,22 @@ class VpcTest(BaseTest):
         self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
 
 
+    def test_dhcp_options_filter(self):
+        session_factory = self.replay_flight_data('test_vpc_dhcp_options')
+        p = self.load_policy({
+            'name': 'c7n-dhcp-options',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'dhcp-options',
+                'ntp-servers': ['128.138.140.44', '128.138.141.172'],
+                'domain-name': 'c7n.internal'
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(
+            [len(resources), resources[0]['VpcId']], [1, 'vpc-7af45101'])
+        self.assertTrue('c7n:DhcpConfiguration' in resources[0])
+
+
 class NetworkLocationTest(BaseTest):
 
     def test_network_location_sg_missing(self):
@@ -456,6 +472,31 @@ class NetworkAclTest(BaseTest):
 
 class NetworkInterfaceTest(BaseTest):
 
+    def test_and_or_nest(self):
+        factory = self.replay_flight_data(
+            'test_network_interface_nested_block_filter')
+
+        p = self.load_policy({
+            'name': 'net-find',
+            'resource': 'eni',
+            'filters': [
+                {'or': [
+                    {'SubnetId': 'subnet-55061130'},
+                    {'and': [
+                        {'type': 'security-group',
+                         'key': 'Description',
+                         'value': 'for apps'},
+                        {'type': 'security-group',
+                         'key': 'Description',
+                         'value': 'i-am-not-here'}]},
+                ]}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            [k for k in resources[0] if k.startswith('c7n')],
+            ['c7n:MatchedFilters'])
+
     @functional
     def test_interface_subnet(self):
         factory = self.replay_flight_data(
@@ -495,9 +536,14 @@ class NetworkInterfaceTest(BaseTest):
                 {'type': 'subnet',
                  'key': 'SubnetId',
                  'value': sub_id},
-                {'type': 'security-group',
-                 'key': 'Description',
-                 'value': 'for apps'}
+                {'or': [
+                 {'type': 'security-group',
+                  'key': 'Description',
+                  'value': 'for apps'},
+                 {'type': 'security-group',
+                  'key': 'Description',
+                  'value': 'i-am-not-here'}
+                ]}
             ],
             'actions': [{
                 'type': 'modify-security-groups',

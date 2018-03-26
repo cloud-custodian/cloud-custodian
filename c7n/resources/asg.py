@@ -105,10 +105,15 @@ class LaunchConfigFilterBase(object):
         self.log.debug(
             "Querying launch configs for filter %s",
             self.__class__.__name__)
-        configs = self.manager.get_resource_manager(
-            'launch-config').resources()
+
+        lc_resources = self.manager.get_resource_manager('launch-config')
+        if len(config_names) < 5:
+            configs = lc_resources.get_resources(list(config_names))
+        else:
+            configs = lc_resources.resources()
         self.configs = {
-            cfg['LaunchConfigurationName']: cfg for cfg in configs}
+            cfg['LaunchConfigurationName']: cfg for cfg in configs
+            if cfg['LaunchConfigurationName'] in config_names}
 
 
 @filters.register('security-group')
@@ -521,20 +526,32 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
         return unencrypted_configs
 
     def get_snapshots(self, ec2, snap_ids):
-        """get snapshots corresponding to id, but tolerant of missing."""
+        """get snapshots corresponding to id, but tolerant of invalid id's."""
         while True:
             try:
                 result = ec2.describe_snapshots(SnapshotIds=snap_ids)
             except ClientError as e:
-                if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
-                    msg = e.response['Error']['Message']
-                    e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
-                    self.log.warning("Snapshot not found %s" % e_snap_id)
-                    snap_ids.remove(e_snap_id)
+                bad_snap = NotEncryptedFilter.get_bad_snapshot(e)
+                if bad_snap:
+                    snap_ids.remove(bad_snap)
                     continue
                 raise
             else:
                 return result.get('Snapshots', ())
+
+    @staticmethod
+    def get_bad_snapshot(e):
+        """Handle various client side errors when describing snapshots"""
+        msg = e.response['Error']['Message']
+        error = e.response['Error']['Code']
+        e_snap_id = None
+        if error == 'InvalidSnapshot.NotFound':
+            e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
+            log.warning("Snapshot not found %s" % e_snap_id)
+        elif error == 'InvalidSnapshotID.Malformed':
+            e_snap_id = msg[msg.find('"') + 1:msg.rfind('"')]
+            log.warning("Snapshot id malformed %s" % e_snap_id)
+        return e_snap_id
 
 
 @filters.register('image-age')

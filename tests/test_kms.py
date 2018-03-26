@@ -45,6 +45,24 @@ class KMSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_set_key_rotation(self):
+        session_factory = self.replay_flight_data('test_key_rotation_set')
+        p = self.load_policy({
+            'name': 'enable-key-rotation',
+            'resource': 'kms-key',
+            'filters': [
+                {'tag:Name': 'CMK-Rotation-Test'},
+                {'type': 'key-rotation-status', 'key': 'KeyRotationEnabled',
+                 'value': False}],
+            'actions': [{
+                'type': 'set-rotation',
+                'state': True
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('kms')
+        key = client.get_key_rotation_status(KeyId=resources[0]['KeyId'])
+        self.assertEqual(key['KeyRotationEnabled'], True)
 
     @functional
     def test_kms_remove_matched(self):

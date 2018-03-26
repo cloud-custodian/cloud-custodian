@@ -61,6 +61,20 @@ class ReplicationInstance(QueryResourceManager):
         return resources
 
 
+@resources.register('dms-endpoint')
+class DmsEndpoints(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'dms'
+        enum_spec = ('describe_endpoints', 'Endpoints', None)
+        detail_spec = None
+        id = 'EndpointArn'
+        name = 'EndpointIdentifier'
+        date = None
+        dimension = None
+        filter_name = None
+
+
 class InstanceDescribe(DescribeSource):
 
     def get_resources(self, resource_ids):
@@ -120,6 +134,72 @@ class InstanceDelete(BaseAction):
         client = local_session(self.manager.session_factory).client('dms')
         for arn, r in zip(self.manager.get_arns(resources), resources):
             client.delete_replication_instance(ReplicationInstanceArn=arn)
+
+
+@ReplicationInstance.action_registry.register('modify-instance')
+class ModifyReplicationInstance(BaseAction):
+    """Modify replication instance(s) to apply new settings
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: enable-minor-version-upgrade
+            resource: dms-instance
+            filters:
+              - AutoMinorVersionUpgrade: False
+            actions:
+              - type: modify-instance
+                ApplyImmediately: True
+                AutoMinorVersionUpgrade: True
+                PreferredMaintenanceWindow: mon:23:00-mon:23:59
+
+    AWS ModifyReplicationInstance Documentation: https://goo.gl/ePye9N
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['modify-instance']},
+            'ReplicationInstanceArn': {'type': 'string'},
+            'AllocatedStorage': {'type': 'integer'},
+            'ApplyImmediately': {'type': 'boolean'},
+            'ReplicationInstanceClass': {'type': 'string'},
+            'VpcSecurityGroupIds': {
+                'type': 'array', 'items': {'type': 'string'}
+            },
+            'PreferredMaintenanceWindow': {'type': 'string'},
+            'MultiAZ': {'type': 'boolean'},
+            'EngineVersion': {'type': 'string'},
+            'AllowMajorVersionUpgrade': {'type': 'boolean'},
+            'AutoMinorVersionUpgrade': {'type': 'boolean'},
+            'ReplicationInstanceIdentifier': {'type': 'string'}
+        }
+    }
+    permissions = ('dms:ModifyReplicationInstance',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dms')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            params['ReplicationInstanceArn'] = r['ReplicationInstanceArn']
+            try:
+                client.modify_replication_instance(**params)
+            except ClientError as e:
+                ecode = e.response['Error']['Code']
+                if ecode in (
+                        'InvalidResourceStateFault',
+                        'ResourceAlreadyExistsFault',
+                        'ResourceNotFoundFault'):
+                    continue
+                elif ecode == 'UpgradeDependencyFailureFault':
+                    self.log.exception(
+                        'Exception modifying instance %s :%s' % (
+                            r['ReplicationInstanceArn'], e))
+                    continue
+                raise
 
 
 @ReplicationInstance.action_registry.register('tag')
@@ -222,5 +302,112 @@ class InstanceMarkForOp(TagDelayedAction):
                     Tags=tags_list)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceNotFoundFault':
+                    continue
+                raise
+
+
+@DmsEndpoints.action_registry.register('modify-endpoint')
+class ModifyDmsEndpoint(BaseAction):
+    """Modify the attributes of a DMS endpoint
+
+    :example:
+
+    .. code-block: yaml
+
+        - policies:
+            - name: dms-endpoint-modify
+              resource: dms-endpoint
+              filters:
+                - EngineName: sqlserver
+                - SslMode: none
+              actions:
+                - type: modify-endpoint
+                  SslMode: require
+
+    AWS ModifyEndpoint Documentation: https://goo.gl/eDFfuf
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['modify-endpoint']},
+            'Port': {'type': 'integer', 'minimum': 1, 'maximum': 65536},
+            'ServerName': {'type': 'string'},
+            'SslMode': {'type': 'string', 'enum': [
+                'none', 'require', 'verify-ca', 'verify-full']},
+            'CertificateArn': {'type': 'string'},
+            'DatabaseName': {'type': 'string'},
+            'EndpointIdentifier': {'type': 'string'},
+            'EngineName': {'enum': [
+                'mysql', 'oracle', 'postgres',
+                'mariadb', 'aurora', 'redshift',
+                'S3', 'sybase', 'dynamodb', 'mongodb',
+                'sqlserver']},
+            'ExtraConnectionAttributes': {'type': 'string'},
+            'Username': {'type': 'string'},
+            'Password': {'type': 'string'},
+            'DynamoDbSettings': {
+                'type': 'object',
+                'additionalProperties': False,
+                'required': ['ServiceAccessRoleArn'],
+                'properties': {'ServiceAccessRoleArn': {'type': 'string'}}
+            },
+            'S3Settings': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'BucketFolder': {'type': 'string'},
+                    'BucketName': {'type': 'string'},
+                    'CompressionType': {
+                        'type': 'string', 'enum': ['none', 'gzip']
+                    },
+                    'CsvDelimiter': {'type': 'string'},
+                    'CsvRowDelimiter': {'type': 'string'},
+                    'ExternalTableDefinition': {'type': 'string'},
+                    'ServiceAccessRoleArn': {'type': 'string'}
+                }
+            },
+            'MongoDbSettings': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'AuthMechanism': {
+                        'type': 'string', 'enum': [
+                            'default', 'mongodb_cr', 'scram_sha_1']
+                    },
+                    'AuthSource': {'type': 'string'},
+                    'Username': {'type': 'string'},
+                    'Password': {'type': 'string'},
+                    'DatabaseName': {'type': 'string'},
+                    'DocsToInvestigate': {'type': 'integer', 'minimum': 1},
+                    'ExtractDocId': {'type': 'string'},
+                    'NestingLevel': {
+                        'type': 'string', 'enum': [
+                            'NONE', 'none', 'ONE', 'one']},
+                    'Port': {
+                        'type': 'integer', 'minimum': 1, 'maximum': 65535},
+                    'ServerName': {'type': 'string'}
+                }
+            }
+        }
+    }
+    permissions = ('dms:ModifyEndpoint',)
+
+    def process(self, endpoints):
+        client = local_session(self.manager.session_factory).client('dms')
+        params = dict(self.data)
+        params.pop('type')
+        for e in endpoints:
+            params['EndpointArn'] = e['EndpointArn']
+            params['EndpointIdentifier'] = params.get(
+                'EndpointIdentifier', e['EndpointIdentifier'])
+            params['EngineName'] = params.get('EngineName', e['EngineName'])
+            try:
+                client.modify_endpoint(**params)
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'InvalidResourceStateFault',
+                        'ResourceAlreadyExistsFault',
+                        'ResourceNotFoundFault'):
                     continue
                 raise

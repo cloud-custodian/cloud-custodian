@@ -59,8 +59,9 @@ def get_archive(config):
 
 def provision(config, session_factory):
     func_config = dict(
-        name='cloud-custodian-mailer',
-        description='Cloud Custodian Mailer',
+        name=config.get('lambda_name', 'cloud-custodian-mailer'),
+        description=config.get('lambda_description', 'Cloud Custodian Mailer'),
+        tags=config.get('lambda_tags', {}),
         handler='periodic.dispatch',
         runtime=config['runtime'],
         memory_size=config['memory'],
@@ -72,7 +73,7 @@ def provision(config, session_factory):
         events=[
             CloudWatchEventSource(
                 {'type': 'periodic',
-                 'schedule': 'rate(5 minutes)'},
+                 'schedule': config.get('lambda_schedule', 'rate(5 minutes)')},
                 session_factory,
                 prefix="")
         ])

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.registry import PluginRegistry
@@ -34,11 +35,17 @@ class GoogleCloud(object):
     resources = PluginRegistry('%s.resources' % resource_prefix)
 
 
+gcp = GoogleCloud.resources
+
+
 @clouds.register('azure')
 class Azure(object):
 
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
+
+
+azure = Azure.resources
 
 
 def resources(cloud_provider=None):

@@ -15,7 +15,6 @@
 """
 
 from collections import Counter
-import csv
 import logging
 import os
 import multiprocessing
@@ -33,7 +32,7 @@ from botocore.exceptions import ClientError
 import click
 import jsonschema
 
-from c7n.credentials import assumed_session
+from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import MainThreadExecutor
 from c7n.handler import Config as Bag
 from c7n.policy import PolicyCollection
@@ -43,11 +42,12 @@ from c7n.manager import resources as resource_registry
 from c7n.utils import CONN_CACHE, dumps
 
 from c7n_org.utils import environ, account_tags
+from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
 
 
-WORKER_COUNT = os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4)
+WORKER_COUNT = int(os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
 
 
 CONFIG_SCHEMA = {
@@ -57,7 +57,7 @@ CONFIG_SCHEMA = {
         'account': {
             'type': 'object',
             'additionalProperties': True,
-            'oneOf': [
+            'anyOf': [
                 {'required': ['role', 'account_id']},
                 {'required': ['profile', 'account_id']}],
             'properties': {
@@ -70,6 +70,7 @@ CONFIG_SCHEMA = {
                 'role': {'oneOf': [
                     {'type': 'array', 'items': {'type': 'string'}},
                     {'type': 'string'}]},
+                'external_id': {'type': 'string'},
             }
         }
     },
@@ -139,9 +140,9 @@ def resolve_regions(regions, partition='aws'):
 
 def get_session(account, session_name, region):
     if account.get('role'):
-        return assumed_session(role, session_name, region=region)
-    elif account.get('profile')
-        return SessionFactory(region, profile)()
+        return assumed_session(account['role'], session_name, region=region, external_id=account.get('external_id'))
+    elif account.get('profile'):
+        return SessionFactory(region, account['profile'])()
     else:
         raise ValueError(
             "No profile or role assume specified for account %s" % account)
@@ -169,10 +170,16 @@ def report_account(account, region, policies_config, output_path, debug):
     cache_path = os.path.join(output_path, "c7n.cache")
     output_path = os.path.join(output_path, account['name'], region)
     bag = Bag.empty(
-        region=region, assume_role=account['role'],
+        region=region,
         output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=False,
         cache=cache_path, log_group=None, profile=None, external_id=None)
+
+    if account['role']:
+        bag['assume_role'] = account['role']
+        bag['external_id'] = account.get('external_id')
+    elif account['profile']:
+        bag['profile'] = account['profile']
 
     policies = PolicyCollection.from_data(policies_config, bag)
     records = []
@@ -195,7 +202,7 @@ def report_account(account, region, policies_config, output_path, debug):
 
 @cli.command()
 @click.option('-c', '--config', required=True, help="Accounts config file")
-@click.option('-f', '--output', type=click.File('wb'), default='-', help="Output File")
+@click.option('-f', '--output', type=click.File('w'), default='-', help="Output File")
 @click.option('-u', '--use', required=True)
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
@@ -208,7 +215,9 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('-p', '--policy', multiple=True)
 @click.option('--format', default='csv', type=click.Choice(['csv', 'json']))
 @click.option('--resource', default=None)
-def report(config, output, use, output_dir, accounts, field, no_default_fields, tags, region, debug, verbose, policy, format, resource):
+def report(config, output, use, output_dir, accounts,
+           field, no_default_fields, tags, region, debug, verbose,
+           policy, format, resource):
     """report on a cross account policy execution."""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, resource=resource)
@@ -218,6 +227,8 @@ def report(config, output, use, output_dir, accounts, field, no_default_fields, 
         resource_types.add(p['resource'])
     if len(resource_types) > 1:
         raise ValueError("can only report on one resource type at a time")
+    elif not len(custodian_config['policies']) > 0:
+        raise ValueError("no matching policies found")
 
     records = []
     with executor(max_workers=WORKER_COUNT) as w:
@@ -264,7 +275,7 @@ def report(config, output, use, output_dir, accounts, field, no_default_fields, 
         fields=prefix_fields)
 
     rows = formatter.to_csv(records, unique=False)
-    writer = csv.writer(output, formatter.headers())
+    writer = UnicodeWriter(output, formatter.headers())
     writer.writerow(formatter.headers())
     writer.writerows(rows)
 
@@ -273,7 +284,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
     try:
         session = get_session(account, "org-script", region)
         creds = session._session.get_credentials()
-    except:
+    except ClientError:
         log.error(
             "unable to obtain credentials for account:%s role:%s",
             account['name'], account['role'])
@@ -325,9 +336,9 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
         futures = {}
         for a in accounts_config.get('accounts', ()):
             for r in resolve_regions(region or a.get('regions', ())):
-                futures[w.submit(
-                    run_account_script, a, r, output_dir, serial, script_args)
-                            ] = (a, r)
+                futures[
+                    w.submit(run_account_script, a, r, output_dir,
+                             serial, script_args)] = (a, r)
         for f in as_completed(futures):
             a, r = futures[f]
             if f.exception():
@@ -347,7 +358,8 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                     a['name'], r, " ".join(script_args))
 
 
-def run_account(account, region, policies_config, output_path, cache_period, metrics, dryrun, debug):
+def run_account(account, region, policies_config, output_path,
+                cache_period, metrics, dryrun, debug):
     """Execute a set of policies on an account.
     """
     logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
@@ -366,6 +378,7 @@ def run_account(account, region, policies_config, output_path, cache_period, met
 
     if account['role']:
         bag['assume_role'] = account['role']
+        bag['external_id'] = account.get('external_id')
     elif account['profile']:
         bag['profile'] = account['profile']
 
@@ -375,14 +388,17 @@ def run_account(account, region, policies_config, output_path, cache_period, met
     with environ(**account_tags(account)):
         for p in policies:
             log.debug(
-                "Running policy:%s account:%s region:%s", p.name, account['name'], region)
+                "Running policy:%s account:%s region:%s",
+                p.name, account['name'], region)
             try:
                 resources = p.run()
                 policy_counts[p.name] = resources and len(resources) or 0
                 if not resources:
                     continue
-                log.info("Ran account:%s region:%s policy:%s matched:%d time:%0.2f",
-                         account['name'], region, p.name, len(resources), time.time()-st)
+                log.info(
+                    "Ran account:%s region:%s policy:%s matched:%d time:%0.2f",
+                    account['name'], region, p.name, len(resources),
+                    time.time() - st)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDenied':
                     log.warning('Access denied account:%s region:%s',
@@ -399,6 +415,7 @@ def run_account(account, region, policies_config, output_path, cache_period, met
                 if not debug:
                     continue
                 import traceback, pdb, sys
+                traceback.print_exc()
                 pdb.post_mortem(sys.exc_info()[-1])
                 raise
 
