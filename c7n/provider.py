@@ -54,25 +54,6 @@ class Provider(object):
         """Get a credential/session factory for api usage."""
 
 
-@clouds.register('azure')
-class Azure(object):
-
-    resource_prefix = 'azure'
-    resources = PluginRegistry('%s.resources' % resource_prefix)
-
-    def initialize(self, options):
-        return options
-
-    def initialize_policies(self, policy_collection, options):
-        return policy_collection
-
-    def get_session_factory(self, options):
-        pass
-
-
-azure = Azure.resources
-
-
 def resources(cloud_provider=None):
     results = {}
     for cname, ctype in clouds.items():
