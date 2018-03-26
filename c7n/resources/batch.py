@@ -108,6 +108,12 @@ class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
     def process(self, resources):
         resources = self.filter_resource_state(
             resources, 'status', self.valid_origin_status)
+        if not resources:
+            self.log.info(
+                '%s: no batch-compute environments with valid status in %s' % (
+                    self.__class__.__name__,
+                    [str(s) for s in self.valid_origin_status]))
+            return
         client = local_session(self.manager.session_factory).client('batch')
         params = dict(self.data)
         params.pop('type')
@@ -147,5 +153,13 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
             self.filter_resource_state(
                 resources, 'state', self.valid_origin_states),
             'status', self.valid_origin_status)
+        if not resources:
+            self.log.info(
+                '%s: no batch-compute environments with valid status in '
+                '%s or with valid state in %s' % (
+                    self.__class__.__name__,
+                    [str(s) for s in self.valid_origin_status],
+                    [str(s) for s in self.valid_origin_states]))
+            return
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.delete_environment, resources))
