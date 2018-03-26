@@ -13,10 +13,10 @@
 # limitations under the License.
 from c7n_gcp.query import QueryResourceManager
 
-from c7n.provider import gcp
+from c7n_gcp.provider import resources
 
 
-@gcp.register('organization')
+@resources.register('organization')
 class Organization(QueryResourceManager):
 
     class resource_type(object):
@@ -25,7 +25,7 @@ class Organization(QueryResourceManager):
         component = 'organizations'
 
 
-@gcp.register('folder')
+@resources.register('folder')
 class Folder(QueryResourceManager):
 
     class resource_type(object):
@@ -34,7 +34,7 @@ class Folder(QueryResourceManager):
         component = 'folders'
 
 
-@gcp.register('project')
+@resources.register('project')
 class Project(QueryResourceManager):
 
     class resource_type(object):

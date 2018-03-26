@@ -13,11 +13,10 @@
 # limitations under the License.
 
 from c7n_gcp.query import QueryResourceManager
+from c7n_gcp.provider import resources
 
-from c7n.provider import gcp
 
-
-@gcp.register('bucket')
+@resources.register('bucket')
 class Bucket(QueryResourceManager):
 
     class resource_type(object):

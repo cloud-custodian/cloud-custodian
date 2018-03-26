@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.resources import vm
-from c7n_azure.resources import vnet
+import c7n_azure.resources.vm
+import c7n_azure.resources.vnet  # noqa: F401
 
 
 def initialize_azure():

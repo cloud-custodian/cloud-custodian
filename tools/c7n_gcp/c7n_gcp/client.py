@@ -432,4 +432,3 @@ class ServiceClient(object):
                                        num_retries=self._num_retries)
         return request.execute(http=self.http,
                                num_retries=self._num_retries)
-

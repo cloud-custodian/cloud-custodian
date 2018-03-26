@@ -14,38 +14,44 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import abc
+import six
+
+
 from c7n.registry import PluginRegistry
 
 
 clouds = PluginRegistry('c7n.providers')
 
 
-@clouds.register('aws')
-class AWS(object):
+@six.add_metaclass(abc.ABCMeta)
+class Provider(object):
+    """Provider Base Class"""
 
-    resource_prefix = 'aws'
-    # legacy path for older plugins
-    resources = PluginRegistry('resources')
+    @abc.abstractproperty
+    def resources(self):
+        """resources registry for this cloud provider"""
 
+    @abc.abstractproperty
+    def resource_prefix(self):
+        """resource prefix for this cloud provider in policy files."""
 
-@clouds.register('gcp')
-class GoogleCloud(object):
+    @abc.abstractmethod
+    def initialize(self, options):
+        """Perform any provider specific initialization
+        """
 
-    resource_prefix = 'gcp'
-    resources = PluginRegistry('%s.resources' % resource_prefix)
+    @abc.abstractmethod
+    def initialize_policies(self, policy_collection, options):
+        """Perform any initialization of policies.
 
+        Common usage is expanding policy collection for per
+        region execution and filtering policies for applicable regions.
+        """
 
-gcp = GoogleCloud.resources
-
-
-@clouds.register('azure')
-class Azure(object):
-
-    resource_prefix = 'azure'
-    resources = PluginRegistry('%s.resources' % resource_prefix)
-
-
-azure = Azure.resources
+    @abc.abstractmethod
+    def get_session_factory(self, options):
+        """Get a credential/session factory for api usage."""
 
 
 def resources(cloud_provider=None):
