@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Endpoints": [
+            {
+                "Status": "active", 
+                "S3Settings": {
+                    "ServiceAccessRoleArn": "arn:aws:iam::644160558196:role/dms-vpc-role", 
+                    "ExternalTableDefinition": "{\n    \"TableCount\": \"1\",\n    \"Tables\": [\n        {\n            \"TableName\": \"employee\",\n            \"TablePath\": \"hr/employee/\",\n            \"TableOwner\": \"hr\",\n            \"TableColumns\": [\n                {\n                    \"ColumnName\": \"Id\",\n                    \"ColumnType\": \"INT8\",\n                    \"ColumnNullable\": \"false\",\n                    \"ColumnIsPk\": \"true\"\n                },\n                {\n                    \"ColumnName\": \"LastName\",\n                    \"ColumnType\": \"STRING\",\n                    \"ColumnLength\": \"20\"\n                },\n                {\n                    \"ColumnName\": \"FirstName\",\n                    \"ColumnType\": \"STRING\",\n                    \"ColumnLength\": \"30\"\n                },\n                {\n                    \"ColumnName\": \"HireDate\",\n                    \"ColumnType\": \"DATETIME\"\n                },\n                {\n                    \"ColumnName\": \"OfficeLocation\",\n                    \"ColumnType\": \"STRING\",\n                    \"ColumnLength\": \"20\"\n                }\n            ],\n            \"TableColumnsTotal\": \"5\"\n        }\n    ]\n}", 
+                    "BucketName": "c7n-sm-test", 
+                    "BucketFolder": "dms"
+                }, 
+                "EndpointType": "SOURCE", 
+                "EndpointArn": "arn:aws:dms:us-east-1:644160558196:endpoint:YWWPQ44VI4JFKHFFASJ2AXBOXE", 
+                "ExtraConnectionAttributes": "bucketName=c7n-sm-test;bucketFolder=dms;cdcPath=dms/cdc", 
+                "SslMode": "require", 
+                "EngineName": "s3", 
+                "EndpointIdentifier": "endpointtest"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "93495f1a-1e56-11e8-8e6e-61fbd598f11f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "93495f1a-1e56-11e8-8e6e-61fbd598f11f", 
+                "date": "Fri, 02 Mar 2018 20:16:21 GMT", 
+                "content-length": "3103", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

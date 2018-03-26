@@ -1,18 +1,18 @@
 {
-    "status_code": 201, 
+    "status_code": 201,
     "data": {
-        "Statement": "{\"Sid\":\"PublicInvoke\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-west-1:644160558196:function:func-b\"}", 
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 201, 
-            "RequestId": "fe74dac8-932a-11e7-b226-77ce6ec92e95", 
+            "RequestId": "92d7e880-251e-11e8-98f4-d92224afce99",
+            "HTTPStatusCode": 201,
             "HTTPHeaders": {
-                "date": "Wed, 06 Sep 2017 17:44:12 GMT", 
-                "x-amzn-requestid": "fe74dac8-932a-11e7-b226-77ce6ec92e95", 
-                "content-length": "191", 
-                "content-type": "application/json", 
-                "connection": "keep-alive"
-            }
-        }
+                "date": "Sun, 11 Mar 2018 11:23:07 GMT",
+                "content-type": "application/json",
+                "content-length": "191",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "92d7e880-251e-11e8-98f4-d92224afce99"
+            },
+            "RetryAttempts": 0
+        },
+        "Statement": "{\"Sid\":\"PublicInvoke\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-2:644160558196:function:func-b\"}"
     }
 }

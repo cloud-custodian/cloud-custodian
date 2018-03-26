@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b", 
+                "Tags": [
+                    {
+                        "Value": "CMK-Rotation-Test", 
+                        "Key": "Name"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "609bd46b-2880-11e8-9fe9-fb0d8b0be24f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "609bd46b-2880-11e8-9fe9-fb0d8b0be24f", 
+                "date": "Thu, 15 Mar 2018 18:40:47 GMT", 
+                "content-length": "470", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

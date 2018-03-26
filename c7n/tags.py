@@ -83,8 +83,8 @@ def universal_augment(self, resources):
         self.session_factory).client('resourcegroupstaggingapi')
 
     paginator = client.get_paginator('get_resources')
-
     resource_type = getattr(self.get_model(), 'resource_type', None)
+
     if not resource_type:
         resource_type = self.get_model().service
         if self.get_model().type:
@@ -93,13 +93,11 @@ def universal_augment(self, resources):
     resource_tag_map_list = list(itertools.chain(
         *[p['ResourceTagMappingList'] for p in paginator.paginate(
             ResourceTypeFilters=[resource_type])]))
-    resource_tag_map = {r['ResourceARN']: r for r in resource_tag_map_list}
-    for r in resources:
-        arn = self.get_arns([r])[0]
-        t = resource_tag_map.get(arn)
-        if t:
-            r['Tags'] = t['Tags']
-
+    resource_tag_map = {
+        r['ResourceARN']: r['Tags'] for r in resource_tag_map_list}
+    for arn, r in zip(self.get_arns(resources), resources):
+        if arn in resource_tag_map:
+            r['Tags'] = resource_tag_map[arn]
     return resources
 
 
@@ -369,6 +367,8 @@ class Tag(Action):
         if msg:
             tags.append({'Key': tag, 'Value': msg})
 
+        self.interpolate_values(tags)
+
         batch_size = self.data.get('batch_size', self.batch_size)
 
         _common_tag_processer(
@@ -384,6 +384,18 @@ class Tag(Action):
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
+
+    def interpolate_values(self, tags):
+        params = {
+            'account_id': self.manager.config.account_id,
+            'now': utils.FormatDate.utcnow(),
+            'region': self.manager.config.region}
+        interpolate_tag_values(tags, params)
+
+
+def interpolate_tag_values(tags, params):
+    for t in tags:
+        t['Value'] = t['Value'].format(**params)
 
 
 class RemoveTag(Action):
@@ -721,6 +733,7 @@ class UniversalTag(Tag):
     """
 
     batch_size = 20
+    concurrency = 1
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
@@ -771,6 +784,7 @@ class UniversalUntag(RemoveTag):
     """
 
     batch_size = 20
+    concurrency = 1
     permissions = ('resourcegroupstaggingapi:UntagResources',)
 
     def process_resource_set(self, resource_set, tag_keys):
