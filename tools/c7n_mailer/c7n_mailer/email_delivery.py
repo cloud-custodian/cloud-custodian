@@ -24,6 +24,18 @@ from .utils import (
     format_struct, get_message_subject, get_resource_tag_targets,
     get_rendered_jinja)
 
+# Those headers are defined as follows:
+#  'X-Priority': 1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest)
+#              Non-standard, cf https://people.dsv.su.se/~jpalme/ietf/ietf-mail-attributes.html
+#              Set by Thunderbird
+#  'X-MSMail-Priority': High, Normal, Low
+#              Cf Microsoft https://msdn.microsoft.com/en-us/library/gg671973(v=exchg.80).aspx
+#              Note: May increase SPAM level on Spamassassin:
+#                    https://wiki.apache.org/spamassassin/Rules/MISSING_MIMEOLE
+#  'Priority': "normal" / "non-urgent" / "urgent"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.6
+#  'Importance': "low" / "normal" / "high"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.4
 PRIORITIES = {
     '1': {
         'X-Priority': '1 (Highest)',
