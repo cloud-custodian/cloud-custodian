@@ -11,6 +11,9 @@ coverage:
 test:
 	./bin/tox -e py27
 
+test3:
+	./bin/tox -e py36
+
 nose-tests:
 	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --processes=-1 --process-timeout=300 tests
 

@@ -52,7 +52,8 @@ class AppELB(QueryResourceManager):
     class resource_type(object):
 
         service = 'elbv2'
-        type = 'app-elb'
+        type = 'loadbalancer/app'
+
         enum_spec = ('describe_load_balancers', 'LoadBalancers', None)
         name = 'LoadBalancerName'
         id = 'LoadBalancerArn'

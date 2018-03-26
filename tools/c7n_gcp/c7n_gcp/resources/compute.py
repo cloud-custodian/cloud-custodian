@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from c7n_gcp.query import QueryResourceManager
+from c7n_gcp.provider import resources
 
-from c7n.provider import gcp
 
-
-@gcp.register('instance')
+@resources.register('instance')
 class Instance(QueryResourceManager):
 
     class resource_type(object):
@@ -25,7 +24,7 @@ class Instance(QueryResourceManager):
         component = 'instance'
 
 
-@gcp.register('image')
+@resources.register('image')
 class Image(QueryResourceManager):
 
     class resource_type(object):
@@ -34,7 +33,7 @@ class Image(QueryResourceManager):
         component = 'images'
 
 
-@gcp.register('disk')
+@resources.register('disk')
 class Disk(QueryResourceManager):
 
     class resource_type(object):

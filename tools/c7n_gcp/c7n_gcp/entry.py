@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_gcp.resources import resourcemanager
-from c7n_gcp.resources import compute
-from c7n_gcp.resources import storage
+
+import c7n_gcp.resources.resourcemanager
+import c7n_gcp.resources.compute
+import c7n_gcp.resources.storage  # noqa: F401
 
 
 def initialize_gcp():

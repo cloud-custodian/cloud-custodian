@@ -12,14 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.query import QueryResourceManager
-from c7n_azure.provider import resources
+from c7n.provider import clouds
+from c7n.registry import PluginRegistry
 
 
-@resources.register('vm')
-class VirtualMachine(QueryResourceManager):
+@clouds.register('azure')
+class Azure(object):
 
-    class resource_type(object):
-        service = 'azure.mgmt.compute'
-        client = 'ComputeManagementClient'
-        ops = 'virtual_machines'
+    resource_prefix = 'azure'
+    resources = PluginRegistry('%s.resources' % resource_prefix)
+
+    def initialize(self, options):
+        return options
+
+    def initialize_policies(self, policy_collection, options):
+        return policy_collection
+
+    def get_session_factory(self, options):
+        pass
+
+
+resources = Azure.resources

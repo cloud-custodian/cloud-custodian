@@ -12,14 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.query import QueryResourceManager
-from c7n_azure.provider import resources
+from c7n.registry import PluginRegistry
+from c7n.provider import Provider, clouds
+
+from .client import Session
 
 
-@resources.register('vm')
-class VirtualMachine(QueryResourceManager):
+@clouds.register('gcp')
+class GoogleCloud(Provider):
 
-    class resource_type(object):
-        service = 'azure.mgmt.compute'
-        client = 'ComputeManagementClient'
-        ops = 'virtual_machines'
+    resource_prefix = 'gcp'
+    resources = PluginRegistry('%s.resources' % resource_prefix)
+
+    def initialize(self, options):
+        return options
+
+    def initialize_policies(self, policy_collection, options):
+        return policy_collection
+
+    def get_session_factory(self, options):
+        """Get a credential/session factory for api usage."""
+        return Session
+
+
+resources = GoogleCloud.resources

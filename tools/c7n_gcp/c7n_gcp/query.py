@@ -46,9 +46,10 @@ class DescribeSource(object):
 
     def __init__(self, manager):
         self.manager = manager
+        self.query = ResourceQuery(manager.session_factory)
 
     def get_resources(self, query):
-        return self.query.filter(self.manager, **query)
+        return self.query.filter(self.manager)
 
     def get_permissions(self):
         return ()
@@ -80,12 +81,19 @@ class QueryResourceManager(ResourceManager):
     def get_permissions(self):
         return ()
 
+    def get_source(self, source_type):
+        return sources.get(source_type)(self)
+
+    def get_cache_key(self, query):
+        return {'source_type': self.source_type, 'query': query}
+
+    @property
     def source_type(self):
         return self.data.get('source', 'describe-gcp')
 
     def resources(self, query=None):
         key = self.get_cache_key(query)
-        resources = self.augment(self.source.resources(query))
+        resources = self.augment(self.source.get_resources(query))
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
