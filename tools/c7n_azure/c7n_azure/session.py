@@ -31,5 +31,3 @@ class Session(object):
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
         return klass(self.credentials, self.subscription_id)
-
-

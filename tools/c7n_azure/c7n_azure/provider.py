@@ -33,4 +33,3 @@ class Azure(object):
 
 
 resources = Azure.resources
-

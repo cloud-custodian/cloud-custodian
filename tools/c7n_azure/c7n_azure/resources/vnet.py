@@ -23,4 +23,3 @@ class Vnet(QueryResourceManager):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         ops = 'virtual_networks'
-        

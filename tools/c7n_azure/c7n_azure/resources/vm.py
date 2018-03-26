@@ -22,5 +22,4 @@ class VirtualMachine(QueryResourceManager):
     class resource_type(object):
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
-        ops = 'virtual_machines'        
-        
+        ops = 'virtual_machines'

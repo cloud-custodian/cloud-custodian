@@ -36,5 +36,3 @@ class GoogleCloud(Provider):
 
 
 resources = GoogleCloud.resources
-
-

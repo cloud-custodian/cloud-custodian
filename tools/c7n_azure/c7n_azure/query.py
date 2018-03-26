@@ -16,8 +16,8 @@ import six
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
-from c7n.manager import ResourceManager
-from c7n.query import sources
+# from c7n.manager import ResourceManager
+# from c7n.query import sources
 from c7n.utils import local_session
 
 
@@ -30,6 +30,8 @@ class ResourceQuery(object):
         m = resource_manager.resource_type
         client = local_session(self.session_factory).client(
             "%s.%s" % (m.service, m.client))
+        # TODO: fixme
+        return client
 
 
 class QueryMeta(type):

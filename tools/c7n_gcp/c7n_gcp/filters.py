@@ -15,4 +15,3 @@
 
 class PolicyFilter(object):
     pass
-
