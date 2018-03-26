@@ -16,8 +16,8 @@ import six
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
-# from c7n.manager import ResourceManager
-# from c7n.query import sources
+from c7n.manager import ResourceManager
+from c7n.query import sources
 from c7n.utils import local_session
 
 
@@ -48,5 +48,30 @@ class QueryMeta(type):
 
 
 @six.add_metaclass(QueryMeta)
-class QueryResourceManager(object):
-    pass
+class QueryResourceManager(ResourceManager):
+
+    def __init__(self, data, options):
+        super(QueryResourceManager, self).__init__(data, options)
+        self.source = self.get_source(self.source_type)
+
+    def get_permissions(self):
+        return ()
+
+    def get_source(self, source_type):
+        return sources.get(source_type)(self)
+
+    def get_cache_key(self, query):
+        return {'source_type': self.source_type, 'query': query}
+
+    @property
+    def source_type(self):
+        return self.data.get('source', 'describe-azure')
+
+    def resources(self, query=None):
+        key = self.get_cache_key(query)
+        resources = self.augment(self.source.get_resources(query))
+        self._cache.save(key, resources)
+        return self.filter_resources(resources)
+
+    def augment(self, resources):
+        return resources
