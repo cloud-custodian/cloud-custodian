@@ -201,5 +201,5 @@ impact Your rights to use Your own Contributions for any other purpose.
 Code of Conduct
 ###############
 
-This project adheres to the `Open Code of Conduct <http://www.capitalone.io/codeofconduct/>`_. By participating, you are
+This project adheres to the `Open Code of Conduct <https://developer.capitalone.com/single/code-of-conduct/>`_. By participating, you are
 expected to honor this code.
