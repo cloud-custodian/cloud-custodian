@@ -1,4 +1,4 @@
-# Copyright 2017 Capital One Services, LLC
+# Copyright 2017-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,8 +60,11 @@ class StateTransitionFilter(object):
             return resources
         orig_length = len(resources)
         results = [r for r in resources if r[key] in states]
-        self.log.info("%s %d of %d resources with valid %s" % (
-            self.__class__.__name__, len(results), orig_length, key.lower()))
+        if len(orig_length) != len(results):
+            self.log.warn(
+                "%s implicitly filtered %d of %d resources with valid %s" % (
+                    self.__class__.__name__,
+                    len(results), orig_length, key.lower()))
         return results
 
 
@@ -108,12 +111,6 @@ class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
     def process(self, resources):
         resources = self.filter_resource_state(
             resources, 'status', self.valid_origin_status)
-        if not resources:
-            self.log.info(
-                '%s: no batch-compute environments with valid status in %s' % (
-                    self.__class__.__name__,
-                    [str(s) for s in self.valid_origin_status]))
-            return
         client = local_session(self.manager.session_factory).client('batch')
         params = dict(self.data)
         params.pop('type')
@@ -153,13 +150,5 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
             self.filter_resource_state(
                 resources, 'state', self.valid_origin_states),
             'status', self.valid_origin_status)
-        if not resources:
-            self.log.info(
-                '%s: no batch-compute environments with valid status in '
-                '%s or with valid state in %s' % (
-                    self.__class__.__name__,
-                    [str(s) for s in self.valid_origin_status],
-                    [str(s) for s in self.valid_origin_states]))
-            return
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.delete_environment, resources))
