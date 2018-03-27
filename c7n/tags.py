@@ -29,7 +29,7 @@ from dateutil.tz import tzutc
 
 import itertools
 
-from c7n.actions import BaseAction as Action, AutoTagUser
+from c7n.actions import BaseAction as Action, AutoTagUser, AutoTagEventTime
 from c7n.filters import Filter, OPERATORS, FilterValidationError
 from c7n import utils
 
@@ -47,6 +47,7 @@ def register_ec2_tags(filters, actions):
     filters.register('tag-count', TagCountFilter)
 
     actions.register('auto-tag-user', AutoTagUser)
+    actions.register('auto-tag-event-time', AutoTagEventTime)
     actions.register('mark-for-op', TagDelayedAction)
     actions.register('tag-trim', TagTrim)
 
@@ -68,6 +69,7 @@ def register_universal_tags(filters, actions):
     actions.register('tag', UniversalTag)
 
     actions.register('auto-tag-user', AutoTagUser)
+    actions.register('auto-tag-event-time', AutoTagEventTime)
     actions.register('mark-for-op', UniversalTagDelayedAction)
 
     actions.register('unmark', UniversalUntag)

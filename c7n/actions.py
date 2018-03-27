@@ -700,6 +700,117 @@ def add_auto_tag_user(registry, _):
 resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
 
 
+class AutoTagEventTime(EventAction):
+    """Tag a resource with the time it was created.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: ec2-auto-tag-creation-date
+          resource: ec2
+          description: |
+            Triggered when a new EC2 Instance is launched. Checks to see if
+            it's missing the CreationDate tag. If missing it gets created
+            with the value of the event time for RunInstances
+          mode:
+            type: cloudtrail
+            role: arn:aws:iam::123456789000:role/custodian-auto-tagger
+            events:
+              - RunInstances
+          filters:
+           - tag:CreationDate: absent
+          actions:
+           - type: auto-tag-event-time
+             tag: CreationDate
+
+    There's a number of caveats to usage. Resources which don't
+    include tagging as part of their api may have some delay before
+    automation kicks in to create a tag. Real world delay may be several
+    minutes, with worst case into hours[0]. This creates a race condition
+    between auto tagging and automation.
+
+    In practice this window is on the order of a fraction of a second, as
+    we fetch the resource and evaluate the presence of the tag before
+    attempting to tag it.
+
+    References
+     - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
+     - CloudTrail User - http://goo.gl/XQhIG6
+     """
+
+    schema = utils.type_schema(
+        'auto-tag-event-time',
+        required=['tag'],
+        **{'user-type': {
+            'type': 'array',
+            'items': {'type': 'string',
+                      'enum': [
+                          'IAMUser',
+                          'AssumedRole',
+                          'FederatedUser'
+                      ]}},
+           'update': {'type': 'boolean'},
+           'tag': {'type': 'string'},
+           }
+    )
+
+    def get_permissions(self):
+        return self.manager.action_registry.get(
+            'tag')({}, self.manager).get_permissions()
+
+    def validate(self):
+        if self.manager.data.get('mode', {}).get('type') != 'cloudtrail':
+            raise ValueError("Auto tag event time requires an event")
+        if self.manager.action_registry.get('tag') is None:
+            raise ValueError("Resource does not support tagging")
+        return self
+
+    def process(self, resources, event):
+        if event is None:
+            return
+        event = event['detail']
+
+        event_time = event['eventTime']
+        if event_time is None:
+            return
+        # if the auto-tag-event-time policy set update to False (or it's unset) then we
+        # will skip writing their event time tag and not overwrite pre-existing values
+        if not self.data.get('update', False):
+            untagged_resources = []
+            # iterating over all the resources the user spun up in this event
+            for resource in resources:
+                tag_already_set = False
+                for tag in resource.get('Tags', ()):
+                    if tag['Key'] == self.data['tag']:
+                        tag_already_set = True
+                        break
+                if not tag_already_set:
+                    untagged_resources.append(resource)
+        # if update is set to True, we will overwrite
+        else:
+            untagged_resources = resources
+
+        tag_action = self.manager.action_registry.get('tag')
+        new_tags = {
+            self.data['tag']: event_time
+        }
+
+        for key, value in six.iteritems(new_tags):
+            tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
+        return new_tags
+
+
+def add_auto_tag_event_time(registry, _):
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        if (klass.action_registry.get('tag') and
+        not klass.action_registry.get('auto-tag-event-time')):
+            klass.action_registry.register('auto-tag-event-time', AutoTagEventTime)
+
+
+resources.subscribe(resources.EVENT_FINAL, add_auto_tag_event_time)
+
+
 class PutMetric(BaseAction):
     """Action to put metrics based on an expression into CloudWatch metrics
 
