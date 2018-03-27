@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n.provider import clouds
+from c7n.provider import Provider, clouds
 from c7n.registry import PluginRegistry
+
+from .session import Session
 
 
 @clouds.register('azure')
-class Azure(object):
+class Azure(Provider):
 
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
@@ -29,7 +31,7 @@ class Azure(object):
         return policy_collection
 
     def get_session_factory(self, options):
-        pass
+        return Session
 
 
 resources = Azure.resources
