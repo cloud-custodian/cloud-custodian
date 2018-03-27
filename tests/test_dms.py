@@ -88,6 +88,28 @@ class ReplInstance(BaseTest):
             ri[0]['PreferredMaintenanceWindow']],
             [True, 'dms.t2.medium', 'mon:23:00-mon:23:59'])
 
+    def test_auto_patch(self):
+        session_factory = self.replay_flight_data(
+            'test_dms_repl_instance_auto_patch')
+        client = session_factory().client('dms')
+        p = self.load_policy({
+            'name': 'dms-replinstance',
+            'resource': 'dms-instance',
+            'filters': [{'AutoMinorVersionUpgrade': False}],
+            'actions': [{
+                'type': 'auto-patch',
+                'state': True,
+                'window': 'sun:10:00-sun:11:00'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['ReplicationInstanceIdentifier'], 'c7n-test')
+        ri = client.describe_replication_instances().get(
+            'ReplicationInstances')
+        self.assertEqual([ri[0]['AutoMinorVersionUpgrade'],
+                          ri[0]['PreferredMaintenanceWindow']],
+                         [True, 'sun:10:00-sun:11:00'])
 
 class ReplicationInstanceTagging(BaseTest):
     def test_replication_instance_tag(self):

@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c9620edb-31f7-11e8-8f36-2b068a974a7a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c9620edb-31f7-11e8-8f36-2b068a974a7a", 
+                "date": "Tue, 27 Mar 2018 19:48:13 GMT", 
+                "content-length": "71", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "test replication instance", 
+                "Key": "description"
+            }
+        ]
+    }
+}
