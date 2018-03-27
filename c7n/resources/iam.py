@@ -784,6 +784,29 @@ class UserCredentialReport(CredentialReport):
         return results
 
 
+@User.filter_registry.register('has-inline-policy')
+class IamUserInlinePolicy(Filter):
+    """
+        Filter IAM users that have an inline-policy attached
+
+        True: Filter users that have an inline-policy
+        False: Filter users that do not have an inline-policy
+    """
+
+    schema = type_schema('has-inline-policy', value={'type': 'boolean'})
+    permissions = ('iam:ListUserPolicies',)
+
+    def _num_inline_policies(self, client, resource):
+        return len(client.list_user_policies(
+            UserName=resource['UserName'])['PolicyNames'])
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value', True):
+            return [r for r in resources if self._num_inline_policies(c, r) > 0]
+        return [r for r in resources if self._num_inline_policies(c, r) == 0]
+
+
 @User.filter_registry.register('policy')
 class UserPolicy(ValueFilter):
     """Filter IAM users based on attached policy values
