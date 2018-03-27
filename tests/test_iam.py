@@ -426,12 +426,14 @@ class IamInlinePolicyUsage(BaseTest):
             'name': 'iam-user-with-inline-policy',
             'resource': 'iam-user',
             'filters': [
-                {'or': [{'UserName': 'andrewalexander'},
-                        {'UserName': 'kapil'},
-                        {'UserName': 'scot@sixfeetup.com'}]},
+                {'type': 'value',
+                 'key': 'UserName',
+                 'op': 'in',
+                 'value': ['andrewalexander',
+                           'kapil',
+                           'scot@sixfeetup.com']},
                 {'type': 'has-inline-policy',
-                 'value': True}
-            ]},
+                 'value': True}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -444,9 +446,12 @@ class IamInlinePolicyUsage(BaseTest):
             'name': 'iam-user-without-inline-policy',
             'resource': 'iam-user',
             'filters': [
-                {'or': [{'UserName': 'andrewalexander'},
-                        {'UserName': 'kapil'},
-                        {'UserName': 'scot@sixfeetup.com'}]},
+                {'type': 'value',
+                 'key': 'UserName',
+                 'op': 'in',
+                 'value': ['andrewalexander',
+                           'kapil',
+                           'scot@sixfeetup.com']},
                 {'type': 'has-inline-policy',
                  'value': False}
             ]},
