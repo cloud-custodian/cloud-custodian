@@ -60,7 +60,7 @@ class StateTransitionFilter(object):
             return resources
         orig_length = len(resources)
         results = [r for r in resources if r[key] in states]
-        if len(orig_length) != len(results):
+        if orig_length != len(results):
             self.log.warn(
                 "%s implicitly filtered %d of %d resources with valid %s" % (
                     self.__class__.__name__,
