@@ -202,6 +202,7 @@ class ModifyReplicationInstance(BaseAction):
                 raise
 
 
+@ReplicationInstance.action_registry.register('mark')
 @ReplicationInstance.action_registry.register('tag')
 class InstanceTag(Tag):
     """
@@ -237,6 +238,7 @@ class InstanceTag(Tag):
                 raise
 
 
+@ReplicationInstance.action_registry.register('unmark')
 @ReplicationInstance.action_registry.register('remove-tag')
 class InstanceRemoveTag(RemoveTag):
     """
@@ -411,3 +413,43 @@ class ModifyDmsEndpoint(BaseAction):
                         'ResourceNotFoundFault'):
                     continue
                 raise
+
+
+@ReplicationInstance.action_registry.register('auto-patch')
+class ReplicationInstanceAutoPatch(BaseAction):
+    """Set the AutoMinorUpgrade flag on DMS replication instance
+
+    optional parameter 'window':
+      - must follow the format: 'ddd:hh:mm-ddd:hh:mm'
+      - must be at least 30 minutes in length
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: enable-dms-auto-patch
+            resource: dms-instance
+            filters:
+              - AutoMinorVersionUpgrade: False
+            actions:
+              - type: auto-patch
+                state: True
+    """
+    schema = type_schema(
+        'auto-patch',
+        state={'type': 'boolean'},
+        window={'type': 'string'})
+    permissions = ('dms:ModifyReplicationInstance',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dms')
+
+        params = dict(AutoMinorVersionUpgrade=self.data.get('state', True))
+        if self.data.get('window'):
+            params['PreferredMaintenanceWindow'] = self.data.get('window')
+
+        for r in resources:
+            client.modify_replication_instance(
+                ReplicationInstanceArn=r['ReplicationInstanceArn'],
+                **params)
