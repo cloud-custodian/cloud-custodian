@@ -24,6 +24,51 @@ from .utils import (
     format_struct, get_message_subject, get_resource_tag_targets,
     get_rendered_jinja)
 
+# Those headers are defined as follows:
+#  'X-Priority': 1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest)
+#              Non-standard, cf https://people.dsv.su.se/~jpalme/ietf/ietf-mail-attributes.html
+#              Set by Thunderbird
+#  'X-MSMail-Priority': High, Normal, Low
+#              Cf Microsoft https://msdn.microsoft.com/en-us/library/gg671973(v=exchg.80).aspx
+#              Note: May increase SPAM level on Spamassassin:
+#                    https://wiki.apache.org/spamassassin/Rules/MISSING_MIMEOLE
+#  'Priority': "normal" / "non-urgent" / "urgent"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.6
+#  'Importance': "low" / "normal" / "high"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.4
+PRIORITIES = {
+    '1': {
+        'X-Priority': '1 (Highest)',
+        'X-MSMail-Priority': 'High',
+        'Priority': 'urgent',
+        'Importance': 'high',
+    },
+    '2': {
+        'X-Priority': '2 (High)',
+        'X-MSMail-Priority': 'High',
+        'Priority': 'urgent',
+        'Importance': 'high',
+    },
+    '3': {
+        'X-Priority': '3 (Normal)',
+        'X-MSMail-Priority': 'Normal',
+        'Priority': 'normal',
+        'Importance': 'normal',
+    },
+    '4': {
+        'X-Priority': '4 (Low)',
+        'X-MSMail-Priority': 'Low',
+        'Priority': 'non-urgent',
+        'Importance': 'low',
+    },
+    '5': {
+        'X-Priority': '5 (Lowest)',
+        'X-MSMail-Priority': 'Low',
+        'Priority': 'non-urgent',
+        'Importance': 'low',
+    }
+}
+
 
 class EmailDelivery(object):
 
@@ -231,7 +276,9 @@ class EmailDelivery(object):
         if priority_header and self.priority_header_is_valid(
             sqs_message['action']['priority_header']
         ):
-            message['X-Priority'] = str(priority_header)
+            priority_headers = PRIORITIES[str(priority_header)].copy()
+            for key in priority_headers:
+                message[key] = priority_headers[key]
         return message
 
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):

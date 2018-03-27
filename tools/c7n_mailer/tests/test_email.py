@@ -127,7 +127,8 @@ class EmailTest(unittest.TestCase):
         with patch("smtplib.SMTP") as mock_smtp:
             for email_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
                 self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
-                self.assertEqual(mimetext_msg['X-Priority'], '1')
+
+                self.assertEqual(mimetext_msg['X-Priority'], '1 (Highest)')
             # Get instance of mocked SMTP object
             smtp_instance = mock_smtp.return_value
             # Checks the mock has been called at least one time
