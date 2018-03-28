@@ -479,7 +479,18 @@ def bucket_client(session, b, kms=False):
 def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
     for bucket in buckets:
         client = bucket_client(local_session(session_factory), bucket)
-        # all the tag marshalling back and forth is a bit gross :-(
+        # Bucket tags are set atomically for the set/document, we want
+        # to refetch against current to guard against any staleness in
+        # our cached representation across multiple policies or concurrent
+        # modifications.
+        try:
+            bucket['Tags'] = client.get_bucket_tagging(
+                Bucket=bucket['Name']).get('TagSet', [])
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'NoSuchTagSet':
+                raise
+            bucket['Tags'] = []
+
         new_tags = {t['Key']: t['Value'] for t in add_tags}
         for t in bucket.get('Tags', ()):
             if (t['Key'] not in new_tags and
@@ -487,6 +498,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
                     t['Key'] not in remove_tags):
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
+
         try:
             client.put_bucket_tagging(
                 Bucket=bucket['Name'], Tagging={'TagSet': tag_set})

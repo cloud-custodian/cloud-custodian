@@ -1,31 +1,28 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
+        "ResponseMetadata": {
+            "RequestId": "881FA07C340A8C27",
+            "HostId": "1qKW/J7Ee9oEs4+uP8ZoK/cE2TPoVmHx8JTzD0F2AFFsalIKuq9cC/azJrf+ZU7OM6KriUg040w=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "1qKW/J7Ee9oEs4+uP8ZoK/cE2TPoVmHx8JTzD0F2AFFsalIKuq9cC/azJrf+ZU7OM6KriUg040w=",
+                "x-amz-request-id": "881FA07C340A8C27",
+                "date": "Wed, 28 Mar 2018 10:37:09 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 1
+        },
         "TagSet": [
             {
-                "Value": "reindeer", 
-                "Key": "rudolph"
-            }, 
+                "Key": "rudolph",
+                "Value": "reindeer"
+            },
             {
-                "Value": "new", 
-                "Key": "borrowed"
-            }, 
-            {
-                "Value": "serverless", 
-                "Key": "platform"
+                "Key": "platform",
+                "Value": "lxwee"
             }
-        ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "HostId": "HVy0wSnoGk7IDgzrreHXK20x13/NV70O90YXjQUbynyUqCdRwY/XAm3ri8UoRje5", 
-            "RequestId": "A136266FA738F60C", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "HVy0wSnoGk7IDgzrreHXK20x13/NV70O90YXjQUbynyUqCdRwY/XAm3ri8UoRje5", 
-                "date": "Sun, 24 Jul 2016 17:36:56 GMT", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "A136266FA738F60C", 
-                "server": "AmazonS3"
-            }
-        }
+        ]
     }
 }

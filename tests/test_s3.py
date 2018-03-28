@@ -560,7 +560,8 @@ class BucketTag(BaseTest):
         bname = 'custodian-tagger'
         if self.recording:
             destroyBucketIfPresent(client, bname)
-        client.create_bucket(Bucket=bname,
+        client.create_bucket(
+            Bucket=bname,
             CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
         self.addCleanup(destroyBucket, client, bname)
         client.put_bucket_tagging(
@@ -2249,6 +2250,8 @@ class S3Test(BaseTest):
         tags = client.get_bucket_tagging(Bucket=bname)
         tag_map = {t['Key']: t['Value'] for t in tags.get('TagSet', {})}
         self.assertTrue('maid_status' not in tag_map)
+        old_tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        self.assertTrue('maid_status' in old_tags)
 
     def test_hosts_website(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [

@@ -1,16 +1,17 @@
 {
-    "status_code": 204, 
+    "status_code": 204,
     "data": {
         "ResponseMetadata": {
-            "HTTPStatusCode": 204, 
-            "HostId": "w6jkE18LDnxISpAb+N+c6cG9Yjam4eEsJZG+EG8yOv6aMAlLrHF8J1ocVcQfVAA3", 
-            "RequestId": "4068AFC44F59982B", 
+            "RequestId": "529BEAAB595EEA28",
+            "HostId": "QxuZFYSXJTIWQuLY6B5/upOOhCAwQjU7J37DksXq3PwJOKI9zNpilsc3z5xuakvyLAJfqtB2YnY=",
+            "HTTPStatusCode": 204,
             "HTTPHeaders": {
-                "x-amz-id-2": "w6jkE18LDnxISpAb+N+c6cG9Yjam4eEsJZG+EG8yOv6aMAlLrHF8J1ocVcQfVAA3", 
-                "date": "Sun, 24 Jul 2016 17:36:51 GMT", 
-                "x-amz-request-id": "4068AFC44F59982B", 
+                "x-amz-id-2": "QxuZFYSXJTIWQuLY6B5/upOOhCAwQjU7J37DksXq3PwJOKI9zNpilsc3z5xuakvyLAJfqtB2YnY=",
+                "x-amz-request-id": "529BEAAB595EEA28",
+                "date": "Wed, 28 Mar 2018 10:37:05 GMT",
                 "server": "AmazonS3"
-            }
+            },
+            "RetryAttempts": 1
         }
     }
 }

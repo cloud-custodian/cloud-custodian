@@ -1,40 +1,24 @@
 {
-    "status_code": 200,
+    "status_code": 404,
     "data": {
-        "TagSet": [
-            {
-                "Value": "CMDBEnvironment",
-                "Key": "ENVTEST"
-            },
-            {
-                "Value": "ASV",
-                "Key": "ASVTEST"
-            },
-            {
-                "Value": "OwnerContact",
-                "Key": "AutomatedTester"
-            },
-            {
-                "Value": "mark-test",
-                "Key": "testtag"
-            },
-            {
-                "Value": "Resource does not meet policy: delete@YYYY/MM/DD",
-                "Key": "maid_status"
-            }
-        ],
+        "Error": {
+            "Code": "NoSuchTagSet",
+            "Message": "The TagSet does not exist",
+            "BucketName": "custodian-skunk-trails"
+        },
         "ResponseMetadata": {
-            "HTTPStatusCode": 200,
-            "RetryAttempts": 0,
-            "HostId": "djM9fww+ngKM1mj3hEgKVN0uceZIfkPfNf8W9j39POr38RQbpD6PlWt/4mD/cpDvRCLirDbVQz0=",
-            "RequestId": "086E85625A85B53D",
+            "RequestId": "772AF6A56D3A5219",
+            "HostId": "sN1KsxUQBE41u4glxnH1Nzzb95NXqL4mAk4Y+9iQwMwTveUzLKOwTPCOrjd/tMeyIAPY/yJl1vY=",
+            "HTTPStatusCode": 404,
             "HTTPHeaders": {
-                "x-amz-id-2": "djM9fww+ngKM1mj3hEgKVN0uceZIfkPfNf8W9j39POr38RQbpD6PlWt/4mD/cpDvRCLirDbVQz0=",
-                "date": "Thu, 08 Sep 2016 22:38:55 GMT",
+                "x-amz-request-id": "772AF6A56D3A5219",
+                "x-amz-id-2": "sN1KsxUQBE41u4glxnH1Nzzb95NXqL4mAk4Y+9iQwMwTveUzLKOwTPCOrjd/tMeyIAPY/yJl1vY=",
+                "content-type": "application/xml",
                 "transfer-encoding": "chunked",
-                "x-amz-request-id": "086E85625A85B53D",
+                "date": "Wed, 28 Mar 2018 10:45:18 GMT",
                 "server": "AmazonS3"
-            }
+            },
+            "RetryAttempts": 0
         }
     }
 }
