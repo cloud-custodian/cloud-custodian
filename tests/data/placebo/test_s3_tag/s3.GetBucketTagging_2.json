@@ -1,23 +1,28 @@
 {
-    "status_code": 404, 
+    "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "HostId": "rdwH7Qb6bL5u7CbQPJGCIa7jXhZFS1FaYbxxVK+P41xKXU5ZcjyzEjp7eCZRaJRS", 
-            "RequestId": "53ECA535C5830C5E", 
+            "RequestId": "881FA07C340A8C27",
+            "HostId": "1qKW/J7Ee9oEs4+uP8ZoK/cE2TPoVmHx8JTzD0F2AFFsalIKuq9cC/azJrf+ZU7OM6KriUg040w=",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "rdwH7Qb6bL5u7CbQPJGCIa7jXhZFS1FaYbxxVK+P41xKXU5ZcjyzEjp7eCZRaJRS", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "53ECA535C5830C5E", 
-                "date": "Sun, 24 Jul 2016 17:36:52 GMT", 
-                "content-type": "application/xml"
+                "x-amz-id-2": "1qKW/J7Ee9oEs4+uP8ZoK/cE2TPoVmHx8JTzD0F2AFFsalIKuq9cC/azJrf+ZU7OM6KriUg040w=",
+                "x-amz-request-id": "881FA07C340A8C27",
+                "date": "Wed, 28 Mar 2018 10:37:09 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 1
+        },
+        "TagSet": [
+            {
+                "Key": "rudolph",
+                "Value": "reindeer"
+            },
+            {
+                "Key": "platform",
+                "Value": "lxwee"
             }
-        }, 
-        "Error": {
-            "Message": "The TagSet does not exist", 
-            "Code": "NoSuchTagSet", 
-            "BucketName": "custodian-skunk-trails"
-        }
+        ]
     }
 }
