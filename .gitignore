@@ -26,3 +26,5 @@ out/
 .tox/
 results.xml
 .idea/
+.vscode/
+!.vscode/*.sample

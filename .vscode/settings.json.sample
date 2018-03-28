@@ -1,4 +1,4 @@
-{ 
+{
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -15,9 +15,9 @@
         "include": true,
         "share": true,
         "man": true,
-        "bin": true,        
+        "bin": true,
 
-        "**/*.egg-info": true,        
+        "**/*.egg-info": true,
         "**/*-nspkg.pth": true,
         "**/*.pyc": true,
         "**/*.pyo": true,

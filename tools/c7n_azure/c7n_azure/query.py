@@ -30,8 +30,28 @@ class ResourceQuery(object):
         m = resource_manager.resource_type
         client = local_session(self.session_factory).client(
             "%s.%s" % (m.service, m.client))
-        # TODO: fixme
-        return client
+        enum_op, list_op = m.enum_spec
+        op = getattr(getattr(client, enum_op), list_op)
+        data = [self.to_dictionary(e) for e in op()]
+        return data
+
+    def to_dictionary(self, obj):
+        if isinstance(obj, dict):
+            data = {}
+            for (k, v) in obj.items():
+                data[k] = self.to_dictionary(v)
+            return data
+        elif hasattr(obj, "_ast"):
+            return self.to_dictionary(obj._ast())
+        elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+            return [self.to_dictionary(v) for v in obj]
+        elif hasattr(obj, "__dict__"):
+            data = dict([(key, self.to_dictionary(value))
+                for key, value in obj.__dict__.iteritems()
+                if not callable(value) and not key.startswith('_')])
+            return data
+        else:
+            return obj
 
 
 @sources.register('describe-azure')

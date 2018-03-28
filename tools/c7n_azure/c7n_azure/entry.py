@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import c7n_azure.resources.vm
+import c7n_azure.resources.storage
 import c7n_azure.resources.vnet  # noqa: F401
 
 
