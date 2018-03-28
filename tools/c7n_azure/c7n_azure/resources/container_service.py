@@ -18,7 +18,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('containerservice')
 class ContainerService(ArmResourceManager):
-    """Container Service
+    """Container Service Resource
 
     :example:
     Returns all container services that did not provision successfully

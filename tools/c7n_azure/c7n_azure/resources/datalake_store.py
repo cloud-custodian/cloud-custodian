@@ -18,10 +18,11 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('datalake')
 class DataLakeStore(ArmResourceManager):
-    """Data Lake
+    """Data Lake Resource
 
     :example:
-    This policy will find all Datalake Stores with one million or more write requests in the last 72 hours
+    This policy will find all Datalake Stores with one million or more
+    write requests in the last 72 hours
 
     .. code-block:: yaml
 

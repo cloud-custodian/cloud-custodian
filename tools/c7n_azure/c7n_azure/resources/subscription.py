@@ -32,7 +32,7 @@ from c7n_azure.query import QueryMeta
 @resources.register('subscription')
 @six.add_metaclass(QueryMeta)
 class Subscription(ResourceManager):
-    """Subscription
+    """Subscription Resource
 
     :example:
     This policy creates Azure Policy scoped to the current subscription if doesn't exist.

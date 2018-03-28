@@ -18,7 +18,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('containerregistry')
 class ContainerRegistry(ArmResourceManager):
-    """Container Registry
+    """Container Registry Resource
 
     :example:
     Returns all container registry named my-test-container-registry

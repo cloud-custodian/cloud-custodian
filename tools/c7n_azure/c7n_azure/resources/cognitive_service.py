@@ -21,7 +21,8 @@ class CognitiveService(ArmResourceManager):
     """Cognitive Services Resource
 
     :example:
-    This policy will find all Cognitive Service accounts with 1000 or more total errors over the 72 hours
+    This policy will find all Cognitive Service accounts with 1000 or more
+    total errors over the 72 hours
 
     .. code-block:: yaml
 

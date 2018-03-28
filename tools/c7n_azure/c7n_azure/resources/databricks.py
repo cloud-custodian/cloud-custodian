@@ -18,7 +18,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('databricks')
 class Databricks(ArmResourceManager):
-    """Databricks
+    """Databricks Resource
 
     :example:
     Returns all databricks named my-test-databricks

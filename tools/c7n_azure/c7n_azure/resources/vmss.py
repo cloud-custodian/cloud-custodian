@@ -18,7 +18,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('vmss')
 class VMScaleSet(ArmResourceManager):
-    """Virtual Machine Scale Set
+    """Virtual Machine Scale Set Resource
 
     :example:
     This policy will find all VM Scale Sets that are set to overprovision

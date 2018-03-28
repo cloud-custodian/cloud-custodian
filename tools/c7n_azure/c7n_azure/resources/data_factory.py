@@ -18,10 +18,11 @@ from c7n_azure.provider import resources
 
 @resources.register('datafactory')
 class DataFactory(ArmResourceManager):
-    """Data Factory
+    """Data Factory Resource
 
     :example:
-    This policy will find all Data Factories with 10 or more failures in pipeline runs over the last 72 hours
+    This policy will find all Data Factories with 10 or more failures in pipeline
+    runs over the last 72 hours
 
     .. code-block:: yaml
 
