@@ -2235,6 +2235,8 @@ class S3Test(BaseTest):
     def test_s3_remove_tag(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_tagging', 'Tags', [], 'TagSet')])
+        self.patch(
+            s3.RemoveTag, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_s3_remove_tag')
         session = session_factory()
         client = session.client('s3')

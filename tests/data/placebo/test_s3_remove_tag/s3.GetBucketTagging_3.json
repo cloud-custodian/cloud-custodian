@@ -1,24 +1,24 @@
 {
-    "status_code": 404,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Code": "NoSuchTagSet",
-            "Message": "The TagSet does not exist",
-            "BucketName": "config-bucket-644160558196"
-        },
         "ResponseMetadata": {
-            "RequestId": "8DA6AC218BBC6AD7",
-            "HostId": "WVHhjh85cLOwcb/V/28BgBQ4locuog9vJyuf2xss6d2rk9Oost+zqXfHhTEbPtCt0RF4zBuRMQc=",
-            "HTTPStatusCode": 404,
+            "RequestId": "F8DC1A0AC4610CC4",
+            "HostId": "cXNBmm1hvQFa4W/TXq3YLWnybl+stSFx00uH6v35KbT7z47p25WKQzoIaMW30LsIM3p0QV44mzA=",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-request-id": "8DA6AC218BBC6AD7",
-                "x-amz-id-2": "WVHhjh85cLOwcb/V/28BgBQ4locuog9vJyuf2xss6d2rk9Oost+zqXfHhTEbPtCt0RF4zBuRMQc=",
-                "content-type": "application/xml",
+                "x-amz-id-2": "cXNBmm1hvQFa4W/TXq3YLWnybl+stSFx00uH6v35KbT7z47p25WKQzoIaMW30LsIM3p0QV44mzA=",
+                "x-amz-request-id": "F8DC1A0AC4610CC4",
+                "date": "Wed, 28 Mar 2018 10:45:21 GMT",
                 "transfer-encoding": "chunked",
-                "date": "Wed, 28 Mar 2018 10:45:18 GMT",
                 "server": "AmazonS3"
             },
             "RetryAttempts": 0
-        }
+        },
+        "TagSet": [
+            {
+                "Key": "env",
+                "Value": "dev"
+            }
+        ]
     }
 }

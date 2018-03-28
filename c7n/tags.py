@@ -416,7 +416,6 @@ class RemoveTag(Action):
 
         tags = self.data.get('tags', [DEFAULT_TAG])
         batch_size = self.data.get('batch_size', self.batch_size)
-
         _common_tag_processer(
             self.executor_factory, batch_size, self.concurrency,
             self.process_resource_set, self.id_key, resources, tags, self.log)

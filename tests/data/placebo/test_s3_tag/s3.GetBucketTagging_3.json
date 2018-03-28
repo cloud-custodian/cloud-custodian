@@ -2,17 +2,17 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "B9BA583E1E9ED285",
-            "HostId": "q6CaLuKlBJTNdn03o7xHOHEmBuwW5q7FLWPL73ZCjYACZdxMq+NN9qq2nWBz9HheTAjXYymUk8M=",
+            "RequestId": "221A5C468790AE3D",
+            "HostId": "6DCXdH/3NhAyTq5DUbtz/f3B6QEYEqxe0OvBqC4dEDTsVo8U6xkixMNOcf0THx0lZ2vQYtHQyqU=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "q6CaLuKlBJTNdn03o7xHOHEmBuwW5q7FLWPL73ZCjYACZdxMq+NN9qq2nWBz9HheTAjXYymUk8M=",
-                "x-amz-request-id": "B9BA583E1E9ED285",
-                "date": "Wed, 28 Mar 2018 10:37:08 GMT",
+                "x-amz-id-2": "6DCXdH/3NhAyTq5DUbtz/f3B6QEYEqxe0OvBqC4dEDTsVo8U6xkixMNOcf0THx0lZ2vQYtHQyqU=",
+                "x-amz-request-id": "221A5C468790AE3D",
+                "date": "Wed, 28 Mar 2018 10:37:10 GMT",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
             },
-            "RetryAttempts": 1
+            "RetryAttempts": 0
         },
         "TagSet": [
             {
@@ -20,8 +20,12 @@
                 "Value": "reindeer"
             },
             {
+                "Key": "borrowed",
+                "Value": "new"
+            },
+            {
                 "Key": "platform",
-                "Value": "lxwee"
+                "Value": "serverless"
             }
         ]
     }

@@ -17,19 +17,6 @@
         },
         "Buckets": [
             {
-                "Name": "config-bucket-644160558196",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2017,
-                    "month": 9,
-                    "day": 5,
-                    "hour": 17,
-                    "minute": 26,
-                    "second": 39,
-                    "microsecond": 0
-                }
-            },
-            {
                 "Name": "custodian-mark-test",
                 "CreationDate": {
                     "__class__": "datetime",
@@ -39,19 +26,6 @@
                     "hour": 10,
                     "minute": 41,
                     "second": 27,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "custodian-skunk-trails",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2017,
-                    "month": 9,
-                    "day": 5,
-                    "hour": 17,
-                    "minute": 26,
-                    "second": 56,
                     "microsecond": 0
                 }
             }

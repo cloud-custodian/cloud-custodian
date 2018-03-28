@@ -1,24 +1,28 @@
 {
-    "status_code": 404,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Code": "NoSuchTagSet",
-            "Message": "The TagSet does not exist",
-            "BucketName": "custodian-skunk-trails"
-        },
         "ResponseMetadata": {
-            "RequestId": "772AF6A56D3A5219",
-            "HostId": "sN1KsxUQBE41u4glxnH1Nzzb95NXqL4mAk4Y+9iQwMwTveUzLKOwTPCOrjd/tMeyIAPY/yJl1vY=",
-            "HTTPStatusCode": 404,
+            "RequestId": "47D32013FF16CE2C",
+            "HostId": "TUoORNPt4HgX+5AJ/Os8prL7LXW0GKeC0Qn962RiPl1psh5CL/dZ/TO2zNnR3TrHFFPoqT3SlQY=",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-request-id": "772AF6A56D3A5219",
-                "x-amz-id-2": "sN1KsxUQBE41u4glxnH1Nzzb95NXqL4mAk4Y+9iQwMwTveUzLKOwTPCOrjd/tMeyIAPY/yJl1vY=",
-                "content-type": "application/xml",
+                "x-amz-id-2": "TUoORNPt4HgX+5AJ/Os8prL7LXW0GKeC0Qn962RiPl1psh5CL/dZ/TO2zNnR3TrHFFPoqT3SlQY=",
+                "x-amz-request-id": "47D32013FF16CE2C",
+                "date": "Wed, 28 Mar 2018 10:45:19 GMT",
                 "transfer-encoding": "chunked",
-                "date": "Wed, 28 Mar 2018 10:45:18 GMT",
                 "server": "AmazonS3"
             },
             "RetryAttempts": 0
-        }
+        },
+        "TagSet": [
+            {
+                "Key": "env",
+                "Value": "dev"
+            },
+            {
+                "Key": "maid_status",
+                "Value": "blarg"
+            }
+        ]
     }
 }
