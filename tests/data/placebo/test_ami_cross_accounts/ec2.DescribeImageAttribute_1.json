@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e1e75729-a0bf-4c58-8b5c-cb1720ff1a70", 
+            "HTTPHeaders": {
+                "date": "Wed, 28 Mar 2018 17:36:57 GMT", 
+                "content-length": "375", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "LaunchPermissions": [
+            {
+                "UserId": "185106417252"
+            }
+        ], 
+        "ImageId": "ami-a63ae2db"
+    }
+}
