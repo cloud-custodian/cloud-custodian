@@ -20,6 +20,25 @@ from netaddr import IPNetwork
 
 @resources.register('cosmosdb')
 class CosmosDB(ArmResourceManager):
+    """Cosmos Database Resource
+
+    :example:
+    This policy will find all CosmosDB with 1000 or less total requests over the last 72 hou
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cosmosdb-inactive
+            resource: azure.cosmosdb
+            filters:
+              - type: metric
+                metric: TotalRequests
+                op: le
+                aggregation: total
+                threshold: 1000
+                timeframe: 72
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.cosmosdb'
