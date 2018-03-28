@@ -2,13 +2,13 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "47D32013FF16CE2C",
-            "HostId": "TUoORNPt4HgX+5AJ/Os8prL7LXW0GKeC0Qn962RiPl1psh5CL/dZ/TO2zNnR3TrHFFPoqT3SlQY=",
+            "RequestId": "D96D809048318E89",
+            "HostId": "tk6EXmmr+xqJ6mfgEOZrJCIKSky7leTJ0LDUVSpSti00DsPacxTmJXFRB5c1zxgtQcpF+q0T6w8=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "TUoORNPt4HgX+5AJ/Os8prL7LXW0GKeC0Qn962RiPl1psh5CL/dZ/TO2zNnR3TrHFFPoqT3SlQY=",
-                "x-amz-request-id": "47D32013FF16CE2C",
-                "date": "Wed, 28 Mar 2018 10:45:19 GMT",
+                "x-amz-id-2": "tk6EXmmr+xqJ6mfgEOZrJCIKSky7leTJ0LDUVSpSti00DsPacxTmJXFRB5c1zxgtQcpF+q0T6w8=",
+                "x-amz-request-id": "D96D809048318E89",
+                "date": "Wed, 28 Mar 2018 10:46:25 GMT",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
             },
@@ -21,7 +21,7 @@
             },
             {
                 "Key": "maid_status",
-                "Value": "blarg"
+                "Value": "Resource does not meet policy: delete@2018/03/31"
             }
         ]
     }
