@@ -47,7 +47,8 @@ from c7n.utils import UnicodeWriter
 log = logging.getLogger('c7n_org')
 
 
-WORKER_COUNT = int(os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
+WORKER_COUNT = int(
+    os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
 
 
 CONFIG_SCHEMA = {
@@ -64,12 +65,12 @@ CONFIG_SCHEMA = {
                 'name': {'type': 'string'},
                 'email': {'type': 'string'},
                 'account_id': {'type': 'string'},
-                'profile': {'type': 'string'},
+                'profile': {'type': 'string', 'minLength': 3},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'regions': {'type': 'array', 'items': {'type': 'string'}},
                 'role': {'oneOf': [
                     {'type': 'array', 'items': {'type': 'string'}},
-                    {'type': 'string'}]},
+                    {'type': 'string', 'minLength': 3}]},
                 'external_id': {'type': 'string'},
             }
         }
@@ -175,10 +176,10 @@ def report_account(account, region, policies_config, output_path, debug):
         account_id=account['account_id'], metrics_enabled=False,
         cache=cache_path, log_group=None, profile=None, external_id=None)
 
-    if account['role']:
+    if account.get('role'):
         bag['assume_role'] = account['role']
         bag['external_id'] = account.get('external_id')
-    elif account['profile']:
+    elif account.get('profile'):
         bag['profile'] = account['profile']
 
     policies = PolicyCollection.from_data(policies_config, bag)
@@ -376,10 +377,10 @@ def run_account(account, region, policies_config, output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         cache=cache_path, log_group=None, profile=None, external_id=None)
 
-    if account['role']:
+    if account.get('role'):
         bag['assume_role'] = account['role']
         bag['external_id'] = account.get('external_id')
-    elif account['profile']:
+    elif account.get('profile'):
         bag['profile'] = account['profile']
 
     policies = PolicyCollection.from_data(policies_config, bag)
