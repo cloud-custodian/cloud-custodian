@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Snapshot": {
+            "EstimatedSecondsToCompletion": 0, 
+            "OwnerAccount": "644160558196", 
+            "CurrentBackupRateInMegaBytesPerSecond": 0.1628, 
+            "ActualIncrementalBackupSizeInMegaBytes": 7.0, 
+            "NumberOfNodes": 1, 
+            "Status": "available", 
+            "VpcId": "vpc-d2d616b5", 
+            "ClusterVersion": "1.0", 
+            "Tags": [], 
+            "MasterUsername": "c7n", 
+            "EnhancedVpcRouting": false, 
+            "TotalBackupSizeInMegaBytes": 15.0, 
+            "DBName": "rsdb", 
+            "BackupProgressInMegaBytes": 7.0, 
+            "ClusterCreateTime": {
+                "hour": 13, 
+                "__class__": "datetime", 
+                "month": 3, 
+                "second": 23, 
+                "microsecond": 845000, 
+                "year": 2018, 
+                "day": 29, 
+                "minute": 38
+            }, 
+            "EncryptedWithHSM": false, 
+            "ClusterIdentifier": "c7n-rs", 
+            "SnapshotCreateTime": {
+                "hour": 13, 
+                "__class__": "datetime", 
+                "month": 3, 
+                "second": 2, 
+                "microsecond": 745000, 
+                "year": 2018, 
+                "day": 29, 
+                "minute": 54
+            }, 
+            "AvailabilityZone": "us-east-1e", 
+            "NodeType": "dc2.large", 
+            "Encrypted": false, 
+            "ElapsedTimeInSeconds": 43, 
+            "SnapshotType": "manual", 
+            "Port": 5439, 
+            "SnapshotIdentifier": "c7n-rs-ss-last"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "126935cc-335d-11e8-bd34-2bccb05ab09f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "126935cc-335d-11e8-bd34-2bccb05ab09f", 
+                "date": "Thu, 29 Mar 2018 14:25:46 GMT", 
+                "content-length": "1589", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

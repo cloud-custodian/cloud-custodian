@@ -23,7 +23,8 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
-    FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS)
+    FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS,
+    CrossAccountAccessFilter)
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -660,6 +661,40 @@ class RedshiftSnapshotAge(AgeFilter):
     date_attribute = 'SnapshotCreateTime'
 
 
+@RedshiftSnapshot.filter_registry.register('cross-account')
+class RedshiftSnapshotCrossAccount(CrossAccountAccessFilter):
+
+    permissions = ('redshift:DescribeClusterSnapshots',)
+
+    def process_resource_set(self, snapshot_set):
+        results = []
+        for s in snapshot_set:
+            accounts = {
+                a.get('AccountId') for a in s['AccountsWithRestoreAccess']}
+            delta_accounts = accounts.difference(self.accounts)
+            if delta_accounts:
+                s['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(s)
+        return results
+
+    def process(self, snapshots, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for snapshot_set in chunks(snapshots, 25):
+                futures.append(
+                    w.submit(self.process_resource_set, snapshot_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception checking cross account access \n %s" % (
+                            f.exception()))
+                    continue
+                results.extend(f.result())
+        return results
+
+
 @RedshiftSnapshot.action_registry.register('delete')
 class RedshiftSnapshotDelete(BaseAction):
     """Filters redshift snapshots based on age (in days)
@@ -799,3 +834,51 @@ class RedshiftSnapshotRemoveTag(tags.RemoveTag):
             arn = self.manager.generate_arn(
                 r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
             client.delete_tags(ResourceName=arn, TagKeys=tag_keys)
+
+
+@RedshiftSnapshot.action_registry.register('revoke-access')
+class RedshiftSnapshotRevokeAccess(BaseAction):
+    """Revokes ability of accounts to restore a snapshot
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: redshift-snapshot-revoke-access
+                resource: redshift-snapshot
+                filters:
+                  - type: cross-account
+                    whitelist:
+                      - 012345678910
+                actions:
+                  - type: revoke-access
+    """
+    permissions = ('redshift:RevokeSnapshotAccess',)
+    schema = type_schema('revoke-access')
+
+    def process_snapshot_set(self, snapshot_set):
+        client = local_session(self.manager.session_factory).client('redshift')
+        for s in snapshot_set:
+            s.setdefault('c7n:CrossAccountViolations', []).extend(
+                self.data.get('accounts', []))
+            for a in s.get('c7n:CrossAccountViolations'):
+                client.revoke_snapshot_access(
+                    SnapshotIdentifier=s['SnapshotIdentifier'],
+                    AccountWithRestoreAccess=a)
+
+    def process(self, snapshots):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {}
+            for snapshot_set in chunks(snapshots, 25):
+                futures[w.submit(
+                    self.process_snapshot_set, snapshot_set)] = snapshot_set
+            for f in as_completed(futures):
+                snapshot_set = f
+                if f.exception():
+                    self.log.exception(
+                        'Exception while revoking access on %s: %s' % (
+                            ', '.join(
+                                [s['SnapshotIdentifier'] for s in snapshot_set]
+                            ), f.exception()))
+                    continue
