@@ -1324,6 +1324,112 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         return instances
 
 
+@actions.register('propagate-spot-tags')
+class PropagateSpotTags(BaseAction):
+    """Propagate Tags that are set at Spot Request level to EC2 instances.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-spot-instances
+            resource: ec2
+          filters:
+            - State.Name: pending
+            - instanceLifecycle: spot
+          actions:
+            - type: propagate-spot-tags
+              only_tags:
+                - Name
+                - BillingTag
+    """
+
+    schema = type_schema(
+        'propagate-spot-tags',
+        **{'only_tags': {'type': 'array', 'items': {'type': 'string'}}})
+
+    permissions = (
+        'ec2:DescribeInstances',
+        'ec2:DescribeSpotInstanceRequests',
+        'ec2:DescribeTags',
+        'ec2:CreateTags')
+
+    MAX_TAG_COUNT = 50
+
+    def process(self, instances):
+        instances = [
+            i for i in instances if i['InstanceLifecycle'] == 'spot']
+        if not len(instances):
+            self.log.warning(
+                "action:%s no spot instances found, implicit filter by action" % (
+                    self.__class__.__name__.lower()))
+            return
+
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        request_instance_map = {}
+        for i in instances:
+            request_instance_map.setdefault(
+                i['SpotInstanceRequestId'], []).append(i)
+
+        # ... and describe the corresponding spot requests ...
+        requests = client.describe_spot_instance_requests(
+            Filters=[{
+                'Name': 'spot-instance-request-id',
+                'Values': list(request_instance_map.keys())}]).get(
+                    'SpotInstanceRequests', [])
+
+        updated = []
+        for r in requests:
+            if not r.get('Tags'):
+                continue
+            updated.extend(
+                self.process_request_instances(
+                    client, r, request_instance_map[r['SpotInstanceRequestId']]))
+        return updated
+
+    def process_request_instances(self, client, request, instances):
+        # Now we find the tags we can copy : either all, either those
+        # indicated with 'only_tags' parameter.
+        copy_keys = self.data.get('only_tags', [])
+        request_tags = {t['Key']: t['Value'] for t in request['Tags']
+                        if not t['Key'].startswith('aws:')}
+        if copy_keys:
+            for k in set(copy_keys).difference(request_tags):
+                del request_tags[k]
+
+        update_instances = []
+        for i in instances:
+            instance_tags = {t['Key']: t['Value'] for t in i.get('Tags', [])}
+            # We may overwrite tags, but if the operation changes no tag,
+            # we will not proceed.
+            for k, v in request_tags.items():
+                if k not in instance_tags or instance_tags[k] != v:
+                    update_instances.append(i['InstanceId'])
+
+            if len(set(instance_tags) | set(request_tags)) > self.MAX_TAG_COUNT:
+                self.log.warning(
+                    "action:%s instance:%s too many tags to copy (> 50)" % (
+                        self.__class__.__name__.lower(),
+                        i['InstanceId']))
+                continue
+
+        for iset in utils.chunks(update_instances, 20):
+            client.create_tags(
+                DryRun=self.manager.config.dryrun,
+                Resources=iset,
+                Tags=[{'Key': k, 'Value': v} for k, v in request_tags.items()])
+
+        self.log.debug(
+            "action:%s tags updated on instances:%r" % (
+                self.__class__.__name__.lower(),
+                update_instances))
+
+        return update_instances
+
+
 # Valid EC2 Query Filters
 # http://docs.aws.amazon.com/AWSEC2/latest/CommandLineReference/ApiReference-cmd-DescribeInstances.html
 EC2_VALID_FILTERS = {

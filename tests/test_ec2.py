@@ -79,6 +79,33 @@ class TestMetricFilter(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestPropagateSpotTags(BaseTest):
+
+    def test_propagate_spot(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_propagate_spot_tags')
+
+        policy = self.load_policy({
+            'name': 'ec2-spot',
+            'resource': 'ec2',
+            'query': [
+                {'instance-id': 'i-01db165f1452ef5e4'}],
+            'actions': [{
+                'type': 'propagate-spot-tags',
+                'only_tags': ['Name']}]
+        }, session_factory=session_factory)
+
+        resources = policy.run()
+        client = session_factory().client('ec2')
+        tags = {t['Key']: t['Value'] for t in client.describe_tags(
+            Filters=[{'Name': 'resource-id',
+                      'Values': ['i-01db165f1452ef5e4']}]).get(
+                          'Tags', [])}
+        self.assertEqual(
+            tags,
+            {'Name': 'Test'})
+
+
 class TestDisableApiTermination(BaseTest):
 
     def test_term_prot_enabled(self):
