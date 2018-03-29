@@ -82,7 +82,7 @@ class TestMetricFilter(BaseTest):
 class TestPropagateSpotTags(BaseTest):
 
     def test_propagate_spot(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             'test_ec2_propagate_spot_tags')
 
         policy = self.load_policy({
