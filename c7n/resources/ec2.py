@@ -1357,104 +1357,77 @@ class PropagateSpotTags(BaseAction):
 
     MAX_TAG_COUNT = 50
 
-    def _filter_ec2_with_spot_request_id(self, instances):
-        return [i for i in instances if len(i['SpotInstanceRequestId']) > 0]
-
-    filter_spot_instances = ValueFilter({
-        'key': 'InstanceLifecycle',
-        'value': 'spot'}).validate()
-
     def process(self, instances):
-        updated_instances = []
-        # We only process spot instances which have a spot request id
-        instances = self.filter_spot_instances.process(
-            self._filter_ec2_with_spot_request_id(instances))
+        instances = [
+            i for i in instances if i['InstanceLifecycle'] == 'spot']
         if not len(instances):
             self.log.warning(
-                "action:%s instances:%r are not retained by filter" % (
-                    self.__class__.__name__.lower(),
-                    instances))
+                "action:%s no spot instances found, implicit filter by action" % (
+                    self.__class__.__name__.lower()))
             return
 
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
 
-        # We list all those spot request ids ...
-        sir_values = []
+        request_instance_map = {}
         for i in instances:
-            sir_values.append(i['SpotInstanceRequestId'])
+            request_instance_map.setdefault(
+                i['SpotInstanceRequestId'], []).append(i)
 
         # ... and describe the corresponding spot requests ...
-        response = client.describe_spot_instance_requests(
-            Filters=[
-                {
-                    'Name': 'spot-instance-request-id',
-                    'Values': sir_values,
-                }
-            ]
-        )
+        requests = client.describe_spot_instance_requests(
+            Filters=[{
+                'Name': 'spot-instance-request-id',
+                'Values': list(request_instance_map.keys())}]).get(
+                    'SpotInstanceRequests', [])
 
-        # ... to find the tags for those requests.
-        sir_tags_map = {}
-        if len(response['SpotInstanceRequests']) > 0:
-            for a in response['SpotInstanceRequests']:
-                tags = a.get('Tags', None)
-                if tags is not None:
-                    sir_tags_map[a['SpotInstanceRequestId']] = tags
+        updated = []
+        for r in requests:
+            if not r.get('Tags'):
+                continue
+            updated.extend(
+                self.process_request_instances(
+                    client, r, request_instance_map[r['SpotInstanceRequestId']]))
+        return updated
 
+    def process_request_instances(self, client, request, instances):
         # Now we find the tags we can copy : either all, either those
         # indicated with 'only_tags' parameter.
         copy_keys = self.data.get('only_tags', [])
+        request_tags = {t['Key']: t['Value'] for t in request['Tags']
+                        if not t['Key'].startswith('aws:')}
+        if copy_keys:
+            for k in set(copy_keys).difference(request_tags):
+                del request_tags[k]
+
+        update_instances = []
         for i in instances:
-            sir_tags = sir_tags_map.get(i['SpotInstanceRequestId'], [])
-
-            copy_tags = []
-            if copy_keys:
-                for t in sir_tags:
-                    if t['Key'] in copy_keys:
-                        copy_tags.append(t)
-            else:
-                copy_tags.extend(sir_tags)
-
-            # We won't copy aws: tags, it's forbidden and will fail
-            # the request.
-            copy_tags = list(filter(lambda x: not x['Key'].startswith('aws:'), copy_tags))
-
-            existing_tags = i.get('Tags', [])
-
+            instance_tags = {t['Key']: t['Value'] for t in i.get('Tags', [])}
             # We may overwrite tags, but if the operation changes no tag,
             # we will not proceed.
-            existing_tags_map = dict((h['Key'], h['Value']) for h in existing_tags)
-            copy_tags_map = dict((h['Key'], h['Value']) for h in copy_tags)
-            future_tags_map = existing_tags_map.copy()
-            future_tags_map.update(copy_tags_map)
+            for k, v in request_tags.items():
+                if k not in instance_tags or instance_tags[k] != v:
+                    update_instances.append(i['InstanceId'])
 
-            if existing_tags_map == future_tags_map:
-                copy_tags = []
-
-            if len(copy_tags) + len(existing_tags) > self.MAX_TAG_COUNT:
+            if len(set(instance_tags) | set(request_tags)) > self.MAX_TAG_COUNT:
                 self.log.warning(
-                    "action:%s instance:%s too many tags to copy (%d > %d)" % (
+                    "action:%s instance:%s too many tags to copy (> 50)" % (
                         self.__class__.__name__.lower(),
-                        i['InstanceId'],
-                        len(copy_tags) + len(existing_tags),
-                        self.MAX_TAG_COUNT))
-                copy_tags = []
+                        i['InstanceId']))
+                continue
 
-            if len(copy_tags) > 0:
-                updated_instances.append(i['InstanceId'])
-                client.create_tags(
-                    DryRun=self.manager.config.dryrun,
-                    Resources=[
-                        i['InstanceId']],
-                    Tags=copy_tags)
+        for iset in utils.chunks(update_instances, 20):
+            client.create_tags(
+                DryRun=self.manager.config.dryrun,
+                Resources=iset,
+                Tags=[{'Key': k, 'Value': v} for k, v in request_tags.items()])
 
         self.log.debug(
             "action:%s tags updated on instances:%r" % (
                 self.__class__.__name__.lower(),
-                updated_instances))
+                update_instances))
 
-        return updated_instances
+        return update_instances
 
 
 # Valid EC2 Query Filters
