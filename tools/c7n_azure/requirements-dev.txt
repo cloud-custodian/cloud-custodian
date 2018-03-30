@@ -1,1 +1,1 @@
-vcr_unittest
+vcr_unittest==1.11.0
