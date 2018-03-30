@@ -59,7 +59,6 @@ class TestAMI(BaseTest):
             'resource': 'ami',
             'filters': [{
                 'type': 'cross-account',
-                'whitelist': ['644160558196']
             }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
