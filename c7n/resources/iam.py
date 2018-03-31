@@ -556,7 +556,8 @@ class PolicyDelete(BaseAction):
                 op: regex
                 value: "(arn:aws:iam::[0-9])" 
                 # regular expression to filter out AWS managed policies. 
-                # they are in the format arn:aws:iam::aws whereas user policies are in the format arn:aws:iam::${account_number}
+                # they are in the format arn:aws:iam::aws 
+                # user policies are in the format arn:aws:iam::${account_number}
           actions:
             - delete
 
