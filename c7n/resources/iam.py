@@ -562,8 +562,7 @@ class PolicyDelete(BaseAction):
 
     """
     schema = type_schema('delete')
-    permissions = (     
-        'iam:DeletePolicy')
+    permissions = ('iam:DeletePolicy',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
