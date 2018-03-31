@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from setuptools import setup, find_packages
 import os
 
-requires = ["Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15"]
+requires = ["Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15", "datadog"]
 try:
     from concurrent import futures
 except ImportError:
@@ -30,7 +30,7 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_mailer",
-    version='0.3.1',
+    version='0.3.2',
     description="Cloud Custodian - Reference Mailer",
     long_description=description,
     classifiers=[

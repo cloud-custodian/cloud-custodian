@@ -25,6 +25,7 @@ import six
 
 from .email_delivery import EmailDelivery
 from .sns_delivery import SnsDelivery
+from .datadog_delivery import DataDogDelivery
 
 DATA_MESSAGE = "maidmsg/1.0"
 
@@ -102,6 +103,7 @@ class MailerSqsQueueProcessor(object):
         self.logger.info("Downloading messages from the SQS queue.")
         aws_sqs = self.session.client('sqs')
         sqs_messages = MailerSqsQueueIterator(aws_sqs, self.receive_queue, self.logger)
+
         sqs_messages.msg_attributes = ['mtype', 'recipient']
         # lambda doesn't support multiprocessing, so we don't instantiate any mp stuff
         # unless it's being run from CLI on a normal system with SHM
@@ -161,3 +163,8 @@ class MailerSqsQueueProcessor(object):
         sns_delivery = SnsDelivery(self.config, self.session, self.logger)
         sns_message_packages = sns_delivery.get_sns_message_packages(sqs_message)
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
+
+        datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+        datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
+        datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
+
