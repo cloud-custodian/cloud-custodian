@@ -22,10 +22,9 @@
 Cloud Custodian
 ---------------
 
-Cloud Custodian is a rules engine for AWS fleet management. It
-allows users to define policies to enable a well managed cloud infrastructure,
-that's both secure and cost optimized. It consolidates many of the adhoc
-scripts organizations have into a lightweight and flexible tool, with unified
+Cloud Custodian is rules engine for AWS fleet management. It
+allows users to define policies to make cloud infrastructure secure and cost optimized. 
+It consolidates adhoc scripts so that it is lightweight and flexible with unified
 metrics and reporting.
 
 Custodian can be used to manage AWS accounts by ensuring real time
