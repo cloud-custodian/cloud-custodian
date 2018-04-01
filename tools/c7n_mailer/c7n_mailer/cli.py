@@ -13,7 +13,7 @@ from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['queue_url', 'role', 'from_address'],
+    'required': ['queue_url', 'role'],
     'properties': {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
