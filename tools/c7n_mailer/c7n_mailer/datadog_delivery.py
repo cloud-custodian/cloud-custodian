@@ -64,6 +64,13 @@ class DataDogDelivery(object):
                 "tags": message
             })
 
+        self.logger.info("Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog metric:{metric}".
+                         format(account=sqs_message.get('account', ''),
+                                policy=sqs_message['policy']['name'],
+                                resource=sqs_message['policy']['resource'],
+                                quantity=len(sqs_message['resources']),
+                                metric=sqs_message['action']['metric_name']))
+
         api.Metric.send(metrics)
 
     @staticmethod

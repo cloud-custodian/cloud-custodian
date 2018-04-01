@@ -416,7 +416,9 @@ class Notify(EventAction):
         'type': 'object',
         'anyOf': [
             {'required': ['type', 'transport', 'to']},
-            {'required': ['type', 'transport', 'to_from']}],
+            {'required': ['type', 'transport', 'to_from']},
+            {'required': ['type', 'transport', 'metric_name']}
+        ],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
@@ -428,6 +430,8 @@ class Notify(EventAction):
             'from': {'type': 'string'},
             'subject': {'type': 'string'},
             'template': {'type': 'string'},
+            'metric_name': {'type': 'string'},
+            'metric_value_tag': {'type': 'string'},
             'transport': {
                 'oneOf': [
                     {'type': 'object',

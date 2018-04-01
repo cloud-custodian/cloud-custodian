@@ -149,22 +149,24 @@ class MailerSqsQueueProcessor(object):
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name'],
-            ', '.join(sqs_message['action']['to'])))
+            ', '.join(sqs_message['action'].get('to', 'datadog'))))
 
-        # get the map of email_to_addresses to mimetext messages (with resources baked in)
-        # and send any emails (to SES or SMTP) if there are email addresses found
-        email_delivery = EmailDelivery(self.config, self.session, self.logger)
-        to_addrs_to_email_messages_map = email_delivery.get_to_addrs_email_messages_map(sqs_message)
-        for email_to_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
-            email_delivery.send_c7n_email(sqs_message, list(email_to_addrs), mimetext_msg)
+        if sqs_message['action'].get('to', False):
+            # get the map of email_to_addresses to mimetext messages (with resources baked in)
+            # and send any emails (to SES or SMTP) if there are email addresses found
+            email_delivery = EmailDelivery(self.config, self.session, self.logger)
+            to_addrs_to_email_messages_map = email_delivery.get_to_addrs_email_messages_map(sqs_message)
+            for email_to_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
+                email_delivery.send_c7n_email(sqs_message, list(email_to_addrs), mimetext_msg)
 
-        # this sections gets the map of sns_to_addresses to rendered_jinja messages
-        # (with resources baked in) and delivers the message to each sns topic
-        sns_delivery = SnsDelivery(self.config, self.session, self.logger)
-        sns_message_packages = sns_delivery.get_sns_message_packages(sqs_message)
-        sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
+            # this sections gets the map of sns_to_addresses to rendered_jinja messages
+            # (with resources baked in) and delivers the message to each sns topic
+            sns_delivery = SnsDelivery(self.config, self.session, self.logger)
+            sns_message_packages = sns_delivery.get_sns_message_packages(sqs_message)
+            sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
 
-        datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-        datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
-        datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
+        if sqs_message['action'].get('metric_name', False):
+            datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+            datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
+            datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
 
