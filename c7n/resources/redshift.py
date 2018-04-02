@@ -19,7 +19,7 @@ import logging
 import itertools
 
 from botocore.exceptions import ClientError
-from concurrent.futures import as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
@@ -28,6 +28,7 @@ from c7n.filters import (
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
+from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
@@ -663,35 +664,30 @@ class RedshiftSnapshotAge(AgeFilter):
 
 @RedshiftSnapshot.filter_registry.register('cross-account')
 class RedshiftSnapshotCrossAccount(CrossAccountAccessFilter):
-
+    """Filter all accounts that allow access to non-whitelisted accounts
+    """
     permissions = ('redshift:DescribeClusterSnapshots',)
+    schema = type_schema(
+        'cross-account',
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_from=ValuesFrom.schema)
 
-    def process_resource_set(self, snapshot_set):
+    def process(self, snapshots, event=None):
+        self.accounts = self.get_accounts()
+        orig_len = len(snapshots)
+        snapshots = [s for s in snapshots if s.get('AccountsWithRestoreAccess')]
+        self.log.info(
+            'Implicitly filtered out %s of %s snapshots with no '
+            'cross-account permissions' % (
+                (orig_len - len(snapshots)), orig_len))
         results = []
-        for s in snapshot_set:
-            accounts = {
-                a.get('AccountId') for a in s['AccountsWithRestoreAccess']}
+        for s in snapshots:
+            accounts = {a.get('AccountId') for a in s[
+                'AccountsWithRestoreAccess']}
             delta_accounts = accounts.difference(self.accounts)
             if delta_accounts:
                 s['c7n:CrossAccountViolations'] = list(delta_accounts)
                 results.append(s)
-        return results
-
-    def process(self, snapshots, event=None):
-        self.accounts = self.get_accounts()
-        results = []
-        with self.executor_factory(max_workers=2) as w:
-            futures = []
-            for snapshot_set in chunks(snapshots, 25):
-                futures.append(
-                    w.submit(self.process_resource_set, snapshot_set))
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Exception checking cross account access \n %s" % (
-                            f.exception()))
-                    continue
-                results.extend(f.result())
         return results
 
 
@@ -860,12 +856,15 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
     def process_snapshot_set(self, snapshot_set):
         client = local_session(self.manager.session_factory).client('redshift')
         for s in snapshot_set:
-            s.setdefault('c7n:CrossAccountViolations', []).extend(
-                self.data.get('accounts', []))
-            for a in s.get('c7n:CrossAccountViolations'):
-                client.revoke_snapshot_access(
-                    SnapshotIdentifier=s['SnapshotIdentifier'],
-                    AccountWithRestoreAccess=a)
+            for a in s.get('c7n:CrossAccountViolations', []):
+                try:
+                    client.revoke_snapshot_access(
+                        SnapshotIdentifier=s['SnapshotIdentifier'],
+                        AccountWithRestoreAccess=a)
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'ClusterSnapshotNotFound':
+                        continue
+                    raise
 
     def process(self, snapshots):
         with self.executor_factory(max_workers=2) as w:
@@ -874,11 +873,10 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
                 futures[w.submit(
                     self.process_snapshot_set, snapshot_set)] = snapshot_set
             for f in as_completed(futures):
-                snapshot_set = f
                 if f.exception():
                     self.log.exception(
                         'Exception while revoking access on %s: %s' % (
                             ', '.join(
-                                [s['SnapshotIdentifier'] for s in snapshot_set]
-                            ), f.exception()))
+                                [s['SnapshotIdentifier'] for s in futures[f]]),
+                            f.exception()))
                     continue

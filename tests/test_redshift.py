@@ -344,20 +344,6 @@ class TestRedshiftSnapshot(BaseTest):
         tag_map = {t['Tag']['Key'] for t in tags}
         self.assertFalse('maid_status' in tag_map)
 
-    def test_redshift_snapshot_cross_account(self):
-        session_factory = self.replay_flight_data(
-            'test_redshift_snapshot_cross_account')
-        p = self.load_policy({
-            'name': 'redshift-snapshot-cross-account',
-            'resource': 'redshift-snapshot',
-            'filters': [{
-                'type': 'cross-account',
-                'whitelist': ['644160558196']}]
-        }, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['SnapshotIdentifier'], 'c7n-rs-ss-last')
-
     def test_redshift_snapshot_revoke_access(self):
         session_factory = self.replay_flight_data(
             'test_redshift_snapshot_revoke_cross_account')
@@ -373,6 +359,8 @@ class TestRedshiftSnapshot(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['SnapshotIdentifier'], 'c7n-rs-ss-last')
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'],
+                         ['185106417252'])
         client = session_factory().client('redshift')
         ss = client.describe_cluster_snapshots(
             SnapshotIdentifier=resources[0]['SnapshotIdentifier'])['Snapshots']
