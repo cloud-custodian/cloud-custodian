@@ -19,7 +19,7 @@ import logging
 import itertools
 
 from botocore.exceptions import ClientError
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
