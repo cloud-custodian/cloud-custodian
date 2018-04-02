@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
@@ -253,3 +254,53 @@ class LastWriteDays(Filter):
         last_write = datetime.fromtimestamp(last_timestamp / 1000.0)
         group['lastWrite'] = last_write
         return self.date_threshold > last_write
+
+
+@LogGroup.filter_registry.register('cross-account')
+class LogCrossAccountFilter(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('logs:DescribeSubscriptionFilters',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
+        accounts = self.get_accounts()
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for rset in chunks(resources, 50):
+                futures.append(
+                    w.submit(
+                        self.process_resource_set, client, accounts, rset))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error checking log groups cross-account %s",
+                        f.exception())
+                    continue
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, client, accounts, resources):
+        results = []
+        for r in resources:
+            found = False
+            filters = self.manager.retry(
+                client.describe_subscription_filters,
+                logGroupName=r['logGroupName']).get('subscriptionFilters', ())
+            for f in filters:
+                if 'destinationArn' not in f:
+                    continue
+                account_id = f['destinationArn'].split(':', 5)[4]
+                if account_id not in accounts:
+                    r.setdefault('c7n:CrossAccountViolations', []).append(
+                        account_id)
+                    found = True
+            if found:
+                results.append(r)
+        return results
