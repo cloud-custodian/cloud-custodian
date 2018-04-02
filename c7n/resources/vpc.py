@@ -23,10 +23,11 @@ from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 import c7n.filters.vpc as net_filters
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n.filters.locked import Locked
-from c7n import query
+from c7n import query, resolver
 from c7n.manager import resources
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
@@ -1291,6 +1292,33 @@ class PeeringConnection(query.QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "pcx-"
+
+
+@PeeringConnection.filter_registry.register('cross-account')
+class CrossAccountPeer(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=resolver.ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('ec2:DescribeVpcPeeringConnections',)
+
+    def process(self, resources, event=None):
+        results = []
+        accounts = self.get_accounts()
+        owners = map(jmespath.compile, (
+            'AccepterVpcInfo.OwnerId', 'RequesterVpcInfo.OwnerId'))
+
+        for r in resources:
+            for o_expr in owners:
+                account_id = o_expr.search(r)
+                if account_id and account_id not in accounts:
+                    r.setdefault(
+                        'c7n:CrossAccountViolations', []).append(account_id)
+                    results.append(r)
+        return results
 
 
 @PeeringConnection.filter_registry.register('missing-route')

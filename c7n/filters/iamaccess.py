@@ -139,8 +139,12 @@ class PolicyChecker(object):
 
         if isinstance(s['Principal'], six.string_types):
             p = s['Principal']
-        else:
+        elif 'AWS' in s['Principal']:
             p = s['Principal']['AWS']
+        elif 'Federated' in s['Principal']:
+            p = s['Principal']['Federated']
+        else:
+            return True
 
         principal_ok = True
         p = isinstance(p, six.string_types) and (p,) or p
