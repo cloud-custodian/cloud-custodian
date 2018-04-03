@@ -16,12 +16,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import itertools
 import logging
 
-from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, AgeFilter, Filter, OPERATORS
+from concurrent.futures import as_completed
 
+from c7n.actions import ActionRegistry, BaseAction
+from c7n.filters import (
+    FilterRegistry, AgeFilter, Filter, OPERATORS, CrossAccountAccessFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.resolver import ValuesFrom
+from c7n.utils import local_session, type_schema, get_retry, chunks
 
 
 log = logging.getLogger('custodian.ami')
@@ -248,3 +251,49 @@ class ImageUnusedFilter(Filter):
         if self.data.get('value', True):
             return [r for r in resources if r['ImageId'] not in images]
         return [r for r in resources if r['ImageId'] in images]
+
+
+@filters.register('cross-account')
+class AmiCrossAccountFilter(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('ec2:DescribeImageAttribute',)
+
+    def process_resource_set(self, client, accounts, resource_set):
+        results = []
+        for r in resource_set:
+            attrs = self.manager.retry(
+                client.describe_image_attribute,
+                ImageId=r['ImageId'],
+                Attribute='launchPermission')['LaunchPermissions']
+            image_accounts = {a.get('Group') or a.get('UserId') for a in attrs}
+            delta_accounts = image_accounts.difference(accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
+
+    def process(self, resources, event=None):
+        results = []
+        client = local_session(self.manager.session_factory).client('ec2')
+        accounts = self.get_accounts()
+
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource_set in chunks(resources, 20):
+                futures.append(
+                    w.submit(
+                        self.process_resource_set, client, accounts, resource_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception checking cross account access \n %s" % (
+                            f.exception()))
+                    continue
+                results.extend(f.result())
+        return results

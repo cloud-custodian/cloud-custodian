@@ -17,7 +17,7 @@ import logging
 
 from c7n import cache
 from c7n.executor import ThreadPoolExecutor
-from c7n.provider import AWS
+from c7n.resources.aws import AWS
 
 from c7n.utils import dumps
 

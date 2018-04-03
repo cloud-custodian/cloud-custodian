@@ -113,22 +113,6 @@ class TestNotFilter(unittest.TestCase):
                 {'Color': 'green'}]})
         self.assertEqual(len(f.process(results)), 2)
 
-        """
-        f = filters.factory({
-            'not': [
-                {'Architecture': 'x86'}]})
-        self.assertEqual(len(f.process(results)), 3)
-
-        f = filters.factory({
-            'not': [
-                {'Architecture': 'x86_64'},
-                {'or': [
-                    {'Color': 'green'},
-                    {'Color': 'blue'},
-                    {'Color': 'yellow'},
-                ]}]})
-        self.assertEqual(len(f.process(results)), 0)
-        """
 
 class TestValueFilter(unittest.TestCase):
 
@@ -178,6 +162,11 @@ class TestValueFilter(unittest.TestCase):
         sentinel = None
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (None, 1))
+
+        vf.vtype = 'unique_size'
+        value = [1, 2, 3, 1, 5]
+        res = vf.process_value_type(sentinel, value, resource)
+        self.assertEqual(res, (None, 4))
 
 
 class TestAgeFilter(unittest.TestCase):

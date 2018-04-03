@@ -23,10 +23,11 @@ from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
 import c7n.filters.vpc as net_filters
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n.filters.locked import Locked
-from c7n import query
+from c7n import query, resolver
 from c7n.manager import resources
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
@@ -239,6 +240,79 @@ class AttributesFilter(Filter):
                 if dns_support == support:
                     results.append(r)
         return results
+
+
+@Vpc.filter_registry.register('dhcp-options')
+class DhcpOptionsFilter(Filter):
+    """Filter VPCs based on their dhcp options
+
+     :example:
+
+     .. code-block: yaml
+
+        - policies:
+             - name: vpcs-in-domain
+               resource: vpc
+               filters:
+                 - type: dhcp-options
+                   domain-name: ec2.internal
+
+    if an option value is specified as a list, then all elements must be present.
+    if an option value is specified as a string, then that string must be present.
+
+    vpcs not matching a given option value can be found via specifying
+    a `present: false` parameter.
+
+    """
+
+    option_keys = ('domain-name', 'domain-name-servers', 'ntp-servers')
+    schema = type_schema('dhcp-options', **{
+        k: {'oneOf': [
+            {'type': 'array', 'items': {'type': 'string'}},
+            {'type': 'string'}]}
+        for k in option_keys})
+    schema['properties']['present'] = {'type': 'boolean'}
+    permissions = ('ec2:DescribeDhcpOptions',)
+
+    def validate(self):
+        if not any([self.data.get(k) for k in self.option_keys]):
+            raise ValueError("one of %s required" % (self.option_keys,))
+        return self
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        option_ids = [r['DhcpOptionsId'] for r in resources]
+        options_map = {}
+        results = []
+        for options in client.describe_dhcp_options(
+                Filters=[{
+                    'Name': 'dhcp-options-id',
+                    'Values': option_ids}]).get('DhcpOptions', ()):
+            options_map[options['DhcpOptionsId']] = {
+                o['Key']: [v['Value'] for v in o['Values']]
+                for o in options['DhcpConfigurations']}
+
+        for vpc in resources:
+            if self.process_vpc(vpc, options_map[vpc['DhcpOptionsId']]):
+                results.append(vpc)
+        return results
+
+    def process_vpc(self, vpc, dhcp):
+        vpc['c7n:DhcpConfiguration'] = dhcp
+        found = True
+        for k in self.option_keys:
+            if k not in self.data:
+                continue
+            is_list = isinstance(self.data[k], list)
+            if k not in dhcp:
+                found = False
+            elif not is_list and self.data[k] not in dhcp[k]:
+                found = False
+            elif is_list and sorted(self.data[k]) != sorted(dhcp[k]):
+                found = False
+        if not self.data.get('present', True):
+            found = not found
+        return found
 
 
 @resources.register('subnet')
@@ -1220,6 +1294,33 @@ class PeeringConnection(query.QueryResourceManager):
         id_prefix = "pcx-"
 
 
+@PeeringConnection.filter_registry.register('cross-account')
+class CrossAccountPeer(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=resolver.ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('ec2:DescribeVpcPeeringConnections',)
+
+    def process(self, resources, event=None):
+        results = []
+        accounts = self.get_accounts()
+        owners = map(jmespath.compile, (
+            'AccepterVpcInfo.OwnerId', 'RequesterVpcInfo.OwnerId'))
+
+        for r in resources:
+            for o_expr in owners:
+                account_id = o_expr.search(r)
+                if account_id and account_id not in accounts:
+                    r.setdefault(
+                        'c7n:CrossAccountViolations', []).append(account_id)
+                    results.append(r)
+        return results
+
+
 @PeeringConnection.filter_registry.register('missing-route')
 class MissingRoute(Filter):
     """Return peers which are missing a route in route tables.
@@ -1466,7 +1567,7 @@ class VpcEndpoint(query.QueryResourceManager):
         service = 'ec2'
         type = 'vpc-endpoint'
         enum_spec = ('describe_vpc_endpoints', 'VpcEndpoints', None)
-        id = 'VpcEndpointId'
+        name = id = 'VpcEndpointId'
         date = 'CreationTimestamp'
         filter_name = 'VpcEndpointIds'
         filter_type = 'list'

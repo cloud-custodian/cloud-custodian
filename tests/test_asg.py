@@ -16,6 +16,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import boto3
 
 from .common import BaseTest
+from botocore.exceptions import ClientError
+from c7n.resources.asg import NotEncryptedFilter
 
 
 class LaunchConfigTest(BaseTest):
@@ -80,6 +82,28 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]['Unencrypted'], ['Image', 'LaunchConfig'])
+
+    def test_get_bad_snapshot_malformed(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+                'Error': {
+                    'Message': 'Invalid id: "snap-malformedsnap"',
+                    'Code': 'InvalidSnapshotID.Malformed'}
+                }
+        e = ClientError(error_response, operation_name)
+        snap = NotEncryptedFilter.get_bad_snapshot(e)
+        self.assertEquals(snap, "snap-malformedsnap")
+
+    def test_get_bad_snapshot_notfound(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+                'Error': {
+                    'Message': "The snapshot 'snap-notfound' does not exist.",
+                    'Code': 'InvalidSnapshot.NotFound'}
+                }
+        e = ClientError(error_response, operation_name)
+        snap = NotEncryptedFilter.get_bad_snapshot(e)
+        self.assertEquals(snap, "snap-notfound")
 
     def test_asg_image_age_filter(self):
         factory = self.replay_flight_data('test_asg_image_age_filter')

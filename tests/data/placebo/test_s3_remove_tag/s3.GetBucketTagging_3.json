@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "F8DC1A0AC4610CC4",
+            "HostId": "cXNBmm1hvQFa4W/TXq3YLWnybl+stSFx00uH6v35KbT7z47p25WKQzoIaMW30LsIM3p0QV44mzA=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "cXNBmm1hvQFa4W/TXq3YLWnybl+stSFx00uH6v35KbT7z47p25WKQzoIaMW30LsIM3p0QV44mzA=",
+                "x-amz-request-id": "F8DC1A0AC4610CC4",
+                "date": "Wed, 28 Mar 2018 10:45:21 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "TagSet": [
+            {
+                "Key": "env",
+                "Value": "dev"
+            }
+        ]
+    }
+}

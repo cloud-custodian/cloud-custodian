@@ -176,7 +176,7 @@ def get_session(role, session_name, profile, region):
 
 def expand_regions(regions, partition='aws'):
     if 'all' in regions:
-        return boto3.Session().get_available_regions('ec2')
+        regions = boto3.Session().get_available_regions('ec2')
     return regions
 
 
