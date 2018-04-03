@@ -1,7 +1,7 @@
 import unittest
 
 from mock import patch
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 from .common import SQS_MESSAGE_1
 from .common import SQS_MESSAGE_2
