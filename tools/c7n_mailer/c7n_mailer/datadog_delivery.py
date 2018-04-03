@@ -39,17 +39,21 @@ class DataDogDelivery(object):
     def get_datadog_message_packages(self, sqs_message):
         datadog_rendered_messages = []
 
-        for resource in sqs_message['resources']:
-            metric = [
-                'event:{}'.format(sqs_message['event']),
-                'account_id:{}'.format(sqs_message['account_id']),
-                'account:{}'.format(sqs_message['account']),
-                'region:{}'.format(sqs_message['region'])
-            ]
+        if sqs_message and sqs_message.get('resources', False):
+            for resource in sqs_message['resources']:
+                metric = [
+                    'event:{}'.format(sqs_message['event']),
+                    'account_id:{}'.format(sqs_message['account_id']),
+                    'account:{}'.format(sqs_message['account']),
+                    'region:{}'.format(sqs_message['region'])
+                ]
 
-            metric.extend(['{key}:{value}'.format(key=key, value=resource[key]) for key in resource.keys()])
+                metric.extend(['{key}:{value}'.format(key=key, value=resource[key]) for key in resource.keys()
+                               if key != 'Tags'])
+                if resource.get('Tags', False):
+                    metric.extend(['{key}:{value}'.format(key=tag['Key'], value=tag['Value']) for tag in resource['Tags']])
 
-            datadog_rendered_messages.append(metric)
+                datadog_rendered_messages.append(metric)
 
         return datadog_rendered_messages
 
