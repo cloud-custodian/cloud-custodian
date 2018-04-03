@@ -3,9 +3,9 @@ import unittest
 from mock import patch
 from mock import MagicMock
 
-from .common import SQS_MESSAGE_1
-from .common import SQS_MESSAGE_2
-from .common import SQS_MESSAGE_3
+from common import SQS_MESSAGE_1
+from common import SQS_MESSAGE_2
+from common import SQS_MESSAGE_3
 
 from c7n_mailer.datadog_delivery import DataDogDelivery
 
