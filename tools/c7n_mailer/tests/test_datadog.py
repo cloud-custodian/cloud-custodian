@@ -13,62 +13,63 @@ from c7n_mailer.datadog_delivery import DataDogDelivery
 DATADOG_APPLICATION_KEY = 'datadog_application_key'
 DATADOG_API_KEY = 'datadog_api_key'
 MESSAGE_ANSWER = [[
-    'event:None',
-    'account_id:000000000000',
-    'account:core-services-dev',
-    'region:us-east-1',
-    'AvailabilityZone:us-east-1a',
     'Attachments:[]',
-    'VolumeId:vol-01a0e6ea6b89f0099',
+    'AvailabilityZone:us-east-1a',
+    'CreatorName:peter',
     'SupportEmail:milton@initech.com',
-    'CreatorName:peter'
+    'VolumeId:vol-01a0e6ea6b89f0099',
+    'account:core-services-dev',
+    'account_id:000000000000',
+    'event:None',
+    'region:us-east-1'
 ]]
-
-
 DATADOG_METRIC_SQS_MESSAGE_2 = [
     {
         'metric': 'EBS_volume.available.size',
         'points': (0, 1),
-        'tags': ['event:None',
-                 'account_id:000000000000',
-                 'account:core-services-dev',
-                 'region:us-east-1',
-                 'AvailabilityZone:us-east-1a',
-                 'Attachments:[]',
-                 'VolumeId:vol-01a0e6ea6b89f0099',
-                 'SupportEmail:milton@initech.com',
-                 'CreatorName:peter']
+        'tags': [
+            'Attachments:[]',
+            'AvailabilityZone:us-east-1a',
+            'CreatorName:peter',
+            'SupportEmail:milton@initech.com',
+            'VolumeId:vol-01a0e6ea6b89f0099',
+            'account:core-services-dev',
+            'account_id:000000000000',
+            'event:None',
+            'region:us-east-1']
     }, {
         'metric': 'EBS_volume.available.size',
         'points': (0, 1),
-        'tags': ['event:None',
-                 'account_id:000000000000',
-                 'account:core-services-dev',
-                 'region:us-east-1',
-                 'AvailabilityZone:us-east-1c',
-                 'Attachments:[]',
-                 'VolumeId:vol-21a0e7ea9b19f0043',
-                 'Size:8',
-                 'SupportEmail:milton@initech.com',
-                 'CreatorName:peter']
-    }]
-
+        'tags': [
+            'Attachments:[]',
+            'AvailabilityZone:us-east-1c',
+            'CreatorName:peter',
+            'Size:8',
+            'SupportEmail:milton@initech.com',
+            'VolumeId:vol-21a0e7ea9b19f0043',
+            'account:core-services-dev',
+            'account_id:000000000000',
+            'event:None',
+            'region:us-east-1']
+    }
+]
 DATADOG_METRIC_SQS_MESSAGE_3 = [
     {
         'metric': 'EBS_volume.available.size',
         'points': (0, 8.0),
         'tags': [
-            'event:None',
-            'account_id:000000000000',
-            'account:core-services-dev',
-            'region:us-east-1',
-            'AvailabilityZone:us-east-1c',
             'Attachments:[]',
-            'VolumeId:vol-21a0e7ea9b19f0043',
+            'AvailabilityZone:us-east-1c',
+            'CreatorName:peter',
             'Size:8',
             'SupportEmail:milton@initech.com',
-            'CreatorName:peter']
-    }]
+            'VolumeId:vol-21a0e7ea9b19f0043',
+            'account:core-services-dev',
+            'account_id:000000000000',
+            'event:None',
+            'region:us-east-1']
+    }
+]
 
 
 class TestDataDogDelivery(unittest.TestCase):
@@ -105,7 +106,10 @@ class TestDataDogDelivery(unittest.TestCase):
     def test_datadog_message_packages_should_return_one_message(self):
         data_dog_delivery = DataDogDelivery(self.config, self.session, self.logger)
 
-        assert data_dog_delivery.get_datadog_message_packages(SQS_MESSAGE_1) == MESSAGE_ANSWER
+        answer = data_dog_delivery.get_datadog_message_packages(SQS_MESSAGE_1)
+        answer[0].sort()
+
+        assert answer == MESSAGE_ANSWER
 
     def test_datadog_message_packages_should_return_list_with_two_messages(self):
         data_dog_delivery = DataDogDelivery(self.config, self.session, self.logger)
@@ -119,7 +123,11 @@ class TestDataDogDelivery(unittest.TestCase):
         datadog_message_packages = datadog_delivery.get_datadog_message_packages(SQS_MESSAGE_2)
         datadog_delivery.deliver_datadog_messages(datadog_message_packages, SQS_MESSAGE_2)
 
-        mock_datadog_api.assert_called_with(DATADOG_METRIC_SQS_MESSAGE_2)
+        answer = mock_datadog_api.mock_calls[0][1][0]
+        answer[0]['tags'].sort()
+        answer[1]['tags'].sort()
+
+        assert answer == DATADOG_METRIC_SQS_MESSAGE_2
 
     @patch('c7n_mailer.datadog_delivery.time.time', return_value=0)
     @patch('c7n_mailer.datadog_delivery.api.Metric.send')
@@ -128,4 +136,7 @@ class TestDataDogDelivery(unittest.TestCase):
         datadog_message_packages = datadog_delivery.get_datadog_message_packages(SQS_MESSAGE_3)
         datadog_delivery.deliver_datadog_messages(datadog_message_packages, SQS_MESSAGE_3)
 
-        mock_datadog_api.assert_called_with(DATADOG_METRIC_SQS_MESSAGE_3)
+        answer = mock_datadog_api.mock_calls[0][1][0]
+        answer[0]['tags'].sort()
+
+        assert answer == DATADOG_METRIC_SQS_MESSAGE_3
