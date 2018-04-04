@@ -397,6 +397,7 @@ S3_AUGMENT_TABLE = (
     ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
     ('get_bucket_notification_configuration', 'Notification', None, None),
     ('get_bucket_lifecycle_configuration', 'Lifecycle', None, None),
+    ('get_bucket_encryption', 'ServerSideEncryptionConfiguration', None, 'ServerSideEncryptionConfiguration')
     #        ('get_bucket_cors', 'Cors'),
 )
 
