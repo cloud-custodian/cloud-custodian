@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "subscriptionFilters": [
+            {
+                "filterPattern": "", 
+                "filterName": "LambdaStream_CloudCustodian", 
+                "creationTime": 1522400974050, 
+                "logGroupName": "/aws/codebuild/custodian", 
+                "destinationArn": "arn:aws:lambda:us-east-2:1111111111111:function:CloudCustodian", 
+                "distribution": "ByLogStream"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "428b0e3a-33fa-11e8-9de6-7753a7c865fe", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "428b0e3a-33fa-11e8-9de6-7753a7c865fe", 
+                "date": "Fri, 30 Mar 2018 09:10:58 GMT", 
+                "content-length": "270", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

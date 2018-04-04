@@ -22,7 +22,7 @@ if os.path.exists('readme.md'):
 
 setup(
     name="c7n_guardian",
-    version='0.3.1',
+    version='0.3.2',
     description="Cloud Custodian - Multi Account Guard Duty Setup",
     long_description=description,
     classifiers=[
