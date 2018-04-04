@@ -24,6 +24,51 @@ from .utils import (
     format_struct, get_message_subject, get_resource_tag_targets,
     get_rendered_jinja)
 
+# Those headers are defined as follows:
+#  'X-Priority': 1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest)
+#              Non-standard, cf https://people.dsv.su.se/~jpalme/ietf/ietf-mail-attributes.html
+#              Set by Thunderbird
+#  'X-MSMail-Priority': High, Normal, Low
+#              Cf Microsoft https://msdn.microsoft.com/en-us/library/gg671973(v=exchg.80).aspx
+#              Note: May increase SPAM level on Spamassassin:
+#                    https://wiki.apache.org/spamassassin/Rules/MISSING_MIMEOLE
+#  'Priority': "normal" / "non-urgent" / "urgent"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.6
+#  'Importance': "low" / "normal" / "high"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.4
+PRIORITIES = {
+    '1': {
+        'X-Priority': '1 (Highest)',
+        'X-MSMail-Priority': 'High',
+        'Priority': 'urgent',
+        'Importance': 'high',
+    },
+    '2': {
+        'X-Priority': '2 (High)',
+        'X-MSMail-Priority': 'High',
+        'Priority': 'urgent',
+        'Importance': 'high',
+    },
+    '3': {
+        'X-Priority': '3 (Normal)',
+        'X-MSMail-Priority': 'Normal',
+        'Priority': 'normal',
+        'Importance': 'normal',
+    },
+    '4': {
+        'X-Priority': '4 (Low)',
+        'X-MSMail-Priority': 'Low',
+        'Priority': 'non-urgent',
+        'Importance': 'low',
+    },
+    '5': {
+        'X-Priority': '5 (Lowest)',
+        'X-MSMail-Priority': 'Low',
+        'Priority': 'non-urgent',
+        'Importance': 'low',
+    }
+}
+
 
 class EmailDelivery(object):
 
@@ -112,6 +157,23 @@ class EmailDelivery(object):
         resource_owner_tag_values = get_resource_tag_targets(resource, resource_owner_tag_keys)
         return self.get_valid_emails_from_list(resource_owner_tag_values)
 
+    def get_account_emails(self, sqs_message):
+        email_list = []
+
+        if 'account-emails' not in sqs_message['action']['to']:
+            return []
+
+        account_id = sqs_message.get('account_id', None)
+        self.logger.debug('get_account_emails for account_id: %s.', account_id)
+
+        if account_id is not None:
+            account_email_mapping = self.config.get('account_emails', {})
+            self.logger.debug('get_account_emails account_email_mapping: %s.', account_email_mapping)
+            email_list = account_email_mapping.get(account_id, [])
+            self.logger.debug('get_account_emails email_list: %s.', email_list)
+
+        return self.get_valid_emails_from_list(email_list)
+
     # this function returns a dictionary with a tuple of emails as the key
     # and the list of resources as the value. This helps ensure minimal emails
     # are sent, while only ever sending emails to the respective parties.
@@ -129,7 +191,10 @@ class EmailDelivery(object):
         # if event-owner is set, and the aws_username has an ldap_lookup email
         # we add that email to the policy emails for these resource(s) on this sqs_message
         event_owner_email = self.get_event_owner_email(targets, sqs_message['event'])
-        policy_to_emails = policy_to_emails + event_owner_email
+
+        account_emails = self.get_account_emails(sqs_message)
+
+        policy_to_emails = policy_to_emails + event_owner_email + account_emails
         for resource in sqs_message['resources']:
             # this is the list of emails that will be sent for this resource
             resource_emails = []
@@ -211,7 +276,9 @@ class EmailDelivery(object):
         if priority_header and self.priority_header_is_valid(
             sqs_message['action']['priority_header']
         ):
-            message['X-Priority'] = str(priority_header)
+            priority_headers = PRIORITIES[str(priority_header)].copy()
+            for key in priority_headers:
+                message[key] = priority_headers[key]
         return message
 
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):
@@ -254,9 +321,14 @@ class EmailDelivery(object):
                 format_struct(event)))
             return None
         if identity['type'] == 'AssumedRole':
-            assume_role_msg = 'No ldap uid is associated with AssumedRole: %s' % identity['arn']
-            self.logger.debug(assume_role_msg)
-            return None
+            self.logger.debug('In some cases there is no ldap uid is associated with AssumedRole: %s' % identity['arn'])
+            self.logger.debug('We will try to assume that identity is in the AssumedRoleSessionName')
+            user = identity['arn'].rsplit('/', 1)[-1]
+            if user is None or user.startswith('i-') or user.startswith('awslambda'):
+                return None
+            if ':' in user:
+                user = user.split(':', 1)[-1]
+            return user
         if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
             return identity['userName']
         if identity['type'] == 'Root':

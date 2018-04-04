@@ -17,16 +17,20 @@ from botocore.exceptions import ClientError
 
 import boto3
 import copy
-from datetime import datetime
+import csv
+from datetime import datetime, timedelta
 import functools
 import json
 import itertools
 import logging
 import os
 import random
+import re
 import threading
 import time
 import six
+import sys
+
 
 from c7n import ipaddress
 
@@ -47,6 +51,23 @@ else:
             SafeLoader = None
 
 log = logging.getLogger('custodian.utils')
+
+
+class UnicodeWriter:
+    """utf8 encoding csv writer."""
+
+    def __init__(self, f, dialect=csv.excel, **kwds):
+        self.writer = csv.writer(f, dialect=dialect, **kwds)
+        if sys.version_info.major == 3:
+            self.writerows = self.writer.writerows
+            self.writerow = self.writer.writerow
+
+    def writerow(self, row):
+        self.writer.writerow([s.encode("utf-8") for s in row])
+
+    def writerows(self, rows):
+        for row in rows:
+            self.writerow(row)
 
 
 class VarsSubstitutionError(Exception):
@@ -469,3 +490,35 @@ def format_string_values(obj, *args, **kwargs):
         return obj.format(*args, **kwargs)
     else:
         return obj
+
+
+class FormatDate(object):
+    """a datetime wrapper with extended pyformat syntax"""
+
+    date_increment = re.compile('\+[0-9]+[Mdh]')
+
+    def __init__(self, d=None):
+        self._d = d
+
+    @classmethod
+    def utcnow(cls):
+        return cls(datetime.utcnow())
+
+    def __getattr__(self, k):
+        return getattr(self._d, k)
+
+    def __format__(self, fmt=None):
+        d = self._d
+        increments = self.date_increment.findall(fmt)
+        for i in increments:
+            p = {}
+            if i[-1] == 'M':
+                p['minutes'] = float(i[1:-1])
+            if i[-1] == 'h':
+                p['hours'] = float(i[1:-1])
+            if i[-1] == 'd':
+                p['days'] = float(i[1:-1])
+            d = d + timedelta(**p)
+        if increments:
+            fmt = self.date_increment.sub("", fmt)
+        return d.__format__(fmt)

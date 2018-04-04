@@ -108,6 +108,39 @@ placebo.pill.deserialize = deserialize
 ##########################################################################
 
 
+class BluePill(pill.Pill):
+
+    def playback(self):
+        result = super(BluePill, self).playback()
+        self._avail = self.get_available()
+
+    def get_available(self):
+        return set(
+            [os.path.join(self.data_path, n)
+             for n in
+             fnmatch.filter(
+                 os.listdir(self.data_path),
+                 '*.json')])
+
+    def get_next_file_path(self, service, operation):
+        fn = super(BluePill, self).get_next_file_path(service, operation)
+        # couple of double use cases
+        if fn in self._avail:
+            self._avail.remove(fn)
+        else:
+            print("\ndouble use %s\n" % fn)
+        return fn
+
+    def stop(self):
+        result = super(BluePill, self).stop()
+        if self._avail:
+            print("Unused json files \n %s" % (
+                "\n".join(sorted(self._avail))))
+        return result
+        #else:
+        #    print("emptied available")
+
+
 class ZippedPill(pill.Pill):
 
     def __init__(self, path, prefix=None, debug=False):
@@ -251,7 +284,7 @@ class PillTest(unittest.TestCase):
         session = boto3.Session()
         default_region = session.region_name
         if not zdata:
-            pill = placebo.attach(session, test_dir, debug=True)
+            pill = placebo.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, debug=True)
 
@@ -291,6 +324,8 @@ class PillTest(unittest.TestCase):
         session = boto3.Session()
         if not zdata:
             pill = placebo.attach(session, test_dir)
+            #pill = BluePill()
+            #pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, False)
 

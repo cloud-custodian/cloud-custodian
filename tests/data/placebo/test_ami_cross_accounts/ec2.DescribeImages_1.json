@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Description": "Test AMI", 
+                "Hypervisor": "xen", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-a63ae2db", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": true, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 8, 
+                            "SnapshotId": "snap-0507048b4551a4ab4"
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "644160558196/c7n-test-ami", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "644160558196", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2018-03-28T17:29:36.000Z", 
+                "Public": false, 
+                "ImageType": "machine", 
+                "Name": "c7n-test-ami"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "078a7b9b-d48e-4354-9fd3-7692f64c702a", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Wed, 28 Mar 2018 17:36:56 GMT"
+            }
+        }
+    }
+}

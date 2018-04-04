@@ -41,7 +41,6 @@ log = logging.getLogger('custodian.elb')
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
 
-actions.register('set-shield', SetShieldProtection)
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
 filters.register('shield-enabled', IsShieldProtected)
@@ -131,6 +130,17 @@ def _elb_tags(elbs, session_factory, executor_factory, retry):
 
     with executor_factory(max_workers=2) as w:
         list(w.map(process_tags, chunks(elbs, 20)))
+
+
+@actions.register('set-shield')
+class SetELBShieldProtection(SetShieldProtection):
+
+    def clear_stale(self, client, protections):
+        # elbs arns need extra discrimination to distinguish
+        # from app load balancer arns. See https://goo.gl/pE7TQb
+        super(SetELBShieldProtection, self).clear_stale(
+            client,
+            [p for p in protections if p['ResourceArn'].count('/') == 1])
 
 
 @actions.register('mark-for-op')
