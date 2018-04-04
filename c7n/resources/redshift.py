@@ -853,6 +853,13 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
     permissions = ('redshift:RevokeSnapshotAccess',)
     schema = type_schema('revoke-access')
 
+    def validate(self):
+        for f in self.manager.ctx.policy.data.get('filters', []):
+            if f.get('type') == 'cross-account':
+                return self
+        raise ValueError('`revoke-access` may only be used in '
+                         'conjunction with `cross-account` filter')
+
     def process_snapshot_set(self, snapshot_set):
         client = local_session(self.manager.session_factory).client('redshift')
         for s in snapshot_set:
