@@ -24,6 +24,7 @@ import json
 import itertools
 import logging
 import os
+import os.path
 import random
 import re
 import threading
@@ -83,6 +84,30 @@ class Bag(dict):
             raise AttributeError(k)
 
 
+def constructor_include(loader, node):
+    try:
+        _root = os.path.split(loader.stream.name)[0]
+    except AttributeError:
+        _root = os.path.curdir
+
+    filename = os.path.abspath(os.path.join(
+        _root, loader.construct_scalar(node)
+    ))
+    extension = os.path.splitext(filename)[1].lstrip('.')
+
+    with open(filename, 'r') as f:
+        if extension in ('yaml', 'yml'):
+            if isinstance(node, SafeLoader):
+                return yaml.safe_load(f)
+            else:
+                return yaml.load(f)
+        else:
+            return ''.join(f.readlines())
+
+if yaml is not None:
+    yaml.SafeLoader.add_constructor('!include', constructor_include)
+    yaml.Loader.add_constructor('!include', constructor_include)
+
 def load_file(path, format=None, vars=None):
     if format is None:
         format = 'yaml'
@@ -117,7 +142,7 @@ def load_file(path, format=None, vars=None):
 def yaml_load(value):
     if yaml is None:
         raise RuntimeError("Yaml not available")
-    return yaml.load(value, Loader=SafeLoader)
+    return yaml.safe_load(value)
 
 
 def loads(body):

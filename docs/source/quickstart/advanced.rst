@@ -6,6 +6,7 @@ Advanced Usage
 * :ref:`run-multiple-regions`
 * :ref:`report-multiple-regions`
 * :ref:`report-custom-fields`
+* :ref:`dry-policy`
 
 .. _run-multiple-regions:
 
@@ -73,3 +74,96 @@ To remove the default fields and only add the desired ones, the ``--no-default-f
 flag can be specified and then specific fields can be added in, e.g.::
 
   $ custodian report -s out --no-default-fields --field Image=ImageId policy.yml
+
+.. _dry-policy:
+
+DRY - how to remove duplication in policies
+-------------------------------------------
+
+Sometimes there are parts of your policies that you would like to reuse in other policies.
+First approach would be to duplicate the old one in a new one, and edit only the differences.
+However, the DRY principle (Dont't Repeat Yourself) tells us that it's better to have only one
+single representation of a piece of knowledge. So we would like to prevent duplication and copy/pasting.
+
+By default, YAML does not allow easy reuse ; however a small extension has been added to allow
+policies to include other yaml files.
+
+This way you remove redundancy and copy/paste and have a single place to edit your changes.
+
+The syntax for this extension is ``!include my_policy_extract.yaml``. The included file
+does not need to be a valid policy itself - it can be any extract or part that you want to reuse.
+
+You can then include it in yaml policies.
+
+E.g. : create a file named ``tag_validation.yaml`` with this content:
+
+.. code-block:: yaml
+
+    - or:
+      - type: value
+        key: tag:my_billing_tag
+        op: in
+        value:
+          - "project1"
+          - "project2"
+      - type: value
+        key: tag:my_billing_tag
+        op: glob
+        value: "project3_*"
+
+Then create two policies that will include this tag:
+
+.. code-block:: yaml
+
+    vars:
+      tag-filters: &tag-compliance-filters !include tag_validation.yaml
+
+    policies:
+    - name: ec2-mark
+      resource: ec2
+      filters:
+        - State.Name: running
+        - "tag:maid_status": absent
+        - or:
+          - "tag:my_billing_tag": absent
+          - not: *tag-compliance-filters
+      actions:
+        - type: mark-for-op
+          op: stop
+          days: 7
+
+
+.. code-block:: yaml
+
+    vars:
+      tag-filters: &tag-compliance-filters !include tag_validation.yaml
+
+    policies:
+    - name: asg-mark
+      resource: asg
+      filters:
+        - SuspendedProcesses: []
+        - "tag:maid_status": absent
+        - or:
+          - "tag:my_billing_tag": absent
+          - not: *tag-compliance-filters
+      actions:
+        - type: mark-for-op
+          op: suspend
+          days: 7
+
+    - name: asg-unmark
+      resource: asg
+      filters:
+        - "tag:maid_status": not-null
+        - "tag:my_billing_tag": present
+        - and: *tag-compliance-filters
+      actions:
+        - unmark
+
+
+You can mix and match the includes, anchors/aliases to achieve your goal
+of writing clean policies.
+
+Do not forget to use ``custodian validate`` to ensure that your policy is
+properly parsed and understood.
