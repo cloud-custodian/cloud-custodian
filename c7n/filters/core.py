@@ -493,7 +493,7 @@ class ValueFilter(Filter):
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
-            if isinstance(value, basestring):
+            if isinstance(value, str):
                 try:
                     value = int(value)
                 except ValueError:
