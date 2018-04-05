@@ -32,7 +32,8 @@ from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 
 from .common import (
-    BaseTest, ConfigTest, event_data, skip_if_not_validating, functional)
+    BaseTest, ConfigTest, event_data,
+    skip_if_not_validating, functional, TestConfig as Config)
 
 
 class RestoreCompletionTest(TestCase):
@@ -1680,7 +1681,9 @@ class S3Test(BaseTest):
             'actions': [{
                 'type': 'attach-encrypt',
                 'role': role}]
-            }, session_factory=session_factory)
+            },
+            config=Config.empty(region='us-west-2'),
+            session_factory=session_factory)
 
         self.addCleanup(
             LambdaManager(functools.partial(session_factory, region='us-west-2')).remove,

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+from .common import BaseTest, TestConfig as Config
 
 
 class TestElastiCacheCluster(BaseTest):
@@ -92,7 +92,7 @@ class TestElastiCacheCluster(BaseTest):
             'actions': [{
                 'type': 'copy-cluster-tags',
                 'tags': ['tagkey']}]},
-            config={'region': 'us-east-1'},
+            Config.empty(region="us-east-1"),
             session_factory=session_factory)
 
         resources = policy.run()

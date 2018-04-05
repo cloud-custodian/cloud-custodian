@@ -24,7 +24,7 @@ from dateutil import parser
 import json
 
 from .test_offhours import mock_datetime_now
-from .common import Config, functional
+from .common import TestConfig as Config, functional
 
 TRAIL = 'nosetest'
 
@@ -332,7 +332,7 @@ class AccountTests(BaseTest):
         self.assertTrue(status['IsLogging'])
 
     def test_create_trail_bucket_exists_in_west(self):
-        config = Config.empty(account_id='644160558196', region='us-west-1')
+        config = Config.empty(region='us-west-1')
         factory = self.replay_flight_data('test_cloudtrail_create_bucket_exists_in_west')
         p = self.load_policy(
             {
