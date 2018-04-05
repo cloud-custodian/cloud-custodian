@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 
 from botocore.exceptions import ClientError
-from .common import BaseTest, functional
+from .common import BaseTest, functional, TestConfig as Config
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
 from c7n.mu import PythonPackageArchive
@@ -274,6 +274,7 @@ class LambdaTagTest(BaseTest):
             'name': 'lambda-mark',
             'resource': 'lambda',
             'filters': [{"tag:Language": "Python"}]},
+            config=Config.empty(),
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -290,6 +291,7 @@ class LambdaTagTest(BaseTest):
             'actions': [{
                 'type': 'mark-for-op', 'op': 'delete',
                 'tag': 'custodian_next', 'days': 1}]},
+            config=Config.empty(),
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -303,6 +305,7 @@ class LambdaTagTest(BaseTest):
             'filters': [
                 {'type': 'marked-for-op', 'tag': 'custodian_next',
                  'op': 'delete'}]},
+            config=Config.empty(),
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)

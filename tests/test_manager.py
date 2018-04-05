@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.ctx import ExecutionContext
 from c7n.resources.ec2 import EC2
 from c7n.tags import Tag
-from .common import BaseTest, instance, Bag, Config
+from .common import BaseTest, instance, Bag, TestConfig as Config
 
 
 class TestEC2Manager(BaseTest):

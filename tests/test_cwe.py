@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import jmespath
 from unittest import TestCase
 
-from .common import event_data, BaseTest
+from .common import event_data, BaseTest, TestConfig as Config
 
 from c7n.cwe import CloudWatchEvents
 
@@ -33,6 +33,7 @@ class CloudWatchRuleTarget(BaseTest):
             'resource': 'event-rule-target',
             'filters': [{'type': 'cross-account'}],
             'actions': ['delete']},
+            config=Config.empty(),
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)

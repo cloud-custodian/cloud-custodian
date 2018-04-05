@@ -522,6 +522,7 @@ class AllowAllIamPolicies(Filter):
                     'Action' in s and
                     isinstance(s['Action'], six.string_types) and
                     s['Action'] == "*" and
+                    'Resource' in s and
                     isinstance(s['Resource'], six.string_types) and
                     s['Resource'] == "*" and
                     s['Effect'] == "Allow"):

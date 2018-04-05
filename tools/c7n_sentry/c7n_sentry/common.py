@@ -17,15 +17,6 @@ import argparse
 import json
 
 
-class Bag(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-
 def setup_parser(parser=None):
     if parser is None:
         parser = argparse.ArgumentParser()

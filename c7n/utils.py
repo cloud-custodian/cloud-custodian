@@ -74,15 +74,6 @@ class VarsSubstitutionError(Exception):
     pass
 
 
-class Bag(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-
 def load_file(path, format=None, vars=None):
     if format is None:
         format = 'yaml'
@@ -409,6 +400,8 @@ class IPv4Network(ipaddress.IPv4Network):
 
     # Override for net 2 net containment comparison
     def __contains__(self, other):
+        if other is None:
+            return False
         if isinstance(other, ipaddress._BaseNetwork):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)

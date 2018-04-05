@@ -18,7 +18,7 @@ import sys
 
 from botocore.exceptions import ClientError
 
-from .common import BaseTest
+from .common import BaseTest, TestConfig as Config
 from c7n.resources.ebs import (
     CopyInstanceTags, EncryptInstanceVolumes, CopySnapshot, Delete)
 from c7n.executor import MainThreadExecutor
@@ -39,7 +39,7 @@ class SnapshotAccessTest(BaseTest):
             'name': 'snap-copy',
             'resource': 'ebs-snapshot',
             'filters': ['cross-account'],
-            }, session_factory=factory)
+            }, config=Config.empty(), session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(
@@ -65,7 +65,7 @@ class SnapshotCopyTest(BaseTest):
                 {'type': 'copy',
                  'target_region': 'us-east-1',
                  'target_key': '82645407-2faa-4d93-be71-7d6a8d59a5fc'}]
-            }, session_factory=factory)
+            }, Config.empty(region='us-west-2'), session_factory=factory)
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
