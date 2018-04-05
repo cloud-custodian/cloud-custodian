@@ -854,8 +854,8 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
     schema = type_schema('revoke-access')
 
     def validate(self):
-        for f in self.manager.ctx.policy.data.get('filters', []):
-            if f.get('type') == 'cross-account':
+        for f in self.manager.filters:
+            if isinstance(f, RedshiftSnapshotCrossAccount):
                 return self
         raise ValueError('`revoke-access` may only be used in '
                          'conjunction with `cross-account` filter')
