@@ -17,6 +17,7 @@ import threading
 from googleapiclient import discovery
 import httplib2
 from oauth2client import client
+import os
 from ratelimiter import RateLimiter
 from retrying import retry
 import socket
@@ -238,7 +239,7 @@ class ServiceClient(object):
             component_api = gcp_service
             for c in component.split('.'):
                 component_api = getattr(component_api, c)
-            self._component = component_api
+            self._component = component_api()
 
         self._entity_field = entity_field
         self._num_retries = num_retries
