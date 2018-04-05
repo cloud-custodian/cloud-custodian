@@ -66,6 +66,8 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 ### DataDog:
+The correct way to do a DataDog integration is use the c7n integration with AWS CloudWatch and use the [DataDog integration with AWS](https://docs.datadoghq.com/integrations/amazon_web_services/) collect CloudWatch metrics. This integration is only for the case you don't want or you can't use AWS CloudWatch.
+
 Your `mailer.yml` should now look something like this:
 
 ```yaml
@@ -127,7 +129,7 @@ Custodian mailer.
 
 Once [installed](#developer-install-os-x-el-capitan) you should have a
 `c7n-mailer` executable on your path:
-
+aws
 ```
 (env) $ c7n-mailer
 usage: c7n-mailer [-h] -c CONFIG
