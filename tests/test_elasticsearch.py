@@ -13,19 +13,18 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, Config
+from .common import BaseTest, TestConfig as Config
 
 
 class ElasticSearch(BaseTest):
 
     def test_resource_manager(self):
-        config = Config.empty(account_id='644160558196')
         factory = self.replay_flight_data('test_elasticsearch_query')
         p = self.load_policy({
             'name': 'es-query',
             'resource': 'elasticsearch',
             'filters': [{'DomainName': 'c7n-test'}]
-            }, session_factory=factory, config=config)
+            }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['DomainName'], 'c7n-test')
@@ -36,7 +35,6 @@ class ElasticSearch(BaseTest):
                 'search-c7n-test-ug4l2nqtnwwrktaeagxsqso'))
 
     def test_metrics_domain(self):
-        config = Config.empty(account_id='644160558196')        
         factory = self.replay_flight_data('test_elasticsearch_delete')
         p = self.load_policy({
             'name': 'es-query',
@@ -48,7 +46,8 @@ class ElasticSearch(BaseTest):
                 'period': 86400,
                 'value': 1000,
                 'op': 'less-than'}]},
-            session_factory=factory, config=config)
+            config=Config.empty(),
+            session_factory=factory)
         self.assertEqual(
             p.resource_manager.filters[0].get_dimensions(
                 {'DomainName': 'foo'}),
@@ -56,14 +55,13 @@ class ElasticSearch(BaseTest):
              {'Name': 'DomainName', 'Value': 'foo'}])
 
     def test_delete_search(self):
-        config = Config.empty(account_id='644160558196')        
         factory = self.replay_flight_data('test_elasticsearch_delete')
         p = self.load_policy({
             'name': 'es-query',
             'resource': 'elasticsearch',
             'filters': [{'DomainName': 'c7n-test'}],
             'actions': ['delete']
-            }, session_factory=factory, config=config)
+            }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['DomainName'], 'c7n-test')
