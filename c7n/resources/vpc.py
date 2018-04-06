@@ -1600,3 +1600,73 @@ class KeyPair(query.QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
+
+
+@Vpc.action_registry.register('create-flow-logs')
+@Subnet.action_registry.register('create-flow-logs')
+@NetworkInterface.action_registry.register('create-flow-logs')
+class CreateFlowLogs(BaseAction):
+    """Create flow logs for a network resource
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: vpc-enable-flow-logs
+            resource: vpc
+            filters:
+              - type: flow-logs
+                enabled: false
+            actions:
+              - type: create-flow-logs
+                DeliverLogsPermissionArn: arn:iam:role
+                LogGroupName: /custodian/vpc/flowlogs/
+                TrafficType: ALL
+    """
+    permissions = ('ec2:CreateFlowLogs',)
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['create-flow-logs']},
+            'DeliverLogsPermissionArn': {'type': 'string'},
+            'LogGroupName': {'type': 'string'},
+            'TrafficType': {'type': 'string',
+                            'enum': ['ACCEPT', 'REJECT', 'ALL']},
+            'required': ['DeliverLogsPermissionArn', 'LogGroupName',
+                         'ResourceIds']
+        }
+    }
+
+    def validate(self):
+        required = ('DeliverLogsPermissionArn', 'LogGroupName', 'TrafficType')
+        for r in required:
+            if r not in self.data or not self.data.get(r):
+                raise ValueError('"%s" is a required parameter' % r)
+
+        types = ('ACCEPT', 'REJECT', 'ALL')
+        if not any(t.upper() in self.data[
+                'TrafficType'].upper() for t in types):
+            raise ValueError(
+                'Invalid TrafficType "%s"' % self.data['TrafficType'])
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        params = dict(self.data)
+        params.pop('type')
+
+        model = self.manager.get_model()
+        r_type = model.type
+        if r_type == 'vpc':
+            r_type = 'VPC'
+        elif r_type == 'subnet':
+            r_type = 'Subnet'
+        else:
+            r_type = 'NetworkInterface'
+        params['ResourceType'] = r_type
+        params['TrafficType'] = params['TrafficType'].upper()
+        params['ResourceIds'] = [r[model.id] for r in resources]
+
+        client.create_flow_logs(**params)

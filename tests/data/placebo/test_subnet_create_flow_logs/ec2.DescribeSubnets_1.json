@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1b", 
+                "Tags": [
+                    {
+                        "Value": "FlowLogSubnet", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AvailableIpAddressCount": 4090, 
+                "DefaultForAz": true, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-d2d616b5", 
+                "State": "available", 
+                "MapPublicIpOnLaunch": true, 
+                "SubnetId": "subnet-efbcccb7", 
+                "CidrBlock": "172.31.16.0/20", 
+                "AssignIpv6AddressOnCreation": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "194fd77b-0883-43a5-b6c1-1211bfba97fc", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 06 Apr 2018 17:26:06 GMT"
+            }
+        }
+    }
+}
