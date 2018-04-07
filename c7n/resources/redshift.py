@@ -673,18 +673,13 @@ class RedshiftSnapshotCrossAccount(CrossAccountAccessFilter):
         whitelist_from=ValuesFrom.schema)
 
     def process(self, snapshots, event=None):
-        self.accounts = self.get_accounts()
-        orig_len = len(snapshots)
+        accounts = self.get_accounts()
         snapshots = [s for s in snapshots if s.get('AccountsWithRestoreAccess')]
-        self.log.info(
-            'Implicitly filtered out %s of %s snapshots with no '
-            'cross-account permissions' % (
-                (orig_len - len(snapshots)), orig_len))
         results = []
         for s in snapshots:
-            accounts = {a.get('AccountId') for a in s[
+            s_accounts = {a.get('AccountId') for a in s[
                 'AccountsWithRestoreAccess']}
-            delta_accounts = accounts.difference(self.accounts)
+            delta_accounts = s_accounts.difference(accounts)
             if delta_accounts:
                 s['c7n:CrossAccountViolations'] = list(delta_accounts)
                 results.append(s)
@@ -860,12 +855,12 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
         raise ValueError('`revoke-access` may only be used in '
                          'conjunction with `cross-account` filter')
 
-    def process_snapshot_set(self, snapshot_set):
-        client = local_session(self.manager.session_factory).client('redshift')
+    def process_snapshot_set(self, client, snapshot_set):
         for s in snapshot_set:
             for a in s.get('c7n:CrossAccountViolations', []):
                 try:
-                    client.revoke_snapshot_access(
+                    self.manager.retry(
+                        client.revoke_snapshot_access,
                         SnapshotIdentifier=s['SnapshotIdentifier'],
                         AccountWithRestoreAccess=a)
                 except ClientError as e:
@@ -874,11 +869,13 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
                     raise
 
     def process(self, snapshots):
+        client = local_session(self.manager.session_factory).client('redshift')
         with self.executor_factory(max_workers=2) as w:
             futures = {}
             for snapshot_set in chunks(snapshots, 25):
                 futures[w.submit(
-                    self.process_snapshot_set, snapshot_set)] = snapshot_set
+                    self.process_snapshot_set, client, snapshot_set)
+                ] = snapshot_set
             for f in as_completed(futures):
                 if f.exception():
                     self.log.exception(
@@ -886,4 +883,4 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
                             ', '.join(
                                 [s['SnapshotIdentifier'] for s in futures[f]]),
                             f.exception()))
-                    continue
+
