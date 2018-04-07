@@ -19,18 +19,17 @@
                 "StackStatus": "CREATE_COMPLETE",
                 "DisableRollback": false,
                 "NotificationARNs": [],
-                "Tags": [],
-                "EnableTerminationProtection": true
+                "Tags": []
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "57489a01-3a5f-11e8-ad4c-b37748d4efe4",
+            "RequestId": "577e4fe9-3a5f-11e8-9a2f-952c05ccedd1",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "57489a01-3a5f-11e8-ad4c-b37748d4efe4",
+                "x-amzn-requestid": "577e4fe9-3a5f-11e8-9a2f-952c05ccedd1",
                 "content-type": "text/xml",
-                "content-length": "915",
-                "date": "Sat, 07 Apr 2018 12:29:38 GMT"
+                "content-length": "843",
+                "date": "Sat, 07 Apr 2018 12:29:39 GMT"
             },
             "RetryAttempts": 0
         }

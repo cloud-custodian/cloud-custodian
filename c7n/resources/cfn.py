@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 
+from concurrent.futures import as_completed
+
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -72,8 +74,8 @@ class Delete(BaseAction):
         client.delete_stack(StackName=stack['StackName'])
 
 
-@CloudFormation.action_registry.register('disable-protection')
-class DisableProtection(BaseAction):
+@CloudFormation.action_registry.register('set-protection')
+class SetProtection(BaseAction):
     """Action to disable termination protection
 
     It is recommended to use a filter to avoid unwanted deletion of stacks
@@ -88,22 +90,33 @@ class DisableProtection(BaseAction):
                 filters:
                   - StackStatus: CREATE_COMPLETE
                 actions:
-                  - disable-protection
+                  - type: set-protection
+                    state: False
     """
 
-    schema = type_schema('disable-protection')
+    schema = type_schema(
+        'set-protection', state={'type': 'boolean', 'default': False})
+
     permissions = ('cloudformation:UpdateStack',)
 
     def process(self, stacks):
-        with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_stacks, stacks))
-
-    def process_stacks(self, stack):
         client = local_session(
             self.manager.session_factory).client('cloudformation')
 
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for s in stacks:
+                futures[w.submit(self.process_stacks, client, s)] = s
+            for f in as_completed(futures):
+                s = futures[f]
+                if f.exception():
+                    self.log.error(
+                        "Error updating protection stack:%s error:%s",
+                        s['StackName'], f.exception())
+
+    def process_stacks(self, client, stack):
         client.update_termination_protection(
-            EnableTerminationProtection=False,
+            EnableTerminationProtection=self.data.get('state', False),
             StackName=stack['StackName'])
 
 

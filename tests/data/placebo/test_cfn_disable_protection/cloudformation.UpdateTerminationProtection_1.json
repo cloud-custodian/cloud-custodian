@@ -1,17 +1,17 @@
 {
     "status_code": 200,
     "data": {
-        "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/sphere11-dev/514b9370-c6b0-11e6-a4cc-50d5cd26c2d2",
+        "StackId": "arn:aws:cloudformation:us-east-2:644160558196:stack/mytopic/7efb2d40-3a5d-11e8-8c44-500cef930ce6",
         "ResponseMetadata": {
-            "RetryAttempts": 0,
+            "RequestId": "57af247e-3a5f-11e8-9a16-0bc34bbf8d72",
             "HTTPStatusCode": 200,
-            "RequestId": "7df15e4b-c6b1-11e6-b9b8-077e63d75d99",
             "HTTPHeaders": {
-                "x-amzn-requestid": "7df15e4b-c6b1-11e6-b9b8-077e63d75d99",
-                "date": "Tue, 20 Dec 2016 12:40:30 GMT",
-                "content-length": "212",
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "57af247e-3a5f-11e8-9a16-0bc34bbf8d72",
+                "content-type": "text/xml",
+                "content-length": "441",
+                "date": "Sat, 07 Apr 2018 12:29:40 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }

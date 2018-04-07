@@ -41,35 +41,24 @@ class TestCFN(BaseTest):
 
     def test_disable_protection(self):
         factory = self.replay_flight_data('test_cfn_disable_protection')
+        client = factory().client('cloudformation')
+        stacks = client.describe_stacks(
+            StackName='mytopic').get('Stacks')
+        self.assertEqual(stacks[0].get('EnableTerminationProtection'), True)
         p = self.load_policy({
             'name': 'cfn-disable-protection',
             'resource': 'cfn',
-            'filters': [{'StackName': 'sphere11-db-1'}],
-            'actions': ['disable-protection']
+            'filters': [{'StackName': 'mytopic'}],
+            'actions': [{
+                'type': 'set-protection',
+                'state': False}]
             }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-    def test_disable_protection_no_match(self):
-        factory = self.replay_flight_data('test_cfn_disable_protection')
-        p = self.load_policy({
-            'name': 'cfn-disable-protection',
-            'resource': 'cfn',
-            'filters': [{'StackName': 'NoMatch'}],
-            'actions': ['disable-protection']
-            }, session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
-
-    def test_disable_protection_all_match(self):
-        factory = self.replay_flight_data('test_cfn_disable_protection')
-        p = self.load_policy({
-            'name': 'cfn-disable-protection',
-            'resource': 'cfn',
-            'actions': ['disable-protection']
-            }, session_factory=factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 7)
+        client = factory().client('cloudformation')
+        stacks = client.describe_stacks(
+            StackName=resources[0]['StackName']).get('Stacks')
+        self.assertEqual(stacks[0].get('EnableTerminationProtection'), False)
 
     def test_cfn_add_tag(self):
         session_factory = self.replay_flight_data('test_cfn_add_tag')

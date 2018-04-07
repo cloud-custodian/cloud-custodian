@@ -20,17 +20,17 @@
                 "DisableRollback": false,
                 "NotificationARNs": [],
                 "Tags": [],
-                "EnableTerminationProtection": true
+                "EnableTerminationProtection": false
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "57489a01-3a5f-11e8-ad4c-b37748d4efe4",
+            "RequestId": "57e1308c-3a5f-11e8-ad4c-b37748d4efe4",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "57489a01-3a5f-11e8-ad4c-b37748d4efe4",
+                "x-amzn-requestid": "57e1308c-3a5f-11e8-ad4c-b37748d4efe4",
                 "content-type": "text/xml",
-                "content-length": "915",
-                "date": "Sat, 07 Apr 2018 12:29:38 GMT"
+                "content-length": "916",
+                "date": "Sat, 07 Apr 2018 12:29:39 GMT"
             },
             "RetryAttempts": 0
         }
