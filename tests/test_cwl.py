@@ -18,6 +18,20 @@ from .common import BaseTest
 
 class LogGroupTest(BaseTest):
 
+    def test_cross_account(self):
+        factory = self.replay_flight_data('test_log_group_cross_account')
+        p = self.load_policy(
+            {'name': 'cross-log',
+             'resource': 'log-group',
+             'filters': [
+                 {'type': 'cross-account'}]
+             },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:CrossAccountViolations'], ['1111111111111'])
+
     def test_last_write(self):
         factory = self.replay_flight_data('test_log_group_last_write')
         p = self.load_policy(

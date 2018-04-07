@@ -136,6 +136,72 @@ class InstanceDelete(BaseAction):
             client.delete_replication_instance(ReplicationInstanceArn=arn)
 
 
+@ReplicationInstance.action_registry.register('modify-instance')
+class ModifyReplicationInstance(BaseAction):
+    """Modify replication instance(s) to apply new settings
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: enable-minor-version-upgrade
+            resource: dms-instance
+            filters:
+              - AutoMinorVersionUpgrade: False
+            actions:
+              - type: modify-instance
+                ApplyImmediately: True
+                AutoMinorVersionUpgrade: True
+                PreferredMaintenanceWindow: mon:23:00-mon:23:59
+
+    AWS ModifyReplicationInstance Documentation: https://goo.gl/ePye9N
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['modify-instance']},
+            'ReplicationInstanceArn': {'type': 'string'},
+            'AllocatedStorage': {'type': 'integer'},
+            'ApplyImmediately': {'type': 'boolean'},
+            'ReplicationInstanceClass': {'type': 'string'},
+            'VpcSecurityGroupIds': {
+                'type': 'array', 'items': {'type': 'string'}
+            },
+            'PreferredMaintenanceWindow': {'type': 'string'},
+            'MultiAZ': {'type': 'boolean'},
+            'EngineVersion': {'type': 'string'},
+            'AllowMajorVersionUpgrade': {'type': 'boolean'},
+            'AutoMinorVersionUpgrade': {'type': 'boolean'},
+            'ReplicationInstanceIdentifier': {'type': 'string'}
+        }
+    }
+    permissions = ('dms:ModifyReplicationInstance',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dms')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            params['ReplicationInstanceArn'] = r['ReplicationInstanceArn']
+            try:
+                client.modify_replication_instance(**params)
+            except ClientError as e:
+                ecode = e.response['Error']['Code']
+                if ecode in (
+                        'InvalidResourceStateFault',
+                        'ResourceAlreadyExistsFault',
+                        'ResourceNotFoundFault'):
+                    continue
+                elif ecode == 'UpgradeDependencyFailureFault':
+                    self.log.exception(
+                        'Exception modifying instance %s :%s' % (
+                            r['ReplicationInstanceArn'], e))
+                    continue
+                raise
+
+
 @ReplicationInstance.action_registry.register('tag')
 class InstanceTag(Tag):
     """

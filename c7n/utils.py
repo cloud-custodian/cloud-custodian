@@ -18,13 +18,14 @@ from botocore.exceptions import ClientError
 import boto3
 import copy
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 import functools
 import json
 import itertools
 import logging
 import os
 import random
+import re
 import threading
 import time
 import six
@@ -71,15 +72,6 @@ class UnicodeWriter:
 
 class VarsSubstitutionError(Exception):
     pass
-
-
-class Bag(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
 
 
 def load_file(path, format=None, vars=None):
@@ -408,6 +400,8 @@ class IPv4Network(ipaddress.IPv4Network):
 
     # Override for net 2 net containment comparison
     def __contains__(self, other):
+        if other is None:
+            return False
         if isinstance(other, ipaddress._BaseNetwork):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
@@ -489,3 +483,35 @@ def format_string_values(obj, *args, **kwargs):
         return obj.format(*args, **kwargs)
     else:
         return obj
+
+
+class FormatDate(object):
+    """a datetime wrapper with extended pyformat syntax"""
+
+    date_increment = re.compile('\+[0-9]+[Mdh]')
+
+    def __init__(self, d=None):
+        self._d = d
+
+    @classmethod
+    def utcnow(cls):
+        return cls(datetime.utcnow())
+
+    def __getattr__(self, k):
+        return getattr(self._d, k)
+
+    def __format__(self, fmt=None):
+        d = self._d
+        increments = self.date_increment.findall(fmt)
+        for i in increments:
+            p = {}
+            if i[-1] == 'M':
+                p['minutes'] = float(i[1:-1])
+            if i[-1] == 'h':
+                p['hours'] = float(i[1:-1])
+            if i[-1] == 'd':
+                p['days'] = float(i[1:-1])
+            d = d + timedelta(**p)
+        if increments:
+            fmt = self.date_increment.sub("", fmt)
+        return d.__format__(fmt)

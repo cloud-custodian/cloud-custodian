@@ -27,8 +27,10 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter, OPERATORS
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
+from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema, chunks
 
 
@@ -249,6 +251,8 @@ class IamRoleUsage(Filter):
 class UsedIamRole(IamRoleUsage):
     """Filter IAM roles that are either being used or not
 
+    Checks for usage on EC2, Lambda, ECS only
+
     :example:
 
     .. code-block:: yaml
@@ -282,6 +286,8 @@ class UnusedIamRole(IamRoleUsage):
     This filter has been deprecated. Please use the 'used' filter
     with the 'state' attribute to get unused iam roles
 
+    Checks for usage on EC2, Lambda, ECS only
+
     :example:
 
     .. code-block:: yaml
@@ -298,6 +304,19 @@ class UnusedIamRole(IamRoleUsage):
 
     def process(self, resources, event=None):
         return UsedIamRole({'state': False}, self.manager).process(resources)
+
+
+@Role.filter_registry.register('cross-account')
+class RoleCrossAccountAccess(CrossAccountAccessFilter):
+
+    policy_attribute = 'AssumeRolePolicyDocument'
+    permissions = ('iam:ListRoles',)
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
 
 
 @Role.filter_registry.register('has-inline-policy')
@@ -503,6 +522,7 @@ class AllowAllIamPolicies(Filter):
                     'Action' in s and
                     isinstance(s['Action'], six.string_types) and
                     s['Action'] == "*" and
+                    'Resource' in s and
                     isinstance(s['Resource'], six.string_types) and
                     s['Resource'] == "*" and
                     s['Effect'] == "Allow"):
@@ -625,8 +645,7 @@ class CredentialReport(Filter):
     """
     schema = type_schema(
         'credential',
-        value_type={'type': 'string', 'enum': [
-            'age', 'expiration', 'size', 'regex']},
+        value_type=ValueFilter.schema['properties']['value_type'],
 
         key={'type': 'string',
              'title': 'report key to search',
@@ -783,6 +802,29 @@ class UserCredentialReport(CredentialReport):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
+
+
+@User.filter_registry.register('has-inline-policy')
+class IamUserInlinePolicy(Filter):
+    """
+        Filter IAM users that have an inline-policy attached
+
+        True: Filter users that have an inline-policy
+        False: Filter users that do not have an inline-policy
+    """
+
+    schema = type_schema('has-inline-policy', value={'type': 'boolean'})
+    permissions = ('iam:ListUserPolicies',)
+
+    def _num_inline_policies(self, client, resource):
+        return len(client.list_user_policies(
+            UserName=resource['UserName'])['PolicyNames'])
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        if self.data.get('value', True):
+            return [r for r in resources if self._num_inline_policies(c, r) > 0]
+        return [r for r in resources if self._num_inline_policies(c, r) == 0]
 
 
 @User.filter_registry.register('policy')

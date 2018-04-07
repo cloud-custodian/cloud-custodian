@@ -367,6 +367,8 @@ class Tag(Action):
         if msg:
             tags.append({'Key': tag, 'Value': msg})
 
+        self.interpolate_values(tags)
+
         batch_size = self.data.get('batch_size', self.batch_size)
 
         _common_tag_processer(
@@ -382,6 +384,18 @@ class Tag(Action):
             Resources=[v[self.id_key] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
+
+    def interpolate_values(self, tags):
+        params = {
+            'account_id': self.manager.config.account_id,
+            'now': utils.FormatDate.utcnow(),
+            'region': self.manager.config.region}
+        interpolate_tag_values(tags, params)
+
+
+def interpolate_tag_values(tags, params):
+    for t in tags:
+        t['Value'] = t['Value'].format(**params)
 
 
 class RemoveTag(Action):
@@ -402,7 +416,6 @@ class RemoveTag(Action):
 
         tags = self.data.get('tags', [DEFAULT_TAG])
         batch_size = self.data.get('batch_size', self.batch_size)
-
         _common_tag_processer(
             self.executor_factory, batch_size, self.concurrency,
             self.process_resource_set, self.id_key, resources, tags, self.log)
@@ -719,6 +732,7 @@ class UniversalTag(Tag):
     """
 
     batch_size = 20
+    concurrency = 1
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
@@ -769,6 +783,7 @@ class UniversalUntag(RemoveTag):
     """
 
     batch_size = 20
+    concurrency = 1
     permissions = ('resourcegroupstaggingapi:UntagResources',)
 
     def process_resource_set(self, resource_set, tag_keys):

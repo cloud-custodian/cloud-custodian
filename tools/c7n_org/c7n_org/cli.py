@@ -34,7 +34,7 @@ import jsonschema
 
 from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import MainThreadExecutor
-from c7n.handler import Config as Bag
+from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_resources
@@ -47,7 +47,8 @@ from c7n.utils import UnicodeWriter
 log = logging.getLogger('c7n_org')
 
 
-WORKER_COUNT = int(os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
+WORKER_COUNT = int(
+    os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
 
 
 CONFIG_SCHEMA = {
@@ -64,12 +65,12 @@ CONFIG_SCHEMA = {
                 'name': {'type': 'string'},
                 'email': {'type': 'string'},
                 'account_id': {'type': 'string'},
-                'profile': {'type': 'string'},
+                'profile': {'type': 'string', 'minLength': 3},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'regions': {'type': 'array', 'items': {'type': 'string'}},
                 'role': {'oneOf': [
                     {'type': 'array', 'items': {'type': 'string'}},
-                    {'type': 'string'}]},
+                    {'type': 'string', 'minLength': 3}]},
                 'external_id': {'type': 'string'},
             }
         }
@@ -169,19 +170,19 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
 def report_account(account, region, policies_config, output_path, debug):
     cache_path = os.path.join(output_path, "c7n.cache")
     output_path = os.path.join(output_path, account['name'], region)
-    bag = Bag.empty(
+    config = Config.empty(
         region=region,
         output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=False,
         cache=cache_path, log_group=None, profile=None, external_id=None)
 
-    if account['role']:
-        bag['assume_role'] = account['role']
-        bag['external_id'] = account.get('external_id')
-    elif account['profile']:
-        bag['profile'] = account['profile']
+    if account.get('role'):
+        config['assume_role'] = account['role']
+        config['external_id'] = account.get('external_id')
+    elif account.get('profile'):
+        config['profile'] = account['profile']
 
-    policies = PolicyCollection.from_data(policies_config, bag)
+    policies = PolicyCollection.from_data(policies_config, config)
     records = []
     for p in policies:
         log.debug(
@@ -263,7 +264,7 @@ def report(config, output, use, output_dir, accounts,
 
     prefix_fields = OrderedDict(
         (('Account', 'account'), ('Region', 'region'), ('Policy', 'policy')))
-    config = Bag.empty()
+    config = Config.empty()
     factory = resource_registry.get(list(resource_types)[0])
 
     formatter = Formatter(
@@ -370,19 +371,19 @@ def run_account(account, region, policies_config, output_path,
         os.makedirs(output_path)
 
     cache_path = os.path.join(output_path, "c7n.cache")
-    bag = Bag.empty(
+    config = Config.empty(
         region=region,
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         cache=cache_path, log_group=None, profile=None, external_id=None)
 
-    if account['role']:
-        bag['assume_role'] = account['role']
-        bag['external_id'] = account.get('external_id')
-    elif account['profile']:
-        bag['profile'] = account['profile']
+    if account.get('role'):
+        config['assume_role'] = account['role']
+        config['external_id'] = account.get('external_id')
+    elif account.get('profile'):
+        config['profile'] = account['profile']
 
-    policies = PolicyCollection.from_data(policies_config, bag)
+    policies = PolicyCollection.from_data(policies_config, config)
     policy_counts = {}
     st = time.time()
     with environ(**account_tags(account)):

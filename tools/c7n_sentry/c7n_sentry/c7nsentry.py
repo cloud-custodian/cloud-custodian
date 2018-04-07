@@ -72,6 +72,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
 from six.moves.urllib.parse import urlparse
 
+from c7n.config import Bag
+
 sqs = logs = config = None
 
 VERSION = "0.1"
@@ -360,7 +362,7 @@ def get_function(session_factory, name, handler, runtime, role,
 
 
 def orgreplay(options):
-    from .common import Bag, get_accounts
+    from .common import get_accounts
     accounts = get_accounts(options)
 
     auth_headers = {'Authorization': 'Bearer %s' % options.sentry_token}

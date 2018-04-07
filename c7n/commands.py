@@ -27,9 +27,11 @@ import time
 import six
 import yaml
 
+from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
-from c7n.utils import Bag, dumps, load_file
+from c7n.utils import dumps, load_file
+from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
 from c7n import schema
@@ -49,7 +51,7 @@ def policy_command(f):
         all_policies = PolicyCollection.from_data({}, options)
 
         # for a default region for policy loading, we'll expand regions later.
-        options.region = options.regions[0]
+        options.region = ""
 
         for fp in options.configs:
             try:
@@ -80,8 +82,18 @@ def policy_command(f):
             getattr(options, 'policy_filter', None),
             getattr(options, 'resource_type', None))
 
-        # expand by region, this results in a separate policy instance per region of execution.
-        policies = policies.expand_regions(options.regions)
+        # provider initialization
+        provider_policies = {}
+        for p in policies:
+            provider_policies.setdefault(p.provider_name, []).append(p)
+
+        policies = PolicyCollection.from_data({}, options)
+        for provider_name in provider_policies:
+            provider = clouds[provider_name]()
+            p_options = provider.initialize(options)
+            policies += provider.initialize_policies(
+                PolicyCollection(provider_policies[provider_name], p_options),
+                p_options)
 
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
@@ -150,6 +162,7 @@ def validate(options):
     used_policy_names = set()
     schm = schema.generate()
     errors = []
+
     for config_file in options.configs:
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
@@ -178,7 +191,7 @@ def validate(options):
             ))
         used_policy_names = used_policy_names.union(conf_policy_names)
         if not errors:
-            null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
+            null_config = Config.empty(dryrun=True, account_id='na', region='na')
             for p in data.get('policies', ()):
                 try:
                     policy = Policy(p, null_config, Bag())
@@ -196,7 +209,6 @@ def validate(options):
             log.error("%s" % e)
     if errors:
         sys.exit(1)
-
 
 # This subcommand is disabled in cli.py.
 # Commmeting it out for coverage purposes.
