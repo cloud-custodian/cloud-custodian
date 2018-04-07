@@ -883,4 +883,3 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
                             ', '.join(
                                 [s['SnapshotIdentifier'] for s in futures[f]]),
                             f.exception()))
-
