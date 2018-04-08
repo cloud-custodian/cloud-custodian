@@ -39,6 +39,27 @@ class TestCFN(BaseTest):
         resources = p.run()
         self.assertEqual(resources, [])
 
+    def test_disable_protection(self):
+        factory = self.replay_flight_data('test_cfn_disable_protection')
+        client = factory().client('cloudformation')
+        stacks = client.describe_stacks(
+            StackName='mytopic').get('Stacks')
+        self.assertEqual(stacks[0].get('EnableTerminationProtection'), True)
+        p = self.load_policy({
+            'name': 'cfn-disable-protection',
+            'resource': 'cfn',
+            'filters': [{'StackName': 'mytopic'}],
+            'actions': [{
+                'type': 'set-protection',
+                'state': False}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('cloudformation')
+        stacks = client.describe_stacks(
+            StackName=resources[0]['StackName']).get('Stacks')
+        self.assertEqual(stacks[0].get('EnableTerminationProtection'), False)
+
     def test_cfn_add_tag(self):
         session_factory = self.replay_flight_data('test_cfn_add_tag')
         p = self.load_policy({
