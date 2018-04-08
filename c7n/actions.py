@@ -416,8 +416,7 @@ class Notify(EventAction):
         'type': 'object',
         'anyOf': [
             {'required': ['type', 'transport', 'to']},
-            {'required': ['type', 'transport', 'to_from']}
-        ],
+            {'required': ['type', 'transport', 'to_from']}],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
