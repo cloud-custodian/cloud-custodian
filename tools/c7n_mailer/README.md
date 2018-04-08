@@ -80,7 +80,7 @@ datadog_application_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
 (Also set `region` if you are in a region other than `us-east-1`.)
 
 Now let's make a Custodian policy to populate your mailer queue. Create a
-`test-policy.yml` file with this content (update `metric_name` to set the metric name that is send to DataDog):
+`test-policy.yml`:
 
 ```yaml
 policies:
@@ -90,14 +90,16 @@ policies:
      - Attachments: []
     actions:
       - type: notify
-        metric_name: datadog.metric.name
-        metric_value_tag: Size
+        to:
+          - datadog://?metric_name=datadog.metric.name&metric_value_tag=Size
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 
-by default the metric value send to datadog is `1` but if you want to use one of the tags returned in the policy you can set it with the attribute `metric_value_tag`, for example in the `test-policy.yml` the value used is the size of the EBS volume. The value must be a number and it's transformed to a float value.
+There is a special `to` that includes the DataDog configuration params with a ulr params like:
+- metric_name: is the name of the metrics send to DataDog
+- metric_value_tag: by default the metric value send to DataDog is `1` but if you want to use one of the tags returned in the policy you can set it with the attribute `metric_value_tag`, for example in the `test-policy.yml` the value used is the size of the EBS volume. The value must be a number and it's transformed to a float value.
 
 
 ### Now run:
@@ -194,10 +196,12 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 #### DataDog Config
 
-| Required? | Key                  | Type             | Notes                               |
-|:---------:|:---------------------|:-----------------|:------------------------------------|
-| &#x2705;  | `metric_name`        | string           | Name of the metric send to DataDog. |
-|           | `metric_value_tag`   | string           | Name of the tag used to send de value of the metric, it must be a number. By defalut the value is `1`. |
+| Required? | Key                       | Type             | Notes                               |
+|:---------:|:--------------------------|:-----------------|:------------------------------------|
+|           | `datadog_api_key`         | string           | DataDog API key. |
+|           | `datadog_application_key` | string           | Datadog application key. |
+
+This fields are not necessary if c7m_mailer run in a instance/lambda/etc with the DataDog agent.
 
 
 
@@ -241,7 +245,7 @@ template that's used to format the email; customizing templates is described
 [below](#writing-an-email-template).
 
 The `to` list specifies the intended recipient for the email. You can specify
-either an email address, an SNS topic, or a special value. The special values
+either an email address, an SNS topic, a Datadog Metric, or a special value. The special values
 are either
 
 - `resource-owner`, in which case the email will be sent to the listed

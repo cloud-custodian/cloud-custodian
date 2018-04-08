@@ -81,40 +81,37 @@ class TestDataDogDelivery(unittest.TestCase):
         self.session = patch('boto3.Session')
         self.logger = MagicMock()
 
-    @patch('c7n_mailer.datadog_delivery.initialize')
-    def test_should_initialize_datadog_with_keys_in_config(self, mock_datadog):
+        self.patcher_datadog_initialize = patch('c7n_mailer.datadog_delivery.initialize')
+        self.mock_datadog_initialize = self.patcher_datadog_initialize.start()
+
+    def tearDown(self):
+        self.patcher_datadog_initialize.stop()
+
+    def test_should_initialize_datadog_with_keys_in_config(self):
         DataDogDelivery(self.config, self.session, self.logger)
 
-        mock_datadog.assert_called_with(api_key=DATADOG_API_KEY, app_key=DATADOG_APPLICATION_KEY)
+        self.mock_datadog_initialize.assert_called_with(api_key=DATADOG_API_KEY, app_key=DATADOG_APPLICATION_KEY)
 
-    @patch('c7n_mailer.datadog_delivery.initialize')
-    def test_should_not_initialize_datadog_with_no_keys_in_config(self, mock_datadog):
+    def test_should_not_initialize_datadog_with_no_keys_in_config(self):
         DataDogDelivery({}, self.session, self.logger)
 
-        mock_datadog.assert_not_called()
+        self.mock_datadog_initialize.assert_not_called()
 
     def test_datadog_message_packages_should_return_empty_list_if_no_sqs_messages_returned(self):
         data_dog_delivery = DataDogDelivery(self.config, self.session, self.logger)
 
         assert data_dog_delivery.get_datadog_message_packages(None) == []
 
-    def test_datadog_message_packages_should_return_list_with_one_message(self):
+    @patch('c7n_mailer.datadog_delivery.time.time', return_value=0)
+    def test_datadog_message_packages_should_return_messages(self, mock_time):
         data_dog_delivery = DataDogDelivery(self.config, self.session, self.logger)
 
-        assert len(data_dog_delivery.get_datadog_message_packages(SQS_MESSAGE_1)) == 1
+        answer = data_dog_delivery.get_datadog_message_packages(SQS_MESSAGE_2)
+        answer[0]['tags'].sort()
+        answer[1]['tags'].sort()
 
-    def test_datadog_message_packages_should_return_one_message(self):
-        data_dog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-
-        answer = data_dog_delivery.get_datadog_message_packages(SQS_MESSAGE_1)
-        answer[0].sort()
-
-        assert answer == MESSAGE_ANSWER
-
-    def test_datadog_message_packages_should_return_list_with_two_messages(self):
-        data_dog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-
-        assert len(data_dog_delivery.get_datadog_message_packages(SQS_MESSAGE_2)) == 2
+        assert len(answer) == 2
+        assert answer == DATADOG_METRIC_SQS_MESSAGE_2
 
     @patch('c7n_mailer.datadog_delivery.time.time', return_value=0)
     @patch('c7n_mailer.datadog_delivery.api.Metric.send')

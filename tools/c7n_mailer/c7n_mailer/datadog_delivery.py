@@ -37,66 +37,64 @@ class DataDogDelivery(object):
             initialize(**options)
 
     def get_datadog_message_packages(self, sqs_message):
+        date_time = time.time()
         datadog_rendered_messages = []
+
+        metric_config_map = self._get_metrics_config_to_resources_map(sqs_message)
 
         if sqs_message and sqs_message.get('resources', False):
             for resource in sqs_message['resources']:
-                metric = [
+                tags = [
                     'event:{}'.format(sqs_message['event']),
                     'account_id:{}'.format(sqs_message['account_id']),
                     'account:{}'.format(sqs_message['account']),
                     'region:{}'.format(sqs_message['region'])
                 ]
 
-                metric.extend(['{key}:{value}'.format(key=key, value=resource[key]) for key in resource.keys()
+                tags.extend(['{key}:{value}'.format(key=key, value=resource[key]) for key in resource.keys()
                                if key != 'Tags'])
                 if resource.get('Tags', False):
-                    metric.extend(['{key}:{value}'.format(key=tag['Key'], value=tag['Value']) for tag in resource['Tags']])
+                    tags.extend(['{key}:{value}'.format(key=tag['Key'], value=tag['Value']) for tag in resource['Tags']])
 
-                datadog_rendered_messages.append(metric)
+                for metric_config in metric_config_map:
+                    datadog_rendered_messages.append({
+                        "metric": metric_config['metric_name'],
+                        "points": (date_time, self._get_metric_value(metric_config=metric_config, tags=tags)),
+                        "tags": tags
+                    })
 
+        # eg: [{'metric': 'metric_name', 'points': (date_time, value), 'tags': ['tag1':'value', 'tag2':'value']}, ...]
         return datadog_rendered_messages
 
     def deliver_datadog_messages(self, datadog_message_packages, sqs_message):
-        metric_name = self.get_metric_name(sqs_message=sqs_message)
-        date_time = time.time()
-        metrics = []
-        for message in datadog_message_packages:
-            metrics.append({
-                "metric": metric_name,
-                "points": (date_time, self.get_metric_value(sqs_message=sqs_message, message=message)),
-                "tags": message
-            })
-
-        self.logger.info("Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog metric:{metric}".
+        self.logger.info("Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog".
                          format(account=sqs_message.get('account', ''),
                                 policy=sqs_message['policy']['name'],
                                 resource=sqs_message['policy']['resource'],
-                                quantity=len(sqs_message['resources']),
-                                metric=sqs_message['action']['metric_name']))
+                                quantity=len(sqs_message['resources'])))
 
-        api.Metric.send(metrics)
-
-    @staticmethod
-    def get_metric_name(sqs_message):
-        metric_name = None
-        for action in sqs_message['policy']['actions']:
-            if action['type'] == 'notify' and action.get('metric_name', None):
-                metric_name = action['metric_name']
-
-        return metric_name
+        api.Metric.send(datadog_message_packages)
 
     @staticmethod
-    def get_metric_value(sqs_message, message):
+    def _get_metric_value(metric_config, tags):
         metric_value = 1
-        metric_value_tag = 'default'
-        for action in sqs_message['policy']['actions']:
-            if action['type'] == 'notify' and action.get('metric_value_tag', None):
-                metric_value_tag = action['metric_value_tag']
-
+        metric_value_tag = metric_config.get('metric_value_tag', 'default')
         if metric_value_tag != 'default':
-            for tag in message:
+            for tag in tags:
                 if metric_value_tag in tag:
                     metric_value = float(tag[tag.find(":")+1:])
 
         return metric_value
+
+    @staticmethod
+    def _get_metrics_config_to_resources_map(sqs_message):
+        metric_config_map = []
+        if sqs_message and sqs_message.get('action', False) and sqs_message['action'].get('to', False):
+            for to in sqs_message['action']['to']:
+                if 'datadog' in to:
+                    params_text = to[to.index('://?') + 4:]
+                    params = dict()
+                    for param in params_text.split("&"):
+                        params[param.split("=")[0]] = param.split("=")[1]
+                    metric_config_map.append(params)
+        return metric_config_map

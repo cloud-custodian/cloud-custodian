@@ -128,7 +128,8 @@ SQS_MESSAGE_2 = {
     'account_id': '000000000000',
     'region': 'us-east-1',
     'action': {
-        'metric_name': 'EBS_volume.available.size'
+        'type': 'notify',
+        'to': ['datadog://?metric_name=EBS_volume.available.size']
     },
     'policy': {
         'filters': [{'Attachments': []}, {'tag:maid_status': 'absent'}],
@@ -141,7 +142,7 @@ SQS_MESSAGE_2 = {
             },
             {
                 'type': 'notify',
-                'metric_name': 'EBS_volume.available.size'
+                'to': ['datadog://?metric_name=EBS_volume.available.size']
             }
         ],
         'comments': 'We are deleting your EBS volumes.',
@@ -156,8 +157,8 @@ SQS_MESSAGE_3 = {
     'account_id': '000000000000',
     'region': 'us-east-1',
     'action': {
-            'metric_name': 'EBS_volume.available.size',
-            'metric_value_tag': 'Size'
+            'type': 'notify',
+            'to': ['datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size']
     },
     'policy': {
         'filters': [{'Attachments': []}, {'tag:maid_status': 'absent'}],
@@ -170,8 +171,7 @@ SQS_MESSAGE_3 = {
             },
             {
                 'type': 'notify',
-                'metric_name': 'EBS_volume.available.size',
-                'metric_value_tag': 'Size'
+                'to': ['datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size']
             }
         ],
         'comments': 'We are deleting your EBS volumes.',
