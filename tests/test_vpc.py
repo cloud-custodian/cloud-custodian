@@ -1578,7 +1578,7 @@ class FlowLogsTest(BaseTest):
                 {'tag:Name': 'FlowLogTest'},
                 {'type': 'flow-logs', 'enabled': False}],
             'actions': [{
-                'type': 'create-flow-logs',
+                'type': 'set-vpc-flow',
                 'DeliverLogsPermissionArn': 'arn:aws:iam::644160558196:role/flowlogsRole',
                 'LogGroupName': '/custodian/vpc_logs/',
                 'TrafficType': 'ALL'}]
@@ -1602,7 +1602,7 @@ class FlowLogsTest(BaseTest):
                 {'tag:Name': 'FlowLogENI'},
                 {'type': 'flow-logs', 'enabled': False}],
             'actions': [{
-                'type': 'create-flow-logs',
+                'type': 'set-vpc-flow',
                 'DeliverLogsPermissionArn': 'arn:aws:iam::644160558196:role/flowlogsRole',
                 'LogGroupName': '/custodian/eni_logs/',
                 'TrafficType': 'ALL'
@@ -1628,7 +1628,7 @@ class FlowLogsTest(BaseTest):
                 {'tag:Name': 'FlowLogSubnet'},
                 {'type': 'flow-logs', 'enabled': False}],
             'actions': [{
-                'type': 'create-flow-logs',
+                'type': 'set-vpc-flow',
                 'DeliverLogsPermissionArn': 'arn:aws:iam::644160558196:role/flowlogsRole',
                 'LogGroupName': '/custodian/subnet_logs/',
                 'TrafficType': 'ALL'
@@ -1640,5 +1640,4 @@ class FlowLogsTest(BaseTest):
         logs = client.describe_flow_logs(Filters=[{
             'Name': 'resource-id',
             'Values': [resources[0]['SubnetId']]}])['FlowLogs']
-        self.assertEqual(logs[0]['ResourceId'],
-                         resources[0]['SubnetId'])
+        self.assertEqual(logs[0]['ResourceId'], resources[0]['SubnetId'])

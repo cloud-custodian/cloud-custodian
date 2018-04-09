@@ -1602,9 +1602,9 @@ class KeyPair(query.QueryResourceManager):
         dimension = None
 
 
-@Vpc.action_registry.register('create-flow-logs')
-@Subnet.action_registry.register('create-flow-logs')
-@NetworkInterface.action_registry.register('create-flow-logs')
+@Vpc.action_registry.register('set-vpc-flow')
+@Subnet.action_registry.register('set-vpc-flow')
+@NetworkInterface.action_registry.register('set-vpc-flow')
 class CreateFlowLogs(BaseAction):
     """Create flow logs for a network resource
 
@@ -1619,7 +1619,7 @@ class CreateFlowLogs(BaseAction):
               - type: flow-logs
                 enabled: false
             actions:
-              - type: create-flow-logs
+              - type: set-vpc-flow
                 DeliverLogsPermissionArn: arn:iam:role
                 LogGroupName: /custodian/vpc/flowlogs/
                 TrafficType: ALL
@@ -1629,7 +1629,7 @@ class CreateFlowLogs(BaseAction):
         'type': 'object',
         'additionalProperties': False,
         'properties': {
-            'type': {'enum': ['create-flow-logs']},
+            'type': {'enum': ['set-vpc-flow']},
             'DeliverLogsPermissionArn': {'type': 'string'},
             'LogGroupName': {'type': 'string'},
             'TrafficType': {'type': 'string',
