@@ -551,13 +551,6 @@ class PolicyDelete(BaseAction):
           resource: iam-policy
           filters:
             - type: unused
-            - type: value
-                key: "Arn"
-                op: regex
-                value: "(arn:aws:iam::[0-9])"
-                # regular expression to filter out AWS managed policies.
-                # they are in the format arn:aws:iam::aws
-                # user policies are in the format arn:aws:iam::${account_number}
           actions:
             - delete
 
@@ -567,10 +560,14 @@ class PolicyDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
+        policies = client.describe_policies()
         for r in resources:
-            self.log.debug('Deleting policy %s' % r['PolicyName'])
-            client.delete_policy(
-                PolicyArn=r['Arn'])
+            if not r['Arn'].startswith("arn:aws:iam::aws:policy"):
+                self.log.debug('Deleting policy %s' % r['PolicyName'])
+                client.delete_policy(
+                    PolicyArn=r['Arn'])
+            else:
+                self.log.debug('Cannot delete AWS managed policy %s' % r['PolicyName'])
 
 
 ###############################
