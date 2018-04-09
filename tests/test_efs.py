@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, functional
+from .common import BaseTest, functional, TestConfig as Config
 
 import uuid
 import time
@@ -40,7 +40,7 @@ class ElasticFileSystem(BaseTest):
             'name': 'efs-query',
             'resource': 'efs',
             'filters': [{'FileSystemId': fs_id}, {'tag:Name': 'Somewhere'}],
-            }, session_factory=factory)
+            }, config=Config.empty(), session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['Tags'], tags)

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, functional, event_data
+from .common import BaseTest, functional, event_data, TestConfig as Config
 from c7n.filters import FilterValidationError
 
 
@@ -605,6 +605,7 @@ class PeeringConnectionTest(BaseTest):
             'resource': 'peering-connection',
             'filters': [
                 {'type': 'cross-account'}]},
+            config=Config.empty(),
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

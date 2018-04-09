@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import jmespath
-from .common import BaseTest
+from .common import BaseTest, TestConfig as Config
 from c7n.utils import local_session
 
 
@@ -191,7 +191,7 @@ class CloudFront(BaseTest):
                     'value': '456'
                 }
             ]
-        }, session_factory=factory)
+        }, config=Config.empty(), session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -240,7 +240,7 @@ class CloudFront(BaseTest):
                     'value': '123'
                 }
             ]
-        }, session_factory=factory)
+        }, config = Config.empty(), session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
