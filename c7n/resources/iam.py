@@ -560,7 +560,6 @@ class PolicyDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
-        policies = client.describe_policies()
         for r in resources:
             if not r['Arn'].startswith("arn:aws:iam::aws:policy"):
                 self.log.debug('Deleting policy %s' % r['PolicyName'])
