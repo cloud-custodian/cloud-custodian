@@ -25,7 +25,7 @@ from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 from c7n.query import ConfigSource
 
-from .common import BaseTest, Config, Bag, event_data
+from .common import BaseTest, event_data, Bag, TestConfig as Config
 
 
 class DummyResource(manager.ResourceManager):

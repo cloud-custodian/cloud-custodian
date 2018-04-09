@@ -30,7 +30,8 @@ import yaml
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
-from c7n.utils import Bag, dumps, load_file
+from c7n.utils import dumps, load_file
+from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
 from c7n import schema
@@ -190,7 +191,7 @@ def validate(options):
             ))
         used_policy_names = used_policy_names.union(conf_policy_names)
         if not errors:
-            null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
+            null_config = Config.empty(dryrun=True, account_id='na', region='na')
             for p in data.get('policies', ()):
                 try:
                     policy = Policy(p, null_config, Bag())
@@ -208,7 +209,6 @@ def validate(options):
             log.error("%s" % e)
     if errors:
         sys.exit(1)
-
 
 # This subcommand is disabled in cli.py.
 # Commmeting it out for coverage purposes.

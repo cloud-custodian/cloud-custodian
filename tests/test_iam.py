@@ -19,7 +19,7 @@ import os
 import tempfile
 
 from unittest import TestCase
-from .common import load_data, BaseTest, functional
+from .common import load_data, BaseTest, functional, TestConfig as Config
 from .test_offhours import mock_datetime_now
 
 from dateutil import parser
@@ -769,6 +769,7 @@ class SNSCrossAccount(BaseTest):
             {'name': 'sns-cross',
              'resource': 'sns',
              'filters': ['cross-account']},
+            config=Config.empty(),
             session_factory=session_factory)
 
         resources = p.run()
@@ -815,6 +816,7 @@ class SNSCrossAccount(BaseTest):
                 'cross-account'
                 ]
             },
+            config=Config.empty(),
             session_factory=session_factory)
 
         resources = p.run()

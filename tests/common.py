@@ -22,6 +22,7 @@ import shutil
 import tempfile
 import unittest
 import uuid
+from functools import partial
 
 import six
 import yaml
@@ -32,6 +33,7 @@ from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
 from c7n.utils import CONN_CACHE
+from c7n.config import Bag, Config
 
 from .zpill import PillTest
 
@@ -47,9 +49,17 @@ ACCOUNT_ID = '644160558196'
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
 
-
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason='We are not validating schemas.')
+
+class TestConfig(Config):
+    config_args = {
+        "metrics_enabled": False,
+        "account_id": ACCOUNT_ID,
+        "output_dir": "s3://test-example/foo"
+    }
+
+    empty = staticmethod(partial(Config.empty, **config_args))
 
 # Set this so that if we run nose directly the tests will not fail
 if 'AWS_DEFAULT_REGION' not in os.environ:
@@ -117,9 +127,10 @@ class BaseTest(PillTest):
     def load_policy_set(self, data, config=None):
         filename = self.write_policy_file(data)
         if config:
+            config['account_id'] = ACCOUNT_ID
             e = Config.empty(**config)
         else:
-            e = Config.empty()
+            e = Config.empty(account_id=ACCOUNT_ID)
         return policy.load(e, filename)
 
     def patch(self, obj, attr, new):
@@ -287,38 +298,6 @@ def load_data(file_name, state=None, **kw):
 
 def instance(state=None, file='ec2-instance.json', **kw):
     return load_data(file, state, **kw)
-
-
-class Bag(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-
-class Config(Bag):
-
-    @classmethod
-    def empty(cls, **kw):
-        region = os.environ.get('AWS_DEFAULT_REGION', "us-east-1")
-        d = {}
-        d.update({
-            'region': region,
-            'regions': [region],
-            'cache': '',
-            'profile': None,
-            'account_id': ACCOUNT_ID,
-            'assume_role': None,
-            'external_id': None,
-            'log_group': None,
-            'metrics_enabled': False,
-            'output_dir': 's3://test-example/foo',
-            'cache_period': 0,
-            'dryrun': False})
-        d.update(kw)
-        return cls(d)
 
 
 class Instance(Bag):
