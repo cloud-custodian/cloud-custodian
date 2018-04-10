@@ -13,7 +13,7 @@ from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['queue_url', 'role', 'from_address'],
+    'required': ['queue_url', 'role'],
     'properties': {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
@@ -56,6 +56,8 @@ CONFIG_SCHEMA = {
         'ses_region': {'type': 'string'},
         'redis_host': {'type': 'string'},
         'redis_port': {'type': 'integer'},
+        'datadog_api_key': {'type': 'string'},              #TODO: encrypt with KMS?
+        'datadog_application_key': {'type': 'string'},      #TODO: encrypt with KMS?
 
         # SDK Config
         'profile': {'type': 'string'},
