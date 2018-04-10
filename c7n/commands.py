@@ -49,6 +49,9 @@ def policy_command(f):
         if 'skip_validation' in options:
             validate = not options.skip_validation
 
+        if not validate:
+            log.debug('Policy validation disabled')
+
         load_resources()
         vars = _load_vars(options)
 

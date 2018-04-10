@@ -294,8 +294,8 @@ def setup_parser():
     _default_options(run)
     _dryrun_option(run)
     run.add_argument(
-        "-V", "--skip-validation",
-        default=False, action="store_true",
+        "--skip-validation",
+        action="store_true",
         help="Skips validation of policies (assumes you've run the validate command seperately).")
     run.add_argument(
         "-m", "--metrics-enabled",
