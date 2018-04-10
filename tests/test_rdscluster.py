@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,12 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from common import BaseTest
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from c7n.executor import MainThreadExecutor
+from c7n.resources.rdscluster import RDSCluster
+from c7n import tags
+
+from .common import BaseTest
 
 
 class RDSClusterTest(BaseTest):
 
+    def remove_augments(self):
+        # This exists because we added tag augmentation after eight other tests
+        # were created and I did not want to re-create the state to re-record
+        # them with the extra API call. If those get re-recorded we can remove
+        # this.
+        self.patch(RDSCluster, 'augment', lambda x, y: y)
+
     def test_rdscluster_security_group(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_sg_filter')
         p = self.load_policy({
             'name': 'rdscluster-sg',
@@ -31,6 +45,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(resources[0]['DatabaseName'], 'devtest')
 
     def test_rdscluster_subnet(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_subnet')
         p = self.load_policy({
             'name': 'rdscluster-sub',
@@ -45,6 +60,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(resources[0]['DatabaseName'], 'devtest')
 
     def test_rdscluster_simple(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_simple')
         p = self.load_policy({
             'name': 'rdscluster-simple',
@@ -54,6 +70,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(len(resources), 2)
 
     def test_rdscluster_simple_filter(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_simple')
         p = self.load_policy({
             'name': 'rdscluster-simple-filter',
@@ -67,6 +84,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rdscluster_delete(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_delete')
         p = self.load_policy({
             'name': 'rdscluster-delete',
@@ -83,6 +101,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rdscluster_delete_with_instances(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_delete_with_instances')
         p = self.load_policy({
             'name': 'rdscluster-delete',
@@ -99,6 +118,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rdscluster_retention(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_retention')
         p = self.load_policy({
             'name': 'rdscluster-delete',
@@ -113,6 +133,7 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rdscluster_snapshot(self):
+        self.remove_augments()
         session_factory = self.replay_flight_data('test_rdscluster_snapshot')
         p = self.load_policy({
             'name': 'rdscluster-snapshot',
@@ -125,6 +146,121 @@ class RDSClusterTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_rdscluster_tag_augment(self):
+        session_factory = self.replay_flight_data('test_rdscluster_tag_augment')
+        p = self.load_policy({
+            'name': 'rdscluster-tag-augment',
+            'resource': 'rds-cluster',
+            'filters': [{'tag:cfoo': 'cbar'}]},
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rdscluster_tag_and_remove(self):
+        self.patch(RDSCluster, 'executor_factory', MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            'test_rdscluster_tag_and_remove'
+        )
+        client = session_factory().client('rds')
+
+        p = self.load_policy({
+            'name': 'rds-cluster-tag',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'DBClusterIdentifier': 'c7ntest'}
+            ],
+            'actions': [
+                {'type': 'tag', 'key': 'xyz', 'value': 'hello world'}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBClusterIdentifier'])
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('xyz' in tag_map)
+
+        policy = self.load_policy({
+            'name': 'rds-cluster-remove-tag',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'tag:xyz': 'not-null'}
+            ],
+            'actions': [
+                {'type': 'remove-tag', 'tags': ['xyz']}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertFalse('xyz' in tag_map)
+
+    def test_rdscluster_mark_match_unmark(self):
+        session_factory = self.replay_flight_data(
+            'test_rdscluster_mark_and_match'
+        )
+        client = session_factory().client('rds')
+
+        # mark
+        p = self.load_policy({
+            'name': 'rds-mark',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'DBClusterIdentifier': 'c7ntest'}],
+            'actions': [
+                {'type': 'mark-for-op', 'tag': 'custodian_next', 'days': 1,
+                 'op': 'delete'}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # assert marked
+        arn = p.resource_manager.generate_arn(
+            resources[0]['DBClusterIdentifier']
+        )
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertTrue('custodian_next' in tag_map)
+
+        # match marked
+        policy = self.load_policy({
+            'name': 'rds-mark-filter',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'type': 'marked-for-op', 'tag': 'custodian_next',
+                 'op': 'delete', 'skew': 1}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        # unmark
+        policy = self.load_policy({
+            'name': 'rds-mark-filter',
+            'resource': 'rds-cluster',
+            'filters': [
+                {'type': 'marked-for-op', 'tag': 'custodian_next',
+                 'op': 'delete', 'skew': 1}
+            ],
+            'actions': [
+                {'type': 'unmark', 'tags': ['custodian_next']}
+            ]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        # assert unmarked
+        tags = client.list_tags_for_resource(ResourceName=arn)
+        tag_map = {t['Key']: t['Value'] for t in tags['TagList']}
+        self.assertFalse('custodian_next' in tag_map)
 
 
 class RDSClusterSnapshotTest(BaseTest):

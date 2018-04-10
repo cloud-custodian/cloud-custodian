@@ -1,0 +1,36 @@
+{
+    "status_code": 201, 
+    "data": {
+        "SizeInBytes": {
+            "Value": 0
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "ef163d56-bf15-11e7-ba33-cf09421587b9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ef163d56-bf15-11e7-ba33-cf09421587b9", 
+                "date": "Wed, 01 Nov 2017 15:04:18 GMT", 
+                "content-length": "300", 
+                "content-type": "application/json"
+            }
+        }, 
+        "CreationToken": "b2bf7400-c02d-4b31-9f88-5691cb3db076", 
+        "Encrypted": false, 
+        "CreationTime": {
+            "hour": 10, 
+            "__class__": "datetime", 
+            "month": 11, 
+            "second": 18, 
+            "microsecond": 0, 
+            "year": 2017, 
+            "day": 1, 
+            "minute": 4
+        }, 
+        "PerformanceMode": "generalPurpose", 
+        "FileSystemId": "fs-f2603dbb", 
+        "NumberOfMountTargets": 0, 
+        "LifeCycleState": "creating", 
+        "OwnerId": "644160558196"
+    }
+}

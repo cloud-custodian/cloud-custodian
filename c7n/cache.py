@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
 """Provide basic caching services to avoid extraneous queries over
 multiple policies on the same resource type.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import cPickle
+from six.moves import cPickle as pickle
 
 import os
 import logging
@@ -31,6 +32,9 @@ def factory(config):
     if not config.cache or not config.cache_period:
         log.debug("Disabling cache")
         return NullCache(config)
+    elif config.cache == 'memory':
+        log.debug("Using in-memory cache")
+        return InMemoryCache()
 
     return FileCacheManager(config)
 
@@ -50,6 +54,24 @@ class NullCache(object):
         pass
 
 
+class InMemoryCache(object):
+    # Running in a temporary environment, so keep as a cache.
+
+    __shared_state = {}
+
+    def __init__(self):
+        self.data = self.__shared_state
+
+    def load(self):
+        return True
+
+    def get(self, key):
+        return self.data.get(pickle.dumps(key))
+
+    def save(self, key, data):
+        self.data[pickle.dumps(key)] = data
+
+
 class FileCacheManager(object):
 
     def __init__(self, config):
@@ -62,7 +84,7 @@ class FileCacheManager(object):
         self.data = {}
 
     def get(self, key):
-        k = cPickle.dumps(key)
+        k = pickle.dumps(key)
         return self.data.get(k)
 
     def load(self):
@@ -72,9 +94,9 @@ class FileCacheManager(object):
             if (time.time() - os.stat(self.cache_path).st_mtime >
                     self.config.cache_period * 60):
                 return False
-            with open(self.cache_path) as fh:
+            with open(self.cache_path, 'rb') as fh:
                 try:
-                    self.data = cPickle.load(fh)
+                    self.data = pickle.load(fh)
                 except EOFError:
                     return False
             log.debug("Using cache file %s" % self.cache_path)
@@ -82,9 +104,9 @@ class FileCacheManager(object):
 
     def save(self, key, data):
         try:
-            with open(self.cache_path, 'w') as fh:
-                self.data[cPickle.dumps(key)] = data
-                cPickle.dump(self.data, fh, protocol=2)
+            with open(self.cache_path, 'wb') as fh:
+                self.data[pickle.dumps(key)] = data
+                pickle.dump(self.data, fh, protocol=2)
         except Exception as e:
             log.warning("Could not save cache %s err: %s" % (
                 self.cache_path, e))

@@ -1,0 +1,98 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "andrewalexander", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 38
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAINLXB4P6J26AKFUC6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/andrewalexander"
+            }, 
+            {
+                "UserName": "kapil", 
+                "PasswordLastUsed": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 33
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAJEZOTH6YPO3DY45QW", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kapil"
+            }, 
+            {
+                "UserName": "scot@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 2
+                }, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 53
+                }, 
+                "UserId": "AIDAIQF3HRTVXDF7TMNAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/scot@sixfeetup.com"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d86c7e1b-bb61-11e7-860e-4dc67757c822", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d86c7e1b-bb61-11e7-860e-4dc67757c822", 
+                "vary": "Accept-Encoding", 
+                "content-length": "7047", 
+                "content-type": "text/xml", 
+                "date": "Fri, 27 Oct 2017 21:57:36 GMT"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

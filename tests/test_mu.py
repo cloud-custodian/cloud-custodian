@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,14 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import datetime, timedelta
-import imp
+import importlib
 import json
 import logging
 import os
 import platform
 import py_compile
 import shutil
+import site
 import sys
 import tempfile
 import time
@@ -26,12 +29,56 @@ import unittest
 import zipfile
 
 from c7n.mu import (
-    custodian_archive, LambdaManager, PolicyLambda, PythonPackageArchive,
-    CloudWatchLogSubscription, SNSSubscription, RUNTIME)
+    custodian_archive, LambdaFunction, LambdaManager, PolicyLambda,
+    PythonPackageArchive, CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from common import BaseTest, Config, event_data
-from data import helloworld
+from .common import BaseTest, event_data, functional, Bag, TestConfig as Config
+from .data import helloworld
+
+
+ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
+
+
+class Publish(BaseTest):
+
+    def make_func(self, **kw):
+        func_data = dict(
+            name='test-foo-bar',
+            handler='index.handler',
+            memory_size=128,
+            timeout=3,
+            role=ROLE,
+            runtime='python2.7',
+            description='test')
+        func_data.update(kw)
+
+        archive = PythonPackageArchive()
+        archive.add_contents('index.py',
+            '''def handler(*a, **kw):\n    print("Greetings, program!")''')
+        archive.close()
+        self.addCleanup(archive.remove)
+        return LambdaFunction(func_data, archive)
+
+    def test_publishes_a_lambda(self):
+        session_factory = self.replay_flight_data('test_publishes_a_lambda')
+        mgr = LambdaManager(session_factory)
+        func = self.make_func()
+        self.addCleanup(mgr.remove, func)
+        result = mgr.publish(func)
+        self.assertEqual(result['CodeSize'], 169)
+
+    def test_can_switch_runtimes(self):
+        session_factory = self.replay_flight_data('test_can_switch_runtimes')
+        func = self.make_func()
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, func)
+        result = mgr.publish(func)
+        self.assertEqual(result['Runtime'], 'python2.7')
+
+        func.func_data['runtime'] = 'python3.6'
+        result = mgr.publish(func)
+        self.assertEqual(result['Runtime'], 'python3.6')
 
 
 class PolicyLambdaProvision(BaseTest):
@@ -51,7 +98,7 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assertEqual(result['FunctionName'], 'custodian-sg-modified')
         self.addCleanup(mgr.remove, pl)
 
@@ -83,7 +130,7 @@ class PolicyLambdaProvision(BaseTest):
         params = dict(
             session_factory=session_factory,
             name="c7n-log-sub",
-            role=self.role,
+            role=ROLE,
             sns_topic="arn:",
             log_groups=[linfo])
 
@@ -100,9 +147,11 @@ class PolicyLambdaProvision(BaseTest):
         #params['sns_topic'] = "arn:123"
         #manager.publish(func)
 
-    def test_sns_subscriber(self):
+    @functional
+    def test_sns_subscriber_and_ipaddress(self):
         self.patch(SNSSubscription, 'iam_delay', 0.01)
-        session_factory = self.replay_flight_data('test_sns_subscriber')
+        session_factory = self.replay_flight_data(
+            'test_sns_subscriber_and_ipaddress')
         session = session_factory()
         client = session.client('sns')
 
@@ -125,8 +174,9 @@ class PolicyLambdaProvision(BaseTest):
 
         # now publish to the topic and look for lambda log output
         client.publish(TopicArn=topic_arn, Message='Greetings, program!')
-        #time.sleep(15) -- turn this back on when recording flight data
-        log_events = manager.logs(func, '1970-1-1', '9170-1-1')
+        if self.recording:
+            time.sleep(30)
+        log_events = manager.logs(func, '1970-1-1 UTC', '9170-1-1')
         messages = [e['message'] for e in log_events
                     if e['message'].startswith('{"Records')]
         self.addCleanup(
@@ -159,7 +209,7 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.addCleanup(mgr.remove, pl)
 
         p = Policy({
@@ -181,7 +231,7 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
 
         output = self.capture_logging('custodian.lambda', level=logging.DEBUG)
-        result2 = mgr.publish(PolicyLambda(p), 'Dev', role=self.role)
+        result2 = mgr.publish(PolicyLambda(p), 'Dev', role=ROLE)
 
         lines = output.getvalue().strip().split('\n')
         self.assertTrue(
@@ -193,8 +243,8 @@ class PolicyLambdaProvision(BaseTest):
         functions = [i for i in mgr.list_functions()
                      if i['FunctionName'] == 'custodian-s3-bucket-policy']
         self.assertTrue(len(functions), 1)
-        start = 0L
-        end = long(time.time() * 1000)
+        start = 0
+        end = time.time() * 1000
         self.assertEqual(list(mgr.logs(pl, start, end)), [])
 
     def test_cwe_trail(self):
@@ -214,7 +264,7 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
 
         events = pl.get_events(session_factory)
         self.assertEqual(len(events), 1)
@@ -231,7 +281,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-s3-bucket-policy',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
     def test_mu_metrics(self):
@@ -267,14 +317,14 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assert_items(
             result,
             {'Description': 'cloud-custodian lambda policy',
              'FunctionName': 'custodian-ec2-encrypted-vol',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -303,13 +353,13 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assert_items(
             result,
             {'FunctionName': 'custodian-asg-spin-detector',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -339,13 +389,13 @@ class PolicyLambdaProvision(BaseTest):
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, 'Dev', role=self.role)
+        result = mgr.publish(pl, 'Dev', role=ROLE)
         self.assert_items(
             result,
             {'FunctionName': 'custodian-periodic-ec2-checker',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60})
 
         events = session_factory().client('events')
@@ -375,7 +425,11 @@ class PolicyLambdaProvision(BaseTest):
         }, Config.empty())
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, pl)
+        def cleanup():
+            mgr.remove(pl)
+            if self.recording:
+                time.sleep(60)
+        self.addCleanup(cleanup)
         return mgr, mgr.publish(pl)
 
     def create_a_lambda_with_lots_of_config(self, flight):
@@ -410,7 +464,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'bar'}},
@@ -435,7 +489,7 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python2.7',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'bloo'}},
@@ -447,6 +501,7 @@ class PolicyLambdaProvision(BaseTest):
         mgr, result = self.create_a_lambda_with_lots_of_config(
             'test_config_coverage_for_lambda_update_from_complex')
         result = self.update_a_lambda(mgr, **{
+            'runtime': 'python3.6',
             'environment': {'Variables': {'FOO': 'baz'}},
             'kms_key_arn': '',
             'dead_letter_config': {},
@@ -459,13 +514,79 @@ class PolicyLambdaProvision(BaseTest):
              'FunctionName': 'custodian-hello-world',
              'Handler': 'custodian_policy.run',
              'MemorySize': 512,
-             'Runtime': RUNTIME,
+             'Runtime': 'python3.6',
              'Timeout': 60,
              'DeadLetterConfig': {'TargetArn': self.sns_arn},
              'Environment': {'Variables': {'FOO': 'baz'}},
              'TracingConfig': {'Mode': 'Active'}})
         tags = mgr.client.list_tags(Resource=result['FunctionArn'])['Tags']
         self.assert_items(tags, {'Foo': 'Baz', 'Bah': 'Bug'})
+
+    def test_optional_packages(self):
+        p = Policy({
+            'resources': 's3',
+            'name': 's3-lambda-extra',
+            'resource': 's3',
+            'mode': {
+                'type': 'cloudtrail',
+                'packages': ['boto3', 'botocore'],
+                'events': ['CreateBucket'],
+                }}, Config.empty())
+        pl = PolicyLambda(p)
+        pl.archive.close()
+        self.assertTrue('boto3/utils.py' in pl.archive.get_filenames())
+        self.assertTrue('botocore/utils.py' in pl.archive.get_filenames())
+
+    def test_delta_config_diff(self):
+        delta = LambdaManager.delta_function
+        self.assertFalse(
+            delta({'VpcConfig': {'SubnetIds': ['s-1', 's-2'],
+                                 'SecurityGroupIds': ['sg-1', 'sg-2']}},
+                  {'VpcConfig': {'SubnetIds': ['s-2', 's-1'],
+                                 'SecurityGroupIds': ['sg-2', 'sg-1']}})
+            )
+        self.assertTrue(
+            delta({'VpcConfig': {'SubnetIds': ['s-1', 's-2'],
+                                 'SecurityGroupIds': ['sg-1', 'sg-2']}},
+                  {'VpcConfig': {'SubnetIds': ['s-2', 's-1'],
+                                 'SecurityGroupIds': ['sg-3', 'sg-1']}})
+            )
+        self.assertFalse(
+            delta({}, {'DeadLetterConfig': {}}))
+
+        self.assertTrue(
+            delta({}, {'DeadLetterConfig': {'TargetArn': 'arn'}}))
+
+        self.assertFalse(
+            delta({}, {'Environment': {'Variables': {}}}))
+
+        self.assertTrue(
+            delta({}, {'Environment': {'Variables': {'k': 'v'}}}))
+
+        self.assertFalse(
+            delta({}, {'KMSKeyArn': ''}))
+
+        self.assertFalse(
+            delta({}, {'VpcConfig': {'SecurityGroupIds': [], 'SubnetIds': []}}))
+
+    def test_config_defaults(self):
+        p = PolicyLambda(Bag({'name': 'hello', 'data': {'mode': {}}}))
+        self.maxDiff = None
+        self.assertEqual(
+            p.get_config(),
+            {'DeadLetterConfig': {},
+             'Description': 'cloud-custodian lambda policy',
+             'Environment': {'Variables': {}},
+             'FunctionName': 'custodian-hello',
+             'Handler': 'custodian_policy.run',
+             'KMSKeyArn': '',
+             'MemorySize': 512,
+             'Role': '',
+             'Runtime': 'python2.7',
+             'Tags': {},
+             'Timeout': 60,
+             'TracingConfig': {'Mode': 'PassThrough'},
+             'VpcConfig': {'SecurityGroupIds': [], 'SubnetIds': []}})
 
 
 class PythonArchiveTest(unittest.TestCase):
@@ -483,14 +604,13 @@ class PythonArchiveTest(unittest.TestCase):
     def get_filenames(self, *a, **kw):
         return self.make_archive(*a, **kw).get_filenames()
 
-
     def test_handles_stdlib_modules(self):
         filenames = self.get_filenames('webbrowser')
         self.assertTrue('webbrowser.py' in filenames)
 
     def test_handles_third_party_modules(self):
-        filenames = self.get_filenames('ipaddress')
-        self.assertTrue('ipaddress.py' in filenames)
+        filenames = self.get_filenames('botocore')
+        self.assertTrue('botocore/__init__.py' in filenames)
 
     def test_handles_packages(self):
         filenames = self.get_filenames('c7n')
@@ -498,10 +618,48 @@ class PythonArchiveTest(unittest.TestCase):
         self.assertTrue('c7n/resources/s3.py' in filenames)
         self.assertTrue('c7n/ufuncs/s3crypt.py' in filenames)
 
+    def _install_namespace_package(self, tmp_sitedir):
+        # Install our test namespace package in such a way that both py27 and
+        # py36 can find it.
+        from setuptools import namespaces
+        installer = namespaces.Installer()
+        class Distribution: namespace_packages = ['namespace_package']
+        installer.distribution = Distribution()
+        installer.target = os.path.join(tmp_sitedir, 'namespace_package.pth')
+        installer.outputs = []
+        installer.dry_run = False
+        installer.install_namespaces()
+        site.addsitedir(tmp_sitedir, known_paths=site._init_pathinfo())
+
+    def test_handles_namespace_packages(self):
+        bench = tempfile.mkdtemp()
+        def cleanup():
+            while bench in sys.path:
+                sys.path.remove(bench)
+            shutil.rmtree(bench)
+        self.addCleanup(cleanup)
+
+        subpackage = os.path.join(bench, 'namespace_package', 'subpackage')
+        os.makedirs(subpackage)
+        open(os.path.join(subpackage, '__init__.py'), 'w+').write('foo = 42\n')
+
+        def _():
+            from namespace_package.subpackage import foo
+            assert foo  # dodge linter
+        self.assertRaises(ImportError, _)
+
+        self._install_namespace_package(bench)
+
+        from namespace_package.subpackage import foo
+        self.assertEqual(foo, 42)
+
+        filenames = self.get_filenames('namespace_package')
+        self.assertTrue('namespace_package/__init__.py' not in filenames)
+        self.assertTrue('namespace_package/subpackage/__init__.py' in filenames)
+        self.assertTrue(filenames[-1].endswith('-nspkg.pth'))
+
     def test_excludes_non_py_files(self):
         filenames = self.get_filenames('ctypes')
-        self.assertTrue('ctypes/__init__.py' in filenames)
-        self.assertTrue('ctypes/macholib/__init__.py' in filenames)
         self.assertTrue('README.ctypes' not in filenames)
 
     def test_cant_get_bytes_when_open(self):
@@ -537,7 +695,7 @@ class PythonArchiveTest(unittest.TestCase):
         archive.close()
         self.assertTrue('cheese.txt' in archive.get_filenames())
         with archive.get_reader() as reader:
-            self.assertEqual('So yummy!', reader.read('cheese.txt'))
+            self.assertEqual(b'So yummy!', reader.read('cheese.txt'))
 
     def test_custodian_archive_creates_a_custodian_archive(self):
         archive = custodian_archive()
@@ -546,7 +704,6 @@ class PythonArchiveTest(unittest.TestCase):
         filenames = archive.get_filenames()
         self.assertTrue('c7n/__init__.py' in filenames)
         self.assertTrue('pkg_resources/__init__.py' in filenames)
-        self.assertTrue('ipaddress.py' in filenames)
 
 
     def make_file(self):
@@ -556,15 +713,13 @@ class PythonArchiveTest(unittest.TestCase):
         self.addCleanup(lambda: shutil.rmtree(bench))
         return path
 
-    def check_readable(self, archive):
-        readable = 0o444 << 16L
-        with open(archive.path) as fh:
-            reader = zipfile.ZipFile(fh, mode='r')
-            for i in reader.infolist():
-                self.assertGreaterEqual(i.external_attr, readable)
+    def check_world_readable(self, archive):
+        world_readable = 0o004 << 16
+        for info in zipfile.ZipFile(archive.path).filelist:
+            self.assertEqual(info.external_attr & world_readable, world_readable)
 
     def test_files_are_all_readable(self):
-        self.check_readable(self.make_archive('c7n'))
+        self.check_world_readable(self.make_archive('c7n'))
 
     def test_even_unreadable_files_become_readable(self):
         path = self.make_file()
@@ -572,14 +727,14 @@ class PythonArchiveTest(unittest.TestCase):
         archive = self.make_open_archive()
         archive.add_file(path)
         archive.close()
-        self.check_readable(archive)
+        self.check_world_readable(archive)
 
     def test_unless_you_make_your_own_zipinfo(self):
         info = zipfile.ZipInfo(self.make_file())
         archive = self.make_open_archive()
         archive.add_contents(info, 'foo.txt')
         archive.close()
-        self.assertRaises(AssertionError, self.check_readable, archive)
+        self.assertRaises(AssertionError, self.check_world_readable, archive)
 
 
 class PycCase(unittest.TestCase):
@@ -611,21 +766,26 @@ class Constructor(PycCase):
         os.unlink(self.py_with_pyc('bar.py'))
 
         # Now: *.py takes precedence over *.pyc ...
-        get = lambda name: os.path.basename(imp.find_module(name)[1])
+        def get(name):
+            return os.path.basename(importlib.import_module(name).__file__)
         self.assertTrue(get('foo'), 'foo.py')
         try:
             # ... and while *.pyc is importable ...
             self.assertTrue(get('bar'), 'bar.pyc')
         except ImportError:
-            # (except on PyPy)
-            # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
-            self.assertEqual(platform.python_implementation(), 'PyPy')
+            try:
+                # (except on PyPy)
+                # http://doc.pypy.org/en/latest/config/objspace.lonepycfiles.html
+                self.assertEqual(platform.python_implementation(), 'PyPy')
+            except AssertionError:
+                # (... aaaaaand Python 3)
+                self.assertEqual(platform.python_version_tuple()[0], '3')
         else:
             # ... we refuse it.
             with self.assertRaises(ValueError) as raised:
                 PythonPackageArchive('bar')
             msg = raised.exception.args[0]
-            self.assertTrue(msg.startswith('We need a *.py source file instead'))
+            self.assertTrue(msg.startswith('Could not find a *.py source file'))
             self.assertTrue(msg.endswith('bar.pyc'))
 
         # We readily ignore a *.pyc if a *.py exists.
@@ -633,7 +793,7 @@ class Constructor(PycCase):
         archive.close()
         self.assertEqual(archive.get_filenames(), ['foo.py'])
         with archive.get_reader() as reader:
-            self.assertEqual('42', reader.read('foo.py'))
+            self.assertEqual(b'42', reader.read('foo.py'))
 
 
 class AddPyFile(PycCase):

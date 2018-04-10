@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "QueueUrl": "https://queue.amazonaws.com/123456789012/test-sqs-remove-named", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "21c3a396-aa28-5643-92cb-f1accb171cab", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "21c3a396-aa28-5643-92cb-f1accb171cab", 
+                "content-length": "333", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Tue, 19 Sep 2017 00:04:15 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

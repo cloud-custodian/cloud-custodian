@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,15 +17,17 @@ Cloud-Custodian Lambda Entry Point
 Mostly this serves to load up the policy and dispatch
 an event.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import logging
 import os
 import uuid
+import logging
 import json
 
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
 from c7n.utils import format_event, get_account_id_from_sts
+from c7n.config import Config
 
 
 logging.root.setLevel(logging.DEBUG)
@@ -33,42 +35,13 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
 
-# TODO move me / we should load config options directly from policy config
-class Config(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-    @classmethod
-    def empty(cls, **kw):
-        try:
-            import boto3
-            session = boto3.Session()
-            account_id = get_account_id_from_sts(session)
-        except:
-            account_id = None
-
-        d = {}
-        d.update({
-            'region': os.environ.get('AWS_DEFAULT_REGION'),
-            'cache': '',
-            'profile': None,
-            'account_id': account_id,
-            'assume_role': None,
-            'log_group': None,
-            'metrics_enabled': True,
-            'output_dir': os.environ.get(
-                'C7N_OUTPUT_DIR',
-                '/tmp/' + str(uuid.uuid4())),
-            'cache_period': 0,
-            'dryrun': False})
-        d.update(kw)
-        if not os.path.exists(d['output_dir']):
-            os.mkdir(d['output_dir'])
-        return cls(d)
+account_id = None
+try:
+    import boto3
+    session = boto3.Session()
+    account_id = get_account_id_from_sts(session)
+except Exception:
+    pass
 
 
 def dispatch_event(event, context):
@@ -87,13 +60,29 @@ def dispatch_event(event, context):
         policy_config = json.load(f)
 
     if not policy_config or not policy_config.get('policies'):
-        return True
+        return False
 
-    options_overrides = policy_config['policies'][0]['mode'].get('execution-options', {})
+    # Initialize output directory, we've seen occassional perm issues with
+    # lambda on temp directory and changing unix execution users, so
+    # use a per execution temp space.
+    output_dir = os.environ.get(
+        'C7N_OUTPUT_DIR',
+        '/tmp/' + str(uuid.uuid4()))
+    if not os.path.exists(output_dir):
+        try:
+            os.mkdir(output_dir)
+        except OSError as error:
+            log.warning("Unable to make output directory: {}".format(error))
+
+    # TODO. This enshrines an assumption of a single policy per lambda.
+    options_overrides = policy_config[
+        'policies'][0].get('mode', {}).get('execution-options', {})
+    options_overrides['account_id'] = account_id
+    options_overrides['output_dir'] = output_dir
     options = Config.empty(**options_overrides)
 
     load_resources()
-    policies = PolicyCollection(policy_config, options)
+    policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:
             p.push(event, context)

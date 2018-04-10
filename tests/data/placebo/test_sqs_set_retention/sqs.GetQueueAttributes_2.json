@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "MessageRetentionPeriod": "86400"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "697d2c5d-52ea-561f-b166-7ea30494c760", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "697d2c5d-52ea-561f-b166-7ea30494c760", 
+                "content-length": "356", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 14 Feb 2018 15:22:38 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

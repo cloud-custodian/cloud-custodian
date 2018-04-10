@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TrainingJobSummaries": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "40bb15e7-cefc-49ef-b98c-460738122cb9", 
+            "HTTPHeaders": {
+                "date": "Wed, 31 Jan 2018 14:08:30 GMT", 
+                "x-amzn-requestid": "40bb15e7-cefc-49ef-b98c-460738122cb9", 
+                "content-length": "27", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

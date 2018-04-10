@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ concurrent.futures implementation over sqs
 Scatter/Gather or Map/Reduce style over two sqs queues.
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import random
 import logging
@@ -112,12 +113,7 @@ class MessageIterator(object):
     def __iter__(self):
         return self
 
-    def ack(self, m):
-        self.client.delete_message(
-            QueueUrl=self.queue_url,
-            ReceiptHandle=m['ReceiptHandle'])
-
-    def next(self):
+    def __next__(self):
         if self.messages:
             return self.messages.pop(0)
         response = self.client.receive_message(
@@ -131,6 +127,13 @@ class MessageIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
+
+    next = __next__  # back-compat
+
+    def ack(self, m):
+        self.client.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=m['ReceiptHandle'])
 
 
 class SQSWorker(object):
@@ -158,7 +161,7 @@ class SQSWorker(object):
 
         try:
             func(*msg['args'], **msg['kwargs'])
-        except Exception, e:
+        except Exception as e:
             log.exception(
                 "Error invoking %s %s" % (
                     op_name, e))

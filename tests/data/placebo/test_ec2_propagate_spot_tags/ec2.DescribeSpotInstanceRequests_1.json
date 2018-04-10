@@ -1,0 +1,86 @@
+{
+    "status_code": 200,
+    "data": {
+        "SpotInstanceRequests": [
+            {
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 3,
+                    "day": 29,
+                    "hour": 8,
+                    "minute": 49,
+                    "second": 34,
+                    "microsecond": 0
+                },
+                "InstanceId": "i-01db165f1452ef5e4",
+                "LaunchSpecification": {
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "default",
+                            "GroupId": "sg-aa6c90c3"
+                        }
+                    ],
+                    "ImageId": "ami-916f59f4",
+                    "InstanceType": "m4.large",
+                    "Placement": {
+                        "AvailabilityZone": "us-east-2b"
+                    },
+                    "SubnetId": "subnet-65dbce1d",
+                    "Monitoring": {
+                        "Enabled": false
+                    }
+                },
+                "LaunchedAvailabilityZone": "us-east-2b",
+                "ProductDescription": "Linux/UNIX",
+                "SpotInstanceRequestId": "sir-rg1rrj3k",
+                "SpotPrice": "0.100000",
+                "State": "active",
+                "Status": {
+                    "Code": "fulfilled",
+                    "Message": "Your spot request is fulfilled.",
+                    "UpdateTime": {
+                        "__class__": "datetime",
+                        "year": 2018,
+                        "month": 3,
+                        "day": 29,
+                        "hour": 8,
+                        "minute": 49,
+                        "second": 35,
+                        "microsecond": 0
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Test"
+                    }
+                ],
+                "Type": "one-time",
+                "ValidUntil": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 5,
+                    "hour": 8,
+                    "minute": 49,
+                    "second": 34,
+                    "microsecond": 0
+                },
+                "InstanceInterruptionBehavior": "terminate"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "5ccc782c-60a4-4c91-b3a2-f12fe046c969",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 29 Mar 2018 09:12:51 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

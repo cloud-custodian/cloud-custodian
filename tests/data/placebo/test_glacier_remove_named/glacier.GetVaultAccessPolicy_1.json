@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "policy": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"WhatIsIt\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"glacier:DescribeVault\",\"Resource\":\"arn:aws:glacier:us-east-1:123456789012:vaults/test-glacier-remove-named\"}]}"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "h2_-d-JhZ1gXe_c_xVDaOOIkoOdMjZv0N-yC0ln0ZWP45kE", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "h2_-d-JhZ1gXe_c_xVDaOOIkoOdMjZv0N-yC0ln0ZWP45kE", 
+                "date": "Sat, 16 Sep 2017 19:15:15 GMT", 
+                "content-length": "247", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

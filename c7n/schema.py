@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import Counter
 import json
 import logging
@@ -32,7 +34,7 @@ import logging
 from jsonschema import Draft4Validator as Validator
 from jsonschema.exceptions import best_match
 
-from c7n.manager import resources
+from c7n.provider import clouds
 from c7n.resources import load_resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
 
@@ -53,7 +55,7 @@ def validate(data, schema=None):
         if dupes:
             return [ValueError(
                 "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes)))]
+                    ", ".join(dupes))), dupes[0]]
         return []
     try:
         resp = specific_error(errors[0])
@@ -67,10 +69,10 @@ def validate(data, schema=None):
         logging.exception(
             "specific_error failed, traceback, followed by fallback")
 
-    return filter(None, [
+    return list(filter(None, [
         errors[0],
         best_match(validator.iter_errors(data)),
-    ])
+    ]))
 
 
 def specific_error(error):
@@ -93,7 +95,7 @@ def specific_error(error):
     if r is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if r in v['$ref'].rsplit('/', 2):
+            if r in v['$ref'].rsplit('/', 2)[1]:
                 found = idx
         if found is not None:
             # error context is a flat list of all validation
@@ -132,6 +134,34 @@ def generate(resource_types=()):
     resource_defs = {}
     definitions = {
         'resources': resource_defs,
+        'iam-statement': {
+            'additionalProperties': False,
+            'type': 'object',
+            'properties': {
+                'Sid': {'type': 'string'},
+                'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
+                'Principal': {'anyOf': [
+                    {'type': 'string'},
+                    {'type': 'object'}, {'type': 'array'}]},
+                'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
+                'Action': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                'NotAction': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
+                'Condition': {'type': 'object'}
+            },
+            'required': ['Sid', 'Effect'],
+            'oneOf': [
+                {'required': ['Principal', 'Action', 'Resource']},
+                {'required': ['NotPrincipal', 'Action', 'Resource']},
+                {'required': ['Principal', 'NotAction', 'Resource']},
+                {'required': ['NotPrincipal', 'NotAction', 'Resource']},
+                {'required': ['Principal', 'Action', 'NotResource']},
+                {'required': ['NotPrincipal', 'Action', 'NotResource']},
+                {'required': ['Principal', 'NotAction', 'NotResource']},
+                {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
+            ]
+        },
         'filters': {
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
@@ -183,6 +213,7 @@ def generate(resource_types=()):
         'policy-mode': {
             'type': 'object',
             'required': ['type'],
+            'additionalProperties': False,
             'properties': {
                 'type': {
                     'enum': [
@@ -190,6 +221,7 @@ def generate(resource_types=()):
                         'ec2-instance-state',
                         'asg-instance-state',
                         'config-rule',
+                        'guard-duty',
                         'periodic'
                     ]},
                 'events': {'type': 'array', 'items': {
@@ -200,18 +232,40 @@ def generate(resource_types=()):
                          'properties': {
                              'source': {'type': 'string'},
                              'ids': {'type': 'string'},
-                             'event': {'type': 'string'}}}]
-                }}
+                             'event': {'type': 'string'}}}],
+                }},
+                'execution-options': {'type': 'object'},
+                'role': {'type': 'string'},
+                'runtime': {'enum': ['python2.7', 'python3.6']},
+                'memory': {'type': 'number'},
+                'timeout': {'type': 'number'},
+                'schedule': {'type': 'string'},
+                'function-prefix': {'type': 'string'},
+                'dead_letter_config': {'type': 'object'},
+                'environment': {'type': 'object'},
+                'kms_key_arn': {'type': 'string'},
+                'tracing_config': {'type': 'object'},
+                'tags': {'type': 'object'},
+                'packages': {'type': 'array'},
+                'subnets': {'type': 'array'},
+                'security_groups': {'type': 'array'},
+                # specific to guard duty
+                'member-role': {'type': 'string'},
             },
         },
     }
 
     resource_refs = []
-    for type_name, resource_type in resources.items():
-        if resource_types and type_name not in resource_types:
-            continue
-        resource_refs.append(
-            process_resource(type_name, resource_type, resource_defs))
+    for cloud_name, cloud_type in clouds.items():
+        for type_name, resource_type in cloud_type.resources.items():
+            if resource_types and type_name not in resource_types:
+                continue
+            alias_name = None
+            r_type_name = "%s.%s" % (cloud_name, type_name)
+            if cloud_name == 'aws':
+                alias_name = type_name
+            resource_refs.append(
+                process_resource(r_type_name, resource_type, resource_defs, alias_name))
 
     schema = {
         '$schema': 'http://json-schema.org/schema#',
@@ -233,7 +287,7 @@ def generate(resource_types=()):
     return schema
 
 
-def process_resource(type_name, resource_type, resource_defs):
+def process_resource(type_name, resource_type, resource_defs, alias_name=None):
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
 
     seen_actions = set()  # Aliases get processed once
@@ -250,7 +304,7 @@ def process_resource(type_name, resource_type, resource_defs):
 
     # one word action shortcuts
     action_refs.append(
-        {'enum': resource_type.action_registry.keys()})
+        {'enum': list(resource_type.action_registry.keys())})
 
     nested_filter_refs = []
     filters_seen = set()
@@ -293,7 +347,7 @@ def process_resource(type_name, resource_type, resource_defs):
 
     # one word filter shortcuts
     filter_refs.append(
-        {'enum': resource_type.filter_registry.keys()})
+        {'enum': list(resource_type.filter_registry.keys())})
 
     resource_policy = {
         'allOf': [
@@ -309,6 +363,10 @@ def process_resource(type_name, resource_type, resource_defs):
         ]
     }
 
+    if alias_name:
+        resource_policy['allOf'][1]['properties'][
+            'resource']['enum'].append(alias_name)
+
     if type_name == 'ec2':
         resource_policy['allOf'][1]['properties']['query'] = {}
 
@@ -316,11 +374,21 @@ def process_resource(type_name, resource_type, resource_defs):
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
-def resource_vocabulary():
+def resource_vocabulary(cloud_name=None, qualify_name=True):
     vocabulary = {}
+    resources = {}
+
+    for cname, ctype in clouds.items():
+        if cloud_name is not None and cloud_name != cname:
+            continue
+        for rname, rtype in ctype.resources.items():
+            if qualify_name:
+                resources['%s.%s' % (cname, rname)] = rtype
+            else:
+                resources[rname] = rtype
+
     for type_name, resource_type in resources.items():
         classes = {'actions': {}, 'filters': {}}
-
         actions = []
         for action_name, cls in resource_type.action_registry.items():
             actions.append(action_name)
@@ -340,7 +408,7 @@ def resource_vocabulary():
 
 
 def summary(vocabulary):
-    print "resource count: %d" % len(vocabulary)
+    print("resource count: %d" % len(vocabulary))
     action_count = filter_count = 0
 
     common_actions = set(['notify', 'invoke-lambda'])
@@ -351,12 +419,16 @@ def summary(vocabulary):
             set(rv.get('actions', ())).difference(common_actions))
         filter_count += len(
             set(rv.get('filters', ())).difference(common_filters))
-    print "unique actions: %d" % action_count
-    print "common actions: %d" % len(common_actions)
-    print "unique filters: %d" % filter_count
-    print "common filters: %s" % len(common_filters)
+    print("unique actions: %d" % action_count)
+    print("common actions: %d" % len(common_actions))
+    print("unique filters: %d" % filter_count)
+    print("common filters: %s" % len(common_filters))
 
 
 def json_dump(resource=None):
     load_resources()
     print(json.dumps(generate(resource), indent=2))
+
+
+if __name__ == '__main__':
+    json_dump()

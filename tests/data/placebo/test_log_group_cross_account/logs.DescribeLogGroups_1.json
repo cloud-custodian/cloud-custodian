@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4276749e-33fa-11e8-a554-9fa6e27bb9bd", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4276749e-33fa-11e8-a554-9fa6e27bb9bd", 
+                "date": "Fri, 30 Mar 2018 09:10:58 GMT", 
+                "content-length": "213", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "logGroups": [
+            {
+                "arn": "arn:aws:logs:us-east-2:644160558196:log-group:/aws/codebuild/custodian:*", 
+                "creationTime": 1504743622686, 
+                "metricFilterCount": 0, 
+                "logGroupName": "/aws/codebuild/custodian", 
+                "storedBytes": 1389598
+            }
+        ]
+    }
+}

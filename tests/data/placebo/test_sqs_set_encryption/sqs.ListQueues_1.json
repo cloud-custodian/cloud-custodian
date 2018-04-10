@@ -2,19 +2,18 @@
     "status_code": 200, 
     "data": {
         "QueueUrls": [
-            "https://us-west-2.queue.amazonaws.com/644160558196/sqs-test", 
-            "https://us-west-2.queue.amazonaws.com/644160558196/whit537-testing-mailer"
+            "https://queue.amazonaws.com/644160558196/sqs-test"
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "043ae68c-4aa9-5efa-b5ce-b71b8137178f", 
+            "RequestId": "fd3593b9-c26e-5edf-9e32-c1ce5ed7c6fd", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "043ae68c-4aa9-5efa-b5ce-b71b8137178f", 
-                "content-length": "420", 
+                "x-amzn-requestid": "fd3593b9-c26e-5edf-9e32-c1ce5ed7c6fd", 
+                "content-length": "316", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "date": "Thu, 18 May 2017 16:18:38 GMT", 
+                "date": "Sat, 04 Nov 2017 10:46:17 GMT", 
                 "content-type": "text/xml"
             }
         }

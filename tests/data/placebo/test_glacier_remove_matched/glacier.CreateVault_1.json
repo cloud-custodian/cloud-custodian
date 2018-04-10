@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "location": "/644160558196/vaults/test-glacier-remove-matched", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "ENUCcvAvSYQsUCGHSlsFxaTKDQVAa-Pf0uud2qpjgkViU3s", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ENUCcvAvSYQsUCGHSlsFxaTKDQVAa-Pf0uud2qpjgkViU3s", 
+                "date": "Wed, 01 Nov 2017 17:29:24 GMT", 
+                "content-length": "2", 
+                "content-type": "application/json", 
+                "location": "/644160558196/vaults/test-glacier-remove-matched"
+            }
+        }
+    }
+}

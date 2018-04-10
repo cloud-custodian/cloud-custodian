@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "HealthChecks": [
+            {
+                "HealthCheckConfig": {
+                    "FullyQualifiedDomainName": "github.com", 
+                    "ResourcePath": "/", 
+                    "EnableSNI": false, 
+                    "Inverted": false, 
+                    "Regions": [
+                        "ap-northeast-1", 
+                        "ap-southeast-1", 
+                        "ap-southeast-2", 
+                        "eu-west-1", 
+                        "sa-east-1", 
+                        "us-east-1", 
+                        "us-west-1", 
+                        "us-west-2"
+                    ], 
+                    "MeasureLatency": false, 
+                    "RequestInterval": 30, 
+                    "Type": "HTTP", 
+                    "Port": 80, 
+                    "FailureThreshold": 3
+                }, 
+                "CallerReference": "b967fb88-84db-48e9-8d6f-23e572de6172", 
+                "HealthCheckVersion": 1, 
+                "Id": "a540d0c1-fec1-492b-823d-faf8079830c2"
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c74b008a-36ae-11e7-b5fe-5bc5f8b52370", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c74b008a-36ae-11e7-b5fe-5bc5f8b52370", 
+                "date": "Fri, 12 May 2017 01:03:14 GMT", 
+                "content-length": "972", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "MaxItems": "100"
+    }
+}

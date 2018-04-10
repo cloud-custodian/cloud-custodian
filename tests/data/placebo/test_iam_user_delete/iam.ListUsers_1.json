@@ -1,0 +1,546 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "Alfredmarc.Gamulo@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 48
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 16, 
+                    "minute": 58
+                }, 
+                "UserId": "AIDAIYEUEZZQWE5TZHHAE", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/Alfredmarc.Gamulo@capitalone.com"
+            }, 
+            {
+                "UserName": "alice", 
+                "Path": "/test/", 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 56
+                }, 
+                "UserId": "AIDAIAKM2IUZB4CV6NFGO", 
+                "Arn": "arn:aws:iam::644160558196:user/test/alice"
+            }, 
+            {
+                "UserName": "andrewalexander", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 38
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAINLXB4P6J26AKFUC6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/andrewalexander"
+            }, 
+            {
+                "UserName": "calvin@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 7
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIVQZEKBMLZZXYA5P2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/calvin@sixfeetup.com"
+            }, 
+            {
+                "UserName": "chad@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 44
+                }, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 19, 
+                    "minute": 4
+                }, 
+                "UserId": "AIDAIXI7ULG2SDYI3RBNM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/chad@sixfeetup.com"
+            }, 
+            {
+                "UserName": "christo.adikary@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 14
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 20
+                }, 
+                "UserId": "AIDAJ62G5JMVUT4KWN57E", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/christo.adikary@capitalone.com"
+            }, 
+            {
+                "UserName": "christopherocampo", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 26
+                }, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJOWQFESQNYYH3RURU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/christopherocampo"
+            }, 
+            {
+                "UserName": "Dhruv.Salwan@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 1
+                }, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 52
+                }, 
+                "UserId": "AIDAIXO7TZYXFJ7PH5UAO", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/Dhruv.Salwan@capitalone.com"
+            }, 
+            {
+                "UserName": "glenn@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 59
+                }, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAIMII4JNO4PLRZXOMO", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/glenn@sixfeetup.com"
+            }, 
+            {
+                "UserName": "hackney", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 15, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJSIT3DH5B67JZOS3I", 
+                "Arn": "arn:aws:iam::644160558196:user/hackney"
+            }, 
+            {
+                "UserName": "John.Nelson@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 49, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 46
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 43
+                }, 
+                "UserId": "AIDAJCZWB5WZ2P6XOLVVU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/John.Nelson@capitalone.com"
+            }, 
+            {
+                "UserName": "joshuaroot", 
+                "PasswordLastUsed": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 39
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 26
+                }, 
+                "UserId": "AIDAJM67KUVNOIMGUCZO4", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/joshuaroot"
+            }, 
+            {
+                "UserName": "kapil", 
+                "PasswordLastUsed": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 33
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAJEZOTH6YPO3DY45QW", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kapil"
+            }, 
+            {
+                "UserName": "kit", 
+                "PasswordLastUsed": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 15
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "UserId": "AIDAJKVAHLRG2G6PHIBAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/kit"
+            }, 
+            {
+                "UserName": "mandeep", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 44
+                }, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 16, 
+                    "minute": 3
+                }, 
+                "UserId": "AIDAIRGKK45UIXHXNN2SI", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/mandeep"
+            }, 
+            {
+                "UserName": "Nicholas.Lykins@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 40
+                }, 
+                "CreateDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 46
+                }, 
+                "UserId": "AIDAJ6NHAJZP3TIYBYABC", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/Nicholas.Lykins@capitalone.com"
+            }, 
+            {
+                "UserName": "rob@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 11
+                }, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 11
+                }, 
+                "UserId": "AIDAIPHUPZEIIDI4QI4GU", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/rob@sixfeetup.com"
+            }, 
+            {
+                "UserName": "saitheja.kadiyala@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 32
+                }, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 47
+                }, 
+                "UserId": "AIDAJK6DJZNHAHXDXHNSQ", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/saitheja.kadiyala@capitalone.com"
+            }, 
+            {
+                "UserName": "Samson.Shi@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 1
+                }, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 55
+                }, 
+                "UserId": "AIDAJATQ7WOI63EQTGBT6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/Samson.Shi@capitalone.com"
+            }, 
+            {
+                "UserName": "scot@sixfeetup.com", 
+                "PasswordLastUsed": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 32
+                }, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 53
+                }, 
+                "UserId": "AIDAIQF3HRTVXDF7TMNAM", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/scot@sixfeetup.com"
+            }, 
+            {
+                "UserName": "tao-hung.yang@capitalone.com", 
+                "PasswordLastUsed": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 23
+                }, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 31, 
+                    "minute": 27
+                }, 
+                "UserId": "AIDAIXHBMUDYXJBFL3JTW", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::644160558196:user/tao-hung.yang@capitalone.com"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "87d77804-b414-11e7-ad14-5b6a92953c46", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "87d77804-b414-11e7-ad14-5b6a92953c46", 
+                "vary": "Accept-Encoding", 
+                "content-length": "7303", 
+                "content-type": "text/xml", 
+                "date": "Wed, 18 Oct 2017 14:56:32 GMT"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

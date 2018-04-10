@@ -22,12 +22,15 @@ subnets:
 security_groups:
   - sg-abbdaaf3
   - sg-bbd3erfa
-
+# Dead Letter Config is optional
+dead_letter_config:
+  TargetArn: arn:aws:sqs:us-east-1:0911411411411:my-dead-letter-queue
 
 ## Mailer Infrastructure Config
 
 # memcached for caching ldap lookups
-cache: "c7n-somewhere.out.there.cache.amazonaws.com"
+cache_engine: redis
+redis_host: "c7n-somewhere.out.there.cache.amazonaws.com"
 
 # ldap server for resolving users
 ldap_uri: "ldap://your_active_directory"

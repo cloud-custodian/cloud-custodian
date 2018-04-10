@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import itertools
+
+import six
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
@@ -73,7 +77,7 @@ class HealthEvents(QueryResourceManager):
         for resource_set in chunks(resources, 10):
             event_map = {r['arn']: r for r in resource_set}
             event_details = client.describe_event_details(
-                eventArns=event_map.keys())['successfulSet']
+                eventArns=list(event_map.keys()))['successfulSet']
             for d in event_details:
                 event_map[d['event']['arn']][
                     'Description'] = d['eventDescription']['latestDescription']
@@ -123,11 +127,11 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
+        if not len(list(self.data.keys())) == 1:
             raise ValueError(
                 "Health Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in HEALTH_VALID_FILTERS:
             raise ValueError(
@@ -142,6 +146,6 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
         return {'Name': self.key, 'Values': value}

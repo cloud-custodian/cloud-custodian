@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3b8a3120-06cb-11e8-812f-47c9f53fd22c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3b8a3120-06cb-11e8-812f-47c9f53fd22c", 
+                "content-length": "522", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

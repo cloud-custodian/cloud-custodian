@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b0e89880-251e-11e8-836e-87330048e3ad",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sun, 11 Mar 2018 11:23:58 GMT",
+                "content-type": "application/json",
+                "content-length": "1259",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b0e89880-251e-11e8-836e-87330048e3ad"
+            },
+            "RetryAttempts": 0
+        },
+        "Functions": [
+            {
+                "FunctionName": "func-d",
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:func-d",
+                "Runtime": "python2.7",
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
+                "Handler": "index.handler",
+                "CodeSize": 168,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2018-03-11T11:23:57.779+0000",
+                "CodeSha256": "NLea8ZDC16RKlQpOPkJ3qYnYL4u5eUGsGw9SZGrB910=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }
+            },
+            {
+                "FunctionName": "envcheck",
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:envcheck",
+                "Runtime": "python2.7",
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 260,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2016-12-24T13:51:31.006+0000",
+                "CodeSha256": "8M2BSmxZu6Z8+V8ywJPG+JoRlAhYjSmoauKd8DqMZrY=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": []
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }
+            }
+        ]
+    }
+}

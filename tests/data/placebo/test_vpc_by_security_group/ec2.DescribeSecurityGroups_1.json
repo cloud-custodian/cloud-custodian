@@ -1,0 +1,133 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "launch-wizard-5 created 2017-02-23T23:09:58.392-05:00", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "launch-wizard-5", 
+                "VpcId": "vpc-d2d616b5", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-45131239"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "644160558196", 
+                                "GroupId": "sg-4b9ada34"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-f1516b97", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-4b9ada34"
+            },
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Has a NetworkLocation:Public tag key-value pair", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestGroupPublic", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }
+                ], 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 0, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "169.254.169.254/32"
+                            }
+                        ], 
+                        "ToPort": 65535, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "FancyTestGroupPublic", 
+                "VpcId": "vpc-f1516b97", 
+                "OwnerId": "644160558196", 
+                "GroupId": "sg-f8c78787"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "282be81b-e8ff-4590-8f74-7d3abf2a9956", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 27 Jun 2017 17:50:58 GMT"
+            }
+        }
+    }
+}

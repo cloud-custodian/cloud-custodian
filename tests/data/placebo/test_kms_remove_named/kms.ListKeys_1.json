@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Keys": [
+            {
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/056d7b49-e807-40d7-adc1-8cfdf47638b6", 
+                "KeyId": "056d7b49-e807-40d7-adc1-8cfdf47638b6"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a9878a79-06cb-11e8-a45c-2795b7188202", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a9878a79-06cb-11e8-a45c-2795b7188202", 
+                "content-length": "5482", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Truncated": false
+    }
+}

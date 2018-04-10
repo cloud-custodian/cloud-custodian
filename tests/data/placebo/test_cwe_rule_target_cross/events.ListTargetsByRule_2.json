@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Targets": [
+            {
+                "Id": "custodian-stop-night-asg", 
+                "Arn": "arn:aws:lambda:us-east-2:644160558196:function:custodian-stop-night-asg"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0c4a2973-212a-11e8-abe7-dbc213c8fee7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0c4a2973-212a-11e8-abe7-dbc213c8fee7", 
+                "date": "Tue, 06 Mar 2018 10:35:10 GMT", 
+                "content-length": "127", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
