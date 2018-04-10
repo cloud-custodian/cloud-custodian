@@ -23,9 +23,9 @@ and run a policy that triggers an email to your inbox.
    Copy the queue URL to `queue_url` in `mailer.yml`.
 1. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
-   
+
 there is different notification endpoints options, you can combine both.
- 
+
 ### Email:
 Make sure your email address is verified in SES, and set it as
    `from_address` in `mailer.yml`. By default SES is in sandbox mode where you
@@ -65,8 +65,18 @@ policies:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
+
 ### DataDog:
-The correct way to do a DataDog integration is use the c7n integration with AWS CloudWatch and use the [DataDog integration with AWS](https://docs.datadoghq.com/integrations/amazon_web_services/) collect CloudWatch metrics. This integration is only for the case you don't want or you can't use AWS CloudWatch.
+The standard way to do a DataDog integration is use the
+c7n integration with AWS CloudWatch and use the
+[DataDog integration with AWS](https://docs.datadoghq.com/integrations/amazon_web_services/)
+to collect CloudWatch metrics. The mailer/messenger integration is only
+for the case you don't want or you can't use AWS CloudWatch.
+
+Note this integration requires the additional dependency of datadog python bindings:
+```
+pip install datadog
+```
 
 Your `mailer.yml` should now look something like this:
 

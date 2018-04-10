@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import time
+from six.moves.urllib.parse import urlparse, parse_qsl
 
 from datadog import initialize
 from datadog import api
@@ -28,7 +29,8 @@ class DataDogDelivery(object):
         self.session     = session
 
         # Initialize datadog
-        if self.config.get(self.DATADOG_API_KEY, False) and self.config.get(self.DATADOG_APPLICATION_KEY, False):
+        if self.config.get(self.DATADOG_API_KEY, False) and self.config.get(
+                self.DATADOG_APPLICATION_KEY, False):
             options = {
                 'api_key': self.config[self.DATADOG_API_KEY],
                 'app_key': self.config[self.DATADOG_APPLICATION_KEY]
@@ -41,6 +43,8 @@ class DataDogDelivery(object):
         datadog_rendered_messages = []
 
         metric_config_map = self._get_metrics_config_to_resources_map(sqs_message)
+        if not metric_config_map:
+            return datadog_rendered_messages
 
         if sqs_message and sqs_message.get('resources', False):
             for resource in sqs_message['resources']:
@@ -51,27 +55,32 @@ class DataDogDelivery(object):
                     'region:{}'.format(sqs_message['region'])
                 ]
 
-                tags.extend(['{key}:{value}'.format(key=key, value=resource[key]) for key in resource.keys()
-                               if key != 'Tags'])
+                tags.extend(['{key}:{value}'.format(
+                    key=key, value=resource[key]) for key in resource.keys()
+                             if key != 'Tags'])
                 if resource.get('Tags', False):
-                    tags.extend(['{key}:{value}'.format(key=tag['Key'], value=tag['Value']) for tag in resource['Tags']])
+                    tags.extend(['{key}:{value}'.format(
+                        key=tag['Key'], value=tag['Value']) for tag in resource['Tags']])
 
                 for metric_config in metric_config_map:
                     datadog_rendered_messages.append({
                         "metric": metric_config['metric_name'],
-                        "points": (date_time, self._get_metric_value(metric_config=metric_config, tags=tags)),
+                        "points": (date_time, self._get_metric_value(
+                            metric_config=metric_config, tags=tags)),
                         "tags": tags
                     })
 
-        # eg: [{'metric': 'metric_name', 'points': (date_time, value), 'tags': ['tag1':'value', 'tag2':'value']}, ...]
+        # eg: [{'metric': 'metric_name', 'points': (date_time, value),
+        # 'tags': ['tag1':'value', 'tag2':'value']}, ...]
         return datadog_rendered_messages
 
     def deliver_datadog_messages(self, datadog_message_packages, sqs_message):
-        self.logger.info("Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog".
-                         format(account=sqs_message.get('account', ''),
-                                policy=sqs_message['policy']['name'],
-                                resource=sqs_message['policy']['resource'],
-                                quantity=len(sqs_message['resources'])))
+        self.logger.info(
+            "Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog".
+            format(account=sqs_message.get('account', ''),
+                   policy=sqs_message['policy']['name'],
+                   resource=sqs_message['policy']['resource'],
+                   quantity=len(sqs_message['resources'])))
 
         api.Metric.send(datadog_message_packages)
 
@@ -89,12 +98,10 @@ class DataDogDelivery(object):
     @staticmethod
     def _get_metrics_config_to_resources_map(sqs_message):
         metric_config_map = []
-        if sqs_message and sqs_message.get('action', False) and sqs_message['action'].get('to', False):
+        if sqs_message and sqs_message.get(
+                'action', False) and sqs_message['action'].get('to', False):
             for to in sqs_message['action']['to']:
-                if 'datadog' in to:
-                    params_text = to[to.index('://?') + 4:]
-                    params = dict()
-                    for param in params_text.split("&"):
-                        params[param.split("=")[0]] = param.split("=")[1]
-                    metric_config_map.append(params)
+                if to.startswith('datadog://'):
+                    parsed = urlparse(to)
+                    metric_config_map.update(dict(parse_qsl(parsed.query)))
         return metric_config_map

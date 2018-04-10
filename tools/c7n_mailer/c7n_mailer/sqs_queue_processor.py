@@ -25,7 +25,11 @@ import six
 
 from .email_delivery import EmailDelivery
 from .sns_delivery import SnsDelivery
-from .datadog_delivery import DataDogDelivery
+try:
+    from .datadog_delivery import DataDogDelivery
+    HAVE_DATADOG = True
+except ImportError:
+    HAVE_DATADOG = False
 
 DATA_MESSAGE = "maidmsg/1.0"
 
@@ -165,7 +169,8 @@ class MailerSqsQueueProcessor(object):
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
 
         # this section gets the map of metrics to send to datadog and delivers it
-        datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-        datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
-        datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
+        if HAVE_DATADOG:
+            datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+            datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
+            datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
 
