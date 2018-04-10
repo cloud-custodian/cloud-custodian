@@ -107,7 +107,7 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 
-There is a special `to` that includes the DataDog configuration params with a ulr params like:
+There is a special `to` format that specifies datadog delivery, and includes the datadog configuration via url parameters.
 - metric_name: is the name of the metrics send to DataDog
 - metric_value_tag: by default the metric value send to DataDog is `1` but if you want to use one of the tags returned in the policy you can set it with the attribute `metric_value_tag`, for example in the `test-policy.yml` the value used is the size of the EBS volume. The value must be a number and it's transformed to a float value.
 
