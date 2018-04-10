@@ -1622,7 +1622,6 @@ class CreateFlowLogs(BaseAction):
               - type: set-vpc-flow
                 DeliverLogsPermissionArn: arn:iam:role
                 LogGroupName: /custodian/vpc/flowlogs/
-                TrafficType: ALL
     """
     permissions = ('ec2:CreateFlowLogs',)
     schema = {
@@ -1634,23 +1633,9 @@ class CreateFlowLogs(BaseAction):
             'LogGroupName': {'type': 'string'},
             'TrafficType': {'type': 'string',
                             'enum': ['ACCEPT', 'REJECT', 'ALL']},
-            'required': ['DeliverLogsPermissionArn', 'LogGroupName',
-                         'ResourceIds']
+            'required': ['DeliverLogsPermissionArn', 'LogGroupName']
         }
     }
-
-    def validate(self):
-        required = ('DeliverLogsPermissionArn', 'LogGroupName', 'TrafficType')
-        for r in required:
-            if r not in self.data or not self.data.get(r):
-                raise ValueError('"%s" is a required parameter' % r)
-
-        types = ('ACCEPT', 'REJECT', 'ALL')
-        if not any(t.upper() in self.data[
-                'TrafficType'].upper() for t in types):
-            raise ValueError(
-                'Invalid TrafficType "%s"' % self.data['TrafficType'])
-        return self
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -1665,8 +1650,12 @@ class CreateFlowLogs(BaseAction):
             r_type = 'Subnet'
         else:
             r_type = 'NetworkInterface'
+
         params['ResourceType'] = r_type
-        params['TrafficType'] = params['TrafficType'].upper()
+        params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
         params['ResourceIds'] = [r[model.id] for r in resources]
 
+        if not params['ResourceIds']:
+            self.log.info('No %s resources to set' % model.type)
+            return
         client.create_flow_logs(**params)
