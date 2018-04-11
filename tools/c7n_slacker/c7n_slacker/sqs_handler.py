@@ -22,7 +22,6 @@ from botocore.exceptions import ClientError
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from ldap3 import Connection, Server
 from ldap3.core.exceptions import LDAPSocketOpenError
-from tenacity import retry, stop_after_attempt, wait_fixed
 
 from c7n import sqsexec
 from slacker import SlackBot
@@ -34,13 +33,14 @@ class SQSHandler(object):
         self.config = config
         self.session = self.session_factory(self.config)
         self.logger = logger
-        self.base_dn   = self.config.get('ldap_bind_dn')
+        self.base_dn = self.config.get('ldap_bind_dn')
         self.email_key = self.config.get('ldap_email_key', 'mail')
-        self.uid_key   = self.config.get('ldap_uid_attribute_name', 'sAMAccountName')
+        self.uid_key = self.config.get('ldap_uid_attribute_name', 'sAMAccountName')
         self.manager_attr = self.config.get('ldap_manager_attribute', 'manager')
         self.attributes = ['displayName', self.uid_key, self.email_key, self.manager_attr]
 
-    def resource_format(self, r, r_type):
+    @staticmethod
+    def resource_format(r, r_type):
         if r_type == 'ec2':
             tag_map = {t['Key']: t['Value'] for t in r.get('Tags', ())}
             return "%s %s %s %s %s %s" % (
@@ -75,7 +75,6 @@ class SQSHandler(object):
                 tag_map.get('Name', ''),
                 "instances: %d" % (len(r.get('Instances', []))))
         elif r_type == 'elb':
-            tag_map = {t['Key']: t['Value'] for t in r.get('Tags', ())}
             if 'ProhibitedPolicies' in r:
                 return "%s %s %s %s" % (
                     r['LoadBalancerName'],
@@ -197,7 +196,8 @@ class SQSHandler(object):
             self.logger.debug('Valid JSON')
             msg_json = json.loads(zlib.decompress(base64.b64decode(message)))
             self.logger.info(
-                "Acct: %s,  msg: %s, resource type: %s, count: %d, policy: %s, recipients: %s, action_desc: %s, violation_desc: %s" % (
+                "Acct: %s,  msg: %s, resource type: %s, count: %d, policy: %s, \
+                recipients: %s, action_desc: %s, violation_desc: %s" % (
                     msg_json.get('account', 'na'),
                     msg['MessageId'],
                     msg_json['policy']['resource'],
@@ -213,13 +213,9 @@ class SQSHandler(object):
         if 'resource-owner' not in msg_json['action']['to']:
             self.logger.debug("Resource owner indicator not found. Skipping message.")
 
-        resource_dict = {}
-
-        resource_dict['account'] = msg_json['account']
-        resource_dict['account_id'] = msg_json['account_id']
-        resource_dict['region'] = msg_json['region']
-        resource_dict['action_desc'] = msg_json['action']['action_desc']
-        resource_dict['violation_desc'] = msg_json['action']['violation_desc']
+        resource_dict = {'account': msg_json['account'], 'account_id': msg_json['account_id'],
+                         'region': msg_json['region'], 'action_desc': msg_json['action']['action_desc'],
+                         'violation_desc': msg_json['action']['violation_desc']}
 
         for resource in msg_json['resources']:
             try:
@@ -239,7 +235,7 @@ class SQSHandler(object):
                     self.logger.debug("%s %s: %s" % (resource_string, matched_tag, resource_owner_value))
                     self.logger.debug("Email address found.")
                     resource_owner_value = resource_owner_value
-                elif (resource_owner_value.find("arn:aws:sns") != -1):
+                elif resource_owner_value.find("arn:aws:sns") != -1:
                     self.logger.debug("Contact method is SNS topic. Skipping.")
                     continue
                 else:
@@ -262,42 +258,28 @@ class SQSHandler(object):
 
             for method in config.get('notify_methods'):
                 if method == 'Slack':
-                    self.slack_handler(config.get('slack_token'), resource_dict)
-
-    @retry(stop=stop_after_attempt(2), wait=wait_fixed(2))
-    def slack_handler(self, token, resource_dict):
-        slack = SlackBot(token)
-
-        response = slack.retrieve_user_im(resource_dict['resource_owner_value'])
-
-        if not response["ok"] and "Retry-After" in response["headers"]:
-            raise Exception("Slack API timeout.")
-        elif not response["ok"] and response["error"] == "users_not_found":
-            self.logger.info("Slack user ID not found.")
-            return
-        else:
-            self.logger.debug("Slack account %s found for user %s", response['user']['enterprise_user']['id'], resource_dict['resource_owner_value'])
-            slack.send_slack_msg(response['user']['enterprise_user']['id'], resource_dict)
+                    slack = SlackBot(config.get('slack_token'), self.logger)
+                    slack.slack_handler(resource_dict)
 
     def process_sqs(self, config):
 
-        sqs_fetch = sqsexec.MessageIterator(client=self.session.client('sqs'), queue_url=self.config.get('queue_url'), timeout=0)
+        sqs_fetch = sqsexec.MessageIterator(client=self.session.client('sqs'),
+                                            queue_url=self.config.get('queue_url'), timeout=0)
         connection = self.get_ldap_session()
         self.logger.info('Processing queue messages')
 
         for m in sqs_fetch:
 
             with ThreadPoolExecutor(max_workers=2) as w:
-                futures = {}
-
-                futures[w.submit(self.message_handler, connection, config, m)] = m
+                futures = {w.submit(self.message_handler, connection, config, m): m}
 
                 for future in as_completed(futures):
                     # sqs_fetch.ack(m)
                     if future.exception():
                         self.logger.error("Error processing message: %s", future.exception())
 
-    def session_factory(self, config):
+    @staticmethod
+    def session_factory(config):
 
         if config.get('region') is None:
             set_region = os.environ['AWS_DEFAULT_REGION']
@@ -330,7 +312,8 @@ class SQSHandler(object):
             self.logger.debug("No tags found.")
             return None, None
 
-    def target_is_email(self, target):
+    @staticmethod
+    def target_is_email(target):
         if parseaddr(target)[1] and '@' in target and '.' in target:
             return True
         else:
@@ -345,13 +328,13 @@ class SQSHandler(object):
                     'Plaintext']
         except (TypeError, base64.binascii.Error) as e:
             self.logger.warning(
-                "Error: %s Unable to base64 decode ldap_bind_password, will assume plaintext." % (e)
+                "Error: %s Unable to base64 decode ldap_bind_password, will assume plaintext." % e
             )
         except ClientError as e:
             if e.response['Error']['Code'] != 'InvalidCiphertextException':
                 raise
             self.logger.warning(
-                "Error: %s Unable to decrypt ldap_bind_password with kms, will assume plaintext." % (e)
+                "Error: %s Unable to decrypt ldap_bind_password with kms, will assume plaintext." % e
             )
         try:
             server = Server(self.config.get('ldap_uri'), use_ssl=True)

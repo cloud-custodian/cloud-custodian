@@ -53,6 +53,7 @@ def get_logger(debug):
     else:
         return logging.getLogger('c7n-slacker')
 
+
 @click.group()
 def cli():
     """Custodian Slacker"""
@@ -76,10 +77,13 @@ def start(config):
 
     message_handler.process_sqs(config)
 
+
 if __name__ == '__main__':
     try:
         start()
     except Exception as e:
-        import traceback, pdb, sys
+        import traceback
+        import pdb
+        import sys
         print traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
