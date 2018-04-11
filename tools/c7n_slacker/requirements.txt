@@ -1,0 +1,17 @@
+boto3>=1.5.15
+botocore>=1.8.35
+docutils>=0.12
+Jinja2>=2.8
+jmespath>=0.9.0
+vcversioner==2.16.0.0
+jsonschema>=2.5.1
+click>=6.7
+c7n
+Markup
+MarkupSafe==1.0
+python-dateutil<2.7.0
+ldap3
+tenacity
+ruamel.yaml<0.15 # rq.filter: <0.15
+six==1.11.0
+redis
