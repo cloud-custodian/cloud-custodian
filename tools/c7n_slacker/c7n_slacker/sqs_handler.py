@@ -23,8 +23,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from ldap3 import Connection, Server
 from ldap3.core.exceptions import LDAPSocketOpenError
 
-from c7n import sqsexec
-from slacker import SlackBot
+from c7n import sqsexec, utils
+
+from slacker import NotifyMechanism
 
 
 class SQSHandler(object):
@@ -39,161 +40,9 @@ class SQSHandler(object):
         self.manager_attr = self.config.get('ldap_manager_attribute', 'manager')
         self.attributes = ['displayName', self.uid_key, self.email_key, self.manager_attr]
 
-    @staticmethod
-    def resource_format(r, r_type):
-        if r_type == 'ec2':
-            tag_map = {t['Key']: t['Value'] for t in r.get('Tags', ())}
-            return "%s %s %s %s %s %s" % (
-                r['InstanceId'],
-                r.get('VpcId', 'NO VPC!'),
-                r['InstanceType'],
-                r.get('LaunchTime'),
-                tag_map.get('Name', ''),
-                r.get('PrivateIpAddress'))
-        elif r_type == 'ami':
-            return "%s %s %s" % (
-                r['Name'], r['ImageId'], r['CreationDate'])
-        elif r_type == 's3':
-            return "%s" % (r['Name'])
-        elif r_type == 'ebs':
-            return "%s %s %s %s" % (
-                r['VolumeId'],
-                r['Size'],
-                r['State'],
-                r['CreateTime'])
-        elif r_type == 'rds':
-            return "%s %s %s %s" % (
-                r['DBInstanceIdentifier'],
-                "%s-%s" % (
-                    r['Engine'], r['EngineVersion']),
-                r['DBInstanceClass'],
-                r['AllocatedStorage'])
-        elif r_type == 'asg':
-            tag_map = {t['Key']: t['Value'] for t in r.get('Tags', ())}
-            return "%s %s %s" % (
-                r['AutoScalingGroupName'],
-                tag_map.get('Name', ''),
-                "instances: %d" % (len(r.get('Instances', []))))
-        elif r_type == 'elb':
-            if 'ProhibitedPolicies' in r:
-                return "%s %s %s %s" % (
-                    r['LoadBalancerName'],
-                    "instances: %d" % len(r['Instances']),
-                    "zones: %d" % len(r['AvailabilityZones']),
-                    "prohibited_policies: %s" % ','.join(
-                        r['ProhibitedPolicies']))
-            return "%s %s %s" % (
-                r['LoadBalancerName'],
-                "instances: %d" % len(r['Instances']),
-                "zones: %d" % len(r['AvailabilityZones']))
-        elif r_type == 'redshift':
-            return "%s %s %s" % (
-                r['ClusterIdentifier'],
-                'nodes:%d' % len(r['ClusterNodes']),
-                'encrypted:%s' % r['Encrypted'])
-        elif r_type == 'emr':
-            return "%s status:%s" % (
-                r['Id'],
-                r['Status']['State'])
-        elif r_type == 'cfn':
-            return "%s" % (
-                r['StackName'])
-        elif r_type == 'launch-config':
-            return "%s" % (
-                r['LaunchConfigurationName'])
-        elif r_type == 'security-group':
-            name = r.get('GroupName', '')
-            for t in r.get('Tags', ()):
-                if t['Key'] == 'Name':
-                    name = t['Value']
-            return "%s %s %s inrules: %d outrules: %d" % (
-                name,
-                r['GroupId'],
-                r.get('VpcId', 'na'),
-                len(r.get('IpPermissions', ())),
-                len(r.get('IpPermissionsEgress', ())))
-        elif r_type == 'log-group':
-            if 'lastWrite' in r:
-                return "name: %s last_write: %s" % (
-                    r['logGroupName'],
-                    r['lastWrite'])
-            return "name: %s" % (r['logGroupName'])
-        elif r_type == 'cache-cluster':
-            return "name: %s created: %s status: %s" % (
-                r['CacheClusterId'],
-                r['CacheClusterCreateTime'],
-                r['CacheClusterStatus'])
-        elif r_type == 'cache-snapshot':
-            return "name: %s cluster: %s source: %s" % (
-                r['SnapshotName'],
-                r['CacheClusterId'],
-                r['SnapshotSource'])
-        elif r_type == 'redshift-snapshot':
-            return "name: %s db: %s" % (
-                r['SnapshotIdentifier'],
-                r['DBName'])
-        elif r_type == 'ebs-snapshot':
-            return "name: %s date: %s" % (
-                r['SnapshotId'],
-                r['StartTime'])
-        elif r_type == 'subnet':
-            return "%s %s %s %s %s %s" % (
-                r['SubnetId'],
-                r['VpcId'],
-                r['AvailabilityZone'],
-                r['State'],
-                r['CidrBlock'],
-                r['AvailableIpAddressCount'])
-        elif r_type == 'account':
-            return " %s %s" % (
-                r['account_id'],
-                r['account_name'])
-        elif r_type == 'cloudtrail':
-            return " %s %s" % (
-                r['account_id'],
-                r['account_name'])
-        elif r_type == 'vpc':
-            return "%s " % (
-                r['VpcId'])
-        elif r_type == 'iam-group':
-            return " %s %s %s" % (
-                r['GroupName'],
-                r['Arn'],
-                r['CreateDate'])
-        elif r_type == 'rds-snapshot':
-            return " %s %s %s" % (
-                r['DBSnapshotIdentifier'],
-                r['DBInstanceIdentifier'],
-                r['SnapshotCreateTime'])
-        elif r_type == 'iam-user':
-            return " %s " % (
-                r['UserName'])
-        elif r_type == 'iam-role':
-            return " %s %s " % (
-                r['RoleName'],
-                r['CreateDate'])
-        elif r_type == 'iam-policy':
-            return " %s " % (
-                r['PolicyName'])
-        elif r_type == 'iam-profile':
-            return " %s " % (
-                r['InstanceProfileId'])
-        elif r_type == 'dynamodb-table':
-            return "name: %s created: %s status: %s" % (
-                r['TableName'],
-                r['CreationDateTime'],
-                r['TableStatus'])
-        elif r_type == "sqs":
-            return "QueueUrl: %s QueueARN: %s " % (
-                r['QueueUrl'],
-                r['QueueArn'])
-        else:
-            return "%s" % r
-
     def message_handler(self, connection, config, msg):
         message = msg['Body']
         try:
-            self.logger.debug('Valid JSON')
             msg_json = json.loads(zlib.decompress(base64.b64decode(message)))
             self.logger.info(
                 "Acct: %s,  msg: %s, resource type: %s, count: %d, policy: %s, \
@@ -206,12 +55,14 @@ class SQSHandler(object):
                     ', '.join(msg_json['action']['to']),
                     msg_json['action']['action_desc'],
                     msg_json['action']['violation_desc']))
+            self.logger.debug('Valid JSON')
         except ValueError:
             self.logger.warning("Invalid JSON")
             return
 
         if 'resource-owner' not in msg_json['action']['to']:
             self.logger.debug("Resource owner indicator not found. Skipping message.")
+            return
 
         resource_dict = {'account': msg_json['account'], 'account_id': msg_json['account_id'],
                          'region': msg_json['region'], 'action_desc': msg_json['action']['action_desc'],
@@ -224,18 +75,17 @@ class SQSHandler(object):
                 self.logger.debug("Error fetching resource owner value: %s" % e)
                 continue
 
-            if resource is None or resource_owner_value is None:
+            if resource_owner_value is None:
                 self.logger.debug("Resource details not found. Skipping message....")
                 continue
             else:
-                resource_string = self.resource_format(resource, msg_json['policy']['resource'])
+                resource_string = utils.resource_format(resource, msg_json['policy']['resource'])
                 self.logger.debug("resource string: %s", resource_string)
 
-                if (self.target_is_email(resource_owner_value)) is True:
+                if (self.target_is_email(resource_owner_value)):
                     self.logger.debug("%s %s: %s" % (resource_string, matched_tag, resource_owner_value))
                     self.logger.debug("Email address found.")
-                    resource_owner_value = resource_owner_value
-                elif resource_owner_value.find("arn:aws:sns") != -1:
+                elif "arn:aws:sns" in resource_owner_value:
                     self.logger.debug("Contact method is SNS topic. Skipping.")
                     continue
                 else:
@@ -257,9 +107,8 @@ class SQSHandler(object):
             resource_dict['resource_string'] = resource_string
 
             for method in config.get('notify_methods'):
-                if method == 'Slack':
-                    slack = SlackBot(config.get('slack_token'), self.logger)
-                    slack.slack_handler(resource_dict)
+                notify_obj = NotifyMechanism.factory(method, config, self.logger)
+                notify_obj.notify_handler(resource_dict)
 
     def process_sqs(self, config):
 
@@ -304,9 +153,8 @@ class SQSHandler(object):
 
         if tags:
             for contact_tag in self.config.get('contact_tags'):
-                for tag in tags:
-                    if tag == contact_tag:
-                        self.logger.debug("Resource owner match: %s - %s", contact_tag, tags[contact_tag])
+                if tags.get(contact_tag, None):
+                        self.logger.info("Resource owner match: %s - %s", contact_tag, tags[contact_tag])
                         return tags[contact_tag], contact_tag
         else:
             self.logger.debug("No tags found.")
@@ -316,8 +164,6 @@ class SQSHandler(object):
     def target_is_email(target):
         if parseaddr(target)[1] and '@' in target and '.' in target:
             return True
-        else:
-            pass
         return False
 
     def get_ldap_session(self):

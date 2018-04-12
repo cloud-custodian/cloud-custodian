@@ -15,14 +15,23 @@ from slackclient import SlackClient
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 
-class SlackBot(object):
+class NotifyMechanism(object):
+
+    def factory(type, config, logger):
+        if type == "Slack":
+            return SlackBot(config.get('slack_token'), logger)
+
+    factory = staticmethod(factory)
+
+
+class SlackBot(NotifyMechanism):
 
     def __init__(self, token, logger):
         self.client = SlackClient(token)
         self.logger = logger
 
     @retry(stop=stop_after_attempt(2), wait=wait_fixed(2))
-    def slack_handler(self, resource_dict):
+    def notify_handler(self, resource_dict):
         response = self.retrieve_user_im(resource_dict['resource_owner_value'])
 
         if not response["ok"] and "Retry-After" in response["headers"]:

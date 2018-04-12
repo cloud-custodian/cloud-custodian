@@ -28,5 +28,3 @@ results.xml
 .idea/
 .vscode/
 !.vscode/*.sample
-config.yml
-test-policy.yml

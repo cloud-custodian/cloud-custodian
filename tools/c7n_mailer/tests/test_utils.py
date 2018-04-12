@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import unittest
 
-from c7n_mailer import utils
+from c7n import utils
 
 
 class FormatStruct(unittest.TestCase):
