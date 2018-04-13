@@ -3,8 +3,8 @@ build:
   unit_tests:
     image: python:2-slim
     commands:
-      - apk update
-      - apk add build-essential
+      - apt-get update
+      - apt-get install build-essential
       - pip install tox
       - tox -e py27
 
