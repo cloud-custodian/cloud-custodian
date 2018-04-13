@@ -68,8 +68,26 @@ RESOURCE_1 = {
     'VolumeId': 'vol-01a0e6ea6b89f0099'
 }
 
+RESOURCE_2 = {
+    'AvailabilityZone': 'us-east-1c',
+    'Attachments': [],
+    'Tags': [
+        {
+            'Value': 'milton@initech.com',
+            'Key': 'SupportEmail'
+        },
+        {
+            'Value': 'peter',
+            'Key': 'CreatorName'
+        }
+    ],
+    'VolumeId': 'vol-21a0e7ea9b19f0043',
+    'Size': 8
+}
+
 SQS_MESSAGE_1 = {
     'account': 'core-services-dev',
+    'account_id': '000000000000',
     'region': 'us-east-1',
     'action': {
         'to': ['resource-owner', 'ldap_uid_tags'],
@@ -105,6 +123,63 @@ SQS_MESSAGE_1 = {
     'resources': [RESOURCE_1]
 }
 
+SQS_MESSAGE_2 = {
+    'account': 'core-services-dev',
+    'account_id': '000000000000',
+    'region': 'us-east-1',
+    'action': {
+        'type': 'notify',
+        'to': ['datadog://?metric_name=EBS_volume.available.size']
+    },
+    'policy': {
+        'filters': [{'Attachments': []}, {'tag:maid_status': 'absent'}],
+        'resource': 'ebs',
+        'actions': [
+            {
+                'type': 'mark-for-op',
+                'days': 15,
+                'op': 'delete'
+            },
+            {
+                'type': 'notify',
+                'to': ['datadog://?metric_name=EBS_volume.available.size']
+            }
+        ],
+        'comments': 'We are deleting your EBS volumes.',
+        'name': 'ebs-mark-unattached-deletion'
+    },
+    'event': None,
+    'resources': [RESOURCE_1, RESOURCE_2]
+}
+
+SQS_MESSAGE_3 = {
+    'account': 'core-services-dev',
+    'account_id': '000000000000',
+    'region': 'us-east-1',
+    'action': {
+            'type': 'notify',
+            'to': ['datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size']
+    },
+    'policy': {
+        'filters': [{'Attachments': []}, {'tag:maid_status': 'absent'}],
+        'resource': 'ebs',
+        'actions': [
+            {
+                'type': 'mark-for-op',
+                'days': 15,
+                'op': 'delete'
+            },
+            {
+                'type': 'notify',
+                'to': ['datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size']
+            }
+        ],
+        'comments': 'We are deleting your EBS volumes.',
+        'name': 'ebs-mark-unattached-deletion'
+    },
+    'event': None,
+    'resources': [RESOURCE_2]
+}
 
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
 
