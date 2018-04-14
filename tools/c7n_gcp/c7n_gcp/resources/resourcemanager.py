@@ -11,33 +11,37 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from c7n_gcp.query import QueryResourceManager
+from c7n_gcp.query import QueryResourceManager, TypeInfo
 
-from c7n.provider import gcp
+from c7n_gcp.provider import resources
 
 
-@gcp.register('organization')
+@resources.register('organization')
 class Organization(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
-        version = 'v2'
+        version = 'v1'
         component = 'organizations'
+        scope = 'global'
 
 
-@gcp.register('folder')
+@resources.register('folder')
 class Folder(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v2'
         component = 'folders'
+        scope = 'global'
 
 
-@gcp.register('project')
+@resources.register('project')
 class Project(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
-        version = 'v2'
+        version = 'v1'
         component = 'projects'
+        scope = 'global'
+        enum_spec = ('list', 'projects', None)

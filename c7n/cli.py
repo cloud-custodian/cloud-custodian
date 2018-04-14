@@ -33,9 +33,8 @@ except ImportError:
     def setproctitle(t):
         return None
 
-from c7n import utils
 from c7n.commands import schema_completer
-from c7n.utils import get_account_id_from_sts
+from c7n.config import Config
 
 DEFAULT_REGION = 'us-east-1'
 
@@ -110,43 +109,6 @@ def _default_options(p, blacklist=""):
             help="Cache validity in minutes (default %(default)i)")
     else:
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
-
-
-def _default_region(options):
-    marker = object()
-    value = getattr(options, 'regions', marker)
-    if value is marker:
-        return
-
-    if len(value) > 0:
-        return
-
-    try:
-        options.regions = [utils.get_profile_session(options).region_name]
-    except Exception:
-        log.warning('Could not determine default region')
-        options.regions = [None]
-
-    if options.regions[0] is None:
-        log.error('No default region set. Specify a default via AWS_DEFAULT_REGION '
-                  'or setting a region in ~/.aws/config')
-        sys.exit(1)
-
-    log.debug("using default region:%s from boto" % options.regions[0])
-
-
-def _default_account_id(options):
-    if options.assume_role:
-        try:
-            options.account_id = options.assume_role.split(':')[4]
-            return
-        except IndexError:
-            pass
-    try:
-        session = utils.get_profile_session(options)
-        options.account_id = get_account_id_from_sts(session)
-    except Exception:
-        options.account_id = None
 
 
 def _report_options(p):
@@ -332,6 +294,10 @@ def setup_parser():
     _default_options(run)
     _dryrun_option(run)
     run.add_argument(
+        "--skip-validation",
+        action="store_true",
+        help="Skips validation of policies (assumes you've run the validate command seperately).")
+    run.add_argument(
         "-m", "--metrics-enabled",
         default=False, action="store_true",
         help="Emit metrics to CloudWatch Metrics")
@@ -380,9 +346,7 @@ def main():
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    if options.subparser in ('report', 'logs', 'metrics', 'run'):
-        _default_region(options)
-        _default_account_id(options)
+    config = Config.empty(**vars(options))
 
     try:
         command = options.command
@@ -395,7 +359,7 @@ def main():
         process_name = [os.path.basename(sys.argv[0])]
         process_name.extend(sys.argv[1:])
         setproctitle(' '.join(process_name))
-        command(options)
+        command(config)
     except Exception:
         if not options.debug:
             raise

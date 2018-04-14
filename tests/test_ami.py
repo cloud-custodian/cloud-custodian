@@ -51,3 +51,14 @@ class TestAMI(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ami_cross_accounts(self):
+        session_factory = self.replay_flight_data('test_ami_cross_accounts')
+        p = self.load_policy({
+            'name': 'cross-account-ami',
+            'resource': 'ami',
+            'filters': [{
+                'type': 'cross-account',
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, functional, event_data
+from .common import BaseTest, functional, event_data, TestConfig as Config
 from c7n.filters import FilterValidationError
 
 
@@ -597,6 +597,19 @@ class RouteTableTest(BaseTest):
 
 
 class PeeringConnectionTest(BaseTest):
+
+    def test_peer_cross_account(self):
+        factory = self.replay_flight_data('test_peer_cross_account')
+        p = self.load_policy({
+            'name': 'cross-account',
+            'resource': 'peering-connection',
+            'filters': [
+                {'type': 'cross-account'}]},
+            config=Config.empty(),
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['185106417252'])
 
     def test_peer_missing_route(self):
         # peer from all routes

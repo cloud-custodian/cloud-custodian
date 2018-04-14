@@ -32,7 +32,8 @@ from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 
 from .common import (
-    BaseTest, ConfigTest, event_data, skip_if_not_validating, functional)
+    BaseTest, ConfigTest, event_data,
+    skip_if_not_validating, functional, TestConfig as Config)
 
 
 class RestoreCompletionTest(TestCase):
@@ -560,7 +561,8 @@ class BucketTag(BaseTest):
         bname = 'custodian-tagger'
         if self.recording:
             destroyBucketIfPresent(client, bname)
-        client.create_bucket(Bucket=bname,
+        client.create_bucket(
+            Bucket=bname,
             CreateBucketConfiguration={'LocationConstraint': 'us-east-2'})
         self.addCleanup(destroyBucket, client, bname)
         client.put_bucket_tagging(
@@ -1679,7 +1681,9 @@ class S3Test(BaseTest):
             'actions': [{
                 'type': 'attach-encrypt',
                 'role': role}]
-            }, session_factory=session_factory)
+            },
+            config=Config.empty(region='us-west-2'),
+            session_factory=session_factory)
 
         self.addCleanup(
             LambdaManager(functools.partial(session_factory, region='us-west-2')).remove,
@@ -2234,6 +2238,8 @@ class S3Test(BaseTest):
     def test_s3_remove_tag(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [
             ('get_bucket_tagging', 'Tags', [], 'TagSet')])
+        self.patch(
+            s3.RemoveTag, 'executor_factory', MainThreadExecutor)
         session_factory = self.replay_flight_data('test_s3_remove_tag')
         session = session_factory()
         client = session.client('s3')
@@ -2249,6 +2255,8 @@ class S3Test(BaseTest):
         tags = client.get_bucket_tagging(Bucket=bname)
         tag_map = {t['Key']: t['Value'] for t in tags.get('TagSet', {})}
         self.assertTrue('maid_status' not in tag_map)
+        old_tags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        self.assertTrue('maid_status' in old_tags)
 
     def test_hosts_website(self):
         self.patch(s3, 'S3_AUGMENT_TABLE', [

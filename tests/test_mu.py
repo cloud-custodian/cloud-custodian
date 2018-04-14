@@ -33,7 +33,7 @@ from c7n.mu import (
     PythonPackageArchive, CloudWatchLogSubscription, SNSSubscription)
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, Config, event_data, functional, Bag
+from .common import BaseTest, event_data, functional, Bag, TestConfig as Config
 from .data import helloworld
 
 

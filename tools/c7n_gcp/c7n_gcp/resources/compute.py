@@ -11,33 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from c7n_gcp.query import QueryResourceManager
+from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.provider import resources
 
-from c7n.provider import gcp
 
-
-@gcp.register('instance')
+@resources.register('instance')
 class Instance(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
-        component = 'instance'
+        component = 'instances'
+        enum_spec = ('aggregatedList', 'items.*.instances[]', None)
+        scope = 'project'
 
 
-@gcp.register('image')
+@resources.register('image')
 class Image(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
         component = 'images'
 
 
-@gcp.register('disk')
+@resources.register('disk')
 class Disk(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
         component = 'disks'
+        scope = 'zone'
+        enum_spec = ('aggregatedList', 'items.*.disks[]', None)

@@ -1,4 +1,4 @@
-# Copyright 2017 Capital One Services, LLC
+# Copyright 2017-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
+from c7n.actions import BaseAction
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('batch-compute')
@@ -41,3 +43,112 @@ class JobDefinition(QueryResourceManager):
         id = name = "jobDefinitionName"
         enum_spec = (
             'describe_job_definitions', 'jobDefinitions', None)
+
+
+class StateTransitionFilter(object):
+    """Filter resources by state.
+
+    Try to simplify construction for policy authors by automatically
+    filtering elements (filters or actions) to the resource states
+    they are valid for.
+    """
+    valid_origin_states = ()
+
+    def filter_resource_state(self, resources, key, states=None):
+        states = states or self.valid_origin_states
+        if not states:
+            return resources
+        orig_length = len(resources)
+        results = [r for r in resources if r[key] in states]
+        if orig_length != len(results):
+            self.log.warn(
+                "%s implicitly filtered %d of %d resources with valid %s" % (
+                    self.__class__.__name__,
+                    len(results), orig_length, key.lower()))
+        return results
+
+
+@ComputeEnvironment.action_registry.register('update-environment')
+class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
+    """Updates an AWS batch compute environment
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: update-environments
+            resource: batch-compute
+            filters:
+              - computeResources.desiredvCpus: 0
+              - state: ENABLED
+            actions:
+              - type: update-environment
+                state: DISABLED
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['update-environment']},
+            'computeEnvironment': {'type': 'string'},
+            'state': {'type': 'string', 'enum': ['ENABLED', 'DISABLED']},
+            'computeResources': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'minvCpus': {'type': 'integer'},
+                    'maxvCpus': {'type': 'integer'},
+                    'desiredvCpus': {'type': 'integer'}
+                }
+            },
+            'serviceRole': {'type': 'string'}
+        }
+    }
+    permissions = ('batch:UpdateComputeEnvironment',)
+    valid_origin_status = ('VALID', 'INVALID')
+
+    def process(self, resources):
+        resources = self.filter_resource_state(
+            resources, 'status', self.valid_origin_status)
+        client = local_session(self.manager.session_factory).client('batch')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            params['computeEnvironment'] = r['computeEnvironmentName']
+            client.update_compute_environment(**params)
+
+
+@ComputeEnvironment.action_registry.register('delete')
+class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
+    """Delete an AWS batch compute environment
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-environments
+            resource: batch-compute
+            filters:
+              - computeResources.desiredvCpus: 0
+            action:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('batch:DeleteComputeEnvironment',)
+    valid_origin_states = ('DISABLED',)
+    valid_origin_status = ('VALID', 'INVALID')
+
+    def delete_environment(self, r):
+        client = local_session(self.manager.session_factory).client('batch')
+        client.delete_compute_environment(
+            computeEnvironment=r['computeEnvironmentName'])
+
+    def process(self, resources):
+        resources = self.filter_resource_state(
+            self.filter_resource_state(
+                resources, 'state', self.valid_origin_states),
+            'status', self.valid_origin_status)
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.delete_environment, resources))

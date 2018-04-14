@@ -58,6 +58,36 @@ class ReplInstance(BaseTest):
             'ReplicationInstances')
         self.assertEqual(instances[0]['ReplicationInstanceStatus'], 'deleting')
 
+    def test_modify(self):
+        session_factory = self.replay_flight_data(
+            'test_dms_repl_instance_modify')
+        client = session_factory().client('dms')
+        p = self.load_policy({
+            'name': 'dms-replinstance',
+            'resource': 'dms-instance',
+            'filters': [
+                {'AutoMinorVersionUpgrade': False},
+                {'ReplicationInstanceClass': 'dms.t2.small'}
+            ],
+            'actions': [{
+                'type': 'modify-instance',
+                'ApplyImmediately': True,
+                'AutoMinorVersionUpgrade': True,
+                'ReplicationInstanceClass': 'dms.t2.medium',
+                'PreferredMaintenanceWindow': 'Mon:23:00-Mon:23:59'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['ReplicationInstanceIdentifier'], 'rep-inst-1')
+        ri = client.describe_replication_instances().get(
+            'ReplicationInstances')
+        self.assertEqual([
+            ri[0]['AutoMinorVersionUpgrade'],
+            ri[0]['PendingModifiedValues']['ReplicationInstanceClass'],
+            ri[0]['PreferredMaintenanceWindow']],
+            [True, 'dms.t2.medium', 'mon:23:00-mon:23:59'])
+
 
 class ReplicationInstanceTagging(BaseTest):
     def test_replication_instance_tag(self):

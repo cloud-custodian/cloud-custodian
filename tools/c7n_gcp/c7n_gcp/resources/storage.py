@@ -11,15 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from c7n_gcp.query import QueryResourceManager
 
-from c7n.provider import gcp
+from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.provider import resources
 
 
-@gcp.register('bucket')
-class Bucket(object):
+@resources.register('bucket')
+class Bucket(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'storage'
         version = 'v1'
         component = 'buckets'
