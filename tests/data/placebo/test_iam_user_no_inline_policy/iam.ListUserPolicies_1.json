@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PolicyNames": [], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d89b0894-bb61-11e7-b158-099c69192f1d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d89b0894-bb61-11e7-b158-099c69192f1d", 
+                "date": "Fri, 27 Oct 2017 21:57:37 GMT", 
+                "content-length": "323", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

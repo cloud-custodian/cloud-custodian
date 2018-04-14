@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import os
 from c7n.ctx import ExecutionContext
 from c7n.output import S3Output
 
-from .common import Config, Bag
+from .common import Bag, TestConfig as Config
 
 
 class S3OutputTest(unittest.TestCase):
@@ -97,7 +97,7 @@ class S3OutputTest(unittest.TestCase):
                 self.assertTrue(f.endswith('.gz'))
 
                 with gzip.open(os.path.join(root, f)) as fh:
-                    self.assertEqual(fh.read(), 'abc')
+                    self.assertEqual(fh.read(), b'abc')
 
     def test_upload(self):
         output = self.get_s3_output()

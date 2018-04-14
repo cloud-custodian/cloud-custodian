@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,25 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from setuptools import setup, find_packages
+import os
+
+requires = ["Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15", "datadog"]
+try:
+    from concurrent import futures
+except ImportError:
+    # The backport has SyntaxErrors under py36, so avoid installing it.
+    # https://github.com/agronholm/pythonfutures/issues/41
+    requires += ['futures']
+
+description = ""
+if os.path.exists('README.md'):
+    description = open('README.md').read()
 
 setup(
     name="c7n_mailer",
-    version='0.1',
+    version='0.3.1',
     description="Cloud Custodian - Reference Mailer",
+    long_description=description,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
@@ -32,5 +46,5 @@ setup(
             'c7n-mailer-replay = c7n_mailer.replay:main'
         ]
     },
-    install_requires=["Jinja2", "boto3", "jsonschema"],
+    install_requires=requires,
 )

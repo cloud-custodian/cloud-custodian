@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "QueueUrl": "https://queue.amazonaws.com/644160558196/custodian-waiter-bb99b77b-af64-4107-869b-af743dfb9cb1", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d2617dfd-4e70-59dd-88db-2ffb227d915d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d2617dfd-4e70-59dd-88db-2ffb227d915d", 
+                "content-length": "365", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Thu, 10 Aug 2017 14:12:29 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

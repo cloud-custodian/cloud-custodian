@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,12 @@
 import json
 import redis
 import re
-import sqlite3
+try:
+    import sqlite3
+except ImportError:
+    have_sqlite = False
+else:
+    have_sqlite = True
 from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
 
@@ -22,12 +27,12 @@ from ldap3.core.exceptions import LDAPSocketOpenError
 class LdapLookup(object):
 
     def __init__(self, config, logger):
+        self.log          = logger
         self.connection = self.get_connection(
             config.get('ldap_uri'),
             config.get('ldap_bind_user', None),
             config.get('ldap_bind_password', None)
         )
-        self.log          = logger
         self.base_dn      = config.get('ldap_bind_dn')
         self.email_key    = config.get('ldap_email_key', 'mail')
         self.manager_attr = config.get('ldap_manager_attribute', 'manager')
@@ -40,6 +45,8 @@ class LdapLookup(object):
             redis_port = int(config.get('redis_port', 6379))
             self.caching = self.get_redis_connection(redis_host, redis_port)
         elif self.cache_engine == 'sqlite':
+            if not have_sqlite:
+                raise RuntimeError('No sqlite available: stackoverflow.com/q/44058239')
             self.caching = LocalSqlite(config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)
 
     def get_redis_connection(self, redis_host, redis_port):
@@ -140,7 +147,8 @@ class LdapLookup(object):
                 self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
                 self.caching.set(uid, ldap_user_metadata)
         else:
-            self.caching.set(uid, {})
+            if self.cache_engine:
+                self.caching.set(uid, {})
             return {}
         return ldap_user_metadata
 
@@ -156,8 +164,7 @@ class LocalSqlite(object):
         self.sqlite.execute('''CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)''')
 
     def get(self, key):
-        sqlite_query = "select * FROM ldap_cache WHERE key='%s'" % key
-        sqlite_result = self.sqlite.execute(sqlite_query)
+        sqlite_result = self.sqlite.execute("select * FROM ldap_cache WHERE key=?", (key,))
         result = sqlite_result.fetchall()
         if len(result) != 1:
             error_msg = 'Did not get 1 result from sqlite, something went wrong with key: %s' % key
@@ -166,8 +173,8 @@ class LocalSqlite(object):
         return json.loads(result[0][1])
 
     def set(self, key, value):
-        sqlite_query = "INSERT INTO ldap_cache VALUES ('%s', '%s')" % (key, json.dumps(value))
-        self.sqlite.execute(sqlite_query)
+        # note, the ? marks are required to ensure escaping into the database.
+        self.sqlite.execute("INSERT INTO ldap_cache VALUES (?, ?)", (key, json.dumps(value)))
 
 
 # redis can't write complex python objects like dictionaries as values (the way memcache can)

@@ -200,7 +200,7 @@ Additional parameters can be passed in from the policy - i.e. action_desc, viola
 			{{ createTable(columnNames, resources, '50') }}					
 
 		{% elif policy['resource'] == "kinesis" %}
-			{% set columnNames = ['KinesisName'] %}
+			{% set columnNames = ['StreamName'] %}
 			{{ createTable(columnNames, resources, '50') }}						
 
 		{% elif policy['resource'] == "launch-config" %}

@@ -1,0 +1,106 @@
+{
+    "status_code": 200, 
+    "data": {
+        "repositories": [
+            {
+                "repositoryName": "test-delete-codecommit", 
+                "cloneUrlSsh": "ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/test-delete-codecommit", 
+                "lastModifiedDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 40, 
+                    "microsecond": 854000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 49
+                }, 
+                "repositoryDescription": "placebo", 
+                "cloneUrlHttp": "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/test-delete-codecommit", 
+                "creationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 40, 
+                    "microsecond": 854000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 49
+                }, 
+                "repositoryId": "3fadfc19-ad40-4cab-a211-a6b34269bfad", 
+                "Arn": "arn:aws:codecommit:us-east-1:644160558196:test-delete-codecommit", 
+                "accountId": "644160558196"
+            }, 
+            {
+                "repositoryName": "test-delete-codecommit2", 
+                "cloneUrlSsh": "ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/test-delete-codecommit2", 
+                "lastModifiedDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 3, 
+                    "microsecond": 923000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 50
+                }, 
+                "repositoryDescription": "placebo2", 
+                "cloneUrlHttp": "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/test-delete-codecommit2", 
+                "creationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 3, 
+                    "microsecond": 923000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 50
+                }, 
+                "repositoryId": "5adbf477-56a3-4799-9e53-23b5d379b3c8", 
+                "Arn": "arn:aws:codecommit:us-east-1:644160558196:test-delete-codecommit2", 
+                "accountId": "644160558196"
+            }, 
+            {
+                "repositoryName": "test-delete-codecommit3", 
+                "cloneUrlSsh": "ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/test-delete-codecommit3", 
+                "lastModifiedDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 426000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 50
+                }, 
+                "repositoryDescription": "placebo", 
+                "cloneUrlHttp": "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/test-delete-codecommit3", 
+                "creationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 426000, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 50
+                }, 
+                "repositoryId": "18ea7aa4-b4a1-48d7-a438-3428f6fdcbd1", 
+                "Arn": "arn:aws:codecommit:us-east-1:644160558196:test-delete-codecommit3", 
+                "accountId": "644160558196"
+            }
+        ], 
+        "repositoriesNotFound": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cd7c66ee-c953-11e7-96d5-914a90de92a8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cd7c66ee-c953-11e7-96d5-914a90de92a8", 
+                "date": "Tue, 14 Nov 2017 15:52:22 GMT", 
+                "content-length": "1520", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

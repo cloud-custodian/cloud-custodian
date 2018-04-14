@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bef7ebce-8d03-439e-9748-a70ea6b5e809", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 19:58:53 GMT", 
+                "x-amzn-requestid": "bef7ebce-8d03-439e-9748-a70ea6b5e809", 
+                "content-length": "219", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "EndpointConfigs": [
+            {
+                "EndpointConfigName": "kmeans-2018-01-18-19-25-36-887", 
+                "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/kmeans-2018-01-18-19-25-36-887", 
+                "CreationTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 40, 
+                    "microsecond": 797000, 
+                    "year": 2018, 
+                    "day": 18, 
+                    "minute": 32
+                }
+            }
+        ]
+    }
+}

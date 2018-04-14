@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
+import functools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -25,7 +26,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks, get_retry)
+    type_schema, local_session, snapshot_identifier, chunks,
+    get_retry, generate_arn)
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -55,6 +57,15 @@ class RDSCluster(QueryResourceManager):
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttled',)))
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn, 'rds', region=self.config.region,
+                account_id=self.account_id,
+                resource_type=self.resource_type.type, separator=':')
+        return self._generate_arn
 
     def augment(self, dbs):
         filter(None, _rds_cluster_tags(
@@ -91,7 +102,7 @@ class TagDelayedAction(tags.TagDelayedAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: mark-for-delete
@@ -126,7 +137,7 @@ class Tag(tags.Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-owner-tag
@@ -158,7 +169,7 @@ class RemoveTag(tags.RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-unmark-cluster
@@ -225,7 +236,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-delete-unused
@@ -292,7 +303,7 @@ class RetentionWindow(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-backup-retention
@@ -333,7 +344,7 @@ class RetentionWindow(BaseAction):
     def process_snapshot_retention(self, cluster):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
-        retention_type = self.data['enforce', 'min'].lower()
+        retention_type = self.data.get('enforce', 'min').lower()
 
         if retention_type == 'min':
             self.set_retention_window(
@@ -366,7 +377,7 @@ class Snapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-snapshot
@@ -428,7 +439,7 @@ class RDSSnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-snapshots-expired
@@ -455,7 +466,7 @@ class RDSClusterSnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: rds-cluster-snapshots-expired-delete

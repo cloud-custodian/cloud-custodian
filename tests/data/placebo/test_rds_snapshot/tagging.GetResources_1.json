@@ -1,0 +1,41 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:c7n-data-index", 
+                "Tags": [
+                    {
+                        "Value": "other", 
+                        "Key": "workload-type"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:c7n-snapshot-test", 
+                "Tags": [
+                    {
+                        "Value": "tag", 
+                        "Key": "missing"
+                    }, 
+                    {
+                        "Value": "other", 
+                        "Key": "workload-type"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e1f18af5-dea6-11e7-aae9-9b0d02cb9c60", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e1f18af5-dea6-11e7-aae9-9b0d02cb9c60", 
+                "date": "Mon, 11 Dec 2017 19:09:58 GMT", 
+                "content-length": "324", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

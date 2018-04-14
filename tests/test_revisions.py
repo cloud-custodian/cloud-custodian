@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,11 +13,99 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+from c7n.filters import revisions
 from c7n.resources.vpc import SecurityGroupDiff, SecurityGroupPatch
+from .common import BaseTest
 
 
 class SGDiffLibTest(BaseTest):
+
+    def test_sg_diff_remove_ingress(self):
+        factory = self.replay_flight_data('test_sg_config_ingres_diff')
+        p = self.load_policy({
+            'name': 'sg-differ',
+            'resource': 'security-group',
+            'filters': [
+                {'GroupId': 'sg-65229a0c'},
+                {'type': 'diff',
+                 'selector': 'date',
+                 'selector_value': '2017/01/27 00:40Z'}],
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.maxDiff = None
+        self.assertEqual(
+            resources[0]['c7n:diff'],
+            {'ingress': {
+                'removed': [{u'FromPort': 0,
+                             u'IpProtocol': u'tcp',
+                             u'IpRanges': [],
+                             u'Ipv6Ranges': [],
+                             u'PrefixListIds': [],
+                             u'ToPort': 0,
+                             u'UserIdGroupPairs': [
+                                 {u'GroupId': u'sg-aa6c90c3',
+                                  u'UserId': u'644160558196'}]}]}})
+
+    def test_json_diff_pitr(self):
+        factory = self.replay_flight_data('test_sg_config_diff')
+        p = self.load_policy({
+            'name': 'sg-differ',
+            'resource': 'security-group',
+            'filters': [
+                {'GroupId': 'sg-a38ed1de'},
+                {'type': 'json-diff',
+                 'selector': 'date',
+                 'selector_value': '2016/12/11 17:25Z'}],
+        }, session_factory=factory)
+
+        resources = p.run()
+        self.maxDiff = None
+        self.assertEqual(len(resources), 1)
+        for change in [
+            {u'op': u'add',
+             u'path': u'/IpPermissionsEgress/0/UserIdGroupPairs/0',
+             u'value': {u'GroupId': u'sg-a08ed1dd',
+                        u'UserId': u'644160558196'}},
+            {u'op': u'replace',
+             u'path': u'/Tags/1/Key',
+             u'value': u'Scope'},
+            {u'op': u'replace',
+             u'path': u'/Tags/1/Value',
+             u'value': u'account'},
+            {u'op': u'add',
+             u'path': u'/Tags/2',
+             u'value': {u'Key': u'NetworkLocation', u'Value': u'DMZ'}},
+            {u'op': u'replace',
+             u'path': u'/IpPermissions/1/FromPort',
+             u'value': 22},
+            {u'op': u'replace',
+             u'path': u'/IpPermissions/1/IpRanges/0/CidrIp',
+             u'value': u'10.0.0.0/24'},
+            {u'op': u'replace',
+             u'path': u'/IpPermissions/1/ToPort',
+             u'value': 22},
+            {u'op': u'add',
+             u'path': u'/IpPermissions/2',
+             u'value': {u'FromPort': 8485,
+                        u'IpProtocol': u'tcp',
+                        u'IpRanges': [],
+                        u'Ipv6Ranges': [],
+                        u'PrefixListIds': [],
+                        u'ToPort': 8485,
+                        u'UserIdGroupPairs': [{u'GroupId': u'sg-a38ed1de',
+                                               u'UserId': u'644160558196'}]}},
+            {u'op': u'add',
+             u'path': u'/IpPermissions/3',
+             u'value': {u'FromPort': 443,
+                        u'IpProtocol': u'tcp',
+                        u'IpRanges': [{u'CidrIp': u'10.42.1.0/24'}],
+                        u'Ipv6Ranges': [],
+                        u'PrefixListIds': [],
+                        u'ToPort': 443,
+                        u'UserIdGroupPairs': []}}]:
+            self.assertTrue(change in resources[0]['c7n:diff'])
 
     def test_sg_diff_pitr(self):
         factory = self.replay_flight_data('test_sg_config_diff')
@@ -49,7 +137,14 @@ class SGDiffLibTest(BaseTest):
                              u'PrefixListIds': [],
                              u'UserIdGroupPairs': []}]},
              'ingress': {
-                 'added': [{u'FromPort': 8485,
+                 'added': [{u'FromPort': 22,
+                            u'IpProtocol': u'tcp',
+                            u'IpRanges': [{u'CidrIp': u'10.0.0.0/24'}],
+                            u'Ipv6Ranges': [],
+                            u'PrefixListIds': [],
+                            u'ToPort': 22,
+                            u'UserIdGroupPairs': []},
+                           {u'FromPort': 8485,
                             u'IpProtocol': u'tcp',
                             u'IpRanges': [],
                             u'Ipv6Ranges': [],
@@ -57,13 +152,7 @@ class SGDiffLibTest(BaseTest):
                             u'ToPort': 8485,
                             u'UserIdGroupPairs': [{u'GroupId': u'sg-a38ed1de',
                                                    u'UserId': u'644160558196'}]},
-                           {u'FromPort': 22,
-                            u'IpProtocol': u'tcp',
-                            u'IpRanges': [{u'CidrIp': u'10.0.0.0/24'}],
-                            u'Ipv6Ranges': [],
-                            u'PrefixListIds': [],
-                            u'ToPort': 22,
-                            u'UserIdGroupPairs': []}]},
+                        ]},
              'tags': {'added': {u'Scope': u'account'}}})
 
     def test_sg_patch_pitr(self):
@@ -89,7 +178,7 @@ class SGDiffLibTest(BaseTest):
         self.assertEqual(
             current_resource,
             resources[0]['c7n:previous-revision']['resource'])
-                
+
     def test_sg_diff_patch(self):
         factory = self.replay_flight_data(
             'test_security_group_revisions_delta')

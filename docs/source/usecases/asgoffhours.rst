@@ -19,7 +19,7 @@ during weekends.
            tag: custodian_downtime
            offhour: 22
        actions:
-         - stop
+         - suspend
 
      - name: onhour-start-10
        resource: asg
@@ -30,7 +30,7 @@ during weekends.
            tag: custodian_downtime
            onhour: 10
        actions:
-         - start
+         - resume
 
 For detailed information on offhours/onhours support and configuration, see
 :ref:`offhours`.

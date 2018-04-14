@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ def dispatch(event, context):
 
 def get_archive(config):
     archive = PythonPackageArchive(
-        'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'yaml',
+        'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'ruamel',
         'redis')
 
     template_dir = os.path.abspath(
@@ -59,19 +59,21 @@ def get_archive(config):
 
 def provision(config, session_factory):
     func_config = dict(
-        name='cloud-custodian-mailer',
-        description='Cloud Custodian Mailer',
+        name=config.get('lambda_name', 'cloud-custodian-mailer'),
+        description=config.get('lambda_description', 'Cloud Custodian Mailer'),
+        tags=config.get('lambda_tags', {}),
         handler='periodic.dispatch',
-        runtime='python2.7',
+        runtime=config['runtime'],
         memory_size=config['memory'],
         timeout=config['timeout'],
         role=config['role'],
         subnets=config['subnets'],
         security_groups=config['security_groups'],
+        dead_letter_config=config.get('dead_letter_config', {}),
         events=[
             CloudWatchEventSource(
                 {'type': 'periodic',
-                 'schedule': 'rate(5 minutes)'},
+                 'schedule': config.get('lambda_schedule', 'rate(5 minutes)')},
                 session_factory,
                 prefix="")
         ])

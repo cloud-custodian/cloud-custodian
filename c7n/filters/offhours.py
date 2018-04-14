@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ Features
 - Can be combined with other filters to get a particular set (
   resources with tag, vpc, etc).
 - Can be combined with arbitrary actions
+- Can omit a set of dates such as public holidays.
 
 Policy Configuration
 ====================
@@ -50,6 +51,10 @@ different policy, they support the same configuration options:
    the policy.
  - **onhour**: the default time to start/run resources, specified as 0-23
  - **offhour**: the default time to stop/suspend resources, specified as 0-23
+ - **skip-days**: a list of dates to skip. Dates must use format YYYY-MM-DD
+ - **skip-days-from**: a list of dates to skip stored at a url. **expr**,
+   **format**, and **url** must be passed as parameters. Same syntax as
+   ``value_from``. Can not specify both **skip-days-from** and **skip-days**.
 
 This example policy overrides most of the defaults for an offhour policy:
 
@@ -201,6 +206,32 @@ above. The best current workaround is to define a separate policy with a unique
 resources with that tag name and a value of ``on``. Note that this can only be
 used in opt-in mode, not opt-out.
 
+Public Holidays
+===============
+
+In order to properly implement support for public holidays, make sure to include
+either **skip-days** or **skip-days-from** with your policy. This list
+should contain all of the public holidays you wish to address and must use
+YYYY-MM-DD syntax for its dates. If the date the policy is being run on matches
+any one of those dates, the policy will not return any resources. These dates
+include year as many holidays vary from year to year so year is required to prevent
+errors. A sample policy that would not start stopped instances on a public holiday
+might look like:
+
+.. code-block:: yaml
+
+    policies:
+        - name: onhour-morning-start-skip-holidays
+          resource: ec2
+          filters:
+            - type: onhour
+              tag: custodian_downtime
+              default_tz: et
+              onhour: 6
+              skip-days: ['2017-12-25']
+          actions:
+            - start
+
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -213,6 +244,7 @@ from dateutil import zoneinfo
 
 from c7n.filters import Filter, FilterValidationError
 from c7n.utils import type_schema, dumps
+from c7n.resolver import ValuesFrom
 
 log = logging.getLogger('custodian.offhours')
 
@@ -235,6 +267,9 @@ class Time(Filter):
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
             'opt-out': {'type': 'boolean'},
+            'skip-days': {'type': 'array', 'items':
+                {'type': 'string', 'pattern': '^[0-9]{4}-[0-9]{2}-[0-9]{2}'}},
+            'skip-days-from': ValuesFrom.schema,
         }
     }
 
@@ -248,6 +283,8 @@ class Time(Filter):
         'pdt': 'America/Los_Angeles',
         'pt': 'America/Los_Angeles',
         'pst': 'America/Los_Angeles',
+        'ast': 'America/Phoenix',
+        'at': 'America/Phoenix',
         'est': 'America/New_York',
         'edt': 'America/New_York',
         'et': 'America/New_York',
@@ -294,6 +331,9 @@ class Time(Filter):
         hour = self.data.get("%shour" % self.time_type, self.DEFAULT_HR)
         if hour not in self.parser.VALID_HOURS:
             raise FilterValidationError("Invalid hour specified %s" % hour)
+        if 'skip-days' in self.data and 'skip-days-from' in self.data:
+            raise FilterValidationError(
+                "Cannot specify two sets of skip days %s" % self.data)
         return self
 
     def process(self, resources, event=None):
@@ -336,7 +376,7 @@ class Time(Filter):
 
         try:
             return self.process_resource_schedule(i, value, self.time_type)
-        except:
+        except Exception:
             log.exception(
                 "%s failed to process resource:%s value:%s",
                 self.__class__.__name__, i[self.id_key], value)
@@ -374,6 +414,14 @@ class Time(Filter):
             return False
         now = datetime.datetime.now(tz).replace(
             minute=0, second=0, microsecond=0)
+        now_str = now.strftime("%Y-%m-%d")
+        if 'skip-days-from' in self.data:
+            values = ValuesFrom(self.data['skip-days-from'], self.manager)
+            self.skip_days = values.get_values()
+        else:
+            self.skip_days = self.data.get('skip-days', [])
+        if now_str in self.skip_days:
+            return False
         return self.match(now, schedule)
 
     def match(self, now, schedule):
@@ -425,9 +473,9 @@ class OffHour(Time):
         if self.weekends_only:
             default[self.time_type][0]['days'] = [4]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -448,9 +496,9 @@ class OnHour(Time):
             # turn on monday
             default[self.time_type][0]['days'] = [0]
         elif self.weekends:
-            default[self.time_type][0]['days'] = range(5)
+            default[self.time_type][0]['days'] = tuple(range(5))
         else:
-            default[self.time_type][0]['days'] = range(7)
+            default[self.time_type][0]['days'] = tuple(range(7))
         return default
 
 
@@ -602,5 +650,5 @@ class ScheduleParser(object):
             return None
         # support wrap around days aka friday-monday = 4,5,6,0
         if day_range[0] > day_range[1]:
-            return range(day_range[0], 7) + range(day_range[1] + 1)
-        return range(min(day_range), max(day_range) + 1)
+            return list(range(day_range[0], 7)) + list(range(day_range[1] + 1))
+        return list(range(min(day_range), max(day_range) + 1))

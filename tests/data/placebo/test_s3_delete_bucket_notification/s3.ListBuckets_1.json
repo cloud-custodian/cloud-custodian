@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "Owner": {
+            "DisplayName": "xxx",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        },
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 2,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 40,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 15,
+                    "minute": 5
+                },
+                "Name": "custodian-delete-bucket-notification-test"
+            },
+            {
+                "CreationDate": {
+                    "hour": 20,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 52,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 15,
+                    "minute": 2
+                },
+                "Name": "cskunk-empty"
+            },
+            {
+                "CreationDate": {
+                    "hour": 13,
+                    "__class__": "datetime",
+                    "month": 9,
+                    "second": 42,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 14,
+                    "minute": 54
+                },
+                "Name": "kit-test-bucket"
+            }
+        ],
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0,
+            "HostId": "7woS1c/cLRL1AA048ZfaGd3GiizHzA4U94DcorNeE/r51WamQY7BM74NLSkuJKZLinXrwp6jX+w=",
+            "RequestId": "BEFE67EDC12B3F74",
+            "HTTPHeaders": {
+                "x-amz-id-2": "7woS1c/cLRL1AA048ZfaGd3GiizHzA4U94DcorNeE/r51WamQY7BM74NLSkuJKZLinXrwp6jX+w=",
+                "server": "AmazonS3",
+                "transfer-encoding": "chunked",
+                "x-amz-request-id": "BEFE67EDC12B3F74",
+                "date": "Fri, 15 Sep 2017 20:11:08 GMT",
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

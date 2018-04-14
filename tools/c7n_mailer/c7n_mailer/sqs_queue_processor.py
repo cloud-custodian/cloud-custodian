@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,13 @@ import zlib
 
 import six
 
-from email_delivery import EmailDelivery
-from sns_delivery import SnsDelivery
+from .email_delivery import EmailDelivery
+from .sns_delivery import SnsDelivery
+try:
+    from .datadog_delivery import DataDogDelivery
+    HAVE_DATADOG = True
+except ImportError:
+    HAVE_DATADOG = False
 
 DATA_MESSAGE = "maidmsg/1.0"
 
@@ -45,12 +50,7 @@ class MailerSqsQueueIterator(object):
     def __iter__(self):
         return self
 
-    def ack(self, m):
-        self.aws_sqs.delete_message(
-            QueueUrl=self.queue_url,
-            ReceiptHandle=m['ReceiptHandle'])
-
-    def next(self):
+    def __next__(self):
         if self.messages:
             return self.messages.pop(0)
         response = self.aws_sqs.receive_message(
@@ -66,6 +66,13 @@ class MailerSqsQueueIterator(object):
         if self.messages:
             return self.messages.pop(0)
         raise StopIteration()
+
+    next = __next__  # python2.7
+
+    def ack(self, m):
+        self.aws_sqs.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=m['ReceiptHandle'])
 
 
 class MailerSqsQueueProcessor(object):
@@ -100,6 +107,7 @@ class MailerSqsQueueProcessor(object):
         self.logger.info("Downloading messages from the SQS queue.")
         aws_sqs = self.session.client('sqs')
         sqs_messages = MailerSqsQueueIterator(aws_sqs, self.receive_queue, self.logger)
+
         sqs_messages.msg_attributes = ['mtype', 'recipient']
         # lambda doesn't support multiprocessing, so we don't instantiate any mp stuff
         # unless it's being run from CLI on a normal system with SHM
@@ -114,7 +122,7 @@ class MailerSqsQueueProcessor(object):
             if msg_kind:
                 msg_kind = msg_kind['StringValue']
             if not msg_kind == DATA_MESSAGE:
-                warning_msg = 'Unknown sqs_message format %s' % (sqs_message['Body'][:50])
+                warning_msg = 'Unknown sqs_message or sns format %s' % (sqs_message['Body'][:50])
                 self.logger.warning(warning_msg)
             if parallel:
                 process_pool.apply_async(self.process_sqs_messsage, args=sqs_message)
@@ -133,14 +141,19 @@ class MailerSqsQueueProcessor(object):
     # in the ldap_uid_tags section of your mailer.yml, we'll do a lookup of those emails
     # (and their manager if that option is on) and also send emails there.
     def process_sqs_messsage(self, encoded_sqs_message):
-        sqs_message = json.loads(zlib.decompress(base64.b64decode(encoded_sqs_message['Body'])))
+        body = encoded_sqs_message['Body']
+        try:
+            body = json.dumps(json.loads(body)['Message'])
+        except ValueError:
+            pass
+        sqs_message = json.loads(zlib.decompress(base64.b64decode(body)))
         self.logger.debug("Got account:%s message:%s %s:%d policy:%s recipients:%s" % (
             sqs_message.get('account', 'na'),
             encoded_sqs_message['MessageId'],
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name'],
-            ', '.join(sqs_message['action']['to'])))
+            ', '.join(sqs_message['action'].get('to', 'datadog'))))
 
         # get the map of email_to_addresses to mimetext messages (with resources baked in)
         # and send any emails (to SES or SMTP) if there are email addresses found
@@ -154,3 +167,10 @@ class MailerSqsQueueProcessor(object):
         sns_delivery = SnsDelivery(self.config, self.session, self.logger)
         sns_message_packages = sns_delivery.get_sns_message_packages(sqs_message)
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
+
+        # this section gets the map of metrics to send to datadog and delivers it
+        if HAVE_DATADOG:
+            datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+            datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
+            datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
+

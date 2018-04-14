@@ -1,36 +1,36 @@
 {
     "status_code": 200,
     "data": {
+        "ResponseMetadata": {
+            "RequestId": "0c3ef3bc-2525-11e8-b2ae-ad0f52fb277e",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sun, 11 Mar 2018 12:09:28 GMT",
+                "content-type": "application/json",
+                "content-length": "620",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "0c3ef3bc-2525-11e8-b2ae-ad0f52fb277e"
+            },
+            "RetryAttempts": 0
+        },
         "Functions": [
             {
+                "FunctionName": "CloudCustodian",
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:CloudCustodian",
+                "Runtime": "go1.x",
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
+                "Handler": "hello",
+                "CodeSize": 1395524,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2018-03-11T11:31:11.206+0000",
+                "CodeSha256": "k1Tv8J0D/hD4MBVvk0xbwJHIrmd/AKjzJ4E2xVjMfdc=",
+                "Version": "$LATEST",
                 "TracingConfig": {
                     "Mode": "PassThrough"
-                },
-                "Version": "$LATEST",
-                "CodeSha256": "SKy82bJowuBMtGgs+XiGqBQN5gdmNq7ufQH+f6x07Xw=",
-                "FunctionName": "CloudCustodian",
-                "MemorySize": 128,
-                "CodeSize": 214,
-                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:CloudCustodian",
-                "Handler": "lambda_function.lambda_handler",
-                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
-                "Timeout": 3,
-                "LastModified": "2017-04-22T03:18:32.282+0000",
-                "Runtime": "python3.6",
-                "Description": ""
+                }
             }
-        ],
-        "ResponseMetadata": {
-            "RetryAttempts": 0,
-            "HTTPStatusCode": 200,
-            "RequestId": "3be1bc28-2717-11e7-803e-0144d903488f",
-            "HTTPHeaders": {
-                "date": "Sat, 22 Apr 2017 04:50:39 GMT",
-                "x-amzn-requestid": "3be1bc28-2717-11e7-803e-0144d903488f",
-                "content-length": "7237",
-                "content-type": "application/json",
-                "connection": "keep-alive"
-            }
-        }
+        ]
     }
 }

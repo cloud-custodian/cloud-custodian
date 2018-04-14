@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "repositories": [
+            {
+                "registryId": "644160558196", 
+                "repositoryName": "test-ecr-no-policy", 
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/test-ecr-no-policy", 
+                "createdAt": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 0
+                }, 
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/test-ecr-no-policy"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "395eb4eb-92ea-11e7-b23d-9f149cf136f1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "395eb4eb-92ea-11e7-b23d-9f149cf136f1", 
+                "content-length": "277", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 06 Sep 2017 10:00:34 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

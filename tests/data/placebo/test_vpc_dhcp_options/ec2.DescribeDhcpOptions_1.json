@@ -1,0 +1,84 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DhcpOptions": [
+            {
+                "Tags": [
+                    {
+                        "Value": "AmazonDefault", 
+                        "Key": "Name"
+                    }
+                ], 
+                "DhcpConfigurations": [
+                    {
+                        "Values": [
+                            {
+                                "Value": "ec2.internal"
+                            }
+                        ], 
+                        "Key": "domain-name"
+                    }, 
+                    {
+                        "Values": [
+                            {
+                                "Value": "AmazonProvidedDNS"
+                            }
+                        ], 
+                        "Key": "domain-name-servers"
+                    }
+                ], 
+                "DhcpOptionsId": "dopt-24ff1940"
+            }, 
+            {
+                "Tags": [
+                    {
+                        "Value": "DhcpOptionsTest", 
+                        "Key": "Name"
+                    }
+                ], 
+                "DhcpConfigurations": [
+                    {
+                        "Values": [
+                            {
+                                "Value": "c7n.internal"
+                            }
+                        ], 
+                        "Key": "domain-name"
+                    }, 
+                    {
+                        "Values": [
+                            {
+                                "Value": "10.0.0.1"
+                            }
+                        ], 
+                        "Key": "domain-name-servers"
+                    }, 
+                    {
+                        "Values": [
+                            {
+                                "Value": "128.138.140.44"
+                            }, 
+                            {
+                                "Value": "128.138.141.172"
+                            }
+                        ], 
+                        "Key": "ntp-servers"
+                    }
+                ], 
+                "DhcpOptionsId": "dopt-4d4c3035"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4a0633bd-d841-463c-ada8-b06b119adeef", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 20 Mar 2018 03:03:59 GMT"
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,10 +27,12 @@ import time
 import six
 import yaml
 
+from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.reports import report as do_report
-from c7n.utils import Bag, dumps, load_file
-from c7n.manager import resources
+from c7n.utils import dumps, load_file
+from c7n.config import Bag, Config
+from c7n import provider
 from c7n.resources import load_resources
 from c7n import schema
 
@@ -49,7 +51,7 @@ def policy_command(f):
         all_policies = PolicyCollection.from_data({}, options)
 
         # for a default region for policy loading, we'll expand regions later.
-        options.region = options.regions[0]
+        options.region = ""
 
         for fp in options.configs:
             try:
@@ -80,8 +82,18 @@ def policy_command(f):
             getattr(options, 'policy_filter', None),
             getattr(options, 'resource_type', None))
 
-        # expand by region, this results in a separate policy instance per region of execution.
-        policies = policies.expand_regions(options.regions)
+        # provider initialization
+        provider_policies = {}
+        for p in policies:
+            provider_policies.setdefault(p.provider_name, []).append(p)
+
+        policies = PolicyCollection.from_data({}, options)
+        for provider_name in provider_policies:
+            provider = clouds[provider_name]()
+            p_options = provider.initialize(options)
+            policies += provider.initialize_policies(
+                PolicyCollection(provider_policies[provider_name], p_options),
+                p_options)
 
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
@@ -150,21 +162,26 @@ def validate(options):
     used_policy_names = set()
     schm = schema.generate()
     errors = []
+
     for config_file in options.configs:
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
             raise ValueError("Invalid path for config %r" % config_file)
 
         options.dryrun = True
-        format = config_file.rsplit('.', 1)[-1]
+        fmt = config_file.rsplit('.', 1)[-1]
         with open(config_file) as fh:
-            if format in ('yml', 'yaml'):
+            if fmt in ('yml', 'yaml'):
                 data = yaml.safe_load(fh.read())
-            if format in ('json',):
+            elif fmt in ('json',):
                 data = json.load(fh)
+            else:
+                log.error("The config file must end in .json, .yml or .yaml.")
+                raise ValueError("The config file must end in .json, .yml or .yaml.")
 
         errors += schema.validate(data, schm)
-        conf_policy_names = {p['name'] for p in data.get('policies', ())}
+        conf_policy_names = {
+            p.get('name', 'unknown') for p in data.get('policies', ())}
         dupes = conf_policy_names.intersection(used_policy_names)
         if len(dupes) >= 1:
             errors.append(ValueError(
@@ -174,11 +191,11 @@ def validate(options):
             ))
         used_policy_names = used_policy_names.union(conf_policy_names)
         if not errors:
-            null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
+            null_config = Config.empty(dryrun=True, account_id='na', region='na')
             for p in data.get('policies', ()):
                 try:
-                    p = Policy(p, null_config, Bag())
-                    p.validate()
+                    policy = Policy(p, null_config, Bag())
+                    policy.validate()
                 except Exception as e:
                     msg = "Policy: %s is invalid: %s" % (
                         p.get('name', 'unknown'), e)
@@ -192,7 +209,6 @@ def validate(options):
             log.error("%s" % e)
     if errors:
         sys.exit(1)
-
 
 # This subcommand is disabled in cli.py.
 # Commmeting it out for coverage purposes.
@@ -275,14 +291,23 @@ def schema_completer(prefix):
     load_resources()
     components = prefix.split('.')
 
+    if components[0] in provider.clouds.keys():
+        cloud_provider = components.pop(0)
+        provider_resources = provider.resources(cloud_provider)
+    else:
+        cloud_provider = 'aws'
+        provider_resources = provider.resources('aws')
+        components[0] = "aws.%s" % components[0]
+
     # Completions for resource
     if len(components) == 1:
-        choices = [r for r in resources.keys() if r.startswith(prefix)]
+        choices = [r for r in provider.resources().keys()
+                   if r.startswith(components[0])]
         if len(choices) == 1:
             choices += ['{}{}'.format(choices[0], '.')]
         return choices
 
-    if components[0] not in resources.keys():
+    if components[0] not in provider_resources.keys():
         return []
 
     # Completions for category
@@ -295,7 +320,7 @@ def schema_completer(prefix):
 
     # Completions for item
     elif len(components) == 3:
-        resource_mapping = schema.resource_vocabulary()
+        resource_mapping = schema.resource_vocabulary(cloud_provider)
         return ['{}.{}.{}'.format(components[0], components[1], x)
                 for x in resource_mapping[components[0]][components[1]]]
 
@@ -310,7 +335,6 @@ def schema_cmd(options):
 
     load_resources()
     resource_mapping = schema.resource_vocabulary()
-
     if options.summary:
         schema.summary(resource_mapping)
         return
@@ -330,13 +354,21 @@ def schema_cmd(options):
     #   - Show class doc string and schema for supplied filter
 
     if not options.resource:
-        resource_list = {'resources': sorted(resources.keys())}
+        resource_list = {'resources': sorted(provider.resources().keys())}
         print(yaml.safe_dump(resource_list, default_flow_style=False))
         return
 
-    # Format is RESOURCE.CATEGORY.ITEM
+    # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
+    # optional provider defaults to aws for compatibility
     components = options.resource.split('.')
-
+    if components[0] in provider.clouds.keys():
+        cloud_provider = components.pop(0)
+        resource_mapping = schema.resource_vocabulary(
+            cloud_provider)
+        components[0] = '%s.%s' % (cloud_provider, components[0])
+    else:
+        resource_mapping = schema.resource_vocabulary('aws')
+        components[0] = 'aws.%s' % components[0]
     #
     # Handle resource
     #
@@ -446,7 +478,7 @@ def version_cmd(options):
     # os.uname is only available on recent versions of Unix
     try:
         print("Platform:   ", os.uname())
-    except:  # pragma: no cover
+    except Exception:  # pragma: no cover
         print("Platform:  ", sys.platform)
     print("Using venv: ", hasattr(sys, 'real_prefix'))
     print("PYTHONPATH: ")

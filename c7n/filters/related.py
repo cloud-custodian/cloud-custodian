@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,8 +86,9 @@ class RelatedResourceFilter(ValueFilter):
             if self.match(robj):
                 found.append(rid)
 
-        if self.AnnotationKey is not None:
-            resource['c7n:%s' % self.AnnotationKey] = found
+        if self.AnnotationKey is not None and found:
+            akey = 'c7n:%s' % self.AnnotationKey
+            resource[akey] = list(set(found).union(resource.get(akey, [])))
 
         if op == 'or' and found:
             return True

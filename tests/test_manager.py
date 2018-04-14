@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.ctx import ExecutionContext
 from c7n.resources.ec2 import EC2
 from c7n.tags import Tag
-from .common import BaseTest, instance, Bag, Config
+from .common import BaseTest, instance, Bag, TestConfig as Config
 
 
 class TestEC2Manager(BaseTest):

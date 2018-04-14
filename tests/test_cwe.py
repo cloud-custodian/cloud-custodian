@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,30 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import jmespath
 from unittest import TestCase
 
-from .common import event_data
+from .common import event_data, BaseTest, TestConfig as Config
 
 from c7n.cwe import CloudWatchEvents
+
+
+class CloudWatchRuleTarget(BaseTest):
+
+
+    def test_target_cross_account_remove(self):
+        session_factory = self.replay_flight_data(
+            'test_cwe_rule_target_cross')
+        client = session_factory().client('events')
+        policy = self.load_policy({
+            'name': 'cwe-cross-account',
+            'resource': 'event-rule-target',
+            'filters': [{'type': 'cross-account'}],
+            'actions': ['delete']},
+            config=Config.empty(),
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        targets = client.list_targets_by_rule(
+            Rule=resources[0]['c7n:parent-id']).get('Targets')
+        self.assertEqual(targets, [])
 
 
 class CloudWatchEventsFacadeTest(TestCase):

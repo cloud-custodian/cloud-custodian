@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 import json
+import mock
 import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
+from c7n.query import ConfigSource
 
-from .common import BaseTest, Config, Bag
+from .common import BaseTest, event_data, Bag, TestConfig as Config
 
 
 class DummyResource(manager.ResourceManager):
@@ -87,6 +90,68 @@ class PolicyPermissions(BaseTest):
                  'ec2:DescribeTags',
                  'cloudwatch:GetMetricStatistics')))
 
+    def xtest_resource_filter_name(self):
+        # resources without a filter name won't play nice in
+        # lambda policies
+        missing = []
+        marker = object
+        for k, v in manager.resources.items():
+            if getattr(v.resource_type, 'filter_name', marker) is marker:
+                missing.append(k)
+        if missing:
+            self.fail("Missing filter name %s" % (', '.join(missing)))
+
+    def test_resource_augment_universal_mask(self):
+        # universal tag had a potential bad patterm of masking
+        # resource augmentation, scan resources to ensure
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'universal_taggable', None):
+                continue
+            if v.augment.__name__ == 'universal_augment' and getattr(
+                    v.resource_type, 'detail_spec', None):
+                self.fail(
+                    "%s resource has universal augment masking resource augment" % k)
+
+    def test_resource_shadow_source_augment(self):
+        shadowed = []
+        bad = []
+        cfg = Config.empty()
+
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'config_type', None):
+                continue
+
+            p = Bag({'name': 'permcheck', 'resource': k})
+            ctx = self.get_context(config=cfg, policy=p)
+            mgr = v(ctx, p)
+
+            source = mgr.get_source('config')
+            if not isinstance(source, ConfigSource):
+                bad.append(k)
+
+            if v.__dict__.get('augment'):
+                shadowed.append(k)
+
+        if shadowed:
+            self.fail(
+                "%s have resource managers shadowing source augments" % (
+                    ", ".join(shadowed)))
+
+        if bad:
+            self.fail(
+                "%s have config types but no config source" % (
+                    ", ".join(bad)))
+
+    def test_resource_name(self):
+        names = []
+        for k, v in manager.resources.items():
+            if not getattr(v.resource_type, 'name', None):
+                names.append(k)
+        if names:
+            self.fail(
+                '%s dont have resource name for reporting' % (
+                    ", ".join(names)))
+
     def test_resource_permissions(self):
         self.capture_logging('c7n.cache')
         missing = []
@@ -128,12 +193,15 @@ class PolicyPermissions(BaseTest):
                          'capacity-delta', 'is-ssl', 'global-grants',
                          'missing-policy-statement', 'missing-statement',
                          'healthcheck-protocol-mismatch', 'image-age',
-                         'has-statement',
+                         'has-statement', 'no-access',
                          'instance-age', 'ephemeral', 'instance-uptime'):
                     continue
+                qk = "%s.filters.%s" % (k, n)
+                if qk in ('route-table.filters.route',):
+                    continue
                 if not perms:
-                    missing.append("%s.filters.%s" % (
-                        k, n))
+                    missing.append(qk)
+
         if missing:
             self.fail("Missing permissions %d on \n\t%s" % (
                 len(missing),
@@ -150,7 +218,7 @@ class TestPolicyCollection(BaseTest):
                 {'name': 'foo',
                  'resource': 'ec2'}]},
             cfg)
-        collection = original.expand_regions(cfg.regions)
+        collection = AWS().initialize_policies(original, cfg)
         self.assertEqual(
             sorted([p.options.region for p in collection]),
             ['cn-north-1', 'us-gov-west-1', 'us-west-2'])
@@ -162,7 +230,8 @@ class TestPolicyCollection(BaseTest):
                  'resource': 'account'}]},
             Config.empty(regions=['us-east-1', 'us-west-2']))
 
-        collection = original.expand_regions(['all'])
+        collection = AWS().initialize_policies(
+            original, Config.empty(regions=['all']))
         self.assertEqual(len(collection), 1)
 
     def test_policy_region_expand_global(self):
@@ -174,14 +243,18 @@ class TestPolicyCollection(BaseTest):
                  'resource': 'iam-user'}]},
             Config.empty(regions=['us-east-1', 'us-west-2']))
 
-        collection = original.expand_regions(['all'])
+        collection = AWS().initialize_policies(
+            original, Config.empty(regions=['all']))
         self.assertEqual(len(collection.resource_types), 2)
-        self.assertEqual(len(collection), 15)        
+        s3_regions = [p.options.region for p in collection if p.resource_type == 's3']
+        self.assertTrue('us-east-1' in s3_regions)
+        self.assertTrue('us-east-2' in s3_regions)
         iam = [p for p in collection if p.resource_type == 'iam-user']
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, 'us-east-1')
 
-        collection = original.expand_regions(['eu-west-1', 'eu-west-2'])
+        collection = AWS().initialize_policies(
+            original, Config.empty(regions=['eu-west-1', 'eu-west-2']))
         iam = [p for p in collection if p.resource_type == 'iam-user']
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, 'eu-west-1')
@@ -189,6 +262,19 @@ class TestPolicyCollection(BaseTest):
 
 
 class TestPolicy(BaseTest):
+
+    def test_child_resource_trail_validation(self):
+        self.assertRaises(
+            ValueError,
+            self.load_policy,
+            {'name': 'api-resources',
+             'resource': 'rest-resource',
+             'mode': {
+                 'type': 'cloudtrail',
+                 'events': [
+                     {'source': 'apigateway.amazonaws.com',
+                      'event': 'UpdateResource',
+                      'ids': 'requestParameter.stageName'}]}})
 
     def test_load_policy_validation_error(self):
         invalid_policies = {
@@ -202,7 +288,6 @@ class TestPolicy(BaseTest):
             }]
         }
         self.assertRaises(Exception, self.load_policy_set, invalid_policies)
-
 
     def test_policy_validation(self):
         policy = self.load_policy({
@@ -444,3 +529,89 @@ class PullModeTest(BaseTest):
         self.assertIn(
             "Skipping policy {} target-region: us-east-1 current-region: us-west-2".format(policy_name),
             lines)
+
+
+class GuardModeTest(BaseTest):
+
+    def test_unsupported_resource(self):
+        self.assertRaises(
+            ValueError,
+            self.load_policy,
+            {'name': 'vpc',
+             'resource': 'vpc',
+             'mode': {'type': 'guard-duty'}},
+            validate=True)
+
+    @mock.patch('c7n.mu.LambdaManager.publish')
+    def test_ec2_guard_event_pattern(self, publish):
+
+        def assert_publish(policy_lambda, alias, role):
+            events = policy_lambda.get_events(mock.MagicMock())
+            self.assertEqual(len(events), 1)
+            pattern = json.loads(events[0].render_event_pattern())
+            expected = {"source": ["aws.guardduty"],
+                "detail": {"resource": {"resourceType": ["Instance"]}},
+                "detail-type": ["GuardDuty Finding"]}
+            self.assertEqual(pattern, expected)
+
+        publish.side_effect = assert_publish
+        p = self.load_policy(
+            {'name': 'ec2-instance-guard',
+             'resource': 'ec2',
+             'mode': {'type': 'guard-duty'}})
+        p.run()
+
+    @mock.patch('c7n.mu.LambdaManager.publish')
+    def test_iam_guard_event_pattern(self, publish):
+
+        def assert_publish(policy_lambda, alias, role):
+            events = policy_lambda.get_events(mock.MagicMock())
+            self.assertEqual(len(events), 1)
+            pattern = json.loads(events[0].render_event_pattern())
+            expected = {"source": ["aws.guardduty"],
+                "detail": {"resource": {"resourceType": ["AccessKey"]}},
+                "detail-type": ["GuardDuty Finding"]}
+            self.assertEqual(pattern, expected)
+
+        publish.side_effect = assert_publish
+        p = self.load_policy(
+            {'name': 'iam-user-guard',
+             'resource': 'iam-user',
+             'mode': {'type': 'guard-duty'}})
+        p.run()
+
+    @mock.patch('c7n.query.QueryResourceManager.get_resources')
+    def test_ec2_instance_guard(self, get_resources):
+
+        def instances(ids, cache=False):
+            return [{'InstanceId': ids[0]}]
+
+        get_resources.side_effect = instances
+
+        p = self.load_policy(
+            {'name': 'ec2-instance-guard',
+             'resource': 'ec2',
+             'mode': {'type': 'guard-duty'}})
+
+        event = event_data('ec2-duty-event.json')
+        results = p.push(event, None)
+        self.assertEqual(results, [{'InstanceId': 'i-99999999'}])
+
+    @mock.patch('c7n.query.QueryResourceManager.get_resources')
+    def test_iam_user_access_key_annotate(self, get_resources):
+
+        def users(ids, cache=False):
+            return [{'UserName': ids[0]}]
+
+        get_resources.side_effect = users
+
+        p = self.load_policy(
+            {'name': 'user-key-guard',
+             'resource': 'iam-user',
+             'mode': {'type': 'guard-duty'}})
+
+        event = event_data('iam-duty-event.json')
+        results = p.push(event, None)
+        self.assertEqual(results, [{
+            u'UserName': u'GeneratedFindingUserName',
+            u'c7n:AccessKeys': {u'AccessKeyId': u'GeneratedFindingAccessKeyId'}}])

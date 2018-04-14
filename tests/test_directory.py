@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,3 +56,38 @@ class CloudDirectoryTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class DirectoryTests(BaseTest):
+
+    def test_directory_tag(self):
+        session_factory = self.replay_flight_data('test_directory_tag')
+        client = session_factory().client('ds')
+        p = self.load_policy({
+            'name': 'tag-directory',
+            'resource': 'directory',
+            'filters': [{'tag:RequiredTag': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'key': 'RequiredId',
+                'value': 'RequiredValue'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['DirectoryId'], 'd-90672a7419')
+        tags = client.list_tags_for_resource(ResourceId='d-90672a7419')['Tags']
+        self.assertEqual(tags[0]['Key'], 'RequiredId')
+        self.assertEqual(tags[0]['Value'], 'RequiredValue')
+
+    def test_directory_remove_tag(self):
+        session_factory = self.replay_flight_data('test_directory_remove_tag')
+        client = session_factory().client('ds')
+        p = self.load_policy({
+            'name': 'tag-directory',
+            'resource': 'directory',
+            'filters': [{'tag:RequiredId': 'RequiredValue'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['RequiredId']}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['DirectoryId'], 'd-90672a7419')
+        tags = client.list_tags_for_resource(ResourceId='d-90672a7419')['Tags']
+        self.assertEqual(len(tags), 0)

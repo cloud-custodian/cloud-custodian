@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import unittest
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
 
-from .common import BaseTest, Bag, Config
+from .common import BaseTest, Bag, TestConfig as Config
 
 
 class TestEMR(BaseTest):

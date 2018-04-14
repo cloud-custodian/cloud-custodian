@@ -30,6 +30,7 @@ Query
        'tag-key': str,
        'tag-value': str,
        'tag:': str,
+       'tenancy': ('dedicated', 'default', 'host'),
        'vpc-id': str}
 
 Filters
@@ -88,6 +89,12 @@ Filter by State Transition Filter
   Filter based on the ``AttachTime`` of the EBS Volumes in days
 
   .. c7n-schema:: InstanceAgeFilter
+      :module: c7n.resources.ec2
+
+``termination-protected``
+  Filter based on the ``disableApiTermination`` instance attribute.
+
+  .. c7n-schema:: DisableApiTermination
       :module: c7n.resources.ec2
 
 Actions
@@ -156,3 +163,31 @@ Snapshot
             - type: snapshot
               copy-tags:
                 - Owner
+
+PropagateSpotTags
+  In case the EC2 instance is a Spot Instance, created by a Spot Instance Request,
+  this action will propagate all (or a subset) of the Tags that are attached to the
+  original Spot Instance Request.
+  Spot Instance Request do not propagate their tags to the Spot Instances.
+  (see `Tagging Spot Instance Requests <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-requests.html#concepts-spot-instances-request-tags>`_)
+
+  However, Spot Fleets are said to propagate their Tags. (see `Tag Your Spot Fleet EC2 Instances <https://aws.amazon.com/about-aws/whats-new/2017/07/tag-your-spot-fleet-ec2-instances/>`_)
+
+  .. c7n-schema:: PropagateSpotTags
+      :module: c7n.resources.ec2
+
+  This example will copy the Name and the BillingTag tag values from the Spot Instance Request
+  to the pending EC2 instances (only if they are Spot Instances)
+
+  .. code-block: yaml
+      policies:
+        - name: ec2-spot-instances
+          resource: ec2
+        filters:
+          - State.Name: pending
+          - instanceLifecycle: spot
+        actions:
+          - type: propagate-spot-tags
+            only_tags:
+              - Name
+              - BillingTag

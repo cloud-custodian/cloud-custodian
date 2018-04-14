@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import boto3
 import io
 import json
 import logging
@@ -20,15 +21,19 @@ import os
 import shutil
 import tempfile
 import unittest
+import uuid
+from functools import partial
 
 import six
 import yaml
 
 from c7n import policy
+from c7n.filters import revisions
 from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
 from c7n.utils import CONN_CACHE
+from c7n.config import Bag, Config
 
 from .zpill import PillTest
 
@@ -44,14 +49,21 @@ ACCOUNT_ID = '644160558196'
 C7N_VALIDATE = bool(os.environ.get('C7N_VALIDATE', ''))
 C7N_SCHEMA = generate()
 
-
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason='We are not validating schemas.')
+
+class TestConfig(Config):
+    config_args = {
+        "metrics_enabled": False,
+        "account_id": ACCOUNT_ID,
+        "output_dir": "s3://test-example/foo"
+    }
+
+    empty = staticmethod(partial(Config.empty, **config_args))
 
 # Set this so that if we run nose directly the tests will not fail
 if 'AWS_DEFAULT_REGION' not in os.environ:
     os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
-
 
 
 class BaseTest(PillTest):
@@ -115,9 +127,10 @@ class BaseTest(PillTest):
     def load_policy_set(self, data, config=None):
         filename = self.write_policy_file(data)
         if config:
+            config['account_id'] = ACCOUNT_ID
             e = Config.empty(**config)
         else:
-            e = Config.empty()
+            e = Config.empty(account_id=ACCOUNT_ID)
         return policy.load(e, filename)
 
     def patch(self, obj, attr, new):
@@ -176,6 +189,75 @@ class BaseTest(PillTest):
         return ACCOUNT_ID
 
 
+class ConfigTest(BaseTest):
+    """Test base class for integration tests with aws config.
+
+    To allow for integration testing with config.
+
+     - before creating and modifying use the
+       initialize_config_subscriber method to setup an sqs queue on
+       the config recorder's sns topic. returns the sqs queue url.
+
+     - after creating/modifying a resource, use the wait_for_config
+       with the queue url and the resource id.
+    """
+
+    def wait_for_config(self, session, queue_url, resource_id):
+        # lazy import to avoid circular
+        from c7n.sqsexec import MessageIterator
+        client = session.client('sqs')
+        messages = MessageIterator(client, queue_url, timeout=20)
+        results = []
+        while True:
+            for m in messages:
+                msg = json.loads(m['Body'])
+                change = json.loads(msg['Message'])
+                messages.ack(m)
+                if change['configurationItem']['resourceId'] != resource_id:
+                    continue
+                results.append(change['configurationItem'])
+                break
+            if results:
+                break
+        return results
+
+    def initialize_config_subscriber(self, session):
+        config = session.client('config')
+        sqs = session.client('sqs')
+        sns = session.client('sns')
+
+        channels = config.describe_delivery_channels().get('DeliveryChannels', ())
+        assert channels, "config not enabled"
+
+        topic = channels[0]['snsTopicARN']
+        queue = "custodian-waiter-%s" % str(uuid.uuid4())
+        queue_url = sqs.create_queue(QueueName=queue).get('QueueUrl')
+        self.addCleanup(sqs.delete_queue, QueueUrl=queue_url)
+
+        attrs = sqs.get_queue_attributes(
+            QueueUrl=queue_url, AttributeNames=('Policy', 'QueueArn'))
+        queue_arn = attrs['Attributes']['QueueArn']
+        policy = json.loads(attrs['Attributes'].get(
+            'Policy',
+            '{"Version":"2008-10-17","Id":"%s/SQSDefaultPolicy","Statement":[]}' % queue_arn))
+        policy['Statement'].append({
+            "Sid": "ConfigTopicSubscribe",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "sqs:SendMessage",
+            "Resource": queue_arn,
+            "Condition": {
+                "ArnEquals": {
+                    "aws:SourceArn": topic}}})
+        sqs.set_queue_attributes(
+            QueueUrl=queue_url, Attributes={'Policy': json.dumps(policy)})
+        subscription = sns.subscribe(
+            TopicArn=topic, Protocol='sqs', Endpoint=queue_arn).get(
+                'SubscriptionArn')
+        self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
+        return queue_url
+
+
 class TextTestIO(io.StringIO):
 
     def write(self, b):
@@ -195,10 +277,10 @@ def placebo_dir(name):
         os.path.dirname(__file__), 'data', 'placebo', name)
 
 
-def event_data(name):
+def event_data(name, event_type='cwe'):
     with open(
             os.path.join(
-                os.path.dirname(__file__), 'data', 'cwe', name)) as fh:
+                os.path.dirname(__file__), 'data', event_type, name)) as fh:
         return json.load(fh)
 
 
@@ -216,38 +298,6 @@ def load_data(file_name, state=None, **kw):
 
 def instance(state=None, file='ec2-instance.json', **kw):
     return load_data(file, state, **kw)
-
-
-class Bag(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-
-class Config(Bag):
-
-    @classmethod
-    def empty(cls, **kw):
-        region = os.environ.get('AWS_DEFAULT_REGION', "us-east-1")
-        d = {}
-        d.update({
-            'region': region,
-            'regions': [region],
-            'cache': '',
-            'profile': None,
-            'account_id': ACCOUNT_ID,
-            'assume_role': None,
-            'external_id': None,
-            'log_group': None,
-            'metrics_enabled': False,
-            'output_dir': 's3://test-example/foo',
-            'cache_period': 0,
-            'dryrun': False})
-        d.update(kw)
-        return cls(d)
 
 
 class Instance(Bag):

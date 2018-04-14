@@ -13,9 +13,102 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+import json
+
+from botocore.exceptions import ClientError
+from .common import BaseTest, functional, TestConfig as Config
 from c7n.executor import MainThreadExecutor
-from c7n.resources.awslambda import AWSLambda
+from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
+from c7n.mu import PythonPackageArchive
+
+
+SAMPLE_FUNC = """\
+def handler(event, context):
+    print("hello world")
+"""
+
+
+class LambdaPermissionTest(BaseTest):
+
+    def create_function(self, client, name):
+        archive = PythonPackageArchive()
+        self.addCleanup(archive.remove)
+        archive.add_contents('index.py', SAMPLE_FUNC)
+        archive.close()
+
+        lfunc = client.create_function(
+            FunctionName=name,
+            Runtime="python2.7",
+            MemorySize=128,
+            Handler='index.handler',
+            Publish=True,
+            Role='arn:aws:iam::644160558196:role/lambda_basic_execution',
+            Code={'ZipFile': archive.get_bytes()})
+        self.addCleanup(client.delete_function, FunctionName=name)
+        return lfunc
+
+    @functional
+    def test_lambda_permission_matched(self):
+        factory = self.replay_flight_data('test_lambda_permission_matched')
+        client = factory().client('lambda')
+        name = "func-b"
+
+        self.create_function(client, name)
+        client.add_permission(
+            FunctionName=name,
+            StatementId="PublicInvoke",
+            Principal="*",
+            Action="lambda:InvokeFunction")
+        client.add_permission(
+            FunctionName=name,
+            StatementId="SharedInvoke",
+            Principal="arn:aws:iam::185106417252:root",
+            Action="lambda:InvokeFunction")
+        p = self.load_policy({
+            'name': 'lambda-perms',
+            'resource': 'lambda',
+            'filters': [
+                {'FunctionName': name},
+                {'type': 'cross-account',
+                 'whitelist': ["185106417252"]}],
+            'actions': [{
+                'type': 'remove-statements',
+                'statement_ids': 'matched'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        policy = json.loads(client.get_policy(FunctionName=name).get('Policy'))
+        self.assertEqual(
+            [s['Sid'] for s in policy.get('Statement', ())],
+            ['SharedInvoke'])
+
+    @functional
+    def test_lambda_permission_named(self):
+        factory = self.replay_flight_data('test_lambda_permission_named')
+        client = factory().client('lambda')
+        name = "func-d"
+
+        self.create_function(client, name)
+        client.add_permission(
+            FunctionName=name,
+            StatementId="PublicInvoke",
+            Principal="*",
+            Action="lambda:InvokeFunction")
+
+        p = self.load_policy({
+            'name': 'lambda-perms',
+            'resource': 'lambda',
+            'filters': [{'FunctionName': name}],
+            'actions': [{
+                'type': 'remove-statements',
+                'statement_ids': ['PublicInvoke']}]},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(
+            ClientError, client.get_policy, FunctionName=name)
+
 
 class LambdaTest(BaseTest):
 
@@ -34,6 +127,72 @@ class LambdaTest(BaseTest):
         client = factory().client('lambda')
         self.assertEqual(client.list_functions()['Functions'], [])
 
+    def test_delete_reserved_concurrency(self):
+        self.patch(ReservedConcurrency, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_aws_lambda_delete_concurrency')
+        p = self.load_policy({
+            'name': 'lambda-concurrency',
+            'resource': 'lambda',
+            'filters': [
+                {'FunctionName': 'envcheck'},
+                {'type': 'reserved-concurrency', 'value': 'present'}],
+            'actions': [
+                {'type': 'set-concurrency',
+                 'value': None}],
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'envcheck')
+
+        client = factory().client('lambda')
+        info = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertFalse('Concurrency' in info)
+
+    def test_set_expr_concurrency(self):
+        self.patch(ReservedConcurrency, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_aws_lambda_set_concurrency_expr')
+        p = self.load_policy({
+            'name': 'lambda-concurrency',
+            'resource': 'lambda',
+            'filters': [
+                {'type': 'metrics',
+                 'name': 'Invocations',
+                 'statistics': 'Sum',
+                 'op': 'greater-than',
+                 'value': 0}],
+            'actions': [
+                {'type': 'set-concurrency',
+                 'expr': True,
+                 'value':  "\"c7n.metrics\".\"AWS/Lambda.Invocations.Sum\"[0].Sum"}]
+            }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'envcheck')
+
+        client = factory().client('lambda')
+        info = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(info['Concurrency']['ReservedConcurrentExecutions'], 5)
+
+    def test_set_filter_concurrency(self):
+        self.patch(ReservedConcurrency, 'executor_factory', MainThreadExecutor)
+        factory = self.replay_flight_data('test_aws_lambda_set_concurrency')
+        p = self.load_policy({
+            'name': 'lambda-concurrency',
+            'resource': 'lambda',
+            'filters': [
+                {'type': 'reserved-concurrency',
+                 'value': 'absent'}],
+            'actions': [
+                {'type': 'set-concurrency',
+                 'value': 10}]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'envcheck')
+
+        client = factory().client('lambda')
+        info = client.get_function(FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(info['Concurrency']['ReservedConcurrentExecutions'], 10)
+                 
     def test_event_source(self):
         factory = self.replay_flight_data('test_aws_lambda_source')
         p = self.load_policy({
@@ -115,9 +274,11 @@ class LambdaTagTest(BaseTest):
             'name': 'lambda-mark',
             'resource': 'lambda',
             'filters': [{"tag:Language": "Python"}]},
+            config=Config.empty(),
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'CloudCustodian')
 
     def test_mark_and_match(self):
         session_factory = self.replay_flight_data(
@@ -130,6 +291,7 @@ class LambdaTagTest(BaseTest):
             'actions': [{
                 'type': 'mark-for-op', 'op': 'delete',
                 'tag': 'custodian_next', 'days': 1}]},
+            config=Config.empty(),
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -143,6 +305,7 @@ class LambdaTagTest(BaseTest):
             'filters': [
                 {'type': 'marked-for-op', 'tag': 'custodian_next',
                  'op': 'delete'}]},
+            config=Config.empty(),
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)

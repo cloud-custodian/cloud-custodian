@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ Authentication utilities
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
+
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
 from boto3 import Session
@@ -31,12 +33,16 @@ class SessionFactory(object):
         self.profile = profile
         self.assume_role = assume_role
         self.external_id = external_id
+        self.session_name = "CloudCustodian"
+        if 'C7N_SESSION_SUFFIX' in os.environ:
+            self.session_name = "%s@%s" % (
+                self.session_name, os.environ['C7N_SESSION_SUFFIX'])
 
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
-                self.assume_role, "CloudCustodian", session,
+                self.assume_role, self.session_name, session,
                 region or self.region, self.external_id)
         else:
             session = Session(

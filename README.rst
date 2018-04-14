@@ -59,14 +59,15 @@ Features
 - Battle-tested - in production on some very large AWS accounts.
 - Supports cross-account usage via STS role assumption.
 - Supports integration with custom/user supplied lambdas as actions.
+- Supports both Python 2.7 and Python 3.6 (beta) lambda runtimes
 
 
 Links
 #####
 
 - `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
-- `Docs <http://www.capitalone.io/cloud-custodian/docs/>`_
-- `Developer Install <http://www.capitalone.io/cloud-custodian/docs/developer/installing.html>`_
+- `Docs <http://capitalone.github.io/cloud-custodian/docs/>`_
+- `Developer Install <http://capitalone.github.io/cloud-custodian/docs/developer/installing.html>`_
 
 
 Quick Install
@@ -200,5 +201,5 @@ impact Your rights to use Your own Contributions for any other purpose.
 Code of Conduct
 ###############
 
-This project adheres to the `Open Code of Conduct <http://www.capitalone.io/codeofconduct/>`_. By participating, you are
+This project adheres to the `Open Code of Conduct <https://developer.capitalone.com/single/code-of-conduct/>`_. By participating, you are
 expected to honor this code.

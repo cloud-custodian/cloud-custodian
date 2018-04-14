@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from concurrent.futures import as_completed
 
-import csv
 from datetime import datetime
 import gzip
 import io
@@ -59,7 +58,7 @@ from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session, dumps
-
+from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('custodian.reports')
 
@@ -69,7 +68,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
     regions = set([p.options.region for p in policies])
     policy_names = set([p.name for p in policies])
     formatter = Formatter(
-        policies[0].resource_manager,
+        policies[0].resource_manager.resource_type,
         extra_fields=options.field,
         include_default_fields=not options.no_default_fields,
         include_region=len(regions) > 1,
@@ -97,7 +96,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
 
     rows = formatter.to_csv(records)
     if options.format == 'csv':
-        writer = csv.writer(output_fh, formatter.headers())
+        writer = UnicodeWriter(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
     else:
@@ -143,27 +142,25 @@ def _get_values(record, field_list, tag_map):
 
 class Formatter(object):
 
-    def __init__(self, resource_manager, extra_fields=(), include_default_fields=True,
-                 include_region=False, include_policy=False):
+    def __init__(self, resource_type, extra_fields=(), include_default_fields=True,
+                 include_region=False, include_policy=False, fields=()):
 
-        self.resource_manager = resource_manager
         # Lookup default fields for resource type.
-        model = resource_manager.resource_type
+        model = resource_type
         self._id_field = model.id
         self._date_field = getattr(model, 'date', None)
 
+        fields = OrderedDict(fields)
         mfields = getattr(model, 'default_report_fields', None)
         if mfields is None:
             mfields = [model.id]
             if model.name != model.id:
                 mfields.append(model.name)
-            if model.date:
+            if getattr(model, 'date', None):
                 mfields.append(model.date)
 
         if include_default_fields:
-            fields = OrderedDict(zip(mfields, mfields))
-        else:
-            fields = OrderedDict()
+            fields.update(OrderedDict(zip(mfields, mfields)))
 
         for index, field in enumerate(extra_fields):
             # TODO this type coercion should be done at cli input, not here
@@ -198,7 +195,7 @@ class Formatter(object):
                 keys.add(rec_id)
         return uniq
 
-    def to_csv(self, records, reverse=True):
+    def to_csv(self, records, reverse=True, unique=True):
         if not records:
             return []
 
@@ -209,7 +206,10 @@ class Formatter(object):
             records.sort(
                 key=lambda r: r[date_sort], reverse=reverse)
 
-        uniq = self.uniq_by_id(records)
+        if unique:
+            uniq = self.uniq_by_id(records)
+        else:
+            uniq = records
         log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
         rows = list(map(self.extract_csv, uniq))
         return rows

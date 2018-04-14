@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5MJR9UGAJ3Q6LPC36I5GEHQLIJVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5MJR9UGAJ3Q6LPC36I5GEHQLIJVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "27", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "1349982091", 
+                "date": "Thu, 22 Feb 2018 01:58:38 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }, 
+        "TableNames": [
+            "c7n-test"
+        ]
+    }
+}

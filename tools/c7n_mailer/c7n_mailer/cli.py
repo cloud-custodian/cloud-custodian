@@ -5,7 +5,7 @@ import boto3
 import functools
 import jsonschema
 import logging
-import yaml
+from ruamel import yaml
 
 from c7n_mailer import deploy, utils
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
@@ -13,7 +13,7 @@ from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['queue_url', 'role', 'from_address'],
+    'required': ['queue_url', 'role'],
     'properties': {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
@@ -22,10 +22,16 @@ CONFIG_SCHEMA = {
         # Standard Lambda Function Config
         'region': {'type': 'string'},
         'role': {'type': 'string'},
+        'runtime': {'type': 'string'},
         'memory': {'type': 'integer'},
         'timeout': {'type': 'integer'},
         'subnets': {'type': 'array', 'items': {'type': 'string'}},
         'security_groups': {'type': 'array', 'items': {'type': 'string'}},
+        'dead_letter_config': {'type': 'object'},
+        'lambda_name': {'type': 'string'},
+        'lambda_description': {'type': 'string'},
+        'lambda_tags': {'type': 'object'},
+        'lambda_schedule': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
@@ -50,11 +56,16 @@ CONFIG_SCHEMA = {
         'ses_region': {'type': 'string'},
         'redis_host': {'type': 'string'},
         'redis_port': {'type': 'integer'},
+        'datadog_api_key': {'type': 'string'},              #TODO: encrypt with KMS?
+        'datadog_application_key': {'type': 'string'},      #TODO: encrypt with KMS?
 
         # SDK Config
         'profile': {'type': 'string'},
         'http_proxy': {'type': 'string'},
-        'https_proxy': {'type': 'string'}
+        'https_proxy': {'type': 'string'},
+
+        # Mapping account / emails
+        'account_emails': {'type': 'object'}
     }
 }
 

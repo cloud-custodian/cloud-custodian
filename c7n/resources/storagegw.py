@@ -1,4 +1,4 @@
-# Copyright 2017 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ class StorageGateway(QueryResourceManager):
     class resource_type(object):
         service = 'storagegateway'
         enum_spec = ('list_gateways', 'Gateways', None)
-        id = 'GatewayArn'
+        id = 'GatewayARN'
         name = 'GatewayName'
         dimension = None
+        filter_name = None

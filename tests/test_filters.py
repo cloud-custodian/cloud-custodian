@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from dateutil import tz
-
+import calendar
 from datetime import datetime, timedelta
+from dateutil import tz
 import unittest
 
 from c7n import filters as base_filters
@@ -98,7 +98,7 @@ class TestAndFilter(unittest.TestCase):
 
 
 class TestNotFilter(unittest.TestCase):
-    
+
     def test_not(self):
 
         results = [
@@ -112,23 +112,7 @@ class TestNotFilter(unittest.TestCase):
                 {'Architecture': 'x86_64'},
                 {'Color': 'green'}]})
         self.assertEqual(len(f.process(results)), 2)
-        
-        """
-        f = filters.factory({
-            'not': [
-                {'Architecture': 'x86'}]})
-        self.assertEqual(len(f.process(results)), 3)
 
-        f = filters.factory({
-            'not': [
-                {'Architecture': 'x86_64'},
-                {'or': [
-                    {'Color': 'green'},
-                    {'Color': 'blue'},
-                    {'Color': 'yellow'},
-                ]}]})
-        self.assertEqual(len(f.process(results)), 0)
-        """
 
 class TestValueFilter(unittest.TestCase):
 
@@ -154,9 +138,6 @@ class TestValueFilter(unittest.TestCase):
         vf.vtype = 'size'
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (sentinel, 0))
-        vf.vtype = 'age'
-        res = vf.process_value_type(sentinel, value, resource)
-        self.assertEqual(res, (0, sentinel))
         vf.vtype = 'cidr'
         sentinel = '10.0.0.0/16'
         value = '10.10.10.10'
@@ -181,6 +162,11 @@ class TestValueFilter(unittest.TestCase):
         sentinel = None
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (None, 1))
+
+        vf.vtype = 'unique_size'
+        value = [1, 2, 3, 1, 5]
+        res = vf.process_value_type(sentinel, value, resource)
+        self.assertEqual(res, (None, 4))
 
 
 class TestAgeFilter(unittest.TestCase):
@@ -316,6 +302,8 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(one_month), True)
         self.assertFilter(fdata, i(now), True)
         self.assertFilter(fdata, i(now.isoformat()), True)
+        self.assertFilter(fdata, i(now.isoformat()), True)
+        self.assertFilter(fdata, i(calendar.timegm(now.timetuple())), True)
 
     def test_expiration(self):
 
@@ -752,6 +740,63 @@ class TestNotInList(unittest.TestCase):
         self.assertEqual(
             f(instance(Thing='Foo')),
             False)
+
+
+class TestContains(unittest.TestCase):
+
+    def test_contains(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Thing',
+                'value': 'D',
+                'op': 'contains'
+            })
+        self.assertEqual(
+            f(instance(Thing=['A', 'B', 'C'])),
+            False)
+        self.assertEqual(
+            f(instance(Thing=['D', 'E', 'F'])),
+            True)
+
+
+class TestDifference(unittest.TestCase):
+
+    def test_difference(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Thing',
+                'value': ['A','B','C'],
+                'op': 'difference'
+            })
+        self.assertEqual(
+            f(instance(Thing=['A', 'B', 'C'])),
+            False)
+        self.assertEqual(
+            f(instance(Thing=['D', 'E', 'F'])),
+            True)
+        self.assertEqual(
+            f(instance(Thing=['A', 'B', 'D'])),
+            True)
+
+
+class TestIntersect(unittest.TestCase):
+
+    def test_intersect(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Thing',
+                'value': ['A','B','C'],
+                'op': 'intersect'
+            })
+        self.assertEqual(
+            f(instance(Thing=['D', 'E', 'F'])),
+            False)
+        self.assertEqual(
+            f(instance(Thing=['C', 'D', 'E'])),
+            True)
 
 
 class TestFilterRegistry(unittest.TestCase):

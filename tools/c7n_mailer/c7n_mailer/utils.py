@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,15 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import datetime
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import jinja2
 import json
 import os
-import yaml
+from ruamel import yaml
 
-from io import StringIO
 from dateutil import parser
-from dateutil.tz import gettz
+from dateutil.tz import gettz, tzutc
+from datetime import datetime, timedelta
 
 
 def get_jinja_env():
@@ -27,8 +28,10 @@ def get_jinja_env():
     env.filters['yaml_safe'] = yaml.safe_dump
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
+    env.filters['get_date_age'] = get_date_age
     env.globals['format_resource'] = resource_format
     env.globals['format_struct'] = format_struct
+    env.globals['get_resource_tag_value'] = get_resource_tag_value
     env.loader  = jinja2.FileSystemLoader(
         [
             os.path.abspath(
@@ -55,6 +58,7 @@ def get_rendered_jinja(target, sqs_message, resources, logger):
         recipient=target,
         resources=resources,
         account=sqs_message.get('account', ''),
+        account_id=sqs_message.get('account_id', ''),
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
@@ -82,6 +86,7 @@ def get_message_subject(sqs_message):
     jinja_template = jinja2.Template(subject)
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
+        account_id=sqs_message.get('account_id', ''),
         region=sqs_message.get('region', '')
     )
     return subject
@@ -91,6 +96,7 @@ def setup_defaults(config):
     config.setdefault('region', 'us-east-1')
     config.setdefault('ses_region', config.get('region'))
     config.setdefault('memory', 1024)
+    config.setdefault('runtime', 'python2.7')
     config.setdefault('timeout', 300)
     config.setdefault('subnets', None)
     config.setdefault('security_groups', None)
@@ -106,16 +112,16 @@ def date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z'):
 
 
 def get_date_time_delta(delta):
-    return str(datetime.datetime.now().replace(tzinfo=gettz('UTC')) + datetime.timedelta(delta))
+    return str(datetime.now().replace(tzinfo=gettz('UTC')) + timedelta(delta))
 
+def get_date_age(date):
+    return (datetime.now(tz=tzutc()) - parser.parse(date)).days
 
 def format_struct(evt):
-    buf = StringIO()
-    json.dump(evt, buf, indent=2)
-    return buf.getvalue()
+    return json.dumps(evt, indent=2, ensure_ascii=False)
 
 
-def resource_tag(resource, k):
+def get_resource_tag_value(resource, k):
     for t in resource.get('Tags', []):
         if t['Key'] == k:
             return t['Value']
@@ -196,9 +202,11 @@ def resource_format(resource, resource_type):
             len(resource.get('IpPermissions', ())),
             len(resource.get('IpPermissionsEgress', ())))
     elif resource_type == 'log-group':
-        return "name: %s last_write: %s" % (
-            resource['logGroupName'],
-            resource['lastWrite'])
+        if 'lastWrite' in resource:
+            return "name: %s last_write: %s" % (
+                resource['logGroupName'],
+                resource['lastWrite'])
+        return "name: %s" % (resource['logGroupName'])
     elif resource_type == 'cache-cluster':
         return "name: %s created: %s status: %s" % (
             resource['CacheClusterId'],
@@ -225,6 +233,44 @@ def resource_format(resource, resource_type):
             resource['State'],
             resource['CidrBlock'],
             resource['AvailableIpAddressCount'])
+    elif resource_type == 'account':
+        return " %s %s" % (
+            resource['account_id'],
+            resource['account_name'])
+    elif resource_type == 'cloudtrail':
+        return " %s %s" % (
+            resource['account_id'],
+            resource['account_name'])
+    elif resource_type == 'vpc':
+        return "%s " % (
+            resource['VpcId'])
+    elif resource_type == 'iam-group':
+        return " %s %s %s" % (
+            resource['GroupName'],
+            resource['Arn'],
+            resource['CreateDate'])
+    elif resource_type == 'rds-snapshot':
+        return " %s %s %s" % (
+            resource['DBSnapshotIdentifier'],
+            resource['DBInstanceIdentifier'],
+            resource['SnapshotCreateTime'])
+    elif resource_type == 'iam-user':
+        return " %s " % (
+            resource['UserName'])
+    elif resource_type == 'iam-role':
+        return " %s %s " % (
+            resource['RoleName'],
+            resource['CreateDate'])
+    elif resource_type == 'iam-policy':
+        return " %s " % (
+            resource['PolicyName'])
+    elif resource_type == 'iam-profile':
+        return " %s " % (
+            resource['InstanceProfileId'])
+    elif resource_type == 'dynamodb-table':
+        return "name: %s created: %s status: %s" % (
+            resource['TableName'],
+            resource['CreationDateTime'],
+            resource['TableStatus'])
     else:
-        print("Unknown resource type", resource_type)
         return "%s" % format_struct(resource)

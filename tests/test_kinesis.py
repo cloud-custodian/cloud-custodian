@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+from .common import BaseTest, TestConfig as Config
 
 
 class Kinesis(BaseTest):
@@ -24,11 +24,18 @@ class Kinesis(BaseTest):
             'name': 'kstream',
             'resource': 'kinesis',
             'filters': [
-                {'type': 'value', 'value_type': 'size',
-                 'value': 2, 'key': 'Shards'}]
-            }, session_factory=factory)
+                {'type': 'value',
+                 'value_type': 'size',
+                 'value': 3,
+                 'key': 'Shards'}]
+            },
+            config=Config.empty(),
+            session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'Origin', 'Value': 'home'}])
         self.assertEqual(resources[0]['StreamStatus'], 'ACTIVE')
 
     def test_stream_delete(self):

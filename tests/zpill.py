@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -106,6 +106,39 @@ placebo.pill.serialize = serialize
 placebo.pill.deserialize = deserialize
 ## END PLACEBO MONKEY
 ##########################################################################
+
+
+class BluePill(pill.Pill):
+
+    def playback(self):
+        result = super(BluePill, self).playback()
+        self._avail = self.get_available()
+
+    def get_available(self):
+        return set(
+            [os.path.join(self.data_path, n)
+             for n in
+             fnmatch.filter(
+                 os.listdir(self.data_path),
+                 '*.json')])
+
+    def get_next_file_path(self, service, operation):
+        fn = super(BluePill, self).get_next_file_path(service, operation)
+        # couple of double use cases
+        if fn in self._avail:
+            self._avail.remove(fn)
+        else:
+            print("\ndouble use %s\n" % fn)
+        return fn
+
+    def stop(self):
+        result = super(BluePill, self).stop()
+        if self._avail:
+            print("Unused json files \n %s" % (
+                "\n".join(sorted(self._avail))))
+        return result
+        #else:
+        #    print("emptied available")
 
 
 class ZippedPill(pill.Pill):
@@ -231,6 +264,8 @@ class PillTest(unittest.TestCase):
     output_dir = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'data', 'output')
 
+    recording = False
+
     def assertJmes(self, expr, instance, expected):
         value = jmespath.search(expr, instance)
         self.assertEqual(value, expected)
@@ -238,9 +273,10 @@ class PillTest(unittest.TestCase):
     def cleanUp(self):
         pass
 
-    def record_flight_data(self, test_case, zdata=False):
-        if not zdata:
-            test_dir = os.path.join(self.placebo_dir, test_case)
+    def record_flight_data(self, test_case, zdata=False, augment=False):
+        self.recording = True
+        test_dir = os.path.join(self.placebo_dir, test_case)
+        if not (zdata or augment):
             if os.path.exists(test_dir):
                 shutil.rmtree(test_dir)
             os.makedirs(test_dir)
@@ -248,7 +284,7 @@ class PillTest(unittest.TestCase):
         session = boto3.Session()
         default_region = session.region_name
         if not zdata:
-            pill = placebo.attach(session, test_dir, debug=True)
+            pill = placebo.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, debug=True)
 
@@ -268,7 +304,17 @@ class PillTest(unittest.TestCase):
 
         return factory
 
-    def replay_flight_data(self, test_case, zdata=False):
+    def replay_flight_data(self, test_case, zdata=False, region=None):
+        """
+        The `region` argument is to allow functional tests to override the
+        default region. It is unused when replaying stored data.
+        """
+
+        if os.environ.get('C7N_FUNCTIONAL') == 'yes':
+            self.recording = True
+            return lambda region=region, assume=None: boto3.Session(
+                region_name=region)
+
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
             if not os.path.exists(test_dir):
@@ -278,6 +324,8 @@ class PillTest(unittest.TestCase):
         session = boto3.Session()
         if not zdata:
             pill = placebo.attach(session, test_dir)
+            #pill = BluePill()
+            #pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, False)
 

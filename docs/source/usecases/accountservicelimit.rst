@@ -18,7 +18,7 @@ more than 50% of the limit and raise the limit for 25%.
          - type: request-limit-increase
            percent-increase: 25
 
-Noted that the ``thresold`` in ``service-limit`` filter is an optional field. If
+Noted that the ``threshold`` in ``service-limit`` filter is an optional field. If
 not mentioned on the policy, the default value is 80.
 
 

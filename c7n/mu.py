@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import abc
 import base64
-import imp
 import hashlib
+import importlib
 import io
 import json
 import logging
 import os
-import sys
 import time
 import tempfile
 import zipfile
@@ -43,10 +42,6 @@ from c7n.utils import parse_s3, local_session
 
 
 log = logging.getLogger('custodian.lambda')
-RUNTIME = 'python{}.{}'.format(
-    sys.version_info.major,
-    sys.version_info.minor,
-)
 
 
 class PythonPackageArchive(object):
@@ -92,21 +87,53 @@ class PythonPackageArchive(object):
         files, including compiled modules. You'll have to add such files
         manually using :py:meth:`add_file`.
         """
-        for module in modules:
-            path = imp.find_module(module)[1]
-            if os.path.isfile(path):
+        for module_name in modules:
+            module = importlib.import_module(module_name)
+
+            if hasattr(module, '__path__'):
+                # https://docs.python.org/3/reference/import.html#module-path
+                for directory in module.__path__:
+                    self.add_directory(directory)
+                if not hasattr(module, '__file__'):
+
+                    # Likely a namespace package. Try to add *.pth files so
+                    # submodules are importable under Python 2.7.
+
+                    sitedir = list(module.__path__)[0].rsplit('/', 1)[0]
+                    for filename in os.listdir(sitedir):
+                        s = filename.startswith
+                        e = filename.endswith
+                        if s(module_name) and e('-nspkg.pth'):
+                            self.add_file(os.path.join(sitedir, filename))
+
+            elif hasattr(module, '__file__'):
+                # https://docs.python.org/3/reference/import.html#__file__
+                path = module.__file__
+
+                if path.endswith('.pyc'):
+                    _path = path[:-1]
+                    if not os.path.isfile(_path):
+                        raise ValueError(
+                            'Could not find a *.py source file behind ' + path)
+                    path = _path
+
                 if not path.endswith('.py'):
-                    raise ValueError('We need a *.py source file instead of ' + path)
+                    raise ValueError(
+                        'We need a *.py source file instead of ' + path)
+
                 self.add_file(path)
-            elif os.path.isdir(path):
-                for root, dirs, files in os.walk(path):
-                    arc_prefix = os.path.relpath(root, os.path.dirname(path))
-                    for f in files:
-                        if not f.endswith('.py'):
-                            continue
-                        f_path = os.path.join(root, f)
-                        dest_path = os.path.join(arc_prefix, f)
-                        self.add_file(f_path, dest_path)
+
+    def add_directory(self, path):
+        """Add ``*.py`` files under the directory ``path`` to the archive.
+        """
+        for root, dirs, files in os.walk(path):
+            arc_prefix = os.path.relpath(root, os.path.dirname(path))
+            for f in files:
+                if not f.endswith('.py'):
+                    continue
+                f_path = os.path.join(root, f)
+                dest_path = os.path.join(arc_prefix, f)
+                self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest=None):
         """Add the file at ``src`` to the archive.
@@ -172,7 +199,7 @@ class PythonPackageArchive(object):
     def get_checksum(self):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
-        with open(self._temp_archive_file.name) as fh:
+        with open(self._temp_archive_file.name, 'rb') as fh:
             return base64.b64encode(checksum(fh, hashlib.sha256()))
 
     def get_bytes(self):
@@ -199,9 +226,30 @@ def checksum(fh, hasher, blocksize=65536):
     return hasher.digest()
 
 
-def custodian_archive():
-    """Create a lambda code archive for running custodian."""
-    return PythonPackageArchive('c7n', 'pkg_resources', 'ipaddress')
+def custodian_archive(packages=None):
+    """Create a lambda code archive for running custodian.
+
+    Lambda archive currently always includes `c7n` and
+    `pkg_resources`. Add additional packages in the mode block.
+
+    Example policy that includes additional packages
+
+    .. code-block:: yaml
+
+        policy:
+          name: lambda-archive-example
+          resource: s3
+          mode:
+            packages:
+              - botocore
+
+    packages: List of additional packages to include in the lambda archive.
+
+    """
+    modules = {'c7n', 'pkg_resources'}
+    if packages:
+        modules = filter(None, modules.union(packages))
+    return PythonPackageArchive(*sorted(modules))
 
 
 class LambdaManager(object):
@@ -241,9 +289,9 @@ class LambdaManager(object):
         return result
 
     def remove(self, func, alias=None):
-        log.info("Removing lambda function %s", func.name)
         for e in func.get_events(self.session_factory):
             e.remove(func)
+        log.info("Removing lambda function %s", func.name)
         try:
             self.client.delete_function(FunctionName=func.name)
         except ClientError as e:
@@ -309,9 +357,23 @@ class LambdaManager(object):
 
     @staticmethod
     def delta_function(old_config, new_config):
+        found = False
         for k in new_config:
-            if k not in old_config or new_config[k] != old_config[k]:
-                return True
+            # Vpc needs special handling as a dict with lists
+            if k == 'VpcConfig' and k in old_config and new_config[k]:
+                if set(old_config[k]['SubnetIds']) != set(
+                        new_config[k]['SubnetIds']):
+                    found = True
+                elif set(old_config[k]['SecurityGroupIds']) != set(
+                        new_config[k]['SecurityGroupIds']):
+                    found = True
+            elif k not in old_config:
+                if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
+                    continue
+                found = True
+            elif new_config[k] != old_config[k]:
+                found = True
+        return found
 
     @staticmethod
     def diff_tags(old_tags, new_tags):
@@ -341,7 +403,8 @@ class LambdaManager(object):
         changed = False
         if existing:
             old_config = existing['Configuration']
-            if archive.get_checksum() != old_config['CodeSha256']:
+            if archive.get_checksum() != old_config[
+                    'CodeSha256'].encode('ascii'):
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)
@@ -352,7 +415,6 @@ class LambdaManager(object):
 
             new_config = func.get_config()
             new_config['Role'] = role
-            del new_config['Runtime']
             new_tags = new_config.pop('Tags', {})
 
             if self.delta_function(old_config, new_config):
@@ -527,16 +589,27 @@ class AbstractLambdaFunction:
             'Runtime': self.runtime,
             'Handler': self.handler,
             'Timeout': self.timeout,
-            'DeadLetterConfig': self.dead_letter_config,
+            'TracingConfig': self.tracing_config,
             'Environment': self.environment,
             'KMSKeyArn': self.kms_key_arn,
-            'TracingConfig': self.tracing_config,
+            'DeadLetterConfig': self.dead_letter_config,
+            'VpcConfig': LAMBDA_EMPTY_VALUES['VpcConfig'],
             'Tags': self.tags}
+
         if self.subnets and self.security_groups:
             conf['VpcConfig'] = {
                 'SubnetIds': self.subnets,
                 'SecurityGroupIds': self.security_groups}
         return conf
+
+
+LAMBDA_EMPTY_VALUES = {
+    'Environment': {'Variables': {}},
+    'DeadLetterConfig': {},
+    'TracingConfig': {'Mode': 'PassThrough'},
+    'VpcConfig': {'SubnetIds': [], 'SecurityGroupIds': []},
+    'KMSKeyArn': '',
+}
 
 
 class LambdaFunction(AbstractLambdaFunction):
@@ -590,11 +663,13 @@ class LambdaFunction(AbstractLambdaFunction):
 
     @property
     def dead_letter_config(self):
-        return self.func_data.get('dead_letter_config', {})
+        return self.func_data.get(
+            'dead_letter_config', LAMBDA_EMPTY_VALUES['DeadLetterConfig'])
 
     @property
     def environment(self):
-        return self.func_data.get('environment', {})
+        return self.func_data.get(
+            'environment', LAMBDA_EMPTY_VALUES['Environment'])
 
     @property
     def kms_key_arn(self):
@@ -602,7 +677,9 @@ class LambdaFunction(AbstractLambdaFunction):
 
     @property
     def tracing_config(self):
-        return self.func_data.get('tracing_config', {})
+        # Default
+        return self.func_data.get(
+            'tracing_config', LAMBDA_EMPTY_VALUES['TracingConfig'])
 
     @property
     def tags(self):
@@ -625,18 +702,18 @@ def run(event, context):
 
 
 class PolicyLambda(AbstractLambdaFunction):
-    """Wraps a custodian policy to turn it into lambda function.
+    """Wraps a custodian policy to turn it into a lambda function.
     """
     handler = "custodian_policy.run"
-    runtime = "python%d.%d" % sys.version_info[:2]
 
     def __init__(self, policy):
         self.policy = policy
-        self.archive = custodian_archive()
+        self.archive = custodian_archive(packages=self.packages)
 
     @property
     def name(self):
-        return "custodian-%s" % self.policy.name
+        prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
+        return "%s%s" % (prefix, self.policy.name)
 
     @property
     def description(self):
@@ -648,6 +725,10 @@ class PolicyLambda(AbstractLambdaFunction):
         return self.policy.data['mode'].get('role', '')
 
     @property
+    def runtime(self):
+        return self.policy.data['mode'].get('runtime', 'python2.7')
+
+    @property
     def memory_size(self):
         return self.policy.data['mode'].get('memory', 512)
 
@@ -657,19 +738,21 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def security_groups(self):
-        return None
+        return self.policy.data['mode'].get('security_groups', None)
 
     @property
     def subnets(self):
-        return None
+        return self.policy.data['mode'].get('subnets', None)
 
     @property
     def dead_letter_config(self):
-        return self.policy.data['mode'].get('dead_letter_config', {})
+        return self.policy.data['mode'].get(
+            'dead_letter_config', LAMBDA_EMPTY_VALUES['DeadLetterConfig'])
 
     @property
     def environment(self):
-        return self.policy.data['mode'].get('environment', {})
+        return self.policy.data['mode'].get(
+            'environment', LAMBDA_EMPTY_VALUES['Environment'])
 
     @property
     def kms_key_arn(self):
@@ -677,11 +760,17 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def tracing_config(self):
-        return self.policy.data['mode'].get('tracing_config', {})
+        # Default
+        return self.policy.data['mode'].get(
+            'tracing_config', {'Mode': 'PassThrough'})
 
     @property
     def tags(self):
         return self.policy.data['mode'].get('tags', {})
+
+    @property
+    def packages(self):
+        return self.policy.data['mode'].get('packages')
 
     def get_events(self, session_factory):
         events = []
@@ -820,6 +909,12 @@ class CloudWatchEventSource(object):
         if event_type == 'cloudtrail':
             if 'signin.amazonaws.com' in payload['detail']['eventSource']:
                 payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
+        elif event_type == 'guard-duty':
+            payload['source'] = ['aws.guardduty']
+            payload['detail-type'] = ['GuardDuty Finding']
+            if 'resource-filter' in self.data:
+                payload.update({
+                    'detail': {'resource': {'resourceType': [self.data['resource-filter']]}}})
         elif event_type == "ec2-instance-state":
             payload['source'] = ['aws.ec2']
             payload['detail-type'] = [
@@ -904,17 +999,18 @@ class CloudWatchEventSource(object):
     def pause(self, func):
         try:
             self.client.disable_rule(Name=func.name)
-        except:
+        except Exception:
             pass
 
     def resume(self, func):
         try:
             self.client.enable_rule(Name=func.name)
-        except:
+        except Exception:
             pass
 
     def remove(self, func):
         if self.get(func.name):
+            log.info("Removing cwe targets and rule %s", func.name)
             try:
                 targets = self.client.list_targets_by_rule(
                     Rule=func.name)['Targets']
@@ -1306,6 +1402,7 @@ class ConfigRule(object):
         rule = self.get(func.name)
         if not rule:
             return
+        log.info("Removing config rule for %s", func.name)
         try:
             self.client.delete_config_rule(
                 ConfigRuleName=func.name)

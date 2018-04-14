@@ -1,0 +1,42 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Code": {
+            "RepositoryType": "S3", 
+            "Location": "https://awslambda-us-east-2-tasks.s3.us-east-2.amazonaws.com/snapshots/644160558196/envcheck-1e140743-adb2-45e5-aead-4ebcbe741d15?X-Amz-Security-Token=FQoDYXdzEJD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDJBkJcjoKckt0KYfJyK3Axip8%2FAxT84z0X9fDzLiQ3p5h8kYz6wjIaC6kP3r7FODovw%2BPHa%2BPUuH98svGadc3PZh%2FxyYqz%2FgSAaykVfLKiv84m668ijCUA5BBI2iudlZU2uoncmyBFHc75nBdNVUSCM%2FtKLgdw8BKgDJqEU%2FOheyI0hd8t2d%2B89UzsLsuI3V5C%2BK%2BzisZNi82kICHLyr%2BkVzARhJKopZy8puP2Wwn4JgvKz1d1gsYLBZQ5WjQbmDs8yKpW7BaRRPXmo%2FrgmSJnFKQ9IUsVEgORODUj4Vbl%2FCtSnyNnEiX2biydPsOIkwbUdUxkDxz2z7hSZhmuz3562HlJOuXFR%2BwYGD8MLKZTJ2jYXpHXZkBp9QUaMXr%2BQa8SqkTGS38sYc3UgoQlZmCqI5yJLF8G6eHAtFITGumrWj3PGSrhKte9f7EIHNCk8OdjPRWVsXdZngTmlu1BHzPmvHoy%2B%2F01fi7f3%2FBJs72FnHFagllx3MKzEYlrqhpssGhWowFxhANP%2F19haqn%2FT3L6HPIA55iawlpVnXzkZe5vTjW6Q3j6AbsnN6ivOJg3ZaLgoYDRxNck0NBvxOdVzHlXatKptXWIQo8LqW1AU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20180215T153121Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAI45JJEKBZKXUYGGQ%2F20180215%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=031eadaf70431e9a2e6ff6f027b92044ffc6c2873c3bb022fe907bc778257d1b"
+        }, 
+        "Configuration": {
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            }, 
+            "Version": "$LATEST", 
+            "CodeSha256": "8M2BSmxZu6Z8+V8ywJPG+JoRlAhYjSmoauKd8DqMZrY=", 
+            "FunctionName": "envcheck", 
+            "VpcConfig": {
+                "SubnetIds": [], 
+                "SecurityGroupIds": []
+            }, 
+            "MemorySize": 128, 
+            "CodeSize": 260, 
+            "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:envcheck", 
+            "Handler": "lambda_function.lambda_handler", 
+            "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+            "Timeout": 3, 
+            "LastModified": "2016-12-24T13:51:31.006+0000", 
+            "Runtime": "python2.7", 
+            "Description": ""
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "467cc9c8-1265-11e8-aea6-01a92e75da57", 
+            "HTTPHeaders": {
+                "date": "Thu, 15 Feb 2018 15:31:21 GMT", 
+                "x-amzn-requestid": "467cc9c8-1265-11e8-aea6-01a92e75da57", 
+                "content-length": "1859", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

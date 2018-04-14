@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@ import logging
 
 from c7n import cache
 from c7n.executor import ThreadPoolExecutor
-from c7n.registry import PluginRegistry
+from c7n.resources.aws import AWS
+
 from c7n.utils import dumps
 
 
-resources = PluginRegistry('resources')
+# Compatibility import
+resources = AWS.resources
 
 
 class ResourceManager(object):

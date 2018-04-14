@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EndpointConfigName": "c7n-endpoint-config", 
+        "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/c7n-endpoint-config", 
+        "CreationTime": {
+            "hour": 9, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 46, 
+            "microsecond": 215000, 
+            "year": 2018, 
+            "day": 29, 
+            "minute": 44
+        }, 
+        "ProductionVariants": [
+            {
+                "InitialVariantWeight": 1.0, 
+                "ModelName": "tmp-for-test-a", 
+                "VariantName": "variant-name-1", 
+                "InitialInstanceCount": 1, 
+                "InstanceType": "ml.m4.xlarge"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3e4ff1a6-4a47-45df-9d57-eb89c2a67cdf", 
+            "HTTPHeaders": {
+                "date": "Mon, 29 Jan 2018 15:40:33 GMT", 
+                "x-amzn-requestid": "3e4ff1a6-4a47-45df-9d57-eb89c2a67cdf", 
+                "content-length": "342", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

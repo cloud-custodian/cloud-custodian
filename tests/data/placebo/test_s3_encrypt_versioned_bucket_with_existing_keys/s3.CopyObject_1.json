@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CopySourceVersionId": "VIWBwqFDt3hzZ04murX7ew89RfaNOpML", 
+        "CopyObjectResult": {
+            "LastModified": {
+                "hour": 16, 
+                "__class__": "datetime", 
+                "month": 2, 
+                "second": 25, 
+                "microsecond": 0, 
+                "year": 2018, 
+                "day": 7, 
+                "minute": 34
+            }, 
+            "ETag": "\"35d6d33467aae9a2e3dccb4b6b027878\""
+        }, 
+        "VersionId": "EH_vStLvfkMfYZFRBQy3EhW1Ki.bpzrp", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "Q2o1PhYeTTFfEUscQRN6RKrcjncF35rhRszdjBKYOd+yfw3FgPZvNSNbOn9nXJzzmMPAnJfCTDU=", 
+            "RequestId": "6DB417AED00C1EDC", 
+            "HTTPHeaders": {
+                "content-length": "234", 
+                "x-amz-id-2": "Q2o1PhYeTTFfEUscQRN6RKrcjncF35rhRszdjBKYOd+yfw3FgPZvNSNbOn9nXJzzmMPAnJfCTDU=", 
+                "x-amz-copy-source-version-id": "VIWBwqFDt3hzZ04murX7ew89RfaNOpML", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "6DB417AED00C1EDC", 
+                "date": "Wed, 07 Feb 2018 16:34:25 GMT", 
+                "x-amz-version-id": "EH_vStLvfkMfYZFRBQy3EhW1Ki.bpzrp", 
+                "x-amz-server-side-encryption": "AES256", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "ServerSideEncryption": "AES256"
+    }
+}

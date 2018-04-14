@@ -1,0 +1,18 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b0a5e9d3-251e-11e8-bc46-bf91ff82ffec",
+            "HTTPStatusCode": 201,
+            "HTTPHeaders": {
+                "date": "Sun, 11 Mar 2018 11:23:57 GMT",
+                "content-type": "application/json",
+                "content-length": "191",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b0a5e9d3-251e-11e8-bc46-bf91ff82ffec"
+            },
+            "RetryAttempts": 0
+        },
+        "Statement": "{\"Sid\":\"PublicInvoke\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-2:644160558196:function:func-d\"}"
+    }
+}
