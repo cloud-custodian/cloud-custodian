@@ -1495,3 +1495,71 @@ class QueryFilter(object):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+
+@filters.register('instance-attribute')
+class InstanceAttribute(ValueFilter):
+    """EC2 Instance Value FIlter on a given instance attribute.
+
+    Filters EC2 Instances with the given instance attribute
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-unoptimized-ebs
+            resource: ec2
+            filters:
+              - type: instance-attribute
+                attribute: ebsOptimized
+                key: "Value"
+                value: false
+    """
+
+    valid_attrs = (
+        'instanceType',
+        'kernel',
+        'ramdisk',
+        'userData',
+        'disableApiTermination',
+        'instanceInitiatedShutdownBehavior',
+        'rootDeviceName',
+        'blockDeviceMapping',
+        'productCodes',
+        'sourceDestCheck',
+        'groupSet',
+        'ebsOptimized',
+        'sriovNetSupport',
+        'enaSupport')
+
+    schema = type_schema(
+        'instance-attribute',
+        rinherit=ValueFilter.schema,
+        attribute={'enum': valid_attrs},
+        required=('attribute',))
+
+    def get_permissions(self):
+        return ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources, event=None):
+        attribute = self.data['attribute']
+        self.get_instance_attribute(resources, attribute)
+        return [resource for resource in resources
+                if self.match(resource['c7n:attribute-%s' % attribute])]
+
+    def get_instance_attribute(self, resources, attribute):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        for resource in resources:
+            instance_id = resource['InstanceId']
+            fetched_attribute = self.manager.retry(
+                client.describe_instance_attribute,
+                Attribute=attribute,
+                InstanceId=instance_id)
+            keys = list(fetched_attribute.keys())
+            keys.remove('ResponseMetadata')
+            keys.remove('InstanceId')
+            resource['c7n:attribute-%s' % attribute] = fetched_attribute[
+                keys[0]]
