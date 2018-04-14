@@ -1508,12 +1508,13 @@ class InstanceAttribute(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: ec2-disabled-termination-protection
+          - name: ec2-unoptimized-ebs
             resource: ec2
             filters:
               - type: instance-attribute
-                key: termination-protection
-                value: true
+                attribute: ebsOptimized
+                key: "Value"
+                value: false
     """
 
     valid_attrs = (
