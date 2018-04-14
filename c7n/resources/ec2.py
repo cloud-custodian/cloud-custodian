@@ -1545,7 +1545,7 @@ class InstanceAttribute(ValueFilter):
         attribute = self.data['attribute']
         self.get_instance_attribute(resources, attribute)
         return [resource for resource in resources
-                if self.match(resource['c7n:%s' % attribute])]
+                if self.match(resource['c7n:attribute-%s' % attribute])]
 
     def get_instance_attribute(self, resources, attribute):
         client = utils.local_session(
