@@ -36,7 +36,8 @@ class SQS(QueryResourceManager):
 
     class resource_type(object):
         service = 'sqs'
-        type = 'queue'
+        type = None
+        # type = 'queue'
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         id = 'QueueUrl'
@@ -63,7 +64,27 @@ class SQS(QueryResourceManager):
         return [r['QueueArn'] for r in resources]
 
     def augment(self, resources):
-        return universal_augment(self, super(SQS, self).augment(resources))
+        client = local_session(self.session_factory).client('sqs')
+
+        def _augment(r):
+            try:
+                queue = self.retry(
+                    client.get_queue_attributes,
+                    QueueUrl=r,
+                    AttributeNames=['All'])['Attributes']
+                queue['QueueUrl'] = r
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
+                    return
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    self.log.warning("Denied access to sqs %s" % r)
+                    return
+                raise
+            return queue
+
+        with self.executor_factory(max_workers=2) as w:
+            return universal_augment(
+                self, list(filter(None, w.map(_augment, resources))))
 
 
 @SQS.filter_registry.register('metrics')
