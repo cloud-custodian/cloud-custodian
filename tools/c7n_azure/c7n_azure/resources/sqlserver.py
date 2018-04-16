@@ -15,12 +15,13 @@
 from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
 
-@resources.register('vm')
-class VirtualMachine(QueryResourceManager):
+
+@resources.register('sqlserver')
+class Vnet(QueryResourceManager):
 
     class resource_type(object):
-        service = 'azure.mgmt.compute'
-        client = 'ComputeManagementClient'
-        enum_spec = ('virtual_machines', 'list_all')
+        service = 'azure.mgmt.sql'
+        client = 'SqlManagementClient'
+        enum_spec = ('servers', 'list')
         id = 'id'
         name = 'name'

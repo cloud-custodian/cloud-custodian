@@ -20,6 +20,8 @@ tox
 -e tools/c7n_sphinxext
 # Local package required for c7n_mailer tests
 -e tools/c7n_mailer
+# Local package required for c7n_azure tests
+-e tools/c7n_azure
 
 # requires pandoc, fails on ci server, only used for pypi metadata
 # setuptools-markdown==0.2

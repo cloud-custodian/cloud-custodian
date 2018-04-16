@@ -23,3 +23,5 @@ class Storage(QueryResourceManager):
         service = 'azure.mgmt.storage'
         client = 'StorageManagementClient'
         enum_spec = ('storage_accounts', 'list')
+        id = 'id'
+        name = 'name'
