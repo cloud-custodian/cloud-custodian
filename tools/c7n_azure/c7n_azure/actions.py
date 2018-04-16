@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Actions to take on Azure resources
+Tag Actions to perform on Azure resources
 """
 from c7n.actions import BaseAction
 from c7n import utils
@@ -34,9 +34,14 @@ class Tag(BaseAction):
     )
 
     def validate(self):
+        if not self.data.get('tags') and not (self.data.get('tag') and self.data.get('value')):
+            raise FilterValidationError(
+                "Must specify either tags or a tag and value")
+
         if self.data.get('tags') and self.data.get('tag'):
             raise FilterValidationError(
                 "Can't specify both tags and tag, choose one")
+
         return self
 
     def process(self, resources):

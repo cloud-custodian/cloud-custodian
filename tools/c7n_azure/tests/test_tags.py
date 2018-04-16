@@ -72,3 +72,50 @@ class TagsTest(BaseTest):
                 ],
             })
             p.run()
+
+    def test_must_specify_tags_or_tag_and_value(self):
+        with self.assertRaises(FilterValidationError):
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'actions': [
+                    {'type': 'tag'}
+                ],
+            })
+            p.run()
+
+    def test_must_specify_non_empty_tags(self):
+        with self.assertRaises(FilterValidationError):
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'actions': [
+                    {'type': 'tag',
+                     'tags': {}}
+                ],
+            })
+            p.run()
+
+    def test_must_specify_both_tag_and_value(self):
+        with self.assertRaises(FilterValidationError):
+            # Missing value
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'actions': [
+                    {'type': 'tag',
+                     'tag': 'myTag'}
+                ],
+            })
+            p.run()
+
+            # Missing tag
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'actions': [
+                    {'type': 'tag',
+                     'value': 'myValue'}
+                ],
+            })
+            p.run()
