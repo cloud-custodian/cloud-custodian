@@ -15,8 +15,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest, functional
 from botocore.exceptions import ClientError
-import json, time
 
+import json
+import time
 
 
 class TestSqsAction(BaseTest):
@@ -44,7 +45,6 @@ class TestSqsAction(BaseTest):
         if self.recording:
             time.sleep(60)
 
-
     @functional
     def test_sqs_set_encryption(self):
         session_factory = self.replay_flight_data(
@@ -53,6 +53,7 @@ class TestSqsAction(BaseTest):
         client_sqs = session_factory().client('sqs')
         client_sqs.create_queue(QueueName='sqs-test')
         queue_url = client_sqs.get_queue_url(QueueName='sqs-test')['QueueUrl']
+
         def cleanup():
             client_sqs.delete_queue(QueueUrl=queue_url)
             if self.recording:
@@ -86,13 +87,13 @@ class TestSqsAction(BaseTest):
             AttributeNames=['All'])['Attributes']['KmsMasterKeyId']
         self.assertEqual(check_master_key, key_id)
 
-
     @functional
     def test_sqs_remove_matched(self):
         session_factory = self.replay_flight_data('test_sqs_remove_matched')
         client = session_factory().client('sqs')
         name = 'test-sqs-remove-matched-1'
         queue_url = client.create_queue(QueueName=name)['QueueUrl']
+
         def cleanup():
             client.delete_queue(QueueUrl=queue_url)
             if self.recording:
@@ -149,7 +150,6 @@ class TestSqsAction(BaseTest):
         self.assertEqual(
             [s['Sid'] for s in data.get('Statement', ())],
             ['SpecificAllow'])
-
 
     @functional
     def test_sqs_remove_named(self):
@@ -226,7 +226,6 @@ class TestSqsAction(BaseTest):
         client = factory().client('sqs')
         d2 = client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=['All'])['Attributes']
         self.assertNotIn('Policy', d2)
-        
 
     @functional
     def test_sqs_mark_for_op(self):
@@ -294,7 +293,9 @@ class TestSqsAction(BaseTest):
         p = self.load_policy({
             'name': 'sqs-mark-for-op',
             'resource': 'sqs',
-            'filters': [{'QueueUrl': queue_url}],
+            'filters': [
+                {'QueueUrl': queue_url},
+                {"tag:remove-this-tag": "present"}],
             'actions': [
                 {'type': 'remove-tag',
                  'tags': ['remove-this-tag']}]},

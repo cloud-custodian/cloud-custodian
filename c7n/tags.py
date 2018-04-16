@@ -95,6 +95,7 @@ def universal_augment(self, resources):
             ResourceTypeFilters=[resource_type])]))
     resource_tag_map = {
         r['ResourceARN']: r['Tags'] for r in resource_tag_map_list}
+
     for arn, r in zip(self.get_arns(resources), resources):
         if arn in resource_tag_map:
             r['Tags'] = resource_tag_map[arn]
