@@ -320,11 +320,15 @@ class TestSqsAction(BaseTest):
             })
         self.addCleanup(client.delete_queue, QueueUrl=queue_url)
 
+        if self.recording:
+            time.sleep(30)
+
         p = self.load_policy({
             'name': 'sqs-marked-for-op',
             'resource': 'sqs',
             'filters': [
-                {'type': 'marked-for-op', 'tag': 'tag-for-op',
+                {'type': 'marked-for-op',
+                 'tag': 'tag-for-op',
                  'op': 'delete'}]},
             session_factory=session_factory)
 
