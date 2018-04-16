@@ -1,10 +1,8 @@
 build:
 
   unit_tests:
-    image: python:2-slim
+    image: python:2.7
     commands:
-      - apt-get update
-      - apt-get install build-essential
       - pip install tox
       - tox -e py27
 
@@ -19,10 +17,8 @@ build:
 #      branch: master
 
   documentation:
-     image: python:2-alpine
+     image: python:2.7
      commands:
-       - apk update
-       - apk add git make build-base python-dev
        - git config --global user.email "cibot@cloud-custodian.io"
        - git config --global user.name "Custodian CI"
        - pip install tox
