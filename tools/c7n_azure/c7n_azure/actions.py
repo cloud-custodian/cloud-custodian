@@ -51,12 +51,12 @@ class Tag(BaseAction):
         for resource in resources:
             id = resource['id']
 
-            tags = self.data.get('tags') or resource.get('tags', {})
-            tag = self.data.get('tag')
-            value = self.data.get('value')
+            tags = resource.get('tags', {})
 
-            if tag and value:
-                tags[tag] = value
+            new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
+
+            for key in new_tags:
+                tags[key] = new_tags[key]
 
             az_resource = GenericResource.deserialize(resource)
             api_version = session.resource_api_version(az_resource)

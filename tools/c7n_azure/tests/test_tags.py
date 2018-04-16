@@ -19,45 +19,66 @@ from c7n.filters import FilterValidationError
 
 
 class TagsTest(BaseTest):
-    """Requires at least one VM in subscription
+    """Requires one VM in the resource group subscription
     """
     def setUp(self):
         super(TagsTest, self).setUp()
 
-    def test_add_single_tag_without_modifying_existing_tags(self):
+    def test_add_or_update_single_tag(self):
+        """Requires a vm named 'test-vm-tags' with the following existing tags:
+        'pre-existing-1': 'unmodified'
+        """
         p = self.load_policy({
             'name': 'test-azure-tag',
             'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'test-add-tags'}
+            ],
             'actions': [
                 {'type': 'tag',
-                 'tag': 'project',
-                 'value': 'contoso'}
+                 'tag': 'tag1',
+                 'value': 'value1'}
             ],
         })
         p.run()
 
-        # verify that the existing tags were not overridden
+        # verify that the a new tag is added without modifying existing tags
         s = Session()
         client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        machines = list(client.virtual_machines.list_all())
-        self.assertEqual(machines[0].tags, {'project': 'contoso', 'existing': 'pre-existing-tag'})
+        vm = [vm for vm in client.virtual_machines.list_all() if vm.name == 'test-add-tags'][0]
+        self.assertEqual(vm.tags, {'tag1': 'value1', 'pre-existing-1': 'unmodified'})
 
-    def test_add_tags_replace_existing_tags(self):
         p = self.load_policy({
             'name': 'test-azure-tag',
             'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'test-add-tags'}
+            ],
             'actions': [
                 {'type': 'tag',
-                 'tags': {'tag1': 'value1', 'tag2': 222}}
+                 'tag': 'pre-existing-1',
+                 'value': 'modified'}
             ],
         })
         p.run()
 
-        # verify that the existing tags were overridden
+        # verify that an existing tag is updated
         s = Session()
         client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        machines = list(client.virtual_machines.list_all())
-        self.assertEqual(machines[0].tags, {'tag1': 'value1', 'tag2': '222'})
+        vm = [vm for vm in client.virtual_machines.list_all() if vm.name == 'test-add-tags'][0]
+        self.assertEqual(vm.tags, {'tag1': 'value1', 'pre-existing-1': 'modified'})
+        s = Session()
+        client = s.client('azure.mgmt.network.NetworkManagementClient')
+        vnets = list(client.virtual_networks.list_all())
+        self.assertEqual(vnets[0].tags, {'pre-existing': 'modified'})
 
     def test_cant_have_both_tag_and_tags(self):
         with self.assertRaises(FilterValidationError):
