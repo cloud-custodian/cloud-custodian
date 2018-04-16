@@ -75,10 +75,36 @@ class TagsTest(BaseTest):
         client = s.client('azure.mgmt.compute.ComputeManagementClient')
         vm = [vm for vm in client.virtual_machines.list_all() if vm.name == 'test-add-tags'][0]
         self.assertEqual(vm.tags, {'tag1': 'value1', 'pre-existing-1': 'modified'})
+
+    def test_add_or_update_tags(self):
+        """Requires a resource group named 'test-tags' with the following existing tags:
+        'pre-existing-1': 'unmodified'
+        'pre-existing-2': 'unmodified'
+
+        """
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.resourcegroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'test-tags'}
+            ],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'tag1': 'value1', 'pre-existing-1': 'modified'}}
+            ],
+        })
+        p.run()
+
+        # verify the
         s = Session()
-        client = s.client('azure.mgmt.network.NetworkManagementClient')
-        vnets = list(client.virtual_networks.list_all())
-        self.assertEqual(vnets[0].tags, {'pre-existing': 'modified'})
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test-tags'][0]
+        self.assertEqual(rg.tags,
+                         {'tag1': 'value1', 'pre-existing-1': 'modified', 'pre-existing-2': 'unmodified'})
 
     def test_cant_have_both_tag_and_tags(self):
         with self.assertRaises(FilterValidationError):

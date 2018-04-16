@@ -17,7 +17,7 @@ Tag Actions to perform on Azure resources
 from c7n.actions import BaseAction
 from c7n import utils
 from c7n.filters import FilterValidationError
-from azure.mgmt.resource.resources.models import GenericResource
+from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
 
 
 class Tag(BaseAction):
@@ -48,18 +48,29 @@ class Tag(BaseAction):
         session = utils.local_session(self.manager.session_factory)
         client = session.client('azure.mgmt.resource.ResourceManagementClient')
 
-        for resource in resources:
-            id = resource['id']
 
+        for resource in resources:
+            # get existing tags
             tags = resource.get('tags', {})
 
+            # add or update tags
             new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
-
             for key in new_tags:
                 tags[key] = new_tags[key]
 
-            az_resource = GenericResource.deserialize(resource)
-            api_version = session.resource_api_version(az_resource)
-            az_resource.tags = tags
+            # resource group type
+            if self.manager.type == 'resourcegroup':
+                params_patch = ResourceGroupPatchable(
+                    tags=tags
+                )
+                client.resource_groups.update(
+                    resource['name'],
+                    params_patch,
+                )
+            # other Azure resources
+            else:
+                az_resource = GenericResource.deserialize(resource)
+                api_version = session.resource_api_version(az_resource)
+                az_resource.tags = tags
 
-            client.resources.create_or_update_by_id(id, api_version, az_resource)
+                client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
