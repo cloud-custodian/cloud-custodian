@@ -1,22 +1,18 @@
 {
     "status_code": 200, 
     "data": {
-        "Unsuccessful": [], 
+        "FlowLogs": [], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "d14c7c2c-f0bd-4ac8-84fb-8298cb7836e7", 
+            "RequestId": "87d06b12-1bec-47d0-bd50-596f42eeaf54", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Fri, 06 Apr 2018 17:26:07 GMT"
+                "date": "Mon, 16 Apr 2018 14:37:27 GMT"
             }
-        }, 
-        "FlowLogIds": [
-            "fl-4377b32a"
-        ], 
-        "ClientToken": "ASZq7l7G2jttF80QvbKX2KR9dIzaKTT1XXmBMUQO6Jw="
+        }
     }
 }

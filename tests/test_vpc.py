@@ -1592,52 +1592,23 @@ class FlowLogsTest(BaseTest):
             'Values': [resources[0]['VpcId']]}])['FlowLogs']
         self.assertEqual(logs[0]['ResourceId'], resources[0]['VpcId'])
 
-    def test_network_interface_create_flow_logs(self):
-        session_factory = self.replay_flight_data(
-            'test_network_create_flow_logs')
+    def test_vpc_delete_flow_logs(self):
+        session_factory = self.replay_flight_data('test_vpc_delete_flow_logs')
         p = self.load_policy({
-            'name': 'eni-flow-logs',
-            'resource': 'eni',
+            'name': 'c7n-delete-vpc-flow-logs',
+            'resource': 'vpc',
             'filters': [
-                {'tag:Name': 'FlowLogENI'},
-                {'type': 'flow-logs', 'enabled': False}],
+                {'tag:Name': 'FlowLogTest'},
+                {'type': 'flow-logs', 'enabled': True}],
             'actions': [{
                 'type': 'set-vpc-flow',
-                'DeliverLogsPermissionArn': 'arn:aws:iam::644160558196:role/flowlogsRole',
-                'LogGroupName': '/custodian/eni_logs/',
-                'TrafficType': 'ALL'
-            }]
+                'LogGroupName': ''}]
         }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['NetworkInterfaceId'], 'eni-cc659531')
+        self.assertEqual(resources[0]['VpcId'], 'vpc-7af45101')
         client = session_factory(region='us-east-1').client('ec2')
         logs = client.describe_flow_logs(Filters=[{
             'Name': 'resource-id',
-            'Values': [resources[0]['NetworkInterfaceId']]}])['FlowLogs']
-        self.assertEqual(logs[0]['ResourceId'],
-                         resources[0]['NetworkInterfaceId'])
-
-    def test_subnet_create_flow_logs(self):
-        session_factory = self.replay_flight_data(
-            'test_subnet_create_flow_logs')
-        p = self.load_policy({
-            'name': 'subnet-flow-logs',
-            'resource': 'subnet',
-            'filters': [
-                {'tag:Name': 'FlowLogSubnet'},
-                {'type': 'flow-logs', 'enabled': False}],
-            'actions': [{
-                'type': 'set-vpc-flow',
-                'DeliverLogsPermissionArn': 'arn:aws:iam::644160558196:role/flowlogsRole',
-                'LogGroupName': '/custodian/subnet_logs/',
-                'TrafficType': 'ALL'
-            }]}, session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['SubnetId'], 'subnet-efbcccb7')
-        client = session_factory(region='us-east-1').client('ec2')
-        logs = client.describe_flow_logs(Filters=[{
-            'Name': 'resource-id',
-            'Values': [resources[0]['SubnetId']]}])['FlowLogs']
-        self.assertEqual(logs[0]['ResourceId'], resources[0]['SubnetId'])
+            'Values': [resources[0]['VpcId']]}])['FlowLogs']
+        self.assertFalse(logs)

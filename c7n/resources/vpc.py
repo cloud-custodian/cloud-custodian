@@ -1633,9 +1633,21 @@ class CreateFlowLogs(BaseAction):
             'LogGroupName': {'type': 'string'},
             'TrafficType': {'type': 'string',
                             'enum': ['ACCEPT', 'REJECT', 'ALL']},
-            'required': ['DeliverLogsPermissionArn', 'LogGroupName']
+            'required': ['LogGroupName']
         }
     }
+
+    def validate(self):
+        if not self.data.get('DeliverLogsPermissionArn'):
+            if self.data.get('LogGroupName'):
+                raise ValueError('DeliverLogsPermissionArn required when '
+                                 'specifying LogGroupName')
+        return self
+
+    def delete_flow_logs(self, client, rids):
+        flow_logs = client.describe_flow_logs(
+            Filters=[{'Name': 'resource-id', 'Values': rids}])['FlowLogs']
+        client.delete_flow_logs(FlowLogIds=[f['FlowLogId'] for f in flow_logs])
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -1658,4 +1670,9 @@ class CreateFlowLogs(BaseAction):
         if not params['ResourceIds']:
             self.log.info('No %s resources to set' % model.type)
             return
+
+        if not params['LogGroupName']:
+            self.delete_flow_logs(client, params['ResourceIds'])
+            return
+
         client.create_flow_logs(**params)
