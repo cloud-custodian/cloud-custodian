@@ -34,6 +34,7 @@ class ELBTagTest(BaseTest):
             'actions': [
                 {'type': 'tag', 'key': 'xyz', 'value': 'abdef'}]
             },
+            config={'account_id': '644160558196'},                                  
             session_factory=session_factory)
 
         resources = policy.run()
@@ -51,6 +52,7 @@ class ELBTagTest(BaseTest):
             'actions': [
                 {'type': 'remove-tag', 'tags': ['xyz']}]
             },
+            config={'account_id': '644160558196'},                                  
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -67,9 +69,11 @@ class ELBTagTest(BaseTest):
             'name': 'elb-mark',
             'resource': 'elb',
             'filters': [{"tag:Platform": "ubuntu"}]},
+            config={'account_id': '644160558196'},                                  
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'CloudCustodian')
 
     def test_mark_and_match(self):
         session_factory = self.replay_flight_data(
@@ -96,6 +100,7 @@ class ELBTagTest(BaseTest):
             'filters': [
                 {'type': 'marked-for-op', 'tag': 'custodian_next',
                  'op': 'delete'}]},
+            config={'account_id': '644160558196'},
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
