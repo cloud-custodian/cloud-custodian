@@ -24,7 +24,7 @@ from c7n.utils import local_session
 from c7n.query import QueryResourceManager
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 
 
 filters = FilterRegistry('sqs.filters')
@@ -59,33 +59,11 @@ class SQS(QueryResourceManager):
         perms.append('sqs:GetQueueAttributes')
         return perms
 
+    def get_arns(self, resources):
+        return [r['QueueArn'] for r in resources]
+
     def augment(self, resources):
-
-        def _augment(r):
-            client = local_session(self.session_factory).client('sqs')
-            try:
-                queue = client.get_queue_attributes(
-                    QueueUrl=r,
-                    AttributeNames=['All'])['Attributes']
-                # Augment Tags
-                tag_dict = client.list_queue_tags(
-                    QueueUrl=r).get('Tags', {})
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning("Denied access to sqs %s" % r)
-                    return
-                raise
-            tag_list = []
-            for k, v in tag_dict.items():
-                tag_list.append({'Key': k, 'Value': v})
-
-            queue['QueueUrl'] = r
-            queue['Tags'] = tag_list
-            return queue
-
-        self.log.debug('retrieving details for %d queues' % len(resources))
-        with self.executor_factory(max_workers=4) as w:
-            return list(filter(None, w.map(_augment, resources)))
+        return universal_augment(self, super(SQS, self).augment(resources))
 
 
 @SQS.filter_registry.register('metrics')
