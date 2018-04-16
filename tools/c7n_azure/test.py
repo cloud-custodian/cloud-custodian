@@ -1,13 +1,13 @@
 from c7n_azure.session import Session
-
+from azure.mgmt.resource import ResourceManagementClient
 import pprint
+import os
 
 
 s = Session()
-client = s.client('azure.mgmt.compute.ComputeManagementClient')
-machines = list(client.virtual_machines.list_all())
-# pprint.pprint(machines[0].as_dict())
+client = s.client('azure.mgmt.resource.ResourceManagementClient')
+resource_group_params = {'location': 'westus'}
+resource_group_params.update(tags={'hello': 'world'})
 
-client = s.client('azure.mgmt.network.NetworkManagementClient')
-networks = list(client.virtual_networks.list_all())
-pprint.pprint(networks[0].as_dict())
+for item in client.resources.list():
+    print(s.resource_api_version(item))
