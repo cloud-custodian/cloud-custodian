@@ -1612,7 +1612,6 @@ class FlowResource(Filter):
     }
 
 
-
 @Vpc.action_registry.register('set-vpc-flow')
 @Subnet.action_registry.register('set-vpc-flow')
 @NetworkInterface.action_registry.register('set-vpc-flow')
