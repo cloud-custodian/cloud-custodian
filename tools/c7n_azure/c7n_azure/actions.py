@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Actions to take on Azure resources
+Tag Actions to perform on Azure resources
 """
 from c7n.actions import BaseAction
 from c7n import utils
 from c7n.filters import FilterValidationError
-from azure.mgmt.resource.resources.models import GenericResource
+from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
 
 
 class Tag(BaseAction):
@@ -34,27 +34,43 @@ class Tag(BaseAction):
     )
 
     def validate(self):
+        if not self.data.get('tags') and not (self.data.get('tag') and self.data.get('value')):
+            raise FilterValidationError(
+                "Must specify either tags or a tag and value")
+
         if self.data.get('tags') and self.data.get('tag'):
             raise FilterValidationError(
                 "Can't specify both tags and tag, choose one")
+
         return self
 
     def process(self, resources):
         session = utils.local_session(self.manager.session_factory)
         client = session.client('azure.mgmt.resource.ResourceManagementClient')
 
+
         for resource in resources:
-            id = resource['id']
+            # get existing tags
+            tags = resource.get('tags', {})
 
-            tags = self.data.get('tags') or resource.get('tags', {})
-            tag = self.data.get('tag')
-            value = self.data.get('value')
+            # add or update tags
+            new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
+            for key in new_tags:
+                tags[key] = new_tags[key]
 
-            if tag and value:
-                tags[tag] = value
+            # resource group type
+            if self.manager.type == 'resourcegroup':
+                params_patch = ResourceGroupPatchable(
+                    tags=tags
+                )
+                client.resource_groups.update(
+                    resource['name'],
+                    params_patch,
+                )
+            # other Azure resources
+            else:
+                az_resource = GenericResource.deserialize(resource)
+                api_version = session.resource_api_version(az_resource)
+                az_resource.tags = tags
 
-            az_resource = GenericResource.deserialize(resource)
-            api_version = session.resource_api_version(az_resource)
-            az_resource.tags = tags
-
-            client.resources.create_or_update_by_id(id, api_version, az_resource)
+                client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
