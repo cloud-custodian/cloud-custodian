@@ -39,7 +39,7 @@ You will need to map it to environment variables for Custodian like this:
 .. code-block:: bash
 
     AZURE_TENANT_ID=tenant
-    AZURE_SUBSCRIPTION_ID=subscription id
+    AZURE_SUBSCRIPTION_ID=subscriptionId
     AZURE_CLIENT_ID=appId
     AZURE_CLIENT_SECRET=password
 
@@ -48,7 +48,7 @@ You will need to map it to environment variables for Custodian like this:
 Azure CLI
 ---------
 
-Set environment variable :code:`AZURE_CLI_AUTH` to any value, and session will pull credentials and default
+Set environment variable :code:`AZURE_CLI_AUTH` to any value, and session will pull credentials and the default
 subscription from Azure CLI.  Requires that you have run :code:`az login` in Azure CLI first.
 
 

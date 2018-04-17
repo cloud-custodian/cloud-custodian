@@ -11,7 +11,7 @@ in the makefile:
     $ make install
     $ source ../cc_env/bin/activate
 
-This creates a virtual env above your enlistment and installs all packages as editable.
+This creates a virtual env in the directory above your enlistment and installs all packages as editable.
 
 
 Testing
