@@ -59,6 +59,29 @@ class TestTagAugmentation(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TestInstanceAttrFilter(BaseTest):
+
+    def test_attr_filter(self):
+        session_factory = self.replay_flight_data(
+            'test_ec2_instance_attribute')
+        ec2 = session_factory().client('ec2')
+        policy = self.load_policy({
+            'name': 'ec2-attr',
+            'resource': 'ec2',
+            'filters': [
+                {'type': 'instance-attribute',
+                 'attribute': 'rootDeviceName',
+                 'key': 'Value',
+                 'value': '/dev/sda1'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(
+            resources[0]['c7n:attribute-rootDeviceName'],
+            {'Value': '/dev/sda1'})
+
+
+
+
 class TestMetricFilter(BaseTest):
 
     def test_metric_filter(self):

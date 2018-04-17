@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceId": "i-0185ca3d74288165e",
+        "RootDeviceName": {
+            "Value": "/dev/sda1"
+        },
+        "ResponseMetadata": {
+            "RequestId": "defd129f-d4ff-4cb8-a409-829ebe0327fb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Sat, 14 Apr 2018 00:48:49 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
