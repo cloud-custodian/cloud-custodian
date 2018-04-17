@@ -2,6 +2,7 @@ Add Tag To Virtual Machines
 ==============================
 
 .. code-block:: yaml
+
     policies:
         - name: tag-add
           description: |

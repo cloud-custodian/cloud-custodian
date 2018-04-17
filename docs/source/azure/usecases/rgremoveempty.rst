@@ -2,6 +2,7 @@ Remove Empty Resource Groups
 ============================
 
 .. code-block:: yaml
+
     policies:
         - name: rg-remove-empty
           description: |
