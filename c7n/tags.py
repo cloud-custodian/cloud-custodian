@@ -79,6 +79,10 @@ def universal_augment(self, resources):
     # Resource Tagging API Support
     # https://goo.gl/uccKc9
 
+    # Bail on empty set
+    if not resources:
+        return resources
+
     client = utils.local_session(
         self.session_factory).client('resourcegroupstaggingapi')
 
