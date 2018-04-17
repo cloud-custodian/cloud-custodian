@@ -25,11 +25,6 @@ import six
 
 from .email_delivery import EmailDelivery
 from .sns_delivery import SnsDelivery
-try:
-    from .datadog_delivery import DataDogDelivery
-    HAVE_DATADOG = True
-except ImportError:
-    HAVE_DATADOG = False
 
 DATA_MESSAGE = "maidmsg/1.0"
 
@@ -147,13 +142,14 @@ class MailerSqsQueueProcessor(object):
         except ValueError:
             pass
         sqs_message = json.loads(zlib.decompress(base64.b64decode(body)))
+
         self.logger.debug("Got account:%s message:%s %s:%d policy:%s recipients:%s" % (
             sqs_message.get('account', 'na'),
             encoded_sqs_message['MessageId'],
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name'],
-            ', '.join(sqs_message['action'].get('to', 'datadog'))))
+            ', '.join(sqs_message['action'].get('to'))))
 
         # get the map of email_to_addresses to mimetext messages (with resources baked in)
         # and send any emails (to SES or SMTP) if there are email addresses found
@@ -168,8 +164,17 @@ class MailerSqsQueueProcessor(object):
         sns_message_packages = sns_delivery.get_sns_message_packages(sqs_message)
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
 
+        # this section sends a notification to the resource owner via Slack
+        if self.config.get('slack_token'):
+            from .slack_delivery import SlackDelivery
+            slack_delivery = SlackDelivery(self.config, self.session, self.logger)
+            if slack_delivery.is_deliverable(sqs_message):
+                slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message, email_delivery)
+                slack_delivery.slack_handler(sqs_message, slack_messages)
+
         # this section gets the map of metrics to send to datadog and delivers it
-        if HAVE_DATADOG:
+        if self.config.get('datadog_api_key'):
+            from .datadog_delivery import DataDogDelivery
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
             datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)

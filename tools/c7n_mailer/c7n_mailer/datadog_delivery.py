@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import time
-from six.moves.urllib.parse import urlparse, parse_qsl
 
-from datadog import initialize
 from datadog import api
+from datadog import initialize
+from six.moves.urllib.parse import urlparse, parse_qsl
 
 
 class DataDogDelivery(object):
