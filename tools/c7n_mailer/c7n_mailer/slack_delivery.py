@@ -35,7 +35,7 @@ class SlackDelivery(object):
 
     @staticmethod
     def is_deliverable(sqs_message):
-        if 'slack' in sqs_message.get('action', ()).get('to', ()):
+        if 'cc-slack' in sqs_message.get('action', ()).get('to', ()):
             return True
         return False
 
@@ -51,7 +51,7 @@ class SlackDelivery(object):
 
             for address, slack_target in resolved_addrs.iteritems():
                 slack_messages[address] = get_rendered_jinja(slack_target, sqs_message, resources,
-                                                             self.logger, 'slack-template', 'slack-default')
+                                                             self.logger, 'slack_template', 'slack_default')
 
         return slack_messages
 
@@ -63,7 +63,7 @@ class SlackDelivery(object):
                                  sqs_message['policy']['name'],
                                  sqs_message['policy']['resource'],
                                  str(len(sqs_message['resources'])),
-                                 sqs_message['action'].get('slack-template', 'slack-default'),
+                                 sqs_message['action'].get('slack_template', 'slack_default'),
                                  json.loads(slack_messages[message])["channel"])
                             )
 

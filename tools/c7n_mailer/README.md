@@ -111,6 +111,39 @@ There is a special `to` format that specifies datadog delivery, and includes the
 - metric_name: is the name of the metrics send to DataDog
 - metric_value_tag: by default the metric value send to DataDog is `1` but if you want to use one of the tags returned in the policy you can set it with the attribute `metric_value_tag`, for example in the `test-policy.yml` the value used is the size of the EBS volume. The value must be a number and it's transformed to a float value.
 
+### Slack:
+
+The Custodian mailer now supports Slack messaging as an extension of the SQS transport method, that currently leverages email as the primary notification mechanism.
+The `mailer.yml` file now supports a `slack_token` field where the user enters the Slack token corresponding to their Slack integration:
+
+```yaml
+queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+role: arn:aws:iam::123456790:role/c7n-mailer-test
+slack_token: xoxo-token123
+```
+
+To enable Slack messaging, several new fields are evaluated in a policy, as shown in the below example:
+
+```
+policies:
+  - name: c7n-mailer-test
+    resource: ebs
+    filters:
+     - Attachments: []
+    actions:
+      - type: notify
+        slack_template: slack
+        to:
+          - cc-slack
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+```
+
+An additional `slack_template` field is used, in addition to the standard `template`, in order to allow separate template usage
+between email and Slack, as well as to provide backwards compatibility for existing policies. This field is optional, however,
+and if not specified, will default to `slack_default`. The `- cc-slack` entry under `to:` indicates that a Slack payload should
+be sent in addition to the traditional email and is required for Slack integration.
 
 ### Now run:
 
@@ -213,7 +246,11 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 This fields are not necessary if c7m_mailer run in a instance/lambda/etc with the DataDog agent.
 
+#### Slack Config
 
+| Required? | Key                       | Type             | Notes                               |
+|:---------:|:--------------------------|:-----------------|:------------------------------------|
+|           | `slack_token`             | string           | Slack API token |
 
 #### SDK Config
 
