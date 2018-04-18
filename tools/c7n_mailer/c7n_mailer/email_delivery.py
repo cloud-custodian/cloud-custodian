@@ -19,9 +19,10 @@ from email.mime.text import MIMEText
 from email.utils import parseaddr
 
 import six
+from c7n.utils import format_struct
 from .ldap_lookup import LdapLookup
 from .utils import (
-    format_struct, get_message_subject, get_resource_tag_targets,
+    get_message_subject, get_resource_tag_targets,
     get_rendered_jinja)
 
 # Those headers are defined as follows:

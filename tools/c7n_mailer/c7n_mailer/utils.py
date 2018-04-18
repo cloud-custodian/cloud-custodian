@@ -14,13 +14,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import jinja2
-import json
 import os
 from ruamel import yaml
 
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
 from datetime import datetime, timedelta
+
+from c7n import utils
 
 
 def get_jinja_env():
@@ -29,8 +30,8 @@ def get_jinja_env():
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
     env.filters['get_date_age'] = get_date_age
-    env.globals['format_resource'] = resource_format
-    env.globals['format_struct'] = format_struct
+    env.globals['format_resource'] = utils.resource_format
+    env.globals['format_struct'] = utils.format_struct
     env.globals['get_resource_tag_value'] = get_resource_tag_value
     env.loader  = jinja2.FileSystemLoader(
         [
@@ -117,9 +118,6 @@ def get_date_time_delta(delta):
 def get_date_age(date):
     return (datetime.now(tz=tzutc()) - parser.parse(date)).days
 
-def format_struct(evt):
-    return json.dumps(evt, indent=2, ensure_ascii=False)
-
 
 def get_resource_tag_value(resource, k):
     for t in resource.get('Tags', []):
@@ -128,149 +126,3 @@ def get_resource_tag_value(resource, k):
     return ''
 
 
-def resource_format(resource, resource_type):
-    if resource_type == 'ec2':
-        tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
-        return "%s %s %s %s %s %s" % (
-            resource['InstanceId'],
-            resource.get('VpcId', 'NO VPC!'),
-            resource['InstanceType'],
-            resource.get('LaunchTime'),
-            tag_map.get('Name', ''),
-            resource.get('PrivateIpAddress'))
-    elif resource_type == 'ami':
-        return "%s %s %s" % (
-            resource['Name'], resource['ImageId'], resource['CreationDate'])
-    elif resource_type == 's3':
-        return "%s" % (resource['Name'])
-    elif resource_type == 'ebs':
-        return "%s %s %s %s" % (
-            resource['VolumeId'],
-            resource['Size'],
-            resource['State'],
-            resource['CreateTime'])
-    elif resource_type == 'rds':
-        return "%s %s %s %s" % (
-            resource['DBInstanceIdentifier'],
-            "%s-%s" % (
-                resource['Engine'], resource['EngineVersion']),
-            resource['DBInstanceClass'],
-            resource['AllocatedStorage'])
-    elif resource_type == 'asg':
-        tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
-        return "%s %s %s" % (
-            resource['AutoScalingGroupName'],
-            tag_map.get('Name', ''),
-            "instances: %d" % (len(resource.get('Instances', []))))
-    elif resource_type == 'elb':
-        tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
-        if 'ProhibitedPolicies' in resource:
-            return "%s %s %s %s" % (
-                resource['LoadBalancerName'],
-                "instances: %d" % len(resource['Instances']),
-                "zones: %d" % len(resource['AvailabilityZones']),
-                "prohibited_policies: %s" % ','.join(
-                    resource['ProhibitedPolicies']))
-        return "%s %s %s" % (
-            resource['LoadBalancerName'],
-            "instances: %d" % len(resource['Instances']),
-            "zones: %d" % len(resource['AvailabilityZones']))
-    elif resource_type == 'redshift':
-        return "%s %s %s" % (
-            resource['ClusterIdentifier'],
-            'nodes:%d' % len(resource['ClusterNodes']),
-            'encrypted:%s' % resource['Encrypted'])
-    elif resource_type == 'emr':
-        return "%s status:%s" % (
-            resource['Id'],
-            resource['Status']['State'])
-    elif resource_type == 'cfn':
-        return "%s" % (
-            resource['StackName'])
-    elif resource_type == 'launch-config':
-        return "%s" % (
-            resource['LaunchConfigurationName'])
-    elif resource_type == 'security-group':
-        name = resource.get('GroupName', '')
-        for t in resource.get('Tags', ()):
-            if t['Key'] == 'Name':
-                name = t['Value']
-        return "%s %s %s inrules: %d outrules: %d" % (
-            name,
-            resource['GroupId'],
-            resource.get('VpcId', 'na'),
-            len(resource.get('IpPermissions', ())),
-            len(resource.get('IpPermissionsEgress', ())))
-    elif resource_type == 'log-group':
-        if 'lastWrite' in resource:
-            return "name: %s last_write: %s" % (
-                resource['logGroupName'],
-                resource['lastWrite'])
-        return "name: %s" % (resource['logGroupName'])
-    elif resource_type == 'cache-cluster':
-        return "name: %s created: %s status: %s" % (
-            resource['CacheClusterId'],
-            resource['CacheClusterCreateTime'],
-            resource['CacheClusterStatus'])
-    elif resource_type == 'cache-snapshot':
-        return "name: %s cluster: %s source: %s" % (
-            resource['SnapshotName'],
-            resource['CacheClusterId'],
-            resource['SnapshotSource'])
-    elif resource_type == 'redshift-snapshot':
-        return "name: %s db: %s" % (
-            resource['SnapshotIdentifier'],
-            resource['DBName'])
-    elif resource_type == 'ebs-snapshot':
-        return "name: %s date: %s" % (
-            resource['SnapshotId'],
-            resource['StartTime'])
-    elif resource_type == 'subnet':
-        return "%s %s %s %s %s %s" % (
-            resource['SubnetId'],
-            resource['VpcId'],
-            resource['AvailabilityZone'],
-            resource['State'],
-            resource['CidrBlock'],
-            resource['AvailableIpAddressCount'])
-    elif resource_type == 'account':
-        return " %s %s" % (
-            resource['account_id'],
-            resource['account_name'])
-    elif resource_type == 'cloudtrail':
-        return " %s %s" % (
-            resource['account_id'],
-            resource['account_name'])
-    elif resource_type == 'vpc':
-        return "%s " % (
-            resource['VpcId'])
-    elif resource_type == 'iam-group':
-        return " %s %s %s" % (
-            resource['GroupName'],
-            resource['Arn'],
-            resource['CreateDate'])
-    elif resource_type == 'rds-snapshot':
-        return " %s %s %s" % (
-            resource['DBSnapshotIdentifier'],
-            resource['DBInstanceIdentifier'],
-            resource['SnapshotCreateTime'])
-    elif resource_type == 'iam-user':
-        return " %s " % (
-            resource['UserName'])
-    elif resource_type == 'iam-role':
-        return " %s %s " % (
-            resource['RoleName'],
-            resource['CreateDate'])
-    elif resource_type == 'iam-policy':
-        return " %s " % (
-            resource['PolicyName'])
-    elif resource_type == 'iam-profile':
-        return " %s " % (
-            resource['InstanceProfileId'])
-    elif resource_type == 'dynamodb-table':
-        return "name: %s created: %s status: %s" % (
-            resource['TableName'],
-            resource['CreationDateTime'],
-            resource['TableStatus'])
-    else:
-        return "%s" % format_struct(resource)
