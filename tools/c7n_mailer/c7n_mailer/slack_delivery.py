@@ -82,6 +82,9 @@ class SlackDelivery(object):
 
             if not response["ok"] and "Retry-After" in response["headers"]:
                 raise Exception("Slack API timeout.")
+            elif not response["ok"] and response["error"] == "invalid_auth":
+                raise Exception("Invalid Slack token.")
+                return
             elif not response["ok"] and response["error"] == "users_not_found":
                 self.logger.info("Slack user ID not found.")
                 self.caching.set(address, {})

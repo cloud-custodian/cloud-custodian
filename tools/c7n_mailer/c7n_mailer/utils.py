@@ -285,21 +285,24 @@ def resource_format(resource, resource_type):
 
 
 def kms_decrypt(config, logger, session, encrypted_field):
-    try:
-        if config.get(encrypted_field, None):
-            kms = session.client('kms')
-            return kms.decrypt(
-                CiphertextBlob=base64.b64decode(config[encrypted_field]))[
-                'Plaintext']
-    except (TypeError, base64.binascii.Error) as e:
-        logger.warning(
-            "Error: %s Unable to base64 decode %s, will assume plaintext." % (e, encrypted_field)
-        )
-    except ClientError as e:
-        if e.response['Error']['Code'] != 'InvalidCiphertextException':
-            raise
-        logger.warning(
-            "Error: %s Unable to decrypt %s with kms, will assume plaintext." % (e, encrypted_field)
-        )
+    if config.get(encrypted_field, None):
+        try:
+                kms = session.client('kms')
+                return kms.decrypt(
+                    CiphertextBlob=base64.b64decode(config[encrypted_field]))[
+                    'Plaintext']
+        except (TypeError, base64.binascii.Error) as e:
+            logger.warning(
+                "Error: %s Unable to base64 decode %s, will assume plaintext." % (e, encrypted_field)
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'InvalidCiphertextException':
+                raise
+            logger.warning(
+                "Error: %s Unable to decrypt %s with kms, will assume plaintext." % (e, encrypted_field)
+            )
 
-    return config[encrypted_field]
+        return config[encrypted_field]
+    else:
+        logger.debug("No encrypted value to decrypt.")
+        return None
