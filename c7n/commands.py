@@ -350,6 +350,8 @@ def schema_cmd(options):
     # Here are the formats for what we accept:
     # - No argument
     #   - List all available RESOURCES
+    # - PROVIDER
+    #   - List all available RESOURCES for supplied PROVIDER
     # - RESOURCE
     #   - List all available actions and filters for supplied RESOURCE
     # - RESOURCE.actions
@@ -369,6 +371,10 @@ def schema_cmd(options):
     # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
     # optional provider defaults to aws for compatibility
     components = options.resource.split('.')
+    if len(components) == 1 and components[0] in provider.clouds.keys():
+        resource_list = {'resources': sorted(provider.resources(cloud_provider=components[0]).keys())}
+        print(yaml.safe_dump(resource_list, default_flow_style=False))
+        return
     if components[0] in provider.clouds.keys():
         cloud_provider = components.pop(0)
         resource_mapping = schema.resource_vocabulary(
