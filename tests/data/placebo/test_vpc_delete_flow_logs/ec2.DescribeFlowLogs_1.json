@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "FlowLogs": [
+            {
+                "ResourceId": "vpc-7af45101", 
+                "CreationTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 46, 
+                    "microsecond": 20000, 
+                    "year": 2018, 
+                    "day": 6, 
+                    "minute": 51
+                }, 
+                "LogGroupName": "/custodian/vpc_logs/", 
+                "TrafficType": "ALL", 
+                "FlowLogStatus": "ACTIVE", 
+                "FlowLogId": "fl-f076b299", 
+                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e9849fcc-0a7d-48ab-a585-04ce816ad2c9", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 16 Apr 2018 14:37:27 GMT"
+            }
+        }
+    }
+}
