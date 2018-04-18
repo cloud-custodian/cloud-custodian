@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "b1a5ae3f-2a89-11e6-97fe-8774387c0f45"
+            "RequestId": "b26ca7c4-2a89-11e6-ac4a-2f43a15b7ecb"
         }, 
         "TagDescriptions": [
             {
@@ -11,6 +11,10 @@
                     {
                         "Value": "test", 
                         "Key": "test"
+                    }, 
+                    {
+                        "Value": "abdef", 
+                        "Key": "xyz"
                     }
                 ], 
                 "LoadBalancerName": "CloudCustodian"
