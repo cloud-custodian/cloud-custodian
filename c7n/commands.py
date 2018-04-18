@@ -370,7 +370,7 @@ def schema_cmd(options):
 
     # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
     # optional provider defaults to aws for compatibility
-    components = options.resource.split('.')
+    components = [i.lower() for i in options.resource.split('.')]
     if len(components) == 1 and components[0] in provider.clouds.keys():
         resource_list = {'resources': sorted(provider.resources(cloud_provider=components[0]).keys())}
         print(yaml.safe_dump(resource_list, default_flow_style=False))
@@ -386,7 +386,7 @@ def schema_cmd(options):
     #
     # Handle resource
     #
-    resource = components[0].lower()
+    resource = components[0]
     if resource not in resource_mapping:
         log.error('{} is not a valid resource'.format(resource))
         sys.exit(1)
@@ -400,7 +400,7 @@ def schema_cmd(options):
     #
     # Handle category
     #
-    category = components[1].lower()
+    category = components[1]
     if category not in ('actions', 'filters'):
         log.error("Valid choices are 'actions' and 'filters'. You supplied '{}'".format(category))
         sys.exit(1)
@@ -416,7 +416,7 @@ def schema_cmd(options):
     #
     # Handle item
     #
-    item = components[2].lower()
+    item = components[2]
     if item not in resource_mapping[resource][category]:
         log.error('{} is not in the {} list for resource {}'.format(item, category, resource))
         sys.exit(1)
