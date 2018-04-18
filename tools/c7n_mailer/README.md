@@ -5,10 +5,10 @@ organization-specific, so this at the moment serves primarily as an example
 implementation.
 
 
-## Email Message Relay
+## Message Relay
 
 Custodian Mailer subscribes to an SQS queue, looks up users, and sends email
-via SES. Custodian lambda and instance policies can send to it. SQS queues
+via SES and/or send notification to DataDog. Custodian lambda and instance policies can send to it. SQS queues
 should be cross-account enabled for sending between accounts.
 
 
@@ -23,7 +23,11 @@ and run a policy that triggers an email to your inbox.
    Copy the queue URL to `queue_url` in `mailer.yml`.
 1. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
-1. Make sure your email address is verified in SES, and set it as
+
+there is different notification endpoints options, you can combine both.
+
+### Email:
+Make sure your email address is verified in SES, and set it as
    `from_address` in `mailer.yml`. By default SES is in sandbox mode where you
 must
 [verify](http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html)
@@ -62,7 +66,53 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 
-Now run:
+### DataDog:
+The standard way to do a DataDog integration is use the
+c7n integration with AWS CloudWatch and use the
+[DataDog integration with AWS](https://docs.datadoghq.com/integrations/amazon_web_services/)
+to collect CloudWatch metrics. The mailer/messenger integration is only
+for the case you don't want or you can't use AWS CloudWatch.
+
+Note this integration requires the additional dependency of datadog python bindings:
+```
+pip install datadog
+```
+
+Your `mailer.yml` should now look something like this:
+
+```yaml
+queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+role: arn:aws:iam::123456790:role/c7n-mailer-test
+datadog_api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+datadog_application_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+```
+
+(Also set `region` if you are in a region other than `us-east-1`.)
+
+Now let's make a Custodian policy to populate your mailer queue. Create a
+`test-policy.yml`:
+
+```yaml
+policies:
+  - name: c7n-mailer-test
+    resource: ebs
+    filters:
+     - Attachments: []
+    actions:
+      - type: notify
+        to:
+          - datadog://?metric_name=datadog.metric.name&metric_value_tag=Size
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+```
+
+There is a special `to` format that specifies datadog delivery, and includes the datadog configuration via url parameters.
+- metric_name: is the name of the metrics send to DataDog
+- metric_value_tag: by default the metric value send to DataDog is `1` but if you want to use one of the tags returned in the policy you can set it with the attribute `metric_value_tag`, for example in the `test-policy.yml` the value used is the size of the EBS volume. The value must be a number and it's transformed to a float value.
+
+
+### Now run:
 
 ```
 c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
@@ -91,7 +141,7 @@ Custodian mailer.
 
 Once [installed](#developer-install-os-x-el-capitan) you should have a
 `c7n-mailer` executable on your path:
-
+aws
 ```
 (env) $ c7n-mailer
 usage: c7n-mailer [-h] -c CONFIG
@@ -108,7 +158,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 | Required? | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
 | &#x2705;  | `queue_url`          | string           | the queue to listen to for messages |
-| &#x2705;  | `from_address`       | string           | default from address                |
+|           | `from_address`       | string           | default from address                |
 |           | `contact_tags`       | array of strings | tags that we should look at for address information |
 |           | `smtp_server`        | string           | if this is unset, aws ses is used by default. To configure your lambda role to talk to smtpd in your private vpc, see [here](https://docs.aws.amazon.com/lambda/latest/dg/vpc.html) |
 |           | `smtp_port`          | integer          | smtp port                           |
@@ -154,6 +204,17 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `ses_region`               | string           | AWS region that handles SES API calls |
 
 
+#### DataDog Config
+
+| Required? | Key                       | Type             | Notes                               |
+|:---------:|:--------------------------|:-----------------|:------------------------------------|
+|           | `datadog_api_key`         | string           | DataDog API key. |
+|           | `datadog_application_key` | string           | Datadog application key. |
+
+This fields are not necessary if c7m_mailer run in a instance/lambda/etc with the DataDog agent.
+
+
+
 #### SDK Config
 
 | Required? | Key                  | Type             | Notes                               |
@@ -194,7 +255,7 @@ template that's used to format the email; customizing templates is described
 [below](#writing-an-email-template).
 
 The `to` list specifies the intended recipient for the email. You can specify
-either an email address, an SNS topic, or a special value. The special values
+either an email address, an SNS topic, a Datadog Metric, or a special value. The special values
 are either
 
 - `resource-owner`, in which case the email will be sent to the listed
