@@ -120,9 +120,9 @@ class MailerSqsQueueProcessor(object):
                 warning_msg = 'Unknown sqs_message or sns format %s' % (sqs_message['Body'][:50])
                 self.logger.warning(warning_msg)
             if parallel:
-                process_pool.apply_async(self.process_sqs_messsage, args=sqs_message)
+                process_pool.apply_async(self.process_sqs_message, args=sqs_message)
             else:
-                self.process_sqs_messsage(sqs_message)
+                self.process_sqs_message(sqs_message)
             self.logger.debug('Processed sqs_message')
             sqs_messages.ack(sqs_message)
         if parallel:
@@ -135,7 +135,7 @@ class MailerSqsQueueProcessor(object):
     # If you explicitly declare which tags are aws_usernames (synonymous with ldap uids)
     # in the ldap_uid_tags section of your mailer.yml, we'll do a lookup of those emails
     # (and their manager if that option is on) and also send emails there.
-    def process_sqs_messsage(self, encoded_sqs_message):
+    def process_sqs_message(self, encoded_sqs_message):
         body = encoded_sqs_message['Body']
         try:
             body = json.dumps(json.loads(body)['Message'])

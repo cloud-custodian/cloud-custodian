@@ -15,6 +15,7 @@ import json
 
 import requests
 import six
+from c7n_mailer.ldap_lookup import Redis
 from c7n_mailer.utils import kms_decrypt, get_rendered_jinja
 from slackclient import SlackClient
 
@@ -25,18 +26,18 @@ class SlackDelivery(object):
         if config.get('slack_token'):
             config['slack_token'] = kms_decrypt(config, logger, session, 'slack_token')
             self.client = SlackClient(config['slack_token'])
+        self.cache_engine = config.get('cache_engine', None)
+        if self.cache_engine == 'redis':
+            self.caching = Redis(redis_host=config.get('redis_host'), redis_port=int(config.get('redis_port', 6379)), db=0)
         self.config = config
         self.logger = logger
         self.session = session
 
     @staticmethod
     def is_deliverable(sqs_message):
-            if sqs_message and sqs_message.get(
-                    'action', False) and sqs_message['action'].get('to', False):
-                for to in sqs_message['action']['to']:
-                    if to == "slack":
-                        return True
-            return False
+        if 'slack' in sqs_message.get('action', ()).get('to', ()):
+            return True
+        return False
 
     def get_to_addrs_slack_messages_map(self, sqs_message, email_delivery):
         to_addrs_to_resources_map = email_delivery.get_email_to_addrs_to_resources_map(sqs_message)
@@ -71,6 +72,11 @@ class SlackDelivery(object):
     def retrieve_user_im(self, email_addresses):
         list = {}
         for address in email_addresses:
+            if self.cache_engine and self.caching.get(address):
+                    self.logger.debug('Got slack metadata from local cache for: %s' % address)
+                    list[address] = self.caching.get(address)
+                    continue
+
             response = self.client.api_call(
                 "users.lookupByEmail", email=address)
 
@@ -78,11 +84,15 @@ class SlackDelivery(object):
                 raise Exception("Slack API timeout.")
             elif not response["ok"] and response["error"] == "users_not_found":
                 self.logger.info("Slack user ID not found.")
-                return
+                self.caching.set(address, {})
+                continue
             else:
                 self.logger.debug("Slack account %s found for user %s", response['user']['enterprise_user']['id'])
+                if self.cache_engine:
+                    self.logger.debug('Writing user: %s metadata to cache engine.' % address)
+                    self.caching.set(address, response['user']['enterprise_user']['id'])
 
-            list[address] = response['user']['enterprise_user']['id']
+                list[address] = response['user']['enterprise_user']['id']
 
         return list
 
