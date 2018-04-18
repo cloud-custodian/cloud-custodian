@@ -1578,7 +1578,7 @@ class FlowLogsTest(BaseTest):
                 {'tag:Name': 'FlowLogTest'},
                 {'type': 'flow-logs', 'enabled': False}],
             'actions': [{
-                'type': 'set-vpc-flow',
+                'type': 'set-flow-log',
                 'DeliverLogsPermissionArn': 'arn:aws:iam::644160558196:role/flowlogsRole',
                 'LogGroupName': '/custodian/vpc_logs/',
                 'TrafficType': 'ALL'}]
@@ -1601,7 +1601,7 @@ class FlowLogsTest(BaseTest):
                 {'tag:Name': 'FlowLogTest'},
                 {'type': 'flow-logs', 'enabled': True}],
             'actions': [{
-                'type': 'set-vpc-flow',
+                'type': 'set-flow-log',
                 'state': False}]
         }, session_factory=session_factory)
         resources = p.run()

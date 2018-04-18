@@ -1603,18 +1603,9 @@ class KeyPair(query.QueryResourceManager):
         dimension = None
 
 
-class FlowResource(Filter):
-
-    RS_ALIAS = {
-        'vpc': 'VPC',
-        'subnet': 'Subnet',
-        'eni': 'NetworkInterface'
-    }
-
-
-@Vpc.action_registry.register('set-vpc-flow')
-@Subnet.action_registry.register('set-vpc-flow')
-@NetworkInterface.action_registry.register('set-vpc-flow')
+@Vpc.action_registry.register('set-flow-log')
+@Subnet.action_registry.register('set-flow-log')
+@NetworkInterface.action_registry.register('set-flow-log')
 class CreateFlowLogs(BaseAction):
     """Create flow logs for a network resource
 
@@ -1629,7 +1620,7 @@ class CreateFlowLogs(BaseAction):
               - type: flow-logs
                 enabled: false
             actions:
-              - type: set-vpc-flow
+              - type: set-flow-log
                 DeliverLogsPermissionArn: arn:iam:role
                 LogGroupName: /custodian/vpc/flowlogs/
     """
@@ -1638,13 +1629,19 @@ class CreateFlowLogs(BaseAction):
         'type': 'object',
         'additionalProperties': False,
         'properties': {
-            'type': {'enum': ['set-vpc-flow']},
+            'type': {'enum': ['set-flow-log']},
             'state': {'type': 'boolean'},
             'DeliverLogsPermissionArn': {'type': 'string'},
             'LogGroupName': {'type': 'string'},
             'TrafficType': {'type': 'string',
                             'enum': ['ACCEPT', 'REJECT', 'ALL']}
         }
+    }
+
+    RESOURCE_ALIAS = {
+        'vpc': 'VPC',
+        'subnet': 'Subnet',
+        'eni': 'NetworkInterface'
     }
 
     def validate(self):
@@ -1667,12 +1664,13 @@ class CreateFlowLogs(BaseAction):
                 FlowLogIds=[f['FlowLogId'] for f in flow_logs])
 
             for r in results['Unsuccessful']:
-                self.log.exception('Exception: delete flow-log for %s: %s' % (
-                    r['ResourceId'], r['Error']['Message']))
+                self.log.exception(
+                    'Exception: delete flow-log for %s: %s on %s',
+                    r['ResourceId'], r['Error']['Message'])
         except ClientError as e:
             if e.response['Error']['Code'] == 'InvalidParameterValue':
-                self.log.exception('delete flow-log: %s' % (
-                    e.response['Error']['Message']))
+                self.log.exception(
+                    'delete flow-log: %s', e.response['Error']['Message'])
             else:
                 raise
 
@@ -1691,18 +1689,20 @@ class CreateFlowLogs(BaseAction):
             self.delete_flow_logs(client, params['ResourceIds'])
             return
 
-        params['ResourceType'] = FlowResource.RS_ALIAS[model.type]
+        params['ResourceType'] = self.RESOURCE_ALIAS[model.type]
         params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
 
         try:
             results = client.create_flow_logs(**params)
 
             for r in results['Unsuccessful']:
-                self.log.exception('Exception: create flow-log for %s: %s' % (
-                    r['ResourceId'], r['Error']['Message']))
+                self.log.exception(
+                    'Exception: create flow-log for %s: %s',
+                    r['ResourceId'], r['Error']['Message'])
         except ClientError as e:
             if e.response['Error']['Code'] == 'FlowLogAlreadyExists':
-                self.log.exception('Exception: create flow-log: %s' % (
-                    e.response['Error']['Message']))
+                self.log.exception(
+                    'Exception: create flow-log: %s',
+                    e.response['Error']['Message'])
             else:
                 raise
