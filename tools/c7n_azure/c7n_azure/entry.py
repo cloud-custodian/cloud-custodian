@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import c7n_azure.actions
 import c7n_azure.resources.vm
 import c7n_azure.resources.storage
+import c7n_azure.resources.resourcegroup
+import c7n_azure.resources.sqlserver
 import c7n_azure.resources.vnet  # noqa: F401
 
 
