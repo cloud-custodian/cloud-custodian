@@ -18,7 +18,6 @@ import logging
 from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.cli.core._profile import Profile
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
-import adal
 
 
 class Session(object):
@@ -26,7 +25,6 @@ class Session(object):
     def __init__(self):
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
-        adal.set_logging_options({'level': 'WARNING'})
 
         tenant_auth_variables = ['AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET']
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
