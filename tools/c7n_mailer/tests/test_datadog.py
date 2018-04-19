@@ -137,3 +137,11 @@ class TestDataDogDelivery(unittest.TestCase):
         answer[0]['tags'].sort()
 
         assert answer == DATADOG_METRIC_SQS_MESSAGE_3
+
+    @patch('c7n_mailer.datadog_delivery.time.time', return_value=0)
+    @patch('c7n_mailer.datadog_delivery.api.Metric.send')
+    def test_deliver_datadog_messages_should_not_send_metric_if_metrics_are_empty(self, mock_datadog_api, mock_time):
+        datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+        datadog_delivery.deliver_datadog_messages([], SQS_MESSAGE_3)
+
+        mock_datadog_api.assert_not_called()

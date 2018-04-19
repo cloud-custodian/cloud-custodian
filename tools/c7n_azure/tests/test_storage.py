@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest
 
 
+# Recorded using template: storage
 class StorageTest(BaseTest):
     def setUp(self):
         super(StorageTest, self).setUp()
@@ -27,9 +28,9 @@ class StorageTest(BaseTest):
 
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cs44bfa739e0d8cx437ex930'}],
+                 'value': 'cctstorage*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
