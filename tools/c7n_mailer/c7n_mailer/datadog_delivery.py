@@ -83,7 +83,11 @@ class DataDogDelivery(object):
                        resource=sqs_message['policy']['resource'],
                        quantity=len(sqs_message['resources'])))
 
+        try:
             api.Metric.send(datadog_message_packages)
+        except Exception:
+            self.logger.debug("Datadog message error")
+            return
 
     @staticmethod
     def _get_metric_value(metric_config, tags):
