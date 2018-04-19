@@ -17,16 +17,14 @@ from azure_common import BaseTest
 
 from c7n.filters import FilterValidationError
 
-
+# Recorded using template: vm
 class TagsTest(BaseTest):
-    """Requires one VM in the resource group subscription
-    """
     def setUp(self):
         super(TagsTest, self).setUp()
 
     def test_add_or_update_single_tag(self):
-        """Requires a vm named 'test-vm-tags' with the following existing tags:
-        'pre-existing-1': 'unmodified'
+        """Verifies we can add a new tag to a VM and not modify
+        an existing tag on that resource
         """
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -36,7 +34,7 @@ class TagsTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test-add-tags'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'tag',
@@ -49,38 +47,12 @@ class TagsTest(BaseTest):
         # verify that the a new tag is added without modifying existing tags
         s = Session()
         client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = [vm for vm in client.virtual_machines.list_all() if vm.name == 'test-add-tags'][0]
-        self.assertEqual(vm.tags, {'tag1': 'value1', 'pre-existing-1': 'unmodified'})
-
-        p = self.load_policy({
-            'name': 'test-azure-tag',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'test-add-tags'}
-            ],
-            'actions': [
-                {'type': 'tag',
-                 'tag': 'pre-existing-1',
-                 'value': 'modified'}
-            ],
-        })
-        p.run()
-
-        # verify that an existing tag is updated
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = [vm for vm in client.virtual_machines.list_all() if vm.name == 'test-add-tags'][0]
-        self.assertEqual(vm.tags, {'tag1': 'value1', 'pre-existing-1': 'modified'})
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        self.assertEqual(vm.tags, {'tag1': 'value1', 'testtag': 'testvalue'})
 
     def test_add_or_update_tags(self):
-        """Requires a resource group named 'test-tags' with the following existing tags:
-        'pre-existing-1': 'unmodified'
-        'pre-existing-2': 'unmodified'
-
+        """Adds tags to an empty resource group, then updates one
+        tag and adds a new tag
         """
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -90,7 +62,31 @@ class TagsTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test-tags'}
+                 'value': 'test_vm'}
+            ],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'pre-existing-1': 'unmodified', 'pre-existing-2': 'unmodified'}},
+            ],
+        })
+        p.run()
+
+        # verify initial tag set
+        s = Session()
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
+        self.assertEqual(rg.tags,
+                         {'pre-existing-1': 'unmodified', 'pre-existing-2': 'unmodified'})
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.resourcegroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'test_vm'}
             ],
             'actions': [
                 {'type': 'tag',
@@ -99,10 +95,8 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        # verify the
-        s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test-tags'][0]
+        # verify modified tags
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
         self.assertEqual(rg.tags,
                          {'tag1': 'value1', 'pre-existing-1': 'modified', 'pre-existing-2': 'unmodified'})
 
