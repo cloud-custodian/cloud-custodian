@@ -372,7 +372,8 @@ def schema_cmd(options):
     # optional provider defaults to aws for compatibility
     components = options.resource.lower().split('.')
     if len(components) == 1 and components[0] in provider.clouds.keys():
-        resource_list = {'resources': sorted(provider.resources(cloud_provider=components[0]).keys())}
+        resource_list = {'resources': sorted(
+            provider.resources(cloud_provider=components[0]).keys())}
         print(yaml.safe_dump(resource_list, default_flow_style=False))
         return
     if components[0] in provider.clouds.keys():
