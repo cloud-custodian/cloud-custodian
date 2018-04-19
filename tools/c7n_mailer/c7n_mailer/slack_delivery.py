@@ -15,6 +15,7 @@ import json
 
 import requests
 import six
+import time
 from c7n_mailer.ldap_lookup import Redis
 from c7n_mailer.utils import kms_decrypt, get_rendered_jinja
 from slackclient import SlackClient
@@ -33,12 +34,6 @@ class SlackDelivery(object):
         self.logger = logger
         self.session = session
 
-    @staticmethod
-    def is_deliverable(sqs_message):
-        if 'cc-slack' in sqs_message.get('action', ()).get('to', ()):
-            return True
-        return False
-
     def get_to_addrs_slack_messages_map(self, sqs_message, email_delivery):
         to_addrs_to_resources_map = email_delivery.get_email_to_addrs_to_resources_map(sqs_message)
         slack_messages = {}
@@ -56,18 +51,17 @@ class SlackDelivery(object):
         return slack_messages
 
     def slack_handler(self, sqs_message, slack_messages):
-
-        for message in slack_messages:
-            self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" % (
+        for email, payload in slack_messages.iteritems():
+            self.logger.info("Sending account:%s policy:%s %s:%s slack:%s to %s" % (
                                  sqs_message.get('account', ''),
                                  sqs_message['policy']['name'],
                                  sqs_message['policy']['resource'],
                                  str(len(sqs_message['resources'])),
                                  sqs_message['action'].get('slack_template', 'slack_default'),
-                                 json.loads(slack_messages[message])["channel"])
+                                 json.loads(payload)["channel"])
                             )
 
-            self.send_slack_msg(slack_messages[message])
+            self.send_slack_msg(payload)
 
     def retrieve_user_im(self, email_addresses):
         list = {}
@@ -81,10 +75,11 @@ class SlackDelivery(object):
                 "users.lookupByEmail", email=address)
 
             if not response["ok"] and "Retry-After" in response["headers"]:
-                raise Exception("Slack API timeout.")
+                self.logger.info("Slack API rate limiting. Waiting %d seconds") % (int(response.headers['retry-after']))
+                time.sleep(int(response.headers['Retry-After']))
+                continue
             elif not response["ok"] and response["error"] == "invalid_auth":
                 raise Exception("Invalid Slack token.")
-                return
             elif not response["ok"] and response["error"] == "users_not_found":
                 self.logger.info("Slack user ID not found.")
                 self.caching.set(address, {})
@@ -107,6 +102,10 @@ class SlackDelivery(object):
                        'Authorization': 'Bearer %s' % self.config.get('slack_token')}
         )
 
-        if response.status_code != 200:
+        if not response.json()["ok"] and "Retry-After" in response["headers"]:
+            self.logger.info("Slack API rate limiting. Waiting %d seconds") % (int(response.headers['retry-after']))
+            time.sleep(int(response.headers['Retry-After']))
+            return
+        elif response.status_code != 200:
             self.logger.info("Error in sending Slack message: %s" % response.json())
             return

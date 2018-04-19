@@ -43,11 +43,16 @@ class LdapLookup(object):
         self.uid_regex    = config.get('ldap_uid_regex', None)
         self.cache_engine = config.get('cache_engine', None)
         if self.cache_engine == 'redis':
-            self.caching = Redis(redis_host=config.get('redis_host'), redis_port=int(config.get('redis_port', 6379)), db=0)
+            redis_host = config.get('redis_host')
+            redis_port = int(config.get('redis_port', 6379))
+            self.caching = self.get_redis_connection(redis_host, redis_port)
         elif self.cache_engine == 'sqlite':
             if not have_sqlite:
                 raise RuntimeError('No sqlite available: stackoverflow.com/q/44058239')
             self.caching = LocalSqlite(config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)
+
+    def get_redis_connection(self, redis_host, redis_port):
+        return Redis(redis_host=redis_host, redis_port=redis_port, db=0)
 
     def get_connection(self, ldap_uri, ldap_bind_user, ldap_bind_password):
         # note, if ldap_bind_user and ldap_bind_password are None

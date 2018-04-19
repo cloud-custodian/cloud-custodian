@@ -134,7 +134,7 @@ policies:
       - type: notify
         slack_template: slack
         to:
-          - cc-slack
+          - slack
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test

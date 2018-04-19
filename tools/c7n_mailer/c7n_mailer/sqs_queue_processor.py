@@ -165,15 +165,14 @@ class MailerSqsQueueProcessor(object):
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
 
         # this section sends a notification to the resource owner via Slack
-        if self.config.get('slack_token'):
+        if 'slack' in sqs_message.get('action', ()).get('to'):
             from .slack_delivery import SlackDelivery
             slack_delivery = SlackDelivery(self.config, self.session, self.logger)
-            if slack_delivery.is_deliverable(sqs_message):
-                slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message, email_delivery)
-                slack_delivery.slack_handler(sqs_message, slack_messages)
+            slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message, email_delivery)
+            slack_delivery.slack_handler(sqs_message, slack_messages)
 
         # this section gets the map of metrics to send to datadog and delivers it
-        if self.config.get('datadog_api_key'):
+        if any(e.startswith('datadog') for e in sqs_message.get('action', ()).get('to')):
             from .datadog_delivery import DataDogDelivery
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
