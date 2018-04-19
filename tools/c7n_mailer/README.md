@@ -142,7 +142,7 @@ policies:
 
 An additional `slack_template` field is used, in addition to the standard `template`, in order to allow separate template usage
 between email and Slack, as well as to provide backwards compatibility for existing policies. This field is optional, however,
-and if not specified, will default to `slack_default`. The `- cc-slack` entry under `to:` indicates that a Slack payload should
+and if not specified, will default to `slack_default`. The `- slack` entry under `to:` indicates that a Slack payload should
 be sent in addition to the traditional email and is required for Slack integration.
 
 ### Now run:
@@ -244,7 +244,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `datadog_api_key`         | string           | DataDog API key. |
 |           | `datadog_application_key` | string           | Datadog application key. |
 
-This fields are not necessary if c7m_mailer run in a instance/lambda/etc with the DataDog agent.
+This fields are not necessary if c7n_mailer run in a instance/lambda/etc with the DataDog agent.
 
 #### Slack Config
 
