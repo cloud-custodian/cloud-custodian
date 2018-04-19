@@ -9,9 +9,9 @@ in the makefile:
 .. code-block:: bash
 
     $ make install
-    $ source ../cc_env/bin/activate
+    $ source bin/activate
 
-This creates a virtual env in the directory above your enlistment and installs all packages as editable.
+This creates a virtual env in your enlistment and installs all packages as editable.
 
 
 Testing
