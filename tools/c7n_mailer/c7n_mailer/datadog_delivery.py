@@ -75,14 +75,15 @@ class DataDogDelivery(object):
         return datadog_rendered_messages
 
     def deliver_datadog_messages(self, datadog_message_packages, sqs_message):
-        self.logger.info(
-            "Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog".
-            format(account=sqs_message.get('account', ''),
-                   policy=sqs_message['policy']['name'],
-                   resource=sqs_message['policy']['resource'],
-                   quantity=len(sqs_message['resources'])))
+        if len(datadog_message_packages) > 0:
+            self.logger.info(
+                "Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog".
+                format(account=sqs_message.get('account', ''),
+                       policy=sqs_message['policy']['name'],
+                       resource=sqs_message['policy']['resource'],
+                       quantity=len(sqs_message['resources'])))
 
-        api.Metric.send(datadog_message_packages)
+            api.Metric.send(datadog_message_packages)
 
     @staticmethod
     def _get_metric_value(metric_config, tags):
