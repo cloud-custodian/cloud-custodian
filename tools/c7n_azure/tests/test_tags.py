@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 import datetime
-from mock import patch, Mock
+import re
+from mock import patch
 from azure_common import BaseTest
 from c7n_azure.session import Session
 from c7n.filters import FilterValidationError
@@ -195,7 +196,7 @@ class TagsTest(BaseTest):
         s = Session()
         client = s.client('azure.mgmt.resource.ResourceManagementClient')
         rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        self.assertRegex(rg.tags['CreatorEmail'], self.EMAIL_REGEX)
+        self.assertTrue(re.match(self.EMAIL_REGEX, rg.tags['CreatorEmail']))
 
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_auto_tag_update_false_noop_for_existing_tag(self, utcnow_mock):
