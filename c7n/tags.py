@@ -233,7 +233,7 @@ class TagActionFilter(Filter):
     time a number of hours into the future.
 
     Optionally, the 'tz' parameter can get used to specify the timezone
-    in which to interpret the clock (default value is 'gmt')
+    in which to interpret the clock (default value is 'utc')
 
     .. code-block :: yaml
 
@@ -247,7 +247,7 @@ class TagActionFilter(Filter):
               tag: custodian_status
               op: stop
               # Another optional tag is skew
-              tz: gmt
+              tz: utc
           actions:
             - stop
 
@@ -267,7 +267,7 @@ class TagActionFilter(Filter):
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError("Invalid marked-for-op op:%s" % op)
 
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'gmt')))
+        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
             raise FilterValidationError(
                 "Invalid timezone specified '%s'" % self.data.get('tz'))
@@ -278,7 +278,7 @@ class TagActionFilter(Filter):
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'gmt')))
+        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         v = None
         for n in i.get('Tags', ()):
@@ -550,7 +550,7 @@ class TagDelayedAction(Action):
     """Tag resources for future action.
 
     The optional 'tz' parameter can be used to adjust the clock to align
-    with a given timezone. The default value is 'gmt'.
+    with a given timezone. The default value is 'utc'.
 
     .. code-block :: yaml
 
@@ -564,7 +564,7 @@ class TagDelayedAction(Action):
               tag: custodian_status
               op: stop
               # Another optional tag is skew
-              tz: gmt
+              tz: utc
           actions:
             - stop
     """
@@ -602,7 +602,7 @@ class TagDelayedAction(Action):
 
     def process(self, resources):
         self.tz = zoneinfo.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'gmt')))
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise FilterValidationError(
                 "Invalid timezone specified %s" % self.tz)
