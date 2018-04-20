@@ -15,21 +15,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 
 
-class StorageTest(BaseTest):
+class VMTest(BaseTest):
     def setUp(self):
-        super(StorageTest, self).setUp()
+        super(VMTest, self).setUp()
 
-    @arm_template('storage.json')
-    def test_value_filter(self):
+    @arm_template('vm.json')
+    def test_find_by_name(self):
         p = self.load_policy({
-            'name': 'test-azure-storage-enum',
-            'resource': 'azure.storage',
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'glob',
+                 'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctstorage*'}],
+                 'value': 'cctestvm'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

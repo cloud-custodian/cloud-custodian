@@ -15,12 +15,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import re
 from mock import patch
-from azure_common import BaseTest
 from c7n_azure.session import Session
 from c7n.filters import FilterValidationError
+from azure_common import BaseTest, arm_template
 
 
-# Recorded using template: vm
 class TagsTest(BaseTest):
 
     # latest VCR recording date that tag tests
@@ -32,6 +31,7 @@ class TagsTest(BaseTest):
     def setUp(self):
         super(TagsTest, self).setUp()
 
+    @arm_template('vm.json')
     def test_add_or_update_single_tag(self):
         """Verifies we can add a new tag to a VM and not modify
         an existing tag on that resource
@@ -60,6 +60,7 @@ class TagsTest(BaseTest):
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
         self.assertEqual(vm.tags, {'tag1': 'value1', 'testtag': 'testvalue'})
 
+    @arm_template('vm.json')
     def test_add_or_update_tags(self):
         """Adds tags to an empty resource group, then updates one
         tag and adds a new tag
@@ -171,6 +172,7 @@ class TagsTest(BaseTest):
             })
             p.run()
 
+    @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_auto_tag_add_creator_tag(self, utcnow_mock):
         """Adds CreatorEmail to a resource group
@@ -199,6 +201,7 @@ class TagsTest(BaseTest):
         self.assertTrue(re.match(self.EMAIL_REGEX, rg.tags['CreatorEmail']))
 
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    @arm_template('vm.json')
     def test_auto_tag_update_false_noop_for_existing_tag(self, utcnow_mock):
         """Adds CreatorEmail to a resource group
         """

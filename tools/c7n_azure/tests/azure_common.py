@@ -1,5 +1,6 @@
 import io
 import logging
+import os
 import shutil
 import tempfile
 import re
@@ -142,3 +143,14 @@ class TextTestIO(io.StringIO):
         if not isinstance(b, six.text_type):
             b = b.decode('utf8')
         return super(TextTestIO, self).write(b)
+
+
+def arm_template(template):
+    def decorator(func):
+        def wrapper(*args):
+            template_file_path = os.path.dirname(__file__) + "/templates/"+template
+            if not os.path.isfile(template_file_path):
+                return args[0].fail("ARM template {} is not found".format(template_file_path))
+        return wrapper
+    return decorator
+
