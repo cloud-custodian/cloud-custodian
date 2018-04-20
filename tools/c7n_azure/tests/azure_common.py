@@ -56,11 +56,11 @@ class AzureVCRBaseTest(VCRTestCase):
         r1_uri = re.sub(
             r"api-version=\d{4}-\d{2}-\d{2}&?",
             "",
-            r1.uri)
+            r1_uri)
         r2_uri = re.sub(
             r"api-version=\d{4}-\d{2}-\d{2}&?",
             "",
-            r2.uri)
+            r2_uri)
 
         return r1_uri == r2_uri
 
