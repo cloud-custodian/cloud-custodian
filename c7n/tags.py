@@ -128,7 +128,7 @@ def _common_tag_processer(executor_factory, batch_size, concurrency,
 class TagTrim(Action):
     """Automatically remove tags from an ec2 resource.
 
-    EC2 Resources have a limit of 10 tags, in order to make
+    EC2 Resources have a limit of 50 tags, in order to make
     additional tags space on a set of resources, this action can
     be used to remove enough tags to make the desired amount of
     space while preserving a given set of tags.
