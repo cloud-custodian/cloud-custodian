@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from c7n_azure.provider import resources
 import c7n_azure.actions
 import c7n_azure.resources.cosmos_db
 import c7n_azure.resources.key_vault
@@ -26,5 +27,7 @@ import c7n_azure.resources.web_app # noqa: F401
 
 
 def initialize_azure():
+    # after all resources are loaded, do out of band registrations of filters/actions
+    resources.notify(resources.EVENT_FINAL)
     pass
 
