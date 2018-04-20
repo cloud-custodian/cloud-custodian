@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 
 
-# Recorded using template: emptyrg
 class ResourceGroupTest(BaseTest):
     def setUp(self):
         super(ResourceGroupTest, self).setUp()

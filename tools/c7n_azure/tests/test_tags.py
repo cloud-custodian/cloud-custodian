@@ -17,7 +17,7 @@ from azure_common import BaseTest
 
 from c7n.filters import FilterValidationError
 
-# Recorded using template: vm
+
 class TagsTest(BaseTest):
     def setUp(self):
         super(TagsTest, self).setUp()

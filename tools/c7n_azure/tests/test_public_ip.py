@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 
 
-# Recorded using template: storage
 class PublicIpAddressTest(BaseTest):
     def setUp(self):
         super(PublicIpAddressTest, self).setUp()
