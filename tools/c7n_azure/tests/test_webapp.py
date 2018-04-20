@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest
+from azure_common import arm_template
 
 
 # Recorded using template: storage
@@ -20,12 +21,12 @@ class WebAppTest(BaseTest):
     def setUp(self):
         super(WebAppTest, self).setUp()
 
+    @arm_template('webapp.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-webapp',
             'resource': 'azure.webapp',
             'filters': [
-
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',

@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest
+from azure_common import arm_template
 
 
 # Recorded using template: storage
@@ -20,12 +21,12 @@ class StorageTest(BaseTest):
     def setUp(self):
         super(StorageTest, self).setUp()
 
+    @arm_template('storage.json')
     def test_value_filter(self):
         p = self.load_policy({
             'name': 'test-azure-storage-enum',
             'resource': 'azure.storage',
             'filters': [
-
                 {'type': 'value',
                  'key': 'name',
                  'op': 'glob',

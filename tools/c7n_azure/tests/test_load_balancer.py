@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest
+from azure_common import arm_template
 
 
 # Recorded using template: storage
@@ -20,12 +21,12 @@ class LoadBalancerTest(BaseTest):
     def setUp(self):
         super(LoadBalancerTest, self).setUp()
 
+    @arm_template('load-balancer.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-loadbalancer',
             'resource': 'azure.loadbalancer',
             'filters': [
-
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',

@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest
+from azure_common import arm_template
 
 
 # Recorded using template: storage
@@ -20,12 +21,12 @@ class KeyVaultTest(BaseTest):
     def setUp(self):
         super(KeyVaultTest, self).setUp()
 
+    @arm_template('keyvault.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
-
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',

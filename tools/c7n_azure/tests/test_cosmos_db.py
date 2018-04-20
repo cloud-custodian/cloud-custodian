@@ -13,19 +13,19 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest
+from azure_common import arm_template
 
 
-# Recorded using template: storage
 class CosmosDBTest(BaseTest):
     def setUp(self):
         super(CosmosDBTest, self).setUp()
 
+    @arm_template('cosmosdb.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
             'resource': 'azure.cosmosdb',
             'filters': [
-
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',

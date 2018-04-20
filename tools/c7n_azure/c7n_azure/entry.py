@@ -13,17 +13,18 @@
 # limitations under the License.
 
 import c7n_azure.actions
-import c7n_azure.resources.vm
-import c7n_azure.resources.storage
-import c7n_azure.resources.resourcegroup
-import c7n_azure.resources.sqlserver
-import c7n_azure.resources.load_balancer
 import c7n_azure.resources.cosmos_db
 import c7n_azure.resources.key_vault
+import c7n_azure.resources.load_balancer
+import c7n_azure.resources.resourcegroup
 import c7n_azure.resources.public_ip
-import c7n_azure.resources.web_app
+import c7n_azure.resources.storage
+import c7n_azure.resources.sqlserver
+import c7n_azure.resources.vm
 import c7n_azure.resources.vnet  # noqa: F401
+import c7n_azure.resources.web_app
 
 
 def initialize_azure():
     pass
+
