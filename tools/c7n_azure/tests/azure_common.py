@@ -7,6 +7,7 @@ import six
 from vcr_unittest import VCRTestCase
 
 from c7n import policy
+from c7n.config import Bag, Config
 from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.utils import CONN_CACHE
@@ -127,37 +128,6 @@ class BaseTest(AzureVCRBaseTest):
             logger.setLevel(old_logger_level)
 
         return log_file
-
-
-class Bag(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-
-class Config(Bag):
-
-    @classmethod
-    def empty(cls, **kw):
-        d = {}
-        d.update({
-            'region': None,
-            'regions': None,
-            'cache': '',
-            'profile': None,
-            'account_id': None,
-            'assume_role': None,
-            'external_id': None,
-            'log_group': None,
-            'metrics_enabled': False,
-            'output_dir': '',
-            'cache_period': 0,
-            'dryrun': False})
-        d.update(kw)
-        return cls(d)
 
 
 class TextTestIO(io.StringIO):
