@@ -16,17 +16,20 @@ from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
 
 
-@resources.register('vnet')
-class Vnet(QueryResourceManager):
+@resources.register('publicip')
+class PublicIPAddress(QueryResourceManager):
 
     class resource_type(object):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
-        enum_spec = ('virtual_networks', 'list_all')
+        enum_spec = ('public_ip_addresses', 'list_all')
         id = 'id'
         name = 'name'
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'properties.publicIPAddressVersion',
+            'properties.publicIPAllocationMethod',
+            'properties.ipAddress'
         )

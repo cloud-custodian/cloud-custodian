@@ -1,0 +1,65 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/2.7.10 (Darwin-17.5.0-x86_64-i386-64bit) requests/2.18.4
+          msrest/0.4.27 msrest_azure/0.4.24 websitemanagementclient/0.34.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/sites?api-version=2016-08-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXM3yx4ePHywP9m+P9vLtvdnDw+2swcH2fa9g73zew92
+        7892HuR367yp1vU0/7yu1it6Z/mDqqym8+02b9rtbFXcXdXVZTHL6+buF8W0rprqvB1/N5/cbQpq
+        0m//0eijZbYgpD6KfdVer/BVCOmirCZZSd++LZYYhjSlVzOMgz44yZdtnZXpV6/p8za7aD569Is/
+        mhezWb7crvMya/PZo7sfMPaL9x57Xl/m9XlWL5q7r+n3Ypq/LLNl/um9bO/g3v72w4d7U8I7X6za
+        649+yegjgrPK67bIGfMN9GlaGgx992q9XBbLC/pkXjXtC3qB3vxe/5Vx9oN1nV/lE56N8TJvP/r+
+        6CP6+/UqmwJQ741tJeZXr6lVw62o27w8f14s39IL87ZdNY/u3r3Krpptwnu2PVvsbu8c3BvTy53u
+        rmi+qivu9tH+/f27X2MKAAtIUPObMd3Ac3W+qujbqr5+TW1AMBpLrGF1tczrjx4t12U5+mjdZBf5
+        a6X5i6peMBvmy2xS5sSJbb3ORx9ls0WxPA0/0ybfft/JIWi9Vs10EWlJ04g/Xgacs8jbbJa1mcGf
+        5sd+S0pAGYtmcv3u2bufJL6liaA+VU189NEvIajZavU6b1viLnoJYIg/s8usKLNJURbtdY8cTVOe
+        oJPzggSSeyIo06Y2v1E3AoiaEsZfVDO8/rxY0B8zet9w8OumZNjU2uHaJ0efFARXX6UXnhYNk54+
+        LVZPsiafEdxXebMuW4PFZVG366w8e2k+aOfrxWRVF0vbpK2+WhEhCWD495kFab5xnRgMXlTtSbU8
+        Ly4IT6CB8b0RvUZNlrOsnpHMbxhhfML/vzPKV1bWmKGm1WK1tvP+NJ8xn+AdUZPPSE2aftwnZyRL
+        P2SDxX3foLShSbghoXeelQ3Jepk1LQ2O+D+fvSkW+VctdPvezu7B9s7+9u7Bm73dR/f3Hu3sjR/u
+        fErPAwLSEHVItbzKpxX1ef00P89o6gxtnXafVsuWtNzxJvmr18uWut3YhqYjl+kylJ7lq7K6XhBw
+        pnSPTPQSKddzEuovsiWhWnu6TCA0b9f0InUlLE0fTBdQrsdlU71uq9XKo1Gb1Rd5+/oqW70uK8t/
+        4Bka5+mSeLVaApfhb0jRnRclDUoaTMuCPjwm/JY03o72lS+hlOwXigfg8iCsAJlvZtUiK5akE2ke
+        iT+J387IfYBWI04xvQYOSLVuJ9V6OTtbHc9mxBUNSPPR/b3x7qf3x7sP9se7e/dG+PPBp+ODh+P7
+        D/kP/m53/Kn9ahc/9w7kz3vjvQfj3d0DAk8y1BSE4pc/i92Mdu+NPz0Y7xJv7u7tU6fgNyJDXr8u
+        fkC03iG6EFddf5EvSJrB3D+xrmBe6Itm3azy5Qw8X1o9AT4zpH2VZw2ZF7Q9Xy+nIOnpu3y6xi9f
+        0aw1J9l0Tp3Im4vs3QvST3n95fl3q/qtR/R5RbahzRYrGnbP6wDOZQVpOVueV+aVZpmtmnnV+p9h
+        6qmZx1JgfPnu/4s+o+mI9Rx90euJSDMTvWJEN9YqbmlISFlYSY+siTJCJXb9vlyW1yo0vwRW7JsK
+        LKjz9vcnNMj9GCYRULw7ndK/rTQlXNWMdj79USBBmMdJc0MM4beOMAcZdPrbhA/0qZm1vjtOkG8O
+        HPZ3f7YDBwI4jGOcp6LRQqfNz16g4HfUIQwRhOAGDcjqRhrRNOEPspoeP/z/LzwIKNGnAoHUt6it
+        sUv0qXNn/9/iM1MTcaOgU2ODi0/z/3cG+P+qoIDIZ1TCrVTvVKbC18DN2wd7q3vFp5NicvkpoU09
+        0Lc0ArGNZFayjWHBQ4QF+zuP7u+QB3YPDwH5f11YIOMWSlF70p3kcf8oInAqK/AkhiMC8rjvkXvu
+        vPFP743v27/IVzeeOX21Q267OPH4ixp+CtYg6bkhHPjAPuQvhUEdgsdo/P9fCQX2d4Hzj0IBkAYd
+        qHojovSDAF+q40aFRJJFkxTGJv+fFPkyf9eSx0AenjRCPIDffsn/A8850WB+GAAA
+    headers:
+      cache-control: [no-cache]
+      content-encoding: [gzip]
+      content-type: [application/json]
+      date: ['Thu, 19 Apr 2018 21:42:25 GMT']
+      etag: ['"1D3D827160AD286"']
+      expires: ['-1']
+      pragma: [no-cache]
+      server: [Microsoft-IIS/10.0]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-aspnet-version: [4.0.30319]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [8ee5e918-1348-4c26-addb-44f76e455d42]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [bc642153-0253-4059-8945-d20ab80bbdcf]
+      x-ms-routing-request-id: ['WESTUS2:20180419T214226Z:8ee5e918-1348-4c26-addb-44f76e455d42']
+      x-powered-by: [ASP.NET]
+    status: {code: 200, message: OK}
+version: 1

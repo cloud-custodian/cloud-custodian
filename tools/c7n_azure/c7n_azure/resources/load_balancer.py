@@ -16,13 +16,13 @@ from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
 
 
-@resources.register('vnet')
-class Vnet(QueryResourceManager):
+@resources.register('loadbalancer')
+class LoadBalancer(QueryResourceManager):
 
     class resource_type(object):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
-        enum_spec = ('virtual_networks', 'list_all')
+        enum_spec = ('load_balancers', 'list_all')
         id = 'id'
         name = 'name'
         default_report_fields = (
