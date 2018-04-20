@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-from azure_common import BaseTest
-from azure_common import arm_template
+from azure_common import BaseTest, arm_template
 
 
 class CosmosDBTest(BaseTest):

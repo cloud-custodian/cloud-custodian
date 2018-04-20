@@ -21,8 +21,8 @@ import c7n_azure.resources.public_ip
 import c7n_azure.resources.storage
 import c7n_azure.resources.sqlserver
 import c7n_azure.resources.vm
-import c7n_azure.resources.vnet  # noqa: F401
-import c7n_azure.resources.web_app
+import c7n_azure.resources.vnet
+import c7n_azure.resources.web_app # noqa: F401
 
 
 def initialize_azure():
