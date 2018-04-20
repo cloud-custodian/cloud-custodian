@@ -62,6 +62,8 @@ class QueryMeta(type):
         if 'action_registry' not in attrs:
             actions = ActionRegistry(
                 '%s.actions' % name.lower())
+
+            # All ARM resources will have tag support; however, classic resources may not have support
             actions.register('tag', Tag)
             attrs['action_registry'] = actions
 
