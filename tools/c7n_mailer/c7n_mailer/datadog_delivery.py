@@ -20,20 +20,21 @@ from six.moves.urllib.parse import urlparse, parse_qsl
 
 
 class DataDogDelivery(object):
+    DATADOG_API_KEY = 'datadog_api_key'
+    DATADOG_APPLICATION_KEY = 'datadog_application_key'
 
     def __init__(self, config, session, logger):
-        self.config      = config
-        self.logger      = logger
-        self.session     = session
-        self.DATADOG_APPLICATION_KEY = self.config.get('datadog_application_key')
-        self.DATADOG_API_KEY = self.config.get('datadog_api_key')
+        self.config                  = config
+        self.logger                  = logger
+        self.session                 = session
+        self.datadog_api_key         = self.config.get(self.DATADOG_API_KEY, None)
+        self.datadog_application_key = self.config.get(self.DATADOG_APPLICATION_KEY, None)
 
         # Initialize datadog
-        if self.config.get(self.DATADOG_API_KEY, False) and self.config.get(
-                self.DATADOG_APPLICATION_KEY, False):
+        if self.datadog_api_key and self.datadog_application_key:
             options = {
-                'api_key': self.config[self.DATADOG_API_KEY],
-                'app_key': self.config[self.DATADOG_APPLICATION_KEY]
+                'api_key': self.datadog_api_key,
+                'app_key': self.datadog_application_key,
 
             }
             initialize(**options)
@@ -83,9 +84,6 @@ class DataDogDelivery(object):
                        resource=sqs_message['policy']['resource'],
                        quantity=len(sqs_message['resources'])))
 
-        if not self.DATADOG_API_KEY:
-            self.logger.info("DataDog API key not found. Skipping DataDog payload.")
-        else:
             api.Metric.send(datadog_message_packages)
 
     @staticmethod
