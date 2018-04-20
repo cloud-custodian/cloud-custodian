@@ -16,17 +16,18 @@ from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
 
 
-@resources.register('vnet')
-class Vnet(QueryResourceManager):
+@resources.register('cosmosdb')
+class CosmosDB(QueryResourceManager):
 
     class resource_type(object):
-        service = 'azure.mgmt.network'
-        client = 'NetworkManagementClient'
-        enum_spec = ('virtual_networks', 'list_all')
+        service = 'azure.mgmt.cosmosdb'
+        client = 'CosmosDB'
+        enum_spec = ('database_accounts', 'list')
         id = 'id'
         name = 'name'
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'kind'
         )

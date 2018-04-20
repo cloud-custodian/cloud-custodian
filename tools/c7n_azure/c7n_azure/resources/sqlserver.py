@@ -25,3 +25,8 @@ class Vnet(QueryResourceManager):
         enum_spec = ('servers', 'list')
         id = 'id'
         name = 'name'
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup'
+        )
