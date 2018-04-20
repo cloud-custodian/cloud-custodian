@@ -43,26 +43,20 @@ class AzureVCRBaseTest(VCRTestCase):
         return myvcr
 
     def azure_matcher(self, r1, r2):
-        """Replace all subscription ID's before doing request matching"""
-        r1_uri = re.sub(
+        """Replace all subscription ID's and ignore api-version"""
+        if [k for k in set(r1.query) if k[0] != 'api-version'] != [k for k in set(r2.query) if k[0] != 'api-version']:
+            return False
+
+        r1_path = re.sub(
             r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
             DEFAULT_SUBSCRIPTION_ID,
-            r1.uri)
-        r2_uri = re.sub(
+            r1.path)
+        r2_path = re.sub(
             r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
             DEFAULT_SUBSCRIPTION_ID,
-            r2.uri)
+            r2.path)
 
-        r1_uri = re.sub(
-            r"api-version=\d{4}-\d{2}-\d{2}&?",
-            "",
-            r1_uri)
-        r2_uri = re.sub(
-            r"api-version=\d{4}-\d{2}-\d{2}&?",
-            "",
-            r2_uri)
-
-        return r1_uri == r2_uri
+        return r1_path == r2_path
 
     def request_callback(self, request):
         """Modify requests before saving"""
