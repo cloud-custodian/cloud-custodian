@@ -19,6 +19,7 @@ SQS Message Processing
 import base64
 import json
 import logging
+import traceback
 import zlib
 
 import six
@@ -169,12 +170,20 @@ class MailerSqsQueueProcessor(object):
             from .slack_delivery import SlackDelivery
             slack_delivery = SlackDelivery(self.config, self.session, self.logger)
             slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message, email_delivery)
-            slack_delivery.slack_handler(sqs_message, slack_messages)
+            try:
+                slack_delivery.slack_handler(sqs_message, slack_messages)
+            except Exception:
+                traceback.print_exc()
+                pass
 
         # this section gets the map of metrics to send to datadog and delivers it
         if any(e.startswith('datadog') for e in sqs_message.get('action', ()).get('to')):
             from .datadog_delivery import DataDogDelivery
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
-            datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
 
+            try:
+                datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
+            except Exception:
+                traceback.print_exc()
+                pass
