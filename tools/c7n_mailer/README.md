@@ -121,7 +121,7 @@ role: arn:aws:iam::123456790:role/c7n-mailer-test
 slack_token: xoxo-token123
 ```
 
-To enable Slack messaging, several new fields are evaluated in a policy, as shown in the below example:
+To enable Slack messaging, several unique fields are evaluated in the policy, as shown in the below example:
 
 ```
 policies:
@@ -139,7 +139,7 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 
-An additional `slack_template` field is used, in addition to the standard `template`, in order to allow separate template usage
+A `slack_template` field is used, in addition to the standard `template`, in order to allow separate template usage
 between email and Slack, as well as to provide backwards compatibility for existing policies. This field is optional, however,
 and if not specified, will default to `slack_default`. The `- slack` entry under `to:` indicates that a Slack payload should
 be sent in addition to the traditional email and is required for Slack integration.
