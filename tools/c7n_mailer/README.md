@@ -113,8 +113,7 @@ There is a special `to` format that specifies datadog delivery, and includes the
 
 ### Slack:
 
-The Custodian mailer now supports Slack messaging as an extension of the SQS transport method, that currently leverages email as the primary notification mechanism.
-The `mailer.yml` file now supports a `slack_token` field where the user enters the Slack token corresponding to their Slack integration:
+The Custodian mailer supports Slack messaging as a separate notification mechanism for the SQS transport method. To enable Slack integration, you must specify a Slack token in the `slack_token` field under the `mailer.yml` file.
 
 ```yaml
 queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
