@@ -1,5 +1,6 @@
 import io
 import logging
+import os
 import shutil
 import tempfile
 import re
@@ -7,6 +8,7 @@ import six
 from vcr_unittest import VCRTestCase
 
 from c7n import policy
+from c7n.config import Bag, Config
 from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.utils import CONN_CACHE
@@ -43,26 +45,20 @@ class AzureVCRBaseTest(VCRTestCase):
         return myvcr
 
     def azure_matcher(self, r1, r2):
-        """Replace all subscription ID's before doing request matching"""
-        r1_uri = re.sub(
+        """Replace all subscription ID's and ignore api-version"""
+        if [k for k in set(r1.query) if k[0] != 'api-version'] != [k for k in set(r2.query) if k[0] != 'api-version']:
+            return False
+
+        r1_path = re.sub(
             r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
             DEFAULT_SUBSCRIPTION_ID,
-            r1.uri)
-        r2_uri = re.sub(
+            r1.path)
+        r2_path = re.sub(
             r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
             DEFAULT_SUBSCRIPTION_ID,
-            r2.uri)
+            r2.path)
 
-        r1_uri = re.sub(
-            r"api-version=\d{4}-\d{2}-\d{2}&?",
-            "",
-            r1.uri)
-        r2_uri = re.sub(
-            r"api-version=\d{4}-\d{2}-\d{2}&?",
-            "",
-            r2.uri)
-
-        return r1_uri == r2_uri
+        return r1_path == r2_path
 
     def request_callback(self, request):
         """Modify requests before saving"""
@@ -135,37 +131,6 @@ class BaseTest(AzureVCRBaseTest):
         return log_file
 
 
-class Bag(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-
-class Config(Bag):
-
-    @classmethod
-    def empty(cls, **kw):
-        d = {}
-        d.update({
-            'region': None,
-            'regions': None,
-            'cache': '',
-            'profile': None,
-            'account_id': None,
-            'assume_role': None,
-            'external_id': None,
-            'log_group': None,
-            'metrics_enabled': False,
-            'output_dir': '',
-            'cache_period': 0,
-            'dryrun': False})
-        d.update(kw)
-        return cls(d)
-
-
 class TextTestIO(io.StringIO):
 
     def write(self, b):
@@ -178,3 +143,14 @@ class TextTestIO(io.StringIO):
         if not isinstance(b, six.text_type):
             b = b.decode('utf8')
         return super(TextTestIO, self).write(b)
+
+
+def arm_template(template):
+    def decorator(func):
+        def wrapper(*args):
+            template_file_path = os.path.dirname(__file__) + "/templates/"+template
+            if not os.path.isfile(template_file_path):
+                return args[0].fail("ARM template {} is not found".format(template_file_path))
+        return wrapper
+    return decorator
+

@@ -62,6 +62,8 @@ class QueryMeta(type):
         if 'action_registry' not in attrs:
             actions = ActionRegistry(
                 '%s.actions' % name.lower())
+
+            # All ARM resources will have tag support; however, classic resources may not have support
             actions.register('tag', Tag)
             attrs['action_registry'] = actions
 
@@ -101,4 +103,8 @@ class QueryResourceManager(ResourceManager):
         return self.filter_resources(resources)
 
     def augment(self, resources):
+        #TODO: temporary put here. Applicable only to ARM resources. Need to move to ARMResourceManager base class
+        for resource in resources:
+            if 'id' in resource:
+                resource['resourceGroup'] = resource['id'].split('/')[4]
         return resources

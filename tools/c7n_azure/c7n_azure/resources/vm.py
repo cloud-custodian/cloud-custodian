@@ -14,6 +14,7 @@
 
 from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
+from c7n.filters.core import ValueFilter, type_schema
 
 @resources.register('vm')
 class VirtualMachine(QueryResourceManager):
@@ -24,3 +25,9 @@ class VirtualMachine(QueryResourceManager):
         enum_spec = ('virtual_machines', 'list_all')
         id = 'id'
         name = 'name'
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            'properties.hardwareProfile.vmSize',
+        )
