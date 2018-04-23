@@ -166,10 +166,10 @@ class MailerSqsQueueProcessor(object):
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
 
         # this section sends a notification to the resource owner via Slack
-        if 'slack' in sqs_message.get('action', ()).get('to'):
+        if any(e.startswith('slack') for e in sqs_message.get('action', ()).get('to')):
             from .slack_delivery import SlackDelivery
             slack_delivery = SlackDelivery(self.config, self.session, self.logger)
-            slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message, email_delivery)
+            slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message)
             try:
                 slack_delivery.slack_handler(sqs_message, slack_messages)
             except Exception:

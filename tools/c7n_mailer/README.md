@@ -134,7 +134,9 @@ policies:
       - type: notify
         slack_template: slack
         to:
-          - slack
+          - slack://owners
+          - slack://foo@bar.com
+          - slack://#custodian-test
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
@@ -142,8 +144,12 @@ policies:
 
 An additional `slack_template` field is used, in addition to the standard `template`, in order to allow separate template usage
 between email and Slack, as well as to provide backwards compatibility for existing policies. This field is optional, however,
-and if not specified, will default to `slack_default`. The `- slack` entry under `to:` indicates that a Slack payload should
-be sent in addition to the traditional email and is required for Slack integration.
+and if not specified, will default to `slack_default`. 
+
+Slack integration for the mailer supports three flavors of messaging. The first supported form, `slack://owners` indicates that Slack notifications be sent to the same
+recipient list being targeted by email for a given policy. The second option `slack://foo@bar.com` provides for Slack messaging to a specified email address. This
+target is separate from the recipients included by the first option and will send a notification to this recipient by Slack only.
+The third flavor, `slack://#custodian-test`, indicates that a notification be sent to a particular Slack channel.
 
 ### Now run:
 

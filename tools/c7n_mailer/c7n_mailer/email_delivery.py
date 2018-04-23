@@ -223,6 +223,9 @@ class EmailDelivery(object):
         return to_addrs_to_mimetext_map
 
     def target_is_email(self, target):
+        if target.startswith('slack://'):
+            self.logger.debug("Slack payload, skipping email.")
+            return False
         if parseaddr(target)[1] and '@' in target and '.' in target:
             return True
         else:

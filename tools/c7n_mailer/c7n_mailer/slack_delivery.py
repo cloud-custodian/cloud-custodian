@@ -16,6 +16,7 @@ import time
 
 import requests
 import six
+from c7n_mailer.email_delivery import EmailDelivery
 from c7n_mailer.ldap_lookup import Redis
 from c7n_mailer.utils import kms_decrypt, get_rendered_jinja
 from slackclient import SlackClient
@@ -29,47 +30,69 @@ class SlackDelivery(object):
             self.client = SlackClient(config['slack_token'])
         self.cache_engine = config.get('cache_engine', None)
         if self.cache_engine == 'redis':
-            self.caching = Redis(redis_host=config.get('redis_host'), redis_port=int(config.get('redis_port', 6379)), db=0)
+            self.caching = Redis(redis_host=config.get('redis_host'),
+                                 redis_port=int(config.get('redis_port', 6379)), db=0)
         self.config = config
         self.logger = logger
         self.session = session
+        self.email_handler = EmailDelivery(config, session, logger)
 
-    def get_to_addrs_slack_messages_map(self, sqs_message, email_delivery):
-        to_addrs_to_resources_map = email_delivery.get_email_to_addrs_to_resources_map(sqs_message)
+    def get_to_addrs_slack_messages_map(self, sqs_message):
+        to_addrs_to_resources_map = self.email_handler.get_email_to_addrs_to_resources_map(sqs_message)
         slack_messages = {}
 
-        for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
-            resolved_addrs = self.retrieve_user_im(list(to_addrs))
+        # Check for Slack targets in 'to' action and render appropriate template.
+        for e in sqs_message.get('action', ()).get('to'):
+            if 'slack://owners' in e:
+                for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
 
-            if not resolved_addrs:
-                continue
+                    resolved_addrs = self.retrieve_user_im(list(to_addrs))
 
-            for address, slack_target in resolved_addrs.iteritems():
-                slack_messages[address] = get_rendered_jinja(slack_target, sqs_message, resources,
-                                                             self.logger, 'slack_template', 'slack_default')
+                    if not resolved_addrs:
+                        continue
+
+                    for address, slack_target in resolved_addrs.iteritems():
+                        slack_messages[address] = get_rendered_jinja(slack_target, sqs_message, resources,
+                                                                     self.logger, 'slack_template', 'slack_default')
+                self.logger.debug("Sending to owners.")
+            elif self.email_handler.target_is_email(e.split('slack://', 1)[1]):
+                resolved_addrs = self.retrieve_user_im([e.split('slack://', 1)[1]])
+                for address, slack_target in resolved_addrs.iteritems():
+                    slack_messages[address] = get_rendered_jinja(
+                        slack_target, sqs_message, to_addrs_to_resources_map.values()[0],
+                        self.logger, 'slack_template', 'slack_default')
+                self.logger.debug("Sending to specified email target, based on lookup via Slack API.")
+            elif e.startswith('slack://#'):
+                resolved_addrs = e.split('slack://#', 1)[1]
+                slack_messages[resolved_addrs] = get_rendered_jinja(resolved_addrs, sqs_message,
+                                                                    to_addrs_to_resources_map.values()[0],
+                                                                    self.logger, 'slack_template', 'slack_default')
+
+                self.logger.debug("Sending to specified Slack channel.")
 
         return slack_messages
 
     def slack_handler(self, sqs_message, slack_messages):
-        for email, payload in slack_messages.iteritems():
+        for key, payload in slack_messages.iteritems():
             self.logger.info("Sending account:%s policy:%s %s:%s slack:%s to %s" % (
-                                 sqs_message.get('account', ''),
-                                 sqs_message['policy']['name'],
-                                 sqs_message['policy']['resource'],
-                                 str(len(sqs_message['resources'])),
-                                 sqs_message['action'].get('slack_template', 'slack_default'),
-                                 json.loads(payload)["channel"])
-                            )
+                sqs_message.get('account', ''),
+                sqs_message['policy']['name'],
+                sqs_message['policy']['resource'],
+                str(len(sqs_message['resources'])),
+                sqs_message['action'].get('slack_template', 'slack_default'),
+                json.loads(payload)["channel"])
+            )
 
             self.send_slack_msg(payload)
 
     def retrieve_user_im(self, email_addresses):
         list = {}
+
         for address in email_addresses:
             if self.cache_engine and self.caching.get(address):
-                    self.logger.debug('Got slack metadata from local cache for: %s' % address)
-                    list[address] = self.caching.get(address)
-                    continue
+                self.logger.debug('Got slack metadata from local cache for: %s' % address)
+                list[address] = self.caching.get(address)
+                continue
 
             response = self.client.api_call(
                 "users.lookupByEmail", email=address)
@@ -99,7 +122,7 @@ class SlackDelivery(object):
             url='https://slack.com/api/chat.postMessage',
             data=message_payload,
             headers={'Content-Type': 'application/json;charset=utf-8',
-                       'Authorization': 'Bearer %s' % self.config.get('slack_token')}
+                     'Authorization': 'Bearer %s' % self.config.get('slack_token')}
         )
 
         if not response.json()["ok"] and "Retry-After" in response["headers"]:
