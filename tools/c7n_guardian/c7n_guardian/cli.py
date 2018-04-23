@@ -212,9 +212,16 @@ def enable_region(master_info, accounts_config, executor, message, region):
     detector_id = get_or_create_detector_id(master_client)
 
     results = master_client.get_paginator(
-        'list_members').paginate(DetectorId=detector_id)
+        'list_members').paginate(DetectorId=detector_id, OnlyAssociated="FALSE")
     extant_members = results.build_full_result().get('Members', ())
     extant_ids = {m['AccountId'] for m in extant_members}
+
+    # Find active members
+    active_ids = {m['AccountId'] for m in extant_members
+                      if m['RelationshipStatus'] == 'Enabled'}
+    # Find invited members
+    invited_ids = {m['AccountId'] for m in extant_members
+                       if m['RelationshipStatus'] == 'Invited'}
 
     # Find extant members not currently enabled
     suspended_ids = {m['AccountId'] for m in extant_members
@@ -222,6 +229,7 @@ def enable_region(master_info, accounts_config, executor, message, region):
     # Filter by accounts under consideration per config and cli flags
     suspended_ids = {a['account_id'] for a in accounts_config['accounts']
                      if a['account_id'] in suspended_ids}
+
     if suspended_ids:
         unprocessed = master_client.start_monitoring_members(
             DetectorId=detector_id,
@@ -238,9 +246,9 @@ def enable_region(master_info, accounts_config, executor, message, region):
                if account['account_id'] not in extant_ids]
 
     if not members:
-        if not suspended_ids:
+        if not suspended_ids and not invited_ids:
             log.info("Region:%s All accounts already enabled", region)
-        return
+            return list(active_ids)
 
     if (len(members) + len(extant_ids)) > 1000:
         raise ValueError(
@@ -249,6 +257,7 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     log.info(
         "Region:%s Enrolling %d accounts in guard duty", region, len(members))
+
     unprocessed = []
     for account_set in chunks(members, 25):
         unprocessed.extend(master_client.create_members(
@@ -261,7 +270,8 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     log.info("Region:%s Inviting %d member accounts", region, len(members))
     unprocessed = []
-    for account_set in chunks(members, 25):
+    for account_set in chunks(
+            [m for m in members if not m['AccountId'] in invited_ids], 25):
         params = {'AccountIds': [m['AccountId'] for m in account_set],
                   'DetectorId': detector_id}
         if message:
@@ -273,26 +283,31 @@ def enable_region(master_info, accounts_config, executor, message, region):
             "Region:%s accounts where unprocessed invite-members\n %s",
             region, format_event(unprocessed))
 
-    log.info("Region:%s Accepting invitations in members", region)
+    members = [{'AccountId': account['account_id'], 'Email': account['email']}
+               for account in accounts_config['accounts']
+               if account['account_id'] not in active_ids]
+
+    log.info("Region:%s Accepting %d invitations in members", region, len(members))
+
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
             if a == master_info:
                 continue
-            if a['account_id'] in extant_ids:
+            if a['account_id'] in active_ids:
                 continue
             futures[w.submit(enable_account, a, master_info['account_id'], region)] = a
 
         for f in as_completed(futures):
             a = futures[f]
             if f.exception():
-                log.error("Region:% sError processing account:%s error:%s",
+                log.error("Region:%s Error processing account:%s error:%s",
                           region, a['name'], f.exception())
                 continue
             if f.result():
                 log.info('Region:%s Enabled guard duty on account:%s',
                          region, a['name'])
-
+    return members
 
 def enable_account(account, master_account_id, region):
     member_session = get_session(

@@ -15,22 +15,23 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 
 
-class StorageTest(BaseTest):
+class PublicIpAddressTest(BaseTest):
     def setUp(self):
-        super(StorageTest, self).setUp()
+        super(PublicIpAddressTest, self).setUp()
 
-    @arm_template('storage.json')
-    def test_value_filter(self):
+    @arm_template('vm.json')
+    def test_find_by_name(self):
         p = self.load_policy({
-            'name': 'test-azure-storage-enum',
-            'resource': 'azure.storage',
+            'name': 'test-azure-public-ip',
+            'resource': 'azure.publicip',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'glob',
+                 'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctstorage*'}],
+                 'value': 'mypublicip'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
 

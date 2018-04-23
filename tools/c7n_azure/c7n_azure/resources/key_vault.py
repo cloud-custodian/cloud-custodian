@@ -16,13 +16,13 @@ from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
 
 
-@resources.register('vnet')
-class Vnet(QueryResourceManager):
+@resources.register('keyvault')
+class KeyVault(QueryResourceManager):
 
     class resource_type(object):
-        service = 'azure.mgmt.network'
-        client = 'NetworkManagementClient'
-        enum_spec = ('virtual_networks', 'list_all')
+        service = 'azure.mgmt.keyvault'
+        client = 'KeyVaultManagementClient'
+        enum_spec = ('vaults', 'list')
         id = 'id'
         name = 'name'
         default_report_fields = (

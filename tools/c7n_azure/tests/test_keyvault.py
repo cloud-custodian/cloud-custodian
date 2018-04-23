@@ -15,22 +15,23 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 
 
-class StorageTest(BaseTest):
+class KeyVaultTest(BaseTest):
     def setUp(self):
-        super(StorageTest, self).setUp()
+        super(KeyVaultTest, self).setUp()
 
-    @arm_template('storage.json')
-    def test_value_filter(self):
+    @arm_template('keyvault.json')
+    def test_find_by_name(self):
         p = self.load_policy({
-            'name': 'test-azure-storage-enum',
-            'resource': 'azure.storage',
+            'name': 'test-azure-keyvault',
+            'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'glob',
+                 'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctstorage*'}],
+                 'value': 'cckeyvault1'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
 
