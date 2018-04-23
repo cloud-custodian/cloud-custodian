@@ -27,6 +27,14 @@ class ResourceQuery(object):
     def __init__(self, session_factory):
         self.session_factory = session_factory
 
+    @staticmethod
+    def resolve(resource_type):
+        if not isinstance(resource_type, type):
+            raise ValueError(resource_type)
+        else:
+            m = resource_type
+        return m
+
     def filter(self, resource_manager, **params):
         m = resource_manager.resource_type
         enum_op, list_op = m.enum_spec
@@ -92,6 +100,10 @@ class QueryResourceManager(ResourceManager):
     def get_cache_key(self, query):
         return {'source_type': self.source_type, 'query': query}
 
+    @classmethod
+    def get_model(cls):
+        return ResourceQuery.resolve(cls.resource_type)
+
     @property
     def source_type(self):
         return self.data.get('source', 'describe-azure')
@@ -108,3 +120,14 @@ class QueryResourceManager(ResourceManager):
             if 'id' in resource:
                 resource['resourceGroup'] = resource['id'].split('/')[4]
         return resources
+
+    def get_resources(self, resource_ids):
+        result = []
+        for resource_id in resource_ids:
+            resource_group = resource_id.split('/')[4]
+            name = resource_id.split('/')[8]
+            # Most of Azure resources can by queried by resource group and name.
+            # For those resources, which take different parameters for function get, method should be overwritten
+            r = self.get_client().public_ip_addresses.get(resource_group, name)
+            result.append(r.serialize(True))
+        return result
