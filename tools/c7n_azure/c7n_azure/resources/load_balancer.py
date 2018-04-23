@@ -14,7 +14,8 @@
 
 from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
-
+from c7n.filters.core import ValueFilter, type_schema
+from c7n.filters.related import RelatedResourceFilter
 
 @resources.register('loadbalancer')
 class LoadBalancer(QueryResourceManager):
@@ -24,9 +25,28 @@ class LoadBalancer(QueryResourceManager):
         client = 'NetworkManagementClient'
         enum_spec = ('load_balancers', 'list_all')
         id = 'id'
+        type = 'loadbalancer'
         name = 'name'
         default_report_fields = (
             'name',
             'location',
             'resourceGroup'
         )
+
+@LoadBalancer.filter_registry.register('frontendip')
+class FrontEndIp(RelatedResourceFilter):
+    # policies:
+    #     - name: test - loadbalancer
+    #     resource: azure.loadbalancer
+    #     filters:
+    #     - type: frontendip
+    #         key: properties.publicIPAddressVersion
+    #         op: eq
+    #         value_type: normalize
+    #         value: "ipv4"
+
+    schema = type_schema('frontendip', rinherit=ValueFilter.schema)
+
+    RelatedResource = "c7n_azure.resources.public_ip.PublicIPAddress"
+    RelatedIdsExpression = "properties.frontendIPConfigurations[0].properties.publicIPAddress.id"
+
