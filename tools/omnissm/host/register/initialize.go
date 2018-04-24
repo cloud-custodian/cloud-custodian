@@ -86,10 +86,11 @@ func main() {
 		panic(err)
 	}
 
-	regBody := map[string]string{}
-	regBody["provider"] = "aws"
-	regBody["identity"] = string(identity)
-	regBody["signature"] = string(signature)
+	regBody := map[string]string{
+		"provider":  "aws",
+		"identity":  string(identity),
+		"signature": string(signature),
+	}
 
 	regSerial, err := json.Marshal(regBody)
 	if err != nil {
@@ -146,4 +147,15 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("SSM Agent Registered")
+
+	// Use old upstart compatibility layer to work with systemd for now.
+	svcCmdPath, err := exec.LookPath("service")
+
+	svcCmd := exec.Command(svcCmdPath, "amazon-ssm-agent", "restart")
+	svcOut, err := svcCmd.CombinedOutput()
+
+	if err != nil {
+		fmt.Println("Error starting ssm agent service", err, string(svcOut))
+	}
+
 }
