@@ -249,7 +249,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `datadog_api_key`         | string           | DataDog API key. |
 |           | `datadog_application_key` | string           | Datadog application key. |
 
-This fields are not necessary if c7n_mailer run in a instance/lambda/etc with the DataDog agent.
+These fields are not necessary if c7n_mailer is run in a instance/lambda/etc with the DataDog agent.
 
 #### Slack Config
 
