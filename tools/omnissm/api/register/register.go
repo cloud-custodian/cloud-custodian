@@ -35,14 +35,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 )
 
-// SSMInstanceRole IAM Role to associate to instance registration
-const SSMInstanceRole = "service-role/AmazonEC2RunCommandRoleForManagedInstances"
+const (
+	// SSMInstanceRole IAM Role to associate to instance registration
+	SSMInstanceRole = "service-role/AmazonEC2RunCommandRoleForManagedInstances"
 
-// RegistrationTable DynamodDb Table for storing instance regisrations
-const RegistrationTable = "omnissm-registrations"
+	// RegistrationTable DynamodDb Table for storing instance regisrations
+	RegistrationTable = "omnissm-registrations"
 
-// AWSRSAIdentityCert is the RSA public certificate
-const AWSRSAIdentityCert = `-----BEGIN CERTIFICATE-----
+	// AWSRSAIdentityCert is the RSA public certificate
+	AWSRSAIdentityCert = `-----BEGIN CERTIFICATE-----
 MIIDIjCCAougAwIBAgIJAKnL4UEDMN/FMA0GCSqGSIb3DQEBBQUAMGoxCzAJBgNV
 BAYTAlVTMRMwEQYDVQQIEwpXYXNoaW5ndG9uMRAwDgYDVQQHEwdTZWF0dGxlMRgw
 FgYDVQQKEw9BbWF6b24uY29tIEluYy4xGjAYBgNVBAMTEWVjMi5hbWF6b25hd3Mu
@@ -61,6 +62,7 @@ BQADgYEAFYcz1OgEhQBXIwIdsgCOS8vEtiJYF+j9uO6jz7VOmJqO+pRlAbRlvY8T
 C1haGgSI/A1uZUKs/Zfnph0oEI0/hu1IIJ/SKBDtN5lvmZ/IzbOPIJWirlsllQIQ
 7zvWbGd9c9+Rm3p04oTvhup99la7kZqevJK0QRdD/6NpCKsqP/0=
 -----END CERTIFICATE-----`
+)
 
 var (
 	// RSACert AWS Public Certificate
@@ -208,7 +210,8 @@ func validateRequest(requestBody string) (InstanceIdentity, events.APIGatewayPro
 	default:
 		response := map[string]string{
 			"error":   "invalid-request",
-			"message": "unknown provider"}
+			"message": "unknown provider",
+		}
 
 		body, _ := json.Marshal(response)
 		return identity, events.APIGatewayProxyResponse{Body: string(body), StatusCode: 400}
@@ -250,8 +253,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return errorResponse, nil
 	}
 
-	fmt.Println("Instance Registration Request",
-		identity.InstanceID, identity.Region, identity.AccountID, identity.GetManagedID())
+	fmt.Println("Instance Registration Request", identity.InstanceID, identity.Region, identity.AccountID, identity.GetManagedID())
 
 	registration, err := identity.GetRegistration()
 	if err != nil {
@@ -267,13 +269,14 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		}
 	}
 
-	response := map[string]interface{}{}
-	response["instance-id"] = identity.InstanceID
-	response["account-id"] = identity.AccountID
-	response["managed-id"] = identity.GetManagedID()
-	response["region"] = identity.Region
-	response["activation-id"] = registration.ActivationID
-	response["activation-code"] = registration.ActivationCode
+	response := map[string]interface{}{
+		"instance-id":     identity.InstanceID,
+		"account-id":      identity.AccountID,
+		"managed-id":      identity.GetManagedID(),
+		"region":          identity.Region,
+		"activation-id":   registration.ActivationID,
+		"activation-code": registration.ActivationCode,
+	}
 
 	serialized, err := json.Marshal(response)
 	fmt.Println("response", string(serialized))
