@@ -16,17 +16,19 @@ from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
 
 
-@resources.register('vnet')
-class Vnet(QueryResourceManager):
+@resources.register('webapp')
+class WebApp(QueryResourceManager):
 
     class resource_type(object):
-        service = 'azure.mgmt.network'
-        client = 'NetworkManagementClient'
-        enum_spec = ('virtual_networks', 'list_all')
+        service = 'azure.mgmt.web'
+        client = 'WebSiteManagementClient'
+        enum_spec = ('web_apps', 'list')
         id = 'id'
         name = 'name'
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'kind',
+            'properties.hostNames[0]'
         )
