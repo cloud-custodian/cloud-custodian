@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  RegistrationHandler:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: "main"
+      FunctionName: "omnissm-register"
+      Runtime: "go1.x"
+      CodeUri: "main.zip"
+      Role: arn:aws:iam::644160558196:role/CloudCustodianRole
+      Events:
+        Request:
+          Properties:
+            Method: POST
+            Path: /register
+          Type: Api
+  RegistrationTable:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      TableName: omnissm-registrations
+      PrimaryKey:
+        Name: mid
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+      
