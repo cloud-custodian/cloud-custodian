@@ -15,7 +15,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest, functional, event_data, TestConfig as Config
 from c7n.filters import FilterValidationError
-
+from botocore.exceptions import ClientError as BotoClientError
+from c7n.resources.vpc import AddressRelease
+import time
+import unittest
 
 class VpcTest(BaseTest):
 
@@ -557,6 +560,141 @@ class NetworkInterfaceTest(BaseTest):
         results = client.describe_network_interfaces(
             NetworkInterfaceIds=[net_id])['NetworkInterfaces']
         self.assertEqual([g['GroupId'] for g in results[0]['Groups']], [qsg_id])
+
+
+class NetworkAddrTest(BaseTest):
+
+    @staticmethod
+    def release_if_still_present(ec2, network_address):
+        # @todo (2018-04-23 jonathana) Throw some logging in here just to see when the cleanup
+        # we're doing from self.addCleanup actually fires
+        try:
+            release_spec = AddressRelease.gen_assoc_spec(network_address)
+            ec2.release_address(**release_spec)
+        except BotoClientError as e:
+            # Swallow the condition that the elastic ip wasn't there (meaning the test should have deleted it),
+            # re-raise any other boto client error
+            if not(e.response['Error']['Code'] == 'InvalidAllocationID.NotFound' and network_address['AllocationId'] in e.response['Error']['Message']):
+                raise e
+
+    # This doesn't really need to be an instance method, it could easily be
+    # classmethod, except we want to use .assertEquals, which is an instance
+    # method
+    def create_ec2_instance(self, ec2, size='t2.nano', ami_id='ami-43a15f3e'):
+        result = ec2.run_instances(ImageId=ami_id,
+                                   InstanceType=size,
+                                   MaxCount=1,
+                                   MinCount=1,
+                                   DisableApiTermination=False,
+                                   )
+        self.assertEquals(len(result['Instances']), 1)
+        self.addCleanup(ec2.terminate_instances, InstanceIds=[i['InstanceId'] for i in result['Instances']])
+
+        instance_data = result['Instances'][0]
+        while instance_data['State']['Code'] != 16:
+            time.sleep(5)
+            result = ec2.describe_instances(InstanceIds=(instance_data['InstanceId'],))
+            self.assertEquals(len(result['Reservations'][0]['Instances']), 1)
+            instance_data = result['Reservations'][0]['Instances'][0]
+
+        return instance_data
+
+    def allocate_network_address(self, ec2, domain_type):
+        network_addr = ec2.allocate_address(Domain=domain_type)
+        self.addCleanup(self.release_if_still_present, ec2, network_addr)
+        return network_addr
+
+    def core_release_op(self, factory, ec2, network_addr, force=False):
+        alloc_id = network_addr['AllocationId']
+
+        p = self.load_policy({
+            'name': 'release-network-addr',
+            'resource': 'network-addr',
+            'filters': [
+                {'AllocationId': alloc_id},
+            ],
+            'actions': [{'type': 'release', 'force': force}], },
+            session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(BotoClientError) as e_cm:
+            ec2.describe_addresses(AllocationIds=[ alloc_id ])
+        e = e_cm.exception
+        self.assertEqual(e.response['Error']['Code'], 'InvalidAllocationID.NotFound')
+        self.assertIn(alloc_id, e.response['Error']['Message'])
+
+    @functional
+    def test_release_detached_vpc(self):
+        #factory = self.replay_flight_data(
+        factory = self.record_flight_data(
+            'test_release_detached_vpc')
+
+        session = factory()
+        ec2 = session.client('ec2')
+
+        network_addr = self.allocate_network_address(ec2, 'vpc')
+        self.core_release_op(factory, ec2, network_addr)
+
+    @functional
+    def test_release_detached_classic(self):
+        #factory = self.replay_flight_data(
+        factory = self.record_flight_data(
+            'test_release_detached_classic')
+
+        session = factory()
+        ec2 = session.client('ec2')
+
+        network_addr = self.allocate_network_address(ec2, 'classic')
+        self.core_release_op(factory, ec2, network_addr)
+
+    # This is not a functional test because spinning up the ec2 takes too long
+    def test_release_attached_ec2_vpc(self):
+        #factory = self.replay_flight_data(
+        factory = self.record_flight_data(
+            'test_release_attached_ec2_vpc')
+
+        session = factory()
+        ec2 = session.client('ec2')
+
+        ec2_instance = self.create_ec2_instance(ec2)
+        network_addr = self.allocate_network_address(ec2, 'vpc')
+
+        assoc_spec = AddressRelease.gen_assoc_spec(network_addr)
+        assoc_spec['InstanceId'] = ec2_instance['InstanceId']
+        assoc_resp = ec2.associate_address(**assoc_spec)
+        network_addr_attached = ec2.describe_addresses(AllocationIds=[ network_addr['AllocationId'] ])
+        self.assertEqual(len(network_addr_attached['Addresses']), 1)
+        self.assertEqual(network_addr_attached['Addresses'][0]['AssociationId'], assoc_resp['AssociationId'])
+
+        self.core_release_op(factory, ec2, network_addr, True)
+
+    def test_release_attached_nif_vpc(self):
+        #factory = self.replay_flight_data(
+        factory = self.record_flight_data(
+            'test_release_attached_nif_vpc')
+
+        session = factory()
+        ec2 = session.client('ec2')
+
+        subnets = ec2.describe_subnets(Filters=[{"Name": "defaultForAz", "Values": [ "true" ] }])
+        if not subnets:
+            self.skipTest('No available subnets to test with')
+        net_if = ec2.create_network_interface(SubnetId=subnets['Subnets'][0]['SubnetId'])
+        net_if_id = net_if['NetworkInterface']['NetworkInterfaceId']
+        self.addCleanup(ec2.delete_network_interface, NetworkInterfaceId=net_if_id)
+
+        network_addr = self.allocate_network_address(ec2, 'vpc')
+
+        assoc_spec = AddressRelease.gen_assoc_spec(network_addr)
+        assoc_spec['NetworkInterfaceId'] = net_if_id
+        assoc_resp = ec2.associate_address(**assoc_spec)
+        network_addr_attached = ec2.describe_addresses(AllocationIds=[ network_addr['AllocationId'] ])
+        self.assertEqual(len(network_addr_attached['Addresses']), 1)
+        self.assertEqual(network_addr_attached['Addresses'][0]['AssociationId'], assoc_resp['AssociationId'])
+
+        self.core_release_op(factory, ec2, network_addr, True)
 
 
 class RouteTableTest(BaseTest):

@@ -19,6 +19,8 @@ import zlib
 
 import jmespath
 
+from botocore.exceptions import ClientError as BotoClientError
+
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
@@ -1454,7 +1456,7 @@ class AclAwsS3Cidrs(Filter):
 
 
 @resources.register('network-addr')
-class Address(query.QueryResourceManager):
+class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1467,6 +1469,91 @@ class Address(query.QueryResourceManager):
         dimension = None
         config_type = "AWS::EC2::EIP"
         taggable = False
+
+
+@NetworkAddress.action_registry.register('release')
+class AddressRelease(BaseAction):
+    """Action to release elastic IP address(es)
+
+    Use the force option to cause any attached elastic IPs to
+    also be released.  Otherwise, only unattached elastic IPs
+    will be released.
+
+    You can filter by AllocationId, if needed
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: release-network-addr
+                resource: network-addr
+                filters:
+                  - AllocationId: ...
+                actions:
+                  - type: release
+                  - force: true|false
+    """
+
+    # Schema, permissions, method process
+    schema = type_schema('release', force={'type': 'boolean'})
+    permissions = ('ec2:ReleaseAddress','ec2:DisassociateAddress',)
+
+    @staticmethod
+    def gen_assoc_spec(network_addr):
+        key_map = {
+            'vpc': 'AllocationId',
+            'standard': 'PublicIp',
+        }
+        return {key_map[network_addr[u'Domain']]: network_addr[key_map[network_addr[u'Domain']]]}
+
+    def process(self, network_addrs):
+        # See https://nedbatchelder.com/blog/201306/filter_a_list_into_two_parts.html
+        # for an explanation of why to partition the list this way.  Python 3.x has a
+        # recipe for how to do this that backports to 2.7, but the itertool methods
+        # they use have different names so this is safer
+        def partition(pred, iterable):
+            a, b = itertools.tee((pred(item), item) for item in iterable)
+            return ((item for pred, item in a if not pred),
+                    (item for pred, item in b if pred))
+
+        def process_attached(associated_addrs, force=True):
+            log_template = 'Elastic IP {0} is attached to {1} {2} and will not be released.  Specify \'force: "true"\' to release'
+            msg_assoc_extractor = lambda x: ('instance', x['InstanceId']) if 'InstanceId' in x else ('network interface', x.get('NetworkInterfaceId'))
+
+            detached_cnt = 0
+            deassoc_addrs = []
+            for aa in associated_addrs:
+                if force:
+                    self.log.info('Forcing release of {0}'.format(aa['AllocationId']))
+                    try:
+                        client.disassociate_address(AssociationId=aa['AssociationId'])
+                        deassoc_addrs.append(aa)
+                        detached_cnt += 1
+                    except BotoClientError as e:
+                        # Swallow the condition that the elastic ip is already disassociated, re-raise any other boto client error
+                        if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and aa['AssocationId'] in e.response['Error']['Message']):
+                            raise e
+                else:
+                    # log attached address
+                    self.log.info(log_template.format(aa['AllocationId'], *msg_assoc_extractor(aa)))
+
+            return deassoc_addrs
+
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        unassoc_addrs, assoc_addrs = partition(lambda na: 'AssociationId' in na, network_addrs)
+
+        detached_addrs = process_attached(network_addrs, self.data.get('force'))
+
+        release_data = [self.gen_assoc_spec(r) for r in itertools.chain(unassoc_addrs, detached_addrs)]
+        for r in release_data:
+            try:
+                client.release_address(**r)
+            except BotoClientError as e:
+                # Swallow the condition that the elastic ip wasn't there, re-raise any other boto client error
+                if not(e.response['Error']['Code'] == 'InvalidAllocationID.NotFound' and r['AllocationId'] in e.response['Error']['Message']):
+                    raise e
 
 
 @resources.register('customer-gateway')

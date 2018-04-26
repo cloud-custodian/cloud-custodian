@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AssociationId": "eipassoc-bbf16761", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a09c235d-77ce-4d30-948d-bb58369494a6", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 26 Apr 2018 15:18:39 GMT"
+            }
+        }
+    }
+}

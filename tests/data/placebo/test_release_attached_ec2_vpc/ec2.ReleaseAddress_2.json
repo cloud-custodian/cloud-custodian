@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "057a1916-5d55-4312-8d17-b8773c08bea1", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Thu, 26 Apr 2018 15:18:42 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Error": {
+            "Message": "The allocation ID 'eipalloc-aed5efa7' does not exist", 
+            "Code": "InvalidAllocationID.NotFound"
+        }
+    }
+}
