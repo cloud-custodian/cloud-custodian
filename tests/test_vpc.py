@@ -18,7 +18,7 @@ from c7n.filters import FilterValidationError
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.resources.vpc import AddressRelease
 import time
-import unittest
+
 
 class VpcTest(BaseTest):
 
