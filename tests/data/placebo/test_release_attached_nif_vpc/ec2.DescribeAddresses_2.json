@@ -3,30 +3,30 @@
     "data": {
         "Addresses": [
             {
+                "Domain": "vpc", 
+                "NetworkInterfaceId": "eni-bcfa7a29", 
+                "AssociationId": "eipassoc-4570d6fd", 
+                "NetworkInterfaceOwnerId": "644160558196", 
+                "PublicIp": "18.204.97.54", 
+                "AllocationId": "eipalloc-e2a399eb", 
+                "PrivateIpAddress": "172.31.53.32"
+            }, 
+            {
                 "PublicIp": "18.233.241.102", 
                 "Domain": "vpc", 
                 "AllocationId": "eipalloc-38192131"
-            }, 
-            {
-                "Domain": "vpc", 
-                "NetworkInterfaceId": "eni-e79d1c72", 
-                "AssociationId": "eipassoc-759d3bcd", 
-                "NetworkInterfaceOwnerId": "644160558196", 
-                "PublicIp": "52.5.41.233", 
-                "AllocationId": "eipalloc-ecd4eee5", 
-                "PrivateIpAddress": "172.31.49.179"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "1e160504-a2d5-4823-8fcd-62124e83bdbc", 
+            "RequestId": "7520cc42-2296-432d-bb6b-14fd12ed0bb0", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 26 Apr 2018 15:18:45 GMT"
+                "date": "Thu, 26 Apr 2018 16:22:54 GMT"
             }
         }
     }

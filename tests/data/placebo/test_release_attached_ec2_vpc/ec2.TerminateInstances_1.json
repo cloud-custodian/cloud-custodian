@@ -3,7 +3,7 @@
     "data": {
         "TerminatingInstances": [
             {
-                "InstanceId": "i-006ebe66dd2655f7f", 
+                "InstanceId": "i-0e60e9da85323a1a6", 
                 "CurrentState": {
                     "Code": 32, 
                     "Name": "shutting-down"
@@ -17,13 +17,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "93545bd6-a274-4263-a201-38a5a3e9e8de", 
+            "RequestId": "3a81da78-78b3-4014-9aa0-ac377b31b024", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 26 Apr 2018 15:18:42 GMT"
+                "date": "Thu, 26 Apr 2018 16:22:52 GMT"
             }
         }
     }

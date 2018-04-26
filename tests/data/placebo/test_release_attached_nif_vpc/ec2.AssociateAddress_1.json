@@ -1,17 +1,17 @@
 {
     "status_code": 200, 
     "data": {
-        "AssociationId": "eipassoc-759d3bcd", 
+        "AssociationId": "eipassoc-4570d6fd", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "e91854b5-f198-4b0d-b82f-6741388d9b07", 
+            "RequestId": "a20a986f-5668-4488-982e-7d1f9c4bdc19", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 26 Apr 2018 15:18:44 GMT"
+                "date": "Thu, 26 Apr 2018 16:22:53 GMT"
             }
         }
     }

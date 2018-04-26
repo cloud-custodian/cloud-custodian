@@ -8,31 +8,31 @@
                         "Monitoring": {
                             "State": "disabled"
                         }, 
-                        "PublicDnsName": "ec2-34-228-55-95.compute-1.amazonaws.com", 
+                        "PublicDnsName": "ec2-107-23-115-16.compute-1.amazonaws.com", 
                         "State": {
                             "Code": 0, 
                             "Name": "pending"
                         }, 
                         "EbsOptimized": false, 
                         "LaunchTime": {
-                            "hour": 15, 
+                            "hour": 16, 
                             "__class__": "datetime", 
                             "month": 4, 
-                            "second": 23, 
+                            "second": 38, 
                             "microsecond": 0, 
                             "year": 2018, 
                             "day": 26, 
-                            "minute": 18
+                            "minute": 22
                         }, 
-                        "PublicIpAddress": "34.228.55.95", 
-                        "PrivateIpAddress": "172.31.4.70", 
+                        "PublicIpAddress": "107.23.115.16", 
+                        "PrivateIpAddress": "172.31.9.32", 
                         "ProductCodes": [], 
                         "VpcId": "vpc-d2d616b5", 
                         "StateTransitionReason": "", 
-                        "InstanceId": "i-006ebe66dd2655f7f", 
+                        "InstanceId": "i-0e60e9da85323a1a6", 
                         "EnaSupport": true, 
                         "ImageId": "ami-43a15f3e", 
-                        "PrivateDnsName": "ip-172-31-4-70.ec2.internal", 
+                        "PrivateDnsName": "ip-172-31-9-32.ec2.internal", 
                         "SecurityGroups": [
                             {
                                 "GroupName": "default", 
@@ -45,38 +45,38 @@
                         "NetworkInterfaces": [
                             {
                                 "Status": "in-use", 
-                                "MacAddress": "0a:1e:ce:9c:89:b6", 
+                                "MacAddress": "0a:ce:bb:66:13:a2", 
                                 "SourceDestCheck": true, 
                                 "VpcId": "vpc-d2d616b5", 
                                 "Description": "", 
-                                "NetworkInterfaceId": "eni-b40df02b", 
+                                "NetworkInterfaceId": "eni-c201fd5d", 
                                 "PrivateIpAddresses": [
                                     {
-                                        "PrivateDnsName": "ip-172-31-4-70.ec2.internal", 
-                                        "PrivateIpAddress": "172.31.4.70", 
+                                        "PrivateDnsName": "ip-172-31-9-32.ec2.internal", 
+                                        "PrivateIpAddress": "172.31.9.32", 
                                         "Primary": true, 
                                         "Association": {
-                                            "PublicIp": "34.228.55.95", 
-                                            "PublicDnsName": "ec2-34-228-55-95.compute-1.amazonaws.com", 
+                                            "PublicIp": "107.23.115.16", 
+                                            "PublicDnsName": "ec2-107-23-115-16.compute-1.amazonaws.com", 
                                             "IpOwnerId": "amazon"
                                         }
                                     }
                                 ], 
-                                "PrivateDnsName": "ip-172-31-4-70.ec2.internal", 
+                                "PrivateDnsName": "ip-172-31-9-32.ec2.internal", 
                                 "Attachment": {
                                     "Status": "attaching", 
                                     "DeviceIndex": 0, 
                                     "DeleteOnTermination": true, 
-                                    "AttachmentId": "eni-attach-bf52451e", 
+                                    "AttachmentId": "eni-attach-d59c8b74", 
                                     "AttachTime": {
-                                        "hour": 15, 
+                                        "hour": 16, 
                                         "__class__": "datetime", 
                                         "month": 4, 
-                                        "second": 23, 
+                                        "second": 38, 
                                         "microsecond": 0, 
                                         "year": 2018, 
                                         "day": 26, 
-                                        "minute": 18
+                                        "minute": 22
                                     }
                                 }, 
                                 "Groups": [
@@ -87,11 +87,11 @@
                                 ], 
                                 "Ipv6Addresses": [], 
                                 "OwnerId": "644160558196", 
-                                "PrivateIpAddress": "172.31.4.70", 
+                                "PrivateIpAddress": "172.31.9.32", 
                                 "SubnetId": "subnet-914763e7", 
                                 "Association": {
-                                    "PublicIp": "34.228.55.95", 
-                                    "PublicDnsName": "ec2-34-228-55-95.compute-1.amazonaws.com", 
+                                    "PublicIp": "107.23.115.16", 
+                                    "PublicDnsName": "ec2-107-23-115-16.compute-1.amazonaws.com", 
                                     "IpOwnerId": "amazon"
                                 }
                             }
@@ -109,16 +109,16 @@
                                 "Ebs": {
                                     "Status": "attaching", 
                                     "DeleteOnTermination": true, 
-                                    "VolumeId": "vol-0275b6afb34b9ed41", 
+                                    "VolumeId": "vol-0da741c7471b16d33", 
                                     "AttachTime": {
-                                        "hour": 15, 
+                                        "hour": 16, 
                                         "__class__": "datetime", 
                                         "month": 4, 
-                                        "second": 24, 
+                                        "second": 39, 
                                         "microsecond": 0, 
                                         "year": 2018, 
                                         "day": 26, 
-                                        "minute": 18
+                                        "minute": 22
                                     }
                                 }
                             }
@@ -130,7 +130,7 @@
                         "AmiLaunchIndex": 0
                     }
                 ], 
-                "ReservationId": "r-0b73c2a987a8360cd", 
+                "ReservationId": "r-06da0da88f4a7d082", 
                 "Groups": [], 
                 "OwnerId": "644160558196"
             }
@@ -138,13 +138,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "61a1cb11-bbf4-4f83-9bea-84ebf84376fa", 
+            "RequestId": "29bc2468-f8a8-45d4-9843-3081767a7c76", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 26 Apr 2018 15:18:28 GMT"
+                "date": "Thu, 26 Apr 2018 16:22:43 GMT"
             }
         }
     }

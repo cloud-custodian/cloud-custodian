@@ -627,9 +627,7 @@ class NetworkAddrTest(BaseTest):
 
     @functional
     def test_release_detached_vpc(self):
-        #factory = self.replay_flight_data(
-        factory = self.record_flight_data(
-            'test_release_detached_vpc')
+        factory = self.replay_flight_data('test_release_detached_vpc')
 
         session = factory()
         ec2 = session.client('ec2')
@@ -639,9 +637,7 @@ class NetworkAddrTest(BaseTest):
 
     @functional
     def test_release_detached_classic(self):
-        #factory = self.replay_flight_data(
-        factory = self.record_flight_data(
-            'test_release_detached_classic')
+        factory = self.replay_flight_data('test_release_detached_classic')
 
         session = factory()
         ec2 = session.client('ec2')
@@ -651,9 +647,7 @@ class NetworkAddrTest(BaseTest):
 
     # This is not a functional test because spinning up the ec2 takes too long
     def test_release_attached_ec2_vpc(self):
-        #factory = self.replay_flight_data(
-        factory = self.record_flight_data(
-            'test_release_attached_ec2_vpc')
+        factory = self.replay_flight_data('test_release_attached_ec2_vpc')
 
         session = factory()
         ec2 = session.client('ec2')
@@ -671,9 +665,7 @@ class NetworkAddrTest(BaseTest):
         self.core_release_op(factory, ec2, network_addr, True)
 
     def test_release_attached_nif_vpc(self):
-        #factory = self.replay_flight_data(
-        factory = self.record_flight_data(
-            'test_release_attached_nif_vpc')
+        factory = self.replay_flight_data('test_release_attached_nif_vpc')
 
         session = factory()
         ec2 = session.client('ec2')

@@ -1,19 +1,19 @@
 {
     "status_code": 200, 
     "data": {
-        "PublicIp": "52.5.41.233", 
+        "PublicIp": "18.204.97.54", 
         "Domain": "vpc", 
-        "AllocationId": "eipalloc-ecd4eee5", 
+        "AllocationId": "eipalloc-e2a399eb", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c286bb37-f011-4f57-8ec8-9cb33d889f4b", 
+            "RequestId": "b0556e0e-778e-4412-a48b-a872ce309d7f", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 26 Apr 2018 15:18:44 GMT"
+                "date": "Thu, 26 Apr 2018 16:22:52 GMT"
             }
         }
     }

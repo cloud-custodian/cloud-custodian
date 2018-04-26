@@ -3,26 +3,26 @@
     "data": {
         "Addresses": [
             {
-                "PublicIp": "18.204.152.21", 
-                "Domain": "vpc", 
-                "AllocationId": "eipalloc-36d5ef3f"
-            }, 
-            {
                 "PublicIp": "18.233.241.102", 
                 "Domain": "vpc", 
                 "AllocationId": "eipalloc-38192131"
+            }, 
+            {
+                "PublicIp": "52.207.185.218", 
+                "Domain": "vpc", 
+                "AllocationId": "eipalloc-bbaf95b2"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "7397e558-e3a9-4c8f-97bd-3b3280569826", 
+            "RequestId": "3d53dd3d-f9bf-4fe8-906f-c5f555ff74bb", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 26 Apr 2018 15:18:51 GMT"
+                "date": "Thu, 26 Apr 2018 16:23:00 GMT"
             }
         }
     }
