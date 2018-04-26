@@ -305,7 +305,8 @@ class Time(Filter):
         'kst': 'Asia/Seoul',
         'sgt': 'Asia/Singapore',
         'aet': 'Australia/Sydney',
-        'brt': 'America/Sao_Paulo'
+        'brt': 'America/Sao_Paulo',
+        'utc': 'Etc/UTC',
     }
 
     def __init__(self, data, manager=None):
