@@ -1492,7 +1492,7 @@ class AddressRelease(BaseAction):
                   - AllocationId: ...
                 actions:
                   - type: release
-                  - force: true|false
+                    force: true|false
     """
 
     # Schema, permissions, method process
