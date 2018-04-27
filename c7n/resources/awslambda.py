@@ -66,7 +66,7 @@ class AWSLambda(query.QueryResourceManager):
         return self._generate_arn
 
     def get_source(self, source_type):
-        if source_type ==  'describe':
+        if source_type == 'describe':
             return DescribeLambda(self)
         elif source_type == 'config':
             return ConfigLambda(self)
