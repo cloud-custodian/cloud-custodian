@@ -48,7 +48,7 @@ class SlackDelivery(object):
 
         # Check for Slack targets in 'to' action and render appropriate template.
         for target in sqs_message.get('action', ()).get('to'):
-            if target == 'slack://owners' and not self.email_handler.target_is_email(target.split('slack://', 1)[1]):
+            if target == 'slack://owners':
                 for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
 
                     resolved_addrs = self.retrieve_user_im(list(to_addrs))
