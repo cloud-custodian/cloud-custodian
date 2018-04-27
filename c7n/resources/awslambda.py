@@ -79,7 +79,7 @@ def tag_function(session_factory, functions, tags, log):
         try:
             client.tag_resource(Resource=arn, Tags=tag_dict)
         except Exception as err:
-            log.warning(
+            log.exception(
                 'Exception tagging lambda function %s: %s',
                 f['FunctionName'], err)
             continue
