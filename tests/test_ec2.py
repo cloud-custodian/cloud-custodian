@@ -635,6 +635,55 @@ class TestTag(BaseTest):
             tzinfo=localtz)
         self.assertEqual(result.date(), dt.date())
 
+    def test_ec2_mark_hours(self):
+        localtz = zoneinfo.gettz('America/New_York')
+        dt = datetime.now(localtz)
+        dt = dt.replace(year=2018, month=2, day=20, hour=18, minute=00)
+        session_factory = self.replay_flight_data('test_ec2_mark_hours')
+        session = session_factory(region='us-east-1')
+        ec2 = session.client('ec2')
+
+        policy = self.load_policy({
+            'name': 'ec2-mark-5-hours',
+            'resource': 'ec2',
+            'filters': [
+                {'tag:hourly-mark': 'absent'},
+                {'tag:CreatorName': 'joshuaroot'}],
+            'actions': [{
+                'type': 'mark-for-op',
+                'tag': 'hourly-mark',
+                'hours': 3,
+                'op': 'stop'}]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        resource = ec2.describe_instances(
+            InstanceIds=[resources[0]['InstanceId']])[
+            'Reservations'][0]['Instances'][0]
+        tags = [
+            t['Value'] for t in resource['Tags'] if t['Key'] == 'hourly-mark']
+        result = datetime.strptime(
+            tags[0].strip().split('@', 1)[-1], '%Y/%m/%d %H%M %Z').replace(
+            tzinfo=localtz)
+        self.assertEqual(result.date(), dt.date())
+
+    def test_ec2_marked_hours(self):
+        session_factory = self.replay_flight_data('test_ec2_marked_hours')
+        policy = self.load_policy({
+            'name': 'ec2-mark-5-hours',
+            'resource': 'ec2',
+            'filters': [{
+                'type': 'marked-for-op',
+                'tag': 'hourly-mark',
+                'op': 'stop',
+                'skew_hours': 3
+            }]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['InstanceId'], 'i-098dae2615acb5809')
+
 
 class TestStop(BaseTest):
 
