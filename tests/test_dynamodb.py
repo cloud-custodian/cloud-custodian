@@ -19,6 +19,7 @@ import datetime
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
 
+
 class DynamodbTest(BaseTest):
 
     def test_resources(self):
@@ -195,7 +196,7 @@ class DynamodbTest(BaseTest):
         p = self.load_policy({
             'name': 'c7n-dynamodb-delete-backup',
             'resource': 'dynamodb-backup',
-            'filters': [{'TableName': 'c7n-dynamodb-backup'}],
+            'filters': [{'TableName': 'omnissm-registrations'}],
             'actions': ['delete']},
             session_factory=factory)
         resources = p.run()
