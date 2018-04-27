@@ -45,6 +45,7 @@ class AWSLambda(QueryResourceManager):
         filter_name = None
         date = 'LastModified'
         dimension = 'FunctionName'
+        config_type = "AWS::Lambda::Function"
 
     filter_registry = filters
     action_registry = actions
