@@ -10,9 +10,14 @@ Resources:
       CodeUri: "main.zip"
       Role: arn:aws:iam::644160558196:role/CloudCustodianRole
       Events:
-        Request:
+        RegisterInstance:
           Properties:
             Method: POST
+            Path: /register
+          Type: Api
+        RegisterId:
+          Properties:
+            Method: PATCH
             Path: /register
           Type: Api
   RegistrationTable:
@@ -20,7 +25,7 @@ Resources:
     Properties:
       TableName: omnissm-registrations
       PrimaryKey:
-        Name: mid
+        Name: id
         Type: String
       ProvisionedThroughput:
         ReadCapacityUnits: 5

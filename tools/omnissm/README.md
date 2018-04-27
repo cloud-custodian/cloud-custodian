@@ -23,6 +23,8 @@ We provide a few bits of automation tooling to enable seamless hybrid mode.
  - a custom inventory plugin for collecting process 
    information.
 
+ - a config subscriber for enriching a ssm instance with tags and cloud inventory,
+   and deleting/gc instances from ssmo.
 
 # Links
 
