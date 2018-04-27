@@ -27,7 +27,7 @@ import (
 	"github.com/shirou/gopsutil/process"
 )
 
-// SSMHostInfo output of ssm-cli get-ubstabce-information
+// SSMHostInfo output of ssm-cli get-instance-information
 type SSMHostInfo struct {
 	InstanceID     string `json:"instance-id"`
 	Region         string `json:"region"`
@@ -49,13 +49,13 @@ func newSSMHost() (*SSMHostInfo, error) {
 	return &ssmInfo, nil
 }
 
-func getProcesses() []map[string]interface{} {
+func getProcesses() []map[string]string {
 
 	procs, _ := process.Pids()
-	procInfos := make([]map[string]interface{}, 0)
+	procInfos := make([]map[string]string, 0)
 
 	for _, pid := range procs {
-		procMap := map[string]interface{}{}
+		procMap := map[string]string{}
 		proc, err := process.NewProcess(int32(pid))
 		if err != nil {
 			continue

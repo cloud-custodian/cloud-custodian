@@ -168,6 +168,8 @@ func (n *NodeInfo) Register() error {
 	if err != nil {
 		return err
 	}
+	defer response.Body.Close()
+
 	if response.StatusCode != 200 {
 		return fmt.Errorf("Registration Error %s", regResultBody)
 	}
@@ -231,6 +233,10 @@ func (n *NodeInfo) UpdateSSMID() error {
 
 	idReq.Header.Set("Content-Type", "application/json")
 	response, err := n.netClient.Do(idReq)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
 
 	idResultBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
