@@ -141,15 +141,19 @@ policies:
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
 ```
 
-A `slack_template` field is used, in addition to the standard `template`, in order to allow separate template usage
-between email and Slack, as well as to provide backwards compatibility for existing policies. This field is optional, however,
-and if not specified, will default to `slack_default`. 
+Slack messages support use of a unique template field specified by `slack_template`. This field is unique and usage will not break
+existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
+and if not specified, the mailer will use the default value `slack_default`. 
 
-Slack integration for the mailer supports three flavors of messaging. The first supported form, `slack://owners` indicates that Slack notifications be sent to the same
-recipient list being targeted by email for a given policy. The second option `slack://foo@bar.com` provides for Slack messaging to a specified email address. This
-target is separate from the recipients included by the first option and will send a notification to this recipient by Slack only.
-The third flavor, `slack://#custodian-test`, indicates that a notification be sent to a particular Slack channel.
-
+Slack integration for the mailer supports three flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used.
+ 
+| Required? | Key                  | Type             | Notes                               |
+|:---------:|:---------------------|:-----------------|:------------------------------------|
+|           | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
+|           | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
+|           | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test | 
+ 
+ 
 ### Now run:
 
 ```
