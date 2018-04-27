@@ -22,6 +22,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"os"
 	"strings"
 
 	"fmt"
@@ -38,9 +39,6 @@ import (
 const (
 	// SSMInstanceRole IAM Role to associate to instance registration
 	SSMInstanceRole = "service-role/AmazonEC2RunCommandRoleForManagedInstances"
-
-	// RegistrationTable DynamodDb Table for storing instance regisrations
-	RegistrationTable = "omnissm-registrations"
 
 	// AWSRSAIdentityCert is the RSA public certificate
 	AWSRSAIdentityCert = `-----BEGIN CERTIFICATE-----
@@ -72,6 +70,9 @@ var (
 
 	dbClient  *dynamodb.DynamoDB
 	ssmClient *ssm.SSM
+
+	// RegistrationTable DynamodDb Table for storing instance regisrations
+	RegistrationTable = os.Getenv("REGISTRATIONS_TABLE")
 )
 
 func init() {
@@ -111,8 +112,6 @@ type InstanceIdentity struct {
 
 // GetIdentifier Get a unique identifier for an instance
 func (i *InstanceIdentity) GetIdentifier() string {
-	// Not Intended to be cryptographically secure, just a partition / lookup key
-	// we only get s
 	ident := strings.Join([]string{i.AccountID, i.InstanceID}, "-")
 	h := sha1.New()
 	h.Write([]byte(ident))
@@ -139,11 +138,11 @@ func (i *InstanceIdentity) GetRegistration() (*InstanceRegistration, error) {
 	getRequest := dbClient.GetItemRequest(params)
 	getResult, err := getRequest.Send()
 	if err != nil {
-		return registration, err
+		return nil, err
 	}
 	err = dynamodbattribute.UnmarshalMap(getResult.Item, registration)
 	if err != nil {
-		return registration, err
+		return nil, err
 	}
 	return registration, nil
 }
@@ -185,12 +184,11 @@ func (i *InstanceIdentity) RegisterInstance() (*InstanceRegistration, error) {
 			strings.Join([]string{i.AccountID, i.InstanceID}, "-")),
 	}
 
-	fmt.Println("Creating Activation Request")
 	activateReq := ssmClient.CreateActivationRequest(activateParams)
 	activateResult, err := activateReq.Send()
 
 	if err != nil {
-		return registration, err
+		return nil, err
 	}
 	registration.ActivationCode = *activateResult.ActivationCode
 	registration.ActivationID = *activateResult.ActivationId
@@ -202,13 +200,11 @@ func (i *InstanceIdentity) RegisterInstance() (*InstanceRegistration, error) {
 		TableName: aws.String(RegistrationTable),
 	}
 
-	fmt.Println("Recording Instance")
 	insertRequest := dbClient.PutItemRequest(insertParams)
 	insertResult, err := insertRequest.Send()
 
 	if err != nil {
-		fmt.Println("Put Registration Error", insertResult, err)
-		return registration, err
+		return nil, fmt.Errorf("Put Registration Error %s %s", insertResult, err)
 	}
 	return registration, nil
 }
@@ -284,7 +280,7 @@ func handleUpdateManagedID(identity InstanceIdentity) events.APIGatewayProxyResp
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Queried Instance", registration, err)
+	fmt.Println("Queried Instance", registration)
 
 	if identity.ManagedID != "" {
 		registration.UpdateManagedID(identity)
@@ -299,22 +295,20 @@ func handleUpdateManagedID(identity InstanceIdentity) events.APIGatewayProxyResp
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("update ssmid response", string(serialized))
+	fmt.Println("Update ssmid response", string(serialized))
 	return events.APIGatewayProxyResponse{Body: string(serialized), StatusCode: 200}
 }
 
 func handleRegistrationRequest(identity InstanceIdentity) events.APIGatewayProxyResponse {
 	fmt.Println("Instance Registration Request", identity.InstanceID, identity.Region, identity.AccountID, identity.GetIdentifier())
-
 	registration, err := identity.GetRegistration()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Queried Instance", registration, err)
 
+	fmt.Println("Queried Instance", registration)
 	if len(registration.ActivationCode) < 1 {
 		registration, err = identity.RegisterInstance()
-		fmt.Println("Registered Instance", registration, err)
 		if err != nil {
 			panic(err)
 		}
@@ -332,7 +326,7 @@ func handleRegistrationRequest(identity InstanceIdentity) events.APIGatewayProxy
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("register response", string(serialized))
+	fmt.Println("Register Response", string(serialized))
 	return events.APIGatewayProxyResponse{Body: string(serialized), StatusCode: 200}
 }
 

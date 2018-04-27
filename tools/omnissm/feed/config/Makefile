@@ -8,7 +8,7 @@ deploy:
 	rm built-template.yml
 
 update:
-	zip func.zip ./subscribe.py
+	zip func.zip ./subscribe.py ./common.py
 	aws lambda update-function-code --function-name="omnissm-config-subscribe" --zip-file fileb://func.zip
 	rm func.zip
 

@@ -35,14 +35,16 @@ type SSMAgentRegistration struct {
 	Region            string
 }
 
-// LinuxSSMRegistrationPath Linux Path to Agent Registration State
-const LinuxSSMRegistrationPath = "/var/lib/amazon/ssm/registration"
+const (
+	// LinuxSSMRegistrationPath Linux Path to Agent Registration State
+	LinuxSSMRegistrationPath = "/var/lib/amazon/ssm/registration"
 
-// IdentityURL EC2 metadata server instance identity document
-const IdentityURL = "http://169.254.169.254/latest/dynamic/instance-identity/document"
+	// IdentityURL EC2 metadata server instance identity document
+	IdentityURL = "http://169.254.169.254/latest/dynamic/instance-identity/document"
 
-// SignatureURL RSA SHA256 Signature of identity document
-const SignatureURL = "http://169.254.169.254/latest/dynamic/instance-identity/signature"
+	// SignatureURL RSA SHA256 Signature of identity document
+	SignatureURL = "http://169.254.169.254/latest/dynamic/instance-identity/signature"
+)
 
 // SSMHostInfo output of ssm-cli get-ubstabce-information
 type SSMHostInfo struct {
@@ -126,22 +128,19 @@ func (n *NodeInfo) IsRegistered() bool {
 }
 
 // GetSSMInfo Return ssm agent node information
-func (n *NodeInfo) GetSSMInfo() (SSMHostInfo, error) {
-
+func (n *NodeInfo) GetSSMInfo() (*SSMHostInfo, error) {
 	ssmInfoCmd := exec.Command(n.BinSSMInfo, "get-instance-information")
-
 	ssmInfoOut, err := ssmInfoCmd.Output()
 	if err != nil {
-		fmt.Println("Error", string(ssmInfoOut))
+		return nil, err
 	}
-	fmt.Println("ssm instance info", string(ssmInfoOut))
 
 	ssmInfo := SSMHostInfo{}
 	err = json.Unmarshal(ssmInfoOut, &ssmInfo)
 	if err != nil {
-		return ssmInfo, err
+		return nil, err
 	}
-	return ssmInfo, nil
+	return &ssmInfo, nil
 }
 
 // Register Node with SSM via registration API
@@ -209,18 +208,9 @@ func (n *NodeInfo) Register() error {
 
 // UpdateSSMID Record host SSM Id via the registration API
 func (n *NodeInfo) UpdateSSMID() error {
-	ssmInfoCmd := exec.Command(n.BinSSMInfo, "get-instance-information")
-	ssmInfoOut, err := ssmInfoCmd.Output()
+	ssmInfo, err := n.GetSSMInfo()
 	if err != nil {
-		fmt.Println("Error", string(ssmInfoOut))
-	}
-
-	// fmt.Println("ssm instance info", string(ssmInfoOut))
-
-	ssmInfo := SSMHostInfo{}
-	err = json.Unmarshal(ssmInfoOut, &ssmInfo)
-	if err != nil {
-		return fmt.Errorf("Unable to query ssm instance info %s", err)
+		return err
 	}
 
 	idSerial, err := json.Marshal(map[string]string{

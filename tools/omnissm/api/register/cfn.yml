@@ -4,11 +4,16 @@ Resources:
   RegistrationHandler:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: "main"
       FunctionName: "omnissm-register"
+      Handler: "main"
+      Tags:
+        App: OmniSSM
       Runtime: "go1.x"
       CodeUri: "main.zip"
       Role: arn:aws:iam::644160558196:role/CloudCustodianRole
+      Environment:
+        Variables:
+          REGISTRATION_TABLE: !Ref RegistrationTable
       Events:
         RegisterInstance:
           Properties:
@@ -24,6 +29,8 @@ Resources:
     Type: 'AWS::Serverless::SimpleTable'
     Properties:
       TableName: omnissm-registrations
+      Tags:
+        App: OmniSSM
       PrimaryKey:
         Name: id
         Type: String
