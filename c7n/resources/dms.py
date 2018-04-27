@@ -442,7 +442,6 @@ class DeleteDmsEndpoint(BaseAction):
                 client.delete_endpoint(EndpointArn=EndpointArn)
             except ClientError as e:
                 self.log.exception(
-                        'Exception deleting endpoint %s :%s' % (
-                            EndpointArn, e))
+                    'Exception deleting endpoint %s :%s' % (
+                        EndpointArn, e))
                 continue
-                
