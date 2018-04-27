@@ -95,7 +95,7 @@ class SlackDelivery(object):
 
         for address in email_addresses:
             if self.caching and self.caching.get(address):
-                    self.logger.debug('Got Slack metadata from local cache for: %s' % address)
+                    self.logger.debug('Got Slack metadata from cache for: %s' % address)
                     list[address] = self.caching.get(address)
                     continue
 
@@ -116,7 +116,7 @@ class SlackDelivery(object):
             else:
                 self.logger.debug("Slack account %s found for user %s", response['user']['enterprise_user']['id'])
                 if self.caching:
-                    self.logger.debug('Writing user: %s metadata to cache engine.' % address)
+                    self.logger.debug('Writing user: %s metadata to cache.' % address)
                     self.caching.set(address, response['user']['enterprise_user']['id'])
 
                 list[address] = response['user']['enterprise_user']['id']
