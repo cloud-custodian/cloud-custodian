@@ -22,6 +22,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"os"
 	"strings"
 
 	"fmt"
@@ -38,9 +39,6 @@ import (
 const (
 	// SSMInstanceRole IAM Role to associate to instance registration
 	SSMInstanceRole = "service-role/AmazonEC2RunCommandRoleForManagedInstances"
-
-	// RegistrationTable DynamodDb Table for storing instance regisrations
-	RegistrationTable = "omnissm-registrations"
 
 	// AWSRSAIdentityCert is the RSA public certificate
 	AWSRSAIdentityCert = `-----BEGIN CERTIFICATE-----
@@ -72,6 +70,9 @@ var (
 
 	dbClient  *dynamodb.DynamoDB
 	ssmClient *ssm.SSM
+
+	// RegistrationTable DynamodDb Table for storing instance regisrations
+	RegistrationTable = os.Getenv("REGISTRATIONS_TABLE")
 )
 
 func init() {
@@ -96,10 +97,12 @@ type RegistrationRequest struct {
 	Identity  string `json:"identity"`
 	Signature string `json:"signature"`
 	Provider  string `json:"provider"`
+	ManagedID string `json:"managed-id"`
 }
 
 // InstanceIdentity provides for ec2 metadata instance information
 type InstanceIdentity struct {
+	ManagedID        string `json:"managedId"`
 	AvailabilityZone string `json:"availabilityZone"`
 	Region           string `json:"region"`
 	InstanceID       string `json:"instanceId"`
@@ -107,15 +110,13 @@ type InstanceIdentity struct {
 	InstanceType     string `json:"instanceType"`
 }
 
-// GetManagedID Retrieve instance ssm managed instance id
-func (i *InstanceIdentity) GetManagedID() string {
-	// Not Intended to be cryptographically secure, just a partition / lookup key
-	// we only get s
+// GetIdentifier Get a unique identifier for an instance
+func (i *InstanceIdentity) GetIdentifier() string {
 	ident := strings.Join([]string{i.AccountID, i.InstanceID}, "-")
 	h := sha1.New()
 	h.Write([]byte(ident))
 	bid := h.Sum(nil)
-	return fmt.Sprintf("%x", bid)[0:17]
+	return fmt.Sprintf("%x", bid)
 }
 
 // GetRegistration fetch instance registration from db
@@ -125,11 +126,11 @@ func (i *InstanceIdentity) GetRegistration() (*InstanceRegistration, error) {
 	params := &dynamodb.GetItemInput{
 		TableName: aws.String(RegistrationTable),
 		AttributesToGet: []string{
-			"mid", "ActivationId", "ActivationCode",
+			"id", "ActivationId", "ActivationCode", "ManagedID",
 		},
 		Key: map[string]dynamodb.AttributeValue{
-			"mid": {
-				S: aws.String(i.GetManagedID()),
+			"id": {
+				S: aws.String(i.GetIdentifier()),
 			},
 		},
 	}
@@ -137,13 +138,38 @@ func (i *InstanceIdentity) GetRegistration() (*InstanceRegistration, error) {
 	getRequest := dbClient.GetItemRequest(params)
 	getResult, err := getRequest.Send()
 	if err != nil {
-		return registration, err
+		return nil, err
 	}
 	err = dynamodbattribute.UnmarshalMap(getResult.Item, registration)
 	if err != nil {
-		return registration, err
+		return nil, err
 	}
 	return registration, nil
+}
+
+// UpdateManagedID Record SSM Managed ID for an Instance
+func (r *InstanceRegistration) UpdateManagedID(identity InstanceIdentity) error {
+
+	params := &dynamodb.UpdateItemInput{
+		TableName: aws.String(RegistrationTable),
+		Key: map[string]dynamodb.AttributeValue{
+			"id": dynamodb.AttributeValue{
+				S: aws.String(identity.GetIdentifier())}},
+		UpdateExpression: aws.String("SET ManagedId = :mid"),
+		ExpressionAttributeValues: map[string]dynamodb.AttributeValue{
+			":mid": {
+				S: aws.String(identity.ManagedID),
+			},
+		},
+	}
+
+	updateReq := dbClient.UpdateItemRequest(params)
+	_, err := updateReq.Send()
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // RegisterInstance Create SSM activation for instance and store
@@ -152,19 +178,21 @@ func (i *InstanceIdentity) RegisterInstance() (*InstanceRegistration, error) {
 	registration := &InstanceRegistration{}
 
 	activateParams := &ssm.CreateActivationInput{
-		IamRole: aws.String(SSMInstanceRole),
+		DefaultInstanceName: aws.String(strings.Join([]string{i.AccountID, i.InstanceID}, "-")),
+		IamRole:             aws.String(SSMInstanceRole),
 		Description: aws.String(
 			strings.Join([]string{i.AccountID, i.InstanceID}, "-")),
 	}
+
 	activateReq := ssmClient.CreateActivationRequest(activateParams)
 	activateResult, err := activateReq.Send()
 
 	if err != nil {
-		return registration, err
+		return nil, err
 	}
 	registration.ActivationCode = *activateResult.ActivationCode
 	registration.ActivationID = *activateResult.ActivationId
-	registration.ManagedID = i.GetManagedID()
+	registration.ID = i.GetIdentifier()
 
 	regRecord, err := dynamodbattribute.MarshalMap(registration)
 	insertParams := &dynamodb.PutItemInput{
@@ -176,17 +204,17 @@ func (i *InstanceIdentity) RegisterInstance() (*InstanceRegistration, error) {
 	insertResult, err := insertRequest.Send()
 
 	if err != nil {
-		fmt.Println("Put Registration Error", insertResult, err)
-		return registration, err
+		return nil, fmt.Errorf("Put Registration Error %s %s", insertResult, err)
 	}
 	return registration, nil
 }
 
 // InstanceRegistration Minimal
 type InstanceRegistration struct {
+	ID             string `json:"id"`
 	ActivationCode string
 	ActivationID   string `json:"ActivationId"`
-	ManagedID      string `json:"mid"`
+	ManagedID      string `json:"ManagedId"`
 }
 
 func validateRequest(requestBody string) (InstanceIdentity, events.APIGatewayProxyResponse) {
@@ -239,7 +267,67 @@ func validateRequest(requestBody string) (InstanceIdentity, events.APIGatewayPro
 	// We verified the signature, so malformed here would more than odd.
 	_ = json.Unmarshal([]byte(regRequest.Identity), &identity)
 
+	// Capture request variable into identity
+	identity.ManagedID = regRequest.ManagedID
+
 	return identity, events.APIGatewayProxyResponse{}
+}
+
+func handleUpdateManagedID(identity InstanceIdentity) events.APIGatewayProxyResponse {
+	fmt.Println("Instance Update SSMID Request", identity.InstanceID, identity.Region, identity.AccountID, identity.GetIdentifier())
+
+	registration, err := identity.GetRegistration()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Queried Instance", registration)
+
+	if identity.ManagedID != "" {
+		registration.UpdateManagedID(identity)
+	}
+
+	response := map[string]interface{}{
+		"instance-id": identity.InstanceID,
+		"account-id":  identity.AccountID,
+		"managed-id":  identity.ManagedID,
+	}
+	serialized, err := json.Marshal(response)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Update ssmid response", string(serialized))
+	return events.APIGatewayProxyResponse{Body: string(serialized), StatusCode: 200}
+}
+
+func handleRegistrationRequest(identity InstanceIdentity) events.APIGatewayProxyResponse {
+	fmt.Println("Instance Registration Request", identity.InstanceID, identity.Region, identity.AccountID, identity.GetIdentifier())
+	registration, err := identity.GetRegistration()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Queried Instance", registration)
+	if len(registration.ActivationCode) < 1 {
+		registration, err = identity.RegisterInstance()
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	response := map[string]interface{}{
+		"instance-id":     identity.InstanceID,
+		"account-id":      identity.AccountID,
+		"region":          identity.Region,
+		"activation-id":   registration.ActivationID,
+		"activation-code": registration.ActivationCode,
+	}
+
+	serialized, err := json.Marshal(response)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Register Response", string(serialized))
+	return events.APIGatewayProxyResponse{Body: string(serialized), StatusCode: 200}
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -253,38 +341,10 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return errorResponse, nil
 	}
 
-	fmt.Println("Instance Registration Request", identity.InstanceID, identity.Region, identity.AccountID, identity.GetManagedID())
-
-	registration, err := identity.GetRegistration()
-	if err != nil {
-		panic(err)
+	if request.HTTPMethod == "POST" {
+		return handleRegistrationRequest(identity), nil
 	}
-	fmt.Println("Queryed Instance", registration, err)
-
-	if len(registration.ActivationCode) < 1 {
-		registration, err = identity.RegisterInstance()
-		fmt.Println("Registered Instance", registration, err)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	response := map[string]interface{}{
-		"instance-id":     identity.InstanceID,
-		"account-id":      identity.AccountID,
-		"managed-id":      identity.GetManagedID(),
-		"region":          identity.Region,
-		"activation-id":   registration.ActivationID,
-		"activation-code": registration.ActivationCode,
-	}
-
-	serialized, err := json.Marshal(response)
-	fmt.Println("response", string(serialized))
-	if err != nil {
-		panic(err)
-	}
-
-	return events.APIGatewayProxyResponse{Body: string(serialized), StatusCode: 200}, nil
+	return handleUpdateManagedID(identity), nil
 }
 
 func main() {

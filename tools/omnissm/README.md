@@ -8,21 +8,26 @@ Automation for AWS Systems Manager using hybrid mode. Using hybrid mode for ec2 
 
 Switching from ec2 to hybrid mode, does mean we have to reproduce a bit of functionality
 
- - Secure instance registration
- - Instance deactivation/garbage collection
+ - Secure instance registration.
+ - Instance deactivation/garbage collection on delete.
  - Instance metadata enrichment.
 
 We provide a few bits of automation tooling to enable seamless hybrid mode.
 
- - a register api via api gw lambda for registering cloud 
-   instances. we handle secure introductions via cloud instance identity document signatures.
+ - A register api via api gw lambda for registering cloud instances.
+   We handle secure introductions via cloud instance identity document signature verification.
 
- - a host registration/initialization cli for interacting
-   with the register api and initializing ssm-agent.
+ - a host registration/initialization cli for interacting with the register api and initializing ssm-agent on instance boot.
 
- - a custom inventory plugin for collecting process 
-   information.
+ - a custom inventory plugin for collecting process information.
 
+ - a config subscriber for enriching a ssm instance with tags and cloud inventory,
+   and deleting/gc instances from ssmo.
+
+ - an sns topic subscriber for enriching instances that are registering after a config event
+   has already fired (ie slow boot).
+
+![(OmniSSM)](docs/omnissm.svg)
 
 # Links
 
@@ -30,4 +35,11 @@ We provide a few bits of automation tooling to enable seamless hybrid mode.
 - EC2 Instance Identity Documents https://amzn.to/2qLuGt9
 - Google Instance Identity https://bit.ly/2HQexKc
 
+# Todo
 
+- scale testing
+- test with large cfg messages
+- sns subscriber for slow boot instances
+- systemd timer example for initialize & inventory
+- custom inventory output directly to agent pickup location
+- osquery inventory example
