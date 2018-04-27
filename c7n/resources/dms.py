@@ -422,7 +422,7 @@ class DeleteDmsEndpoint(BaseAction):
     .. code-block: yaml
 
         - policies:
-            - name: dms-endpoint-delete
+            - name: dms-endpoint-no-ssl-delete
               resource: dms-endpoint
               filters:
                 - EngineName: mariadb
