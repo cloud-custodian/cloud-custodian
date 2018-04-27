@@ -203,3 +203,23 @@ class DmsEndpointTests(BaseTest):
             [ep['Port'], ep['SslMode'], ep['Username'],
              ep['ServerName'], ep['DatabaseName']],
             [3305, 'require', 'admin', 'c7n-sql-db-02', 'c7n-db-02'])
+
+
+    def test_dms_endpoint_delete(self):
+        session_factory = self.replay_flight_data(
+            'test_dms_endpoint_delete')
+        policy = {
+            'name': 'dms-delete-endpoint',
+            'resource': 'dms-endpoint',
+            'filters': [
+                {'EndpointIdentifier': 'c7n-test'}
+            ],
+            'actions': [
+                'delete'
+            ]}
+        policy = self.load_policy(
+            policy,
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
