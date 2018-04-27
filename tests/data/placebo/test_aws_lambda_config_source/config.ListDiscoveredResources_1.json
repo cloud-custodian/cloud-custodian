@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourceIdentifiers": [
+            {
+                "resourceType": "AWS::Lambda::Function",
+                "resourceId": "omnissm-config-subscribe",
+                "resourceName": "omnissm-config-subscribe"
+            },
+            {
+                "resourceType": "AWS::Lambda::Function",
+                "resourceId": "omnissm-register",
+                "resourceName": "omnissm-register"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "f633db9e-4a51-11e8-aa84-17fa85ed09f2",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f633db9e-4a51-11e8-aa84-17fa85ed09f2",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "255",
+                "date": "Fri, 27 Apr 2018 19:34:11 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
