@@ -151,7 +151,7 @@ def subscribe(config, accounts, region, merge, debug):
     """subscribe accounts log groups to target account log group destination"""
     config = validate.callback(config)
     subscription = config.get('subscription')
-    print(region)
+
     if subscription is None:
         log.error("config file: logs subscription missing")
         sys.exit(1)
@@ -214,14 +214,12 @@ def subscribe(config, accounts, region, merge, debug):
                         f = filters.pop()
                         if (f['filterName'] == sub_name
                             and f['destinationArn'] == subscription['destination-arn']
-                            #and f['roleArn'] == subscription['destination-role']
                             and f['distribution'] == distribution):
                             continue
                         client.delete_subscription_filter(
                             logGroupName=l, filterName=sub_name)
                     client.put_subscription_filter(
                         logGroupName=l,
-                        #roleArn=subscription['destination-arn'],
                         destinationArn=subscription['destination-arn'],
                         filterName=sub_name,
                         filterPattern="",
@@ -243,7 +241,6 @@ def subscribe(config, accounts, region, merge, debug):
                         logGroupName=g, filterName=sub_name)
                 client.put_subscription_filter(
                     logGroupName=g,
-                    #roleArn=subscription['destination-arn'],
                     destinationArn=subscription['destination-arn'],
                     filterName=sub_name,
                     filterPattern="",
@@ -279,7 +276,7 @@ def subscribe(config, accounts, region, merge, debug):
 @click.option('--end')
 @click.option('-a', '--accounts', multiple=True)
 @click.option('--debug', is_flag=True, default=False)
-def run(config, start, end, accounts,debug):
+def run(config, start, end, accounts, debug):
     """run export across accounts and log groups specified in config."""
     config = validate.callback(config)
     destination = config.get('destination')
@@ -800,9 +797,7 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
     if session is None:
         session = get_session(role)
 
-    client = session.client('logs')
-    
-    print("This is the GROUP:  %s" % group)    
+    client = session.client('logs') 
 
     allLogGroups = []
     paginator = client.get_paginator('describe_log_groups')
