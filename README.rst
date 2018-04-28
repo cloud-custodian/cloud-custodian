@@ -22,13 +22,13 @@
 Cloud Custodian
 ---------------
 
-Cloud Custodian is a rules engine for AWS fleet management. It
+Cloud Custodian is a rules engine for Cloud fleet management. It
 allows users to define policies to enable a well managed cloud infrastructure,
 that's both secure and cost optimized. It consolidates many of the adhoc
 scripts organizations have into a lightweight and flexible tool, with unified
 metrics and reporting.
 
-Custodian can be used to manage AWS accounts by ensuring real time
+Custodian can be used to manage cloud accounts by ensuring real time
 compliance to security policies (like encryption and access requirements),
 tag policies, and cost management via garbage collection of unused resources
 and off-hours resource management.
@@ -37,7 +37,7 @@ Custodian policies are written in simple YAML configuration files that
 enable users to specify policies on a resource type (ec2, asg, redshift, etc)
 and are constructed from a vocabulary of filters and actions.
 
-It integrates with lambda and cloudwatch events to provide for
+It integrates with lambda, cloudwatch events, and AWS config rules to provide for
 real time enforcement of policies with builtin provisioning of the lambdas, or
 as a simple cron job on a server to execute against large existing fleets.
 
@@ -53,8 +53,8 @@ Features
 - Dry run any policy to see what it would do.
 - Automatically provisions lambda functions, config rules, and cloud watch event targets for
   real-time policies.
-- Cloudwatch metrics outputs on resources that matched a policy
-- Structured outputs into s3 of which resources matched a policy.
+- Cloudwatch metrics outputs on resources that matched a policy.
+- Json outputs into object storage of which resources matched a policy.
 - Intelligent cache usage to minimize api calls.
 - Battle-tested - in production on some very large AWS accounts.
 - Supports cross-account usage via STS role assumption.
@@ -66,8 +66,8 @@ Links
 #####
 
 - `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
-- `Docs <http://capitalone.github.io/cloud-custodian/docs/>`_
-- `Developer Install <http://capitalone.github.io/cloud-custodian/docs/developer/installing.html>`_
+- `Docs <https://capitalone.github.io/cloud-custodian/docs/>`_
+- `Developer Install <https://capitalone.github.io/cloud-custodian/docs/developer/installing.html>`_
 
 
 Quick Install
