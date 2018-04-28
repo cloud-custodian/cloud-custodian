@@ -112,6 +112,21 @@ class LambdaPermissionTest(BaseTest):
 
 class LambdaTest(BaseTest):
 
+    def test_lambda_config_source(self):
+        factory = self.replay_flight_data('test_aws_lambda_config_source')
+        p = self.load_policy({
+            'name': 'lambda-config',
+            'resource': 'lambda',
+            'source': 'config',
+            'filters': [{'FunctionName': 'omnissm-register'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'lambda:createdBy', 'Value': 'SAM'}])
+        self.assertTrue('c7n:Policy' in resources[0])
+
     def test_delete(self):
         factory = self.replay_flight_data('test_aws_lambda_delete')
         p = self.load_policy({

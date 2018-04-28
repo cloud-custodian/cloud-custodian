@@ -265,14 +265,6 @@ def setup_parser():
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
-    # access_desc = ("Show permissions needed to execute the policies")
-    # access = subs.add_parser(
-    #    'access', description=access_desc, help=access_desc)
-    # access.set_defaults(command='c7n.commands.access')
-    # _default_options(access)
-    # access.add_argument(
-    #    '-m', '--access', default=False, action='store_true')
-
     run_desc = "\n".join((
         "Execute the policies in a config file",
         "",
