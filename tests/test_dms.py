@@ -223,3 +223,17 @@ class DmsEndpointTests(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dms')
+        ep = client.describe_endpoints(
+            Filters=[
+                {
+                    'Name': 'endpoint-id',
+                    'Values': [
+                        'c7n-test'
+                    ]
+                },
+            ],
+        )['Endpoints'][0]
+        self.assertEqual(
+            [ep['EndpointIdentifier'], ep['Status']]],
+            ['c7n-test', 'deleting'])
