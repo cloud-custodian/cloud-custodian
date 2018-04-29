@@ -235,5 +235,5 @@ class DmsEndpointTests(BaseTest):
             ],
         )['Endpoints'][0]
         self.assertEqual(
-            [ep['EndpointIdentifier'], ep['Status']]],
+            [ep['EndpointIdentifier'], ep['Status']],
             ['c7n-test', 'deleting'])
