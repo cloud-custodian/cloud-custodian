@@ -218,16 +218,6 @@ def validate(options):
     if errors:
         sys.exit(1)
 
-# This subcommand is disabled in cli.py.
-# Commmeting it out for coverage purposes.
-#
-# @policy_command
-# def access(options, policies):
-#    permissions = set()
-#    for p in policies:
-#        permissions.update(p.get_permissions())
-#    pprint.pprint(sorted(list(permissions)))
-
 
 @policy_command
 def run(options, policies):
