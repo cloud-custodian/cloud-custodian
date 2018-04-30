@@ -11,18 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import base64
 import smtplib
-
-from botocore.exceptions import ClientError
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 
 import six
+
 from .ldap_lookup import LdapLookup
 from .utils import (
     format_struct, get_message_subject, get_resource_tag_targets,
-    get_rendered_jinja)
+    get_rendered_jinja, kms_decrypt)
 
 # Those headers are defined as follows:
 #  'X-Priority': 1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest)
@@ -81,22 +79,8 @@ class EmailDelivery(object):
 
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
-            try:
-                if self.config.get('ldap_bind_password', None):
-                    kms = self.session.client('kms')
-                    self.config['ldap_bind_password'] = kms.decrypt(
-                        CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
-                            'Plaintext']
-            except (TypeError, base64.binascii.Error) as e:
-                self.logger.warning(
-                    "Error: %s Unable to base64 decode ldap_bind_password, will assume plaintext." % (e)
-                )
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'InvalidCiphertextException':
-                    raise
-                self.logger.warning(
-                    "Error: %s Unable to decrypt ldap_bind_password with kms, will assume plaintext." % (e)
-                )
+            self.config['ldap_bind_password'] = kms_decrypt(self.config, self.logger,
+                                                            self.session, 'ldap_bind_password')
             return LdapLookup(self.config, self.logger)
         return None
 
@@ -239,6 +223,9 @@ class EmailDelivery(object):
         return to_addrs_to_mimetext_map
 
     def target_is_email(self, target):
+        if target.startswith('slack://'):
+            self.logger.debug("Slack payload, skipping email.")
+            return False
         if parseaddr(target)[1] and '@' in target and '.' in target:
             return True
         else:
@@ -259,7 +246,7 @@ class EmailDelivery(object):
         smtp_connection.quit()
 
     def get_mimetext_message(self, sqs_message, resources, to_addrs):
-        body = get_rendered_jinja(to_addrs, sqs_message, resources, self.logger)
+        body = get_rendered_jinja(to_addrs, sqs_message, resources, self.logger, 'template', 'default')
         if not body:
             return None
         email_format = sqs_message['action'].get('template_format', None)
@@ -300,8 +287,7 @@ class EmailDelivery(object):
                     self.config
                 )
             )
-        self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" %
-            (
+        self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" % (
                 sqs_message.get('account', ''),
                 sqs_message['policy']['name'],
                 sqs_message['policy']['resource'],

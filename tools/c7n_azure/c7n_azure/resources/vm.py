@@ -28,6 +28,7 @@ class VirtualMachine(QueryResourceManager):
         default_report_fields = (
             'name',
             'location',
+            'resourceGroup',
             'properties.hardwareProfile.vmSize',
         )
 

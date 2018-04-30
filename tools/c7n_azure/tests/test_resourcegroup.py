@@ -12,25 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-from azure_common import BaseTest
+from azure_common import BaseTest, arm_template
 
 
 class ResourceGroupTest(BaseTest):
     def setUp(self):
         super(ResourceGroupTest, self).setUp()
 
+    @arm_template('emptyrg.json')
     def test_delete_empty_group(self):
-        """Assumes existence of a single empty RG named 'empty_group_for_testing'"""
         p = self.load_policy({
             'name': 'test-azure-resource-group',
             'resource': 'azure.resourcegroup',
             'filters': [
-                {'type': 'empty-group'}],
+                {'type': 'empty-group'},
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': 'test_emptyrg'}],
             'actions': [
                 {'type': 'delete'}]})
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'empty_group_for_testing')
+        self.assertEqual(resources[0]['name'], 'test_emptyrg')
 
 
 

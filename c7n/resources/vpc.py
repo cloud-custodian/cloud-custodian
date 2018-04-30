@@ -31,6 +31,7 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
+from botocore.exceptions import ClientError
 
 
 @resources.register('vpc')
@@ -1600,3 +1601,108 @@ class KeyPair(query.QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
+
+
+@Vpc.action_registry.register('set-flow-log')
+@Subnet.action_registry.register('set-flow-log')
+@NetworkInterface.action_registry.register('set-flow-log')
+class CreateFlowLogs(BaseAction):
+    """Create flow logs for a network resource
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: vpc-enable-flow-logs
+            resource: vpc
+            filters:
+              - type: flow-logs
+                enabled: false
+            actions:
+              - type: set-flow-log
+                DeliverLogsPermissionArn: arn:iam:role
+                LogGroupName: /custodian/vpc/flowlogs/
+    """
+    permissions = ('ec2:CreateFlowLogs',)
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['set-flow-log']},
+            'state': {'type': 'boolean'},
+            'DeliverLogsPermissionArn': {'type': 'string'},
+            'LogGroupName': {'type': 'string'},
+            'TrafficType': {'type': 'string',
+                            'enum': ['ACCEPT', 'REJECT', 'ALL']}
+        }
+    }
+
+    RESOURCE_ALIAS = {
+        'vpc': 'VPC',
+        'subnet': 'Subnet',
+        'eni': 'NetworkInterface'
+    }
+
+    def validate(self):
+        self.state = self.data.get('state', True)
+        if self.state:
+            if not self.data.get('DeliverLogsPermissionArn'):
+                raise ValueError('DeliverLogsPermissionArn required when '
+                                 'creating flow-logs')
+            if not self.data.get('LogGroupName'):
+                raise ValueError('LogGroupName required when '
+                                 'creating flow-logs')
+        return self
+
+    def delete_flow_logs(self, client, rids):
+        flow_logs = client.describe_flow_logs(
+            Filters=[{'Name': 'resource-id', 'Values': rids}])['FlowLogs']
+
+        try:
+            results = client.delete_flow_logs(
+                FlowLogIds=[f['FlowLogId'] for f in flow_logs])
+
+            for r in results['Unsuccessful']:
+                self.log.exception(
+                    'Exception: delete flow-log for %s: %s on %s',
+                    r['ResourceId'], r['Error']['Message'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'InvalidParameterValue':
+                self.log.exception(
+                    'delete flow-log: %s', e.response['Error']['Message'])
+            else:
+                raise
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        params = dict(self.data)
+        params.pop('type')
+
+        if self.data.get('state'):
+            params.pop('state')
+
+        model = self.manager.get_model()
+        params['ResourceIds'] = [r[model.id] for r in resources]
+
+        if not self.state:
+            self.delete_flow_logs(client, params['ResourceIds'])
+            return
+
+        params['ResourceType'] = self.RESOURCE_ALIAS[model.type]
+        params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
+
+        try:
+            results = client.create_flow_logs(**params)
+
+            for r in results['Unsuccessful']:
+                self.log.exception(
+                    'Exception: create flow-log for %s: %s',
+                    r['ResourceId'], r['Error']['Message'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'FlowLogAlreadyExists':
+                self.log.exception(
+                    'Exception: create flow-log: %s',
+                    e.response['Error']['Message'])
+            else:
+                raise

@@ -25,3 +25,8 @@ class Storage(QueryResourceManager):
         enum_spec = ('storage_accounts', 'list')
         id = 'id'
         name = 'name'
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup'
+        )

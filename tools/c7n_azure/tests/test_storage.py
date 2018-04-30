@@ -12,24 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-from azure_common import BaseTest
+from azure_common import BaseTest, arm_template
 
 
 class StorageTest(BaseTest):
     def setUp(self):
         super(StorageTest, self).setUp()
 
+    @arm_template('storage.json')
     def test_value_filter(self):
         p = self.load_policy({
             'name': 'test-azure-storage-enum',
             'resource': 'azure.storage',
             'filters': [
-
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cs44bfa739e0d8cx437ex930'}],
+                 'value': 'cctstorage*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

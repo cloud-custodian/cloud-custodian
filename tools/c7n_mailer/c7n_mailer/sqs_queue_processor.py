@@ -19,17 +19,13 @@ SQS Message Processing
 import base64
 import json
 import logging
+import traceback
 import zlib
 
 import six
 
 from .email_delivery import EmailDelivery
 from .sns_delivery import SnsDelivery
-try:
-    from .datadog_delivery import DataDogDelivery
-    HAVE_DATADOG = True
-except ImportError:
-    HAVE_DATADOG = False
 
 DATA_MESSAGE = "maidmsg/1.0"
 
@@ -125,9 +121,9 @@ class MailerSqsQueueProcessor(object):
                 warning_msg = 'Unknown sqs_message or sns format %s' % (sqs_message['Body'][:50])
                 self.logger.warning(warning_msg)
             if parallel:
-                process_pool.apply_async(self.process_sqs_messsage, args=sqs_message)
+                process_pool.apply_async(self.process_sqs_message, args=sqs_message)
             else:
-                self.process_sqs_messsage(sqs_message)
+                self.process_sqs_message(sqs_message)
             self.logger.debug('Processed sqs_message')
             sqs_messages.ack(sqs_message)
         if parallel:
@@ -140,20 +136,21 @@ class MailerSqsQueueProcessor(object):
     # If you explicitly declare which tags are aws_usernames (synonymous with ldap uids)
     # in the ldap_uid_tags section of your mailer.yml, we'll do a lookup of those emails
     # (and their manager if that option is on) and also send emails there.
-    def process_sqs_messsage(self, encoded_sqs_message):
+    def process_sqs_message(self, encoded_sqs_message):
         body = encoded_sqs_message['Body']
         try:
             body = json.dumps(json.loads(body)['Message'])
         except ValueError:
             pass
         sqs_message = json.loads(zlib.decompress(base64.b64decode(body)))
+
         self.logger.debug("Got account:%s message:%s %s:%d policy:%s recipients:%s" % (
             sqs_message.get('account', 'na'),
             encoded_sqs_message['MessageId'],
             sqs_message['policy']['resource'],
             len(sqs_message['resources']),
             sqs_message['policy']['name'],
-            ', '.join(sqs_message['action'].get('to', 'datadog'))))
+            ', '.join(sqs_message['action'].get('to'))))
 
         # get the map of email_to_addresses to mimetext messages (with resources baked in)
         # and send any emails (to SES or SMTP) if there are email addresses found
@@ -168,9 +165,25 @@ class MailerSqsQueueProcessor(object):
         sns_message_packages = sns_delivery.get_sns_message_packages(sqs_message)
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
 
+        # this section sends a notification to the resource owner via Slack
+        if any(e.startswith('slack') for e in sqs_message.get('action', ()).get('to')):
+            from .slack_delivery import SlackDelivery
+            slack_delivery = SlackDelivery(self.config, self.session, self.logger)
+            slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message)
+            try:
+                slack_delivery.slack_handler(sqs_message, slack_messages)
+            except Exception:
+                traceback.print_exc()
+                pass
+
         # this section gets the map of metrics to send to datadog and delivers it
-        if HAVE_DATADOG:
+        if any(e.startswith('datadog') for e in sqs_message.get('action', ()).get('to')):
+            from .datadog_delivery import DataDogDelivery
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(sqs_message)
-            datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
 
+            try:
+                datadog_delivery.deliver_datadog_messages(datadog_message_packages, sqs_message)
+            except Exception:
+                traceback.print_exc()
+                pass

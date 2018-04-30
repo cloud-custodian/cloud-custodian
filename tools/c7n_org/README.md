@@ -42,6 +42,9 @@ accounts:
 ...
 ```
 
+We also distribute a script `orgaccounts.py` that can generate this config file
+from the AWS Organizations API.
+
 ## Running a Policy with c7n-org
 
 To run a policy, the following arguments must be passed in:

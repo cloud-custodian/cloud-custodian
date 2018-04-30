@@ -13,27 +13,28 @@
 # limitations under the License.
 
 import time
-from six.moves.urllib.parse import urlparse, parse_qsl
 
-from datadog import initialize
 from datadog import api
+from datadog import initialize
+from six.moves.urllib.parse import urlparse, parse_qsl
 
 
 class DataDogDelivery(object):
-    DATADOG_APPLICATION_KEY = 'datadog_application_key'
     DATADOG_API_KEY = 'datadog_api_key'
+    DATADOG_APPLICATION_KEY = 'datadog_application_key'
 
     def __init__(self, config, session, logger):
-        self.config      = config
-        self.logger      = logger
-        self.session     = session
+        self.config                  = config
+        self.logger                  = logger
+        self.session                 = session
+        self.datadog_api_key         = self.config.get(self.DATADOG_API_KEY, None)
+        self.datadog_application_key = self.config.get(self.DATADOG_APPLICATION_KEY, None)
 
         # Initialize datadog
-        if self.config.get(self.DATADOG_API_KEY, False) and self.config.get(
-                self.DATADOG_APPLICATION_KEY, False):
+        if self.datadog_api_key and self.datadog_application_key:
             options = {
-                'api_key': self.config[self.DATADOG_API_KEY],
-                'app_key': self.config[self.DATADOG_APPLICATION_KEY]
+                'api_key': self.datadog_api_key,
+                'app_key': self.datadog_application_key,
 
             }
             initialize(**options)
@@ -75,14 +76,15 @@ class DataDogDelivery(object):
         return datadog_rendered_messages
 
     def deliver_datadog_messages(self, datadog_message_packages, sqs_message):
-        self.logger.info(
-            "Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog".
-            format(account=sqs_message.get('account', ''),
-                   policy=sqs_message['policy']['name'],
-                   resource=sqs_message['policy']['resource'],
-                   quantity=len(sqs_message['resources'])))
+        if len(datadog_message_packages) > 0:
+            self.logger.info(
+                "Sending account:{account} policy:{policy} {resource}:{quantity} to DataDog".
+                format(account=sqs_message.get('account', ''),
+                       policy=sqs_message['policy']['name'],
+                       resource=sqs_message['policy']['resource'],
+                       quantity=len(sqs_message['resources'])))
 
-        api.Metric.send(datadog_message_packages)
+            api.Metric.send(datadog_message_packages)
 
     @staticmethod
     def _get_metric_value(metric_config, tags):
