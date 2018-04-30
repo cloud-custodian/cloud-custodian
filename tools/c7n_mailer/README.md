@@ -111,7 +111,49 @@ There is a special `to` format that specifies datadog delivery, and includes the
 - metric_name: is the name of the metrics send to DataDog
 - metric_value_tag: by default the metric value send to DataDog is `1` but if you want to use one of the tags returned in the policy you can set it with the attribute `metric_value_tag`, for example in the `test-policy.yml` the value used is the size of the EBS volume. The value must be a number and it's transformed to a float value.
 
+### Slack:
 
+The Custodian mailer supports Slack messaging as a separate notification mechanism for the SQS transport method. To enable Slack integration, you must specify a Slack token in the `slack_token` field under the `mailer.yml` file.
+
+```yaml
+queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+role: arn:aws:iam::123456790:role/c7n-mailer-test
+slack_token: xoxo-token123
+```
+
+To enable Slack messaging, several unique fields are evaluated in the policy, as shown in the below example:
+
+```
+policies:
+  - name: c7n-mailer-test
+    resource: ebs
+    filters:
+     - Attachments: []
+    actions:
+      - type: notify
+        slack_template: slack
+        to:
+          - slack://owners
+          - slack://foo@bar.com
+          - slack://#custodian-test
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+```
+
+Slack messages support use of a unique template field specified by `slack_template`. This field is unique and usage will not break
+existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
+and if not specified, the mailer will use the default value `slack_default`. 
+
+Slack integration for the mailer supports three flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used.
+ 
+| Required? | Key                  | Type             | Notes                               |
+|:---------:|:---------------------|:-----------------|:------------------------------------|
+|           | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
+|           | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
+|           | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test | 
+ 
+ 
 ### Now run:
 
 ```
@@ -211,9 +253,13 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `datadog_api_key`         | string           | DataDog API key. |
 |           | `datadog_application_key` | string           | Datadog application key. |
 
-This fields are not necessary if c7m_mailer run in a instance/lambda/etc with the DataDog agent.
+These fields are not necessary if c7n_mailer is run in a instance/lambda/etc with the DataDog agent.
 
+#### Slack Config
 
+| Required? | Key                       | Type             | Notes                               |
+|:---------:|:--------------------------|:-----------------|:------------------------------------|
+|           | `slack_token`             | string           | Slack API token |
 
 #### SDK Config
 
