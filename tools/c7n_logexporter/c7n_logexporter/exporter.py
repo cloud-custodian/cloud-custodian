@@ -805,13 +805,10 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         loggroupz = p['logGroups']
         for logz in loggroupz:
             allLogGroups.append(logz)
-    #print(allLogGroups)
 
     for groupitem in allLogGroups:
         loggroupname = groupitem['logGroupName']
-        #print(loggroupname)
         if loggroupname == group:
-            #print(loggroupname)
             break
     else:
         raise ValueError("Log group %s not found." % loggroupname)
