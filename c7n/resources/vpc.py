@@ -1508,15 +1508,6 @@ class AddressRelease(BaseAction):
         return {key_map[network_addr[u'Domain']]: network_addr[key_map[network_addr[u'Domain']]]}
 
     def process(self, network_addrs):
-        # See https://nedbatchelder.com/blog/201306/filter_a_list_into_two_parts.html
-        # for an explanation of why to partition the list this way.  Python 3.x has a
-        # recipe for how to do this that backports to 2.7, but the itertool methods
-        # they use have different names so this is safer
-        def partition(pred, iterable):
-            a, b = itertools.tee((pred(item), item) for item in iterable)
-            return ((item for pred, item in a if not pred),
-                    (item for pred, item in b if pred))
-
         def process_attached(associated_addrs, force=True):
             def msg_assoc_extractor(x):
                 return ('instance', x['InstanceId']) if 'InstanceId' in x else \
@@ -1547,9 +1538,11 @@ class AddressRelease(BaseAction):
 
         client = local_session(self.manager.session_factory).client('ec2')
 
-        unassoc_addrs, assoc_addrs = partition(lambda na: 'AssociationId' in na, network_addrs)
+        is_associated = lambda item: 'AssociationId' in item  # noqa: E731
+        assoc_addrs = (addr for addr in network_addrs if is_associated(addr))
+        unassoc_addrs = (addr for addr in network_addrs if not is_associated(addr))
 
-        detached_addrs = process_attached(network_addrs, self.data.get('force'))
+        detached_addrs = process_attached(assoc_addrs, self.data.get('force'))
 
         release_data = [self.gen_assoc_spec(r) for r in
                         itertools.chain(unassoc_addrs, detached_addrs)]
