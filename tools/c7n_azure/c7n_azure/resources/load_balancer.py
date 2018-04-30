@@ -36,14 +36,14 @@ class LoadBalancer(QueryResourceManager):
 @LoadBalancer.filter_registry.register('frontendip')
 class FrontEndIp(RelatedResourceFilter):
     # policies:
-    #     - name: test - loadbalancer
+    #   - name: test - loadbalancer
     #     resource: azure.loadbalancer
     #     filters:
     #     - type: frontendip
     #         key: properties.publicIPAddressVersion
-    #         op: eq
+    #         op: in
     #         value_type: normalize
-    #         value: "ipv4"
+    #         value: "ipv6"
 
     schema = type_schema('frontendip', rinherit=ValueFilter.schema)
 
