@@ -34,3 +34,24 @@ class VMTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @arm_template('vm.json')
+    def test_find_running(self):
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
