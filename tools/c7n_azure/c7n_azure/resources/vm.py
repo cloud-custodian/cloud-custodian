@@ -39,7 +39,7 @@ class InstanceViewFilter(ValueFilter):
     def __call__(self, i):
         if 'instanceView' not in i:
             client = self.manager.get_client()
-            instance = client.virtual_machines.get(i['id'].split('/')[4], i['name'], expand='instanceview').instance_view
+            instance = client.virtual_machines.get(i['resourceGroup'], i['name'], expand='instanceview').instance_view
             i['instanceView'] = instance.serialize()
 
-        return super(InstanceViewFilter, self).__call__(i)
+        return super(InstanceViewFilter, self).__call__(i['instanceView'])
