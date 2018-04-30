@@ -48,5 +48,5 @@ class FrontEndIp(RelatedResourceFilter):
     schema = type_schema('frontendip', rinherit=ValueFilter.schema)
 
     RelatedResource = "c7n_azure.resources.public_ip.PublicIPAddress"
-    RelatedIdsExpression = "properties.frontendIPConfigurations[0].properties.publicIPAddress.id"
+    RelatedIdsExpression = "properties.frontendIPConfigurations[].properties.publicIPAddress.id"
 
