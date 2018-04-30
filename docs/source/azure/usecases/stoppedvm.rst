@@ -1,15 +1,15 @@
-Add Tag To Virtual Machines
-==============================
+Find Stopped Virtual Machines
+=============================
 
 .. code-block:: yaml
 
-    policies:
-        - name: tag-add
-          description: |
-            Adds a tag to all virtual machines
-          resource: azure.vm
-          actions:
-           - type: tag
-             tag: TagName
-             value: TagValue
+     policies:
+       - name: stopped-vm
+         resource: azure.vm
+         filters:
+          - type: instance-view
+            key: statuses[].code
+            op: not-in
+            value_type: swap
+            value: "PowerState/running"
 
