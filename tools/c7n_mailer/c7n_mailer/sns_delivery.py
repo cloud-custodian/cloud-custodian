@@ -46,7 +46,9 @@ class SnsDelivery(object):
             policy_sns_address,
             sqs_message,
             resources,
-            self.logger
+            self.logger,
+            'template',
+            'default'
         )
         return {
             'topic': policy_sns_address,
