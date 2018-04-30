@@ -24,7 +24,7 @@ from c7n.actions import ActionRegistry, BaseAction, RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, FilterRegistry, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n import query
 from c7n.tags import (
     RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment)
 from c7n.utils import get_retry, local_session, type_schema, generate_arn
@@ -35,7 +35,7 @@ filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('lambda')
-class AWSLambda(QueryResourceManager):
+class AWSLambda(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'lambda'
@@ -45,14 +45,11 @@ class AWSLambda(QueryResourceManager):
         filter_name = None
         date = 'LastModified'
         dimension = 'FunctionName'
+        config_type = "AWS::Lambda::Function"
 
     filter_registry = filters
     action_registry = actions
     retry = staticmethod(get_retry(('Throttled',)))
-
-    def augment(self, resources):
-        return universal_augment(
-            self, super(AWSLambda, self).augment(resources))
 
     @property
     def generate_arn(self):
@@ -67,6 +64,32 @@ class AWSLambda(QueryResourceManager):
                 resource_type=self.get_model().type,
                 separator=':')
         return self._generate_arn
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeLambda(self)
+        elif source_type == 'config':
+            return ConfigLambda(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeLambda(query.DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager, super(DescribeLambda, self).augment(resources))
+
+
+class ConfigLambda(query.ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigLambda, self).load_resource(item)
+        resource['Tags'] = [
+            {u'Key': k, u'Value': v} for k, v in item.get('tags', {}).items()]
+        resource['c7n:Policy'] = item[
+            'supplementaryConfiguration'].get('Policy')
+        return resource
 
 
 def tag_function(session_factory, functions, tags, log):
@@ -210,13 +233,15 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
     """
     permissions = ('lambda:GetPolicy',)
 
+    policy_attribute = 'c7n:Policy'
+
     def process(self, resources, event=None):
 
         def _augment(r):
             client = local_session(
                 self.manager.session_factory).client('lambda')
             try:
-                r['Policy'] = client.get_policy(
+                r['c7n:Policy'] = client.get_policy(
                     FunctionName=r['FunctionName'])['Policy']
                 return r
             except ClientError as e:
@@ -273,19 +298,19 @@ class RemovePolicyStatement(RemovePolicyBase):
         return results
 
     def process_resource(self, client, resource):
-        if 'Policy' not in resource:
+        if 'c7n:Policy' not in resource:
             try:
-                resource['Policy'] = client.get_policy(
+                resource['c7n:Policy'] = client.get_policy(
                     FunctionName=resource['FunctionName']).get('Policy')
             except ClientError as e:
                 if e.response['Error']['Code'] != ErrAccessDenied:
                     raise
-                resource['Policy'] = None
+                resource['c7n:Policy'] = None
 
-        if not resource['Policy']:
+        if not resource['c7n:Policy']:
             return
 
-        p = json.loads(resource['Policy'])
+        p = json.loads(resource['c7n:Policy'])
 
         statements, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)

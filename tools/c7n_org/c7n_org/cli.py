@@ -333,6 +333,11 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
         print("command to run: `%s`" % (" ".join(script_args)))
         return
 
+    # Support fully quoted scripts, which are common to avoid parameter
+    # overlap with c7n-org run-script.
+    if len(script_args) == 1 and " " in script_args[0]:
+        script_args = script_args[0].split()
+
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):

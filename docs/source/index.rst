@@ -52,6 +52,14 @@ Navigate below and get started with Cloud Custodian!
    developer/installing.rst
    developer/tests.rst
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Azure
+
+   azure/index
+   azure/contribute
+   azure/authentication
+   azure/usecases/index
 
 .. toctree::
    :maxdepth: 2

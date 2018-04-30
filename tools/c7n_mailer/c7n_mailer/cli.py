@@ -1,19 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
-import boto3
 import functools
-import jsonschema
 import logging
-from ruamel import yaml
 
+import boto3
+import jsonschema
 from c7n_mailer import deploy, utils
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
+from ruamel import yaml
 
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['queue_url', 'role', 'from_address'],
+    'required': ['queue_url', 'role'],
     'properties': {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
@@ -56,6 +56,9 @@ CONFIG_SCHEMA = {
         'ses_region': {'type': 'string'},
         'redis_host': {'type': 'string'},
         'redis_port': {'type': 'integer'},
+        'datadog_api_key': {'type': 'string'},              #TODO: encrypt with KMS?
+        'datadog_application_key': {'type': 'string'},      #TODO: encrypt with KMS?
+        'slack_token': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},
