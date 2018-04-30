@@ -566,8 +566,6 @@ class NetworkAddrTest(BaseTest):
 
     @staticmethod
     def release_if_still_present(ec2, network_address):
-        # @todo (2018-04-23 jonathana) Throw some logging in here just to see when the cleanup
-        # we're doing from self.addCleanup actually fires
         try:
             release_spec = AddressRelease.gen_assoc_spec(network_address)
             ec2.release_address(**release_spec)
@@ -604,7 +602,7 @@ class NetworkAddrTest(BaseTest):
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         return network_addr
 
-    def core_release_op(self, factory, ec2, network_addr, force=False):
+    def assert_policy_release(self, factory, ec2, network_addr, force=False):
         alloc_id = network_addr['AllocationId']
 
         p = self.load_policy({
@@ -633,7 +631,7 @@ class NetworkAddrTest(BaseTest):
         ec2 = session.client('ec2')
 
         network_addr = self.allocate_network_address(ec2, 'vpc')
-        self.core_release_op(factory, ec2, network_addr)
+        self.assert_policy_release(factory, ec2, network_addr)
 
     @functional
     def test_release_detached_classic(self):
@@ -643,26 +641,19 @@ class NetworkAddrTest(BaseTest):
         ec2 = session.client('ec2')
 
         network_addr = self.allocate_network_address(ec2, 'classic')
-        self.core_release_op(factory, ec2, network_addr)
+        self.assert_policy_release(factory, ec2, network_addr)
 
-    # This is not a functional test because spinning up the ec2 takes too long
     def test_release_attached_ec2_vpc(self):
         factory = self.replay_flight_data('test_release_attached_ec2_vpc')
 
         session = factory()
         ec2 = session.client('ec2')
 
-        ec2_instance = self.create_ec2_instance(ec2)
-        network_addr = self.allocate_network_address(ec2, 'vpc')
+        network_addrs = ec2.describe_addresses(AllocationIds=['eipalloc-2da7a824'])
+        self.assertEqual(len(network_addrs['Addresses']), 1)
+        self.assertEqual(network_addrs['Addresses'][0]['AssociationId'], 'eipassoc-e551ce3f')
 
-        assoc_spec = AddressRelease.gen_assoc_spec(network_addr)
-        assoc_spec['InstanceId'] = ec2_instance['InstanceId']
-        assoc_resp = ec2.associate_address(**assoc_spec)
-        network_addr_attached = ec2.describe_addresses(AllocationIds=[ network_addr['AllocationId'] ])
-        self.assertEqual(len(network_addr_attached['Addresses']), 1)
-        self.assertEqual(network_addr_attached['Addresses'][0]['AssociationId'], assoc_resp['AssociationId'])
-
-        self.core_release_op(factory, ec2, network_addr, True)
+        self.assert_policy_release(factory, ec2, network_addrs['Addresses'][0], True)
 
     def test_release_attached_nif_vpc(self):
         factory = self.replay_flight_data('test_release_attached_nif_vpc')
@@ -670,23 +661,11 @@ class NetworkAddrTest(BaseTest):
         session = factory()
         ec2 = session.client('ec2')
 
-        subnets = ec2.describe_subnets(Filters=[{"Name": "defaultForAz", "Values": [ "true" ] }])
-        if not subnets:
-            self.skipTest('No available subnets to test with')
-        net_if = ec2.create_network_interface(SubnetId=subnets['Subnets'][0]['SubnetId'])
-        net_if_id = net_if['NetworkInterface']['NetworkInterfaceId']
-        self.addCleanup(ec2.delete_network_interface, NetworkInterfaceId=net_if_id)
+        network_addrs = ec2.describe_addresses(AllocationIds=['eipalloc-ebaaa5e2'])
+        self.assertEqual(len(network_addrs['Addresses']), 1)
+        self.assertEqual(network_addrs['Addresses'][0]['AssociationId'], 'eipassoc-8a8d4647')
 
-        network_addr = self.allocate_network_address(ec2, 'vpc')
-
-        assoc_spec = AddressRelease.gen_assoc_spec(network_addr)
-        assoc_spec['NetworkInterfaceId'] = net_if_id
-        assoc_resp = ec2.associate_address(**assoc_spec)
-        network_addr_attached = ec2.describe_addresses(AllocationIds=[ network_addr['AllocationId'] ])
-        self.assertEqual(len(network_addr_attached['Addresses']), 1)
-        self.assertEqual(network_addr_attached['Addresses'][0]['AssociationId'], assoc_resp['AssociationId'])
-
-        self.core_release_op(factory, ec2, network_addr, True)
+        self.assert_policy_release(factory, ec2, network_addrs['Addresses'][0], True)
 
 
 class RouteTableTest(BaseTest):
