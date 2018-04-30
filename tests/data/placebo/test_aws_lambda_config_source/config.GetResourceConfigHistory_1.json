@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "configurationItems": [
+            {
+                "version": "1.3",
+                "accountId": "644160558196",
+                "configurationItemCaptureTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 26,
+                    "hour": 23,
+                    "minute": 7,
+                    "second": 2,
+                    "microsecond": 118000
+                },
+                "configurationItemStatus": "OK",
+                "configurationStateId": "1524798422118",
+                "configurationItemMD5Hash": "",
+                "arn": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-config-subscribe",
+                "resourceType": "AWS::Lambda::Function",
+                "resourceId": "omnissm-config-subscribe",
+                "resourceName": "omnissm-config-subscribe",
+                "awsRegion": "us-east-2",
+                "availabilityZone": "Not Applicable",
+                "tags": {
+                    "lambda:createdBy": "SAM"
+                },
+                "relatedEvents": [],
+                "relationships": [
+                    {
+                        "resourceType": "AWS::IAM::Role",
+                        "resourceName": "CloudCustodianRole",
+                        "relationshipName": "Is associated with "
+                    }
+                ],
+                "configuration": "{\"functionName\":\"omnissm-config-subscribe\",\"functionArn\":\"arn:aws:lambda:us-east-2:644160558196:function:omnissm-config-subscribe\",\"runtime\":\"python2.7\",\"role\":\"arn:aws:iam::644160558196:role/CloudCustodianRole\",\"handler\":\"subscribe.handle\",\"codeSize\":1947,\"description\":\"\",\"timeout\":3,\"memorySize\":128,\"lastModified\":\"2018-04-27T03:04:42.139+0000\",\"codeSha256\":\"UoxgHWAb4E95uJmisGV30y3m3MPdhpybOtXya8oJO34\\u003d\",\"version\":\"$LATEST\",\"tracingConfig\":{\"mode\":\"PassThrough\"},\"revisionId\":\"0ad0e93c-5cd6-4c53-86a7-beaefd1337ba\"}",
+                "supplementaryConfiguration": {
+                    "Policy": "\"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Id\\\":\\\"default\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"omnissm-config-subscribe-RegistrationHandlerConfigFeedPermission-XL007WB4ROMR\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"events.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:invokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-2:644160558196:function:omnissm-config-subscribe\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:events:us-east-2:644160558196:rule/omnissm-config-subscribe-RegistrationHandlerConfig-3F7VCO47BDC0\\\"}}}]}\"",
+                    "Tags": "{\"lambda:createdBy\":\"SAM\"}"
+                }
+            }
+        ],
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbMTIzLC01NywtNCw2MiwtNTAsLTcwLC0xMTcsLTU4LC0yNywxMDksLTkxLDEyNywxMDIsNTksMTE5LC00NSwtMjUsMjMsLTExLDg2LC0xMjUsOCw5OCwtNCwtMzMsLTEyNiwtNTQsLTExNiw3MCwxNyw2OCwtMTIwLC0xMjgsNzQsLTExMCwtMTExLC0zOSwxMjAsLTQ5LC0xMDksNDgsLTEyNywzLDE2LDczLDIyLDM5LDQsMTAyLC03NCwtMTAwLDExMiwtNjAsOSwtMTI2LDQwLC0xMjgsMjUsLTMwLDc0LDQ3LC01OSwyNSwxMDYsLTY4LDU3LC03MiwtNzQsMjUsODcsLTc1LDM3LDkyLDEwNSwzMCwxMTksLTQzLDEwMSw4OCw0MCw0MSwtMTI3LDI2LDExMyw5OCwtMTI0LDk4LC04OCwtMzQsOCwxMywtMjYsLTI4LC0xLDQyLC01NCw3Nyw2Nyw0MCwxMDksLTk0LC04OCwtMTI1LC0xMTUsLTc5LC02NCwtMTA4LC00NSwtOTIsOSw3NiwtMTE1LC0xMTksLTg0LC0yOCwtMzUsLTEyNywtNiwtNzYsNDksLTcyLDI4LC0yNywxMiwxMjEsLTQsLTI5LC02NSwxMjAsLTEwNCw5OSwtMTI2LDU2LC02NCwtMTMsMjksNDIsNjcsLTExLC0yMywxMTIsODQsMzEsNjYsLTE1LC0zMyw5Miw2OSw1NSwtNzgsLTI3LC02Miw4NSw2OCwtNzgsMTAxLDExMiwtNDAsLTQ5LDExNSwtMTA2LC00OCw0OCwtOTYsOSwtMTAyXSwibWF0ZXJpYWxTZXRTZXJpYWxOdW1iZXIiOjEsIml2UGFyYW1ldGVyU3BlYyI6eyJpdiI6Wzk2LDE5LC0xMDUsLTExLC05MCw1MCwxMjMsLTI5LDY3LC0yNSwtOTgsLTExNyw5NSwtOTksLTE0LC0xOV19fQ==",
+        "ResponseMetadata": {
+            "RequestId": "f687794c-4a51-11e8-a9ac-651f940b5db9",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f687794c-4a51-11e8-a9ac-651f940b5db9",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "2957",
+                "date": "Fri, 27 Apr 2018 19:34:11 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
