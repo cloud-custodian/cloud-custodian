@@ -32,7 +32,6 @@ import os
 import operator
 from tabulate import tabulate
 import yaml
-import re
 
 from c7n.executor import MainThreadExecutor
 MainThreadExecutor.async = False
@@ -57,7 +56,7 @@ CONFIG_SCHEMA = {
                 'destination-role': {'type': 'string'},
                 'managed-policy': {'type': 'boolean'},
                 'name': {'type': 'string'},
-                },
+            },
         },
         'destination': {
             'type': 'object',
@@ -148,9 +147,9 @@ def _process_subscribe_group(client, group_name, subscription, distribution):
         logGroupName=group_name).get('subscriptionFilters', ())
     if filters:
         f = filters.pop()
-        if (f['filterName'] == sub_name
-            and f['destinationArn'] == subscription['destination-arn']
-            and f['distribution'] == distribution):
+        if (f['filterName'] == sub_name and
+                f['destinationArn'] == subscription['destination-arn'] and
+                f['distribution'] == distribution):
             return
     client.delete_subscription_filter(
         logGroupName=group_name, filterName=sub_name)
@@ -810,9 +809,9 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         group['storedBytes'])
 
     t = time.time()
-    days = [(start + timedelta(i)).replace(
-                minute=0, hour=0, second=0, microsecond=0)
-            for i in range((end - start).days)]
+    days = [(
+        start + timedelta(i)).replace(minute=0, hour=0, second=0, microsecond=0)
+        for i in range((end - start).days)]
     day_count = len(days)
     s3 = boto3.Session().client('s3')
     days = filter_extant_exports(s3, bucket, prefix, days, start, end)

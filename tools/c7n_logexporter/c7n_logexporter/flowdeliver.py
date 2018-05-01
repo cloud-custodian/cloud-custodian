@@ -135,7 +135,7 @@ def process_record_set(k, records):
                 Body=out_fh.read())
 
 
-def records_iter(fh, buffer_size=1024*1024*16):
+def records_iter(fh, buffer_size=1024 * 1024 * 16):
     """Split up a firehose s3 object into records
 
     Firehose cloudwatch log delivery of flow logs does not delimit
@@ -157,7 +157,7 @@ def records_iter(fh, buffer_size=1024*1024*16):
                 buf = chunk
                 chunk = None
                 continue
-            record = chunk[:idx+1]
+            record = chunk[:idx + 1]
             yield json.loads(record)
             chunk = chunk[idx + 1:]
 
