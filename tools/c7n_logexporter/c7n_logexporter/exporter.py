@@ -56,7 +56,7 @@ CONFIG_SCHEMA = {
                 'destination-role': {'type': 'string'},
                 'managed-policy': {'type': 'boolean'},
                 'name': {'type': 'string'},
-                },
+            },
         },
         'destination': {
             'type': 'object',
@@ -141,12 +141,33 @@ def validate(config):
     return data
 
 
+def _process_subscribe_group(client, group_name, subscription, distribution):
+    sub_name = subscription.get('name', 'FlowLogStream')
+    filters = client.describe_subscription_filters(
+        logGroupName=group_name).get('subscriptionFilters', ())
+    if filters:
+        f = filters.pop()
+        if (f['filterName'] == sub_name and
+                f['destinationArn'] == subscription['destination-arn'] and
+                f['distribution'] == distribution):
+            return
+    client.delete_subscription_filter(
+        logGroupName=group_name, filterName=sub_name)
+    client.put_subscription_filter(
+        logGroupName=group_name,
+        destinationArn=subscription['destination-arn'],
+        filterName=sub_name,
+        filterPattern="",
+        distribution=distribution)
+
+
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
+@click.option('-r', '--region', default="us-east-1", multiple=False)
 @click.option('--merge', is_flag=True, default=False)
 @click.option('--debug', is_flag=True, default=False)
-def subscribe(config, accounts, merge, debug):
+def subscribe(config, accounts, region, merge, debug):
     """subscribe accounts log groups to target account log group destination"""
     config = validate.callback(config)
     subscription = config.get('subscription')
@@ -189,36 +210,25 @@ def subscribe(config, accounts, merge, debug):
                     'Resource': subscription['destination-arn'],
                     'Sid': 'CrossAccountDelivery'}]}))
 
-    def subscribe_account(t_account, subscription):
-        session = get_session(t_account['role'])
+    def subscribe_account(t_account, subscription, region):
+        session = get_session(t_account['role'], region)
         client = session.client('logs')
+        distribution = subscription.get('distribution', 'ByLogStream')
 
         for g in account.get('groups'):
-            sub_name = subscription.get('name', 'FlowLogStream')
-            distribution = subscription.get('distribution', 'ByLogStream')
-            filters = client.describe_subscription_filters(
-                logGroupName=g,
-                ).get('subscriptionFilters', ())
-            if filters:
-                f = filters.pop()
-                if (f['filterName'] == sub_name
-                    and f['destinationArn'] == subscription['destination-arn']
-                    and f['roleArn'] == subscription['destination-role']
-                    and f['distribution'] == distribution):
-                    continue
-                client.delete_subscription_filter(
-                    logGroupName=g, filterName=sub_name)
-            client.put_subscription_filter(
-                logGroupName=g,
-                roleArn=subscription['destination-arn'],
-                destinationArn=subscription['destination-arn'],
-                filterName=sub_name,
-                filterPattern="",
-                distribution=distribution)
+            if (g.endswith('*')):
+                g = g.replace('*', '')
+                paginator = client.get_paginator('describe_log_groups')
+                allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
+                for l in allLogGroups:
+                    _process_subscribe_group(
+                        client, l['logGroupName'], subscription, distribution)
+            else:
+                _process_subscribe_group(client, g, subscription, distribution)
 
     if subscription.get('managed-policy'):
         if subscription.get('destination-role'):
-            session = get_session(subscription['destination-role'])
+            session = get_session(subscription['destination-role'], region)
         else:
             session = boto3.Session()
         converge_destination_policy(session.client('logs'), config)
@@ -230,7 +240,7 @@ def subscribe(config, accounts, merge, debug):
         for account in config.get('accounts', ()):
             if accounts and account['name'] not in accounts:
                 continue
-            futures[w.submit(subscribe_account, account, subscription)] = account
+            futures[w.submit(subscribe_account, account, subscription, region)] = account
 
         for f in as_completed(futures):
             account = futures[f]
@@ -246,7 +256,7 @@ def subscribe(config, accounts, merge, debug):
 @click.option('--end')
 @click.option('-a', '--accounts', multiple=True)
 @click.option('--debug', is_flag=True, default=False)
-def run(config, start, end, accounts):
+def run(config, start, end, accounts, debug):
     """run export across accounts and log groups specified in config."""
     config = validate.callback(config)
     destination = config.get('destination')
@@ -332,15 +342,15 @@ def process_account(account, start, end, destination, incremental=True):
              len(groups), time.time() - t)
 
 
-def get_session(role, session_name="c7n-log-exporter", session=None):
+def get_session(role, region, session_name="c7n-log-exporter", session=None):
     if role == 'self':
         session = boto3.Session()
     elif isinstance(role, basestring):
-        session = assumed_session(role, session_name)
+        session = assumed_session(role, session_name, region=region)
     elif isinstance(role, list):
         session = None
         for r in role:
-            session = assumed_session(r, session_name, session=session)
+            session = assumed_session(r, session_name, session=session, region=region)
     else:
         session = boto3.Session()
     return session
@@ -768,12 +778,20 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         session = get_session(role)
 
     client = session.client('logs')
-    for _group in client.describe_log_groups()['logGroups']:
-        if _group['logGroupName'] == group:
+
+    paginator = client.get_paginator('describe_log_groups')
+    for p in paginator.paginate():
+        found = False
+        for _group in p['logGroups']:
+            if _group['logGroupName'] == group:
+                group = _group
+                found = True
+                break
+        if found:
             break
-    else:
-        raise ValueError('Log group not found.')
-    group = _group
+
+    if not found:
+        raise ValueError("Log group %s not found." % group)
 
     if prefix:
         prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))
@@ -791,9 +809,9 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
         group['storedBytes'])
 
     t = time.time()
-    days = [(start + timedelta(i)).replace(
-                minute=0, hour=0, second=0, microsecond=0)
-            for i in range((end - start).days)]
+    days = [(
+        start + timedelta(i)).replace(minute=0, hour=0, second=0, microsecond=0)
+        for i in range((end - start).days)]
     day_count = len(days)
     s3 = boto3.Session().client('s3')
     days = filter_extant_exports(s3, bucket, prefix, days, start, end)
