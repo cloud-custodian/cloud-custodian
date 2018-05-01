@@ -32,6 +32,7 @@ import os
 import operator
 from tabulate import tabulate
 import yaml
+import re
 
 from c7n.executor import MainThreadExecutor
 MainThreadExecutor.async = False
@@ -198,7 +199,7 @@ def subscribe(config, accounts, region, merge, debug):
 
         for g in account.get('groups'):
             if (g.endswith('*')):
-                g = g.replace('*','')
+                g = re.sub('\*$', '', g)
                 allLogGroups = []
                 paginator = client.get_paginator('describe_log_groups')
                 for p in paginator.paginate(logGroupNamePrefix=g):
@@ -808,6 +809,15 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
                 found = True
                 break
         if found:
+=======
+        loggroupz = p['logGroups']
+        for logz in loggroupz:
+            allLogGroups.append(logz)
+
+    for groupitem in allLogGroups:
+        loggroupname = groupitem['logGroupName']
+        if loggroupname == group:
+>>>>>>> 2b94589a56ac49dbb85cffb34e1bb35ace79bed4
             break
 
     if not found:
