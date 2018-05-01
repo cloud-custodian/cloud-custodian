@@ -424,6 +424,11 @@ class LambdaMode(PolicyExecutionMode):
                 mode = variables['policy']['mode'].copy()
                 mode['role'] = mode['role'].format(**variables)
                 p['mode'] = mode
+            if 'execution-options' in variables['policy']['mode']:
+                if 'output_dir' in variables['policy']['mode']['execution-options']:    
+                    executionoptions = variables['policy']['mode']['execution-options'].copy()
+                    executionoptions['output_dir'] = executionoptions['output_dir'].format(**variables)
+                    p['mode']['execution-options'] = executionoptions       
         return p
 
     def provision(self):
@@ -435,7 +440,8 @@ class LambdaMode(PolicyExecutionMode):
                 "Provisioning policy lambda %s", self.policy.name)
             variables = {
                 'account_id': self.policy.options.account_id,
-                'policy': self.policy.data
+                'policy': self.policy.data,
+                'region': self.policy.options.region or 'default'
             }
             self.policy.data = self.expand_variables(variables)
             try:
