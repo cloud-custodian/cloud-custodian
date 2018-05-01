@@ -90,7 +90,7 @@ class Tag(BaseAction):
             # other Azure resources
             else:
                 az_resource = GenericResource.deserialize(resource)
-                api_version = session.resource_api_version(az_resource)
+                api_version = session.resource_api_version(az_resource.id)
                 az_resource.tags = tags
 
                 client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)

@@ -33,19 +33,26 @@ class LoadBalancer(QueryResourceManager):
             'resourceGroup'
         )
 
-@LoadBalancer.filter_registry.register('frontendip')
+@LoadBalancer.filter_registry.register('frontend-public-ip')
 class FrontEndIp(RelatedResourceFilter):
-    # policies:
-    #   - name: test - loadbalancer
-    #     resource: azure.loadbalancer
-    #     filters:
-    #     - type: frontendip
-    #         key: properties.publicIPAddressVersion
-    #         op: in
-    #         value_type: normalize
-    #         value: "ipv6"
+    """Filters load balancers by frontend public ip.
 
-    schema = type_schema('frontendip', rinherit=ValueFilter.schema)
+    :Example:
+
+        .. code-block:: yaml
+
+            policies:
+               - name: loadbalancer-with-ipv6-frontend
+                 resource: azure.loadbalancer
+                 filters:
+                    - type: frontend-public-ip
+                      key: properties.publicIPAddressVersion
+                      op: in
+                      value_type: normalize
+                      value: "ipv6"
+    """
+
+    schema = type_schema('frontend-public-ip', rinherit=ValueFilter.schema)
 
     RelatedResource = "c7n_azure.resources.public_ip.PublicIPAddress"
     RelatedIdsExpression = "properties.frontendIPConfigurations[].properties.publicIPAddress.id"
