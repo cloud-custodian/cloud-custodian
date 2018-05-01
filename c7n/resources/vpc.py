@@ -1499,42 +1499,35 @@ class AddressRelease(BaseAction):
     schema = type_schema('release', force={'type': 'boolean'})
     permissions = ('ec2:ReleaseAddress','ec2:DisassociateAddress',)
 
-    @staticmethod
-    def gen_assoc_spec(network_addr):
-        key_map = {
-            'vpc': 'AllocationId',
-            'standard': 'PublicIp',
-        }
-        return {key_map[network_addr[u'Domain']]: network_addr[key_map[network_addr[u'Domain']]]}
+    def process_attached(self, client, associated_addrs, force=True):
+        def msg_assoc_extractor(x):
+            return ('instance', x['InstanceId']) if 'InstanceId' in x else \
+                ('network interface', x.get('NetworkInterfaceId'))
+
+        log_template = 'Elastic IP {0} is attached to {1} {2} and will not be released.  Specify \'force: "true"\' to release'  # noqa: E501
+
+        detached_cnt = 0
+        deassoc_addrs = []
+        for aa in associated_addrs:
+            if force:
+                self.log.info('Forcing release of {0}'.format(aa['AllocationId']))
+                try:
+                    client.disassociate_address(AssociationId=aa['AssociationId'])
+                    deassoc_addrs.append(aa)
+                    detached_cnt += 1
+                except BotoClientError as e:
+                    # Swallow the condition that the elastic ip is already disassociated,
+                    # re-raise any other boto client error
+                    if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
+                           aa['AssocationId'] in e.response['Error']['Message']):
+                        raise e
+            else:
+                # log attached address
+                self.log.info(log_template.format(aa['AllocationId'], *msg_assoc_extractor(aa)))
+
+        return deassoc_addrs
 
     def process(self, network_addrs):
-        def process_attached(associated_addrs, force=True):
-            def msg_assoc_extractor(x):
-                return ('instance', x['InstanceId']) if 'InstanceId' in x else \
-                    ('network interface', x.get('NetworkInterfaceId'))
-
-            log_template = 'Elastic IP {0} is attached to {1} {2} and will not be released.  Specify \'force: "true"\' to release'  # noqa: E501
-
-            detached_cnt = 0
-            deassoc_addrs = []
-            for aa in associated_addrs:
-                if force:
-                    self.log.info('Forcing release of {0}'.format(aa['AllocationId']))
-                    try:
-                        client.disassociate_address(AssociationId=aa['AssociationId'])
-                        deassoc_addrs.append(aa)
-                        detached_cnt += 1
-                    except BotoClientError as e:
-                        # Swallow the condition that the elastic ip is already disassociated,
-                        # re-raise any other boto client error
-                        if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
-                               aa['AssocationId'] in e.response['Error']['Message']):
-                            raise e
-                else:
-                    # log attached address
-                    self.log.info(log_template.format(aa['AllocationId'], *msg_assoc_extractor(aa)))
-
-            return deassoc_addrs
 
         client = local_session(self.manager.session_factory).client('ec2')
 
@@ -1542,13 +1535,11 @@ class AddressRelease(BaseAction):
         assoc_addrs = (addr for addr in network_addrs if is_associated(addr))
         unassoc_addrs = (addr for addr in network_addrs if not is_associated(addr))
 
-        detached_addrs = process_attached(assoc_addrs, self.data.get('force'))
+        detached_addrs = self.process_attached(client, assoc_addrs, self.data.get('force'))
 
-        release_data = [self.gen_assoc_spec(r) for r in
-                        itertools.chain(unassoc_addrs, detached_addrs)]
-        for r in release_data:
+        for r in itertools.chain(unassoc_addrs, detached_addrs):
             try:
-                client.release_address(**r)
+                client.release_address(AllocationId=r['AllocationId'])
             except BotoClientError as e:
                 # Swallow the condition that the elastic ip wasn't there,re-raise
                 # any other boto client error
