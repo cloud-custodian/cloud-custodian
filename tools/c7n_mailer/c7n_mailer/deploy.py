@@ -41,7 +41,7 @@ def dispatch(event, context):
 def get_archive(config):
     archive = PythonPackageArchive(
         'c7n_mailer', 'ldap3', 'pyasn1', 'jinja2', 'markupsafe', 'ruamel',
-        'redis')
+        'redis', 'datadog', 'slackclient', 'requests')
 
     template_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..', 'msg-templates'))
