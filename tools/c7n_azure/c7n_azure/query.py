@@ -118,5 +118,11 @@ class QueryResourceManager(ResourceManager):
         #TODO: temporary put here. Applicable only to ARM resources. Need to move to ARMResourceManager base class
         for resource in resources:
             if 'id' in resource:
-                resource['resourceGroup'] = resource['id'].split('/')[4]
+                resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
         return resources
+
+    def get_resources(self, resource_ids):
+        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
+        session = local_session(self.session_factory)
+        data = [resource_client.resources.get_by_id(rid, session.resource_api_version(rid)) for rid in resource_ids]
+        return [r.serialize(True) for r in data]

@@ -10,4 +10,4 @@ resource_group_params = {'location': 'westus'}
 resource_group_params.update(tags={'hello': 'world'})
 
 for item in client.resources.list():
-    print(s.resource_api_version(item))
+    print(s.resource_api_version(item.id))

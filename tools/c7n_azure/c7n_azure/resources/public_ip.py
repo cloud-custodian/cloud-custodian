@@ -34,12 +34,3 @@ class PublicIPAddress(QueryResourceManager):
             'properties.publicIPAllocationMethod',
             'properties.ipAddress'
         )
-
-    def get_resources(self, resource_ids):
-        result = []
-        for resource_id in resource_ids:
-            resource_group = resource_id.split('/')[4]
-            name = resource_id.split('/')[8]
-            r = self.get_client().public_ip_addresses.get(resource_group, name)
-            result.append(r.serialize(True))
-        return result
