@@ -31,3 +31,15 @@ class VirtualMachine(QueryResourceManager):
             'resourceGroup',
             'properties.hardwareProfile.vmSize',
         )
+
+@VirtualMachine.filter_registry.register('instance-view')
+class InstanceViewFilter(ValueFilter):
+    schema = type_schema('instance-view', rinherit=ValueFilter.schema)
+
+    def __call__(self, i):
+        if 'instanceView' not in i:
+            client = self.manager.get_client()
+            instance = client.virtual_machines.get(i['resourceGroup'], i['name'], expand='instanceview').instance_view
+            i['instanceView'] = instance.serialize()
+
+        return super(InstanceViewFilter, self).__call__(i['instanceView'])
