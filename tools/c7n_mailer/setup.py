@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from setuptools import setup, find_packages
 import os
 
+# *Any* updates here should also go into c7n_mailer/deploy.py for lambda packaging.
 requires = ["Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15", "datadog", "slackclient"]
 try:
     from concurrent import futures
