@@ -195,7 +195,7 @@ def subscribe(config, accounts, region, merge, debug):
         client = session.client('logs')
         sub_name = subscription.get('name', 'FlowLogStream')
         distribution = subscription.get('distribution', 'ByLogStream')
-        
+
         for g in account.get('groups'):
             if (g.endswith('*')):
                 g = g.replace('*','')
@@ -205,7 +205,7 @@ def subscribe(config, accounts, region, merge, debug):
                     loggroupz = p['logGroups']
                     for logz in loggroupz:
                         allLogGroups.append(logz['logGroupName'])
-                
+
                 for l in allLogGroups:
                     filters = client.describe_subscription_filters(
                         logGroupName=l,
@@ -797,25 +797,21 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
     if session is None:
         session = get_session(role)
 
-    client = session.client('logs') 
+    client = session.client('logs')
 
-    allLogGroups = []
     paginator = client.get_paginator('describe_log_groups')
     for p in paginator.paginate():
-        loggroupz = p['logGroups']
-        for logz in loggroupz:
-            allLogGroups.append(logz)
-    #print(allLogGroups)
-
-    for groupitem in allLogGroups:
-        loggroupname = groupitem['logGroupName']
-        #print(loggroupname)
-        if loggroupname == group:
-            #print(loggroupname)
+        found = False
+        for _group in p['logGroups']:
+            if _group['logGroupName'] == group:
+                group = _group
+                found = True
+                break
+        if found:
             break
-    else:
-        raise ValueError("Log group %s not found." % loggroupname)
-    group = groupitem
+
+    if not found:
+        raise ValueError("Log group %s not found." % group)
 
     if prefix:
         prefix = "%s/%s" % (prefix.rstrip('/'), group['logGroupName'].strip('/'))
