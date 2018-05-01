@@ -142,6 +142,26 @@ def validate(config):
     return data
 
 
+def _process_subscribe_group(client, group_name, subscription, distribution):
+    sub_name = subscription.get('name', 'FlowLogStream')
+    filters = client.describe_subscription_filters(
+        logGroupName=group_name).get('subscriptionFilters', ())
+    if filters:
+        f = filters.pop()
+        if (f['filterName'] == sub_name
+            and f['destinationArn'] == subscription['destination-arn']
+            and f['distribution'] == distribution):
+            return
+    client.delete_subscription_filter(
+        logGroupName=group_name, filterName=sub_name)
+    client.put_subscription_filter(
+        logGroupName=group_name,
+        destinationArn=subscription['destination-arn'],
+        filterName=sub_name,
+        filterPattern="",
+        distribution=distribution)
+
+
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
@@ -194,58 +214,18 @@ def subscribe(config, accounts, region, merge, debug):
     def subscribe_account(t_account, subscription, region):
         session = get_session(t_account['role'], region)
         client = session.client('logs')
-        sub_name = subscription.get('name', 'FlowLogStream')
         distribution = subscription.get('distribution', 'ByLogStream')
 
         for g in account.get('groups'):
             if (g.endswith('*')):
-                g = re.sub('\*$', '', g)
-                allLogGroups = []
+                g = g.replace('*', '')
                 paginator = client.get_paginator('describe_log_groups')
-                for p in paginator.paginate(logGroupNamePrefix=g):
-                    loggroupz = p['logGroups']
-                    for logz in loggroupz:
-                        allLogGroups.append(logz['logGroupName'])
-
+                allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
                 for l in allLogGroups:
-                    filters = client.describe_subscription_filters(
-                        logGroupName=l,
-                        ).get('subscriptionFilters', ())
-                    if filters:
-                        f = filters.pop()
-                        if (f['filterName'] == sub_name
-                            and f['destinationArn'] == subscription['destination-arn']
-                            and f['distribution'] == distribution):
-                            continue
-                        client.delete_subscription_filter(
-                            logGroupName=l, filterName=sub_name)
-                    client.put_subscription_filter(
-                        logGroupName=l,
-                        destinationArn=subscription['destination-arn'],
-                        filterName=sub_name,
-                        filterPattern="",
-                        distribution=distribution)
+                    _process_subscribe_group(
+                        client, l['logGroupName'], subscription, distribution)
             else:
-                sub_name = subscription.get('name', 'FlowLogStream')
-                distribution = subscription.get('distribution', 'ByLogStream')
-                filters = client.describe_subscription_filters(
-                    logGroupName=g,
-                    ).get('subscriptionFilters', ())
-                if filters:
-                    f = filters.pop()
-                    if (f['filterName'] == sub_name
-                        and f['destinationArn'] == subscription['destination-arn']
-                        and f['roleArn'] == subscription['destination-role']
-                        and f['distribution'] == distribution):
-                        continue
-                    client.delete_subscription_filter(
-                        logGroupName=g, filterName=sub_name)
-                client.put_subscription_filter(
-                    logGroupName=g,
-                    destinationArn=subscription['destination-arn'],
-                    filterName=sub_name,
-                    filterPattern="",
-                    distribution=distribution)
+                _process_subscribe_group(client, g, subscription, distribution)
 
     if subscription.get('managed-policy'):
         if subscription.get('destination-role'):
