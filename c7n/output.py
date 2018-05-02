@@ -173,7 +173,7 @@ class FSOutput(LogOutput):
             if path.startswith('%s://' % k):
                 return blob_outputs[k]
         # Fall back local disk
-        return blob_outputs['dir']
+        return blob_outputs['file']
 
     @staticmethod
     def join(*parts):
@@ -199,7 +199,7 @@ class FSOutput(LogOutput):
                     os.remove(fp)
 
 
-@blob_outputs.register('fs')
+@blob_outputs.register('file')
 class DirectoryOutput(FSOutput):
 
     permissions = ()
