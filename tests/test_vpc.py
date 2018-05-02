@@ -620,7 +620,6 @@ class NetworkAddrTest(BaseTest):
         ec2 = session.client('ec2')
         network_addr = ec2.allocate_address(Domain='vpc')
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
-        network_addr = self.allocate_network_address(ec2, 'vpc')
         self.assert_policy_released(factory, ec2, network_addr)
 
     def test_release_attached_ec2(self):
