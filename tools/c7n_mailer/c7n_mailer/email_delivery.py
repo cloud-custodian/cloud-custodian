@@ -87,7 +87,7 @@ class EmailDelivery(object):
     def priority_header_is_valid(self, priority_header):
         try:
             priority_header_int = int(priority_header)
-        except:
+        except ValueError:
             return False
         if priority_header_int and 0 < int(priority_header_int) < 6:
             return True
@@ -152,7 +152,8 @@ class EmailDelivery(object):
 
         if account_id is not None:
             account_email_mapping = self.config.get('account_emails', {})
-            self.logger.debug('get_account_emails account_email_mapping: %s.', account_email_mapping)
+            self.logger.debug(
+                'get_account_emails account_email_mapping: %s.', account_email_mapping)
             email_list = account_email_mapping.get(account_id, [])
             self.logger.debug('get_account_emails email_list: %s.', email_list)
 
@@ -246,7 +247,8 @@ class EmailDelivery(object):
         smtp_connection.quit()
 
     def get_mimetext_message(self, sqs_message, resources, to_addrs):
-        body = get_rendered_jinja(to_addrs, sqs_message, resources, self.logger, 'template', 'default')
+        body = get_rendered_jinja(
+            to_addrs, sqs_message, resources, self.logger, 'template', 'default')
         if not body:
             return None
         email_format = sqs_message['action'].get('template_format', None)
@@ -288,14 +290,12 @@ class EmailDelivery(object):
                 )
             )
         self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" % (
-                sqs_message.get('account', ''),
-                sqs_message['policy']['name'],
-                sqs_message['policy']['resource'],
-                str(len(sqs_message['resources'])),
-                sqs_message['action'].get('template', 'default'),
-                email_to_addrs
-            )
-        )
+            sqs_message.get('account', ''),
+            sqs_message['policy']['name'],
+            sqs_message['policy']['resource'],
+            str(len(sqs_message['resources'])),
+            sqs_message['action'].get('template', 'default'),
+            email_to_addrs))
 
     # https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
     def get_aws_username_from_event(self, event):
@@ -307,8 +307,11 @@ class EmailDelivery(object):
                 format_struct(event)))
             return None
         if identity['type'] == 'AssumedRole':
-            self.logger.debug('In some cases there is no ldap uid is associated with AssumedRole: %s' % identity['arn'])
-            self.logger.debug('We will try to assume that identity is in the AssumedRoleSessionName')
+            self.logger.debug(
+                'In some cases there is no ldap uid is associated with AssumedRole: %s',
+                identity['arn'])
+            self.logger.debug(
+                'We will try to assume that identity is in the AssumedRoleSessionName')
             user = identity['arn'].rsplit('/', 1)[-1]
             if user is None or user.startswith('i-') or user.startswith('awslambda'):
                 return None
