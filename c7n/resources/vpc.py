@@ -1479,8 +1479,6 @@ class AddressRelease(BaseAction):
     also be released.  Otherwise, only unattached elastic IPs
     will be released.
 
-    You can filter by AllocationId, if needed
-
     :example:
 
     .. code-block:: yaml
@@ -1495,57 +1493,41 @@ class AddressRelease(BaseAction):
                     force: true|false
     """
 
-    # Schema, permissions, method process
     schema = type_schema('release', force={'type': 'boolean'})
     permissions = ('ec2:ReleaseAddress','ec2:DisassociateAddress',)
 
-    def process_attached(self, client, associated_addrs, force=True):
-        def msg_assoc_extractor(x):
-            return ('instance', x['InstanceId']) if 'InstanceId' in x else \
-                ('network interface', x.get('NetworkInterfaceId'))
-
-        log_template = 'Elastic IP {0} is attached to {1} {2} and will not be released.  Specify \'force: "true"\' to release'  # noqa: E501
-
-        detached_cnt = 0
-        deassoc_addrs = []
+    def process_attached(self, client, associated_addrs):
         for aa in associated_addrs:
-            if force:
-                self.log.info('Forcing release of {0}'.format(aa['AllocationId']))
-                try:
-                    client.disassociate_address(AssociationId=aa['AssociationId'])
-                    deassoc_addrs.append(aa)
-                    detached_cnt += 1
-                except BotoClientError as e:
-                    # Swallow the condition that the elastic ip is already disassociated,
-                    # re-raise any other boto client error
-                    if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
-                           aa['AssocationId'] in e.response['Error']['Message']):
-                        raise e
-            else:
-                # log attached address
-                self.log.info(log_template.format(aa['AllocationId'], *msg_assoc_extractor(aa)))
-
-        return deassoc_addrs
+            try:
+                client.disassociate_address(AssociationId=aa['AssociationId'])
+            except BotoClientError as e:
+                # If its already been diassociated ignore, else raise.
+                if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
+                       aa['AssocationId'] in e.response['Error']['Message']):
+                    raise e
+        return associated_addrs
 
     def process(self, network_addrs):
-
         client = local_session(self.manager.session_factory).client('ec2')
+        force = self.data.get('force')
+        assoc_addrs = [addr for addr in network_addrs if 'AssociationId' in addr]
+        unassoc_addrs = [addr for addr in network_addrs if 'AssociationId' not in addr]
 
-        is_associated = lambda item: 'AssociationId' in item  # noqa: E731
-        assoc_addrs = (addr for addr in network_addrs if is_associated(addr))
-        unassoc_addrs = (addr for addr in network_addrs if not is_associated(addr))
+        if len(assoc_addrs) and not force:
+            self.log.warning(
+                "Filtered %d attached eips of %d eips. Use 'force: true' to release them.",
+                len(assoc_addrs), len(network_addrs))
+        elif len(assoc_addrs) and force:
+            unassoc_addrs = itertools.chain(
+                unassoc_addrs, self.process_attached(client, assoc_addrs))
 
-        detached_addrs = self.process_attached(client, assoc_addrs, self.data.get('force'))
-
-        for r in itertools.chain(unassoc_addrs, detached_addrs):
+        for r in unassoc_addrs:
             try:
                 client.release_address(AllocationId=r['AllocationId'])
             except BotoClientError as e:
-                # Swallow the condition that the elastic ip wasn't there,re-raise
-                # any other boto client error
-                if not(e.response['Error']['Code'] == 'InvalidAllocationID.NotFound' and
-                       r['AllocationId'] in e.response['Error']['Message']):
-                    raise e
+                # If its already been released, ignore, else raise.
+                if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
+                    raise
 
 
 @resources.register('customer-gateway')
