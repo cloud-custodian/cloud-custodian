@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
+from c7n.registry import PluginRegistry
 from c7n.provider import clouds
 from c7n import mu
 from c7n import query
@@ -196,11 +197,17 @@ class PolicyExecutionMode(object):
         return values
 
 
+execution = PluginRegistry('c7n.execution')
+
+
+@execution.register('pull')
 class PullMode(PolicyExecutionMode):
     """Pull mode execution of a policy.
 
     Queries resources from cloud provider for filtering and actions.
     """
+
+    schema = utils.type_schema('pull')
 
     def run(self, *args, **kw):
         if self.policy.region and (
@@ -305,6 +312,29 @@ class LambdaMode(PolicyExecutionMode):
     """A policy that runs/executes in lambda."""
 
     POLICY_METRICS = ('ResourceCount',)
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'execution-options': {'type': 'object'},
+            'function-prefix': {'type': 'string'},
+            'member-role': {'type': 'string'},
+            'packages': {'type': 'array'},
+            # Lambda passthrough config
+            'runtime': {'enum': ['python2.7', 'python3.6']},
+            'role': {'type': 'string'},
+            'timeout': {'type': 'number'},
+            'memory': {'type': 'number'},
+            'environment': {'type': 'object'},
+            'tags': {'type': 'object'},
+            'dead_letter_config': {'type': 'object'},
+            'kms_key_arn': {'type': 'string'},
+            'tracing_config': {'type': 'object'},
+            'security_groups': {'type': 'array'},
+            'subnets': {'type': 'array'}
+        }
+    }
 
     def get_metrics(self, start, end, period):
         from c7n.mu import LambdaManager, PolicyLambda
@@ -459,17 +489,36 @@ class LambdaMode(PolicyExecutionMode):
         )
 
 
+@execution.register('periodic')
 class PeriodicMode(LambdaMode, PullMode):
     """A policy that runs in pull mode within lambda."""
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
+    schema = utils.type_schema(
+        'periodic', schedule={'type': 'string'}, rinherit=LambdaMode.schema)
+
     def run(self, event, lambda_context):
         return PullMode.run(self)
 
 
+@execution.register('cloudtrail')
 class CloudTrailMode(LambdaMode):
     """A lambda policy using cloudwatch events rules on cloudtrail api logs."""
+
+    schema = utils.type_schema(
+        'cloudtrail',
+        events={'type': 'array', 'items': {
+            'oneOf': [
+                {'type': 'string'},
+                {'type': 'object',
+                 'required': ['event', 'source', 'ids'],
+                 'properties': {
+                     'source': {'type': 'string'},
+                     'ids': {'type': 'string'},
+                     'event': {'type': 'string'}}}]
+        }},
+        rinherit=LambdaMode.schema)
 
     def validate(self):
         events = self.policy.data['mode'].get('events')
@@ -487,16 +536,33 @@ class CloudTrailMode(LambdaMode):
                         self.policy.resource_type))
 
 
+@execution.register('ec2-instance-state')
 class EC2InstanceState(LambdaMode):
     """a lambda policy that executes on ec2 instance state changes."""
 
+    schema = utils.type_schema(
+        'ec2-instance-state', rinherit=LambdaMode.schema,
+        events={'type': 'array', 'items': {
+            'enum': ['running', 'shutting-down',
+                     'stopped', 'stopping', 'terminated']}})
 
+
+@execution.register('asg-instance-state')
 class ASGInstanceState(LambdaMode):
     """a lambda policy that executes on an asg's ec2 instance state changes."""
 
+    schema = utils.type_schema(
+        'asg-instance-state', rinherit=LambdaMode.schema,
+        events={'type': 'array', 'items': {
+            'enum': ['launch-success', 'launch-failure',
+                     'terminate-success', 'terminate-failure']}})
 
+
+@execution.register('guard-duty')
 class GuardDutyMode(LambdaMode):
     """Incident Response for AWS Guard Duty"""
+
+    schema = utils.type_schema('guard-duty', rinherit=LambdaMode.schema)
 
     supported_resources = ('account', 'ec2', 'iam-user')
 
@@ -534,12 +600,14 @@ class GuardDutyMode(LambdaMode):
         return super(GuardDutyMode, self).provision()
 
 
+@execution.register('config-rule')
 class ConfigRuleMode(LambdaMode):
     """a lambda policy that executes as a config service rule.
         http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
     """
 
     cfg_event = None
+    schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)
 
     def resolve_resources(self, event):
         source = self.policy.resource_manager.get_source('config')

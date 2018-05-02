@@ -48,8 +48,10 @@ class HandleTest(BaseTest):
             policy_execution.append((event, context))
 
         self.patch(Policy, 'push', push)
-            
+
         from c7n import handler
+
+        self.patch(handler, 'account_id', '111222333444555')
 
         with open(os.path.join(self.run_dir, 'config.json'), 'w') as fh:
             json.dump(
