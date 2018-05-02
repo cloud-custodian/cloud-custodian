@@ -357,3 +357,15 @@ class TestSqsAction(BaseTest):
             QueueUrl=resources[0]['QueueUrl'],
             AttributeNames=['MessageRetentionPeriod'])['Attributes']
         self.assertEqual(int(retention['MessageRetentionPeriod']), 86400)
+
+    def test_sqs_get_resources(self):
+        factory = self.replay_flight_data('test_sqs_get_resources')
+        p = self.load_policy({
+            'name': 'sqs-reduce',
+            'resource': 'sqs'}, session_factory=factory)
+        url1 = 'https://us-east-2.queue.amazonaws.com/644160558196/BrickHouse'
+        url2 = 'https://sqs.us-east-2.amazonaws.com/644160558196/BrickHouse'
+        resources = p.resource_manager.get_resources([url1])
+        self.assertEqual(resources[0]['QueueUrl'], url1)
+        resources = p.resource_manager.get_resources([url2])
+        self.assertEqual(resources[0]['QueueUrl'], url1)
