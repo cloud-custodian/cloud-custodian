@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest, functional, event_data, TestConfig as Config
 from c7n.filters import FilterValidationError
+from botocore.exceptions import ClientError as BotoClientError
 
 
 class VpcTest(BaseTest):
@@ -557,6 +558,105 @@ class NetworkInterfaceTest(BaseTest):
         results = client.describe_network_interfaces(
             NetworkInterfaceIds=[net_id])['NetworkInterfaces']
         self.assertEqual([g['GroupId'] for g in results[0]['Groups']], [qsg_id])
+
+
+class NetworkAddrTest(BaseTest):
+
+    @staticmethod
+    def release_if_still_present(ec2, network_address):
+        try:
+            ec2.release_address(AllocationId=network_address['AllocationId'])
+        except BotoClientError as e:
+            # Swallow the condition that the elastic ip wasn't there (meaning the test should have deleted it),
+            # re-raise any other boto client error
+            if not(e.response['Error']['Code'] == 'InvalidAllocationID.NotFound' and network_address['AllocationId'] in e.response['Error']['Message']):
+                raise e
+
+    def assert_policy_released(self, factory, ec2, network_addr, force=False):
+        alloc_id = network_addr['AllocationId']
+
+        p = self.load_policy({
+            'name': 'release-network-addr',
+            'resource': 'network-addr',
+            'filters': [
+                {'AllocationId': alloc_id},
+            ],
+            'actions': [{'type': 'release', 'force': force}], },
+            session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(BotoClientError) as e_cm:
+            ec2.describe_addresses(AllocationIds=[ alloc_id ])
+        e = e_cm.exception
+        self.assertEqual(e.response['Error']['Code'], 'InvalidAllocationID.NotFound')
+        self.assertIn(alloc_id, e.response['Error']['Message'])
+
+    def assert_policy_release_failed(self, factory, ec2, network_addr):
+        alloc_id = network_addr['AllocationId']
+
+        p = self.load_policy({
+            'name': 'release-network-addr',
+            'resource': 'network-addr',
+            'filters': [
+                {'AllocationId': alloc_id},
+            ],
+            'actions': [{'type': 'release', 'force': False}], },
+            session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        address_info = ec2.describe_addresses(AllocationIds=[alloc_id])
+        self.assertEqual(len(address_info['Addresses']), 1)
+        self.assertEqual(address_info['Addresses'][0]['AssociationId'],
+                         network_addr['AssociationId'])
+
+    @functional
+    def test_release_detached_vpc(self):
+        factory = self.replay_flight_data('test_release_detached_vpc')
+        session = factory()
+        ec2 = session.client('ec2')
+        network_addr = ec2.allocate_address(Domain='vpc')
+        self.addCleanup(self.release_if_still_present, ec2, network_addr)
+        self.assert_policy_released(factory, ec2, network_addr)
+
+    def test_release_attached_ec2(self):
+        factory = self.replay_flight_data('test_release_attached_ec2')
+
+        session = factory()
+        ec2 = session.client('ec2')
+
+        network_addrs = ec2.describe_addresses(AllocationIds=['eipalloc-2da7a824'])
+        self.assertEqual(len(network_addrs['Addresses']), 1)
+        self.assertEqual(network_addrs['Addresses'][0]['AssociationId'], 'eipassoc-e551ce3f')
+
+        self.assert_policy_released(factory, ec2, network_addrs['Addresses'][0], True)
+
+    def test_release_attached_nif(self):
+        factory = self.replay_flight_data('test_release_attached_nif')
+
+        session = factory()
+        ec2 = session.client('ec2')
+
+        network_addrs = ec2.describe_addresses(AllocationIds=['eipalloc-ebaaa5e2'])
+        self.assertEqual(len(network_addrs['Addresses']), 1)
+        self.assertEqual(network_addrs['Addresses'][0]['AssociationId'], 'eipassoc-8a8d4647')
+
+        self.assert_policy_released(factory, ec2, network_addrs['Addresses'][0], True)
+
+    def test_norelease_attached_nif(self):
+        factory = self.replay_flight_data('test_norelease_attached_nif')
+
+        session = factory()
+        ec2 = session.client('ec2')
+
+        network_addrs = ec2.describe_addresses(AllocationIds=['eipalloc-983b3391'])
+        self.assertEqual(len(network_addrs['Addresses']), 1)
+        self.assertEqual(network_addrs['Addresses'][0]['AssociationId'], 'eipassoc-eb20eb26')
+
+        self.assert_policy_release_failed(factory, ec2, network_addrs['Addresses'][0])
 
 
 class RouteTableTest(BaseTest):

@@ -140,6 +140,7 @@ func (n *NodeInfo) GetSSMInfo() (*SSMHostInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	n.ManagedID = ssmInfo.InstanceID
 	return &ssmInfo, nil
 }
 

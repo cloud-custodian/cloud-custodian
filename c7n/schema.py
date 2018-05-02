@@ -34,6 +34,7 @@ import logging
 from jsonschema import Draft4Validator as Validator
 from jsonschema.exceptions import best_match
 
+from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
@@ -211,48 +212,8 @@ def generate(resource_types=()):
             },
         },
         'policy-mode': {
-            'type': 'object',
-            'required': ['type'],
-            'additionalProperties': False,
-            'properties': {
-                'type': {
-                    'enum': [
-                        'cloudtrail',
-                        'ec2-instance-state',
-                        'asg-instance-state',
-                        'config-rule',
-                        'guard-duty',
-                        'periodic'
-                    ]},
-                'events': {'type': 'array', 'items': {
-                    'oneOf': [
-                        {'type': 'string'},
-                        {'type': 'object',
-                         'required': ['event', 'source', 'ids'],
-                         'properties': {
-                             'source': {'type': 'string'},
-                             'ids': {'type': 'string'},
-                             'event': {'type': 'string'}}}],
-                }},
-                'execution-options': {'type': 'object'},
-                'role': {'type': 'string'},
-                'runtime': {'enum': ['python2.7', 'python3.6']},
-                'memory': {'type': 'number'},
-                'timeout': {'type': 'number'},
-                'schedule': {'type': 'string'},
-                'function-prefix': {'type': 'string'},
-                'dead_letter_config': {'type': 'object'},
-                'environment': {'type': 'object'},
-                'kms_key_arn': {'type': 'string'},
-                'tracing_config': {'type': 'object'},
-                'tags': {'type': 'object'},
-                'packages': {'type': 'array'},
-                'subnets': {'type': 'array'},
-                'security_groups': {'type': 'array'},
-                # specific to guard duty
-                'member-role': {'type': 'string'},
-            },
-        },
+            'anyOf': [e.schema for _, e in execution.items()],
+        }
     }
 
     resource_refs = []

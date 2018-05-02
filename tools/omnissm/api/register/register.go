@@ -72,7 +72,11 @@ var (
 	ssmClient *ssm.SSM
 
 	// RegistrationTable DynamodDb Table for storing instance regisrations
-	RegistrationTable = os.Getenv("REGISTRATIONS_TABLE")
+	RegistrationTable = os.Getenv("REGISTRATION_TABLE")
+
+	// Only allow instance registrations from these accounts, read from
+	// $ACCOUNT_WHITELIST (comma-separated)
+	accountWhitelist = make(map[string]bool)
 )
 
 func init() {
@@ -90,6 +94,10 @@ func init() {
 	dbClient = dynamodb.New(cfg)
 	ssmClient = ssm.New(cfg)
 
+	w := os.Getenv("ACCOUNT_WHITELIST")
+	for _, a := range strings.Split(w, ",") {
+		accountWhitelist[a] = true
+	}
 }
 
 // RegistrationRequest structure of instance registration request
@@ -224,44 +232,23 @@ func validateRequest(requestBody string) (InstanceIdentity, events.APIGatewayPro
 
 	err := json.Unmarshal([]byte(requestBody), &regRequest)
 	if err != nil {
-		response := map[string]string{
-			"error":   "invalid-request",
-			"message": "malformed json",
-		}
-		body, _ := json.Marshal(response)
-		return identity, events.APIGatewayProxyResponse{Body: string(body), StatusCode: 400}
+		return identity, newErrorResponse("invalid-request", "malformed json", 400)
 	}
 
 	// TODO: At the moment this is AWS Specific, support GCP & Azure to the extant possible.
 	switch regRequest.Provider {
 	case "aws":
 	default:
-		response := map[string]string{
-			"error":   "invalid-request",
-			"message": "unknown provider",
-		}
-
-		body, _ := json.Marshal(response)
-		return identity, events.APIGatewayProxyResponse{Body: string(body), StatusCode: 400}
+		return identity, newErrorResponse("invalid-request", "unknown provider", 400)
 	}
 
 	signature, err := base64.StdEncoding.DecodeString(string(regRequest.Signature))
 	if err != nil {
-		response := map[string]string{
-			"error":   "invalid-request",
-			"message": "malformed rsa signature",
-		}
-		body, _ := json.Marshal(response)
-		return identity, events.APIGatewayProxyResponse{Body: string(body), StatusCode: 400}
+		return identity, newErrorResponse("invalid-request", "malformed rsa signature", 400)
 	}
 	err = RSACert.CheckSignature(x509.SHA256WithRSA, []byte(regRequest.Identity), signature)
 	if err != nil {
-		response := map[string]string{
-			"error":   "invalid-signature",
-			"message": "invalid identity",
-		}
-		body, _ := json.Marshal(response)
-		return identity, events.APIGatewayProxyResponse{Body: string(body), StatusCode: 400}
+		return identity, newErrorResponse("invalid-signature", "invalid identity", 400)
 	}
 
 	// We verified the signature, so malformed here would more than odd.
@@ -330,6 +317,15 @@ func handleRegistrationRequest(identity InstanceIdentity) events.APIGatewayProxy
 	return events.APIGatewayProxyResponse{Body: string(serialized), StatusCode: 200}
 }
 
+func newErrorResponse(name, msg string, statusCode int) events.APIGatewayProxyResponse {
+	response := map[string]string{
+		"error":   name,
+		"message": msg,
+	}
+	body, _ := json.Marshal(response)
+	return events.APIGatewayProxyResponse{Body: string(body), StatusCode: statusCode}
+}
+
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	fmt.Printf("Processing request data for request %s.\n", request.RequestContext.RequestID)
@@ -339,6 +335,12 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	if len(identity.InstanceID) < 1 {
 		return errorResponse, nil
+	}
+
+	if !accountWhitelist[identity.AccountID] {
+		// Account is not whitelisted, deny request
+		fmt.Printf("Request from account '%s' is not whitelisted.\n", identity.AccountID)
+		return newErrorResponse("invalid-request", "invalid account", 401), nil
 	}
 
 	if request.HTTPMethod == "POST" {
