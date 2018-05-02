@@ -1,5 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
+Parameters:
+  AccountIDs:
+    Description: "IDs of accounts permitted to register"
+    Type: CommaDelimitedList
+    Default: "644160558196"
 Resources:
   RegistrationHandler:
     Type: 'AWS::Serverless::Function'
@@ -14,6 +19,7 @@ Resources:
       Environment:
         Variables:
           REGISTRATION_TABLE: !Ref RegistrationTable
+          ACCOUNT_WHITELIST: !Join [ ",", !Ref AccountIDs ]
       Events:
         RegisterInstance:
           Properties:
