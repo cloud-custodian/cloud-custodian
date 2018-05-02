@@ -1460,13 +1460,13 @@ class Address(query.QueryResourceManager):
         service = 'ec2'
         type = 'network-addr'
         enum_spec = ('describe_addresses', 'Addresses', None)
-        name = id = 'PublicIp'
+        name = 'PublicIp'
+        id = 'AllocationId'
         filter_name = 'PublicIps'
         filter_type = 'list'
         date = None
         dimension = None
         config_type = "AWS::EC2::EIP"
-        taggable = False
 
 
 @resources.register('customer-gateway')
