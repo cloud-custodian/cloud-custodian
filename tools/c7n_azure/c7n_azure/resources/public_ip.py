@@ -24,6 +24,7 @@ class PublicIPAddress(QueryResourceManager):
         client = 'NetworkManagementClient'
         enum_spec = ('public_ip_addresses', 'list_all')
         id = 'id'
+        type = 'publicip'
         name = 'name'
         default_report_fields = (
             'name',

@@ -25,7 +25,7 @@ class SessionTest(BaseTest):
         s = Session()
         client = s.client('azure.mgmt.resource.ResourceManagementClient')
         resource = next(client.resources.list())
-        self.assertEqual('2018-04-01', s.resource_api_version(resource))
+        self.assertEqual('2018-04-01', s.resource_api_version(resource.id))
 
 
 
