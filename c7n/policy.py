@@ -415,22 +415,6 @@ class LambdaMode(PolicyExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
-    def expand_variables(self, variables):
-        """expand variables in the mode role fields.
-        """
-        p = variables['policy'].copy()
-        if 'mode' in variables['policy']:
-            if 'role' in variables['policy']['mode']:
-                mode = variables['policy']['mode'].copy()
-                mode['role'] = mode['role'].format(**variables)
-                p['mode'] = mode
-            if 'execution-options' in variables['policy']['mode']:
-                if 'output_dir' in variables['policy']['mode']['execution-options']:    
-                    executionoptions = variables['policy']['mode']['execution-options'].copy()
-                    executionoptions['output_dir'] = executionoptions['output_dir'].format(**variables)
-                    p['mode']['execution-options'] = executionoptions       
-        return p
-
     def provision(self):
         # Avoiding runtime lambda dep, premature optimization?
         from c7n.mu import PolicyLambda, LambdaManager
@@ -443,7 +427,7 @@ class LambdaMode(PolicyExecutionMode):
                 'policy': self.policy.data,
                 'region': self.policy.options.region or 'default'
             }
-            self.policy.data = self.expand_variables(variables)
+            self.policy.data = utils.format_string_values(variables['policy'], **variables)
             try:
                 manager = LambdaManager(self.policy.session_factory)
             except ClientError:
