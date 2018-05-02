@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PublicIp": "52.207.185.218", 
+        "Domain": "vpc", 
+        "AllocationId": "eipalloc-bbaf95b2", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "15f55797-5b9d-493d-8bbd-cf809bba5364", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 26 Apr 2018 16:22:59 GMT"
+            }
+        }
+    }
+}

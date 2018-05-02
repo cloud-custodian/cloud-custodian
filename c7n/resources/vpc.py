@@ -19,6 +19,8 @@ import zlib
 
 import jmespath
 
+from botocore.exceptions import ClientError as BotoClientError
+
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import (
     DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
@@ -1454,7 +1456,7 @@ class AclAwsS3Cidrs(Filter):
 
 
 @resources.register('network-addr')
-class Address(query.QueryResourceManager):
+class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
@@ -1467,6 +1469,66 @@ class Address(query.QueryResourceManager):
         date = None
         dimension = None
         config_type = "AWS::EC2::EIP"
+
+
+@NetworkAddress.action_registry.register('release')
+class AddressRelease(BaseAction):
+    """Action to release elastic IP address(es)
+
+    Use the force option to cause any attached elastic IPs to
+    also be released.  Otherwise, only unattached elastic IPs
+    will be released.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: release-network-addr
+                resource: network-addr
+                filters:
+                  - AllocationId: ...
+                actions:
+                  - type: release
+                    force: true|false
+    """
+
+    schema = type_schema('release', force={'type': 'boolean'})
+    permissions = ('ec2:ReleaseAddress','ec2:DisassociateAddress',)
+
+    def process_attached(self, client, associated_addrs):
+        for aa in list(associated_addrs):
+            try:
+                client.disassociate_address(AssociationId=aa['AssociationId'])
+            except BotoClientError as e:
+                # If its already been diassociated ignore, else raise.
+                if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
+                       aa['AssocationId'] in e.response['Error']['Message']):
+                    raise e
+                associated_addrs.remove(aa)
+        return associated_addrs
+
+    def process(self, network_addrs):
+        client = local_session(self.manager.session_factory).client('ec2')
+        force = self.data.get('force')
+        assoc_addrs = [addr for addr in network_addrs if 'AssociationId' in addr]
+        unassoc_addrs = [addr for addr in network_addrs if 'AssociationId' not in addr]
+
+        if len(assoc_addrs) and not force:
+            self.log.warning(
+                "Filtered %d attached eips of %d eips. Use 'force: true' to release them.",
+                len(assoc_addrs), len(network_addrs))
+        elif len(assoc_addrs) and force:
+            unassoc_addrs = itertools.chain(
+                unassoc_addrs, self.process_attached(client, assoc_addrs))
+
+        for r in unassoc_addrs:
+            try:
+                client.release_address(AllocationId=r['AllocationId'])
+            except BotoClientError as e:
+                # If its already been released, ignore, else raise.
+                if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
+                    raise
 
 
 @resources.register('customer-gateway')
