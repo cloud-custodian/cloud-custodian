@@ -18,7 +18,7 @@ import logging
 from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.cli.core._profile import Profile
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
-from utils import ResourceIdParser
+from c7n_azure.utils import ResourceIdParser
 
 
 class Session(object):

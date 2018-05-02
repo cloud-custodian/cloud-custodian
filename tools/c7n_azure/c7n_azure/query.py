@@ -20,7 +20,7 @@ from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
 from c7n.utils import local_session
-from utils import ResourceIdParser
+from c7n_azure.utils import ResourceIdParser
 
 
 class ResourceQuery(object):
