@@ -1497,7 +1497,7 @@ class AddressRelease(BaseAction):
     permissions = ('ec2:ReleaseAddress','ec2:DisassociateAddress',)
 
     def process_attached(self, client, associated_addrs):
-        for aa in associated_addrs:
+        for aa in list(associated_addrs):
             try:
                 client.disassociate_address(AssociationId=aa['AssociationId'])
             except BotoClientError as e:
@@ -1505,6 +1505,7 @@ class AddressRelease(BaseAction):
                 if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
                        aa['AssocationId'] in e.response['Error']['Message']):
                     raise e
+                associated_addrs.remove(aa)
         return associated_addrs
 
     def process(self, network_addrs):

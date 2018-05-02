@@ -16,8 +16,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from .common import BaseTest, functional, event_data, TestConfig as Config
 from c7n.filters import FilterValidationError
 from botocore.exceptions import ClientError as BotoClientError
-from c7n.resources.vpc import AddressRelease
-import time
 
 
 class VpcTest(BaseTest):
@@ -574,11 +572,6 @@ class NetworkAddrTest(BaseTest):
             if not(e.response['Error']['Code'] == 'InvalidAllocationID.NotFound' and network_address['AllocationId'] in e.response['Error']['Message']):
                 raise e
 
-    def allocate_network_address(self, ec2, domain_type):
-        network_addr = ec2.allocate_address(Domain=domain_type)
-        self.addCleanup(self.release_if_still_present, ec2, network_addr)
-        return network_addr
-
     def assert_policy_released(self, factory, ec2, network_addr, force=False):
         alloc_id = network_addr['AllocationId']
 
@@ -615,7 +608,7 @@ class NetworkAddrTest(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
-        address_info = ec2.describe_addresses(AllocationIds=[ alloc_id ])
+        address_info = ec2.describe_addresses(AllocationIds=[alloc_id])
         self.assertEqual(len(address_info['Addresses']), 1)
         self.assertEqual(address_info['Addresses'][0]['AssociationId'],
                          network_addr['AssociationId'])
@@ -623,10 +616,10 @@ class NetworkAddrTest(BaseTest):
     @functional
     def test_release_detached_vpc(self):
         factory = self.replay_flight_data('test_release_detached_vpc')
-
         session = factory()
         ec2 = session.client('ec2')
-
+        network_addr = ec2.allocate_address(Domain='vpc')
+        self.addCleanup(self.release_if_still_present, ec2, network_addr)
         network_addr = self.allocate_network_address(ec2, 'vpc')
         self.assert_policy_released(factory, ec2, network_addr)
 
