@@ -21,7 +21,6 @@ from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 from dateutil import zoneinfo
 from dateutil.parser import parse
-from dateutil.tz import tzutc
 
 import logging
 import itertools
