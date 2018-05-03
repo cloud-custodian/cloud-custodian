@@ -283,7 +283,7 @@ class PullMode(PolicyExecutionMode):
                 start,
                 end,
             )
-        elif log_source.use_s3():
+        elif log_source.type == 's3':
             raw_entries = log_entries_from_s3(
                 self.policy.session_factory,
                 log_source,
