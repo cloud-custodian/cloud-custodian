@@ -454,7 +454,8 @@ class LambdaMode(PolicyExecutionMode):
                 p['mode']['role'] = utils.format_string_values(p['mode']['role'], **variables)
             if 'execution-options' in p['mode']:
                 if 'output_dir' in p['mode']['execution-options']:
-                    p['mode']['execution-options']['output_dir'] = utils.format_string_values(p['mode']['execution-options']['output_dir'], **variables)
+                    p['mode']['execution-options']['output_dir'] = utils.format_string_values(
+                        p['mode']['execution-options']['output_dir'], **variables)
         return p
 
     def provision(self):
