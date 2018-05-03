@@ -455,7 +455,7 @@ class LambdaMode(PolicyExecutionMode):
             variables = {
                 'account_id': self.policy.options.account_id,
                 'policy': self.policy.data,
-                'region': self.policy.options.region or 'default'
+                'region': self.policy.options.region
             }
             self.policy.data = utils.format_string_values(variables['policy'], **variables)
             try:
