@@ -26,6 +26,7 @@ import fnmatch
 import functools
 import jsonschema
 import logging
+import six
 import sys
 import time
 import os
@@ -345,7 +346,7 @@ def process_account(account, start, end, destination, incremental=True):
 def get_session(role, region, session_name="c7n-log-exporter", session=None):
     if role == 'self':
         session = boto3.Session()
-    elif isinstance(role, basestring):
+    elif isinstance(role, six.string_types):
         session = assumed_session(role, session_name, region=region)
     elif isinstance(role, list):
         session = None
@@ -584,7 +585,7 @@ def sync(config, group, accounts=(), dryrun=False):
         exports = get_exports(client, destination['bucket'], prefix + "/")
 
         role = account.pop('role')
-        if isinstance(role, basestring):
+        if isinstance(role, six.string_types):
             account['account_id'] = role.split(':')[4]
         else:
             account['account_id'] = role[-1].split(':')[4]
@@ -599,7 +600,7 @@ def sync(config, group, accounts=(), dryrun=False):
         try:
             tag_set = client.get_object_tagging(
                 Bucket=destination['bucket'], Key=prefix).get('TagSet', [])
-        except:
+        except ClientError:
             tag_set = []
 
         tags = {t['Key']: t['Value'] for t in tag_set}
@@ -673,7 +674,7 @@ def status(config, group, accounts=()):
         prefix = "%s/flow-log" % prefix
 
         role = account.pop('role')
-        if isinstance(role, basestring):
+        if isinstance(role, six.string_types):
             account['account_id'] = role.split(':')[4]
         else:
             account['account_id'] = role[-1].split(':')[4]
@@ -683,7 +684,7 @@ def status(config, group, accounts=()):
         try:
             tag_set = client.get_object_tagging(
                 Bucket=destination['bucket'], Key=prefix).get('TagSet', [])
-        except:
+        except ClientError:
             account['export'] = 'missing'
             continue
         tags = {t['Key']: t['Value'] for t in tag_set}
@@ -768,8 +769,8 @@ def get_exports(client, bucket, prefix, latest=True):
 @lambdafan
 def export(group, bucket, prefix, start, end, role, poll_period=120, session=None, name=""):
     """export a given log group to s3"""
-    start = start and isinstance(start, basestring) and parse(start) or start
-    end = (end and isinstance(start, basestring) and
+    start = start and isinstance(start, six.string_types) and parse(start) or start
+    end = (end and isinstance(start, six.string_types) and
            parse(end) or end or datetime.now())
     start = start.replace(tzinfo=tzlocal()).astimezone(tzutc())
     end = end.replace(tzinfo=tzlocal()).astimezone(tzutc())

@@ -20,7 +20,7 @@ import os
 requires = [
     "Jinja2", "boto3", "jsonschema", "ruamel.yaml<0.15", "datadog", "slackclient", "ldap3"]
 try:
-    from concurrent import futures
+    from concurrent import futures  # noqa F401
 except ImportError:
     # The backport has SyntaxErrors under py36, so avoid installing it.
     # https://github.com/agronholm/pythonfutures/issues/41

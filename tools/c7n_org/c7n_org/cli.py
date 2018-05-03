@@ -141,7 +141,9 @@ def resolve_regions(regions, partition='aws'):
 
 def get_session(account, session_name, region):
     if account.get('role'):
-        return assumed_session(account['role'], session_name, region=region, external_id=account.get('external_id'))
+        return assumed_session(
+            account['role'], session_name, region=region,
+            external_id=account.get('external_id'))
     elif account.get('profile'):
         return SessionFactory(region, account['profile'])()
     else:

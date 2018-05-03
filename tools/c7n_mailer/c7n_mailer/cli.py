@@ -56,8 +56,8 @@ CONFIG_SCHEMA = {
         'ses_region': {'type': 'string'},
         'redis_host': {'type': 'string'},
         'redis_port': {'type': 'integer'},
-        'datadog_api_key': {'type': 'string'},              #TODO: encrypt with KMS?
-        'datadog_application_key': {'type': 'string'},      #TODO: encrypt with KMS?
+        'datadog_api_key': {'type': 'string'},              # TODO: encrypt with KMS?
+        'datadog_application_key': {'type': 'string'},      # TODO: encrypt with KMS?
         'slack_token': {'type': 'string'},
 
         # SDK Config
@@ -104,7 +104,7 @@ def get_c7n_mailer_parser():
     debug_help_msg = 'sets c7n_mailer logger to debug, for maximum output (the default is INFO)'
     parser.add_argument('--debug', action='store_true', help=debug_help_msg)
     max_num_processes_help_msg = 'will run the mailer in parallel, integer of max processes allowed'
-    parser.add_argument('--max-num-processes', help=max_num_processes_help_msg)
+    parser.add_argument('--max-num-processes', type=int, help=max_num_processes_help_msg)
     group = parser.add_mutually_exclusive_group(required=True)
     update_lambda_help_msg = 'packages your c7n_mailer, uploads the zip to aws lambda as a function'
     group.add_argument('--update-lambda', action='store_true', help=update_lambda_help_msg)
@@ -114,13 +114,9 @@ def get_c7n_mailer_parser():
 
 
 def run_mailer_in_parallel(mailer_config, aws_session, logger, max_num_processes):
-    try:
-        max_num_processes = int(max_num_processes)
-        if max_num_processes < 1:
-            raise Exception
-    except:
-        print('--max-num-processes must be an integer')
-        return
+    max_num_processes = int(max_num_processes)
+    if max_num_processes < 1:
+        raise Exception
     sqs_queue_processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
     sqs_queue_processor.max_num_processes = max_num_processes
     sqs_queue_processor.run(parallel=True)

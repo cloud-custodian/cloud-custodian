@@ -17,7 +17,6 @@ import threading
 from googleapiclient import discovery
 import httplib2
 from oauth2client import client
-import os
 from ratelimiter import RateLimiter
 from retrying import retry
 import socket
