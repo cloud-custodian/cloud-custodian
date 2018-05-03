@@ -314,7 +314,7 @@ class TagActionFilter(Filter):
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz).replace(minute=0)
+            self.current_date = datetime.now(tz=tz)
 
         return self.current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
@@ -598,7 +598,7 @@ class TagDelayedAction(Action):
         return self
 
     def generate_timestamp(self, days, hours):
-        n = datetime.now(tz=self.tz).replace(minute=0)
+        n = datetime.now(tz=self.tz)
         if days == hours == 0:
             # maintains default value of days being 4 if nothing is provided
             days = 4
