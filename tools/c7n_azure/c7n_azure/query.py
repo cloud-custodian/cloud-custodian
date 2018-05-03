@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import six
+from c7n_azure.actions import Tag
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
 from c7n.utils import local_session
+from c7n_azure.utils import ResourceIdParser
 
 
 class ResourceQuery(object):
@@ -28,30 +30,19 @@ class ResourceQuery(object):
 
     def filter(self, resource_manager, **params):
         m = resource_manager.resource_type
-        client = local_session(self.session_factory).client(
-            "%s.%s" % (m.service, m.client))
         enum_op, list_op = m.enum_spec
-        op = getattr(getattr(client, enum_op), list_op)
-        data = [self.to_dictionary(e) for e in op()]
+        op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
+        data = [r.serialize(True) for r in op()]
+
         return data
 
-    def to_dictionary(self, obj):
-        if isinstance(obj, dict):
-            data = {}
-            for (k, v) in obj.items():
-                data[k] = self.to_dictionary(v)
-            return data
-        elif hasattr(obj, "_ast"):
-            return self.to_dictionary(obj._ast())
-        elif hasattr(obj, "__iter__") and not isinstance(obj, str):
-            return [self.to_dictionary(v) for v in obj]
-        elif hasattr(obj, "__dict__"):
-            data = dict([(key, self.to_dictionary(value))
-                for key, value in obj.__dict__.iteritems()
-                if not callable(value) and not key.startswith('_')])
-            return data
+    @staticmethod
+    def resolve(resource_type):
+        if not isinstance(resource_type, type):
+            raise ValueError(resource_type)
         else:
-            return obj
+            m = resource_type
+        return m
 
 
 @sources.register('describe-azure')
@@ -78,8 +69,12 @@ class QueryMeta(type):
             attrs['filter_registry'] = FilterRegistry(
                 '%s.filters' % name.lower())
         if 'action_registry' not in attrs:
-            attrs['action_registry'] = ActionRegistry(
+            actions = ActionRegistry(
                 '%s.actions' % name.lower())
+
+            # All ARM resources will have tag support; however, classic resources may not have support
+            actions.register('tag', Tag)
+            attrs['action_registry'] = actions
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -97,8 +92,18 @@ class QueryResourceManager(ResourceManager):
     def get_source(self, source_type):
         return sources.get(source_type)(self)
 
+    def get_client(self, service=None):
+        if not service:
+            return local_session(self.session_factory).client(
+                "%s.%s" % (self.resource_type.service, self.resource_type.client))
+        return local_session(self.session_factory).client(service)
+
     def get_cache_key(self, query):
         return {'source_type': self.source_type, 'query': query}
+
+    @classmethod
+    def get_model(cls):
+        return ResourceQuery.resolve(cls.resource_type)
 
     @property
     def source_type(self):
@@ -111,4 +116,14 @@ class QueryResourceManager(ResourceManager):
         return self.filter_resources(resources)
 
     def augment(self, resources):
+        #TODO: temporary put here. Applicable only to ARM resources. Need to move to ARMResourceManager base class
+        for resource in resources:
+            if 'id' in resource:
+                resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
         return resources
+
+    def get_resources(self, resource_ids):
+        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
+        session = local_session(self.session_factory)
+        data = [resource_client.resources.get_by_id(rid, session.resource_api_version(rid)) for rid in resource_ids]
+        return [r.serialize(True) for r in data]

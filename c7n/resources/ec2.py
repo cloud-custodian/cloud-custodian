@@ -338,18 +338,19 @@ class DisableApiTermination(Filter):
         perms.extend(self.manager.get_permissions())
         return perms
 
-    def is_termination_protection_enabled(self, inst):
-        res_id = self.manager.get_model().id
-        client = utils.local_session(self.manager.session_factory).client('ec2')
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        return [r for r in resources
+                if self.is_termination_protection_enabled(client, r)]
+
+    def is_termination_protection_enabled(self, client, inst):
         attr_val = self.manager.retry(
             client.describe_instance_attribute,
             Attribute='disableApiTermination',
-            InstanceId=inst[res_id]
+            InstanceId=inst['InstanceId']
         )
         return attr_val['DisableApiTermination']['Value']
-
-    def __call__(self, i):
-        return self.is_termination_protection_enabled(i)
 
 
 class InstanceImageBase(object):
@@ -1044,24 +1045,22 @@ class Terminate(BaseAction, StateTransitionFilter):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
         if self.data.get('force'):
             self.log.info("Disabling termination protection on instances")
             self.disable_deletion_protection(
+                client,
                 [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
         # limit batch sizes to avoid api limits
         for batch in utils.chunks(instances, 100):
             self.manager.retry(
                 client.terminate_instances,
                 InstanceIds=[i['InstanceId'] for i in instances])
 
-    def disable_deletion_protection(self, instances):
+    def disable_deletion_protection(self, client, instances):
 
-        @utils.worker
         def process_instance(i):
-            client = utils.local_session(
-                self.manager.session_factory).client('ec2')
             try:
                 self.manager.retry(
                     client.modify_instance_attribute,
@@ -1100,32 +1099,37 @@ class Snapshot(BaseAction):
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def process(self, resources):
-        for resource in resources:
-            with self.executor_factory(max_workers=2) as w:
-                futures = []
-                futures.append(w.submit(self.process_volume_set, resource))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception creating snapshot set \n %s" % (
-                                f.exception()))
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource in resources:
+                futures.append(w.submit(
+                    self.process_volume_set, client, resource))
+            for f in as_completed(futures):
+                if f.exception():
+                    raise f.exception()
+                    self.log.error(
+                        "Exception creating snapshot set \n %s" % (
+                            f.exception()))
 
-    @utils.worker
-    def process_volume_set(self, resource):
-        c = utils.local_session(self.manager.session_factory).client('ec2')
+    def process_volume_set(self, client, resource):
         for block_device in resource['BlockDeviceMappings']:
             if 'Ebs' not in block_device:
                 continue
             volume_id = block_device['Ebs']['VolumeId']
             description = "Automated,Backup,%s,%s" % (
-                resource['InstanceId'],
-                volume_id)
+                resource['InstanceId'], volume_id)
+            tags = self.get_snapshot_tags(resource, block_device)
             try:
-                response = self.manager.retry(
-                    c.create_snapshot,
+                self.manager.retry(
+                    client.create_snapshot,
                     DryRun=self.manager.config.dryrun,
                     VolumeId=volume_id,
-                    Description=description)
+                    Description=description,
+                    TagSpecifications=[{
+                        'ResourceType': 'snapshot',
+                        'Tags': tags}])
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectState':
                     self.log.warning(
@@ -1135,34 +1139,28 @@ class Snapshot(BaseAction):
                     continue
                 raise
 
-            tags = [
-                {'Key': 'Name', 'Value': volume_id},
-                {'Key': 'InstanceId', 'Value': resource['InstanceId']},
-                {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
-                {'Key': 'custodian_snapshot', 'Value': ''}
-            ]
+    def get_snapshot_tags(self, resource, block_device):
+        tags = [
+            {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
+            {'Key': 'InstanceId', 'Value': resource['InstanceId']},
+            {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
+            {'Key': 'custodian_snapshot', 'Value': ''}]
 
-            copy_keys = self.data.get('copy-tags', [])
-            copy_tags = []
-            if copy_keys:
-                for t in resource.get('Tags', []):
-                    if t['Key'] in copy_keys:
-                        copy_tags.append(t)
+        copy_keys = self.data.get('copy-tags', [])
+        copy_tags = []
+        if copy_keys:
+            for t in resource.get('Tags', []):
+                if t['Key'] in copy_keys:
+                    copy_tags.append(t)
 
             if len(copy_tags) + len(tags) > 40:
                 self.log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
-                        volume_id))
+                        block_device['Ebs']['VolumeId']))
                 copy_tags = []
-
             tags.extend(copy_tags)
-            self.manager.retry(
-                c.create_tags,
-                DryRun=self.manager.config.dryrun,
-                Resources=[
-                    response['SnapshotId']],
-                Tags=tags)
+        return tags
 
 
 @actions.register('modify-security-groups')
@@ -1497,3 +1495,71 @@ class QueryFilter(object):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+
+@filters.register('instance-attribute')
+class InstanceAttribute(ValueFilter):
+    """EC2 Instance Value FIlter on a given instance attribute.
+
+    Filters EC2 Instances with the given instance attribute
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-unoptimized-ebs
+            resource: ec2
+            filters:
+              - type: instance-attribute
+                attribute: ebsOptimized
+                key: "Value"
+                value: false
+    """
+
+    valid_attrs = (
+        'instanceType',
+        'kernel',
+        'ramdisk',
+        'userData',
+        'disableApiTermination',
+        'instanceInitiatedShutdownBehavior',
+        'rootDeviceName',
+        'blockDeviceMapping',
+        'productCodes',
+        'sourceDestCheck',
+        'groupSet',
+        'ebsOptimized',
+        'sriovNetSupport',
+        'enaSupport')
+
+    schema = type_schema(
+        'instance-attribute',
+        rinherit=ValueFilter.schema,
+        attribute={'enum': valid_attrs},
+        required=('attribute',))
+
+    def get_permissions(self):
+        return ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources, event=None):
+        attribute = self.data['attribute']
+        self.get_instance_attribute(resources, attribute)
+        return [resource for resource in resources
+                if self.match(resource['c7n:attribute-%s' % attribute])]
+
+    def get_instance_attribute(self, resources, attribute):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        for resource in resources:
+            instance_id = resource['InstanceId']
+            fetched_attribute = self.manager.retry(
+                client.describe_instance_attribute,
+                Attribute=attribute,
+                InstanceId=instance_id)
+            keys = list(fetched_attribute.keys())
+            keys.remove('ResponseMetadata')
+            keys.remove('InstanceId')
+            resource['c7n:attribute-%s' % attribute] = fetched_attribute[
+                keys[0]]

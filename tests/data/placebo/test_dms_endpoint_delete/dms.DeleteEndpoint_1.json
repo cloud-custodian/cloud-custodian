@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoint": {
+            "Username": "erwerwerrs",
+            "Status": "deleting",
+            "EndpointArn": "arn:aws:dms:us-east-1:0123456789012:endpoint:BICKTYIAQR4U6TPFW7Z7ORGSY4",
+            "ServerName": "c7n-test",
+            "CertificateArn": "arn:aws:dms:us-east-1:0123456789012:cert:KAU6PM6MZGOKW7NUFW2LYQD6TA",
+            "EndpointType": "SOURCE",
+            "SslMode": "verify-ca",
+            "KmsKeyId": "arn:aws:kms:us-east-1:0123456789012:key/1462981a-3f7f-40d1-a81f-f10728064be9",
+            "EngineDisplayName": "MariaDB",
+            "EngineName": "mariadb",
+            "EndpointIdentifier": "c7n-test",
+            "Port": 32342
+        },
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "017b3a78-4b50-11e8-844c-6bd72d6d5073",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "017b3a78-4b50-11e8-844c-6bd72d6d5073",
+                "date": "Sun, 29 Apr 2018 01:52:42 GMT",
+                "content-length": "542",
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

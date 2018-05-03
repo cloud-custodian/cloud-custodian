@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Addresses": [
+            {
+                "Domain": "vpc", 
+                "NetworkInterfaceId": "eni-f74ac24a", 
+                "AssociationId": "eipassoc-8a8d4647", 
+                "NetworkInterfaceOwnerId": "644160558196", 
+                "PublicIp": "18.205.88.88", 
+                "AllocationId": "eipalloc-ebaaa5e2", 
+                "PrivateIpAddress": "172.31.44.138"
+            }, 
+            {
+                "Domain": "vpc", 
+                "InstanceId": "i-0efa0d85bb0deee24", 
+                "NetworkInterfaceId": "eni-739c1fec", 
+                "AssociationId": "eipassoc-e551ce3f", 
+                "NetworkInterfaceOwnerId": "644160558196", 
+                "PublicIp": "34.237.108.203", 
+                "AllocationId": "eipalloc-2da7a824", 
+                "PrivateIpAddress": "172.31.14.6"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a7ed4549-bc6d-4721-84fd-0295221eec2b", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 30 Apr 2018 21:01:26 GMT"
+            }
+        }
+    }
+}

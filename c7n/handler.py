@@ -29,6 +29,7 @@ from c7n.resources import load_resources
 from c7n.utils import format_event, get_account_id_from_sts
 from c7n.config import Config
 
+import boto3
 
 logging.root.setLevel(logging.DEBUG)
 logging.getLogger('botocore').setLevel(logging.WARNING)
@@ -36,15 +37,14 @@ log = logging.getLogger('custodian.lambda')
 
 
 account_id = None
-try:
-    import boto3
-    session = boto3.Session()
-    account_id = get_account_id_from_sts(session)
-except Exception:
-    pass
 
 
 def dispatch_event(event, context):
+
+    global account_id
+    if account_id is None:
+        session = boto3.Session()
+        account_id = get_account_id_from_sts(session)
 
     error = event.get('detail', {}).get('errorCode')
     if error:
@@ -78,7 +78,8 @@ def dispatch_event(event, context):
     options_overrides = policy_config[
         'policies'][0].get('mode', {}).get('execution-options', {})
     options_overrides['account_id'] = account_id
-    options_overrides['output_dir'] = output_dir
+    if 'output_dir' not in options_overrides:
+        options_overrides['output_dir'] = output_dir
     options = Config.empty(**options_overrides)
 
     load_resources()

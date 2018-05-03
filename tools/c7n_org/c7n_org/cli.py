@@ -141,7 +141,9 @@ def resolve_regions(regions, partition='aws'):
 
 def get_session(account, session_name, region):
     if account.get('role'):
-        return assumed_session(account['role'], session_name, region=region, external_id=account.get('external_id'))
+        return assumed_session(
+            account['role'], session_name, region=region,
+            external_id=account.get('external_id'))
     elif account.get('profile'):
         return SessionFactory(region, account['profile'])()
     else:
@@ -332,6 +334,11 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))
         return
+
+    # Support fully quoted scripts, which are common to avoid parameter
+    # overlap with c7n-org run-script.
+    if len(script_args) == 1 and " " in script_args[0]:
+        script_args = script_args[0].split()
 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
