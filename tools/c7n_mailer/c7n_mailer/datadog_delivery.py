@@ -58,7 +58,7 @@ class DataDogDelivery(object):
 
                 tags.extend(['{key}:{value}'.format(
                     key=key, value=resource[key]) for key in resource.keys()
-                             if key != 'Tags'])
+                    if key != 'Tags'])
                 if resource.get('Tags', False):
                     tags.extend(['{key}:{value}'.format(
                         key=tag['Key'], value=tag['Value']) for tag in resource['Tags']])
@@ -93,7 +93,7 @@ class DataDogDelivery(object):
         if metric_value_tag != 'default':
             for tag in tags:
                 if metric_value_tag in tag:
-                    metric_value = float(tag[tag.find(":")+1:])
+                    metric_value = float(tag[tag.find(":") + 1:])
 
         return metric_value
 

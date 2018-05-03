@@ -14,7 +14,8 @@
 
 from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
-
+from c7n.filters.core import ValueFilter, type_schema
+from c7n.filters.related import RelatedResourceFilter
 
 @resources.register('loadbalancer')
 class LoadBalancer(QueryResourceManager):
@@ -24,9 +25,35 @@ class LoadBalancer(QueryResourceManager):
         client = 'NetworkManagementClient'
         enum_spec = ('load_balancers', 'list_all')
         id = 'id'
+        type = 'loadbalancer'
         name = 'name'
         default_report_fields = (
             'name',
             'location',
             'resourceGroup'
         )
+
+@LoadBalancer.filter_registry.register('frontend-public-ip')
+class FrontEndIp(RelatedResourceFilter):
+    """Filters load balancers by frontend public ip.
+
+    :Example:
+
+        .. code-block:: yaml
+
+            policies:
+               - name: loadbalancer-with-ipv6-frontend
+                 resource: azure.loadbalancer
+                 filters:
+                    - type: frontend-public-ip
+                      key: properties.publicIPAddressVersion
+                      op: in
+                      value_type: normalize
+                      value: "ipv6"
+    """
+
+    schema = type_schema('frontend-public-ip', rinherit=ValueFilter.schema)
+
+    RelatedResource = "c7n_azure.resources.public_ip.PublicIPAddress"
+    RelatedIdsExpression = "properties.frontendIPConfigurations[].properties.publicIPAddress.id"
+
