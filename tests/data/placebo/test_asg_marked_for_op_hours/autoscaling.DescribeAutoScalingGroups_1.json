@@ -4,7 +4,7 @@
     "AutoScalingGroups": [
       {
         "AutoScalingGroupName": "marked",
-        "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-1:899826514230:autoScalingGroup:11d5f55c-66b5-498a-82a3-c3c87801f58e:autoScalingGroupName/marked",
+        "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-1:123456789012:autoScalingGroup:11d5f55c-66b5-498a-82a3-c3c87801f58e:autoScalingGroupName/marked",
         "LaunchConfigurationName": "spottest",
         "MinSize": 1,
         "MaxSize": 1,
@@ -37,7 +37,7 @@
             "ResourceId": "marked",
             "ResourceType": "auto-scaling-group",
             "Key": "maid_status",
-            "Value": "AutoScaleGroup does not meet org policy: delete@2018/05/03 0246 UTC",
+            "Value": "AutoScaleGroup does not meet org policy: delete@2018/05/01 0246 UTC",
             "PropagateAtLaunch": true
           }
         ],
@@ -48,7 +48,7 @@
       },
       {
         "AutoScalingGroupName": "not_marked",
-        "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-1:899826514230:autoScalingGroup:b1d7fa70-f757-4fdb-bb0d-9d125337e6c8:autoScalingGroupName/not_marked",
+        "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-1:123456789012:autoScalingGroup:b1d7fa70-f757-4fdb-bb0d-9d125337e6c8:autoScalingGroupName/not_marked",
         "LaunchConfigurationName": "spottest",
         "MinSize": 1,
         "MaxSize": 1,
@@ -85,15 +85,7 @@
     ],
     "ResponseMetadata": {
       "RequestId": "f08f794b-4e73-11e8-94c9-85996aab7948",
-      "HTTPStatusCode": 200,
-      "HTTPHeaders": {
-        "x-amzn-requestid": "f08f794b-4e73-11e8-94c9-85996aab7948",
-        "content-type": "text/xml",
-        "content-length": "4239",
-        "vary": "Accept-Encoding",
-        "date": "Thu, 03 May 2018 01:47:29 GMT"
-      },
-      "RetryAttempts": 0
+      "HTTPStatusCode": 200
     }
   }
 }

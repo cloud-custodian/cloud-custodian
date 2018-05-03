@@ -230,6 +230,20 @@ class AutoScalingTest(BaseTest):
         self.assertTrue('custodian_action' in tag_map)
         self.assertTrue('suspend@' in tag_map['custodian_action'])
 
+    def test_asg_marked_for_op_hours(self):
+        session_factory = self.replay_flight_data('test_asg_marked_for_op_hours')
+        policy = self.load_policy({
+            'name': 'asg-marked-for-delete',
+            'resource': 'asg',
+            'filters': [{
+                'type': 'marked-for-op',
+                'op': 'delete'
+            }]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'marked')
+
     def test_asg_rename_tag(self):
         factory = self.replay_flight_data('test_asg_rename')
         p = self.load_policy({
