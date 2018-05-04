@@ -147,6 +147,8 @@ def records_iter(fh, buffer_size=1024 * 1024 * 16):
     while True:
         chunk = fh.read(buffer_size)
         if not chunk:
+            if buf:
+                yield json.loads(buf)
             return
         if buf:
             chunk = b"%s%s" % (buf, chunk)

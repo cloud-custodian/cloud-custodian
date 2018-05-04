@@ -63,6 +63,15 @@ class SQS(QueryResourceManager):
     def get_arns(self, resources):
         return [r['QueueArn'] for r in resources]
 
+    def get_resources(self, ids, cache=True):
+        ids_normalized = []
+        for i in ids:
+            if not i.startswith('https://'):
+                ids_normalized.append(i)
+                continue
+            ids_normalized.append(i.rsplit('/', 1)[-1])
+        return super(SQS, self).get_resources(ids_normalized, cache)
+
     def augment(self, resources):
         client = local_session(self.session_factory).client('sqs')
 

@@ -54,7 +54,7 @@ class S3OutputTest(unittest.TestCase):
 
     def test_s3_output(self):
         output = self.get_s3_output()
-        self.assertEquals(output.use_s3(), True)
+        self.assertEquals(output.type, "s3")
 
         # Make sure __repr__ is defined
         name = str(output)
