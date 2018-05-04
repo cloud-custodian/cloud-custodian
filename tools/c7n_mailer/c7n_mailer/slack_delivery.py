@@ -102,7 +102,7 @@ class SlackDelivery(object):
 
             response = requests.post(
                 url='https://slack.com/api/users.lookupByEmail',
-                data={ 'email': address },
+                data={'email': address},
                 headers={'Content-Type': 'application/x-www-form-urlencoded',
                          'Authorization': 'Bearer %s' % self.config.get('slack_token')})
 
