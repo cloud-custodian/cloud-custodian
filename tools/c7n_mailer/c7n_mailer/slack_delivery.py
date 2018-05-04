@@ -14,12 +14,11 @@
 import json
 import time
 
-import requests
+from botocore.vendored import requests
 import six
 from c7n_mailer.email_delivery import EmailDelivery
 from c7n_mailer.ldap_lookup import Redis
 from c7n_mailer.utils import kms_decrypt, get_rendered_jinja
-from slackclient import SlackClient
 
 
 class SlackDelivery(object):
@@ -27,7 +26,6 @@ class SlackDelivery(object):
     def __init__(self, config, session, logger):
         if config.get('slack_token'):
             config['slack_token'] = kms_decrypt(config, logger, session, 'slack_token')
-            self.client = SlackClient(config['slack_token'])
         self.caching = self.cache_factory(config, config.get('cache_engine', None))
         self.config = config
         self.logger = logger
@@ -102,18 +100,21 @@ class SlackDelivery(object):
                     list[address] = self.caching.get(address)
                     continue
 
-            response = self.client.api_call(
-                "users.lookupByEmail", email=address)
+            response = requests.post(
+                url='https://slack.com/api/users.lookupByEmail',
+                data={ 'email': address },
+                headers={'Content-Type': 'application/x-www-form-urlencoded',
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')})
 
-            if not response["ok"] and "Retry-After" in response["headers"]:
+            if not response.json()["ok"] and "Retry-After" in response.json()["headers"]:
                 self.logger.info(
                     "Slack API rate limiting. Waiting %d seconds",
-                    int(response.headers['retry-after']))
-                time.sleep(int(response.headers['Retry-After']))
+                    int(response.json().headers['retry-after']))
+                time.sleep(int(response.json().headers['Retry-After']))
                 continue
-            elif not response["ok"] and response["error"] == "invalid_auth":
+            elif not response.json()["ok"] and response.json()["error"] == "invalid_auth":
                 raise Exception("Invalid Slack token.")
-            elif not response["ok"] and response["error"] == "users_not_found":
+            elif not response.json()["ok"] and response.json()["error"] == "users_not_found":
                 self.logger.info("Slack user ID not found.")
                 if self.caching:
                     self.caching.set(address, {})
@@ -121,12 +122,12 @@ class SlackDelivery(object):
             else:
                 self.logger.debug(
                     "Slack account %s found for user %s",
-                    response['user']['enterprise_user']['id'])
+                    response.json()['user']['enterprise_user']['id'])
                 if self.caching:
                     self.logger.debug('Writing user: %s metadata to cache.', address)
-                    self.caching.set(address, response['user']['enterprise_user']['id'])
+                    self.caching.set(address, response.json()['user']['enterprise_user']['id'])
 
-                list[address] = response['user']['enterprise_user']['id']
+                list[address] = response.json()['user']['enterprise_user']['id']
 
         return list
 

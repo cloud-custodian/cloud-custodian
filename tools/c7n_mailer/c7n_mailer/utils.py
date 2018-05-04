@@ -296,13 +296,13 @@ def kms_decrypt(config, logger, session, encrypted_field):
                     'Plaintext']
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
-                "Error: %s Unable to base64 decode %s, will assume plaintext.",
+                "Error: %s Unable to base64 decode %s, will assume plaintext." %
                 (e, encrypted_field))
         except ClientError as e:
             if e.response['Error']['Code'] != 'InvalidCiphertextException':
                 raise
             logger.warning(
-                "Error: %s Unable to decrypt %s with kms, will assume plaintext.",
+                "Error: %s Unable to decrypt %s with kms, will assume plaintext." %
                 (e, encrypted_field))
         return config[encrypted_field]
     else:
