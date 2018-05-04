@@ -528,9 +528,9 @@ class MetricsTest(CliTest):
 class MiscTest(CliTest):
 
     def test_no_args(self):
-        # success is really about not seeing sysexit, in this case we do explicitly
-        # do sys.exit(0)
-        self.run_and_expect_failure(['custodian'], 0)
+        stdout, stderr = self.run_and_expect_failure(['custodian'], 2)
+        self.assertIn('metrics', stderr)
+        self.assertIn('logs', stderr)
 
     def test_empty_policy_file(self):
         # Doesn't do anything, but should exit 0
