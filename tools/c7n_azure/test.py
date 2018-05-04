@@ -1,7 +1,4 @@
 from c7n_azure.session import Session
-from azure.mgmt.resource import ResourceManagementClient
-import pprint
-import os
 
 
 s = Session()
