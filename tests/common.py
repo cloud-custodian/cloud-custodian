@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import boto3
 import io
 import json
 import logging
@@ -28,7 +27,6 @@ import six
 import yaml
 
 from c7n import policy
-from c7n.filters import revisions
 from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.resources import load_resources
@@ -51,6 +49,7 @@ C7N_SCHEMA = generate()
 
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason='We are not validating schemas.')
+
 
 class TestConfig(Config):
     config_args = {
@@ -137,6 +136,20 @@ class BaseTest(PillTest):
         old = getattr(obj, attr, None)
         setattr(obj, attr, new)
         self.addCleanup(setattr, obj, attr, old)
+
+    def change_cwd(self, work_dir=None):
+        if work_dir is None:
+            work_dir = self.get_temp_dir()
+
+        cur_dir = os.path.abspath(os.getcwd())
+
+        def restore():
+            os.chdir(cur_dir)
+
+        self.addCleanup(restore)
+
+        os.chdir(work_dir)
+        return work_dir
 
     def change_environment(self, **kwargs):
         """Change the environment to the given set of variables.
@@ -324,4 +337,4 @@ try:
     import pytest
     functional = pytest.mark.functional
 except ImportError:
-    functional = lambda func: func  # noop
+    functional = lambda func: func  # noqa E731

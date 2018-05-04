@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,27 @@ import shutil
 import os
 
 from c7n.ctx import ExecutionContext
-from c7n.output import S3Output
+from c7n.output import S3Output, DirectoryOutput
 
-from .common import Bag, TestConfig as Config
+from .common import Bag, BaseTest, TestConfig as Config
+
+
+class DirOutputTest(BaseTest):
+
+    def get_dir_output(self, location):
+        work_dir = self.change_cwd()
+        return work_dir, DirectoryOutput(
+            ExecutionContext(
+                None,
+                Bag(name="xyz"),
+                Config.empty(output_dir=location)))
+
+    def test_dir_output(self):
+        work_dir, output = self.get_dir_output('file://myoutput')
+        self.assertEqual(
+            os.listdir(work_dir), ['myoutput'])
+        self.assertTrue(
+            os.path.isdir(os.path.join(work_dir, 'myoutput')))
 
 
 class S3OutputTest(unittest.TestCase):
