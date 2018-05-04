@@ -333,7 +333,7 @@ def main():
     options = parser.parse_args()
     if options.subparser is None:
         parser.print_help()
-        return sys.exit(0)
+        return sys.exit(2)
 
     _setup_logger(options)
 
