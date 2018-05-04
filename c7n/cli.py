@@ -331,6 +331,9 @@ def main():
     parser = setup_parser()
     argcomplete.autocomplete(parser)
     options = parser.parse_args()
+    if options.subparser is None:
+        parser.print_help()
+        return sys.exit(0)
 
     _setup_logger(options)
 
