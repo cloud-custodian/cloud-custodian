@@ -104,17 +104,17 @@ class SlackDelivery(object):
                 url='https://slack.com/api/users.lookupByEmail',
                 data={'email': address},
                 headers={'Content-Type': 'application/x-www-form-urlencoded',
-                         'Authorization': 'Bearer %s' % self.config.get('slack_token')})
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')}).json()
 
-            if not response.json()["ok"] and "Retry-After" in response.json()["headers"]:
+            if not response["ok"] and "Retry-After" in response["headers"]:
                 self.logger.info(
                     "Slack API rate limiting. Waiting %d seconds",
-                    int(response.json().headers['retry-after']))
-                time.sleep(int(response.json().headers['Retry-After']))
+                    int(response.headers['retry-after']))
+                time.sleep(int(response.headers['Retry-After']))
                 continue
-            elif not response.json()["ok"] and response.json()["error"] == "invalid_auth":
+            elif not response["ok"] and response["error"] == "invalid_auth":
                 raise Exception("Invalid Slack token.")
-            elif not response.json()["ok"] and response.json()["error"] == "users_not_found":
+            elif not response["ok"] and response["error"] == "users_not_found":
                 self.logger.info("Slack user ID not found.")
                 if self.caching:
                     self.caching.set(address, {})
@@ -122,12 +122,12 @@ class SlackDelivery(object):
             else:
                 self.logger.debug(
                     "Slack account %s found for user %s",
-                    response.json()['user']['enterprise_user']['id'])
+                    response['user']['enterprise_user']['id'])
                 if self.caching:
                     self.logger.debug('Writing user: %s metadata to cache.', address)
-                    self.caching.set(address, response.json()['user']['enterprise_user']['id'])
+                    self.caching.set(address, response['user']['enterprise_user']['id'])
 
-                list[address] = response.json()['user']['enterprise_user']['id']
+                list[address] = response['user']['enterprise_user']['id']
 
         return list
 
