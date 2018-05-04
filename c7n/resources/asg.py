@@ -1353,12 +1353,17 @@ class MarkForOp(Tag):
     default_template = (
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
-    def process(self, asgs):
+    def validate(self):
         self.tz = zoneinfo.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise FilterValidationError(
                 "Invalid timezone specified %s" % self.tz)
+        return self
+
+    def process(self, asgs):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('message', self.default_template)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))

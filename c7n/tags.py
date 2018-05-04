@@ -595,6 +595,12 @@ class TagDelayedAction(Action):
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError(
                 "mark-for-op specifies invalid op:%s" % op)
+
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        if not self.tz:
+            raise FilterValidationError(
+                "Invalid timezone specified %s" % self.tz)
         return self
 
     def generate_timestamp(self, days, hours):
@@ -613,9 +619,6 @@ class TagDelayedAction(Action):
     def process(self, resources):
         self.tz = zoneinfo.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
-        if not self.tz:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.tz)
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
