@@ -603,7 +603,12 @@ class TagDelayedAction(Action):
             # maintains default value of days being 4 if nothing is provided
             days = 4
         action_date = (n + timedelta(days=days, hours=hours))
-        return action_date.strftime('%Y/%m/%d %H%M %Z')
+        if hours > 0:
+            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
+        else:
+            action_date_string = action_date.strftime('%Y/%m/%d')
+
+        return action_date_string
 
     def process(self, resources):
         self.tz = zoneinfo.gettz(
