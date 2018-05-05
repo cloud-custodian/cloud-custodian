@@ -332,7 +332,7 @@ def main():
     argcomplete.autocomplete(parser)
     options = parser.parse_args()
     if options.subparser is None:
-        parser.print_help()
+        parser.print_help(file=sys.stderr)
         return sys.exit(2)
 
     _setup_logger(options)
