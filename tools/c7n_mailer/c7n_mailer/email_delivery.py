@@ -14,7 +14,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import parseaddr
-
+from itertools import chain
 import six
 
 from .ldap_lookup import LdapLookup
@@ -139,7 +139,13 @@ class EmailDelivery(object):
             return []
         resource_owner_tag_keys = self.config.get('contact_tags', [])
         resource_owner_tag_values = get_resource_tag_targets(resource, resource_owner_tag_keys)
-        return self.get_valid_emails_from_list(resource_owner_tag_values)
+        explicit_emails = self.get_valid_emails_from_list(resource_owner_tag_values)
+
+        # resolve the contact info from ldap
+        non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
+        ldap_emails = [self.ldap_lookup.get_email_to_addrs_from_uid(uid) for uid in non_email_ids]
+
+        return list(chain(explicit_emails, ldap_emails))
 
     def get_account_emails(self, sqs_message):
         email_list = []
