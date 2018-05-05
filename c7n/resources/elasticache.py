@@ -216,7 +216,7 @@ class SnapshotElastiCacheCluster(BaseAction):
     permissions = ('elasticache:CreateSnapshot',)
 
     def process(self, clusters):
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             futures = []
             for cluster in clusters:
                 if not _cluster_eligible_for_snapshot(cluster):
@@ -427,7 +427,7 @@ class CopyClusterTags(BaseAction):
     schema = type_schema(
         'copy-cluster-tags',
         tags={'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
-        required = ('tags',))
+        required=('tags',))
 
     def get_permissions(self):
         perms = self.manager.get_resource_manager('cache-cluster').get_permissions()
@@ -435,39 +435,52 @@ class CopyClusterTags(BaseAction):
         return perms
 
     def process(self, snapshots):
-        log.info("Modifying %d ElastiCache snapshots", len(snapshots))
         client = local_session(self.manager.session_factory).client('elasticache')
-        clusters = {}
-        for r in self.manager.get_resource_manager('cache-cluster').resources():
-            # Classify replicated clusters by one of its members, they should all
-            # share the same tags.
-            if 'ReplicationGroupId' in r:
-                clusters[r['ReplicationGroupId']] = r
-            else:
-                clusters[r['CacheClusterId']] = r
+        clusters = {r['CacheClusterId']: r for r in
+                    self.manager.get_resource_manager('cache-cluster').resources()}
+        copyable_tags = self.data.get('tags')
 
         for s in snapshots:
-            if 'ReplicationGroupId' in s:
-                cluster_id = s['ReplicationGroupId']
+            # For replicated/sharded clusters it is possible for each
+            # shard to have separate tags, we go ahead and tag the
+            # snap with the union of tags with overlaps getting the
+            # last value (arbitrary if mismatched).
+            if 'CacheClusterId' not in s:
+                cluster_ids = [ns['CacheClusterId'] for ns in s['NodeSnapshots']]
             else:
-                cluster_id = s['CacheClusterId']
-            if cluster_id not in clusters:
+                cluster_ids = [s['CacheClusterId']]
+
+            copy_tags = {}
+            for cid in sorted(cluster_ids):
+                if cid not in clusters:
+                    continue
+
+                cluster_tags = {t['Key']: t['Value'] for t in clusters[cid]['Tags']}
+                snap_tags = {t['Key']: t['Value'] for t in s.get('Tags', ())}
+
+                for k, v in cluster_tags.items():
+                    if copyable_tags and k not in copyable_tags:
+                        continue
+                    if k.startswith('aws:'):
+                        continue
+                    if snap_tags.get(k, '') == v:
+                        continue
+                    copy_tags[k] = v
+
+            if not copy_tags:
+                continue
+
+            if len(set(copy_tags).union(set(snap_tags))) > 50:
+                self.log.error(
+                    "Cant copy tags, max tag limit hit on snapshot:%s",
+                    s['SnapshotName'])
                 continue
 
             arn = self.manager.generate_arn(s['SnapshotName'])
-            tags_cluster = clusters[cluster_id]['Tags']
-            only_tags = self.data.get('tags', [])  # Specify tags to copy
-            extant_tags = {t['Key']: t['Value'] for t in s.get('Tags', ())}
-            copy_tags = []
-
-            for t in tags_cluster:
-                if t['Key'] in only_tags and t['Value'] != extant_tags.get(
-                        t['Key'], ""):
-                    copy_tags.append(t)
-            if copy_tags:
-                self.manager.retry(
-                    client.add_tags_to_resource,
-                    ResourceName=arn, Tags=copy_tags)
+            self.manager.retry(
+                client.add_tags_to_resource,
+                ResourceName=arn,
+                Tags=[{'Key': k, 'Value': v} for k, v in copy_tags.items()])
 
 
 def _cluster_eligible_for_snapshot(cluster):

@@ -52,6 +52,7 @@ C7N_SCHEMA = generate()
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason='We are not validating schemas.')
 
+
 class TestConfig(Config):
     config_args = {
         "metrics_enabled": False,
