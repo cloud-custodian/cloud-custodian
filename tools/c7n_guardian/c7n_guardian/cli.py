@@ -1,4 +1,4 @@
-# Copyright 2017 Capital One Services, LLC
+# Copyright 2017-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -218,17 +218,29 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find active members
     active_ids = {m['AccountId'] for m in extant_members
-                      if m['RelationshipStatus'] == 'Enabled'}
+                  if m['RelationshipStatus'] == 'Enabled'}
+
     # Find invited members
     invited_ids = {m['AccountId'] for m in extant_members
-                       if m['RelationshipStatus'] == 'Invited'}
+                   if m['RelationshipStatus'] == 'Invited'}
+
+    # Find failed invitations (member detector suspended typically)
+    invites_failed = {m['AccountId'] for m in extant_members
+                      if m['RelationshipStatus'] == 'EmailVerificationFailed'}
 
     # Find extant members not currently enabled
     suspended_ids = {m['AccountId'] for m in extant_members
                      if m['RelationshipStatus'] == 'Disabled'}
+
     # Filter by accounts under consideration per config and cli flags
     suspended_ids = {a['account_id'] for a in accounts_config['accounts']
                      if a['account_id'] in suspended_ids}
+
+    if invites_failed:
+        process_failed_invites(
+            master_client, region,
+            [a for a in accounts_config['accounts']
+             if a['account_id'] in invites_failed])
 
     if suspended_ids:
         unprocessed = master_client.start_monitoring_members(
@@ -269,6 +281,9 @@ def enable_region(master_info, accounts_config, executor, message, region):
             region, format_event(unprocessed))
 
     log.info("Region:%s Inviting %d member accounts", region, len(members))
+    # Add back in failed invitations we reset
+    members.extend([
+        m for m in extant_members if m['AccountId'] in invites_failed])
     unprocessed = []
     for account_set in chunks(
             [m for m in members if not m['AccountId'] in invited_ids], 25):
@@ -308,6 +323,35 @@ def enable_region(master_info, accounts_config, executor, message, region):
                 log.info('Region:%s Enabled guard duty on account:%s',
                          region, a['name'])
     return members
+
+
+def process_failed_invites(master_client, region, accounts):
+    """Most common reason we've seen for invite failure is detector suspension.
+
+    If the member account detector is suspended before the master
+    relationship is established invitations to the member will go to
+    EmailVerificationFailed status. If the member is already part of a
+    master relationship, suspending the detector will put the member
+    in a Disabled state, and we can re-enable from the master via a
+    start_monitoring api call.
+    """
+    account_ids = {a['account_id'] for a in accounts}
+
+    # Go ahead and delete the extant invitation, we'll reinvite
+    # after we enable.
+    unprocessed = master_client.delete_invitations(
+        AccountIds=list(account_ids)).get('UnprocessedAccounts', ())
+    if unprocessed:
+        log.warning("Master failed to delete invitations for %s", unprocessed)
+
+    for a in accounts:
+        session = get_session(
+            a.get('role'), 'c7n-guardian', region=region,
+            profile=a.get('profile'))
+        client = session.client('guardduty')
+        detector_id = get_or_create_detector_id(client)
+        client.update_detector(DetectorId=detector_id, Enable=True)
+
 
 def enable_account(account, master_account_id, region):
     member_session = get_session(

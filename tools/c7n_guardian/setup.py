@@ -17,12 +17,12 @@ import os
 
 description = ""
 if os.path.exists('readme.md'):
-   description = open('readme.md').read()
+    description = open('readme.md').read()
 
 
 setup(
     name="c7n_guardian",
-    version='0.3.2',
+    version='0.4.0',
     description="Cloud Custodian - Multi Account Guard Duty Setup",
     long_description=description,
     classifiers=[

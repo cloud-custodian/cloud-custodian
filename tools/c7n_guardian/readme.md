@@ -17,7 +17,10 @@ $ c7n-guardian enable --config accounts.yml --master 120312301231 --tags dev
 ```
 
 The accounts config file is similiar to c7n-org, with the addition of the
-account email.
+account email. The entire config file can be automatically generated
+from the organizations api using the script here
+https://github.com/capitalone/cloud-custodian/blob/master/tools/c7n_org/orgaccounts.py
+
 
 ```
 $ cat accounts.yml
