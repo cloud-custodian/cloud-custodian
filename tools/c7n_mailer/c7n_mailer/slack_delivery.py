@@ -138,7 +138,6 @@ class SlackDelivery(object):
 
         return list
 
-
     def send_slack_msg(self, key, message_payload):
 
         if key.startswith('https://hooks.slack.com/'):
