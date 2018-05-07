@@ -59,6 +59,7 @@ CONFIG_SCHEMA = {
         'datadog_api_key': {'type': 'string'},              # TODO: encrypt with KMS?
         'datadog_application_key': {'type': 'string'},      # TODO: encrypt with KMS?
         'slack_token': {'type': 'string'},
+        'slack_webhook': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},
