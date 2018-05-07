@@ -266,9 +266,9 @@ class DynamoDbAccelerator(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
         client = session_factory(region='us-east-1').client('dax')
-        tags = sorted(
-            client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags'])
-        self.assertEqual(tags[1]['Value'], 'Required')
+        tags = client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags']
+        print(tags[0]['Value'])
+        self.assertEqual(tags[0]['Value'], 'Required')
 
     def test_remove_tagging(self):
         session_factory = self.replay_flight_data(
@@ -309,10 +309,9 @@ class DynamoDbAccelerator(BaseTest):
         self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
         client = session_factory(region='us-east-1').client('dax')
         dtact = (dtnow + timedelta(days=7)).strftime('%Y/%m/%d %H%M UTC')
-        tags = sorted(
-            client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags'])
-        self.assertEqual(tags[1]['Value'],
-                         'Missing tag Required: delete@%s' % dtact)
+        tags = client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags']
+        self.assertEqual(tags[0]['Value'],
+                        'Missing tag Required: delete@%s' % dtact)
 
     def test_delete(self):
         session_factory = self.replay_flight_data(
