@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cc08b6f3-4fb8-11e8-9978-e11c90c2d4bb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cc08b6f3-4fb8-11e8-9978-e11c90c2d4bb", 
+                "date": "Fri, 04 May 2018 16:32:54 GMT", 
+                "content-length": "135", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "Missing tag Required: delete@2018/05/11 1600 UTC", 
+                "Key": "custodian_cleanup"
+            }, 
+            {
+                "Value": "c7n-dax-test", 
+                "Key": "Name"
+            }
+        ]
+    }
+}
