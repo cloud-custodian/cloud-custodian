@@ -133,11 +133,10 @@ def resource_tag(resource, k):
     return ''
 
 
-def resource_owner(resource):
+def resource_owner(resource, k):
     tags = {t['Key']: t['Value'] for t in resource.get('Tags', [])}
-    for k in ('OwnerContact', 'OwnerEID', 'OwnerEmail'):
-        if k in tags:
-            return tags[k]
+    if k in tags:
+        return tags[k]
     return "Unknown"
 
 
