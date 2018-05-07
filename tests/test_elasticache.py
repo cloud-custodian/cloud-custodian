@@ -76,12 +76,36 @@ class TestElastiCacheCluster(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
 
+    def test_elasticache_sharded_snapshot_copy_tags(self):
+        factory = self.replay_flight_data(
+            'test_elasticache_sharded_copy_cluster_tags')
+        client = factory().client('elasticache')
+        snap_tags = {
+            t['Key']: t['Value'] for t in client.list_tags_for_resource(
+                ResourceName='arn:aws:elasticache:us-east-2:644160558196:snapshot:zero-bytes'
+            )['TagList']}
+        self.assertEqual(snap_tags, {'App': 'MegaCache'})
+        p = self.load_policy({
+            'name': 'test-copy-cluster-tags',
+            'resource': 'cache-snapshot',
+            'actions': [
+                {'type': 'copy-cluster-tags', 'tags': ['App', 'Env', 'Zone', 'Color']}]},
+            config=Config.empty(region='us-east-2'), session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['SnapshotName'], 'zero-bytes')
+        arn = p.resource_manager.get_arns(resources)[0]
+        snap_tags = {
+            t['Key']: t['Value'] for t in
+            client.list_tags_for_resource(ResourceName=arn)['TagList']}
+        self.assertEqual(
+            snap_tags, {'App': 'MegaCache', 'Color': 'Blue', 'Env': 'Dev', 'Zone': '12'})
+
     def test_elasticache_snapshot_copy_cluster_tags(self):
         session_factory = self.replay_flight_data(
             'test_elasticache_copy_cluster_tags')
-
-        results = session_factory().client(
-            'elasticache').list_tags_for_resource(
+        client = session_factory().client('elasticache')
+        results = client.list_tags_for_resource(
                 ResourceName='arn:aws:elasticache:us-east-1:644160558196:snapshot:myec-backup')['TagList']
         tags = {t['Key']: t['Value'] for t in results}
         self.assertEqual(tags, {})
@@ -98,9 +122,7 @@ class TestElastiCacheCluster(BaseTest):
         resources = policy.run()
         arn = policy.resource_manager.generate_arn(
             resources[0]['SnapshotName'])
-        results = session_factory().client(
-            'elasticache').list_tags_for_resource(ResourceName=arn)['TagList']
-
+        results = client.list_tags_for_resource(ResourceName=arn)['TagList']
         tags = {t['Key']: t['Value'] for t in results}
         self.assertEqual(tags['tagkey'], 'tagval')
 

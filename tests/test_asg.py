@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import boto3
+from datetime import datetime
+from dateutil import zoneinfo
 
 from .common import BaseTest
 from botocore.exceptions import ClientError
@@ -229,6 +230,54 @@ class AutoScalingTest(BaseTest):
         tag_map = {t['Key']: t['Value'] for t in result['Tags']}
         self.assertTrue('custodian_action' in tag_map)
         self.assertTrue('suspend@' in tag_map['custodian_action'])
+
+    def test_asg_mark_for_op_hours(self):
+        session_factory = self.replay_flight_data('test_asg_mark_for_op_hours')
+        session = session_factory(region='us-east-1')
+        asg = session.client('autoscaling')
+        localtz = zoneinfo.gettz('America/New_York')
+        dt = datetime.now(localtz)
+        dt = dt.replace(year=2018, month=2, day=20, hour=8, minute=42)
+
+        policy = self.load_policy({
+            'name': 'asg-mark-for-op-hours',
+            'resource': 'asg',
+            'filters': [
+                {'tag:Service': 'absent'}
+            ],
+            'actions': [
+                {'type': 'mark-for-op',
+                 'op': 'delete',
+                 'hours': 1}
+            ],
+            }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        describe_auto_scaling_groups = asg.describe_auto_scaling_groups(
+            AutoScalingGroupNames=['marked']
+        )
+        resource=describe_auto_scaling_groups['AutoScalingGroups'][0]
+        tags = [
+            t['Value'] for t in resource['Tags'] if t['Key'] == 'maid_status']
+        result = datetime.strptime(
+            tags[0].strip().split('@', 1)[-1], '%Y/%m/%d %H%M %Z').replace(
+            tzinfo=localtz)
+        self.assertEqual(result.date(), dt.date())
+
+    def test_asg_marked_for_op_hours(self):
+        session_factory = self.replay_flight_data('test_asg_marked_for_op_hours')
+        policy = self.load_policy({
+            'name': 'asg-marked-for-delete',
+            'resource': 'asg',
+            'filters': [{
+                'type': 'marked-for-op',
+                'op': 'delete'
+            }]
+        }, session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['AutoScalingGroupName'], 'marked')
 
     def test_asg_rename_tag(self):
         factory = self.replay_flight_data('test_asg_rename')
