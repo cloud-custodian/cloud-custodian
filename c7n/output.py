@@ -209,8 +209,8 @@ class DirectoryOutput(FSOutput):
         if self.root_dir.startswith('file://'):
             self.root_dir = self.root_dir[len('file://'):]
         if self.ctx.output_path is not None:
-            if not os.path.exists(self.ctx.output_path):
-                os.makedirs(self.ctx.output_path)
+            if not os.path.exists(self.root_dir):
+                os.makedirs(self.root_dir)
 
     def __repr__(self):
         return "<%s to dir:%s>" % (self.__class__.__name__, self.root_dir)

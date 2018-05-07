@@ -110,7 +110,9 @@ class AutoTagUser(BaseAction):
            - type: auto-tag-user
              tag: CreatorEmail
 
-    This action searches from the earliest 'write' operation's caller in the activity logs for a particular resource.
+    This action searches from the earliest 'write' operation's caller
+    in the activity logs for a particular resource.
+
     Note: activity logs are only held for the last 90 days.
 
     """
@@ -134,7 +136,8 @@ class AutoTagUser(BaseAction):
         if self.manager.action_registry.get('tag') is None:
             raise FilterValidationError("Resource does not support tagging")
 
-        if self.data.get('days') is not None and (self.data.get('days') < 1 or self.data.get('days') > 90):
+        if (self.data.get('days') is not None and
+                (self.data.get('days') < 1 or self.data.get('days') > 90)):
             raise FilterValidationError("Days must be between 1 and 90")
 
         return self

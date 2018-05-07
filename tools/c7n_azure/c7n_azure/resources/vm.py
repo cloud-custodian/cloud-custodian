@@ -16,6 +16,7 @@ from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
 from c7n.filters.core import ValueFilter, type_schema
 
+
 @resources.register('vm')
 class VirtualMachine(QueryResourceManager):
 
@@ -32,6 +33,7 @@ class VirtualMachine(QueryResourceManager):
             'properties.hardwareProfile.vmSize',
         )
 
+
 @VirtualMachine.filter_registry.register('instance-view')
 class InstanceViewFilter(ValueFilter):
     schema = type_schema('instance-view', rinherit=ValueFilter.schema)
@@ -39,7 +41,11 @@ class InstanceViewFilter(ValueFilter):
     def __call__(self, i):
         if 'instanceView' not in i:
             client = self.manager.get_client()
-            instance = client.virtual_machines.get(i['resourceGroup'], i['name'], expand='instanceview').instance_view
+            instance = (
+                client.virtual_machines
+                .get(i['resourceGroup'], i['name'], expand='instanceview')
+                .instance_view
+            )
             i['instanceView'] = instance.serialize()
 
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
