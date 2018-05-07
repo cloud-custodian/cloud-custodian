@@ -888,7 +888,38 @@ class UniversalTagDelayedAction(TagDelayedAction):
     concurrency = 2
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
+    # def process(self, resources):
+    #     self.id_key = self.manager.get_model().id
+    #
+    #     # Move this to policy? / no resources bypasses actions?
+    #     if not len(resources):
+    #         return
+    #
+    #     msg_tmpl = self.data.get('msg', self.default_template)
+    #
+    #     op = self.data.get('op', 'stop')
+    #     tag = self.data.get('tag', DEFAULT_TAG)
+    #     date = self.data.get('days', 4)
+    #
+    #     n = datetime.now(tz=tzutc())
+    #     action_date = n + timedelta(days=date)
+    #     msg = msg_tmpl.format(
+    #         op=op, action_date=action_date.strftime('%Y/%m/%d'))
+    #
+    #     self.log.info("Tagging %d resources for %s on %s" % (
+    #         len(resources), op, action_date.strftime('%Y/%m/%d')))
+    #
+    #     tags = {tag: msg}
+    #
+    #     batch_size = self.data.get('batch_size', self.batch_size)
+    #
+    #     _common_tag_processer(
+    #         self.executor_factory, batch_size, self.concurrency,
+    #         self.process_resource_set, self.id_key, resources, tags, self.log)
+
     def process(self, resources):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
@@ -899,15 +930,15 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        date = self.data.get('days', 4)
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
+        action_date = self.generate_timestamp(days, hours)
 
-        n = datetime.now(tz=tzutc())
-        action_date = n + timedelta(days=date)
         msg = msg_tmpl.format(
-            op=op, action_date=action_date.strftime('%Y/%m/%d'))
+            op=op, action_date=action_date)
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date.strftime('%Y/%m/%d')))
+            len(resources), op, action_date))
 
         tags = {tag: msg}
 
