@@ -33,6 +33,8 @@ def get_jinja_env():
     env.filters['get_date_age'] = get_date_age
     env.globals['format_resource'] = resource_format
     env.globals['format_struct'] = format_struct
+    env.globals['resource_tag'] = resource_tag
+    env.globals['resource_owner'] = resource_owner
     env.globals['get_resource_tag_value'] = get_resource_tag_value
     env.loader  = jinja2.FileSystemLoader(
         [
@@ -122,6 +124,21 @@ def get_date_time_delta(delta):
 
 def get_date_age(date):
     return (datetime.now(tz=tzutc()) - parser.parse(date)).days
+
+
+def resource_tag(resource, k):
+    for t in resource.get('Tags', []):
+        if t['Key'] == k:
+            return t['Value']
+    return ''
+
+
+def resource_owner(resource):
+    tags = {t['Key']: t['Value'] for t in resource.get('Tags', [])}
+    for k in ('OwnerContact', 'OwnerEID', 'OwnerEmail'):
+        if k in tags:
+            return tags[k]
+    return "Unknown"
 
 
 def format_struct(evt):
