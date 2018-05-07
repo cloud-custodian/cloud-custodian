@@ -72,7 +72,8 @@ class QueryMeta(type):
             actions = ActionRegistry(
                 '%s.actions' % name.lower())
 
-            # All ARM resources will have tag support; however, classic resources may not have support
+            # All ARM resources will have tag support;
+            # however, classic resources may not have support
             actions.register('tag', Tag)
             attrs['action_registry'] = actions
 
@@ -116,7 +117,8 @@ class QueryResourceManager(ResourceManager):
         return self.filter_resources(resources)
 
     def augment(self, resources):
-        #TODO: temporary put here. Applicable only to ARM resources. Need to move to ARMResourceManager base class
+        # TODO: temporary put here. Applicable only to ARM resources.
+        # Need to move to ARMResourceManager base class
         for resource in resources:
             if 'id' in resource:
                 resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
@@ -125,5 +127,8 @@ class QueryResourceManager(ResourceManager):
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
         session = local_session(self.session_factory)
-        data = [resource_client.resources.get_by_id(rid, session.resource_api_version(rid)) for rid in resource_ids]
+        data = [
+            resource_client.resources.get_by_id(rid, session.resource_api_version(rid))
+            for rid in resource_ids
+        ]
         return [r.serialize(True) for r in data]

@@ -314,7 +314,7 @@ class TagActionFilter(Filter):
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz).replace(minute=0)
+            self.current_date = datetime.now(tz=tz)
 
         return self.current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
@@ -595,22 +595,30 @@ class TagDelayedAction(Action):
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError(
                 "mark-for-op specifies invalid op:%s" % op)
-        return self
 
-    def generate_timestamp(self, days, hours):
-        n = datetime.now(tz=self.tz).replace(minute=0)
-        if days == hours == 0:
-            # maintains default value of days being 4 if nothing is provided
-            days = 4
-        action_date = (n + timedelta(days=days, hours=hours))
-        return action_date.strftime('%Y/%m/%d %H%M %Z')
-
-    def process(self, resources):
         self.tz = zoneinfo.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise FilterValidationError(
                 "Invalid timezone specified %s" % self.tz)
+        return self
+
+    def generate_timestamp(self, days, hours):
+        n = datetime.now(tz=self.tz)
+        if days == hours == 0:
+            # maintains default value of days being 4 if nothing is provided
+            days = 4
+        action_date = (n + timedelta(days=days, hours=hours))
+        if hours > 0:
+            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
+        else:
+            action_date_string = action_date.strftime('%Y/%m/%d')
+
+        return action_date_string
+
+    def process(self, resources):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
