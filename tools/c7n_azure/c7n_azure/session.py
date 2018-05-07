@@ -27,7 +27,10 @@ class Session(object):
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
 
-        tenant_auth_variables = ['AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET']
+        tenant_auth_variables = [
+            'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
+            'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
+        ]
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
 
         # If the user has specified they want to auth with Azure CLI
@@ -64,7 +67,6 @@ class Session(object):
 
         self.log.error('Unable to locate credentials for Azure session.')
 
-
     def client(self, client):
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
@@ -83,10 +85,10 @@ class Session(object):
         resource_client = self.client('azure.mgmt.resource.ResourceManagementClient')
         provider = resource_client.providers.get(namespace)
 
-        rt = next((t for t in provider.resource_types if t.resource_type == str(resource_type).split('/')[-1]), None)
+        rt = next((t for t in provider.resource_types
+            if t.resource_type == str(resource_type).split('/')[-1]), None)
         if rt and rt.api_versions:
             versions = [v for v in rt.api_versions if 'preview' not in v.lower()]
             api_version = versions[0] if versions else rt.api_versions[0]
             self._provider_cache[resource_type] = api_version
             return api_version
-

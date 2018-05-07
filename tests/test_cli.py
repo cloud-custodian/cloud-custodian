@@ -21,6 +21,7 @@ from argparse import ArgumentTypeError
 from c7n import cli, version, commands, utils
 from datetime import datetime, timedelta
 
+from c7n.resources import aws
 from .common import BaseTest, TextTestIO
 
 
@@ -31,7 +32,7 @@ class CliTest(BaseTest):
         def test_account_id(options):
             options.account_id = self.account_id
 
-        self.patch(cli, '_default_account_id', test_account_id)
+        self.patch(aws, '_default_account_id', test_account_id)
 
     def get_output(self, argv):
         """ Run cli.main with the supplied argv and return the output. """
@@ -526,6 +527,11 @@ class MetricsTest(CliTest):
 
 
 class MiscTest(CliTest):
+
+    def test_no_args(self):
+        stdout, stderr = self.run_and_expect_failure(['custodian'], 2)
+        self.assertIn('metrics', stderr)
+        self.assertIn('logs', stderr)
 
     def test_empty_policy_file(self):
         # Doesn't do anything, but should exit 0
