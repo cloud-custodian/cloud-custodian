@@ -238,7 +238,19 @@ class EmailTest(unittest.TestCase):
             'Tags': [
                 {
                     'Value': '123456',
-                    'Key': 'OwnerContact'
+                    'Key': 'OwnerEmail'
+                }
+            ],
+            'VolumeId': 'vol-01a0e6ea6b8lsdkj93'
+        }
+
+        RESOURCE_3 = {
+            'AvailabilityZone': 'us-east-1a',
+            'Attachments': [],
+            'Tags': [
+                {
+                    'Value': 'milton@initech.com',
+                    'Key': 'OwnerEmail'
                 }
             ],
             'VolumeId': 'vol-01a0e6ea6b8lsdkj93'
@@ -247,6 +259,13 @@ class EmailTest(unittest.TestCase):
         ldap_emails = self.email_delivery.get_resource_owner_emails_from_resource(
             SQS_MESSAGE_1,
             RESOURCE_2
+        )
+
+        self.assertEquals(ldap_emails, ['milton@initech.com'])
+
+        ldap_emails = self.email_delivery.get_resource_owner_emails_from_resource(
+            SQS_MESSAGE_1,
+            RESOURCE_3
         )
 
         self.assertEquals(ldap_emails, ['milton@initech.com'])

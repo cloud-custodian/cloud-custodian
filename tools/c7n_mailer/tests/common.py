@@ -42,7 +42,7 @@ BILL = (
 MAILER_CONFIG = {
     'smtp_port': 25,
     'from_address': 'devops@initech.com',
-    'contact_tags': ['OwnerEmail', 'SupportEmail', 'OwnerContact'],
+    'contact_tags': ['OwnerEmail', 'SupportEmail'],
     'queue_url': 'https://sqs.us-east-1.amazonaws.com/xxxx/cloudcustodian-mailer',
     'region': 'us-east-1',
     'ldap_uri': 'ldap.initech.com',
