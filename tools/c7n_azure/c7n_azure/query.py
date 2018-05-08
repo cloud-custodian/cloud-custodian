@@ -76,8 +76,6 @@ class QueryMeta(type):
             # however, classic resources may not have support
             actions.register('tag', Tag)
             actions.register('untag', RemoveTag)
-            actions.register('remove-tag', RemoveTag)
-            actions.register('unmark', RemoveTag)
             attrs['action_registry'] = actions
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)

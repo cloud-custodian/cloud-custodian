@@ -115,7 +115,7 @@ class RemoveTag(BaseAction):
                  tag: Environment
     """
     schema = utils.type_schema(
-        'untag', aliases=('unmark', 'remove-tag'),
+        'untag',
         tags={'type': 'array', 'items': {'type': 'string'}})
 
     def validate(self):
