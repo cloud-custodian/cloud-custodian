@@ -243,7 +243,6 @@ class EmailTest(unittest.TestCase):
             ],
             'VolumeId': 'vol-01a0e6ea6b8lsdkj93'
         }
-
         RESOURCE_3 = {
             'AvailabilityZone': 'us-east-1a',
             'Attachments': [],
