@@ -224,8 +224,8 @@ class TagsTest(BaseTest):
 
     @arm_template('vm.json')
     def test_remove_tags(self):
-        """Adds tags to an empty resource group, then updates one
-        tag and adds a new tag
+        """Verifies we can delete multiple tags from a resource
+        group without modifying existing tags.
         """
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -274,6 +274,43 @@ class TagsTest(BaseTest):
         rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
         self.assertEqual(rg.tags,
                          {'pre-existing-1': 'to-keep', 'pre-existing-2': 'to-keep'})
+
+    @arm_template('vm.json')
+    def test_removal_does_not_raise_on_nonexistent_tag(self):
+        """Verifies attempting to delete a tag that is
+        not on the resource does not throw an error
+        """
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'untag',
+                 'tags': ['tag-does-not-exist']},
+            ],
+        })
+
+        # verify initial tag set is empty
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+
+        raised = False
+        try:
+            p.run()
+        except KeyError:
+            raised = True
+
+        # verify no exception raised and no changes to tags on resource
+        self.assertFalse(raised)
+        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
 
     def test_must_specify_tags_to_remove(self):
         with self.assertRaises(FilterValidationError):
