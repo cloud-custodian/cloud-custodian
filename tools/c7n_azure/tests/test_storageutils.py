@@ -21,25 +21,29 @@ class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()
 
-    @classmethod
-    @arm_template('storage.json')
-    def setUpClass(cls):
+    def setup_account(self):
         # Find actual name of storage account provisioned in our test environment
         s = Session()
         client = s.client('azure.mgmt.storage.StorageManagementClient')
         accounts = list(client.storage_accounts.list())
         matching_account = [a for a in accounts if a.name.startswith("cctstorage")]
-        cls.account = matching_account[0]
+        return matching_account[0]
 
+    @arm_template('storage.json')
     def test_get_account_by_name(self):
-        found = StorageUtilities.get_storage_account_by_name(StorageUtilsTest.account.name)
-        self.assertEqual(found.id, self.account.id)
+        account = self.setup_account()
+        found = StorageUtilities.get_storage_account_by_name(account.name)
+        self.assertEqual(found.id, account.id)
 
+    @arm_template('storage.json')
     def test_get_account_by_name_not_exists(self):
-        found = StorageUtilities.get_storage_account_by_name(StorageUtilsTest.account.name + "break")
+        account = self.setup_account()
+        found = StorageUtilities.get_storage_account_by_name(account.name + "break")
         self.assertIsNone(found)
 
+    @arm_template('storage.json')
     def test_get_keys(self):
-        keys = StorageUtilities.get_storage_keys(StorageUtilsTest.account.id)
+        account = self.setup_account()
+        keys = StorageUtilities.get_storage_keys(account.id)
         self.assertEqual(len(keys), 2)
 
