@@ -42,7 +42,7 @@ BILL = (
 MAILER_CONFIG = {
     'smtp_port': 25,
     'from_address': 'devops@initech.com',
-    'contact_tags': ['OwnerEmail', 'SupportEmail'],
+    'contact_tags': ['OwnerEmail', 'SupportEmail', 'OwnerContact'],
     'queue_url': 'https://sqs.us-east-1.amazonaws.com/xxxx/cloudcustodian-mailer',
     'region': 'us-east-1',
     'ldap_uri': 'ldap.initech.com',
@@ -180,6 +180,7 @@ SQS_MESSAGE_3 = {
     'event': None,
     'resources': [RESOURCE_2]
 }
+
 
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
 
