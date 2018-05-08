@@ -267,7 +267,6 @@ class DynamoDbAccelerator(BaseTest):
         self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
         client = session_factory(region='us-east-1').client('dax')
         tags = client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags']
-        print(tags[0]['Value'])
         self.assertEqual(tags[0]['Value'], 'Required')
 
     def test_remove_tagging(self):
@@ -289,7 +288,6 @@ class DynamoDbAccelerator(BaseTest):
         self.assertEqual(tags, [{'Key': 'Name', 'Value': 'c7n-dax-test'}])
 
     def test_mark_for_op(self):
-        dtnow = datetime.datetime(year=2018, month=5, day=4, hour=16, minute=0)
         session_factory = self.replay_flight_data(
             'test_dax_mark_for_op')
         p = self.load_policy({
@@ -301,17 +299,16 @@ class DynamoDbAccelerator(BaseTest):
             'actions': [{
                 'type': 'mark-for-op',
                 'tag': 'custodian_cleanup',
-                'msg': "Missing tag Required: {op}@{action_date}",
                 'op': 'delete',
                 'days': 7}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
         client = session_factory(region='us-east-1').client('dax')
-        dtact = (dtnow + timedelta(days=7)).strftime('%Y/%m/%d %H%M UTC')
         tags = client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags']
+        self.assertEqual(tags[0]['Key'], 'custodian_cleanup')
         self.assertEqual(tags[0]['Value'],
-                        'Missing tag Required: delete@%s' % dtact)
+                         'Resource does not meet policy: delete@2018/05/15')
 
     def test_delete(self):
         session_factory = self.replay_flight_data(

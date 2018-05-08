@@ -31,11 +31,11 @@
                             "hour": 9, 
                             "__class__": "datetime", 
                             "month": 5, 
-                            "second": 52, 
-                            "microsecond": 709000, 
+                            "second": 7, 
+                            "microsecond": 812000, 
                             "year": 2018, 
-                            "day": 4, 
-                            "minute": 50
+                            "day": 8, 
+                            "minute": 17
                         }
                     }
                 ], 
@@ -48,16 +48,16 @@
                     "ParameterGroupName": "default.dax1.0", 
                     "ParameterApplyStatus": "in-sync"
                 }, 
-                "PreferredMaintenanceWindow": "wed:05:30-wed:06:30"
+                "PreferredMaintenanceWindow": "wed:09:00-wed:10:00"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "cac5fdc6-4fb8-11e8-b2b5-69901f6d49c4", 
+            "RequestId": "6767dbf4-52c3-11e8-91ec-d7b7dc1ccbae", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "cac5fdc6-4fb8-11e8-b2b5-69901f6d49c4", 
-                "date": "Fri, 04 May 2018 16:32:52 GMT", 
+                "x-amzn-requestid": "6767dbf4-52c3-11e8-91ec-d7b7dc1ccbae", 
+                "date": "Tue, 08 May 2018 13:26:24 GMT", 
                 "content-length": "895", 
                 "content-type": "application/x-amz-json-1.1"
             }

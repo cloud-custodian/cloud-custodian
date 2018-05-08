@@ -472,9 +472,8 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         date = None
 
     retry = staticmethod(get_retry(('Throttled',)))
-    filters = FilterRegistry('dynamodb-dax.filters')
+    filter_registry = FilterRegistry('dynamodb-dax.filters')
     filters.register('marked-for-op', TagActionFilter)
-    filter_registry = filters
     permissions = ('dax:ListTags',)
 
     def get_source(self, source_type):
@@ -509,12 +508,11 @@ def _dax_cluster_tags(tables, session_factory, executor_factory, retry, log):
             if e.response['Error']['Code'] in (
                     'ClusterNotFoundFault',
                     'InvalidARNFault',
-                    'InvalidClusterStateFault',
-                    'InvalidParameterCombinationException',
-                    'InvalidParameterValueException'):
-                log.warning(
-                    'Exception collecting tags for %s: \n%s' % (
-                        r['ClusterName'], e))
+                    'InvalidClusterStateFault'):
+                log.warning('Exception collecting tags for %s: \n%s' % (
+                    r['ClusterName'], e))
+            else:
+                raise
         r['Tags'] = tags
         return r
 
@@ -556,13 +554,10 @@ class DaxTagging(Tag):
             except ClientError as e:
                 if e.response['Error']['Code'] in (
                         'ClusterNotFoundFault',
-                        'InvalidARNFault',
                         'InvalidClusterStateFault',
-                        'InvalidParameterCombinationException',
-                        'InvalidParameterValueException'):
-                    self.log.warning(
-                        'Exception tagging %s: \n%s' % (
-                            r['ClusterName'], e))
+                        'InvalidARNFault'):
+                    self.log.warning('Exception tagging %s: \n%s' % (
+                        r['ClusterName'], e))
                     continue
                 raise
 
@@ -598,12 +593,9 @@ class DaxRemoveTagging(RemoveTag):
                         'ClusterNotFoundFault',
                         'InvalidARNFault',
                         'InvalidClusterStateFault',
-                        'InvalidParameterCombinationException',
-                        'InvalidParameterValueException',
                         'TagNotFoundFault'):
-                    self.log.warning(
-                        'Exception removing tags on %s: \n%s' % (
-                            r['ClusterName'], e))
+                    self.log.warning('Exception removing tags on %s: \n%s' % (
+                        r['ClusterName'], e))
                     continue
                 raise
 
@@ -640,13 +632,9 @@ class DaxMarkForOp(TagDelayedAction):
                 if e.response['Error']['Code'] in (
                         'ClusterNotFoundFault',
                         'InvalidARNFault',
-                        'InvalidClusterStateFault',
-                        'InvalidParameterCombinationException',
-                        'InvalidParameterValueException',
-                        'TagNotFoundFault'):
+                        'InvalidClusterStateFault'):
                     self.log.warning(
-                        'Exception marking %s: \n%s' % (
-                            r['ClusterName'], e))
+                        'Exception marking %s: \n%s' % (r['ClusterName'], e))
                     continue
                 raise
 
@@ -678,11 +666,8 @@ class DaxDeleteCluster(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in (
                         'ClusterNotFoundFault',
-                        'InvalidClusterStateFault',
-                        'InvalidParameterCombinationException',
-                        'InvalidParameterValueException'):
-                    self.log.warning(
-                        'Exception marking %s: \n%s' % (
-                            r['ClusterName'], e))
+                        'InvalidClusterStateFault'):
+                    self.log.warning('Exception marking %s: \n%s' % (
+                        r['ClusterName'], e))
                     continue
                 raise
