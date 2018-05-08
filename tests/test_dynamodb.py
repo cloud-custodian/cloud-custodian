@@ -320,7 +320,6 @@ class DynamoDbAccelerator(BaseTest):
             'actions': [{'type': 'delete'}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
         client = session_factory(region='us-east-1').client('dax')
         clusters = client.describe_clusters()['Clusters']
         self.assertEqual(clusters[0]['Status'], 'deleting')
