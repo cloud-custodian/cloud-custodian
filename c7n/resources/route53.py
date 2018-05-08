@@ -59,12 +59,11 @@ def _describe_route53_tags(
                 k = k.split("/")[-1]
             resource_map[k] = r
 
-        for r in list(resource_map.keys()):
-            ResourceIdsList = [r]
+        for resource_batch in chunks(list(resource_map.keys()), 10):
             results = retry(
                 client.list_tags_for_resources,
                 ResourceType=model.type,
-                ResourceIds=ResourceIdsList)
+                ResourceIds=resource_batch)
             for resource_tag_set in results['ResourceTagSets']:
                 if ('ResourceId' in resource_tag_set and
                         resource_tag_set['ResourceId'] in resource_map):
