@@ -13,14 +13,12 @@
 # limitations under the License.
 
 import six
-from c7n_azure.actions import Tag, RemoveTag
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
 from c7n.utils import local_session
-from c7n_azure.utils import ResourceIdParser
 
 
 class ResourceQuery(object):
@@ -69,14 +67,8 @@ class QueryMeta(type):
             attrs['filter_registry'] = FilterRegistry(
                 '%s.filters' % name.lower())
         if 'action_registry' not in attrs:
-            actions = ActionRegistry(
+            attrs['action_registry'] = ActionRegistry(
                 '%s.actions' % name.lower())
-
-            # All ARM resources will have tag support;
-            # however, classic resources may not have support
-            actions.register('tag', Tag)
-            actions.register('untag', RemoveTag)
-            attrs['action_registry'] = actions
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -116,14 +108,6 @@ class QueryResourceManager(ResourceManager):
         resources = self.augment(self.source.get_resources(query))
         self._cache.save(key, resources)
         return self.filter_resources(resources)
-
-    def augment(self, resources):
-        # TODO: temporary put here. Applicable only to ARM resources.
-        # Need to move to ARMResourceManager base class
-        for resource in resources:
-            if 'id' in resource:
-                resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
-        return resources
 
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
