@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import six
-from c7n_azure.actions import Tag
+from c7n_azure.actions import Tag, RemoveTag
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
@@ -75,6 +75,7 @@ class QueryMeta(type):
             # All ARM resources will have tag support;
             # however, classic resources may not have support
             actions.register('tag', Tag)
+            actions.register('untag', RemoveTag)
             attrs['action_registry'] = actions
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
