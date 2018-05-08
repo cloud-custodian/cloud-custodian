@@ -14,7 +14,7 @@
 
 import six
 from c7n_azure.query import QueryResourceManager, QueryMeta
-from c7n_azure.actions import Tag, AutoTagUser
+from c7n_azure.actions import Tag, AutoTagUser, RemoveTag
 from c7n_azure.utils import ResourceIdParser
 from c7n_azure.provider import resources
 
@@ -47,6 +47,7 @@ class ArmResourceManager(QueryResourceManager):
             klass = registry.get(resource)
             if issubclass(klass, ArmResourceManager):
                 klass.action_registry.register('tag', Tag)
+                klass.action_registry.register('untag', RemoveTag)
                 klass.action_registry.register('auto-tag-user', AutoTagUser)
 
 
