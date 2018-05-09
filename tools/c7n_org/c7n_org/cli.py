@@ -161,6 +161,7 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
         filtered_accounts.append(a)
     accounts_config['accounts'] = filtered_accounts
 
+
 def filter_policies(policies_config, tags, policies, resource, not_policies=None):
     filtered_policies = []
     for p in policies_config.get('policies', ()):
@@ -179,6 +180,7 @@ def filter_policies(policies_config, tags, policies, resource, not_policies=None
                 continue
         filtered_policies.append(p)
     policies_config['policies'] = filtered_policies
+
 
 def report_account(account, region, policies_config, output_path, debug):
     cache_path = os.path.join(output_path, "c7n.cache")
