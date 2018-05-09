@@ -143,7 +143,8 @@ class EmailDelivery(object):
 
         # resolve the contact info from ldap
         non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
-        ldap_emails = [self.ldap_lookup.get_email_to_addrs_from_uid(uid) for uid in non_email_ids]
+        ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
+                                              (uid) for uid in non_email_ids]))
 
         return list(chain(explicit_emails, ldap_emails))
 
