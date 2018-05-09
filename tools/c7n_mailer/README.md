@@ -370,8 +370,7 @@ The following extra global functions are available:
 | signature | behavior |
 |:----------|:-----------|
 | `format_struct(struct)` | pretty print a json structure |
-| `resource_tag(resource, key)` | retrieve a tag value from a resource or return an empty string |
-| `resource_owner(resource)` | retrieve the contact field value for a resource from tags, if not found returns `Unknown` |
+| `resource_tag(resource, key)` | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
 | `format_resource(resource, resource_type)` | renders a one line summary of a resource |
 
 The following extra jinja filters are available:

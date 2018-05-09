@@ -14,7 +14,7 @@
 import json
 import time
 
-import requests
+from botocore.vendored import requests
 import six
 from c7n_mailer.email_delivery import EmailDelivery
 from c7n_mailer.ldap_lookup import Redis
@@ -102,8 +102,11 @@ class SlackDelivery(object):
                     list[address] = self.caching.get(address)
                     continue
 
-            response = self.client.api_call(
-                "users.lookupByEmail", email=address)
+            response = requests.post(
+                url='https://slack.com/api/users.lookupByEmail',
+                data={'email': address},
+                headers={'Content-Type': 'application/x-www-form-urlencoded',
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')}).json()
 
             if not response["ok"] and "Retry-After" in response["headers"]:
                 self.logger.info(

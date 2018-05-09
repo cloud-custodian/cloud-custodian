@@ -33,6 +33,7 @@ def get_jinja_env():
     env.filters['get_date_age'] = get_date_age
     env.globals['format_resource'] = resource_format
     env.globals['format_struct'] = format_struct
+    env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
     env.loader  = jinja2.FileSystemLoader(
         [
@@ -296,13 +297,13 @@ def kms_decrypt(config, logger, session, encrypted_field):
                     'Plaintext']
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
-                "Error: %s Unable to base64 decode %s, will assume plaintext.",
+                "Error: %s Unable to base64 decode %s, will assume plaintext." %
                 (e, encrypted_field))
         except ClientError as e:
             if e.response['Error']['Code'] != 'InvalidCiphertextException':
                 raise
             logger.warning(
-                "Error: %s Unable to decrypt %s with kms, will assume plaintext.",
+                "Error: %s Unable to decrypt %s with kms, will assume plaintext." %
                 (e, encrypted_field))
         return config[encrypted_field]
     else:
