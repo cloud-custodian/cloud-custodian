@@ -136,6 +136,7 @@ policies:
           - slack://owners
           - slack://foo@bar.com
           - slack://#custodian-test
+          - slack://webhook/#c7n-webhook-test
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
@@ -143,17 +144,18 @@ policies:
 
 Slack messages support use of a unique template field specified by `slack_template`. This field is unique and usage will not break
 existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
-and if not specified, the mailer will use the default value `slack_default`. 
+and if not specified, the mailer will use the default value `slack_default`.
 
 Slack integration for the mailer supports three flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used.
- 
+
 | Required? | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
 |           | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
 |           | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
-|           | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test | 
- 
- 
+|           | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
+|           | `slack://webhook/#c7n-webhook-test` | string      | Send to a Slack webhook; appended with the target channel. |
+
+
 ### Now run:
 
 ```

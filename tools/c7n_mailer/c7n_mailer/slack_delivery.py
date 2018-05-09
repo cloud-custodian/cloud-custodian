@@ -62,6 +62,14 @@ class SlackDelivery(object):
                             self.logger, 'slack_template', 'slack_default')
                 self.logger.debug(
                     "Generating messages for recipient list produced by resource owner resolution.")
+            elif target.startswith('slack://webhook/#') and self.config.get('slack_webhook'):
+                webhook_target = self.config.get('slack_webhook')
+                slack_messages[webhook_target] = get_rendered_jinja(
+                    target.split('slack://webhook/#', 1)[1], sqs_message,
+                    to_addrs_to_resources_map.values()[0],
+                    self.logger, 'slack_template', 'slack_default')
+                self.logger.debug(
+                    "Generating message for webhook %s." % self.config.get('slack_webhook'))
             elif target.startswith('slack://') and self.email_handler.target_is_email(
                     target.split('slack://', 1)[1]):
                 resolved_addrs = self.retrieve_user_im([target.split('slack://', 1)[1]])
@@ -91,7 +99,7 @@ class SlackDelivery(object):
                 json.loads(payload)["channel"])
             )
 
-            self.send_slack_msg(payload)
+            self.send_slack_msg(key, payload)
 
     def retrieve_user_im(self, email_addresses):
         list = {}
@@ -130,14 +138,21 @@ class SlackDelivery(object):
 
         return list
 
-    def send_slack_msg(self, message_payload):
-        response = requests.post(
-            url='https://slack.com/api/chat.postMessage',
-            data=message_payload,
-            headers={'Content-Type': 'application/json;charset=utf-8',
-                     'Authorization': 'Bearer %s' % self.config.get('slack_token')})
+    def send_slack_msg(self, key, message_payload):
 
-        if not response.json()["ok"] and "Retry-After" in response["headers"]:
+        if key.startswith('https://hooks.slack.com/'):
+            response = requests.post(
+                url=key,
+                data=message_payload,
+                headers={'Content-Type': 'application/json'})
+        else:
+            response = requests.post(
+                url='https://slack.com/api/chat.postMessage',
+                data=message_payload,
+                headers={'Content-Type': 'application/json;charset=utf-8',
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')})
+
+        if response.status_code == 429 and "Retry-After" in response.headers:
             self.logger.info(
                 "Slack API rate limiting. Waiting %d seconds",
                 int(response.headers['retry-after']))
