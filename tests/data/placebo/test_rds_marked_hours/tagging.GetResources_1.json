@@ -4,7 +4,7 @@
         "PaginationToken": "", 
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:rds:us-west-2:123456789012:db:db1",
+                "ResourceARN": "arn:aws:rds:us-east-1:123456789012:db:db1",
                 "Tags": [
                     {
                         "Value": "Resource does not meet policy: delete@2018/05/09 1520 UTC", 

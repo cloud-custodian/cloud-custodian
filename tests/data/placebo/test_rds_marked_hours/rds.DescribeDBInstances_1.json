@@ -74,13 +74,13 @@
                 }, 
                 "ReadReplicaDBInstanceIdentifiers": [], 
                 "AllocatedStorage": 20, 
-                "DBInstanceArn": "arn:aws:rds:us-west-2:123456789012:db:db1",
+                "DBInstanceArn": "arn:aws:rds:us-east-1:123456789012:db:db1",
                 "BackupRetentionPeriod": 0, 
                 "PreferredMaintenanceWindow": "sun:09:32-sun:10:02", 
                 "Endpoint": {
                     "HostedZoneId": "Z1PVIF0B656C1W", 
                     "Port": 3306, 
-                    "Address": "db1.camx4omr69zr.us-west-2.rds.amazonaws.com"
+                    "Address": "db1.camx4omr69zr.us-east-1.rds.amazonaws.com"
                 }, 
                 "DBInstanceStatus": "available", 
                 "IAMDatabaseAuthenticationEnabled": false, 

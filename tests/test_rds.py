@@ -224,7 +224,7 @@ class RDSTest(BaseTest):
         dt = dt.replace(year=2018, month=5, day=9, hour=21, minute=20,
                         second=0, microsecond=0)
         session_factory = self.replay_flight_data('test_rds_mark_hours')
-        session = session_factory(region='us-west-2')
+        session = session_factory(region='us-east-1')
         rds = session.client('rds')
 
         policy = self.load_policy({
