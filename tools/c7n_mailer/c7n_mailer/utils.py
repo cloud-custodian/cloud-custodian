@@ -222,7 +222,7 @@ def resource_format(resource, resource_type):
     elif resource_type == 'cache-snapshot':
         return "name: %s cluster: %s source: %s" % (
             resource['SnapshotName'],
-            resource['CacheClusterId'],
+            resource.get('CacheClusterId'),
             resource['SnapshotSource'])
     elif resource_type == 'redshift-snapshot':
         return "name: %s db: %s" % (
