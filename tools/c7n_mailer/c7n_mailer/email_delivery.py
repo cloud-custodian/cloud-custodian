@@ -201,6 +201,7 @@ class EmailDelivery(object):
                 sqs_message,
                 resource
             )
+
             resource_emails = resource_emails + ro_emails
             # if 'owner_absent_contact' was specified in the policy and no resource
             # owner emails were found, add those addresses

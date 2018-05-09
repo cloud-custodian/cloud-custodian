@@ -111,6 +111,7 @@ def setup_defaults(config):
     config.setdefault('ldap_bind_password', None)
     config.setdefault('datadog_api_key', None)
     config.setdefault('slack_token', None)
+    config.setdefault('slack_webhook', None)
 
 
 def date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z'):
