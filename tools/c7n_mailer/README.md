@@ -156,6 +156,8 @@ Slack integration for the mailer supports three flavors of messaging, listed bel
 |           | `slack://webhook/#c7n-webhook-test` | string      | Send to a Slack webhook; appended with the target channel. |
 
 
+The `slack_token` field is required for any of the first three Slack notify forms. However, a token is not required for use of the webhook.
+
 ### Now run:
 
 ```
