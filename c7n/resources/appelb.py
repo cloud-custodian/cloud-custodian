@@ -59,7 +59,7 @@ class AppELB(QueryResourceManager):
         id = 'LoadBalancerArn'
         filter_name = None
         filter_type = None
-        dimension = None
+        dimension = "LoadBalancer"
         date = 'CreatedTime'
         config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
 
