@@ -19,7 +19,6 @@ from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupP
 from msrestazure.azure_exceptions import CloudError
 from c7n import utils
 from c7n.actions import BaseAction
-from c7n_azure.provider import resources
 from c7n.filters import FilterValidationError
 
 
@@ -27,6 +26,25 @@ def utcnow():
     """The datetime object for the current time in UTC
     """
     return datetime.datetime.utcnow()
+
+
+def update_resource_tags(self, session, client, resource, tags):
+    # resource group type
+    if self.manager.type == 'resourcegroup':
+        params_patch = ResourceGroupPatchable(
+            tags=tags
+        )
+        client.resource_groups.update(
+            resource['name'],
+            params_patch,
+        )
+    # other Azure resources
+    else:
+        az_resource = GenericResource.deserialize(resource)
+        api_version = session.resource_api_version(az_resource.id)
+        az_resource.tags = tags
+
+        client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
 
 
 class Tag(BaseAction):
@@ -78,22 +96,46 @@ class Tag(BaseAction):
             for key in new_tags:
                 tags[key] = new_tags[key]
 
-            # resource group type
-            if self.manager.type == 'resourcegroup':
-                params_patch = ResourceGroupPatchable(
-                    tags=tags
-                )
-                client.resource_groups.update(
-                    resource['name'],
-                    params_patch,
-                )
-            # other Azure resources
-            else:
-                az_resource = GenericResource.deserialize(resource)
-                api_version = session.resource_api_version(az_resource.id)
-                az_resource.tags = tags
+            update_resource_tags(self, session, client, resource, tags)
 
-                client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+
+class RemoveTag(BaseAction):
+    """Removes tags from Azure resources
+
+        .. code-block:: yaml
+
+          policies:
+            - name: azure-remove-tag-resourcegroups
+              resource: azure.resourcegroup
+              description: |
+                Remove tag for all existing resource groups with a key such as Environment
+              actions:
+               - type: untag
+                 tags: ['Environment']
+    """
+    schema = utils.type_schema(
+        'untag',
+        tags={'type': 'array', 'items': {'type': 'string'}})
+
+    def validate(self):
+        if not self.data.get('tags'):
+            raise FilterValidationError("Must specify tags")
+        return self
+
+    def process(self, resources):
+        session = utils.local_session(self.manager.session_factory)
+        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
+        for resource in resources:
+            # get existing tags
+            tags = resource.get('tags', {})
+
+            # delete tag
+            tags_to_delete = self.data.get('tags')
+            for key in tags_to_delete:
+                tags.pop(key, None)
+
+            update_resource_tags(self, session, client, resource, tags)
 
 
 class AutoTagUser(BaseAction):
@@ -201,14 +243,3 @@ class AutoTagUser(BaseAction):
                 first_operation = l
 
         return first_operation
-
-    @staticmethod
-    def add_auto_tag_user(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
-                klass.action_registry.register('auto-tag-user', AutoTagUser)
-
-
-# Add the AutoTagUser action to all resources that support tagging
-resources.subscribe(resources.EVENT_FINAL, AutoTagUser.add_auto_tag_user)
