@@ -27,7 +27,6 @@ from c7n.utils import (
     local_session, get_retry, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter
 
-log = logging.getLogger('custodian.dynamodb')
 
 filters = FilterRegistry('dynamodb-table.filters')
 filters.register('marked-for-op', TagActionFilter)
@@ -475,6 +474,7 @@ class DynamoDbAccelerator(query.QueryResourceManager):
     filter_registry = FilterRegistry('dynamodb-dax.filters')
     filters.register('marked-for-op', TagActionFilter)
     permissions = ('dax:ListTags',)
+    log = logging.getLogger('custodian.dax')
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -497,9 +497,9 @@ class DescribeDaxCluster(query.DescribeSource):
 
 
 def _dax_cluster_tags(tables, session_factory, executor_factory, retry, log):
+    client = local_session(session_factory).client('dax')
 
     def process_tags(r):
-        client = local_session(session_factory).client('dax')
         tags = []
         try:
             tags = retry(
@@ -582,8 +582,7 @@ class DaxRemoveTagging(RemoveTag):
     permissions = ('dax:UntagResource',)
 
     def process_resource_set(self, resources, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('dax')
+        client = local_session(self.manager.session_factory).client('dax')
         for r in resources:
             try:
                 client.untag_resource(
