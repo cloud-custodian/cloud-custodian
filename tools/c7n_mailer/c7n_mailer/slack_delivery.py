@@ -14,12 +14,11 @@
 import json
 import time
 
-import requests
+from botocore.vendored import requests
 import six
 from c7n_mailer.email_delivery import EmailDelivery
 from c7n_mailer.ldap_lookup import Redis
 from c7n_mailer.utils import kms_decrypt, get_rendered_jinja
-from slackclient import SlackClient
 
 
 class SlackDelivery(object):
@@ -27,7 +26,6 @@ class SlackDelivery(object):
     def __init__(self, config, session, logger):
         if config.get('slack_token'):
             config['slack_token'] = kms_decrypt(config, logger, session, 'slack_token')
-            self.client = SlackClient(config['slack_token'])
         self.caching = self.cache_factory(config, config.get('cache_engine', None))
         self.config = config
         self.logger = logger
@@ -102,8 +100,11 @@ class SlackDelivery(object):
                     list[address] = self.caching.get(address)
                     continue
 
-            response = self.client.api_call(
-                "users.lookupByEmail", email=address)
+            response = requests.post(
+                url='https://slack.com/api/users.lookupByEmail',
+                data={'email': address},
+                headers={'Content-Type': 'application/x-www-form-urlencoded',
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')}).json()
 
             if not response["ok"] and "Retry-After" in response["headers"]:
                 self.logger.info(
