@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
+from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.filters import Filter
@@ -23,6 +24,7 @@ from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session, chunks, get_retry
+from c7n.tags import RemoveTag, Tag
 
 
 @resources.register('alarm')
@@ -304,3 +306,79 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
             if found:
                 results.append(r)
         return results
+
+
+@LogGroup.action_registry.register('tag')
+class LogGroupAddTag(Tag):
+    """Action to create tag(s) on a resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: log-group-tag
+                resource: log-group
+                filters:
+                  - "tag:DesiredTag": absent
+                actions:
+                  - type: tag
+                    key: DesiredTag
+                    value: DesiredTagValue
+    """
+    permissions = ('logs:TagLogGroup',)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('logs')
+
+        def _add_tags(r):
+            try:
+                tag_dict = {}
+                for t in tags:
+                    tag_dict[t['Key']] = t['Value']
+                client.tag_log_group(logGroupName=r['logGroupName'],
+                                     tags=tag_dict)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                    raise
+                self.log.warning('Exception tagging %s: \n%s' % (
+                    r['logGroupName'], e))
+
+        with self.executor_factory(max_workers=1) as w:
+            list(w.map(_add_tags, resources))
+
+
+@LogGroup.action_registry.register('remove-tag')
+class LogGroupRemoveTag(RemoveTag):
+    """Action to remove tag(s) on a resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: log-group-remove-tag
+                resource: log-group
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """
+    permissions = ('logs:UntagLogGroup',)
+
+    def process_resource_set(self, resources, tag_keys):
+        client = local_session(self.manager.session_factory).client('logs')
+
+        def _remove_tags(r):
+            try:
+                client.untag_log_group(
+                    logGroupName=r['logGroupName'], tags=tag_keys)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                    raise
+                self.log.warning('Exception untagging %s: \n%s' % (
+                    r['logGroupName'], e))
+
+            with self.executor_factory(max_workers=1) as w:
+                list(w.map(_remove_tags, resources))

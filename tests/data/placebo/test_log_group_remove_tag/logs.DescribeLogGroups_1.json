@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8654a2c8-545f-11e8-8d2f-e1c550312b8d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8654a2c8-545f-11e8-8d2f-e1c550312b8d", 
+                "date": "Thu, 10 May 2018 14:36:28 GMT", 
+                "content-length": "195", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "logGroups": [
+            {
+                "arn": "arn:aws:logs:us-east-1:385131497716:log-group:c7n-test-log-group:*", 
+                "creationTime": 1525962988478, 
+                "metricFilterCount": 0, 
+                "logGroupName": "c7n-test-log-group", 
+                "storedBytes": 0
+            }
+        ]
+    }
+}
