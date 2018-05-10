@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import datetime
 import re
+import logging
 from mock import patch
 from c7n_azure.session import Session
 from c7n.filters import FilterValidationError
@@ -27,6 +28,8 @@ class TagsTest(BaseTest):
 
     # regex for identifying valid email addresses
     EMAIL_REGEX = "[^@]+@[^@]+\.[^@]+"
+
+    logger = logging.getLogger()
 
     def setUp(self):
         super(TagsTest, self).setUp()
@@ -599,27 +602,29 @@ class TagsTest(BaseTest):
         self.assertEqual(vm.tags, {'testtag': 'testvalue'})
 
     @arm_template('vm.json')
-    def test_tag_trim_warns_no_candidates(self):
+    @patch('logging.Logger.warning')
+    def test_tag_trim_warns_no_candidates(self, logger_mock):
         """Verifies tag trim warns when there are no candidates
         to trim
         """
 
-        with self.assertLogs(None, 'WARNING'):
-            p = self.load_policy({
-                'name': 'test-azure-tag',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'}
-                ],
-                'actions': [
-                    {'type': 'tag-trim',
-                     'space': 0,
-                     'preserve': ['testtag']
-                     }
-                ],
-            })
-            p.run()
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'tag-trim',
+                 'space': 0,
+                 'preserve': ['testtag']
+                 }
+            ],
+        })
+        p.run()
+
+        logger_mock.assert_called()

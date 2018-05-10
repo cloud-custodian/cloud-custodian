@@ -313,7 +313,7 @@ class TagTrim(BaseAction):
             if space:
                 # Free up slots to fit
                 remove = len(candidates) - (
-                        self.max_tag_count - (space + len(tags_to_preserve)))
+                    self.max_tag_count - (space + len(tags_to_preserve)))
                 candidates = list(sorted(candidates))[:remove]
 
             if not candidates:
@@ -322,6 +322,3 @@ class TagTrim(BaseAction):
                 return
 
             untag_action({'tags': candidates}, self.manager).process([resource])
-
-
-
