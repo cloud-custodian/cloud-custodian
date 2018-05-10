@@ -251,27 +251,33 @@ class TagTrim(BaseAction):
     in order to make additional tags space on a set of resources,
     this action can be used to remove enough tags to make the
     desired amount of space while preserving a given set of tags.
+    Setting the space value to 0 removes all tags but those
+    listed to preserve.
 
     .. code-block :: yaml
 
       - policies:
          - name: azure-tag-trim
            comment: |
-             Any instances with 8 or more tags get tags removed until
-             they match the target tag count, in this case 7 so
+             Any instances with 14 or more tags get tags removed until
+             they match the target tag count, in this case 13, so
              that we free up tag slots for another usage.
            resource: azure.resourcegroup
            filters:
-               # Filter down to resources which already have 8 tags
-               # as we need space for 3 more, this also ensures that
-               # metrics reporting is correct for the policy.
+               # Filter down to resources that do not have the space
+               # to add additional required tags. For example, if an
+               # additional 2 tags need to be added to a resource, with
+               # 15 tags as the limit, then filter down to resources that
+               # have 14 or more tags since they will need to have tags
+               # removed for the 2 extra. This also ensures that metrics
+               # reporting is correct for the policy.
                type: value
                key: "[length(Tags)][0]"
                op: ge
-               value: 8
+               value: 14
            actions:
              - type: tag-trim
-               space: 7
+               space: 2
                preserve:
                 - OwnerContact
                 - Environment
@@ -286,8 +292,7 @@ class TagTrim(BaseAction):
         preserve={'type': 'array', 'items': {'type': 'string'}})
 
     def validate(self):
-        if (self.data.get('space') is not None and
-                (self.data.get('space') < 0 or self.data.get('space') > 15)):
+        if self.data.get('space') < 0 or self.data.get('space') > 15:
             raise FilterValidationError("Space must be between 0 and 15")
 
         return self
@@ -301,9 +306,8 @@ class TagTrim(BaseAction):
             # get existing tags
             tags = resource.get('tags', {})
 
-            # space == 0 means remove all but specified
             if space and len(tags) + space <= self.max_tag_count:
-                return
+                continue
 
             # delete tags
             keys = set(tags)
@@ -319,6 +323,6 @@ class TagTrim(BaseAction):
             if not candidates:
                 self.log.warning(
                     "Could not find any candidates to trim %s" % resource['id'])
-                return
+                continue
 
             untag_action({'tags': candidates}, self.manager).process([resource])

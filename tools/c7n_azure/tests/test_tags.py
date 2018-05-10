@@ -627,4 +627,10 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        logger_mock.assert_called()
+        expected_warning = (
+            "Could not find any candidates to trim "
+            "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/"
+            "providers/Microsoft.Compute/virtualMachines/cctestvm"
+        )
+
+        logger_mock.assert_called_with(expected_warning)
