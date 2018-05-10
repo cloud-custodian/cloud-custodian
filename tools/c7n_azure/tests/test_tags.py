@@ -460,8 +460,11 @@ class TagsTest(BaseTest):
         client = s.client('azure.mgmt.compute.ComputeManagementClient')
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
         start_tags = vm.tags
+
+        # verify there is at least 1 space for a tag
         self.assertLess(len(start_tags), 15)
 
+        # trim for space for 1 tag
         p = self.load_policy({
             'name': 'test-azure-tag',
             'resource': 'azure.vm',
@@ -479,7 +482,8 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        # verify that the tags are unchanged
+        # verify that tags are unchanged
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
         self.assertEqual(vm.tags, start_tags)
 
     @arm_template('vm.json')
@@ -488,12 +492,6 @@ class TagsTest(BaseTest):
         and number of tags on the resource are greater than the max
         tag value (15)
         """
-
-        # verify initial tags
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
 
         # Add tags to trim
         p = self.load_policy({
@@ -513,9 +511,11 @@ class TagsTest(BaseTest):
         })
         p.run()
 
+        # verify more than 1 tag on resource
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        added_tags = vm.tags
-        self.assertEqual(added_tags, {'testtag': 'testvalue', 'tag-to-trim1': 'value1', 'tag-to-trim2': 'value2'})
+        self.assertTrue(len(vm.tags) > 1)
 
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -536,22 +536,16 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        # verify that the tags were trimmed
+        # verify that tags were trimmed to
+        # have 14 spaces and 1 preserved
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertLess(len(vm.tags), len(added_tags))
-        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+        self.assertEqual(len(vm.tags), 1)
 
     @arm_template('vm.json')
     def test_tag_trim_space_0_removes_all_tags_but_preserve(self):
         """Verifies tag trim removes all other tags but tags
         listed in preserve
         """
-
-        # verify initial tags
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
 
         # Add tags to trim
         p = self.load_policy({
@@ -572,10 +566,14 @@ class TagsTest(BaseTest):
         })
         p.run()
 
+        # verify initial tags contain more than testtag
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        added_tags = vm.tags
-        self.assertEqual(added_tags, {'testtag': 'testvalue', 'tag-to-trim1': 'value1', 'tag-to-trim2': 'value2',
-                                      'tag-to-trim3': 'value3'})
+        self.assertTrue('tag-to-trim1' in vm.tags)
+        self.assertTrue('tag-to-trim2' in vm.tags)
+        self.assertTrue('tag-to-trim3' in vm.tags)
+        self.assertTrue('testtag' in vm.tags)
 
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -596,9 +594,8 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        # verify that the tags were trimmed
+        # verify all tags trimmed but testtag
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertLess(len(vm.tags), len(added_tags))
         self.assertEqual(vm.tags, {'testtag': 'testvalue'})
 
     @arm_template('vm.json')
@@ -607,7 +604,7 @@ class TagsTest(BaseTest):
         to trim
         """
 
-        with self.assertLogs('Logger', 'WARNING'):
+        with self.assertLogs(None, 'WARNING'):
             p = self.load_policy({
                 'name': 'test-azure-tag',
                 'resource': 'azure.vm',
