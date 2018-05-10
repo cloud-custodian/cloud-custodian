@@ -534,8 +534,8 @@ class RequestLimitIncrease(BaseAction):
         percent_increase = self.data.get('percent-increase')
         amount_increase = self.data.get('amount-increase')
         minimum_increase = self.data.get('minimum-increase')
-            if not mimimum_increase:
-                mimimum_increase = 1
+            if not minimum_increase:
+                minimum_increase = 1
                 
         for s in limit_exceeded:
             current_limit = int(s['limit'])
