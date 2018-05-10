@@ -87,3 +87,41 @@ class LogGroupTest(BaseTest):
         self.assertEqual(
             client.describe_log_groups(
                 logGroupNamePrefix=log_group)['logGroups'], [])
+
+    def test_tag(self):
+        log_group = 'c7n-test-log-group'
+        session = self.replay_flight_data('test_log_group_add_tag')
+        client = session(region='us-east-1').client('logs')
+        client.create_log_group(logGroupName=log_group)
+        self.addCleanup(client.delete_log_group, logGroupName=log_group)
+        p = self.load_policy({
+            'name': 'log-group',
+            'resource': 'log-group',
+            'actions': [{
+                'type': 'tag',
+                'key': 'DesiredTag',
+                'value': 'DesiredValue'}]}, session_factory=session)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['logGroupName'], log_group)
+        self.assertEqual(
+            client.list_tags_log_group(logGroupName=log_group)['tags'],
+            {'DesiredTag': 'DesiredValue'})
+
+    def test_remove_tag(self):
+        log_group = 'c7n-test-log-group'
+        session = self.replay_flight_data('test_log_group_remove_tag')
+        client = session(region='us-east-1').client('logs')
+        client.create_log_group(logGroupName=log_group)
+        self.addCleanup(client.delete_log_group, logGroupName=log_group)
+        p = self.load_policy({
+            'name': 'log-group',
+            'resource': 'log-group',
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['DesiredTag']}]}, session_factory=session)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['logGroupName'], log_group)
+        self.assertFalse(
+            client.list_tags_log_group(logGroupName=log_group)['tags'])
