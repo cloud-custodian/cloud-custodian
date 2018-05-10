@@ -296,7 +296,7 @@ class TagsTest(BaseTest):
             ],
         })
 
-        # verify initial tag set is empty
+        # verify initial tag set
         s = Session()
         client = s.client('azure.mgmt.compute.ComputeManagementClient')
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
@@ -422,6 +422,207 @@ class TagsTest(BaseTest):
                     {'type': 'auto-tag-user',
                      'tag': 'CreatorEmail',
                      'days': 0}
+                ],
+            })
+            p.run()
+
+    def test_tag_trim_space_must_be_btwn_0_and_15(self):
+        with self.assertRaises(FilterValidationError):
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'actions': [
+                    {'type': 'tag-trim',
+                     'space': -1}
+                ],
+            })
+            p.run()
+
+        with self.assertRaises(FilterValidationError):
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'actions': [
+                    {'type': 'tag-trim',
+                     'space': 16}
+                ],
+            })
+            p.run()
+
+    @arm_template('vm.json')
+    def test_tag_trim_does_nothing_if_space_available(self):
+        """Verifies tag trim returns without trimming tags
+        if the resource has space equal to or greater than
+        the space value.
+        """
+
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        start_tags = vm.tags
+        self.assertLess(len(start_tags), 15)
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'tag-trim',
+                 'space': 1}
+            ],
+        })
+        p.run()
+
+        # verify that the tags are unchanged
+        self.assertEqual(vm.tags, start_tags)
+
+    @arm_template('vm.json')
+    def test_tag_trim_removes_tags_for_space(self):
+        """Verifies tag trim removes tags when the space value
+        and number of tags on the resource are greater than the max
+        tag value (15)
+        """
+
+        # verify initial tags
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+
+        # Add tags to trim
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'tag-to-trim1': 'value1', 'tag-to-trim2': 'value2'}}
+            ],
+        })
+        p.run()
+
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        added_tags = vm.tags
+        self.assertEqual(added_tags, {'testtag': 'testvalue', 'tag-to-trim1': 'value1', 'tag-to-trim2': 'value2'})
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'tag-trim',
+                 'space': 14,
+                 'preserve': ['testtag']
+                 }
+            ],
+        })
+        p.run()
+
+        # verify that the tags were trimmed
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        self.assertLess(len(vm.tags), len(added_tags))
+        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+
+    @arm_template('vm.json')
+    def test_tag_trim_space_0_removes_all_tags_but_preserve(self):
+        """Verifies tag trim removes all other tags but tags
+        listed in preserve
+        """
+
+        # verify initial tags
+        s = Session()
+        client = s.client('azure.mgmt.compute.ComputeManagementClient')
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+
+        # Add tags to trim
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'tag-to-trim1': 'value1', 'tag-to-trim2': 'value2',
+                          'tag-to-trim3': 'value3'}}
+            ],
+        })
+        p.run()
+
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        added_tags = vm.tags
+        self.assertEqual(added_tags, {'testtag': 'testvalue', 'tag-to-trim1': 'value1', 'tag-to-trim2': 'value2',
+                                      'tag-to-trim3': 'value3'})
+
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'tag-trim',
+                 'space': 0,
+                 'preserve': ['testtag']
+                 }
+            ],
+        })
+        p.run()
+
+        # verify that the tags were trimmed
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        self.assertLess(len(vm.tags), len(added_tags))
+        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+
+    @arm_template('vm.json')
+    def test_tag_trim_warns_no_candidates(self):
+        """Verifies tag trim warns when there are no candidates
+        to trim
+        """
+
+        with self.assertLogs('Logger', 'WARNING'):
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'}
+                ],
+                'actions': [
+                    {'type': 'tag-trim',
+                     'space': 0,
+                     'preserve': ['testtag']
+                     }
                 ],
             })
             p.run()
