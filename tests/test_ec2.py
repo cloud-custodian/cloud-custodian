@@ -638,7 +638,8 @@ class TestTag(BaseTest):
     def test_ec2_mark_hours(self):
         localtz = zoneinfo.gettz('America/New_York')
         dt = datetime.now(localtz)
-        dt = dt.replace(year=2018, month=2, day=20, hour=18, minute=00)
+        dt = dt.replace(year=2018, month=2, day=20, hour=18, minute=00,
+                        second=0, microsecond=0)
         session_factory = self.replay_flight_data('test_ec2_mark_hours')
         session = session_factory(region='us-east-1')
         ec2 = session.client('ec2')
@@ -666,7 +667,7 @@ class TestTag(BaseTest):
         result = datetime.strptime(
             tags[0].strip().split('@', 1)[-1], '%Y/%m/%d %H%M %Z').replace(
             tzinfo=localtz)
-        self.assertEqual(result.date(), dt.date())
+        self.assertEqual(result, dt)
 
     def test_ec2_marked_hours(self):
         session_factory = self.replay_flight_data('test_ec2_marked_hours')
