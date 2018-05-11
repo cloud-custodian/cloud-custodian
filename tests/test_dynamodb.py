@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+from datetime import timedelta
 import datetime
 
 from c7n.resources.dynamodb import DeleteTable
@@ -222,3 +223,103 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue(stream_field)
         self.assertEqual("NEW_IMAGE", stream_type)
+
+
+class DynamoDbAccelerator(BaseTest):
+
+    def test_resources(self):
+        session_factory = self.replay_flight_data('test_dax_resources')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax'}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Status'], 'available')
+
+    def test_dax_security_group(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_security_group_filter')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{
+                'type': 'security-group',
+                'key': 'GroupName',
+                'value': 'default'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+
+    def test_tagging(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_add_tags')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{'tag:Required': 'absent'}],
+            'actions': [{
+                'type': 'tag',
+                'tags': {'Required': 'Required'}
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        tags = client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags']
+        self.assertEqual(tags[0]['Value'], 'Required')
+
+    def test_remove_tagging(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_remove_tags')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{'tag:Required': 'present'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['Required']
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        tags = client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags']
+        self.assertEqual(tags, [{'Key': 'Name', 'Value': 'c7n-dax-test'}])
+
+    def test_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_mark_for_op')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [
+                {'tag:custodian_cleanup': 'absent'},
+                {'tag:Required': 'absent'}],
+            'actions': [{
+                'type': 'mark-for-op',
+                'tag': 'custodian_cleanup',
+                'op': 'delete',
+                'days': 7}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        tags = client.list_tags(ResourceName=resources[0]['ClusterArn'])['Tags']
+        self.assertEqual(tags[0]['Key'], 'custodian_cleanup')
+        self.assertEqual(tags[0]['Value'],
+                         'Resource does not meet policy: delete@2018/05/15')
+
+    def test_delete(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_delete_cluster')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{'tag:Required': 'absent'}],
+            'actions': [{'type': 'delete'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region='us-east-1').client('dax')
+        clusters = client.describe_clusters()['Clusters']
+        self.assertEqual(clusters[0]['Status'], 'deleting')
