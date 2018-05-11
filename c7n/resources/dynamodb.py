@@ -670,3 +670,55 @@ class DaxDeleteCluster(BaseAction):
                         r['ClusterName'], e))
                     continue
                 raise
+
+
+@DynamoDbAccelerator.action_registry.register('update-cluster')
+class DaxUpdateCluster(BaseAction):
+    """Updates a DAX cluster configuration
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: dax-update-cluster
+            resource: dax
+            filters:
+              - ParameterGroup.ParameterGroupName: 'default.dax1.0'
+            actions:
+              - type: update-cluster
+                ParameterGroupName: 'testparamgroup'
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['update-cluster']},
+            'Description': {'type': 'string'},
+            'PreferredMaintenanceWindow': {'type': 'string'},
+            'NotificationTopicArn': {'type': 'string'},
+            'NotificationTopicStatus': {'type': 'string'},
+            'ParameterGroupName': {'type': 'string'},
+            'SecurityGroupIds': {'type': 'array', 'items': {'type': 'string'}}
+        }
+    }
+    permissions = ('dax:UpdateCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dax')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            params['ClusterName'] = r['ClusterName']
+            try:
+                client.update_cluster(**params)
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'ClusterNotFoundFault',
+                        'InvalidClusterStateFault',
+                        'ParameterGroupNotFoundFault'):
+                    self.log.warning(
+                        'Exception updating dax cluster %s: \n%s' % (
+                            r['ClusterName'], e))
+                else:
+                    raise
