@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import logging
+
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -23,6 +25,7 @@ from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 from c7n.utils import (
     local_session, get_retry, chunks, type_schema, snapshot_identifier)
+from c7n.filters.vpc import SecurityGroupFilter
 
 
 filters = FilterRegistry('dynamodb-table.filters')
@@ -450,3 +453,220 @@ class Stream(query.QueryResourceManager):
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
+
+
+@resources.register('dax')
+class DynamoDbAccelerator(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'dax'
+        type = 'cluster'
+        enum_spec = ('describe_clusters', 'Clusters', None)
+        detail_spec = None
+        id = 'ClusterArn'
+        name = 'ClusterName'
+        config_type = 'AWS::DAX::Cluster'
+        filter_name = None
+        dimension = None
+        date = None
+
+    retry = staticmethod(get_retry(('Throttled',)))
+    filter_registry = FilterRegistry('dynamodb-dax.filters')
+    filters.register('marked-for-op', TagActionFilter)
+    permissions = ('dax:ListTags',)
+    log = logging.getLogger('custodian.dax')
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeDaxCluster(self)
+        elif source_type == 'config':
+            return query.ConfigSource(self)
+        raise ValueError('invalid source %s' % source_type)
+
+
+class DescribeDaxCluster(query.DescribeSource):
+
+    def augment(self, clusters):
+        resources = super(DescribeDaxCluster, self).augment(clusters)
+        return list(filter(None, _dax_cluster_tags(
+            resources,
+            self.manager.session_factory,
+            self.manager.executor_factory,
+            self.manager.retry,
+            self.manager.log)))
+
+
+def _dax_cluster_tags(tables, session_factory, executor_factory, retry, log):
+    client = local_session(session_factory).client('dax')
+
+    def process_tags(r):
+        tags = []
+        try:
+            tags = retry(
+                client.list_tags, ResourceName=r['ClusterArn'])['Tags']
+        except ClientError as e:
+            if e.response['Error']['Code'] in (
+                    'ClusterNotFoundFault',
+                    'InvalidARNFault',
+                    'InvalidClusterStateFault'):
+                log.warning('Exception collecting tags for %s: \n%s' % (
+                    r['ClusterName'], e))
+            else:
+                raise
+        r['Tags'] = tags
+        return r
+
+    with executor_factory(max_workers=2) as w:
+        return list(w.map(process_tags, tables))
+
+
+@DynamoDbAccelerator.filter_registry.register('security-group')
+class DaxSecurityGroupFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[].SecurityGroupIdentifier"
+
+
+@DynamoDbAccelerator.action_registry.register('tag')
+class DaxTagging(Tag):
+    """Action to create tag(s) on a resource
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: dax-cluster-tag
+                resource: dax
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+    permissions = ('dax:TagResource',)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('dax')
+        for r in resources:
+            try:
+                client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'ClusterNotFoundFault',
+                        'InvalidClusterStateFault',
+                        'InvalidARNFault'):
+                    self.log.warning('Exception tagging %s: \n%s' % (
+                        r['ClusterName'], e))
+                    continue
+                raise
+
+
+@DynamoDbAccelerator.action_registry.register('remove-tag')
+class DaxRemoveTagging(RemoveTag):
+    """Action to remove tag(s) on a resource
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dax-remove-tag
+            resource: dax
+            filters:
+              - "tag:OutdatedTag": present
+            actions:
+              - type: remove-tag
+                tags: ["OutdatedTag"]
+    """
+    permissions = ('dax:UntagResource',)
+
+    def process_resource_set(self, resources, tag_keys):
+        client = local_session(self.manager.session_factory).client('dax')
+        for r in resources:
+            try:
+                client.untag_resource(
+                    ResourceName=r['ClusterArn'], TagKeys=tag_keys)
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'ClusterNotFoundFault',
+                        'InvalidARNFault',
+                        'InvalidClusterStateFault',
+                        'TagNotFoundFault'):
+                    self.log.warning('Exception removing tags on %s: \n%s' % (
+                        r['ClusterName'], e))
+                    continue
+                raise
+
+
+@DynamoDbAccelerator.action_registry.register('mark-for-op')
+class DaxMarkForOp(TagDelayedAction):
+    """Action to specify an action to occur at a later date
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dax-mark-tag-compliance
+            resource: dax
+            filters:
+              - "tag:custodian_cleanup": absent
+              - "tag:OwnerName": absent
+            actions:
+              - type: mark-for-op
+                tag: custodian_cleanup
+                msg: "Missing tag 'OwnerName': {op}@{action_date}"
+                op: delete
+                days: 7
+    """
+    permission = ('dax:TagResource',)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(self.manager.session_factory).client('dax')
+        for r in resources:
+            try:
+                client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'ClusterNotFoundFault',
+                        'InvalidARNFault',
+                        'InvalidClusterStateFault'):
+                    self.log.warning(
+                        'Exception marking %s: \n%s' % (r['ClusterName'], e))
+                    continue
+                raise
+
+
+@DynamoDbAccelerator.action_registry.register('delete')
+class DaxDeleteCluster(BaseAction):
+    """Action to delete a DAX cluster
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: dax-delete-cluster
+            resource: dax
+            filters:
+              - "tag:DeleteMe": present
+            actions:
+              - type: delete
+    """
+    permissions = ('dax:DeleteCluster',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dax')
+        for r in resources:
+            try:
+                client.delete_cluster(ClusterName=r['ClusterName'])
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'ClusterNotFoundFault',
+                        'InvalidClusterStateFault'):
+                    self.log.warning('Exception marking %s: \n%s' % (
+                        r['ClusterName'], e))
+                    continue
+                raise
