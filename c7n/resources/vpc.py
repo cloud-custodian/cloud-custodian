@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import itertools
 import operator
 import zlib
-
+import functools
 import jmespath
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -32,9 +32,9 @@ from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr, generate_arn)
 from botocore.exceptions import ClientError
-
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 @resources.register('vpc')
 class Vpc(query.QueryResourceManager):
