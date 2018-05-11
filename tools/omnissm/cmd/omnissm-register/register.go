@@ -118,6 +118,7 @@ type InstanceIdentity struct {
 	InstanceType     string `json:"instanceType"`
 }
 
+// TODO(chris): this is in other code
 // GetIdentifier Get a unique identifier for an instance
 func (i *InstanceIdentity) GetIdentifier() string {
 	ident := strings.Join([]string{i.AccountID, i.InstanceID}, "-")
