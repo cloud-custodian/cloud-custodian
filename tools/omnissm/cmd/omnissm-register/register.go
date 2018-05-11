@@ -72,7 +72,7 @@ var (
 	ssmClient *ssm.SSM
 
 	// RegistrationTable DynamodDb Table for storing instance regisrations
-	RegistrationTable = os.Getenv("REGISTRATION_TABLE")
+	RegistrationTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 
 	// Only allow instance registrations from these accounts, read from
 	// $ACCOUNT_WHITELIST (comma-separated)

@@ -32,17 +32,17 @@ type Config struct {
 	RegistrationURL string
 }
 
-// NodeInfo SSM Node Registration Information
-type NodeRegistrar struct {
+type Node struct {
 	*http.Client
 
 	config    *Config
 	managedId string
 }
 
-// NewNodeInfo Constructor for SSM Node Info
-func NewNodeRegistrar(c *Config) (*NodeRegistrar, error) {
-	n := &NodeRegistrar{
+// NewNode returns a new Node resource, representing an instance that can be
+// registered and tracked by SSM.
+func NewNode(c *Config) (*Node, error) {
+	n := &Node{
 		Client: &http.Client{Timeout: time.Second * 10},
 		config: c,
 	}
@@ -70,8 +70,8 @@ type RegisterResponse struct {
 	Message        string `json:"message"`
 }
 
-// Register Node with SSM via registration API
-func (n *NodeRegistrar) Register() error {
+// Register adds a Node/Resource to SSM via the register API
+func (n *Node) Register() error {
 	data, err := json.Marshal(RegisterRequest{
 		Provider:  "aws",
 		Identity:  n.config.Identity.Document,
@@ -100,7 +100,7 @@ func (n *NodeRegistrar) Register() error {
 	if r.Error != "" {
 		return fmt.Errorf("Registration Error %s %s", r.Error, r.Message)
 	}
-	out, err := exec.Command(ssmAgentCmd, "-register", "-y",
+	out, err := exec.Command(SSMAgent.Path(), "-register", "-y",
 		"-id", r.ActivationId,
 		"-code", r.ActivationCode,
 		"-i", r.ManagedId,
@@ -111,8 +111,8 @@ func (n *NodeRegistrar) Register() error {
 	return restartAgent()
 }
 
-// UpdateSSMID Record host SSM Id via the registration API
-func (n *NodeRegistrar) Update() error {
+// Update adds the instance id (managedId) via the register API
+func (n *Node) Update() error {
 	info, err := getInstanceInformation()
 	if err != nil {
 		return err

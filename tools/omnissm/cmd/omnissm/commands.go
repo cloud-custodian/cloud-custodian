@@ -7,22 +7,23 @@ import (
 )
 
 var (
-	// TODO: might need to change
-	ssmAgentCmd = mustFindExecutable("amazon-ssm-agent")
-	ssmCLICmd   = mustFindExecutable("ssm-cli")
-	serviceCmd  = mustFindExecutable("service")
+	SSMAgent = Cmd("amazon-ssm-agent")
+	SSMCLI   = Cmd("ssm-cli")
+	Service  = Cmd("service")
 )
 
-func mustFindExecutable(cmdName string) string {
-	cmd, err := exec.LookPath(cmdName)
+type Cmd string
+
+func (c Cmd) Path() string {
+	cmd, err := exec.LookPath(string(c))
 	if err != nil {
-		log.Fatal().Msgf("cannot find executable: %#v", cmdName)
+		log.Fatal().Err(err).Msgf("cannot find executable: %#v", c)
 	}
 	return cmd
 }
 
 func restartAgent() error {
-	if out, err := exec.Command(serviceCmd, "amazon-ssm-agent", "restart").CombinedOutput(); err != nil {
+	if out, err := exec.Command(Service.Path(), "amazon-ssm-agent", "restart").CombinedOutput(); err != nil {
 		log.Debug().Str("combinedOutput", string(out)).Msg("cannot restart SSM agent")
 		return err
 	}

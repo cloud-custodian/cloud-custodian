@@ -4,16 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var RootCmd = &cobra.Command{
-	Use:   "omnissm",
-	Short: "",
+	Use:              "omnissm",
+	Short:            "",
+	PersistentPreRun: checkDebug,
 }
 
 var ProcessCmd = &cobra.Command{
@@ -48,14 +51,14 @@ var ProcessCmd = &cobra.Command{
 }
 
 var RegisterCmd = &cobra.Command{
-	Use:   "regiser",
+	Use:   "register",
 	Short: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		u := viper.GetString("uri")
+		u := viper.GetString("register_endpoint")
 		if u == "" {
-			log.Fatal().Msg("registration url (OMNISSM_URI) cannot be blank")
+			log.Fatal().Msg("registration url (OMNISSM_REGISTER_ENDPOINT) cannot be blank")
 		}
-		n, err := NewNodeRegistrar(&Config{
+		n, err := NewNode(&Config{
 			Identity:        *getLocalInstanceIdentity(),
 			RegistrationURL: u,
 		})
@@ -76,15 +79,38 @@ var RegisterCmd = &cobra.Command{
 	},
 }
 
+var VersionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "",
+	Run: func(cmd *cobra.Command, args []string) {
+		info, err := getInstanceInformation()
+		if err != nil {
+			log.Fatal().Err(err).Msgf("cannot get instance info")
+		}
+		fmt.Println(info.ReleaseVersion)
+	},
+}
+
+func checkDebug(cmd *cobra.Command, args []string) {
+	if viper.GetBool("verbose") {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
+}
+
 func init() {
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("OMNISSM")
+
 	RootCmd.PersistentFlags().CountP("verbose", "v", "increase logging level (debug)")
 	viper.BindPFlags(RootCmd.PersistentFlags())
+
+	RegisterCmd.Flags().String("register-endpoint", "", "")
+	viper.BindPFlags(RegisterCmd.Flags())
 }
 
 func main() {
-	RootCmd.AddCommand(ProcessCmd, RegisterCmd)
+	RootCmd.AddCommand(ProcessCmd, RegisterCmd, VersionCmd)
 	if err := RootCmd.Execute(); err != nil {
 		log.Fatal().Err(err).Msg("failed to execute RootCmd")
 	}

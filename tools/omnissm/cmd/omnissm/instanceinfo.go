@@ -13,6 +13,7 @@ import (
 const (
 	// DefaultLinuxSSMRegistrationPath Linux Path to Agent Registration State
 	DefaultLinuxSSMRegistrationPath = "/var/lib/amazon/ssm/registration"
+
 	// IdentityDocumentURL EC2 metadata server instance identity document
 	IdentityDocumentURL = "http://169.254.169.254/latest/dynamic/instance-identity/document"
 
@@ -30,15 +31,15 @@ type InstanceInfo struct {
 }
 
 func getInstanceInformation() (*InstanceInfo, error) {
-	out, err := exec.Command(ssmCLICmd, "get-instance-information").Output()
+	out, err := exec.Command(SSMCLI.Path(), "get-instance-information").Output()
 	if err != nil {
 		return nil, err
 	}
-	var info *InstanceInfo
-	if err := json.Unmarshal(out, info); err != nil {
+	var info InstanceInfo
+	if err := json.Unmarshal(out, &info); err != nil {
 		return nil, err
 	}
-	return info, nil
+	return &info, nil
 }
 
 func readRegistrationFile(path string) (id string, err error) {

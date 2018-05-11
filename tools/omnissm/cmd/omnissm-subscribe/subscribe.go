@@ -23,7 +23,7 @@ var (
 		"ResourceDiscovered": struct{}{},
 		"OK":                 struct{}{},
 	}
-	RegistrationsTable = os.Getenv("REGISTRATIONS_TABLE")
+	RegistrationsTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 )
 
 func init() {
