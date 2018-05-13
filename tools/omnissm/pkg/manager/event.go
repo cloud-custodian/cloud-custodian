@@ -1,16 +1,31 @@
-package main
+/*
+Copyright 2018 Capital One Services, LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+
+You may obtain a copy of the License at
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package manager
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 )
 
-// cloudWatchEvent is only needed to unmarshal specific fields of a
-// CloudWatch event, therefore is not exported.
-type cloudWatchEvent struct {
+// CloudWatchEvent is only needed to unmarshal specific fields of a
+// CloudWatch event (i.e. not intended to be a holistic representation of a
+// CloudWatch event).
+type CloudWatchEvent struct {
 	Version    string                `json:"version"`
 	ID         string                `json:"id"`
 	DetailType string                `json:"detail-type"`
@@ -19,24 +34,24 @@ type cloudWatchEvent struct {
 	Time       time.Time             `json:"time"`
 	Region     string                `json:"region"`
 	Resources  []string              `json:"resources"`
-	Detail     cloudWatchEventDetail `json:"detail"`
+	Detail     CloudWatchEventDetail `json:"detail"`
 }
 
-type cloudWatchEventDetail struct {
+type CloudWatchEventDetail struct {
 	RecordVersion            string                 `json:"recordVersion"`
 	MessageType              string                 `json:"messageType"`
 	ConfigurationItemDiff    map[string]interface{} `json:"configurationItemDiff"`
 	NotificationCreationTime string                 `json:"notificationCreationTime"`
-	ConfigurationItem        configurationItem      `json:"configurationItem"`
+	ConfigurationItem        ConfigurationItem      `json:"configurationItem"`
 }
 
-type configurationItem struct {
+type ConfigurationItem struct {
 	Configuration struct {
 		ImageId            string             `json:"imageId"`
 		KeyName            string             `json:"keyName"`
 		Platform           string             `json:"platform"`
 		SubnetId           string             `json:"subnetId"`
-		State              configurationState `json:"state"`
+		State              ConfigurationState `json:"state"`
 		InstanceType       string             `json:"instanceType"`
 		IAMInstanceProfile struct {
 			ARN string `json:"arn"`
@@ -60,14 +75,14 @@ type configurationItem struct {
 	ResourceCreationTime         string            `json:"resourceCreationTime"`
 }
 
-func (c *configurationItem) getIdentity() string {
-	return strings.ToUpper(fmt.Sprintf("%x", sha1.Sum([]byte(fmt.Sprintf("%s-%s", c.AWSAccountId, c.ResourceId)))))
+func (c *ConfigurationItem) Name() string {
+	return fmt.Sprintf("%s-%s", c.AWSAccountId, c.ResourceId)
 }
 
-// configurationState can be a string or object
-type configurationState string
+// ConfigurationState can be a string or object
+type ConfigurationState string
 
-func (s *configurationState) UnmarshalJSON(b []byte) (err error) {
+func (s *ConfigurationState) UnmarshalJSON(b []byte) (err error) {
 	var st struct {
 		Code int    `json:"code"`
 		Name string `json:"name"`

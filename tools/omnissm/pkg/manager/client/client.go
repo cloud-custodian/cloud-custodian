@@ -13,7 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package main
+
+package client
 
 import (
 	"bytes"
@@ -24,64 +25,56 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/api"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
 )
 
 type Config struct {
-	Identity        InstanceIdentity
+	Document        string
+	Signature       string
 	RegistrationURL string
 }
 
-type Node struct {
+type Client struct {
 	*http.Client
 
 	config    *Config
 	managedId string
 }
 
-// NewNode returns a new Node resource, representing an instance that can be
-// registered and tracked by SSM.
-func NewNode(c *Config) (*Node, error) {
-	n := &Node{
+// NewClient returns a new client for registering/updating managed resources.
+func NewClient(config *Config) (*Client, error) {
+	c := &Client{
 		Client: &http.Client{Timeout: time.Second * 10},
-		config: c,
+		config: config,
 	}
 	var err error
-	n.managedId, err = readRegistrationFile(DefaultLinuxSSMRegistrationPath)
+	c.managedId, err = readRegistrationFile(DefaultLinuxSSMRegistrationPath)
 	if err != nil {
 		log.Debug().Err(err).Msg("cannot read SSM regisration file")
 	}
-	return n, nil
+	return c, nil
 }
 
-type RegisterRequest struct {
-	Provider  string `json:"provider"`
-	Identity  string `json:"identity"`
-	Signature string `json:"signature"`
-	ManagedId string `json:"managed-id,omitempty"`
-}
-
-type RegisterResponse struct {
-	ActivationId   string `json:"activation-id"`
-	ActivationCode string `json:"activation-code"`
-	ManagedId      string `json:"managed-id"`
-	Region         string `json:"region"`
-	Error          string `json:"error"`
-	Message        string `json:"message"`
+func (c *Client) ManagedId() string {
+	return c.managedId
 }
 
 // Register adds a Node/Resource to SSM via the register API
-func (n *Node) Register() error {
-	data, err := json.Marshal(RegisterRequest{
+func (c *Client) Register() error {
+	data, err := json.Marshal(api.RegisterRequest{
 		Provider:  "aws",
-		Identity:  n.config.Identity.Document,
-		Signature: n.config.Identity.Signature,
+		Document:  []byte(c.config.Document),
+		Signature: c.config.Signature,
 	})
 	if err != nil {
 		return err
 	}
 	log.Info().Msgf("reqistration request: %#v", string(data))
-	resp, err := n.Post(n.config.RegistrationURL, "application/json", bytes.NewReader(data))
+	resp, err := c.Post(c.config.RegistrationURL, "application/json", bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
@@ -93,11 +86,11 @@ func (n *Node) Register() error {
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("register error: %#v", string(data))
 	}
-	var r RegisterResponse
+	var r api.RegisterResponse
 	if err := json.Unmarshal(data, &r); err != nil {
 		return err
 	}
-	if r.Error != "" {
+	if r.Err() != nil {
 		return fmt.Errorf("Registration Error %s %s", r.Error, r.Message)
 	}
 	out, err := exec.Command(SSMAgent.Path(), "-register", "-y",
@@ -112,27 +105,30 @@ func (n *Node) Register() error {
 }
 
 // Update adds the instance id (managedId) via the register API
-func (n *Node) Update() error {
-	info, err := getInstanceInformation()
+func (c *Client) Update() error {
+	info, err := GetInstanceInformation()
 	if err != nil {
 		return err
 	}
-	n.managedId = info.InstanceId
-	data, err := json.Marshal(RegisterRequest{
+	if !identity.IsManagedInstance(info.InstanceId) {
+		return errors.Errorf("cannot update node, not a managed instance: %#v", info.InstanceId)
+	}
+	c.managedId = info.InstanceId
+	data, err := json.Marshal(api.RegisterRequest{
 		Provider:  "aws",
-		Identity:  n.config.Identity.Document,
-		Signature: n.config.Identity.Signature,
+		Document:  []byte(c.config.Document),
+		Signature: c.config.Signature,
 		ManagedId: info.InstanceId,
 	})
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PATCH", n.config.RegistrationURL, bytes.NewReader(data))
+	req, err := http.NewRequest("PATCH", c.config.RegistrationURL, bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := n.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}

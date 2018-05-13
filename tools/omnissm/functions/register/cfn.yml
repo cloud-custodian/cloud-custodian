@@ -19,7 +19,7 @@ Resources:
       Environment:
         Variables:
           OMNISSM_REGISTRATIONS_TABLE: !Ref RegistrationsTable
-          ACCOUNT_WHITELIST: !Join [ ",", !Ref AccountIDs ]
+          OMNISSM_ACCOUNT_WHITELIST: !Join [ ",", !Ref AccountIDs ]
       Events:
         RegisterInstance:
           Properties:
