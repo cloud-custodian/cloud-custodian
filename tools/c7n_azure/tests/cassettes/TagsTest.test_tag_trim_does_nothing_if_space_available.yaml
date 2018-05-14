@@ -1,0 +1,161 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.5.0-x86_64-i386-64bit) requests/2.18.4
+          msrest/0.4.29 msrest_azure/0.4.29 computemanagementclient/3.0.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2017-03-30
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz48e7t/bfXBv9un2/fv5wfb+9OFse3J/+un2eba3d//T+/fv
+        HUzPPxrpS/Osnl1ldf6yrs6LMqf3FRx9d7l4XfwAH330JGuK6e9/vPORfPdLzNtNW9XZRfTlYkFf
+        vMrP8zpfToOv6MvVelIWzTyv6fOPTrJltSymWWmQwvNRdU6v4uuvJutlu36d15f0t9+iebvG97uf
+        jnf2xzvbz9+8Dr6m5k1RLdGkzNq8aRV5hz41qpqnRfOW2vjYVc2b6xVQ/uh5sVy/C6AuswV/M50C
+        5OXi9/+SIfz+u7//we49omw++/TeebZ/cP/+5CC7f34v35tkk/t7u/emAZhpnRNOX65axfBZXS3O
+        QLGwVTadF8sLNHiVZ7Pv1kUbNlhkS3pnBgyokTcG+k7n5ng6rYiAZkSv22w5ozn//Z+/CshFLxTM
+        PXeb9aSZ1gWj1tzNsocHDx/sT7bvz/ay7f3Zw4Pt7MFBtn3vYO/83oPd+7OdB/ndOm+qdT3NP6+r
+        9aq5C8r8/peLu8Sll8WMpuHuF8W0rprqvB2fVIvVus3vzgjl5u7XoKJD2U0jIQ944NbPn9Ag7u2Y
+        b1ybj2ZZm6ETiMz3zKdph2jlGtOxY9/C059zdLb3+2cPdx4+yGfT8+zTT/fPz/cPpgf5Af3vwezB
+        3s7OvWCmCEp3yk8Xq/a628ZN+Itq2YWwYbbp2/edb3rl53LG8ectaOhj7CYTTzjluzt799y3v8T8
+        +n35xbxJoh3TVVNBsX6hE3252L+/+EXTi+zB6m1zVTi6fZTNFsXyqyavDU9gNGv622tTQmmcVMvz
+        4mJdZyAqNbSdUQNCPJuU+cusaa6qena8buf5siUNqG3Ps7LJTXuDOr3X5MRDLfNvd1zLvCVQb73B
+        mY/OljSw82wKU/G9X8xT/rM94y+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2kqtqnron/
+        HX2bL0FIGlLa1utcQeIx0vBVXdCXH83bdtU8uns3mNYm45m6XIwnZTUZT6s6H18Vy1l11YwJ9buW
+        95SbLMo8ZtgWElWSL9LJ1MXr9XSa5zNCBq2k7UetSqGjjZGGy6Ju11n5BQs8zY20LyvLBB8Rudv5
+        lBijzsq1adBmFx4NmPvoI/qEf72kliIy2j9m+4cm4J0hWVFX1I3E2I9/4+SX/D+EkGbQzggAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Thu, 10 May 2018 16:43:32 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [fc96bd67-7d28-49b2-9b1e-4bba4a641112]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;4195,Microsoft.Compute/LowCostGet30Min;33585']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [e6e72ff6-40c4-4502-b141-2947dc26b663]
+      x-ms-routing-request-id: ['WESTUS2:20180510T164333Z:fc96bd67-7d28-49b2-9b1e-4bba4a641112']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131652014115955634]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.5.0-x86_64-i386-64bit) requests/2.18.4
+          msrest/0.4.29 msrest_azure/0.4.29 computemanagementclient/3.0.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2017-03-30
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UeXWbnOP3qUfg9/pSl/iOejVV2t8rot8oa+tR/TF5eLsxl99NHswTSfPbx3b/vhwYPZ9v50d3/7
+        4acH2fbk4e5kcj97uDvL849G3ovzrJ5dZXX+sq7OixKdemDp+8vF6+IH+Pij1222nFHr3//JbvOR
+        a/NLfGhNW9XZxSCwYkFfvsrP8zpfTntfU4PVelIWzTyv6buPTrJltSymWekjjOej6pxAoMlXk/Wy
+        Xb/O60v6u9uqebtGm91Pxzv728/fvO41oJeaolqiUZm1edN6wwoHRo2r5mnRvKW2XZyr5s31CoP5
+        6HmxXL/r9bLMFvxttvxBVVbT+TZ62r5c/P5fMsTff/f3z+/v5Pdmu5MHk/PJ/sHBvcn9vQef5vm9
+        e/nuzuz+/sMeyGmdE75frlrF/lldLc5A237LbDovlhdo9CrPZt+ti7bfaJEt6d0ZsKGGnfHR9zqr
+        x9NpReQ2o31Z54tivfj9n7/qUZbeKZgd7zbrSTOtC8a0uZtlDw8ePtifbN+f7WXb+7OHB9vZA+LO
+        ewd75/ce7N6f7TzI79Z5U63raf55Xa1Xzd3jFz/15fMvT769/eb09Zvtn/ziLsnAZTGjqbv7RTGt
+        q6Y6b8cn1WK1bvO7MxoCdfP1KR2OI2QBGhXgQx4+f0Kju7fjfxu2/WiWtRk6haB+7/vuK78Zsc6Q
+        pExlQPWLAeYJKf5RNlsUy6+avDbMNimzeadNCe48qZbnxcW6zjAh1DDolRrRALNJmb/MmuaqqmfH
+        63aeL1sSQm1/npVN7r/jj4feb3LizXbjoJd5S6DfeiM3H50tacTn2RTa7Xu/mFnom+CgLu2iHPRC
+        ULjbQ6X3+u793Y9+yfeDIc2K7GJZNUSnwQmdVFX71DXrfk8t8iUoT2NO23qde+DxGBn8qi6owUfz
+        tl01j+5a3IDa5QJoPLy/O56U1WQ8rep8fFUsZ9VVM6ZR3Q14+5e4P4KRMGmgFElpkMInZUG9vV5P
+        p3k+I9xMS/fOR62qA0dKI4yXRd2us/ILVkE0p+4dQtkw1Ec0Ve18SkxWZ+Xab9RmF0wmry9wxA9f
+        qXTGYYluGMLD2Yhfr4m0MEOxUw96bzboD/fv7T64N/t0+/79/IAM+sPZ9uT+9NPt82xv7/6n9+/f
+        O5ieOwToxdsb9CdZU0x//+MdRQ6PQRCPYbkhQD93xny88/8Ccz6dogvfuBzs3qPZyGef3jvP9g/u
+        358cZPfP7+V7k4zMzO69aQ8UqUrC80vmY4D8OTHjJOXi1v0s23FQ6/cfUL5G0sj6kPn+GpQN0Q6n
+        mgYBuOD69zTb/jee0Jrno3KNadsJIODp8wgQ2Pv9s4c7Dx/ks+l59umn++fn+wfTg/yA/vdg9mBv
+        Z+deb0YJUpdFTher9jrWzjHIi2oZg3QDd1CLr8Mf9NrPJYfgz1vQtYt1OOl4QhbZ3dm7F7bw7GWa
+        Dnk2t3fnLhf79xe/aHqRPVi9ba6KkK59bw6jXdPfnXY/bz060GOIU4YducX1T37xopj+v8Z5C1ig
+        yXg2Lxf/P/PezAf4iGaNPqZP+VdJcpjvPZzAJd+IQoFz9/u/p3NnVIs3FCOF9iv5hieBROKX/D/d
+        4AdPtBEAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Thu, 10 May 2018 16:43:34 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [e1ca9213-d4f6-4089-9aa6-492b94de3c2c]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/HighCostGet3Min;158,Microsoft.Compute/HighCostGet30Min;798']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [1a72d665-4fba-4004-8502-5551cb68b0a1]
+      x-ms-routing-request-id: ['WESTUS2:20180510T164334Z:e1ca9213-d4f6-4089-9aa6-492b94de3c2c']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131652014115955634]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.5.0-x86_64-i386-64bit) requests/2.18.4
+          msrest/0.4.29 msrest_azure/0.4.29 computemanagementclient/3.0.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2017-03-30
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz48e7t/bfXBv9un2/fv5wfb+9OFse3J/+un2eba3d//T+/fv
+        HUzPPxrpS/Osnl1ldf6yrs6LMqf3FRx9d7l4XfwAH330JGuK6e9/vPORfPdLzNtNW9XZRfTlYkFf
+        vMrP8zpfToOv6MvVelIWzTyv6fOPTrJltSymWWmQwvNRdU6v4uuvJutlu36d15f0t9+iebvG97uf
+        jnf2xzvbz9+8Dr6m5k1RLdGkzNq8aRV5hz41qpqnRfOW2vjYVc2b6xVQ/uh5sVy/C6AuswV/M50C
+        5OXi9/+SIfz+u7//we49omw++/TeebZ/cP/+5CC7f34v35tkk/t7u/emAZhpnRNOX65axfBZXS3O
+        QLGwVTadF8sLNHiVZ7Pv1kUbNlhkS3pnBgyokTcG+k7n5ng6rYiAZkSv22w5ozn//Z+/CshFLxTM
+        PXeb9aSZ1gWj1tzNsocHDx/sT7bvz/ay7f3Zw4Pt7MFBtn3vYO/83oPd+7OdB/ndOm+qdT3NP6+r
+        9aq5C8r8/peLu8Sll8WMpuHuF8W0rprqvB2fVIvVus3vzgjl5u7XoKJD2U0jIQ944NbPn9Ag7u2Y
+        b1ybj2ZZm6ETiMz3zKdph2jlGtOxY9/C059zdLb3+2cPdx4+yGfT8+zTT/fPz/cPpgf5Af3vwezB
+        3s7OvWCmCEp3yk8Xq/a628ZN+Itq2YWwYbbp2/edb3rl53LG8ectaOhj7CYTTzjluzt799y3v8T8
+        +n35xbxJoh3TVVNBsX6hE3252L+/+EXTi+zB6m1zVTi6fZTNFsXyqyavDU9gNGv622tTQmmcVMvz
+        4mJdZyAqNbSdUQNCPJuU+cusaa6qena8buf5siUNqG3Ps7LJTXuDOr3X5MRDLfNvd1zLvCVQb73B
+        mY/OljSw82wKU/G9X8xT/rM94y+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2kqtqnron/
+        HX2bL0FIGlLa1utcQeIx0vBVXdCXH83bdtU8uns3mNYm45m6XIwnZTUZT6s6H18Vy1l11YwJ9buW
+        95SbLMo8ZtgWElWSL9LJ1MXr9XSa5zNCBq2k7UetSqGjjZGGy6Ju11n5BQs8zY20LyvLBB8Rudv5
+        lBijzsq1adBmFx4NmPvoI/qEf72kliIy2j9m+4cm4J0hWVFX1I3E2I9/4+SX/D+EkGbQzggAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Thu, 10 May 2018 16:43:34 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [783d89b0-0337-478b-b19a-cffd932c3ec3]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;4194,Microsoft.Compute/LowCostGet30Min;33584']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [c9d2eeeb-6524-49d0-9c3b-d9b054f92353]
+      x-ms-routing-request-id: ['WESTUS2:20180510T164334Z:783d89b0-0337-478b-b19a-cffd932c3ec3']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131652014115955634]
+    status: {code: 200, message: OK}
+version: 1
