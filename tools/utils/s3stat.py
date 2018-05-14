@@ -70,7 +70,7 @@ def bucket_info(c, bucket):
 def main():
 
     logging.basicConfig(level=logging.INFO)
-    results = {'buckets':[]}
+    results = {'buckets': []}
     size_count = obj_count = 0.0
     s = boto3.Session()
     s3 = s.client('s3')

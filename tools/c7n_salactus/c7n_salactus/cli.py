@@ -99,8 +99,8 @@ CONFIG_SCHEMA = {
                 'type': {'type': 'string', 'enum': ['object-acl']},
                 'report-only': {'type': 'boolean'},
                 'allow-log': {'type': 'boolean'},
-#                'allow-permissions': {'type': 'array', 'item': {'type': 'string', 'enum': ''}}
-                'whitelist-accounts': {'type': 'array', 'item': {'type': 'string'}}
+                'whitelist-accounts': {'type': 'array', 'item': {'type': 'string'}},
+                # 'allow-permissions': {'type': 'array', 'item': {'type': 'string', 'enum': ''}}
             }
         },
 
@@ -195,7 +195,7 @@ def run(config, tag, bucket, account, not_bucket, not_account, debug, region):
 
     if debug:
         def invoke(f, *args, **kw):
-            #if f.func_name == 'process_keyset':
+            # if f.func_name == 'process_keyset':
             #    key_count = len(args[-1])
             #    print("debug skip keyset %d" % key_count)
             #    return
@@ -217,7 +217,8 @@ def run(config, tag, bucket, account, not_bucket, not_account, debug, region):
                 account_info['visitors'] = data['visitors']
             if 'object-reporting' in data and 'object-reporting' not in account_info:
                 account_info['object-reporting'] = data['object-reporting']
-                account_info['object-reporting']['record-prefix'] = datetime.utcnow().strftime('%Y/%m/%d')
+                account_info['object-reporting'][
+                    'record-prefix'] = datetime.utcnow().strftime('%Y/%m/%d')
             if bucket:
                 account_info['buckets'] = bucket
             if not_bucket:
@@ -247,7 +248,7 @@ def save(dbpath):
 
 @cli.command()
 # todo check redis version if >=4 support this
-#@click.option('--async/--sync', default=False)
+# @click.option('--async/--sync', default=False)
 def reset(async=None):
     """Delete all persistent cluster state.
     """
@@ -336,8 +337,8 @@ def accounts(dbpath, output, format, account,
     """Report on stats by account"""
     d = db.db(dbpath)
     accounts = d.accounts()
-    formatter = (format == 'csv' and format_accounts_csv
-                 or format_accounts_plain)
+    formatter = (
+        format == 'csv' and format_accounts_csv or format_accounts_plain)
 
     if region:
         for a in accounts:
@@ -580,7 +581,6 @@ def watch(limit):
             keys=['bucket_id', 'scanned', 'gkrate', 'lrate', 'krate'])
 
 
-
 @cli.command(name='inspect-partitions')
 @click.option('-b', '--bucket', required=True)
 def inspect_partitions(bucket):
@@ -636,7 +636,7 @@ def inspect_partitions(bucket):
     keys_scanned = sum(keyset)
     click.echo(
         "Found %d partitions %s keys scanned during partitioning" % (
-        len(partitions), keys_scanned))
+            len(partitions), keys_scanned))
     click.echo("\n".join(partitions))
 
 

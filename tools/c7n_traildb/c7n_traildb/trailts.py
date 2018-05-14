@@ -212,7 +212,7 @@ def index_account(config, region, account, day, incremental):
                 os.remove(fh.name)
                 return
             if e.response['Error']['Code'] == '403':
-                msg = "account:%s region:%s forbidden key:%s" %(
+                msg = "account:%s region:%s forbidden key:%s" % (
                     name, region, key)
                 log.warning(msg)
                 raise ValueError(msg)
