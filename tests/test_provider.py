@@ -25,4 +25,4 @@ class ProviderTest(BaseTest):
         # installs (tools/c7n_azure and tools/c7n_gcp)
         self.assertEqual(
             sorted(clouds.keys()),
-            ['aws', 'azure'])
+            ['aws', 'azure', 'gcp'])
