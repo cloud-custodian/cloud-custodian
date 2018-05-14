@@ -29,15 +29,13 @@ def utcnow():
 
 
 def update_resource_tags(self, resource, tags):
-    session = utils.local_session(self.manager.session_factory)
-    client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     # resource group type
     if self.manager.type == 'resourcegroup':
         params_patch = ResourceGroupPatchable(
             tags=tags
         )
-        client.resource_groups.update(
+        self.client.resource_groups.update(
             resource['name'],
             params_patch,
         )
@@ -45,10 +43,10 @@ def update_resource_tags(self, resource, tags):
     else:
         try:
             az_resource = GenericResource.deserialize(resource)
-            api_version = session.resource_api_version(az_resource.id)
+            api_version = self.session.resource_api_version(az_resource.id)
             az_resource.tags = tags
 
-            client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+            self.client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
         except CloudError:
             print(CloudError)
 
@@ -90,6 +88,8 @@ class Tag(BaseAction):
         return self
 
     def process(self, resources):
+        self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_resource, resources))
 
@@ -129,6 +129,8 @@ class RemoveTag(BaseAction):
         return self
 
     def process(self, resources):
+        self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_resource, resources))
 
@@ -190,55 +192,58 @@ class AutoTagUser(BaseAction):
         return self
 
     def process(self, resources):
-        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
-        tag_action = self.manager.action_registry.get('tag')
-        tag_key = self.data['tag']
-        should_update = self.data.get('update', False)
+        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        self.tag_action = self.manager.action_registry.get('tag')
+        self.tag_key = self.data['tag']
+        self.should_update = self.data.get('update', False)
 
-        for resource in resources:
-            # if the auto-tag-user policy set update to False (or it's unset) then we
-            # will skip writing their UserName tag and not overwrite pre-existing values
-            if not should_update and resource.get('tags', {}).get(tag_key, None):
-                continue
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-            user = self.default_user
+    def process_resource(self, resource):
+        # if the auto-tag-user policy set update to False (or it's unset) then we
+        # will skip writing their UserName tag and not overwrite pre-existing values
+        if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
+            return
 
-            # resource group type
-            if self.manager.type == 'resourcegroup':
-                resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
-                query_filter = " and ".join([
-                    "eventTimestamp ge '%s'" % self.start_time,
-                    "resourceGroupName eq '%s'" % resource['name'],
-                    "eventChannels eq 'Operation'"
-                ])
-            # other Azure resources
-            else:
-                resource_type = resource['type']
-                query_filter = " and ".join([
-                    "eventTimestamp ge '%s'" % self.start_time,
-                    "resourceUri eq '%s'" % resource['id'],
-                    "eventChannels eq 'Operation'"
-                ])
+        user = self.default_user
 
-            # fetch activity logs
-            logs = client.activity_logs.list(
-                filter=query_filter,
-                select=self.query_select
-            )
+        # resource group type
+        if self.manager.type == 'resourcegroup':
+            resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % self.start_time,
+                "resourceGroupName eq '%s'" % resource['name'],
+                "eventChannels eq 'Operation'"
+            ])
+        # other Azure resources
+        else:
+            resource_type = resource['type']
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % self.start_time,
+                "resourceUri eq '%s'" % resource['id'],
+                "eventChannels eq 'Operation'"
+            ])
 
-            # get the user who issued the first operation
-            operation_name = "%s/write" % resource_type
-            first_op = self.get_first_operation(logs, operation_name)
-            if first_op is not None:
-                user = first_op.caller
+        # fetch activity logs
+        logs = self.client.activity_logs.list(
+            filter=query_filter,
+            select=self.query_select
+        )
 
-            # issue tag action to label user
-            try:
-                tag_action({'tag': tag_key, 'value': user}, self.manager).process([resource])
-            except CloudError as e:
-                # resources can be locked
-                if e.inner_exception.error == 'ScopeLocked':
-                    pass
+        # get the user who issued the first operation
+        operation_name = "%s/write" % resource_type
+        first_op = self.get_first_operation(logs, operation_name)
+        if first_op is not None:
+            user = first_op.caller
+
+        # issue tag action to label user
+        try:
+            self.tag_action({'tag': self.tag_key, 'value': user}, self.manager).process([resource])
+        except CloudError as e:
+            # resources can be locked
+            if e.inner_exception.error == 'ScopeLocked':
+                pass
 
     @staticmethod
     def get_first_operation(logs, operation_name):
