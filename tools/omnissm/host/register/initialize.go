@@ -18,7 +18,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -27,13 +26,9 @@ import (
 	"os/exec"
 	"strings"
 	"time"
-)
 
-// SSMAgentRegistration Sourced from /var/lib/amazon/ssm/registration
-type SSMAgentRegistration struct {
-	ManagedInstanceID string
-	Region            string
-}
+	"github.com/pkg/errors"
+)
 
 const (
 	// LinuxSSMRegistrationPath Linux Path to Agent Registration State
@@ -45,6 +40,12 @@ const (
 	// SignatureURL RSA SHA256 Signature of identity document
 	SignatureURL = "http://169.254.169.254/latest/dynamic/instance-identity/signature"
 )
+
+// SSMAgentRegistration Sourced from /var/lib/amazon/ssm/registration
+type SSMAgentRegistration struct {
+	ManagedInstanceID string
+	Region            string
+}
 
 // SSMHostInfo output of ssm-cli get-ubstabce-information
 type SSMHostInfo struct {
@@ -58,6 +59,7 @@ type NodeInfo struct {
 	BinSSMAgent     string
 	BinSSMInfo      string
 	BinService      string
+	ServiceArgs     []string
 	RegistrationURL string
 	Identity        string
 	Signature       string
@@ -67,7 +69,6 @@ type NodeInfo struct {
 
 // NewNodeInfo Constructor for SSM Node Info
 func NewNodeInfo() (*NodeInfo, error) {
-
 	ssmCmdPath, err := exec.LookPath("amazon-ssm-agent")
 	if err != nil {
 		return nil, errors.New("Package Missing - Error finding amazon-ssm-agent")
@@ -78,9 +79,21 @@ func NewNodeInfo() (*NodeInfo, error) {
 		return nil, errors.New("Package Missing - Error finding ssm-cli")
 	}
 
-	svcCmdPath, err := exec.LookPath("service")
+	svcPath, err := exec.LookPath("systemctl")
 	if err != nil {
-		return nil, errors.New("Service cmd missing - no upstart/systemd?")
+		if e, ok := err.(*exec.Error); !(ok && e.Err == exec.ErrNotFound) {
+			return nil, errors.Wrap(err, "Unable to find systemctl")
+		}
+	}
+	serviceCmdArgs := []string{"amazon-ssm-agent", "restart"}
+
+	if svcPath == "" {
+		svcPath, err = exec.LookPath("initctl")
+		if err != nil {
+			return nil, errors.New("Package Missing - Error finding systemctl or initctl")
+		}
+		// initctl expects command first, then service name
+		serviceCmdArgs = []string{"restart", "amazon-ssm-agent"}
 	}
 
 	registrationURL := os.Getenv("OMNISSM_URI")
@@ -88,37 +101,41 @@ func NewNodeInfo() (*NodeInfo, error) {
 		return nil, errors.New("Missing Registration Endpoint Env Var (OMNISSM_URI)")
 	}
 
-	identity, err := FetchContents(IdentityURL)
-	if err != nil {
-		return nil, err
-	}
-	signature, err := FetchContents(SignatureURL)
-	if err != nil {
-		return nil, err
-	}
-
-	return &NodeInfo{
+	n := NodeInfo{
 		BinSSMAgent:     ssmCmdPath,
 		BinSSMInfo:      ssmInfoPath,
-		BinService:      svcCmdPath,
+		BinService:      svcPath,
+		ServiceArgs:     serviceCmdArgs,
 		RegistrationURL: registrationURL,
-		Identity:        string(identity),
-		Signature:       string(signature),
-		netClient:       &http.Client{Timeout: time.Second * 10},
-	}, nil
+		netClient:       &http.Client{Timeout: 10 * time.Second},
+	}
 
+	// EC2 Metadata request for identity document
+	b, err := readResponse(n.netClient.Get(IdentityURL))
+	if err != nil {
+		return nil, errors.Wrap(err, "instance identity request failed")
+	}
+	n.Identity = string(b)
+
+	// EC2 Metadata request for signature
+	b, err = readResponse(n.netClient.Get(SignatureURL))
+	if err != nil {
+		return nil, errors.Wrap(err, "instance signature request failed")
+	}
+	n.Signature = string(b)
+
+	return &n, nil
 }
 
 // IsRegistered Is the node registered with SSM
 func (n *NodeInfo) IsRegistered() bool {
 	// If we have a current registration for hybrid mode, exit
-	agentRaw, err := ioutil.ReadFile(LinuxSSMRegistrationPath)
+	raw, err := ioutil.ReadFile(LinuxSSMRegistrationPath)
 	if err == nil {
-		agentReg := SSMAgentRegistration{}
-		err = json.Unmarshal(agentRaw, &agentReg)
-		if err == nil {
-			if strings.HasPrefix(agentReg.ManagedInstanceID, "mi-") {
-				n.ManagedID = agentReg.ManagedInstanceID
+		var r SSMAgentRegistration
+		if err := json.Unmarshal(raw, &r); err == nil {
+			if strings.HasPrefix(r.ManagedInstanceID, "mi-") {
+				n.ManagedID = r.ManagedInstanceID
 				return true
 
 			}
@@ -129,147 +146,114 @@ func (n *NodeInfo) IsRegistered() bool {
 
 // GetSSMInfo Return ssm agent node information
 func (n *NodeInfo) GetSSMInfo() (*SSMHostInfo, error) {
-	ssmInfoCmd := exec.Command(n.BinSSMInfo, "get-instance-information")
-	ssmInfoOut, err := ssmInfoCmd.Output()
+	cmd := exec.Command(n.BinSSMInfo, "get-instance-information")
+	out, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	ssmInfo := SSMHostInfo{}
-	err = json.Unmarshal(ssmInfoOut, &ssmInfo)
+	info := SSMHostInfo{}
+	err = json.Unmarshal(out, &info)
 	if err != nil {
 		return nil, err
 	}
-	n.ManagedID = ssmInfo.InstanceID
-	return &ssmInfo, nil
+	if strings.HasPrefix(info.InstanceID, "mi-") {
+		n.ManagedID = info.InstanceID
+	}
+	return &info, nil
 }
 
 // Register Node with SSM via registration API
 func (n *NodeInfo) Register() error {
-
-	regSerial, err := json.Marshal(
-		map[string]string{
-			"provider":  "aws",
-			"identity":  n.Identity,
-			"signature": n.Signature,
-		})
-
+	regSerial, err := json.Marshal(map[string]string{
+		"provider":  "aws",
+		"identity":  n.Identity,
+		"signature": n.Signature,
+	})
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("Registration Request", string(regSerial))
 
-	response, err := n.netClient.Post(
-		n.RegistrationURL, "application/json", bytes.NewReader(regSerial))
+	b, err := readResponse(n.netClient.Post(n.RegistrationURL, "application/json", bytes.NewReader(regSerial)))
 	if err != nil {
 		return err
 	}
-	regResultBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
+
+	result := make(map[string]string)
+	if err := json.Unmarshal(b, &result); err != nil {
 		return err
 	}
-	defer response.Body.Close()
-
-	if response.StatusCode != 200 {
-		return fmt.Errorf("Registration Error %s", regResultBody)
+	if code, ok := result["error"]; ok {
+		return errors.Errorf("%s: %s", code, result["message"])
 	}
 
-	regResult := map[string]string{}
-
-	err = json.Unmarshal(regResultBody, &regResult)
-	if err != nil {
-		return err
-	}
-	errCode, ok := regResult["error"]
-	if ok {
-		return fmt.Errorf("Registration Error %s %s", errCode, regResult["message"])
-	}
-
-	ssmCmd := exec.Command(
-		n.BinSSMAgent, "-register", "-y",
-		"-id", regResult["activation-id"],
-		"-code", regResult["activation-code"],
-		"-i", regResult["managed-id"],
-		"--region", regResult["region"])
+	ssmCmd := exec.Command(n.BinSSMAgent,
+		"-register", "-y",
+		"-id", result["activation-id"],
+		"-code", result["activation-code"],
+		"-i", result["managed-id"],
+		"--region", result["region"])
 	ssmOut, err := ssmCmd.CombinedOutput()
-
 	if err != nil {
-		return fmt.Errorf("SSM Register Error %s %s", err, string(ssmOut))
+		return errors.Errorf("SSM agent command failed: %v - %s", err, string(ssmOut))
 	}
 
-	svcCmd := exec.Command(n.BinService, "amazon-ssm-agent", "restart")
+	svcCmd := exec.Command(n.BinService, n.ServiceArgs...)
 	svcOut, err := svcCmd.CombinedOutput()
-
 	if err != nil {
-		return fmt.Errorf("SSM agent restart error %s %s", err, svcOut)
+		return errors.Errorf("SSM agent restart failed: %v - %s", err, string(svcOut))
 	}
-
 	return nil
-
 }
 
 // UpdateSSMID Record host SSM Id via the registration API
 func (n *NodeInfo) UpdateSSMID() error {
-	ssmInfo, err := n.GetSSMInfo()
+	info, err := n.GetSSMInfo()
 	if err != nil {
 		return err
 	}
 
-	idSerial, err := json.Marshal(map[string]string{
+	b, err := json.Marshal(map[string]string{
 		"provider":   "aws",
 		"identity":   n.Identity,
 		"signature":  n.Signature,
-		"managed-id": ssmInfo.InstanceID,
+		"managed-id": info.InstanceID,
 	})
-
 	if err != nil {
 		return err
 	}
 
-	idReq, err := http.NewRequest("PATCH", n.RegistrationURL, bytes.NewReader(idSerial))
+	req, err := http.NewRequest("PATCH", n.RegistrationURL, bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
-
-	idReq.Header.Set("Content-Type", "application/json")
-	response, err := n.netClient.Do(idReq)
-	if err != nil {
-		return err
-	}
-	defer response.Body.Close()
-
-	idResultBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode != 200 {
-		return fmt.Errorf("Error recording SSM Instance Id %s %s", err, idResultBody)
-	}
-
-	return nil
+	req.Header.Set("Content-Type", "application/json")
+	_, err = readResponse(n.netClient.Do(req))
+	return err
 }
 
-// FetchContents Retrieve contents of URL
-func FetchContents(uri string) ([]byte, error) {
-	response, err := http.Get(uri)
+func readResponse(resp *http.Response, err error) ([]byte, error) {
+	if err != nil {
+		// network error sending request
+		return nil, err
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
+	if resp.StatusCode != 200 {
+		return nil, errors.Errorf("%d: %s", resp.StatusCode, string(b))
 	}
-	return body, nil
+	return b, nil
 }
 
 func main() {
-
 	node, err := NewNodeInfo()
 	if err != nil {
-		log.Fatalf("Error initializing node %s", err)
+		log.Fatalf("Error initializing node: %v", err)
 	}
 
 	if node.IsRegistered() {
@@ -280,12 +264,12 @@ func main() {
 	log.Println("Registering Instance")
 	err = node.Register()
 	if err != nil {
-		log.Fatalf("Error registering node %s", err)
+		log.Fatalf("Error registering node: %v", err)
 	}
 
 	err = node.UpdateSSMID()
 	if err != nil {
-		log.Fatalf("Error recording node ssm id %s", err)
+		log.Fatalf("Error recording node ssm id: %v", err)
 	}
 
 	log.Printf("Instance Registered - ManagedId: %s\n", node.ManagedID)

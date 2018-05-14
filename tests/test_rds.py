@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
+from dateutil import tz, zoneinfo
 import json
 import logging
 import os
@@ -216,6 +217,61 @@ class RDSTest(BaseTest):
             session_factory=session_factory)
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+    def test_rds_mark_hours(self):
+        localtz = zoneinfo.gettz('Etc/UTC')
+        dt = datetime.datetime.now(localtz)
+        dt = dt.replace(year=2018, month=5, day=9, hour=21, minute=20,
+                        second=0, microsecond=0)
+        session_factory = self.replay_flight_data('test_rds_mark_hours')
+        session = session_factory(region='us-east-1')
+        rds = session.client('rds')
+
+        policy = self.load_policy({
+            'name': 'rds-mark-5-hours',
+            'resource': 'rds',
+            'filters': [
+                {'tag:CreatorName': 'absent'}
+            ],
+            'actions': [
+                {'type': 'mark-for-op',
+                 'hours': 5,
+                 'op': 'delete'}]
+        },
+            config={'account_id': '123456789012'},
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        resource = rds.list_tags_for_resource(
+            ResourceName=resources[0]['DBInstanceArn']
+        )
+        tags = [
+            t['Value'] for t in resource['TagList']
+            if t['Key'] == 'maid_status'
+        ]
+        result = datetime.datetime.strptime(
+            tags[0].strip().split('@', 1)[-1], '%Y/%m/%d %H%M %Z'
+        ).replace(tzinfo=localtz)
+        self.assertEqual(result, dt)
+
+    def test_rds_marked_hours(self):
+        session_factory = self.replay_flight_data('test_rds_marked_hours')
+        policy = self.load_policy(
+            {'name': 'rds-marked-for-op-hours',
+             'resource': 'rds',
+             'filters': [
+                 {'type': 'marked-for-op',
+                  'op': 'delete'}
+             ]
+             },
+            config={'account_id': '123456789012'},
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBInstanceIdentifier'], 'db1')
 
     def test_rds_default_vpc(self):
         session_factory = self.replay_flight_data('test_rds_default_vpc')

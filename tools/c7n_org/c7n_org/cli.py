@@ -20,6 +20,7 @@ import os
 import multiprocessing
 import time
 import subprocess
+import sys
 
 from concurrent.futures import (
     ProcessPoolExecutor,
@@ -46,6 +47,10 @@ from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
 
+# On OSX High Sierra Workaround
+# https://github.com/ansible/ansible/issues/32499
+if sys.platform == 'darwin':
+    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
 
 WORKER_COUNT = int(
     os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
@@ -93,7 +98,7 @@ def cli():
     """custodian organization multi-account runner."""
 
 
-def init(config, use, debug, verbose, accounts, tags, policies, resource=None):
+def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=()):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
         level=level,
@@ -114,14 +119,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None):
     else:
         custodian_config = {}
 
-    filtered_policies = []
-    for p in custodian_config.get('policies', ()):
-        if policies and p['name'] not in policies:
-            continue
-        if resource and p['resource'] != resource:
-            continue
-        filtered_policies.append(p)
-    custodian_config['policies'] = filtered_policies
+    filter_policies(custodian_config, policy_tags, policies, resource)
 
     filter_accounts(accounts_config, tags, accounts)
 
@@ -169,6 +167,26 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     accounts_config['accounts'] = filtered_accounts
 
 
+def filter_policies(policies_config, tags, policies, resource, not_policies=None):
+    filtered_policies = []
+    for p in policies_config.get('policies', ()):
+        if not_policies and p['name'] in not_policies:
+            continue
+        if policies and p['name'] not in policies:
+            continue
+        if resource and p['resource'] != resource:
+            continue
+        if tags:
+            found = set()
+            for t in tags:
+                if t in p.get('tags', ()):
+                    found.add(t)
+            if not found == set(tags):
+                continue
+        filtered_policies.append(p)
+    policies_config['policies'] = filtered_policies
+
+
 def report_account(account, region, policies_config, output_path, debug):
     cache_path = os.path.join(output_path, "c7n.cache")
     output_path = os.path.join(output_path, account['name'], region)
@@ -211,19 +229,22 @@ def report_account(account, region, policies_config, output_path, debug):
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--field', multiple=True)
 @click.option('--no-default-fields', default=False, is_flag=True)
-@click.option('-t', '--tags', multiple=True, default=None)
+@click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-p', '--policy', multiple=True)
+@click.option('-l', '--policytags', 'policy_tags',
+              multiple=True, default=None, help="Policy tag filter")
 @click.option('--format', default='csv', type=click.Choice(['csv', 'json']))
 @click.option('--resource', default=None)
 def report(config, output, use, output_dir, accounts,
            field, no_default_fields, tags, region, debug, verbose,
-           policy, format, resource):
+           policy, policy_tags, format, resource):
     """report on a cross account policy execution."""
     accounts_config, custodian_config, executor = init(
-        config, use, debug, verbose, accounts, tags, policy, resource=resource)
+        config, use, debug, verbose, accounts, tags, policy,
+        resource=resource, policy_tags=policy_tags)
 
     resource_types = set()
     for p in custodian_config.get('policies'):
@@ -320,7 +341,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
 @click.option('-c', '--config', required=True, help="Accounts config file")
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
-@click.option('-t', '--tags', multiple=True, default=None)
+@click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
 @click.option('--echo', default=False, is_flag=True)
 @click.option('--serial', default=False, is_flag=True)
@@ -329,7 +350,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     """run an aws script across accounts"""
     # TODO count up on success / error / error list by account
     accounts_config, custodian_config, executor = init(
-        config, None, serial, True, accounts, tags, ())
+        config, None, serial, True, accounts, tags, (), ())
 
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))
@@ -435,19 +456,21 @@ def run_account(account, region, policies_config, output_path,
 @click.option("-u", "--use", required=True)
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
-@click.option('-t', '--tags', multiple=True, default=None)
+@click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
 @click.option('-p', '--policy', multiple=True)
+@click.option('-l', '--policytags', 'policy_tags',
+              multiple=True, default=None, help="Policy tag filter")
 @click.option('--cache-period', default=15, type=int)
 @click.option("--metrics", default=False, is_flag=True)
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def run(config, use, output_dir, accounts, tags,
-        region, policy, cache_period, metrics, dryrun, debug, verbose):
+        region, policy, policy_tags, cache_period, metrics, dryrun, debug, verbose):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
-        config, use, debug, verbose, accounts, tags, policy)
+        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
     policy_counts = Counter()
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
