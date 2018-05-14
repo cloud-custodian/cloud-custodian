@@ -23,6 +23,7 @@ from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 
 
 @resources.register('sagemaker-notebook')
@@ -566,6 +567,18 @@ class DeleteNotebookInstance(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_instance, resources))
+
+
+@NotebookInstance.filter_registry.register('security-group')
+class NotebookSecurityGroupFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[]"
+
+
+@NotebookInstance.filter_registry.register('subnet')
+class NotebookSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "SubnetId"
 
 
 @Model.action_registry.register('delete')

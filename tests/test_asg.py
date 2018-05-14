@@ -237,7 +237,8 @@ class AutoScalingTest(BaseTest):
         asg = session.client('autoscaling')
         localtz = zoneinfo.gettz('America/New_York')
         dt = datetime.now(localtz)
-        dt = dt.replace(year=2018, month=2, day=20, hour=8, minute=42)
+        dt = dt.replace(year=2018, month=2, day=20, hour=12, minute=42,
+                        second=0, microsecond=0)
 
         policy = self.load_policy({
             'name': 'asg-mark-for-op-hours',
@@ -263,7 +264,7 @@ class AutoScalingTest(BaseTest):
         result = datetime.strptime(
             tags[0].strip().split('@', 1)[-1], '%Y/%m/%d %H%M %Z').replace(
             tzinfo=localtz)
-        self.assertEqual(result.date(), dt.date())
+        self.assertEqual(result, dt)
 
     def test_asg_marked_for_op_hours(self):
         session_factory = self.replay_flight_data('test_asg_marked_for_op_hours')
