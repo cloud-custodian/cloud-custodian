@@ -17,8 +17,6 @@ limitations under the License.
 package manager
 
 import (
-	"strings"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/aws/aws-sdk-go-v2/service/ssm/ssmiface"
@@ -50,11 +48,10 @@ func NewManager(config *Config) *Manager {
 		SSMAPI:        ssm.New(config.Config),
 		Registrations: store.NewRegistrations(config.Config, config.RegistrationsTable),
 	}
-	var tags string
 	if len(config.ResourceTags) == 0 {
-		tags = "App,OwnerContact,Name"
+		config.ResourceTags = []string{"App", "OwnerContact", "Name"}
 	}
-	for _, t := range strings.Split(tags, ",") {
+	for _, t := range config.ResourceTags {
 		m.resourceTags[t] = struct{}{}
 	}
 	return m

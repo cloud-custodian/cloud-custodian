@@ -45,8 +45,8 @@ type Client struct {
 	managedId string
 }
 
-// NewClient returns a new client for registering/updating managed resources.
-func NewClient(config *Config) (*Client, error) {
+// New returns a new client for registering/updating managed resources.
+func New(config *Config) (*Client, error) {
 	c := &Client{
 		Client: &http.Client{Timeout: time.Second * 10},
 		config: config,
@@ -65,7 +65,7 @@ func (c *Client) ManagedId() string {
 
 // Register adds a Node/Resource to SSM via the register API
 func (c *Client) Register() error {
-	data, err := json.Marshal(api.RegisterRequest{
+	data, err := json.Marshal(api.RegistrationRequest{
 		Provider:  "aws",
 		Document:  []byte(c.config.Document),
 		Signature: c.config.Signature,
@@ -86,12 +86,9 @@ func (c *Client) Register() error {
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("register error: %#v", string(data))
 	}
-	var r api.RegisterResponse
+	var r api.RegistrationResponse
 	if err := json.Unmarshal(data, &r); err != nil {
 		return err
-	}
-	if r.Err() != nil {
-		return fmt.Errorf("Registration Error %s %s", r.Error, r.Message)
 	}
 	out, err := exec.Command(SSMAgent.Path(), "-register", "-y",
 		"-id", r.ActivationId,
@@ -114,7 +111,7 @@ func (c *Client) Update() error {
 		return errors.Errorf("cannot update node, not a managed instance: %#v", info.InstanceId)
 	}
 	c.managedId = info.InstanceId
-	data, err := json.Marshal(api.RegisterRequest{
+	data, err := json.Marshal(api.RegistrationRequest{
 		Provider:  "aws",
 		Document:  []byte(c.config.Document),
 		Signature: c.config.Signature,

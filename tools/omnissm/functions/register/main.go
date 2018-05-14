@@ -19,16 +19,16 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"net/http"
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/pkg/errors"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/api"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/lambdautil"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 )
 
@@ -38,35 +38,35 @@ var (
 )
 
 func main() {
-	lambda.Start(api.ServeResponse(func(ctx context.Context, req *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	lambda.Start(lambdautil.ServeResponse(func(ctx context.Context, req *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 		whitelist := identity.NewWhitelist(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"))
 		cfg, err := external.LoadDefaultAWSConfig()
 		if err != nil {
 			return nil, err
 		}
-		router := api.NewRouter(manager.NewManager(&manager.Config{
+		r := api.RegistrationHandler{manager.NewManager(&manager.Config{
 			Config:             cfg,
 			RegistrationsTable: RegistrationsTable,
-		}))
+		})}
 		switch req.Resource {
 		case "/register":
-			var r api.RegisterRequest
-			if err := json.Unmarshal([]byte(req.Body), &r); err != nil {
-				return api.NewErrorResponse(http.StatusBadRequest, err), nil
+			var registerReq api.RegistrationRequest
+			if err := json.Unmarshal([]byte(req.Body), &registerReq); err != nil {
+				return nil, err
 			}
-			if err := r.Verify(); err != nil {
-				return api.NewErrorResponse(http.StatusBadRequest, err), nil
+			if err := registerReq.Verify(); err != nil {
+				return nil, err
 			}
-			if !whitelist.Exists(r.Identity().AccountId) {
-				return api.NewErrorResponse(http.StatusBadRequest, errors.New("unauthorized account")), nil
+			if !whitelist.Exists(registerReq.Identity().AccountId) {
+				return nil, err
 			}
 			switch req.HTTPMethod {
 			case "PATCH":
-				return router.HandleUpdateRegisterRequest(ctx, &r)
+				return lambdautil.JSON(r.HandleUpdateRegistrationRequest(ctx, &registerReq))
 			case "POST":
-				return router.HandleCreateRegisterRequest(ctx, &r)
+				return lambdautil.JSON(r.HandleCreateRegistrationRequest(ctx, &registerReq))
 			}
 		}
-		return api.NewErrorResponse(http.StatusNotFound, errors.Errorf("cannot find resource %#v", req.Resource)), nil
+		return nil, lambdautil.NotFoundError{fmt.Sprintf("cannot find resource %#v", req.Resource)}
 	}))
 }

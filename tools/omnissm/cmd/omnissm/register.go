@@ -33,7 +33,7 @@ var RegisterCmd = &cobra.Command{
 		if url == "" {
 			log.Fatal().Msg("registration url (OMNISSM_REGISTER_ENDPOINT) cannot be blank")
 		}
-		c, err := client.NewClient(&client.Config{
+		c, err := client.New(&client.Config{
 			Document:        string(identity.GetLocalInstanceDocument()),
 			Signature:       string(identity.GetLocalInstanceSignature()),
 			RegistrationURL: url,

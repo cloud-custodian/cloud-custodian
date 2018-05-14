@@ -19,17 +19,17 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/store"
 )
 
-type RegisterRequest struct {
+type RegistrationRequest struct {
+	json.Unmarshaler
 	Provider  string          `json:"provider"`
 	Document  json.RawMessage `json:"document"`
 	Signature string          `json:"signature"`
@@ -38,11 +38,11 @@ type RegisterRequest struct {
 	document identity.Document
 }
 
-func (r *RegisterRequest) Identity() *identity.Document {
+func (r *RegistrationRequest) Identity() *identity.Document {
 	return &r.document
 }
 
-func (r *RegisterRequest) Verify() error {
+func (r *RegistrationRequest) Verify() error {
 	if err := identity.Verify(r.Document, r.Signature); err != nil {
 		return err
 	}
@@ -52,14 +52,18 @@ func (r *RegisterRequest) Verify() error {
 	return nil
 }
 
-type RegisterResponse struct {
+type RegistrationResponse struct {
+	json.Marshaler
 	*store.RegistrationEntry
-	Error
 
 	Region string `json:"region,omitempty"`
 }
 
-func (r *RouterContext) HandleCreateRegisterRequest(ctx context.Context, req *RegisterRequest) (*events.APIGatewayProxyResponse, error) {
+type RegistrationHandler struct {
+	*manager.Manager
+}
+
+func (r *RegistrationHandler) HandleCreateRegistrationRequest(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
 	logger := log.With().Str("handler", "CreateRegistration").Logger()
 	logger.Info().Interface("identity", req.Identity()).Msg("new registration request")
 	entry, err, ok := r.Manager.Get(identity.Hash(req.Identity().Name()))
@@ -76,18 +80,13 @@ func (r *RouterContext) HandleCreateRegisterRequest(ctx context.Context, req *Re
 		logger.Info().Interface("entry", entry).Msg("existing registration entry found")
 	}
 	logger.Info().Interface("entry", entry).Msg("registration entry found")
-	data, err := json.Marshal(&RegisterResponse{
+	return &RegistrationResponse{
 		RegistrationEntry: entry,
 		Region:            req.Identity().Region,
-	})
-	if err != nil {
-		return nil, err
-	}
-	logger.Info().Str("response", string(data)).Msg("new registration response")
-	return &events.APIGatewayProxyResponse{StatusCode: http.StatusOK, Body: string(data)}, nil
+	}, nil
 }
 
-func (r *RouterContext) HandleUpdateRegisterRequest(ctx context.Context, req *RegisterRequest) (*events.APIGatewayProxyResponse, error) {
+func (r *RegistrationHandler) HandleUpdateRegistrationRequest(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
 	logger := log.With().Str("handler", "UpdateRegistration").Logger()
 	logger.Info().Interface("identity", req.Identity()).Msg("update registration request")
 	id := identity.Hash(req.Identity().Name())
@@ -106,10 +105,5 @@ func (r *RouterContext) HandleUpdateRegisterRequest(ctx context.Context, req *Re
 		}
 		logger.Info().Interface("entry", entry).Msg("registration entry updated")
 	}
-	data, err := json.Marshal(&RegisterResponse{RegistrationEntry: entry})
-	if err != nil {
-		return nil, err
-	}
-	logger.Info().Str("response", string(data)).Msg("update registration response")
-	return &events.APIGatewayProxyResponse{StatusCode: http.StatusOK, Body: string(data)}, nil
+	return &RegistrationResponse{RegistrationEntry: entry}, nil
 }

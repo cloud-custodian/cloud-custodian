@@ -19,7 +19,6 @@ package identity
 import (
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/json"
 	"encoding/pem"
 
 	"github.com/pkg/errors"
@@ -51,30 +50,18 @@ C1haGgSI/A1uZUKs/Zfnph0oEI0/hu1IIJ/SKBDtN5lvmZ/IzbOPIJWirlsllQIQ
 var (
 	// RSACert AWS Public Certificate
 	RSACert *x509.Certificate
-
-	// RSACertPEM Decoded pem signature
-	RSACertPEM, _ = pem.Decode([]byte(AWSRSAIdentityCert))
 )
 
 func init() {
+	block, _ := pem.Decode([]byte(AWSRSAIdentityCert))
 	var err error
-	if RSACert, err = x509.ParseCertificate(RSACertPEM.Bytes); err != nil {
+	RSACert, err = x509.ParseCertificate(block.Bytes)
+	if err != nil {
 		panic(err)
 	}
 }
 
-func Verify(v interface{}, signature string) error {
-	var doc []byte
-	switch t := v.(type) {
-	case string:
-		doc = []byte(t)
-	case []byte:
-		doc = t
-	case json.RawMessage:
-		doc = []byte(t)
-	default:
-		return errors.Errorf("expected string, received %T", v)
-	}
+func Verify(doc []byte, signature string) error {
 	sig, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
 		return errors.Wrap(err, "malformed RSA signature")

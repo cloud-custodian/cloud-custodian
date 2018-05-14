@@ -1,5 +1,8 @@
 # OmniSSM
 
+[![GoDoc](https://godoc.org/github.com/capitalone/cloud-custodian/tools/omnissm?status.svg)](https://godoc.org/github.com/capitalone/cloud-custodian/tools/omnissm)
+
+
 Automation for AWS Systems Manager using hybrid mode. Using hybrid mode for ec2 instances brings a few benefits.
 
  - No instance credentials needed
@@ -27,7 +30,7 @@ We provide a few bits of automation tooling to enable seamless hybrid mode.
  - an sns topic subscriber for enriching instances that are registering after a config event
    has already fired (ie slow boot).
 
-![(OmniSSM)](docs/omnissm.svg)
+![(OmniSSM)](assets/omnissm.svg)
 
 # Links
 

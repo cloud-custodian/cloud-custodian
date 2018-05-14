@@ -16,7 +16,13 @@ limitations under the License.
 
 package identity
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/pkg/errors"
+)
+
+var ErrUnauthorizedAccount = errors.New("unauthorized account")
 
 // A Whitelist stores a map of account values for existential lookups.
 type Whitelist struct {

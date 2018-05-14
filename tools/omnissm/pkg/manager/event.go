@@ -89,7 +89,7 @@ func (s *ConfigurationState) UnmarshalJSON(b []byte) (err error) {
 	}
 	err = json.Unmarshal(b, &st)
 	if err == nil {
-		*s = configurationState(st.Name)
+		*s = ConfigurationState(st.Name)
 		return
 	}
 	return json.Unmarshal(b, (*string)(s))
