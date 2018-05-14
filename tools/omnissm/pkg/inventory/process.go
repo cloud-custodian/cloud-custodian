@@ -68,7 +68,7 @@ func ListAllProcesses() ([]Process, error) {
 			process.Cmdline = cmdline
 		}
 		iocounters, err := p.IOCounters()
-		if err == nil {
+		if err != nil {
 			log.Debug().Err(err).Msgf("cannot get process i/o counters: %v", pid)
 		} else {
 			process.ReadBytes = iocounters.ReadBytes
