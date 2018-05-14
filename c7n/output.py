@@ -62,6 +62,12 @@ class MetricsOutput(object):
         self.buf = []
 
     def get_timestamp(self):
+        """
+        Now, if C7N_METRICS_TZ is set to TRUE, UTC timestamp will be used.
+        For backwards compatibility, if it is not set, UTC will be the default.
+        To disable this and use the system's time zone, C7N_METRICS_TZ shoule be set to FALSE.
+        """
+
         if os.getenv("C7N_METRICS_TZ", '').upper() in ('TRUE', ''):
             return datetime.datetime.utcnow()
         else:

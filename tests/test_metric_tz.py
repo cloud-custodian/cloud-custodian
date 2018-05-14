@@ -27,21 +27,14 @@ class metrics_log_test(BaseTest):
   def test_output_tz(self):
 
     mo = MetricsOutput(None)
-    c7nmetric = os.getenv("C7N_METRICS_TZ")
-
-    self.change_environment(C7N_METRICS_TZ=str(c7nmetric))
-
+    self.change_environment()
     t1 = datetime.datetime.now()
-
-    os.unsetenv("C7N_METRICS_TZ")
-
     gts = mo.get_timestamp()
 
     self.assertEqual(gts.hour,t1.hour)
-   
     self.assertEqual(gts.minute,t1.minute)
 
-    os.environ["C7N_METRICS_TZ"] = 'TRUE'
+    self.change_environment(C7N_METRICS_TZ='TRUE')
     tutc = datetime.datetime.utcnow()
 
     gts = mo.get_timestamp()
