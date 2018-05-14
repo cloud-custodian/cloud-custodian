@@ -68,16 +68,16 @@ CONFIG_SCHEMA = {
                 {'required': ['profile', 'account_id']}
             ],
             'properties': {
-               'name': {'type': 'string'},
-               'email': {'type': 'string'},
-               'account_id': {'type': 'string'},
-               'profile': {'type': 'string', 'minLength': 3},
-               'tags': {'type': 'array', 'items': {'type': 'string'}},
-               'regions': {'type': 'array', 'items': {'type': 'string'}},
-               'role': {'oneOf': [
-                   {'type': 'array', 'items': {'type': 'string'}},
-                   {'type': 'string', 'minLength': 3}]},
-               'external_id': {'type': 'string'},
+                'name': {'type': 'string'},
+                'email': {'type': 'string'},
+                'account_id': {'type': 'string'},
+                'profile': {'type': 'string', 'minLength': 3},
+                'tags': {'type': 'array', 'items': {'type': 'string'}},
+                'regions': {'type': 'array', 'items': {'type': 'string'}},
+                'role': {'oneOf': [
+                    {'type': 'array', 'items': {'type': 'string'}},
+                    {'type': 'string', 'minLength': 3}]},
+                'external_id': {'type': 'string'},
             }
         },
         'azure_sub': {
