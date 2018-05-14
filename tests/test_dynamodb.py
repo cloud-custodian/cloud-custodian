@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
-from datetime import timedelta
 import datetime
 
 from c7n.resources.dynamodb import DeleteTable
@@ -363,11 +362,8 @@ class DynamoDbAccelerator(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
         client = session_factory(region='us-east-1').client('dax')
-        sgs = sorted(
-            client.describe_clusters()['Clusters'][0]['SecurityGroups'])
-        self.assertEqual(
-            [sgs[0]['Status'], sgs[0]['SecurityGroupIdentifier']],
-            ['removing', 'sg-4b9ada34'])
-        self.assertEqual(
-            [sgs[1]['Status'], sgs[1]['SecurityGroupIdentifier']],
-            ['adding', 'sg-72916c3b'])
+        sgs = client.describe_clusters()['Clusters'][0]['SecurityGroups']
+        self.assertDictEqual(sgs[0], {"Status": "adding",
+                                      "SecurityGroupIdentifier": "sg-72916c3b"})
+        self.assertDictEqual(sgs[1], {"Status": "removing",
+                                      "SecurityGroupIdentifier": "sg-4b9ada34"})
