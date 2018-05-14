@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2c992969-5079-11e8-8aae-d99659c87397", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2c992969-5079-11e8-8aae-d99659c87397", 
+                "date": "Sat, 05 May 2018 15:29:59 GMT", 
+                "content-length": "396", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "MegaCache", 
+                "Key": "App"
+            }
+        ]
+    }
+}

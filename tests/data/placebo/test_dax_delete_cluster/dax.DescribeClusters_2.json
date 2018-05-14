@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [
+            {
+                "Status": "deleting", 
+                "SubnetGroup": "c7n-dax-subnet-group", 
+                "NodeType": "dax.t2.small", 
+                "ClusterName": "c7n-dax", 
+                "ActiveNodes": 0, 
+                "TotalNodes": 1, 
+                "IamRoleArn": "arn:aws:iam::644160558196:role/service-role/C7N-DAXtoDynamoDB-Role", 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupIdentifier": "sg-4b9ada34"
+                    }
+                ], 
+                "ClusterArn": "arn:aws:dax:us-east-1:644160558196:cache/c7n-dax", 
+                "ClusterDiscoveryEndpoint": {
+                    "Port": 8111, 
+                    "Address": "c7n-dax.qgcgte.clustercfg.dax.use1.cache.amazonaws.com"
+                }, 
+                "ParameterGroup": {
+                    "NodeIdsToReboot": [], 
+                    "ParameterGroupName": "default.dax1.0", 
+                    "ParameterApplyStatus": "in-sync"
+                }, 
+                "PreferredMaintenanceWindow": "wed:05:30-wed:06:30"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5e668511-4fd7-11e8-81fd-ad0b822cbbfa", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5e668511-4fd7-11e8-81fd-ad0b822cbbfa", 
+                "date": "Fri, 04 May 2018 20:11:45 GMT", 
+                "content-length": "649", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

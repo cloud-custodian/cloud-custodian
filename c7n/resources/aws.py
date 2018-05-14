@@ -146,10 +146,16 @@ def get_service_region_map(regions, resource_types):
         region_name='us-east-1',
         aws_access_key_id='never',
         aws_secret_access_key='found')
+    normalized_types = []
+    for r in resource_types:
+        if r.startswith('aws.'):
+            normalized_types.append(r[4:])
+        else:
+            normalized_types.append(r)
 
     resource_service_map = {
         r: clouds['aws'].resources.get(r).resource_type.service
-        for r in resource_types if r != 'account'}
+        for r in normalized_types if r != 'account'}
     # support for govcloud and china, we only utilize these regions if they
     # are explicitly passed in on the cli.
     partition_regions = {}

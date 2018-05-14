@@ -19,7 +19,6 @@ from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupP
 from msrestazure.azure_exceptions import CloudError
 from c7n import utils
 from c7n.actions import BaseAction
-from c7n_azure.provider import resources
 from c7n.filters import FilterValidationError
 
 
@@ -27,6 +26,25 @@ def utcnow():
     """The datetime object for the current time in UTC
     """
     return datetime.datetime.utcnow()
+
+
+def update_resource_tags(self, session, client, resource, tags):
+    # resource group type
+    if self.manager.type == 'resourcegroup':
+        params_patch = ResourceGroupPatchable(
+            tags=tags
+        )
+        client.resource_groups.update(
+            resource['name'],
+            params_patch,
+        )
+    # other Azure resources
+    else:
+        az_resource = GenericResource.deserialize(resource)
+        api_version = session.resource_api_version(az_resource.id)
+        az_resource.tags = tags
+
+        client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
 
 
 class Tag(BaseAction):
@@ -78,22 +96,45 @@ class Tag(BaseAction):
             for key in new_tags:
                 tags[key] = new_tags[key]
 
-            # resource group type
-            if self.manager.type == 'resourcegroup':
-                params_patch = ResourceGroupPatchable(
-                    tags=tags
-                )
-                client.resource_groups.update(
-                    resource['name'],
-                    params_patch,
-                )
-            # other Azure resources
-            else:
-                az_resource = GenericResource.deserialize(resource)
-                api_version = session.resource_api_version(az_resource.id)
-                az_resource.tags = tags
+            update_resource_tags(self, session, client, resource, tags)
 
-                client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+
+class RemoveTag(BaseAction):
+    """Removes tags from Azure resources
+
+        .. code-block:: yaml
+
+          policies:
+            - name: azure-remove-tag-resourcegroups
+              resource: azure.resourcegroup
+              description: |
+                Remove tag for all existing resource groups with a key such as Environment
+              actions:
+               - type: untag
+                 tags: ['Environment']
+    """
+    schema = utils.type_schema(
+        'untag',
+        tags={'type': 'array', 'items': {'type': 'string'}})
+
+    def validate(self):
+        if not self.data.get('tags'):
+            raise FilterValidationError("Must specify tags")
+        return self
+
+    def process(self, resources):
+        session = utils.local_session(self.manager.session_factory)
+        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
+        for resource in resources:
+            # get existing tags
+            tags = resource.get('tags', {})
+
+            # delete tag
+            tags_to_delete = self.data.get('tags')
+            resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
+
+            update_resource_tags(self, session, client, resource, resource_tags)
 
 
 class AutoTagUser(BaseAction):
@@ -110,7 +151,9 @@ class AutoTagUser(BaseAction):
            - type: auto-tag-user
              tag: CreatorEmail
 
-    This action searches from the earliest 'write' operation's caller in the activity logs for a particular resource.
+    This action searches from the earliest 'write' operation's caller
+    in the activity logs for a particular resource.
+
     Note: activity logs are only held for the last 90 days.
 
     """
@@ -134,7 +177,8 @@ class AutoTagUser(BaseAction):
         if self.manager.action_registry.get('tag') is None:
             raise FilterValidationError("Resource does not support tagging")
 
-        if self.data.get('days') is not None and (self.data.get('days') < 1 or self.data.get('days') > 90):
+        if (self.data.get('days') is not None and
+                (self.data.get('days') < 1 or self.data.get('days') > 90)):
             raise FilterValidationError("Days must be between 1 and 90")
 
         return self
@@ -199,13 +243,86 @@ class AutoTagUser(BaseAction):
 
         return first_operation
 
-    @staticmethod
-    def add_auto_tag_user(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
-                klass.action_registry.register('auto-tag-user', AutoTagUser)
 
+class TagTrim(BaseAction):
+    """Automatically remove tags from an azure resource.
 
-# Add the AutoTagUser action to all resources that support tagging
-resources.subscribe(resources.EVENT_FINAL, AutoTagUser.add_auto_tag_user)
+    Azure Resources and Resource Groups have a limit of 15 tags.
+    In order to make additional tag space on a set of resources,
+    this action can be used to remove enough tags to make the
+    desired amount of space while preserving a given set of tags.
+    Setting the space value to 0 removes all tags but those
+    listed to preserve.
+
+    .. code-block :: yaml
+
+      - policies:
+         - name: azure-tag-trim
+           comment: |
+             Any instances with 14 or more tags get tags removed until
+             they match the target tag count, in this case 13, so
+             that we free up tag slots for another usage.
+           resource: azure.resourcegroup
+           filters:
+               # Filter down to resources that do not have the space
+               # to add additional required tags. For example, if an
+               # additional 2 tags need to be added to a resource, with
+               # 15 tags as the limit, then filter down to resources that
+               # have 14 or more tags since they will need to have tags
+               # removed for the 2 extra. This also ensures that metrics
+               # reporting is correct for the policy.
+               type: value
+               key: "[length(Tags)][0]"
+               op: ge
+               value: 14
+           actions:
+             - type: tag-trim
+               space: 2
+               preserve:
+                - OwnerContact
+                - Environment
+                - downtime
+                - custodian_status
+    """
+    max_tag_count = 15
+
+    schema = utils.type_schema(
+        'tag-trim',
+        space={'type': 'integer'},
+        preserve={'type': 'array', 'items': {'type': 'string'}})
+
+    def validate(self):
+        if self.data.get('space') < 0 or self.data.get('space') > 15:
+            raise FilterValidationError("Space must be between 0 and 15")
+
+        return self
+
+    def process(self, resources):
+        preserve = set(self.data.get('preserve', {}))
+        space = self.data.get('space')
+        untag_action = self.manager.action_registry.get('untag')
+
+        for resource in resources:
+            # get existing tags
+            tags = resource.get('tags', {})
+
+            if space and len(tags) + space <= self.max_tag_count:
+                continue
+
+            # delete tags
+            keys = set(tags)
+            tags_to_preserve = preserve.intersection(keys)
+            candidates = keys - tags_to_preserve
+
+            if space:
+                # Free up slots to fit
+                remove = len(candidates) - (
+                    self.max_tag_count - (space + len(tags_to_preserve)))
+                candidates = list(sorted(candidates))[:remove]
+
+            if not candidates:
+                self.log.warning(
+                    "Could not find any candidates to trim %s" % resource['id'])
+                continue
+
+            untag_action({'tags': candidates}, self.manager).process([resource])

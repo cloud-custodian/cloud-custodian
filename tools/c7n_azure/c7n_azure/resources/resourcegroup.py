@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.query import QueryResourceManager
+from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.utils import type_schema
 
+
 @resources.register('resourcegroup')
-class ResourceGroup(QueryResourceManager):
-    class resource_type(object):
+class ResourceGroup(ArmResourceManager):
+
+    class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resource_groups', 'list')
-        id = 'id'
-        name = 'name'
 
 
 @ResourceGroup.filter_registry.register('empty-group')
@@ -37,7 +37,12 @@ class EmptyGroup(Filter):
     #       - type: empty-group
 
     def __call__(self, group):
-        resources_iterator = self.manager.get_client().resources.list_by_resource_group(group['name'])
+        resources_iterator = (
+            self.manager
+                .get_client()
+                .resources
+                .list_by_resource_group(group['name'])
+        )
         return not any(True for _ in resources_iterator)
 
 

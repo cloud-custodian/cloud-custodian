@@ -60,6 +60,7 @@ Navigate below and get started with Cloud Custodian!
    azure/contribute
    azure/authentication
    azure/usecases/index
+   azure/policy/index
 
 .. toctree::
    :maxdepth: 2
