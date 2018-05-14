@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import itertools
 import operator
 import zlib
-
+import functools
 import jmespath
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -32,8 +32,9 @@ from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr, generate_arn)
 from botocore.exceptions import ClientError
+from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
 @resources.register('vpc')
@@ -1469,6 +1470,32 @@ class NetworkAddress(query.QueryResourceManager):
         date = None
         dimension = None
         config_type = "AWS::EC2::EIP"
+
+    @property
+    def generate_arn(self):
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.get_model().service,
+                region=self.config.region,
+                account_id=self.account_id,
+                resource_type='eip-allocation',
+                separator='/')
+        return self._generate_arn
+
+    def get_arn(self, r):
+        return self.generate_arn(r[self.get_model().id])
+
+    def get_arns(self, resource_set):
+        arns = []
+        for r in resource_set:
+            _id = r[self.get_model().id]
+            arns.append(self.generate_arn(_id))
+        return arns
+
+
+NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
+NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
 
 
 @NetworkAddress.action_registry.register('release')
