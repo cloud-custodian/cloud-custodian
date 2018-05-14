@@ -61,6 +61,12 @@ class MetricsOutput(object):
         self.namespace = namespace
         self.buf = []
 
+    def get_timestamp(self):
+        if os.getenv("C7N_METRICS_TZ", '').upper() in ('TRUE', ''):
+            return datetime.datetime.utcnow()
+        else:
+            return datetime.datetime.now()
+
     def flush(self):
         if self.buf:
             self._put_metrics(self.namespace, self.buf)
@@ -69,7 +75,7 @@ class MetricsOutput(object):
     def put_metric(self, key, value, unit, buffer=False, **dimensions):
         d = {
             "MetricName": key,
-            "Timestamp": datetime.datetime.now(),
+            "Timestamp": self.get_timestamp(),
             "Value": value,
             "Unit": unit}
         d["Dimensions"] = [
