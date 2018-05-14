@@ -209,10 +209,9 @@ class RulesAction(BaseAction):
             nsg_name = nsg['name']
             resource_group = nsg['resourceGroup']
             for rule in nsg['properties']['securityRules']:
-                self.manager.log.info(
-                    'Updating access to \'%s\' for security rule '
-                    '\'%s\' in resource group \'%s\''.format(
-                        self.access_action, rule['name'], resource_group))
+                self.manager.log.info("Updating access to '%s' for security rule "
+                                      "'%s' in resource group '%s'",
+                                      self.access_action, rule['name'], resource_group)
                 rule['properties']['access'] = self.access_action
                 self.manager.get_client().security_rules.create_or_update(
                     resource_group,
