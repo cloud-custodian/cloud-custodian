@@ -12,26 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib
 import os
-import logging
 import yaml
-import click
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource.subscriptions import SubscriptionClient
 
 
-@click.command()
-@click.option(
-    '-f', '--output', type=click.File('w'),
-    help="File to store the generated config (default stdout)")
-def main(output):
+def main():
     """
     Generate a c7n-org subscriptions config file
     """
-
-    log = logging.getLogger('custodian.azure.session')
-    _provider_cache = {}
 
     tenant_auth_variables = [
         'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
@@ -57,11 +47,17 @@ def main(output):
             }
             results.append(sub_info)
 
-        print(
+        output = '../azure_config.yaml'
+
+        with open(output, 'w') as f:
+            f.write(yaml.safe_dump({
+                'accounts': results
+            }, default_flow_style=False))
+        '''print(
             yaml.safe_dump(
                 {'accounts': results},
                 default_flow_style=False),
-            file=output)
+            file=output)'''
 
 
 if __name__ == '__main__':
