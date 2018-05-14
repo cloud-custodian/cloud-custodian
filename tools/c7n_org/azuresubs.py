@@ -42,7 +42,7 @@ def main():
         results = []
         for sub in subs:
             sub_info = {
-                'account_id': sub['subscriptionId'],
+                'subscription_id': sub['subscriptionId'],
                 'name': sub['displayName']
             }
             results.append(sub_info)
@@ -51,7 +51,7 @@ def main():
 
         with open(output, 'w') as f:
             f.write(yaml.safe_dump({
-                'accounts': results
+                'azure_subscriptions': results
             }, default_flow_style=False))
         '''print(
             yaml.safe_dump(

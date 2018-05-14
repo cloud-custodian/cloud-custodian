@@ -65,29 +65,45 @@ CONFIG_SCHEMA = {
             'additionalProperties': True,
             'anyOf': [
                 {'required': ['role', 'account_id']},
-                {'required': ['profile', 'account_id']}],
+                {'required': ['profile', 'account_id']}
+            ],
             'properties': {
+               'name': {'type': 'string'},
+               'email': {'type': 'string'},
+               'account_id': {'type': 'string'},
+               'profile': {'type': 'string', 'minLength': 3},
+               'tags': {'type': 'array', 'items': {'type': 'string'}},
+               'regions': {'type': 'array', 'items': {'type': 'string'}},
+               'role': {'oneOf': [
+                   {'type': 'array', 'items': {'type': 'string'}},
+                   {'type': 'string', 'minLength': 3}]},
+               'external_id': {'type': 'string'},
+            }
+        },
+        'azure_sub': {
+            'type': 'object',
+            'additionalProperties': True,
+            'properties': {
+                'subscription_id': {'type': 'string'},
                 'name': {'type': 'string'},
-                'email': {'type': 'string'},
-                'account_id': {'type': 'string'},
-                'profile': {'type': 'string', 'minLength': 3},
-                'tags': {'type': 'array', 'items': {'type': 'string'}},
-                'regions': {'type': 'array', 'items': {'type': 'string'}},
-                'role': {'oneOf': [
-                    {'type': 'array', 'items': {'type': 'string'}},
-                    {'type': 'string', 'minLength': 3}]},
-                'external_id': {'type': 'string'},
             }
         }
     },
     'type': 'object',
     'additionalProperties': False,
-    'required': ['accounts'],
+    'oneOf': [
+        {'required': ['accounts']},
+        {'required': ['azure_subscriptions']}
+    ],
     'properties': {
         'vars': {'type': 'object'},
         'accounts': {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
+        },
+        'azure_subscriptions': {
+            'type': 'array',
+            'items': {'$ref': '#/definitions/azure_sub'}
         }
     }
 }
