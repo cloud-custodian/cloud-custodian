@@ -379,7 +379,7 @@ class LambdaManager(object):
     def diff_tags(old_tags, new_tags):
         add = {}
         remove = set()
-        for k,v in new_tags.items():
+        for k, v in new_tags.items():
             if k not in old_tags or old_tags[k] != v:
                 add[k] = v
         for k in old_tags:

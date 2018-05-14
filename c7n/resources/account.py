@@ -533,7 +533,7 @@ class RequestLimitIncrease(BaseAction):
         limit_exceeded = resources[0].get('c7n:ServiceLimitsExceeded', [])
         percent_increase = self.data.get('percent-increase')
         amount_increase = self.data.get('amount-increase')
-        minimum_increase = self.data.get('minimum-increase',1)
+        minimum_increase = self.data.get('minimum-increase', 1)
 
         for s in limit_exceeded:
             current_limit = int(s['limit'])
