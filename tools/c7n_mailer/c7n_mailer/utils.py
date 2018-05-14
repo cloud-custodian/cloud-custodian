@@ -220,9 +220,13 @@ def resource_format(resource, resource_type):
             resource['CacheClusterCreateTime'],
             resource['CacheClusterStatus'])
     elif resource_type == 'cache-snapshot':
+        cid = resource.get('CacheClusterId')
+        if cid is None:
+            cid = ', '.join([
+                ns['CacheClusterId'] for ns in resource['NodeSnapshots']])
         return "name: %s cluster: %s source: %s" % (
             resource['SnapshotName'],
-            resource['CacheClusterId'],
+            cid,
             resource['SnapshotSource'])
     elif resource_type == 'redshift-snapshot':
         return "name: %s db: %s" % (
