@@ -28,7 +28,10 @@ def utcnow():
     return datetime.datetime.utcnow()
 
 
-def update_resource_tags(self, session, client, resource, tags):
+def update_resource_tags(self, resource, tags):
+    session = utils.local_session(self.manager.session_factory)
+    client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
     # resource group type
     if self.manager.type == 'resourcegroup':
         params_patch = ResourceGroupPatchable(
@@ -40,11 +43,14 @@ def update_resource_tags(self, session, client, resource, tags):
         )
     # other Azure resources
     else:
-        az_resource = GenericResource.deserialize(resource)
-        api_version = session.resource_api_version(az_resource.id)
-        az_resource.tags = tags
+        try:
+            az_resource = GenericResource.deserialize(resource)
+            api_version = session.resource_api_version(az_resource.id)
+            az_resource.tags = tags
 
-        client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+            client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+        except CloudError:
+            print(CloudError)
 
 
 class Tag(BaseAction):
@@ -84,19 +90,19 @@ class Tag(BaseAction):
         return self
 
     def process(self, resources):
-        session = utils.local_session(self.manager.session_factory)
-        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+    def process_resource(self, resource):
+        # get existing tags
+        tags = resource.get('tags', {})
 
-            # add or update tags
-            new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
-            for key in new_tags:
-                tags[key] = new_tags[key]
+        # add or update tags
+        new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
+        for key in new_tags:
+            tags[key] = new_tags[key]
 
-            update_resource_tags(self, session, client, resource, tags)
+        update_resource_tags(self, resource, tags)
 
 
 class RemoveTag(BaseAction):
@@ -123,18 +129,18 @@ class RemoveTag(BaseAction):
         return self
 
     def process(self, resources):
-        session = utils.local_session(self.manager.session_factory)
-        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+    def process_resource(self, resource):
+        # get existing tags
+        tags = resource.get('tags', {})
 
-            # delete tag
-            tags_to_delete = self.data.get('tags')
-            resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
+        # delete tag
+        tags_to_delete = self.data.get('tags')
+        resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
 
-            update_resource_tags(self, session, client, resource, resource_tags)
+        update_resource_tags(self, resource, resource_tags)
 
 
 class AutoTagUser(BaseAction):
@@ -298,31 +304,34 @@ class TagTrim(BaseAction):
         return self
 
     def process(self, resources):
-        preserve = set(self.data.get('preserve', {}))
-        space = self.data.get('space')
-        untag_action = self.manager.action_registry.get('untag')
+        self.preserve = set(self.data.get('preserve', {}))
+        self.space = self.data.get('space', 1)
+        self.untag_action = self.manager.action_registry.get('untag')
 
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-            if space and len(tags) + space <= self.max_tag_count:
-                continue
+    def process_resource(self, resource):
+        # get existing tags
+        tags = resource.get('tags', {})
 
-            # delete tags
-            keys = set(tags)
-            tags_to_preserve = preserve.intersection(keys)
-            candidates = keys - tags_to_preserve
+        if self.space and len(tags) + self.space <= self.max_tag_count:
+            return
 
-            if space:
-                # Free up slots to fit
-                remove = len(candidates) - (
-                    self.max_tag_count - (space + len(tags_to_preserve)))
-                candidates = list(sorted(candidates))[:remove]
+        # delete tags
+        keys = set(tags)
+        tags_to_preserve = self.preserve.intersection(keys)
+        candidates = keys - tags_to_preserve
 
-            if not candidates:
-                self.log.warning(
-                    "Could not find any candidates to trim %s" % resource['id'])
-                continue
+        if self.space:
+            # Free up slots to fit
+            remove = len(candidates) - (
+                    self.max_tag_count - (self.space + len(tags_to_preserve)))
+            candidates = list(sorted(candidates))[:remove]
 
-            untag_action({'tags': candidates}, self.manager).process([resource])
+        if not candidates:
+            self.log.warning(
+                "Could not find any candidates to trim %s" % resource['id'])
+            return
+
+        self.untag_action({'tags': candidates}, self.manager).process([resource])
