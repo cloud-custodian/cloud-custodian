@@ -149,7 +149,7 @@ def debug(f):
             f(*args, **kw)
         except (SystemExit, KeyboardInterrupt):
             raise
-        except:
+        except Exception:
             import traceback, sys, pdb
             traceback.print_exc()
             pdb.post_mortem(sys.exc_info()[-1])
@@ -228,7 +228,7 @@ def run(config, tag, bucket, account, not_bucket, not_account, debug, region):
 
             try:
                 worker.invoke(worker.process_account, account_info)
-            except:
+            except Exception:
                 if not debug:
                     raise
                 import pdb, traceback, sys

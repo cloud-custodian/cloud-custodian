@@ -364,7 +364,7 @@ def process_bucket_set(account_info, buckets):
 
             try:
                 info['keycount'] = bucket_key_count(cw, info)
-            except:
+            except Exception:
                 raise
             else:
                 connection.hset('bucket-sizes', bid, info['keycount'])

@@ -13,7 +13,7 @@
 # limitations under the License.
 from datetime import datetime, timedelta
 
-
+from botocore.exceptions import ClientError
 import boto3
 import json
 import logging
@@ -88,7 +88,7 @@ def main():
             # special case per https://goo.gl/iXdpnl
             elif bucket_region == "EU":
                 bucket_region = "eu-west-1"
-        except:
+        except ClientError:
             # We don't have permission to the bucket, try us-east-1
             bucket_region = "us-east-1"
 

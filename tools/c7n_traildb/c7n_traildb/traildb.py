@@ -268,7 +268,7 @@ def process_bucket(
                 os.remove(fpath)
             db.flush()
 
-        l = t
+        l = t # NOQA
         t = time.time()
 
         log.info("Stored page time:%0.2fs", t - st)

@@ -180,7 +180,7 @@ def index_account_trails(config, account, region, date, directory):
 
                 try:
                     os.remove(local_db_file)
-                except:
+                except Exception:
                     log.warning("Failed to remove temporary file: {}".format(
                         local_db_file))
                     pass
