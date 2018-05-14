@@ -18,7 +18,7 @@ import logging
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry
 from c7n import query
 from c7n.manager import resources
@@ -698,8 +698,7 @@ class DaxUpdateCluster(BaseAction):
             'PreferredMaintenanceWindow': {'type': 'string'},
             'NotificationTopicArn': {'type': 'string'},
             'NotificationTopicStatus': {'type': 'string'},
-            'ParameterGroupName': {'type': 'string'},
-            'SecurityGroupIds': {'type': 'array', 'items': {'type': 'string'}}
+            'ParameterGroupName': {'type': 'string'}
         }
     }
     permissions = ('dax:UpdateCluster',)
@@ -722,3 +721,19 @@ class DaxUpdateCluster(BaseAction):
                             r['ClusterName'], e))
                 else:
                     raise
+
+
+@DynamoDbAccelerator.action_registry.register('modify-security-groups')
+class DaxModifySecurityGroup(ModifyVpcSecurityGroupsAction):
+
+    permissions = ('dax:UpdateCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dax')
+        groups = super(DaxModifySecurityGroup, self).get_groups(
+            resources, metadata_key='SecurityGroupIdentifier')
+
+        for idx, r in enumerate(resources):
+            client.update_cluster(
+                ClusterName=r['ClusterName'],
+                SecurityGroupIds=groups[idx])

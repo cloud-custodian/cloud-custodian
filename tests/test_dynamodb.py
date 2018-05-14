@@ -343,3 +343,31 @@ class DynamoDbAccelerator(BaseTest):
         clusters = client.describe_clusters()['Clusters']
         self.assertEqual(clusters[0]['ParameterGroup']['ParameterGroupName'],
                          'testparamgroup')
+
+    def test_modify_security_groups(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_update_security_groups')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{
+                'type': 'security-group',
+                'key': 'GroupName',
+                'value': 'default'}],
+            'actions': [{
+                'type': 'modify-security-groups',
+                'remove': 'matched',
+                'add': 'sg-72916c3b'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        sgs = sorted(
+            client.describe_clusters()['Clusters'][0]['SecurityGroups'])
+        self.assertEqual(
+            [sgs[0]['Status'], sgs[0]['SecurityGroupIdentifier']],
+            ['removing', 'sg-4b9ada34'])
+        self.assertEqual(
+            [sgs[1]['Status'], sgs[1]['SecurityGroupIdentifier']],
+            ['adding', 'sg-72916c3b'])
