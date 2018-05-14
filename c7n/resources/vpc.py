@@ -179,7 +179,7 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
     """
     schema = type_schema(
         'security-group', rinherit=ValueFilter.schema,
-        **{'match-resource':{'type': 'boolean'},
+        **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']}})
     RelatedResource = "c7n.resources.vpc.SecurityGroup"
     RelatedIdsExpression = '[SecurityGroups][].GroupId'
@@ -1494,7 +1494,7 @@ class AddressRelease(BaseAction):
     """
 
     schema = type_schema('release', force={'type': 'boolean'})
-    permissions = ('ec2:ReleaseAddress','ec2:DisassociateAddress',)
+    permissions = ('ec2:ReleaseAddress', 'ec2:DisassociateAddress',)
 
     def process_attached(self, client, associated_addrs):
         for aa in list(associated_addrs):

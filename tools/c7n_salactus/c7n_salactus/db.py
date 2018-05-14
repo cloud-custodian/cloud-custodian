@@ -185,8 +185,7 @@ class Bucket(object):
             int(self.data.get('keys-enderr', {}).get(self.bucket_id, 0)),
             int(self.data.get('keys-sesserr', {}).get(self.bucket_id, 0)),
             int(self.data.get('keys-error', {}).get(self.bucket_id, 0)),
-            int(self.data.get('keys-missing', {}).get(self.bucket_id, 0))
-            ))
+            int(self.data.get('keys-missing', {}).get(self.bucket_id, 0))))
 
     @property
     def gkrate(self):

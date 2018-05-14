@@ -38,7 +38,7 @@ from c7n_salactus import worker, db
 
 # side-effect serialization patches...
 try:
-    from c7n_salactus import rqworker
+    from c7n_salactus import rqworker # NOQA F401
     HAVE_BIN_LIBS = True
 except ImportError:
     # we want the cli to work in lambda and we might not package up
@@ -60,7 +60,7 @@ CONFIG_SCHEMA = {
                 'glacier': {'type': 'boolean'},
                 'key-id': {'type': 'string'},
                 'crypto': {'type': 'string', 'enum': ['AES256', 'aws:kms']}
-                }
+            }
         },
 
         'inventory': {
@@ -77,7 +77,7 @@ CONFIG_SCHEMA = {
                 'id-selector': {
                     'description': (
                         'Only use inventories with the given id.'),
-                        'default': 'salactus',
+                    'default': 'salactus',
                     'type': 'string'},
             }
         },
@@ -557,7 +557,7 @@ def watch(limit):
             elif b.scanned == prev_buckets[b.bucket_id].scanned:
                 continue
             else:
-                b.data['gkrate'][b.bucket_id] =  (
+                b.data['gkrate'][b.bucket_id] = (
                     b.scanned - prev_buckets[b.bucket_id].scanned) / period
             progress.append(b)
 
@@ -674,7 +674,6 @@ def inspect_bucket(bucket):
     click.echo("Endpoint: %s" % found.data['keys-enderr'].get(found.bucket_id, 0))
 
 
-
 @cli.command(name='inspect-queue')
 @click.option('--queue', required=True)
 @click.option(
@@ -699,8 +698,8 @@ def inspect_queue(queue, state, limit, bucket):
         row = {
             'account': account,
             'bucket': bucket,
-            #'region': j.args[1]['region'],
-            #'size': j.args[1]['keycount'],
+            # 'region': j.args[1]['region'],
+            # 'size': j.args[1]['keycount'],
             'ttl': j.ttl,
             'enqueued': j.enqueued_at,
             'rtt': j.result_ttl,
