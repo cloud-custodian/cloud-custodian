@@ -108,6 +108,9 @@ class SlackDelivery(object):
     def retrieve_user_im(self, email_addresses):
         list = {}
 
+        if not self.config['slack_token']:
+            raise Exception("No Slack token found.")
+
         for address in email_addresses:
             if self.caching and self.caching.get(address):
                     self.logger.debug('Got Slack metadata from cache for: %s' % address)
