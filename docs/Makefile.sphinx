@@ -55,7 +55,9 @@ clean:
 	rm -rf $(SRCDIR)/generated
 
 html:
-	$(SPHINXBINS)/sphinx-apidoc -o $(SRCDIR)/generated $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
+	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
+	$(SPHINXBINS)/sphinx-apidoc -H "Azure" -o $(SRCDIR)/generated/azure $(SRCDIR)/../../tools/c7n_azure/c7n_azure
+	$(SPHINXBINS)/sphinx-apidoc -H "GCP" -o $(SRCDIR)/generated/gcp $(SRCDIR)/../../tools/c7n_gcp/c7n_gcp
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
