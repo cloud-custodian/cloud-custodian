@@ -36,6 +36,7 @@ from c7n.utils import (
 from botocore.exceptions import ClientError
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
+
 @resources.register('vpc')
 class Vpc(query.QueryResourceManager):
 
@@ -1469,7 +1470,7 @@ class NetworkAddress(query.QueryResourceManager):
         date = None
         dimension = None
         config_type = "AWS::EC2::EIP"
-        
+
     @property
     def generate_arn(self):
         if self._generate_arn is None:
@@ -1484,13 +1485,14 @@ class NetworkAddress(query.QueryResourceManager):
 
     def get_arn(self, r):
         return self.generate_arn(r[self.get_model().id])
-    
+
     def get_arns(self, resource_set):
         arns = []
         for r in resource_set:
             _id = r[self.get_model().id]
             arns.append(self.generate_arn(_id))
         return arns
+
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
 NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
