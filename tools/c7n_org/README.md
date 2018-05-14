@@ -76,3 +76,26 @@ output
     |- account-2
 ...
 ```
+
+# Selecting accounts and policy for execution
+
+You can filter the accounts to be run against by either passing the account name or id
+via the `-a` flag, which can be specified multiple times.
+
+Groups of accounts can also be selected for execution by specifying the `-t` tag filter.
+Account tags are specified in the config file. ie given the above accounts config file
+you can specify all prod accounts with `-t type:prod`.
+
+You can specify which policies to use for execution by either specifying `-p` or selecting
+groups of policies via their tags with `-l`.
+
+
+See `c7n-org run --help` for more information.
+
+# Other commands
+
+c7n-org also supports running arbitrary scripts against accounts via the run command, which
+exports standard AWS SDK credential information into the process environment before executing.
+
+c7n-org also supports generating reports for a given policy execution across accounts via
+the `c7n-org report` subcommand.

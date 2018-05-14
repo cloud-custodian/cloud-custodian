@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8fec247d-4fb6-11e8-9978-e11c90c2d4bb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8fec247d-4fb6-11e8-9978-e11c90c2d4bb", 
+                "date": "Fri, 04 May 2018 16:16:54 GMT", 
+                "content-length": "86", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "Required", 
+                "Key": "Required"
+            }, 
+            {
+                "Value": "c7n-dax-test", 
+                "Key": "Name"
+            }
+        ]
+    }
+}
