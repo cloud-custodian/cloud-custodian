@@ -734,11 +734,9 @@ class PutMetric(BaseAction):
             'key': {'type': 'string'},  # jmes path
             'namespace': {'type': 'string'},
             'metric_name': {'type': 'string'},
-            'dimensions':
-                {'type':'array',
-                'items': {
-                    'type':'object'
-                },
+            'dimensions': {
+                'type': 'array',
+                'items': {'type': 'object'},
             },
             'op': {'enum': list(METRIC_OPS.keys())},
             'units': {'enum': METRIC_UNITS}

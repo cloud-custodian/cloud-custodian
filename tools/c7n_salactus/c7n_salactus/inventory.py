@@ -32,13 +32,14 @@ from c7n.utils import chunks
 def load_manifest_file(client, bucket, schema, versioned, ifilters, key_info):
     """Given an inventory csv file, return an iterator over keys
     """
-    # to avoid thundering herd downloads
+    # To avoid thundering herd downloads, we do an immediate yield for
+    # interspersed i/o
     yield None
 
     # Inline these values to avoid the local var lookup, they are constants
-    #rKey = schema['Key'] # 1
-    #rIsLatest = schema['IsLatest'] # 3
-    #rVersionId = schema['VersionId'] # 2
+    # rKey = schema['Key'] # 1
+    # rIsLatest = schema['IsLatest'] # 3
+    # rVersionId = schema['VersionId'] # 2
 
     with tempfile.NamedTemporaryFile() as fh:
         client.download_fileobj(Bucket=bucket, Key=key_info['key'], Fileobj=fh)
