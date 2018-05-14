@@ -58,13 +58,13 @@ func main() {
 				return nil, err
 			}
 			if !whitelist.Exists(registerReq.Identity().AccountId) {
-				return nil, err
+				return nil, identity.ErrUnauthorizedAccount
 			}
 			switch req.HTTPMethod {
 			case "PATCH":
-				return lambdautil.JSON(r.HandleUpdateRegistrationRequest(ctx, &registerReq))
+				return lambdautil.JSON(r.HandleUpdate(ctx, &registerReq))
 			case "POST":
-				return lambdautil.JSON(r.HandleCreateRegistrationRequest(ctx, &registerReq))
+				return lambdautil.JSON(r.HandleCreate(ctx, &registerReq))
 			}
 		}
 		return nil, lambdautil.NotFoundError{fmt.Sprintf("cannot find resource %#v", req.Resource)}

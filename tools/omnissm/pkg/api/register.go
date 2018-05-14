@@ -29,13 +29,22 @@ import (
 )
 
 type RegistrationRequest struct {
-	json.Unmarshaler
 	Provider  string          `json:"provider"`
 	Document  json.RawMessage `json:"document"`
 	Signature string          `json:"signature"`
 	ManagedId string          `json:"managedId,omitempty"`
 
 	document identity.Document
+}
+
+func (r *RegistrationRequest) UnmarshalJSON(data []byte) error {
+	type alias RegistrationRequest
+	var req alias
+	if err := json.Unmarshal(data, &req); err != nil {
+		return err
+	}
+	*r = RegistrationRequest(req)
+	return nil
 }
 
 func (r *RegistrationRequest) Identity() *identity.Document {
@@ -53,17 +62,21 @@ func (r *RegistrationRequest) Verify() error {
 }
 
 type RegistrationResponse struct {
-	json.Marshaler
 	*store.RegistrationEntry
 
 	Region string `json:"region,omitempty"`
+}
+
+func (r *RegistrationResponse) MarshalJSON() ([]byte, error) {
+	type alias RegistrationResponse
+	return json.Marshal((*alias)(r))
 }
 
 type RegistrationHandler struct {
 	*manager.Manager
 }
 
-func (r *RegistrationHandler) HandleCreateRegistrationRequest(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
+func (r *RegistrationHandler) HandleCreate(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
 	logger := log.With().Str("handler", "CreateRegistration").Logger()
 	logger.Info().Interface("identity", req.Identity()).Msg("new registration request")
 	entry, err, ok := r.Manager.Get(identity.Hash(req.Identity().Name()))
@@ -86,7 +99,7 @@ func (r *RegistrationHandler) HandleCreateRegistrationRequest(ctx context.Contex
 	}, nil
 }
 
-func (r *RegistrationHandler) HandleUpdateRegistrationRequest(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
+func (r *RegistrationHandler) HandleUpdate(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
 	logger := log.With().Str("handler", "UpdateRegistration").Logger()
 	logger.Info().Interface("identity", req.Identity()).Msg("update registration request")
 	id := identity.Hash(req.Identity().Name())
