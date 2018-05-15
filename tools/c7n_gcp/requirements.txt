@@ -1,0 +1,4 @@
+c7n
+retrying
+google-api-python-client==1.6.7
+ratelimiter==1.2.0.post0
