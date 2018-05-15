@@ -23,7 +23,7 @@ from c7n_azure.utils import ResourceIdParser
 
 class Session(object):
 
-    def __init__(self):
+    def __init__(self, subscription_id=None):
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
 

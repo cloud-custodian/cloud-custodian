@@ -14,50 +14,50 @@
 
 import os
 import yaml
+import click
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource.subscriptions import SubscriptionClient
 
 
-def main():
+@click.command()
+@click.option(
+    '-f', '--output', type=click.File('w'),
+    help="File to store the generated config (default stdout)")
+def main(output):
     """
     Generate a c7n-org subscriptions config file
     """
 
     tenant_auth_variables = [
-        'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
-        'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
+        'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
     ]
 
     # Set credentials with environment variables if all
     # required variables are present
-    if all(k in os.environ for k in tenant_auth_variables):
-        credentials = ServicePrincipalCredentials(
-            client_id=os.environ['AZURE_CLIENT_ID'],
-            secret=os.environ['AZURE_CLIENT_SECRET'],
-            tenant=os.environ['AZURE_TENANT_ID']
-        )
-        client = SubscriptionClient(credentials)
-        subs = [sub.serialize(True) for sub in client.subscriptions.list()]
+    if not all(k in os.environ for k in tenant_auth_variables):
+        raise ValueError("Missing one of the environment variables "
+                         "('AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'")
+    credentials = ServicePrincipalCredentials(
+        client_id=os.environ['AZURE_CLIENT_ID'],
+        secret=os.environ['AZURE_CLIENT_SECRET'],
+        tenant=os.environ['AZURE_TENANT_ID']
+    )
+    client = SubscriptionClient(credentials)
+    subs = [sub.serialize(True) for sub in client.subscriptions.list()]
 
-        results = []
-        for sub in subs:
-            sub_info = {
-                'subscription_id': sub['subscriptionId'],
-                'name': sub['displayName']
-            }
-            results.append(sub_info)
+    results = []
+    for sub in subs:
+        sub_info = {
+            'subscription_id': sub['subscriptionId'],
+            'name': sub['displayName']
+        }
+        results.append(sub_info)
 
-        output = '../azure_config.yaml'
-
-        with open(output, 'w') as f:
-            f.write(yaml.safe_dump({
-                'azure_subscriptions': results
-            }, default_flow_style=False))
-        '''print(
-            yaml.safe_dump(
-                {'accounts': results},
-                default_flow_style=False),
-            file=output)'''
+    print(
+        yaml.safe_dump(
+            {'accounts': results},
+            default_flow_style=False),
+        file=output)
 
 
 if __name__ == '__main__':

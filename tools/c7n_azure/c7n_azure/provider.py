@@ -31,7 +31,7 @@ class Azure(Provider):
         return policy_collection
 
     def get_session_factory(self, options):
-        return Session
+        return Session(subscription_id=options.account_id)
 
 
 resources = Azure.resources
