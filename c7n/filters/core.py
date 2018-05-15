@@ -491,7 +491,6 @@ class ValueFilter(Filter):
         elif self.vtype == 'swap':
             return value, sentinel
         elif self.vtype == 'age':
-            print('value: {}, type(value): {}'.format(value, type(value)))
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
             if isinstance(value, (str, int, float)):
