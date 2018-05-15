@@ -14,6 +14,7 @@
 
 import os
 import yaml
+import pdb
 import click
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource.subscriptions import SubscriptionClient
@@ -31,7 +32,6 @@ def main(output):
     tenant_auth_variables = [
         'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
     ]
-
     # Set credentials with environment variables if all
     # required variables are present
     if not all(k in os.environ for k in tenant_auth_variables):
@@ -55,7 +55,7 @@ def main(output):
 
     print(
         yaml.safe_dump(
-            {'accounts': results},
+            {'subscriptions': results},
             default_flow_style=False),
         file=output)
 

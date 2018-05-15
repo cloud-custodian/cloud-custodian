@@ -21,6 +21,7 @@ import multiprocessing
 import time
 import subprocess
 import sys
+import pdb
 
 from concurrent.futures import (
     ProcessPoolExecutor,
@@ -80,7 +81,7 @@ CONFIG_SCHEMA = {
                 'external_id': {'type': 'string'},
             }
         },
-        'azure_sub': {
+        'subscription': {
             'type': 'object',
             'additionalProperties': True,
             'properties': {
@@ -93,7 +94,7 @@ CONFIG_SCHEMA = {
     'additionalProperties': False,
     'oneOf': [
         {'required': ['accounts']},
-        {'required': ['azure_subscriptions']}
+        {'required': ['subscriptions']}
     ],
     'properties': {
         'vars': {'type': 'object'},
@@ -101,9 +102,9 @@ CONFIG_SCHEMA = {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
         },
-        'azure_subscriptions': {
+        'subscriptions': {
             'type': 'array',
-            'items': {'$ref': '#/definitions/azure_sub'}
+            'items': {'$ref': '#/definitions/subscription'}
         }
     }
 }
@@ -403,11 +404,10 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                     a['name'], r, " ".join(script_args))
 
 def accounts_iterator(config):
-
     for a in config.get('accounts'):
         yield a
     for a in config.get('subscriptions'):
-        d = {'account_id': a['subscriptionId'], 'name': a['name']}
+        d = {'account_id': a['subscription_id'], 'name': a['name']}
         yield d
 
 
@@ -423,12 +423,12 @@ def run_account(account, region, policies_config, output_path,
         os.makedirs(output_path)
 
     cache_path = os.path.join(output_path, "c7n.cache")
+
     config = Config.empty(
         region=region,
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         cache=cache_path, log_group=None, profile=None, external_id=None)
-
     if account.get('role'):
         config['assume_role'] = account['role']
         config['external_id'] = account.get('external_id')
