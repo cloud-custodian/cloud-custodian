@@ -402,6 +402,14 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                     "error running script on account:%s region:%s script: `%s`",
                     a['name'], r, " ".join(script_args))
 
+def accounts_iterator(config):
+
+    for a in config.get('accounts'):
+        yield a
+    for a in config.get('subscriptions'):
+        d = {'account_id': a['subscriptionId'], 'name': a['name']}
+        yield d
+
 
 def run_account(account, region, policies_config, output_path,
                 cache_period, metrics, dryrun, debug):
@@ -490,8 +498,12 @@ def run(config, use, output_dir, accounts, tags,
     policy_counts = Counter()
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
+<<<<<<< HEAD
         # Run AWS Accounts
         for a in accounts_config.get('accounts', ()):
+=======
+        for a in accounts_iterator(accounts_config):
+>>>>>>> kapill/azure-c7n-org
             for r in resolve_regions(region or a.get('regions', ())):
                 futures[w.submit(
                     run_account,
