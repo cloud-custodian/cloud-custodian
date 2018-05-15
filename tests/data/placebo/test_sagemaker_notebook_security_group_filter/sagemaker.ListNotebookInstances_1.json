@@ -1,0 +1,73 @@
+{
+    "status_code": 200, 
+    "data": {
+        "NotebookInstances": [
+            {
+                "NotebookInstanceStatus": "InService", 
+                "Url": "c7n-test-nb.notebook.us-east-1.sagemaker.aws", 
+                "NotebookInstanceName": "c7n-test-nb", 
+                "CreationTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 18, 
+                    "microsecond": 733000, 
+                    "year": 2018, 
+                    "day": 10, 
+                    "minute": 3
+                }, 
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-test-nb", 
+                "LastModifiedTime": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 48, 
+                    "microsecond": 398000, 
+                    "year": 2018, 
+                    "day": 10, 
+                    "minute": 6
+                }, 
+                "InstanceType": "ml.t2.medium"
+            }, 
+            {
+                "NotebookInstanceStatus": "InService", 
+                "Url": "kapil-playground.notebook.us-east-1.sagemaker.aws", 
+                "NotebookInstanceName": "kapil-playground", 
+                "CreationTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 55, 
+                    "microsecond": 143000, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 19
+                }, 
+                "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/kapil-playground", 
+                "LastModifiedTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 35, 
+                    "microsecond": 138000, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 24
+                }, 
+                "InstanceType": "ml.t2.medium"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "77afb98c-079a-4234-a1f1-c9be5b58547f", 
+            "HTTPHeaders": {
+                "date": "Thu, 10 May 2018 15:23:11 GMT", 
+                "x-amzn-requestid": "77afb98c-079a-4234-a1f1-c9be5b58547f", 
+                "content-length": "682", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

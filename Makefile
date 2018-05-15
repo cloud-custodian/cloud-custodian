@@ -2,7 +2,7 @@
 install:
 	python -m virtualenv --python python2.7 .
 	. bin/activate && pip install -r requirements-dev.txt
-	. bin/activate && python setup.py develop
+	. bin/activate && pip install -e .
 
 coverage:
 	rm -Rf .coverage
@@ -43,6 +43,9 @@ ghpages:
 	git add -u && \
 	git add -A && \
 	git commit -m "Updated generated Sphinx documentation"
+
+lint:
+	flake8 c7n tools
 
 clean:
 	rm -rf .tox .Python bin include lib pip-selfcheck.json

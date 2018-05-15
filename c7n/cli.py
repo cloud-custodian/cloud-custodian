@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -265,14 +265,6 @@ def setup_parser():
     schema.set_defaults(command="c7n.commands.schema_cmd")
     _schema_options(schema)
 
-    # access_desc = ("Show permissions needed to execute the policies")
-    # access = subs.add_parser(
-    #    'access', description=access_desc, help=access_desc)
-    # access.set_defaults(command='c7n.commands.access')
-    # _default_options(access)
-    # access.add_argument(
-    #    '-m', '--access', default=False, action='store_true')
-
     run_desc = "\n".join((
         "Execute the policies in a config file",
         "",
@@ -293,6 +285,10 @@ def setup_parser():
     run.set_defaults(command="c7n.commands.run")
     _default_options(run)
     _dryrun_option(run)
+    run.add_argument(
+        "--skip-validation",
+        action="store_true",
+        help="Skips validation of policies (assumes you've run the validate command seperately).")
     run.add_argument(
         "-m", "--metrics-enabled",
         default=False, action="store_true",
@@ -335,6 +331,9 @@ def main():
     parser = setup_parser()
     argcomplete.autocomplete(parser)
     options = parser.parse_args()
+    if options.subparser is None:
+        parser.print_help(file=sys.stderr)
+        return sys.exit(2)
 
     _setup_logger(options)
 

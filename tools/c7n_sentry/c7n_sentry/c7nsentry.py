@@ -225,7 +225,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
         _, level, logger, msg_frag = [s.strip() for s in error_msg[
             error_msg.find(','):].split('-', 3)]
         error_msg = " - ".join([level, logger, msg_frag])
-    except:
+    except Exception:
         level, logger = 'ERROR', None
 
     for f in reversed(error['stacktrace']['frames']):
@@ -290,7 +290,7 @@ def parse_traceback(msg, site_path="site-packages", in_app_prefix="c7n"):
     err_ctx = None
 
     for l in lines[1:-1]:
-        l = l.strip()
+        l = l.strip() # noqa E741
         if l.startswith('Traceback'):
             continue
         elif l.startswith('File'):
@@ -527,7 +527,7 @@ if __name__ == '__main__':
         main()
     except (SystemExit, KeyboardInterrupt):
         raise
-    except:
+    except Exception:
         import traceback, sys, pdb
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

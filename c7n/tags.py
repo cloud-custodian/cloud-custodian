@@ -24,13 +24,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
+from dateutil import zoneinfo
 from dateutil.parser import parse
-from dateutil.tz import tzutc
 
 import itertools
 
 from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.filters import Filter, OPERATORS, FilterValidationError
+from c7n.filters.offhours import Time
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
@@ -79,6 +80,10 @@ def universal_augment(self, resources):
     # Resource Tagging API Support
     # https://goo.gl/uccKc9
 
+    # Bail on empty set
+    if not resources:
+        return resources
+
     client = utils.local_session(
         self.session_factory).client('resourcegroupstaggingapi')
 
@@ -95,6 +100,7 @@ def universal_augment(self, resources):
             ResourceTypeFilters=[resource_type])]))
     resource_tag_map = {
         r['ResourceARN']: r['Tags'] for r in resource_tag_map_list}
+
     for arn, r in zip(self.get_arns(resources), resources):
         if arn in resource_tag_map:
             r['Tags'] = resource_tag_map[arn]
@@ -123,7 +129,7 @@ def _common_tag_processer(executor_factory, batch_size, concurrency,
 class TagTrim(Action):
     """Automatically remove tags from an ec2 resource.
 
-    EC2 Resources have a limit of 10 tags, in order to make
+    EC2 Resources have a limit of 50 tags, in order to make
     additional tags space on a set of resources, this action can
     be used to remove enough tags to make the desired amount of
     space while preserving a given set of tags.
@@ -133,8 +139,8 @@ class TagTrim(Action):
       - policies:
          - name: ec2-tag-trim
            comment: |
-             Any instances with 8 or more tags get tags removed until
-             they match the target tag count, in this case 7 so we
+             Any instances with 48 or more tags get tags removed until
+             they match the target tag count, in this case 47 so we
              that we free up a tag slot for another usage.
            resource: ec2
            filters:
@@ -144,7 +150,7 @@ class TagTrim(Action):
                type: value
                key: "[length(Tags)][0]"
                op: ge
-               value: 8
+               value: 48
            actions:
              - type: tag-trim
                space: 3
@@ -227,6 +233,12 @@ class TagActionFilter(Filter):
     be sending a final notice email a few days before terminating an
     instance, or snapshotting a volume prior to deletion.
 
+    The optional 'skew_hours' parameter provides for incrementing the current
+    time a number of hours into the future.
+
+    Optionally, the 'tz' parameter can get used to specify the timezone
+    in which to interpret the clock (default value is 'utc')
+
     .. code-block :: yaml
 
       - policies:
@@ -239,6 +251,7 @@ class TagActionFilter(Filter):
               tag: custodian_status
               op: stop
               # Another optional tag is skew
+              tz: utc
           actions:
             - stop
 
@@ -246,7 +259,9 @@ class TagActionFilter(Filter):
     schema = utils.type_schema(
         'marked-for-op',
         tag={'type': 'string'},
+        tz={'type': 'string'},
         skew={'type': 'number', 'minimum': 0},
+        skew_hours={'type': 'number', 'minimum': 0},
         op={'type': 'string'})
 
     current_date = None
@@ -255,12 +270,19 @@ class TagActionFilter(Filter):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError("Invalid marked-for-op op:%s" % op)
+
+        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        if not tz:
+            raise FilterValidationError(
+                "Invalid timezone specified '%s'" % self.data.get('tz'))
         return self
 
     def __call__(self, i):
         tag = self.data.get('tag', DEFAULT_TAG)
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
+        skew_hours = self.data.get('skew_hours', 0)
+        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         v = None
         for n in i.get('Tags', ()):
@@ -288,7 +310,13 @@ class TagActionFilter(Filter):
         if self.current_date is None:
             self.current_date = datetime.now()
 
-        return self.current_date >= (action_date - timedelta(skew))
+        if action_date.tzinfo:
+            # if action_date is timezone aware, set to timezone provided
+            action_date = action_date.astimezone(tz)
+            self.current_date = datetime.now(tz=tz)
+
+        return self.current_date >= (
+            action_date - timedelta(days=skew, hours=skew_hours))
 
 
 class TagCountFilter(Filter):
@@ -525,6 +553,9 @@ class RenameTag(Action):
 class TagDelayedAction(Action):
     """Tag resources for future action.
 
+    The optional 'tz' parameter can be used to adjust the clock to align
+    with a given timezone. The default value is 'utc'.
+
     .. code-block :: yaml
 
       - policies:
@@ -537,6 +568,7 @@ class TagDelayedAction(Action):
               tag: custodian_status
               op: stop
               # Another optional tag is skew
+              tz: utc
           actions:
             - stop
     """
@@ -546,6 +578,8 @@ class TagDelayedAction(Action):
         tag={'type': 'string'},
         msg={'type': 'string'},
         days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        tz={'type': 'string'},
         op={'type': 'string'})
 
     permissions = ('ec2:CreateTags',)
@@ -560,9 +594,30 @@ class TagDelayedAction(Action):
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError(
                 "mark-for-op specifies invalid op:%s" % op)
+
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        if not self.tz:
+            raise FilterValidationError(
+                "Invalid timezone specified %s" % self.tz)
         return self
 
+    def generate_timestamp(self, days, hours):
+        n = datetime.now(tz=self.tz)
+        if days == hours == 0:
+            # maintains default value of days being 4 if nothing is provided
+            days = 4
+        action_date = (n + timedelta(days=days, hours=hours))
+        if hours > 0:
+            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
+        else:
+            action_date_string = action_date.strftime('%Y/%m/%d')
+
+        return action_date_string
+
     def process(self, resources):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
@@ -573,15 +628,15 @@ class TagDelayedAction(Action):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        date = self.data.get('days', 4)
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
+        action_date = self.generate_timestamp(days, hours)
 
-        n = datetime.now(tz=tzutc())
-        action_date = n + timedelta(days=date)
         msg = msg_tmpl.format(
-            op=op, action_date=action_date.strftime('%Y/%m/%d'))
+            op=op, action_date=action_date)
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date.strftime('%Y/%m/%d')))
+            len(resources), op, action_date))
 
         tags = [{'Key': tag, 'Value': msg}]
 
@@ -705,8 +760,8 @@ class NormalizeTag(Action):
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for r in resource_set:
-                action    = self.data.get('action')
-                value     = self.data.get('value')
+                action = self.data.get('action')
+                value = self.data.get('value')
                 new_value = False
                 if action == 'lower' and not r.islower():
                     new_value = r.lower()
@@ -833,6 +888,8 @@ class UniversalTagDelayedAction(TagDelayedAction):
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
@@ -843,15 +900,15 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        date = self.data.get('days', 4)
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
+        action_date = self.generate_timestamp(days, hours)
 
-        n = datetime.now(tz=tzutc())
-        action_date = n + timedelta(days=date)
         msg = msg_tmpl.format(
-            op=op, action_date=action_date.strftime('%Y/%m/%d'))
+            op=op, action_date=action_date)
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date.strftime('%Y/%m/%d')))
+            len(resources), op, action_date))
 
         tags = {tag: msg}
 

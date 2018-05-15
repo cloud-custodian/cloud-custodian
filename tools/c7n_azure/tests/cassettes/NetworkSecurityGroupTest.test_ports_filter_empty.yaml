@@ -1,0 +1,65 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/2.7.14 (Windows-10-10.0.16299) requests/2.18.4 msrest/0.4.28
+          msrest_azure/0.4.28 networkmanagementclient/1.7.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkSecurityGroups?api-version=2017-11-01
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      cache-control: [no-cache]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 04 May 2018 16:28:15 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [91c422a3-22a8-4245-ac76-751cc41a58ec]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [ea538f6c-b7bd-4ac6-ac72-2ed5281d9e17]
+      x-ms-routing-request-id: ['WESTUS2:20180504T162816Z:91c422a3-22a8-4245-ac76-751cc41a58ec']
+    status: {code: 200, message: OK}
+version: 1

@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  RegistrationHandler:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: "subscribe.handle"
+      FunctionName: "omnissm-config-subscribe"
+      Runtime: "python2.7"
+      Tags:
+        App: OmniSSM
+      CodeUri: "."
+      Role: arn:aws:iam::644160558196:role/CloudCustodianRole
+      Events:
+        ConfigFeed:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              source: ["aws.config"]
+              detail-type: ["Config Configuration Item Change"]
+              detail:
+                configurationItem:
+                  resourceType: ["AWS::EC2::Instance"]

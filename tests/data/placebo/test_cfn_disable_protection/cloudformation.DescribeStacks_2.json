@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-2:644160558196:stack/mytopic/7efb2d40-3a5d-11e8-8c44-500cef930ce6",
+                "StackName": "mytopic",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 12,
+                    "minute": 16,
+                    "second": 27,
+                    "microsecond": 160000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "577e4fe9-3a5f-11e8-9a2f-952c05ccedd1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "577e4fe9-3a5f-11e8-9a2f-952c05ccedd1",
+                "content-type": "text/xml",
+                "content-length": "843",
+                "date": "Sat, 07 Apr 2018 12:29:39 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -77,7 +77,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
 
     records = []
     for policy in policies:
-        if policy.ctx.output.use_s3():
+        if policy.ctx.output.type == 's3':
             policy_records = record_set(
                 policy.session_factory,
                 policy.ctx.output.bucket,
