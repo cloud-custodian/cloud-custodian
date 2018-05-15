@@ -143,7 +143,8 @@ class EmailDelivery(object):
 
         # resolve the contact info from ldap
         non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
-        ldap_emails = [self.ldap_lookup.get_email_to_addrs_from_uid(uid) for uid in non_email_ids]
+        ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
+                                              (uid) for uid in non_email_ids]))
 
         return list(chain(explicit_emails, ldap_emails))
 
@@ -200,6 +201,7 @@ class EmailDelivery(object):
                 sqs_message,
                 resource
             )
+
             resource_emails = resource_emails + ro_emails
             # if 'owner_absent_contact' was specified in the policy and no resource
             # owner emails were found, add those addresses

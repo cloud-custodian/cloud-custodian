@@ -181,6 +181,7 @@ SQS_MESSAGE_3 = {
     'resources': [RESOURCE_2]
 }
 
+
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
 
 _safe_rdn = mockBase.safe_rdn
