@@ -22,6 +22,8 @@ tox
 -e tools/c7n_mailer
 # Local package required for c7n_azure tests
 -e tools/c7n_azure
+# Local package required for c7n_gcp tests
+-e tools/c7n_gcp
 
 # requires pandoc, fails on ci server, only used for pypi metadata
 # setuptools-markdown==0.2

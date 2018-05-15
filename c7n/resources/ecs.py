@@ -352,7 +352,7 @@ class SetState(BaseAction):
     """
     schema = type_schema(
         'set-state',
-        state={"type": "string",'enum': ['DRAINING', 'ACTIVE']})
+        state={"type": "string", 'enum': ['DRAINING', 'ACTIVE']})
     permissions = ('ecs:UpdateContainerInstancesState',)
 
     def process(self, resources):

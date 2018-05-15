@@ -331,8 +331,7 @@ class ServiceClient(object):
 
         Args:
             verb (str): Method to execute on the component (ex. get, list).
-            verb_arguments (dict): key-value pairs to be passed to
-                _build_request.
+            verb_arguments (dict): key-value pairs to be passed to _build_request.
 
         Returns:
             dict: An async operation Service Response.
@@ -345,8 +344,7 @@ class ServiceClient(object):
 
         Args:
             verb (str): Method to execute on the component (ex. get, list).
-            verb_arguments (dict): key-value pairs to be passed to
-                _BuildRequest.
+            verb_arguments (dict): key-value pairs to be passed to _BuildRequest.
 
         Yields:
             dict: Service Response.
@@ -372,8 +370,7 @@ class ServiceClient(object):
 
         Args:
             verb (str): Method to execute on the component (ex. search).
-            verb_arguments (dict): key-value pairs to be passed to
-                _BuildRequest.
+            verb_arguments (dict): key-value pairs to be passed to _BuildRequest.
 
         Yields:
             dict: Service Response.
@@ -401,8 +398,7 @@ class ServiceClient(object):
 
         Args:
             verb (str): Method to execute on the component (ex. get, list).
-            verb_arguments (dict): key-value pairs to be passed to
-                _BuildRequest.
+            verb_arguments (dict): key-value pairs to be passed to _BuildRequest.
 
         Returns:
             dict: Service Response.
