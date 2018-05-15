@@ -1,36 +1,34 @@
+.. _nsg:
+
 Network Security Groups
 =======================
 
-Available Types:
-----------------
-    - ingress - Inbound Security Rules
-    - egress - Outbound Security Rules
+Filters
+-------
+- Standard Value Filter (see :ref:`filters`)
 
-Available Filters:
-------------------
-    - FromPort
-        - Lower bound of port range (inclusive)
-        - Can be used alone to indicate all ports at or above number
-        - Can be used with ToPort to create range
-    - ToPort
-        - Upper bound of port range (inclusive)
-        - Can be used alone to indicate all ports at or below number
-        - Can be used with FromPort to create range
-    - Ports
-        - Filter on ports contained in list.
-        - Ex: Ports: [8080,8081]
-    - OnlyPorts
-        - Filter on ports NOT contained in list.
-        - Ex: OnlyPorts: [22]
-    - IpProtocol
-        - Specify for rules with indicated protocol (TCP,UDP)
-        - Can be used with any other filter
-        - Ex: IpProtocol: TCP
+``ingress``
+  Filter based on Inbound Security Rules
 
-Available Actions
------------------
-    - open - Allow access to security rules
-    - close - Deny access to security rules
+  .. c7n-schema:: IngressFilter
+      :module: c7n_azure.resources.network_security_group
+
+``egress``
+  Filter based on Outbound Security Rules
+
+  .. c7n-schema:: EgressFilter
+      :module: c7n_azure.resources.network_security_group
+
+
+Actions
+-------
+
+``open``
+  Allow access to security rules
+
+``close``
+  Deny access to security rules
+
 
 Example Policies
 ----------------

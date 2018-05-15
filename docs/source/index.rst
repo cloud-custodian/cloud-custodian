@@ -66,7 +66,9 @@ Navigate below and get started with Cloud Custodian!
    :maxdepth: 2
    :caption: API Reference
 
-   generated/modules
+   generated/aws/modules
+   generated/azure/modules
+   generated/gcp/modules
 
 
 Indices and tables
