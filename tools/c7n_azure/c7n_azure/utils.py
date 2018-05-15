@@ -26,3 +26,7 @@ class ResourceIdParser(object):
     @staticmethod
     def get_resource_type(resource_id):
         return resource_id.split('/')[7]
+
+    @staticmethod
+    def get_resource_name(resource_id):
+        return resource_id.split('/')[8]
