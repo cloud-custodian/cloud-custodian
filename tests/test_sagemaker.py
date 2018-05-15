@@ -158,6 +158,36 @@ class TestNotebookInstance(BaseTest):
             NotebookInstanceName=resources[0]['NotebookInstanceName'])
         self.assertTrue(notebook['NotebookInstanceStatus'], 'Deleting')
 
+    def test_notebook_subnet(self):
+        nb = 'c7n-test-nb'
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_notebook_subnet_filter')
+        p = self.load_policy({
+            'name': 'sagemaker-notebook',
+            'resource': 'sagemaker-notebook',
+            'filters': [{
+                'type': 'subnet',
+                'key': 'tag:Name',
+                'value': 'Pluto'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['NotebookInstanceName'], nb)
+
+    def test_notebook_security_group(self):
+        nb = 'c7n-test-nb'
+        session_factory = self.replay_flight_data(
+            'test_sagemaker_notebook_security_group_filter')
+        p = self.load_policy({
+            'name': 'sagemaker-notebook',
+            'resource': 'sagemaker-notebook',
+            'filters': [{
+                'type': 'security-group',
+                'key': 'GroupName',
+                'value': 'SGW-SG'}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['NotebookInstanceName'], nb)
+
 
 class TestModelInstance(BaseTest):
     def test_list_model(self):

@@ -218,17 +218,17 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find active members
     active_ids = {m['AccountId'] for m in extant_members
-                      if m['RelationshipStatus'] == 'Enabled'}
+        if m['RelationshipStatus'] == 'Enabled'}
     # Find invited members
     invited_ids = {m['AccountId'] for m in extant_members
-                       if m['RelationshipStatus'] == 'Invited'}
+        if m['RelationshipStatus'] == 'Invited'}
 
     # Find extant members not currently enabled
     suspended_ids = {m['AccountId'] for m in extant_members
-                     if m['RelationshipStatus'] == 'Disabled'}
+        if m['RelationshipStatus'] == 'Disabled'}
     # Filter by accounts under consideration per config and cli flags
     suspended_ids = {a['account_id'] for a in accounts_config['accounts']
-                     if a['account_id'] in suspended_ids}
+        if a['account_id'] in suspended_ids}
 
     if suspended_ids:
         unprocessed = master_client.start_monitoring_members(
@@ -308,6 +308,7 @@ def enable_region(master_info, accounts_config, executor, message, region):
                 log.info('Region:%s Enabled guard duty on account:%s',
                          region, a['name'])
     return members
+
 
 def enable_account(account, master_account_id, region):
     member_session = get_session(
