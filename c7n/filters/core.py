@@ -491,18 +491,14 @@ class ValueFilter(Filter):
         elif self.vtype == 'swap':
             return value, sentinel
         elif self.vtype == 'age':
+            print('value: {}, type(value): {}'.format(value, type(value)))
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
-            if isinstance(value, str):
+            if isinstance(value, (str, int, float)):
                 try:
-                    value = int(value)
+                    value = datetime.datetime.fromtimestamp(float(value)).replace(tzinfo=tzutc())
                 except ValueError:
                     pass
-            if isinstance(value, (int, float)):
-                try:
-                    value = datetime.datetime.fromtimestamp(value).replace(tzinfo=tzutc())
-                except ValueError:
-                    value = 0
             if not isinstance(value, datetime.datetime):
                 # EMR bug when testing ages in EMR. This is due to
                 # EMR not having more functionality.
