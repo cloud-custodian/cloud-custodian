@@ -331,7 +331,7 @@ class TagTrim(BaseAction):
         if self.space:
             # Free up slots to fit
             remove = len(candidates) - (
-                    self.max_tag_count - (self.space + len(tags_to_preserve)))
+                self.max_tag_count - (self.space + len(tags_to_preserve)))
             candidates = list(sorted(candidates))[:remove]
 
         if not candidates:
