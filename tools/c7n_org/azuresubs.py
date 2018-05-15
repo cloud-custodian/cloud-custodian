@@ -16,6 +16,7 @@ import os
 import yaml
 import pdb
 import click
+from c7n_azure.session import Session
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource.subscriptions import SubscriptionClient
 
@@ -29,22 +30,9 @@ def main(output):
     Generate a c7n-org subscriptions config file
     """
 
-    tenant_auth_variables = [
-        'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
-    ]
-    # Set credentials with environment variables if all
-    # required variables are present
-    if not all(k in os.environ for k in tenant_auth_variables):
-        raise ValueError("Missing one of the environment variables "
-                         "('AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'")
-    credentials = ServicePrincipalCredentials(
-        client_id=os.environ['AZURE_CLIENT_ID'],
-        secret=os.environ['AZURE_CLIENT_SECRET'],
-        tenant=os.environ['AZURE_TENANT_ID']
-    )
-    client = SubscriptionClient(credentials)
+    client = SubscriptionClient(Session().credentials)
     subs = [sub.serialize(True) for sub in client.subscriptions.list()]
-
+    pdb.set_trace()
     results = []
     for sub in subs:
         sub_info = {
