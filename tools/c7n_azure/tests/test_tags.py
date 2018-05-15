@@ -24,6 +24,7 @@ from azure_common import BaseTest, arm_template
 class TagsTest(BaseTest):
 
     # latest VCR recording date that tag tests
+    # If tests need to be re-recorded, update to current date
     TEST_DATE = datetime.datetime(2018, 5, 16, 0, 0, 0)
 
     # regex for identifying valid email addresses
@@ -338,8 +339,6 @@ class TagsTest(BaseTest):
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_auto_tag_add_creator_tag(self, utcnow_mock):
         """Adds CreatorEmail to a resource group.
-        If this test needs to be re-recorded, update TEST_DATE to
-        current date.
         """
         p = self.load_policy({
             'name': 'test-azure-tag',

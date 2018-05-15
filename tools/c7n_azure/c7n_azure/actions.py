@@ -73,6 +73,11 @@ class Tag(BaseAction):
         }
     )
 
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Tag, self).__init__(data, manager, log_dir)
+        self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
     def validate(self):
         if not self.data.get('tags') and not (self.data.get('tag') and self.data.get('value')):
             raise FilterValidationError(
@@ -85,8 +90,6 @@ class Tag(BaseAction):
         return self
 
     def process(self, resources):
-        self.session = utils.local_session(self.manager.session_factory)
-        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_resource, resources))
 
@@ -120,14 +123,17 @@ class RemoveTag(BaseAction):
         'untag',
         tags={'type': 'array', 'items': {'type': 'string'}})
 
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(RemoveTag, self).__init__(data, manager, log_dir)
+        self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
     def validate(self):
         if not self.data.get('tags'):
             raise FilterValidationError("Must specify tags")
         return self
 
     def process(self, resources):
-        self.session = utils.local_session(self.manager.session_factory)
-        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_resource, resources))
 
@@ -177,6 +183,8 @@ class AutoTagUser(BaseAction):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
         delta_days = self.data.get('days', self.max_query_days)
         self.start_time = utcnow() - datetime.timedelta(days=delta_days)
+        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        self.tag_action = self.manager.action_registry.get('tag')
 
     def validate(self):
         if self.manager.action_registry.get('tag') is None:
@@ -189,11 +197,8 @@ class AutoTagUser(BaseAction):
         return self
 
     def process(self, resources):
-        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
-        self.tag_action = self.manager.action_registry.get('tag')
         self.tag_key = self.data['tag']
         self.should_update = self.data.get('update', False)
-
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_resource, resources))
 
@@ -299,6 +304,10 @@ class TagTrim(BaseAction):
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
 
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(TagTrim, self).__init__(data, manager, log_dir)
+        self.untag_action = self.manager.action_registry.get('untag')
+
     def validate(self):
         if self.data.get('space') < 0 or self.data.get('space') > 15:
             raise FilterValidationError("Space must be between 0 and 15")
@@ -308,7 +317,6 @@ class TagTrim(BaseAction):
     def process(self, resources):
         self.preserve = set(self.data.get('preserve', {}))
         self.space = self.data.get('space', 1)
-        self.untag_action = self.manager.action_registry.get('untag')
 
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_resource, resources))
