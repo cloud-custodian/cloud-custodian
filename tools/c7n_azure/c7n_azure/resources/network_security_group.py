@@ -16,6 +16,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.actions import BaseAction
 from c7n.filters import Filter
+from c7n.utils import type_schema
 
 
 @resources.register('networksecuritygroup')
@@ -226,6 +227,7 @@ class CloseRules(RulesAction):
     """
     Deny access to Security Rule
     """
+    schema = type_schema('close')
     access_action = 'Deny'
 
 
@@ -234,4 +236,5 @@ class OpenRules(RulesAction):
     """
     Allow access to Security Rule
     """
+    schema = type_schema('open')
     access_action = 'Allow'

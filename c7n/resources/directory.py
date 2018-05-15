@@ -85,7 +85,7 @@ class DirectoryTag(Tag):
         client = local_session(self.manager.session_factory).client('ds')
         tag_list = []
         for t in tags:
-            tag_list.append({'Key': t['Key'],'Value': t['Value']})
+            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
         for d in directories:
             try:
                 client.add_tags_to_resource(

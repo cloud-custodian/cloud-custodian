@@ -31,5 +31,5 @@ setup(
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
     },
-    install_requires=["c7n", "click", "azure", "azure-cli-core", "adal"]
+    install_requires=["azure", "c7n", "click", "azure-cli-core", "adal", "futures==3.1.1"],
 )
