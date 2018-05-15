@@ -102,5 +102,5 @@ def output(result):
         print()
     try:
         print(json.dumps(result.json(), indent=2))
-    except:
+    except Exception:
         print(result.text)

@@ -13,3 +13,5 @@ ldap3
 ruamel.yaml<0.15 # rq.filter: <0.15
 six==1.11.0
 redis
+datadog
+slackclient

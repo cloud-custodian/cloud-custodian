@@ -29,12 +29,17 @@ import tempfile
 import os
 
 from boto3.s3.transfer import S3Transfer
-from c7n.utils import local_session, parse_s3, get_retry
+
+from c7n.registry import PluginRegistry
 from c7n.log import CloudWatchLogHandler
+from c7n.utils import local_session, parse_s3, get_retry
 
 DEFAULT_NAMESPACE = "CloudMaid"
 
 log = logging.getLogger('custodian.output')
+
+
+blob_outputs = PluginRegistry('c7n.blob-outputs')
 
 
 class MetricsOutput(object):
@@ -56,6 +61,18 @@ class MetricsOutput(object):
         self.namespace = namespace
         self.buf = []
 
+    def get_timestamp(self):
+        """
+        Now, if C7N_METRICS_TZ is set to TRUE, UTC timestamp will be used.
+        For backwards compatibility, if it is not set, UTC will be the default.
+        To disable this and use the system's time zone, C7N_METRICS_TZ shoule be set to FALSE.
+        """
+
+        if os.getenv("C7N_METRICS_TZ", '').upper() in ('TRUE', ''):
+            return datetime.datetime.utcnow()
+        else:
+            return datetime.datetime.now()
+
     def flush(self):
         if self.buf:
             self._put_metrics(self.namespace, self.buf)
@@ -64,7 +81,7 @@ class MetricsOutput(object):
     def put_metric(self, key, value, unit, buffer=False, **dimensions):
         d = {
             "MetricName": key,
-            "Timestamp": datetime.datetime.now(),
+            "Timestamp": self.get_timestamp(),
             "Value": value,
             "Unit": unit}
         d["Dimensions"] = [
@@ -164,10 +181,11 @@ class FSOutput(LogOutput):
 
     @staticmethod
     def select(path):
-        if path.startswith('s3://'):
-            return S3Output
-        else:
-            return DirectoryOutput
+        for k in blob_outputs.keys():
+            if path.startswith('%s://' % k):
+                return blob_outputs[k]
+        # Fall back local disk
+        return blob_outputs['file']
 
     @staticmethod
     def join(*parts):
@@ -192,27 +210,25 @@ class FSOutput(LogOutput):
                         shutil.copyfileobj(sfh, zfh, length=2**15)
                     os.remove(fp)
 
-    def use_s3(self):
-        raise NotImplementedError()  # pragma: no cover
 
-
+@blob_outputs.register('file')
 class DirectoryOutput(FSOutput):
 
     permissions = ()
 
     def __init__(self, ctx):
         super(DirectoryOutput, self).__init__(ctx)
+        if self.root_dir.startswith('file://'):
+            self.root_dir = self.root_dir[len('file://'):]
         if self.ctx.output_path is not None:
-            if not os.path.exists(self.ctx.output_path):
-                os.makedirs(self.ctx.output_path)
+            if not os.path.exists(self.root_dir):
+                os.makedirs(self.root_dir)
 
     def __repr__(self):
         return "<%s to dir:%s>" % (self.__class__.__name__, self.root_dir)
 
-    def use_s3(self):
-        return False
 
-
+@blob_outputs.register('s3')
 class S3Output(FSOutput):
     """
     Usage:
@@ -269,9 +285,3 @@ class S3Output(FSOutput):
                     os.path.join(root, f), self.bucket, key,
                     extra_args={
                         'ServerSideEncryption': 'AES256'})
-
-    def use_s3(self):
-        return True
-
-
-s3_join = S3Output.join

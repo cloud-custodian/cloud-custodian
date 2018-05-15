@@ -13,14 +13,16 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import jinja2
+import base64
 import json
 import os
-from ruamel import yaml
+from datetime import datetime, timedelta
 
+import jinja2
+from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
-from datetime import datetime, timedelta
+from ruamel import yaml
 
 
 def get_jinja_env():
@@ -31,6 +33,7 @@ def get_jinja_env():
     env.filters['get_date_age'] = get_date_age
     env.globals['format_resource'] = resource_format
     env.globals['format_struct'] = format_struct
+    env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
     env.loader  = jinja2.FileSystemLoader(
         [
@@ -44,9 +47,10 @@ def get_jinja_env():
     return env
 
 
-def get_rendered_jinja(target, sqs_message, resources, logger):
+def get_rendered_jinja(
+        target, sqs_message, resources, logger, specified_template, default_template):
     env = get_jinja_env()
-    mail_template = sqs_message['action'].get('template')
+    mail_template = sqs_message['action'].get(specified_template, default_template)
     if not os.path.isabs(mail_template):
         mail_template = '%s.j2' % mail_template
     try:
@@ -105,6 +109,9 @@ def setup_defaults(config):
     config.setdefault('ldap_bind_dn', None)
     config.setdefault('ldap_bind_user', None)
     config.setdefault('ldap_bind_password', None)
+    config.setdefault('datadog_api_key', None)
+    config.setdefault('slack_token', None)
+    config.setdefault('slack_webhook', None)
 
 
 def date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z'):
@@ -114,8 +121,10 @@ def date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z'):
 def get_date_time_delta(delta):
     return str(datetime.now().replace(tzinfo=gettz('UTC')) + timedelta(delta))
 
+
 def get_date_age(date):
     return (datetime.now(tz=tzutc()) - parser.parse(date)).days
+
 
 def format_struct(evt):
     return json.dumps(evt, indent=2, ensure_ascii=False)
@@ -140,7 +149,7 @@ def resource_format(resource, resource_type):
             resource.get('PrivateIpAddress'))
     elif resource_type == 'ami':
         return "%s %s %s" % (
-            resource['Name'], resource['ImageId'], resource['CreationDate'])
+            resource.get('Name'), resource['ImageId'], resource['CreationDate'])
     elif resource_type == 's3':
         return "%s" % (resource['Name'])
     elif resource_type == 'ebs':
@@ -213,9 +222,13 @@ def resource_format(resource, resource_type):
             resource['CacheClusterCreateTime'],
             resource['CacheClusterStatus'])
     elif resource_type == 'cache-snapshot':
+        cid = resource.get('CacheClusterId')
+        if cid is None:
+            cid = ', '.join([
+                ns['CacheClusterId'] for ns in resource['NodeSnapshots']])
         return "name: %s cluster: %s source: %s" % (
             resource['SnapshotName'],
-            resource['CacheClusterId'],
+            cid,
             resource['SnapshotSource'])
     elif resource_type == 'redshift-snapshot':
         return "name: %s db: %s" % (
@@ -272,5 +285,32 @@ def resource_format(resource, resource_type):
             resource['TableName'],
             resource['CreationDateTime'],
             resource['TableStatus'])
+    elif resource_type == "sqs":
+        return "QueueURL: %s QueueArn: %s " % (
+            resource['QueueUrl'],
+            resource['QueueArn'])
     else:
         return "%s" % format_struct(resource)
+
+
+def kms_decrypt(config, logger, session, encrypted_field):
+    if config.get(encrypted_field):
+        try:
+            kms = session.client('kms')
+            return kms.decrypt(
+                CiphertextBlob=base64.b64decode(config[encrypted_field]))[
+                    'Plaintext']
+        except (TypeError, base64.binascii.Error) as e:
+            logger.warning(
+                "Error: %s Unable to base64 decode %s, will assume plaintext." %
+                (e, encrypted_field))
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'InvalidCiphertextException':
+                raise
+            logger.warning(
+                "Error: %s Unable to decrypt %s with kms, will assume plaintext." %
+                (e, encrypted_field))
+        return config[encrypted_field]
+    else:
+        logger.debug("No encrypted value to decrypt.")
+        return None

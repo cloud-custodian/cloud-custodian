@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:BrickHouse",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1525276033",
+            "LastModifiedTimestamp": "1525276033",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0"
+        },
+        "ResponseMetadata": {
+            "RequestId": "3383aa7f-a419-56d5-a5c9-f91c45969536",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Wed, 02 May 2018 15:54:55 GMT",
+                "content-type": "text/xml",
+                "content-length": "1164",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "3383aa7f-a419-56d5-a5c9-f91c45969536"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

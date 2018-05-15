@@ -28,30 +28,19 @@ class ResourceQuery(object):
 
     def filter(self, resource_manager, **params):
         m = resource_manager.resource_type
-        client = local_session(self.session_factory).client(
-            "%s.%s" % (m.service, m.client))
         enum_op, list_op = m.enum_spec
-        op = getattr(getattr(client, enum_op), list_op)
-        data = [self.to_dictionary(e) for e in op()]
+        op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
+        data = [r.serialize(True) for r in op()]
+
         return data
 
-    def to_dictionary(self, obj):
-        if isinstance(obj, dict):
-            data = {}
-            for (k, v) in obj.items():
-                data[k] = self.to_dictionary(v)
-            return data
-        elif hasattr(obj, "_ast"):
-            return self.to_dictionary(obj._ast())
-        elif hasattr(obj, "__iter__") and not isinstance(obj, str):
-            return [self.to_dictionary(v) for v in obj]
-        elif hasattr(obj, "__dict__"):
-            data = dict([(key, self.to_dictionary(value))
-                for key, value in obj.__dict__.iteritems()
-                if not callable(value) and not key.startswith('_')])
-            return data
+    @staticmethod
+    def resolve(resource_type):
+        if not isinstance(resource_type, type):
+            raise ValueError(resource_type)
         else:
-            return obj
+            m = resource_type
+        return m
 
 
 @sources.register('describe-azure')
@@ -97,8 +86,18 @@ class QueryResourceManager(ResourceManager):
     def get_source(self, source_type):
         return sources.get(source_type)(self)
 
+    def get_client(self, service=None):
+        if not service:
+            return local_session(self.session_factory).client(
+                "%s.%s" % (self.resource_type.service, self.resource_type.client))
+        return local_session(self.session_factory).client(service)
+
     def get_cache_key(self, query):
         return {'source_type': self.source_type, 'query': query}
+
+    @classmethod
+    def get_model(cls):
+        return ResourceQuery.resolve(cls.resource_type)
 
     @property
     def source_type(self):
@@ -110,5 +109,11 @@ class QueryResourceManager(ResourceManager):
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
-    def augment(self, resources):
-        return resources
+    def get_resources(self, resource_ids):
+        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
+        session = local_session(self.session_factory)
+        data = [
+            resource_client.resources.get_by_id(rid, session.resource_api_version(rid))
+            for rid in resource_ids
+        ]
+        return [r.serialize(True) for r in data]

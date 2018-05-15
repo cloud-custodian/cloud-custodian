@@ -52,12 +52,23 @@ Navigate below and get started with Cloud Custodian!
    developer/installing.rst
    developer/tests.rst
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Azure
+
+   azure/index
+   azure/contribute
+   azure/authentication
+   azure/usecases/index
+   azure/policy/index
 
 .. toctree::
    :maxdepth: 2
    :caption: API Reference
 
-   generated/modules
+   generated/aws/modules
+   generated/azure/modules
+   generated/gcp/modules
 
 
 Indices and tables

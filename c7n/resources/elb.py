@@ -52,6 +52,7 @@ class ELB(QueryResourceManager):
 
     class resource_type(object):
         service = 'elb'
+        resource_type = 'elasticloadbalancing:loadbalancer'
         type = 'loadbalancer'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
@@ -86,6 +87,9 @@ class ELB(QueryResourceManager):
             self.config.account_id,
             r[self.resource_type.id])
 
+    def get_arns(self, resources):
+        return map(self.get_arn, resources)
+
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeELB(self)
@@ -95,41 +99,7 @@ class ELB(QueryResourceManager):
 class DescribeELB(DescribeSource):
 
     def augment(self, resources):
-        _elb_tags(
-            resources,
-            self.manager.session_factory,
-            self.manager.executor_factory,
-            self.manager.retry)
-        return resources
-
-
-def _elb_tags(elbs, session_factory, executor_factory, retry):
-
-    def process_tags(elb_set):
-        client = local_session(session_factory).client('elb')
-        elb_map = {elb['LoadBalancerName']: elb for elb in elb_set}
-
-        while True:
-            try:
-                results = retry(
-                    client.describe_tags,
-                    LoadBalancerNames=list(elb_map.keys()))
-                break
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'LoadBalancerNotFound':
-                    raise
-                msg = e.response['Error']['Message']
-                _, lb_name = msg.strip().rsplit(' ', 1)
-                elb_map.pop(lb_name)
-                if not elb_map:
-                    results = {'TagDescriptions': []}
-                    break
-                continue
-        for tag_desc in results['TagDescriptions']:
-            elb_map[tag_desc['LoadBalancerName']]['Tags'] = tag_desc['Tags']
-
-    with executor_factory(max_workers=2) as w:
-        list(w.map(process_tags, chunks(elbs, 20)))
+        return tags.universal_augment(self.manager, resources)
 
 
 @actions.register('set-shield')
@@ -396,7 +366,7 @@ class EnableS3Logging(BaseAction):
         client = local_session(self.manager.session_factory).client('elb')
         for elb in resources:
             elb_name = elb['LoadBalancerName']
-            log_attrs = {'Enabled':True}
+            log_attrs = {'Enabled': True}
             if 'bucket' in self.data:
                 log_attrs['S3BucketName'] = self.data['bucket']
             if 'prefix' in self.data:

@@ -29,13 +29,9 @@ class HandleTest(BaseTest):
         level = logging.root.level
         botocore_level = logging.getLogger('botocore').level
 
-        self.run_dir = tempfile.mkdtemp()
-        cur_dir = os.path.abspath(os.getcwd())
-        os.chdir(self.run_dir)
+        self.run_dir = self.change_cwd()
 
         def cleanup():
-            os.chdir(cur_dir)
-            shutil.rmtree(self.run_dir)
             logging.root.setLevel(level)
             logging.getLogger('botocore').setLevel(botocore_level)
 
@@ -48,8 +44,10 @@ class HandleTest(BaseTest):
             policy_execution.append((event, context))
 
         self.patch(Policy, 'push', push)
-            
+
         from c7n import handler
+
+        self.patch(handler, 'account_id', '111222333444555')
 
         with open(os.path.join(self.run_dir, 'config.json'), 'w') as fh:
             json.dump(

@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://us-east-2.queue.amazonaws.com/644160558196/BrickHouse"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "33a8cdad-f762-5ddd-af78-9ece16f2d7bf",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Wed, 02 May 2018 15:54:56 GMT",
+                "content-type": "text/xml",
+                "content-length": "328",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "33a8cdad-f762-5ddd-af78-9ece16f2d7bf"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
