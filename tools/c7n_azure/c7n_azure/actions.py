@@ -142,7 +142,7 @@ class RemoveTag(BaseAction):
         tags_to_delete = self.data.get('tags')
         resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
 
-        update_resource_tags(self, session, client, resource, resource_tags)
+        update_resource_tags(self, resource, resource_tags)
 
 
 class AutoTagUser(BaseAction):
