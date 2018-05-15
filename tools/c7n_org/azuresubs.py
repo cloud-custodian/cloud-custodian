@@ -14,12 +14,9 @@
 
 from __future__ import print_function
 
-import os
 import yaml
-import pdb
 import click
 from c7n_azure.session import Session
-from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource.subscriptions import SubscriptionClient
 
 

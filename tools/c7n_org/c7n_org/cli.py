@@ -21,7 +21,6 @@ import multiprocessing
 import time
 import subprocess
 import sys
-import pdb
 
 from concurrent.futures import (
     ProcessPoolExecutor,
@@ -403,6 +402,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                     "error running script on account:%s region:%s script: `%s`",
                     a['name'], r, " ".join(script_args))
 
+
 def accounts_iterator(config):
     for a in config.get('accounts'):
         yield a
@@ -509,7 +509,6 @@ def run(config, use, output_dir, accounts, tags,
                     metrics,
                     dryrun,
                     debug)] = (a, r)
-
 
         for f in as_completed(futures):
             a, r = futures[f]
