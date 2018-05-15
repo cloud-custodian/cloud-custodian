@@ -72,7 +72,7 @@ class ResourceQuery(object):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(
-            m.service)
+            m.service, resource_manager.config.region)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
@@ -431,13 +431,15 @@ class QueryResourceManager(ResourceManager):
                 return [r for r in resources if r[m.id] in id_set]
         return None
 
-    def get_resources(self, ids, cache=True):
+    def get_resources(self, ids, cache=True, augment=True):
         if cache:
             resources = self._get_cached_resources(ids)
             if resources is not None:
                 return resources
         try:
-            resources = self.augment(self.source.get_resources(ids))
+            resources = self.source.get_resources(ids)
+            if augment:
+                resources = self.augment(resources)
             return resources
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
@@ -503,7 +505,8 @@ class ChildResourceManager(QueryResourceManager):
 
 def _batch_augment(manager, model, detail_spec, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
-    client = local_session(manager.session_factory).client(model.service)
+    client = local_session(manager.session_factory).client(
+        model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)
@@ -517,7 +520,8 @@ def _batch_augment(manager, model, detail_spec, resource_set):
 
 def _scalar_augment(manager, model, detail_spec, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
-    client = local_session(manager.session_factory).client(model.service)
+    client = local_session(manager.session_factory).client(
+        model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)
