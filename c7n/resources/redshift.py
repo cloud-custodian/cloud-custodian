@@ -346,7 +346,7 @@ class Snapshot(BaseAction):
             SnapshotIdentifier=snapshot_identifier(
                 'Backup',
                 cluster['ClusterIdentifier']),
-            ClusterIdentifier=cluster['ClusterIdentifier'],Tags=cluster_tags)
+            ClusterIdentifier=cluster['ClusterIdentifier'], Tags=cluster_tags)
 
 
 @actions.register('enable-vpc-routing')

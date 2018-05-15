@@ -63,7 +63,7 @@ class SNSPolicyChecker(PolicyChecker):
         # yield to aws:sourceowner
         if not self.allowed_endpoints:
             return not any(
-                single_condition.get('key',None) == 'aws:sourceowner'
+                single_condition.get('key', None) == 'aws:sourceowner'
                 for single_condition in conditions
             )
         # check if any of the allowed_endpoints are a substring

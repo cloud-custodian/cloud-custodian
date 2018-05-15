@@ -342,7 +342,7 @@ class SetEncryption(BaseAction):
     """
     schema = type_schema(
         'set-encryption',
-        key={'type': 'string'},required=('key',))
+        key={'type': 'string'}, required=('key',))
 
     permissions = ('sqs:SetQueueAttributes',)
 
@@ -359,9 +359,7 @@ class SetEncryption(BaseAction):
         try:
             client.set_queue_attributes(
                 QueueUrl=queue['QueueUrl'],
-                Attributes={
-                    'KmsMasterKeyId':self.key_id
-                }
+                Attributes={'KmsMasterKeyId': self.key_id}
             )
         except ClientError as e:
             self.log.exception(
