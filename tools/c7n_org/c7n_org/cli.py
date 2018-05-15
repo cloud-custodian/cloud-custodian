@@ -498,12 +498,7 @@ def run(config, use, output_dir, accounts, tags,
     policy_counts = Counter()
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
-<<<<<<< HEAD
-        # Run AWS Accounts
-        for a in accounts_config.get('accounts', ()):
-=======
         for a in accounts_iterator(accounts_config):
->>>>>>> kapill/azure-c7n-org
             for r in resolve_regions(region or a.get('regions', ())):
                 futures[w.submit(
                     run_account,
@@ -514,15 +509,6 @@ def run(config, use, output_dir, accounts, tags,
                     metrics,
                     dryrun,
                     debug)] = (a, r)
-        # Run Azure subscriptions
-        for sub in accounts_config.get('azure_subscriptions', ()):
-            futures[w.submit(
-                run_azure_subscription,
-                sub,
-                custodian_config,
-                output_dir)] = (sub, 'No region')
-            print(sub)
-
 
 
         for f in as_completed(futures):
