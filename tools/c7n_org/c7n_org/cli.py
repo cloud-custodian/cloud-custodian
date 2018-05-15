@@ -65,7 +65,8 @@ CONFIG_SCHEMA = {
             'additionalProperties': True,
             'anyOf': [
                 {'required': ['role', 'account_id']},
-                {'required': ['profile', 'account_id']}],
+                {'required': ['profile', 'account_id']}
+            ],
             'properties': {
                 'name': {'type': 'string'},
                 'email': {'type': 'string'},
@@ -78,16 +79,31 @@ CONFIG_SCHEMA = {
                     {'type': 'string', 'minLength': 3}]},
                 'external_id': {'type': 'string'},
             }
+        },
+        'azure_sub': {
+            'type': 'object',
+            'additionalProperties': True,
+            'properties': {
+                'subscription_id': {'type': 'string'},
+                'name': {'type': 'string'},
+            }
         }
     },
     'type': 'object',
     'additionalProperties': False,
-    'required': ['accounts'],
+    'oneOf': [
+        {'required': ['accounts']},
+        {'required': ['azure_subscriptions']}
+    ],
     'properties': {
         'vars': {'type': 'object'},
         'accounts': {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
+        },
+        'azure_subscriptions': {
+            'type': 'array',
+            'items': {'$ref': '#/definitions/azure_sub'}
         }
     }
 }
