@@ -32,7 +32,6 @@ def main(output):
 
     client = SubscriptionClient(Session().credentials)
     subs = [sub.serialize(True) for sub in client.subscriptions.list()]
-    pdb.set_trace()
     results = []
     for sub in subs:
         sub_info = {
