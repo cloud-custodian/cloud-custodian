@@ -17,7 +17,7 @@ import os
 
 description = ""
 if os.path.exists('readme.md'):
-   description = open('readme.md').read()
+    description = open('readme.md').read()
 
 
 setup(
