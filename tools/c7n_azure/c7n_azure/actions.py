@@ -41,14 +41,11 @@ def update_resource_tags(self, resource, tags):
         )
     # other Azure resources
     else:
-        try:
-            az_resource = GenericResource.deserialize(resource)
-            api_version = self.session.resource_api_version(az_resource.id)
-            az_resource.tags = tags
+        az_resource = GenericResource.deserialize(resource)
+        api_version = self.session.resource_api_version(az_resource.id)
+        az_resource.tags = tags
 
-            self.client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
-        except CloudError:
-            print(CloudError)
+        self.client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
 
 
 class Tag(BaseAction):
