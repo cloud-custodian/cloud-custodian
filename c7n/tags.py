@@ -139,8 +139,8 @@ class TagTrim(Action):
       - policies:
          - name: ec2-tag-trim
            comment: |
-             Any instances with 8 or more tags get tags removed until
-             they match the target tag count, in this case 7 so we
+             Any instances with 48 or more tags get tags removed until
+             they match the target tag count, in this case 47 so we
              that we free up a tag slot for another usage.
            resource: ec2
            filters:
@@ -150,7 +150,7 @@ class TagTrim(Action):
                type: value
                key: "[length(Tags)][0]"
                op: ge
-               value: 8
+               value: 48
            actions:
              - type: tag-trim
                space: 3

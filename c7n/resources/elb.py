@@ -366,7 +366,7 @@ class EnableS3Logging(BaseAction):
         client = local_session(self.manager.session_factory).client('elb')
         for elb in resources:
             elb_name = elb['LoadBalancerName']
-            log_attrs = {'Enabled':True}
+            log_attrs = {'Enabled': True}
             if 'bucket' in self.data:
                 log_attrs['S3BucketName'] = self.data['bucket']
             if 'prefix' in self.data:

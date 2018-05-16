@@ -16,6 +16,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.actions import BaseAction
 from c7n.filters import Filter
+from c7n.utils import type_schema
 
 
 @resources.register('networksecuritygroup')
@@ -209,10 +210,9 @@ class RulesAction(BaseAction):
             nsg_name = nsg['name']
             resource_group = nsg['resourceGroup']
             for rule in nsg['properties']['securityRules']:
-                self.manager.log.info(
-                    'Updating access to \'%s\' for security rule '
-                    '\'%s\' in resource group \'%s\''.format(
-                        self.access_action, rule['name'], resource_group))
+                self.manager.log.info("Updating access to '%s' for security rule "
+                                      "'%s' in resource group '%s'",
+                                      self.access_action, rule['name'], resource_group)
                 rule['properties']['access'] = self.access_action
                 self.manager.get_client().security_rules.create_or_update(
                     resource_group,
@@ -227,6 +227,7 @@ class CloseRules(RulesAction):
     """
     Deny access to Security Rule
     """
+    schema = type_schema('close')
     access_action = 'Deny'
 
 
@@ -235,4 +236,5 @@ class OpenRules(RulesAction):
     """
     Allow access to Security Rule
     """
+    schema = type_schema('open')
     access_action = 'Allow'
