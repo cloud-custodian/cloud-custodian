@@ -16,8 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 
 from .common import BaseTest
-from c7n.resources.route53 import HostedZone, EnableQueryLogging, IsQueryLoggingEnabled
-
+from c7n.resources.route53 import HostedZone
 
 class Route53HostedZoneTest(BaseTest):
 
@@ -330,16 +329,15 @@ class Route53DomainTest(BaseTest):
 class Route53EnableDNSQueryLoggingTest(BaseTest):
 
     def test_hostedzone_querylogging(self):
-        session_factory = self.replay_flight_data('test_route53_enable_query_logging')
+        session_factory = self.replay_flight_data(
+            'test_route53_enable_query_logging')
         p = self.load_policy({
             'name': 'enablednsquerylogging',
             'resource': 'hostedzone',
             'filters': [
                 {'Config.PrivateZone': False},
                 {'type': 'query-logging-enabled', 'state': False}],
-            'actions': [
-                {'type': 'enable-query-logging', 'state': True, 'logretentiondays': 60 }],
-                },
+            'actions': [{'type': 'set-query-logging', 'state': True}]},
             session_factory=session_factory)
         self.assertEqual(len(p.run()), 1)
         p = self.load_policy({
@@ -347,5 +345,6 @@ class Route53EnableDNSQueryLoggingTest(BaseTest):
             'resource': 'hostedzone',
             'filters': [{'type': 'query-logging-enabled', 'state': True}]},
             session_factory=session_factory)
-        self.assertEqual(p.run()[0]['Id'], "/hostedzone/TESTABCXYZ1234")
-
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], "/hostedzone/TESTABCXYZ1234")
