@@ -496,6 +496,7 @@ class RequestLimitIncrease(BaseAction):
             'type': {'enum': ['request-limit-increase']},
             'percent-increase': {'type': 'number', 'minimum': 1},
             'amount-increase': {'type': 'number', 'minimum': 1},
+            'minimum-increase': {'type': 'number', 'minimum': 1},
             'subject': {'type': 'string'},
             'message': {'type': 'string'},
             'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']}
@@ -532,12 +533,13 @@ class RequestLimitIncrease(BaseAction):
         limit_exceeded = resources[0].get('c7n:ServiceLimitsExceeded', [])
         percent_increase = self.data.get('percent-increase')
         amount_increase = self.data.get('amount-increase')
+        minimum_increase = self.data.get('minimum-increase', 1)
 
         for s in limit_exceeded:
             current_limit = int(s['limit'])
             if percent_increase:
                 increase_by = current_limit * float(percent_increase) / 100
-                increase_by = max(increase_by, 1)
+                increase_by = max(increase_by, minimum_increase)
             else:
                 increase_by = amount_increase
             increase_by = round(increase_by)

@@ -67,7 +67,6 @@ from botocore.exceptions import (
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from c7n.credentials import assumed_session
-#from c7n.executor import MainThreadExecutor
 from c7n.resources.s3 import EncryptExtantKeys
 from c7n.utils import chunks, dumps
 
@@ -90,6 +89,7 @@ def patch_ssl():
         # no pyopenssl support used / needed / available
         pass
     setattr(CONN_CACHE, 'patched', True)
+
 
 # We use a connection cache for sts role assumption
 CONN_CACHE = threading.local()
@@ -364,7 +364,7 @@ def process_bucket_set(account_info, buckets):
 
             try:
                 info['keycount'] = bucket_key_count(cw, info)
-            except:
+            except Exception:
                 raise
             else:
                 connection.hset('bucket-sizes', bid, info['keycount'])
@@ -833,8 +833,6 @@ def process_keyset(bid, key_set):
     objects['objects_denied'] = []
 
     with bucket_ops(bid, 'key'):
-        #MainThreadExecutor.async = False
-        #with MainThreadExecutor(max_workers=10) as w:
         with ThreadPoolExecutor(max_workers=10) as w:
             futures = {}
             for kchunk in chunks(key_set, 100):

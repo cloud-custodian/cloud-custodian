@@ -19,8 +19,8 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
+from dateutil import zoneinfo
 from dateutil.parser import parse
-from dateutil.tz import tzutc
 
 import logging
 import itertools
@@ -30,7 +30,7 @@ from c7n.actions import Action, ActionRegistry
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
     OPERATORS)
-from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -1347,30 +1347,55 @@ class MarkForOp(Tag):
         key={'type': 'string'},
         tag={'type': 'string'},
         message={'type': 'string'},
-        days={'type': 'number', 'minimum': 0})
+        days={'type': 'number', 'minimum': 0},
+        hours={'type': 'number', 'minimum': 0})
 
     default_template = (
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
+    def validate(self):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        if not self.tz:
+            raise FilterValidationError(
+                "Invalid timezone specified %s" % self.tz)
+        return self
+
     def process(self, asgs):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+
         msg_tmpl = self.data.get('message', self.default_template)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         op = self.data.get('op', 'suspend')
-        date = self.data.get('days', 4)
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
 
-        n = datetime.now(tz=tzutc())
-        stop_date = n + timedelta(days=date)
+        action_date = self._generate_timestamp(days, hours)
         try:
             msg = msg_tmpl.format(
-                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
+                op=op, action_date=action_date)
         except Exception:
             self.log.warning("invalid template %s" % msg_tmpl)
             msg = self.default_template.format(
-                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
+                op=op, action_date=action_date)
 
         self.log.info("Tagging %d asgs for %s on %s" % (
-            len(asgs), op, stop_date.strftime('%Y/%m/%d')))
+            len(asgs), op, action_date))
         self.tag(asgs, key, msg)
+
+    def _generate_timestamp(self, days, hours):
+        n = datetime.now(tz=self.tz)
+        if days == hours == 0:
+            # maintains default value of days being 4 if nothing is provided
+            days = 4
+        action_date = (n + timedelta(days=days, hours=hours))
+        if hours > 0:
+            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
+        else:
+            action_date_string = action_date.strftime('%Y/%m/%d')
+
+        return action_date_string
 
 
 @actions.register('suspend')

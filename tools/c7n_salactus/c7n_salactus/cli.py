@@ -38,7 +38,7 @@ from c7n_salactus import worker, db
 
 # side-effect serialization patches...
 try:
-    from c7n_salactus import rqworker
+    from c7n_salactus import rqworker # NOQA F401
     HAVE_BIN_LIBS = True
 except ImportError:
     # we want the cli to work in lambda and we might not package up
@@ -60,7 +60,7 @@ CONFIG_SCHEMA = {
                 'glacier': {'type': 'boolean'},
                 'key-id': {'type': 'string'},
                 'crypto': {'type': 'string', 'enum': ['AES256', 'aws:kms']}
-                }
+            }
         },
 
         'inventory': {
@@ -77,7 +77,7 @@ CONFIG_SCHEMA = {
                 'id-selector': {
                     'description': (
                         'Only use inventories with the given id.'),
-                        'default': 'salactus',
+                    'default': 'salactus',
                     'type': 'string'},
             }
         },
@@ -99,8 +99,8 @@ CONFIG_SCHEMA = {
                 'type': {'type': 'string', 'enum': ['object-acl']},
                 'report-only': {'type': 'boolean'},
                 'allow-log': {'type': 'boolean'},
-#                'allow-permissions': {'type': 'array', 'item': {'type': 'string', 'enum': ''}}
-                'whitelist-accounts': {'type': 'array', 'item': {'type': 'string'}}
+                'whitelist-accounts': {'type': 'array', 'item': {'type': 'string'}},
+                # 'allow-permissions': {'type': 'array', 'item': {'type': 'string', 'enum': ''}}
             }
         },
 
@@ -149,7 +149,7 @@ def debug(f):
             f(*args, **kw)
         except (SystemExit, KeyboardInterrupt):
             raise
-        except:
+        except Exception:
             import traceback, sys, pdb
             traceback.print_exc()
             pdb.post_mortem(sys.exc_info()[-1])
@@ -195,7 +195,7 @@ def run(config, tag, bucket, account, not_bucket, not_account, debug, region):
 
     if debug:
         def invoke(f, *args, **kw):
-            #if f.func_name == 'process_keyset':
+            # if f.func_name == 'process_keyset':
             #    key_count = len(args[-1])
             #    print("debug skip keyset %d" % key_count)
             #    return
@@ -217,7 +217,8 @@ def run(config, tag, bucket, account, not_bucket, not_account, debug, region):
                 account_info['visitors'] = data['visitors']
             if 'object-reporting' in data and 'object-reporting' not in account_info:
                 account_info['object-reporting'] = data['object-reporting']
-                account_info['object-reporting']['record-prefix'] = datetime.utcnow().strftime('%Y/%m/%d')
+                account_info['object-reporting'][
+                    'record-prefix'] = datetime.utcnow().strftime('%Y/%m/%d')
             if bucket:
                 account_info['buckets'] = bucket
             if not_bucket:
@@ -227,7 +228,7 @@ def run(config, tag, bucket, account, not_bucket, not_account, debug, region):
 
             try:
                 worker.invoke(worker.process_account, account_info)
-            except:
+            except Exception:
                 if not debug:
                     raise
                 import pdb, traceback, sys
@@ -247,7 +248,7 @@ def save(dbpath):
 
 @cli.command()
 # todo check redis version if >=4 support this
-#@click.option('--async/--sync', default=False)
+# @click.option('--async/--sync', default=False)
 def reset(async=None):
     """Delete all persistent cluster state.
     """
@@ -336,8 +337,8 @@ def accounts(dbpath, output, format, account,
     """Report on stats by account"""
     d = db.db(dbpath)
     accounts = d.accounts()
-    formatter = (format == 'csv' and format_accounts_csv
-                 or format_accounts_plain)
+    formatter = (
+        format == 'csv' and format_accounts_csv or format_accounts_plain)
 
     if region:
         for a in accounts:
@@ -557,7 +558,7 @@ def watch(limit):
             elif b.scanned == prev_buckets[b.bucket_id].scanned:
                 continue
             else:
-                b.data['gkrate'][b.bucket_id] =  (
+                b.data['gkrate'][b.bucket_id] = (
                     b.scanned - prev_buckets[b.bucket_id].scanned) / period
             progress.append(b)
 
@@ -578,7 +579,6 @@ def watch(limit):
             progress, None,
             explicit_only=True,
             keys=['bucket_id', 'scanned', 'gkrate', 'lrate', 'krate'])
-
 
 
 @cli.command(name='inspect-partitions')
@@ -636,7 +636,7 @@ def inspect_partitions(bucket):
     keys_scanned = sum(keyset)
     click.echo(
         "Found %d partitions %s keys scanned during partitioning" % (
-        len(partitions), keys_scanned))
+            len(partitions), keys_scanned))
     click.echo("\n".join(partitions))
 
 
@@ -674,7 +674,6 @@ def inspect_bucket(bucket):
     click.echo("Endpoint: %s" % found.data['keys-enderr'].get(found.bucket_id, 0))
 
 
-
 @cli.command(name='inspect-queue')
 @click.option('--queue', required=True)
 @click.option(
@@ -699,8 +698,8 @@ def inspect_queue(queue, state, limit, bucket):
         row = {
             'account': account,
             'bucket': bucket,
-            #'region': j.args[1]['region'],
-            #'size': j.args[1]['keycount'],
+            # 'region': j.args[1]['region'],
+            # 'size': j.args[1]['keycount'],
             'ttl': j.ttl,
             'enqueued': j.enqueued_at,
             'rtt': j.result_ttl,
