@@ -16,18 +16,7 @@ module to test some universal tagging infrastructure not directly exposed.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
-import json
-import os
-import unittest
-import sys
-import tempfile
 import time
-
-from botocore.exceptions import ClientError
-from dateutil.parser import parse as parse_date
-import six
-
 from mock import MagicMock, call
 from c7n.tags import universal_retry
 from .common import BaseTest
@@ -51,7 +40,6 @@ class UniversalTagRetry(BaseTest):
         self.assertEqual(universal_retry(method, ['arn:abc', 'arn:def']),
                          {'Result': 32})
         sleep.assert_called_once()
-        print(method.call_args_list)
         self.assertTrue(
             method.call_args_list == [
                 call(ResourceARNList=['arn:abc', 'arn:def']),
