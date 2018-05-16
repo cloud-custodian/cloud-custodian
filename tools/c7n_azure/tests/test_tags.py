@@ -24,7 +24,8 @@ from azure_common import BaseTest, arm_template
 class TagsTest(BaseTest):
 
     # latest VCR recording date that tag tests
-    TEST_DATE = datetime.datetime(2018, 4, 21, 0, 0, 0)
+    # If tests need to be re-recorded, update to current date
+    TEST_DATE = datetime.datetime(2018, 5, 16, 0, 0, 0)
 
     # regex for identifying valid email addresses
     EMAIL_REGEX = "[^@]+@[^@]+\.[^@]+"
@@ -252,9 +253,11 @@ class TagsTest(BaseTest):
         s = Session()
         client = s.client('azure.mgmt.resource.ResourceManagementClient')
         rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        self.assertEqual(rg.tags,
-                         {'pre-existing-1': 'to-keep', 'pre-existing-2': 'to-keep',
-                          'added-1': 'to-delete', 'added-2': 'to-delete'})
+        start_tags = rg.tags
+        self.assertTrue('pre-existing-1' in start_tags)
+        self.assertTrue('pre-existing-2' in start_tags)
+        self.assertTrue('added-1' in start_tags)
+        self.assertTrue('added-2' in start_tags)
 
         p = self.load_policy({
             'name': 'test-azure-remove-tag',
@@ -275,8 +278,11 @@ class TagsTest(BaseTest):
 
         # verify tags removed and pre-existing tags not removed
         rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        self.assertEqual(rg.tags,
-                         {'pre-existing-1': 'to-keep', 'pre-existing-2': 'to-keep'})
+        end_tags = rg.tags
+        self.assertTrue('pre-existing-1' in end_tags)
+        self.assertTrue('pre-existing-2' in end_tags)
+        self.assertTrue('added-1' not in end_tags)
+        self.assertTrue('added-2' not in end_tags)
 
     @arm_template('vm.json')
     def test_removal_does_not_raise_on_nonexistent_tag(self):
@@ -303,7 +309,8 @@ class TagsTest(BaseTest):
         s = Session()
         client = s.client('azure.mgmt.compute.ComputeManagementClient')
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+        start_tags = vm.tags
+        self.assertTrue('tag-does-not-exist' not in start_tags)
 
         raised = False
         try:
@@ -312,8 +319,10 @@ class TagsTest(BaseTest):
             raised = True
 
         # verify no exception raised and no changes to tags on resource
+        vm = client.virtual_machines.get('test_vm', 'cctestvm')
         self.assertFalse(raised)
-        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+        self.assertEqual(vm.tags, start_tags)
+
 
     def test_must_specify_tags_to_remove(self):
         with self.assertRaises(FilterValidationError):
@@ -329,7 +338,7 @@ class TagsTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_auto_tag_add_creator_tag(self, utcnow_mock):
-        """Adds CreatorEmail to a resource group
+        """Adds CreatorEmail to a resource group.
         """
         p = self.load_policy({
             'name': 'test-azure-tag',

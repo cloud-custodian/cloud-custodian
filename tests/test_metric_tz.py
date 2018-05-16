@@ -26,21 +26,21 @@ class metrics_log_test(BaseTest):
 
   def test_output_tz(self):
 
-    mo = MetricsOutput(None)
+    output = MetricsOutput(None)
     self.change_environment()
-    t1 = datetime.datetime.now()
-    gts = mo.get_timestamp()
+    now = datetime.datetime.utcnow()
+    output_time = output.get_timestamp()
 
-    self.assertEqual(gts.hour,t1.hour)
-    self.assertEqual(gts.minute,t1.minute)
+    self.assertEqual(now.hour, output_time.hour)
+    self.assertEqual(now.minute, output_time.minute)
 
-    self.change_environment(C7N_METRICS_TZ='TRUE')
-    tutc = datetime.datetime.utcnow()
+    self.change_environment(C7N_METRICS_TZ='False')
+    now_utc = datetime.datetime.now()
 
-    gts = mo.get_timestamp()
+    output_time = output.get_timestamp()
 
-    self.assertEqual(gts.hour,tutc.hour)
-    self.assertEqual(gts.minute, tutc.minute)
+    self.assertEqual(now_utc.hour, output_time.hour)
+    self.assertEqual(now_utc.minute, output_time.minute)
 
 if __name__ == '__main__':
     unittest.main()
