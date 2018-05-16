@@ -25,35 +25,27 @@ class ActionTest(BaseTest):
 
     def test_run_api(self):
         resp = {
-            'Error': {
-                'Code': 'DryRunOperation',
-                'Message': 'would have succeeded',
-            },
-            'ResponseMetadata': {
-                'HTTPStatusCode': 412
-            }
+            "Error": {"Code": "DryRunOperation", "Message": "would have succeeded"},
+            "ResponseMetadata": {"HTTPStatusCode": 412},
         }
 
-        func = lambda: (_ for _ in ()).throw(ClientError(resp, 'test'))
+        func = lambda: (_ for _ in ()).throw(ClientError(resp, "test"))  # NOQA
         # Hard to test for something because it just logs a message, but make
         # sure that the ClientError gets caught and not re-raised
         Action()._run_api(func)
 
     def test_run_api_error(self):
-        resp = {
-            'Error': {
-                'Code': 'Foo',
-                'Message': 'Bar',
-            }
-        }
-        func = lambda: (_ for _ in ()).throw(ClientError(resp, 'test2'))
+        resp = {"Error": {"Code": "Foo", "Message": "Bar"}}
+        func = lambda: (_ for _ in ()).throw(ClientError(resp, "test2"))  # NOQA
         self.assertRaises(ClientError, Action()._run_api, func)
 
 
 class ActionRegistryTest(BaseTest):
 
     def test_error_bad_action_type(self):
-        self.assertRaises(ValueError, ActionRegistry('test.actions').factory, {}, None)
+        self.assertRaises(ValueError, ActionRegistry("test.actions").factory, {}, None)
 
     def test_error_unregistered_action_type(self):
-        self.assertRaises(ValueError, ActionRegistry('test.actions').factory, 'foo', None)
+        self.assertRaises(
+            ValueError, ActionRegistry("test.actions").factory, "foo", None
+        )

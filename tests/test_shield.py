@@ -24,38 +24,45 @@ class ShieldTest(BaseTest):
     def test_shield_sync(self):
         # shield resources
 
-        p = self.load_policy({
-            'name': 'elb-sync',
-            'resource': 'elb',
-            'actions': [{
-                'type': 'set-shield',
-                'sync': True,
-                'state': True}]})
+        p = self.load_policy(
+            {
+                "name": "elb-sync",
+                "resource": "elb",
+                "actions": [{"type": "set-shield", "sync": True, "state": True}],
+            }
+        )
 
         client = mock.MagicMock()
         client.delete_protection = delete = mock.Mock()
 
         set_shield = p.resource_manager.actions[0]
 
-        with mock.patch.object(p.resource_manager, 'get_arn') as mock_get_arn:
+        with mock.patch.object(p.resource_manager, "get_arn") as mock_get_arn:
             mock_get_arn.side_effect = ["%s/lb" % i for i in map(str, range(5))]
-            with mock.patch.object(p.resource_manager, 'get_resource_manager') as mock_resource_manager:
+            with mock.patch.object(
+                p.resource_manager, "get_resource_manager"
+            ) as mock_resource_manager:
                 mock_resource_manager.return_value = mock_resource_manager
                 mock_resource_manager.resources.return_value = map(str, range(5))
-                protections = [{'Id': i, 'ResourceArn': "%s/lb" % i} for i in map(str, range(10))]
+                protections = [
+                    {"Id": i, "ResourceArn": "%s/lb" % i} for i in map(str, range(10))
+                ]
                 protections.extend(
-                    [{'Id': i, 'ResourceArn': "%s/app/lb" % i} for i in map(str, range(10, 15))])
+                    [
+                        {"Id": i, "ResourceArn": "%s/app/lb" % i}
+                        for i in map(str, range(10, 15))
+                    ]
+                )
                 protections.extend(
-                    [{'Id': i, 'ResourceArn': "%s/net/lb" % i} for i in map(str, range(10, 15))])
+                    [
+                        {"Id": i, "ResourceArn": "%s/net/lb" % i}
+                        for i in map(str, range(10, 15))
+                    ]
+                )
 
                 set_shield.clear_stale(client, protections)
-                self.assertEqual(
-                    delete.call_count, 5)
+                self.assertEqual(delete.call_count, 5)
                 for i in range(5, 10):
-                    self.assertTrue(mock.call(ProtectionId=str(i)) in delete.call_args_list)
-
-            
-
-        
-
-        
+                    self.assertTrue(
+                        mock.call(ProtectionId=str(i)) in delete.call_args_list
+                    )

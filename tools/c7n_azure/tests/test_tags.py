@@ -111,9 +111,10 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify modified tags
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        self.assertEqual(rg.tags,
-                         {'tag1': 'value1', 'pre-existing-1': 'modified', 'pre-existing-2': 'unmodified'})
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0] # NOQA
+        self.assertEqual(
+            rg.tags,
+            {'tag1': 'value1', 'pre-existing-1': 'modified', 'pre-existing-2': 'unmodified'})
 
     def test_cant_have_both_tag_and_tags(self):
         with self.assertRaises(FilterValidationError):
@@ -277,7 +278,7 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify tags removed and pre-existing tags not removed
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0] # NOQA
         end_tags = rg.tags
         self.assertTrue('pre-existing-1' in end_tags)
         self.assertTrue('pre-existing-2' in end_tags)
@@ -322,7 +323,6 @@ class TagsTest(BaseTest):
         vm = client.virtual_machines.get('test_vm', 'cctestvm')
         self.assertFalse(raised)
         self.assertEqual(vm.tags, start_tags)
-
 
     def test_must_specify_tags_to_remove(self):
         with self.assertRaises(FilterValidationError):
