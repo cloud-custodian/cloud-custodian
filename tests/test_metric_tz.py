@@ -13,35 +13,34 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import argparse
 import unittest
 
 from .common import BaseTest
 
 import datetime
 from c7n.output import MetricsOutput
-import os
+
 
 class metrics_log_test(BaseTest):
 
-  def test_output_tz(self):
+    def test_output_tz(self):
 
-    output = MetricsOutput(None)
-    self.change_environment()
-    now = datetime.datetime.utcnow()
-    output_time = output.get_timestamp()
+        output = MetricsOutput(None)
+        self.change_environment()
+        now = datetime.datetime.utcnow()
+        output_time = output.get_timestamp()
 
-    self.assertEqual(now.hour, output_time.hour)
-    self.assertEqual(now.minute, output_time.minute)
+        self.assertEqual(now.hour, output_time.hour)
+        self.assertEqual(now.minute, output_time.minute)
 
-    self.change_environment(C7N_METRICS_TZ='False')
-    now_utc = datetime.datetime.now()
+        self.change_environment(C7N_METRICS_TZ="False")
+        now_utc = datetime.datetime.now()
 
-    output_time = output.get_timestamp()
+        output_time = output.get_timestamp()
 
-    self.assertEqual(now_utc.hour, output_time.hour)
-    self.assertEqual(now_utc.minute, output_time.minute)
+        self.assertEqual(now_utc.hour, output_time.hour)
+        self.assertEqual(now_utc.minute, output_time.minute)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
-

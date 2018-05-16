@@ -19,35 +19,43 @@ from .common import BaseTest
 class TestBatchComputeEnvironment(BaseTest):
 
     def test_batch_compute_update(self):
-        session_factory = self.replay_flight_data('test_batch_compute_update')
-        p = self.load_policy({
-            'name': 'batch-compute',
-            'resource': 'batch-compute',
-            'filters': [
-                {'computeResources.desiredvCpus': 0},
-                {'state': 'ENABLED'}],
-            'actions': [{
-                'type': 'update-environment',
-                'state': 'DISABLED'}]}, session_factory=session_factory)
+        session_factory = self.replay_flight_data("test_batch_compute_update")
+        p = self.load_policy(
+            {
+                "name": "batch-compute",
+                "resource": "batch-compute",
+                "filters": [{"computeResources.desiredvCpus": 0}, {"state": "ENABLED"}],
+                "actions": [{"type": "update-environment", "state": "DISABLED"}],
+            },
+            session_factory=session_factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory().client('batch')
+        client = session_factory().client("batch")
         envs = client.describe_compute_environments(
-            computeEnvironments=[resources[0]['computeEnvironmentName']]
-        )['computeEnvironments']
-        self.assertEqual(envs[0]['state'], 'DISABLED')
+            computeEnvironments=[resources[0]["computeEnvironmentName"]]
+        )[
+            "computeEnvironments"
+        ]
+        self.assertEqual(envs[0]["state"], "DISABLED")
 
     def test_batch_compute_delete(self):
-        session_factory = self.replay_flight_data('test_batch_compute_delete')
-        p = self.load_policy({
-            'name': 'batch-compute',
-            'resource': 'batch-compute',
-            'filters': [{'computeResources.desiredvCpus': 0}],
-            'actions': [{'type': 'delete'}]}, session_factory=session_factory)
+        session_factory = self.replay_flight_data("test_batch_compute_delete")
+        p = self.load_policy(
+            {
+                "name": "batch-compute",
+                "resource": "batch-compute",
+                "filters": [{"computeResources.desiredvCpus": 0}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory().client('batch')
+        client = session_factory().client("batch")
         envs = client.describe_compute_environments(
-            computeEnvironments=[resources[0]['computeEnvironmentName']]
-        )['computeEnvironments']
-        self.assertEqual(envs[0]['status'], 'DELETING')
+            computeEnvironments=[resources[0]["computeEnvironmentName"]]
+        )[
+            "computeEnvironments"
+        ]
+        self.assertEqual(envs[0]["status"], "DELETING")
