@@ -48,6 +48,29 @@ class SnapshotAccessTest(BaseTest):
             {'snap-7f9496cf': ['619193117841'],
              'snap-af0eb71b': ['all']})
 
+class SnapshotDetachTest(BaseTest):
+
+        def test_volume_detach(self):
+             factory = self.replay_flight_data('test_ebs_detach')
+             p = self.load_policy({
+                'name': 'volume-detach',
+                'resource': 'ebs',
+                'filters': [ 
+                    {'VolumeId' :  'vol-03cef4fb8917f8232'}],
+                'actions': [
+                    {'type' : 'detach'}]
+                }, config=Config.empty(), session_factory=factory)
+             resources = p.run()
+             self.assertEqual(len(resources), 1)
+
+             client = factory(region="us-east-1").client('ec2')
+             volumelist=[]
+             volumelist.append(resources[0]['VolumeId'])
+             response = client.describe_volumes(VolumeIds=volumelist)
+
+             for resp in response['Volumes']:
+                 for attachment in resp['Attachments']:
+                     self.assertEqual(attachment['State'], "detached")
 
 class SnapshotCopyTest(BaseTest):
 
