@@ -74,41 +74,6 @@ class Route53HostedZoneTest(BaseTest):
         self.assertEqual(len(tags['ResourceTagSet']['Tags']), 1)
         self.assertTrue('abc' in tags['ResourceTagSet']['Tags'][0].values())
 
-    def test_route53_hostedzone_tag_exception(self):
-        output = self.capture_logging(level=logging.DEBUG)
-        # intentionally cause error to be thrown by sending wrong arn
-        def generate_arn(*args):
-            return 'arn:aws:route53:::hostedzone/Z148QEXAMPLE8V'
-        self.patch(HostedZone, 'generate_arn', generate_arn)
-
-        session_factory = self.replay_flight_data('test_route53_hostedzone_tag_exception')
-        p = self.load_policy({
-            'name': 'hostedzone-tag-records',
-            'resource': 'hostedzone',
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'ResourceRecordSetCount',
-                    'value': 2,
-                    'op': 'gte'
-                }
-            ],
-            'actions': [
-                {
-                    'type': 'tag',
-                    'key': 'abc',
-                    'value': 'xyz'
-                }
-            ]},
-            session_factory=session_factory)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        self.assertTrue(("Resource:arn:aws:route53:::hostedzone/Z148QEXAMPLE8V "
-                         "ErrorCode:NoSuchHostedZone StatusCode:404 "
-                         "ErrorMessage:No hosted zone "
-                         "found with ID: Z148QEXAMPLE8V") in output.getvalue())
-
     def test_route53_hostedzone_untag(self):
         session_factory = self.replay_flight_data('test_route53_hostedzone_untag')
 

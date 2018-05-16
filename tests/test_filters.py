@@ -304,6 +304,7 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(now.isoformat()), True)
         self.assertFilter(fdata, i(now.isoformat()), True)
         self.assertFilter(fdata, i(calendar.timegm(now.timetuple())), True)
+        self.assertFilter(fdata, i(str(calendar.timegm(now.timetuple()))), True)
 
     def test_expiration(self):
 

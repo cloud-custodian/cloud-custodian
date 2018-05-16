@@ -28,6 +28,7 @@ from dateutil import zoneinfo
 from dateutil.parser import parse
 
 import itertools
+import time
 
 from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.filters import Filter, OPERATORS, FilterValidationError
@@ -35,12 +36,6 @@ from c7n.filters.offhours import Time
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
-
-universal_tag_retry = utils.get_retry((
-    'Throttled',
-    'RequestLimitExceeded',
-    'Client.RequestLimitExceeded'
-))
 
 
 def register_ec2_tags(filters, actions):
@@ -818,19 +813,8 @@ class UniversalTag(Tag):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = universal_tag_retry(
-            client.tag_resources,
-            ResourceARNList=arns,
-            Tags=tags)
-
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+        return universal_retry(
+            client.tag_resources, ResourceARNList=arns, Tags=tags)
 
 
 class UniversalUntag(RemoveTag):
@@ -844,22 +828,9 @@ class UniversalUntag(RemoveTag):
     def process_resource_set(self, resource_set, tag_keys):
         client = utils.local_session(
             self.manager.session_factory).client('resourcegroupstaggingapi')
-
         arns = self.manager.get_arns(resource_set)
-
-        response = universal_tag_retry(
-            client.untag_resources,
-            ResourceARNList=arns,
-            TagKeys=tag_keys)
-
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+        return universal_retry(
+            client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
 
 
 class UniversalTagDelayedAction(TagDelayedAction):
@@ -923,17 +894,45 @@ class UniversalTagDelayedAction(TagDelayedAction):
             self.manager.session_factory).client('resourcegroupstaggingapi')
 
         arns = self.manager.get_arns(resource_set)
+        return universal_retry(
+            client.tag_resources, ResourceARNList=arns, Tags=tags)
 
-        response = universal_tag_retry(
-            client.tag_resources,
-            ResourceARNList=arns,
-            Tags=tags)
 
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+def universal_retry(method, ResourceARNList, **kw):
+    """Retry support for resourcegroup tagging apis.
+
+    The resource group tagging api typically returns a 200 status code
+    with embedded resource specific errors. To enable resource specific
+    retry on throttles, we extract those, perform backoff w/ jitter and
+    continue. Other errors are immediately raised.
+
+    We do not aggregate unified resource responses across retries, only the
+    last successful response is returned for a subset of the resources if
+    a retry is performed.
+    """
+    max_attempts = 6
+
+    for idx, delay in enumerate(
+            utils.backoff_delays(1.5, 2 ** 8, jitter=True)):
+        response = method(ResourceARNList=ResourceARNList, **kw)
+        failures = response.get('FailedResourcesMap', {})
+        if not failures:
+            return response
+
+        errors = {}
+        throttles = set()
+
+        for f_arn in failures:
+            if failures[f_arn]['ErrorCode'] == 'ThrottlingException':
+                throttles.add(f_arn)
+            else:
+                errors[f_arn] = failures[f_arn]['ErrorCode']
+
+        if errors:
+            raise Exception("Resource Tag Errors %s" % (errors))
+
+        if idx == max_attempts - 1:
+            raise Exception("Resource Tag Throttled %s" % (", ".join(throttles)))
+
+        time.sleep(delay)
+        ResourceARNList = list(throttles)
