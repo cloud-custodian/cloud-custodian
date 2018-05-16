@@ -17,6 +17,7 @@ import logging
 from c7n_mailer.ldap_lookup import LdapLookup, Redis
 from ldap3 import Server, Connection, MOCK_SYNC
 from ldap3.strategy import mockBase
+
 logger = logging.getLogger('custodian.mailer')
 
 PETER = (
@@ -185,8 +186,11 @@ SQS_MESSAGE_3 = {
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
 
 _safe_rdn = mockBase.safe_rdn
+
+
 def safe_rdn(*a, **kw):
     return [(k, mockBase.to_raw(v)) for k,v in _safe_rdn(*a, **kw)]
+
 mockBase.safe_rdn = safe_rdn
 
 

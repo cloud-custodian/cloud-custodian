@@ -706,6 +706,8 @@ if __name__ == '__main__':
     try:
         cli()
     except Exception:
-        import pdb, traceback, sys
+        import pdb
+        import traceback
+        import sys
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

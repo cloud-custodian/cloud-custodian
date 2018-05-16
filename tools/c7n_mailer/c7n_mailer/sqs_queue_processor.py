@@ -35,12 +35,12 @@ class MailerSqsQueueIterator(object):
     msg_attributes = ['sequence_id', 'op', 'ser']
 
     def __init__(self, aws_sqs, queue_url, logger, limit=0, timeout=10):
-        self.aws_sqs   = aws_sqs
+        self.aws_sqs = aws_sqs
         self.queue_url = queue_url
-        self.limit     = limit
-        self.logger    = logger
-        self.timeout   = timeout
-        self.messages  = []
+        self.limit = limit
+        self.logger = logger
+        self.timeout = timeout
+        self.messages = []
 
     # this and the next function make this object iterable with a for loop
     def __iter__(self):
@@ -74,11 +74,11 @@ class MailerSqsQueueIterator(object):
 class MailerSqsQueueProcessor(object):
 
     def __init__(self, config, session, logger, max_num_processes=16):
-        self.config                = config
-        self.logger                = logger
-        self.session               = session
-        self.max_num_processes     = max_num_processes
-        self.receive_queue         = self.config['queue_url']
+        self.config = config
+        self.logger = logger
+        self.session = session
+        self.max_num_processes = max_num_processes
+        self.receive_queue = self.config['queue_url']
         if self.config.get('debug', False):
             self.logger.debug('debug logging is turned on from mailer config file.')
             logger.setLevel(logging.DEBUG)

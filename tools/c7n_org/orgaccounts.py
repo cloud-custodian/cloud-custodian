@@ -84,7 +84,7 @@ def get_ou_from_path(client, path):
         found = False
         for page in ou_pager.paginate(ParentId=ou['Id']):
             for child in page.get('OrganizationalUnits'):
-                if child['Name']  == part:
+                if child['Name'] == part:
                     found = True
                     ou = child
                     break

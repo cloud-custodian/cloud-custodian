@@ -60,6 +60,7 @@ class TestConfig(Config):
 
     empty = staticmethod(partial(Config.empty, **config_args))
 
+
 # Set this so that if we run nose directly the tests will not fail
 if 'AWS_DEFAULT_REGION' not in os.environ:
     os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'

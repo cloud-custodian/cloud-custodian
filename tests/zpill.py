@@ -65,7 +65,7 @@ def deserialize(obj):
     if '__class__' in target:
         class_name = target.pop('__class__')
     if '__module__' in obj:
-        module_name = obj.pop('__module__')
+        obj.pop('__module__')
     # Use getattr(module, class_name) for custom types if needed
     if class_name == 'datetime':
         return datetime(tzinfo=utc, **target)
@@ -104,14 +104,15 @@ def serialize(obj):
 
 placebo.pill.serialize = serialize
 placebo.pill.deserialize = deserialize
-## END PLACEBO MONKEY
+
+# END PLACEBO MONKEY
 ##########################################################################
 
 
 class BluePill(pill.Pill):
 
     def playback(self):
-        result = super(BluePill, self).playback()
+        super(BluePill, self).playback()
         self._avail = self.get_available()
 
     def get_available(self):
@@ -137,8 +138,6 @@ class BluePill(pill.Pill):
             print("Unused json files \n %s" % (
                 "\n".join(sorted(self._avail))))
         return result
-        #else:
-        #    print("emptied available")
 
 
 class ZippedPill(pill.Pill):
@@ -324,8 +323,8 @@ class PillTest(unittest.TestCase):
         session = boto3.Session()
         if not zdata:
             pill = placebo.attach(session, test_dir)
-            #pill = BluePill()
-            #pill.attach(session, test_dir)
+            # pill = BluePill()
+            # pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, False)
 

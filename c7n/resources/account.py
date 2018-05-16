@@ -131,7 +131,7 @@ class CloudTrailEnabled(Filter):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
         if self.data.get('current-region'):
             current_region = session.region_name
-            trails  = [t for t in trails if t.get(
+            trails = [t for t in trails if t.get(
                 'HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
         if self.data.get('kms'):
             trails = [t for t in trails if t.get('KmsKeyId')]

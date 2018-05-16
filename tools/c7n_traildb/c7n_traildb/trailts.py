@@ -380,7 +380,7 @@ def index(config, start, end, incremental=False, concurrency=5, accounts=None,
         if incremental:
             account_starts = get_incremental_starts(config, start)
         else:
-            account_starts = defaultdict(lambda : start)
+            account_starts = defaultdict(lambda : start) # NOQA E203
 
         for account in config.get('accounts'):
             if accounts and account['name'] not in accounts:
