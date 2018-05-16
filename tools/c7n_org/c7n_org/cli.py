@@ -65,7 +65,8 @@ CONFIG_SCHEMA = {
             'additionalProperties': True,
             'anyOf': [
                 {'required': ['role', 'account_id']},
-                {'required': ['profile', 'account_id']}],
+                {'required': ['profile', 'account_id']}
+            ],
             'properties': {
                 'name': {'type': 'string'},
                 'email': {'type': 'string'},
@@ -78,16 +79,31 @@ CONFIG_SCHEMA = {
                     {'type': 'string', 'minLength': 3}]},
                 'external_id': {'type': 'string'},
             }
+        },
+        'subscription': {
+            'type': 'object',
+            'additionalProperties': True,
+            'properties': {
+                'subscription_id': {'type': 'string'},
+                'name': {'type': 'string'},
+            }
         }
     },
     'type': 'object',
     'additionalProperties': False,
-    'required': ['accounts'],
+    'oneOf': [
+        {'required': ['accounts']},
+        {'required': ['subscriptions']}
+    ],
     'properties': {
         'vars': {'type': 'object'},
         'accounts': {
             'type': 'array',
             'items': {'$ref': '#/definitions/account'}
+        },
+        'subscriptions': {
+            'type': 'array',
+            'items': {'$ref': '#/definitions/subscription'}
         }
     }
 }
@@ -387,6 +403,14 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                     a['name'], r, " ".join(script_args))
 
 
+def accounts_iterator(config):
+    for a in config.get('accounts'):
+        yield a
+    for a in config.get('subscriptions'):
+        d = {'account_id': a['subscription_id'], 'name': a['name']}
+        yield d
+
+
 def run_account(account, region, policies_config, output_path,
                 cache_period, metrics, dryrun, debug):
     """Execute a set of policies on an account.
@@ -399,12 +423,12 @@ def run_account(account, region, policies_config, output_path,
         os.makedirs(output_path)
 
     cache_path = os.path.join(output_path, "c7n.cache")
+
     config = Config.empty(
         region=region,
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         cache=cache_path, log_group=None, profile=None, external_id=None)
-
     if account.get('role'):
         config['assume_role'] = account['role']
         config['external_id'] = account.get('external_id')
@@ -474,7 +498,7 @@ def run(config, use, output_dir, accounts, tags,
     policy_counts = Counter()
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
-        for a in accounts_config.get('accounts', ()):
+        for a in accounts_iterator(accounts_config):
             for r in resolve_regions(region or a.get('regions', ())):
                 futures[w.submit(
                     run_account,
