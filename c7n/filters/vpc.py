@@ -13,9 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
-from .core import Filter, ValueFilter, FilterValidationError
+from .core import Filter, ValueFilter
 from .related import RelatedResourceFilter
 
 import jmespath
@@ -105,11 +106,14 @@ class NetworkLocation(Filter):
     def validate(self):
         rfilters = self.manager.filter_registry.keys()
         if 'subnet' not in rfilters:
-            raise FilterValidationError(
-                "network-location requires resource subnet filter availability")
+            raise PolicyValidationError(
+                "network-location requires resource subnet filter availability on %s" % (
+                    self.manager.data))
+
         if 'security-group' not in rfilters:
-            raise FilterValidationError(
-                "network-location requires resource security-group filter availability")
+            raise PolicyValidationError(
+                "network-location requires resource security-group filter availability on %s" % (
+                    self.manager.data))
         return self
 
     def process(self, resources, event=None):

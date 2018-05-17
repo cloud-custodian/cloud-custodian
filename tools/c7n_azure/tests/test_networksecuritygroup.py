@@ -63,7 +63,6 @@ class NetworkSecurityGroupTest(BaseTest):
         self.assertEqual(resources[0]['name'], 'tabarlow-test-open-ssh')
         self.assertEqual(len(resources[0]['properties']['securityRules']), 1)
 
-
     @arm_template('networksecuritygroup.json')
     def test_invalid_policy_range(self):
         self.assertRaises(ValueError, lambda: self.load_policy({
@@ -75,7 +74,6 @@ class NetworkSecurityGroupTest(BaseTest):
                  'ToPort': 20}],
             'actions': [
                 {'type': 'close'}]}))
-
 
     @arm_template('networksecuritygroup.json')
     def test_invalid_policy_params(self):
@@ -102,5 +100,3 @@ class NetworkSecurityGroupTest(BaseTest):
                  'Ports': [8080]}],
             'actions': [
                 {'type': 'close'}]}))
-
-

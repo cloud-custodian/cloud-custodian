@@ -38,13 +38,11 @@ class SchemaTest(BaseTest):
     def test_schema_plugin_name_mismatch(self):
         for k, v in resources.items():
             for fname, f in v.filter_registry.items():
-                if fname in ('or', 'and', 'not'):
+                if fname in ("or", "and", "not"):
                     continue
-                self.assertIn(
-                    fname, f.schema['properties']['type']['enum'])
+                self.assertIn(fname, f.schema["properties"]["type"]["enum"])
             for aname, a in v.action_registry.items():
-                self.assertIn(
-                    aname, a.schema['properties']['type']['enum'])
+                self.assertIn(aname, a.schema["properties"]["type"]["enum"])
 
     def test_schema(self):
         try:
@@ -56,62 +54,63 @@ class SchemaTest(BaseTest):
     def test_schema_serialization(self):
         try:
             dumps(generate())
-        except:
+        except Exception:
             self.fail("Failed to serialize schema")
 
     def test_empty_skeleton(self):
-        self.assertEqual(validate({'policies': []}), [])
+        self.assertEqual(validate({"policies": []}), [])
 
     def test_duplicate_policies(self):
         data = {
-            'policies': [
-                {'name': 'monday-morning',
-                 'resource': 'ec2'},
-                {'name': 'monday-morning',
-                 'resource': 'ec2'},
-                ]}
+            "policies": [
+                {"name": "monday-morning", "resource": "ec2"},
+                {"name": "monday-morning", "resource": "ec2"},
+            ]
+        }
 
         result = validate(data)
         self.assertEqual(len(result), 2)
         self.assertTrue(isinstance(result[0], ValueError))
-        self.assertTrue('monday-morning' in str(result[0]))
+        self.assertTrue("monday-morning" in str(result[0]))
 
     def test_semantic_error(self):
         data = {
-            'policies': [
-                {'name': 'test',
-                 'resource': 'ec2',
-                 'filters': {
-                     'type': 'ebs',
-                     'skipped_devices': []}
-                    }]
-            }
+            "policies": [
+                {
+                    "name": "test",
+                    "resource": "ec2",
+                    "filters": {"type": "ebs", "skipped_devices": []},
+                }
+            ]
+        }
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
         error = specific_error(errors[0])
         self.assertTrue(
-            len(errors[0].absolute_schema_path) < len(
-                error.absolute_schema_path))
-
-        self.assertTrue(
-            "'skipped_devices': []" in error.message)
-        self.assertTrue(
-            "u'type': u'ebs'" in error.message or
-            "'type': 'ebs'" in error.message
+            len(errors[0].absolute_schema_path) < len(error.absolute_schema_path)
         )
 
-    @mock.patch('c7n.schema.specific_error')
+        self.assertTrue("'skipped_devices': []" in error.message)
+        self.assertTrue(
+            "u'type': u'ebs'" in error.message or "'type': 'ebs'" in error.message
+        )
+
+    @mock.patch("c7n.schema.specific_error")
     def test_handle_specific_error_fail(self, mock_specific_error):
         from jsonschema.exceptions import ValidationError
+
         data = {
-                'policies': [{'name': 'test',
-                 'resource': 'aws.ec2',
-                 'filters': {
-                     'type': 'ebs',
-                     'invalid': []}
-                    }]
-            }
-        mock_specific_error.side_effect = ValueError('The specific error crapped out hard')
+            "policies": [
+                {
+                    "name": "test",
+                    "resource": "aws.ec2",
+                    "filters": {"type": "ebs", "invalid": []},
+                }
+            ]
+        }
+        mock_specific_error.side_effect = ValueError(
+            "The specific error crapped out hard"
+        )
         resp = validate(data)
         # if it is 2, then we know we got the exception from specific_error
         self.assertEqual(len(resp), 2)
@@ -120,182 +119,202 @@ class SchemaTest(BaseTest):
 
     def test_vars_and_tags(self):
         data = {
-            'vars': {'alpha': 1, 'beta': 2},
-            'policies': [{
-                'name': 'test',
-                'resource': 'ec2',
-                'tags': ['controls']}]}
+            "vars": {"alpha": 1, "beta": 2},
+            "policies": [{"name": "test", "resource": "ec2", "tags": ["controls"]}],
+        }
         self.assertEqual(list(self.validator.iter_errors(data)), [])
 
     def test_semantic_error_on_value_derived(self):
         data = {
-            'policies': [
-                {'name': 'test',
-                 'resource': 'ec2',
-                 'filters': [
-                     {'type': 'ebs',
-                      'skipped_devices': []}
-                     ]}
-            ]}
+            "policies": [
+                {
+                    "name": "test",
+                    "resource": "ec2",
+                    "filters": [{"type": "ebs", "skipped_devices": []}],
+                }
+            ]
+        }
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
         error = specific_error(errors[0])
         self.assertTrue(
-            len(errors[0].absolute_schema_path) < len(
-                error.absolute_schema_path))
-        self.assertTrue(
-            "Additional properties are not allowed " in error.message
+            len(errors[0].absolute_schema_path) < len(error.absolute_schema_path)
         )
-        self.assertTrue(
-            "'skipped_devices' was unexpected" in error.message
-        )
+        self.assertTrue("Additional properties are not allowed " in error.message)
+        self.assertTrue("'skipped_devices' was unexpected" in error.message)
 
     def test_invalid_resource_type(self):
         data = {
-            'policies': [
-                {'name': 'instance-policy',
-                 'resource': 'ec3',
-                 'filters': []}]}
+            "policies": [{"name": "instance-policy", "resource": "ec3", "filters": []}]
+        }
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
 
     def test_value_filter_short_form_invalid(self):
         for rtype in ["elb", "rds", "ec2"]:
             data = {
-                'policies': [
-                    {'name': 'instance-policy',
-                     'resource': 'elb',
-                     'filters': [
-                         {"tag:Role": "webserver"}]}
-                ]}
+                "policies": [
+                    {
+                        "name": "instance-policy",
+                        "resource": "elb",
+                        "filters": [{"tag:Role": "webserver"}],
+                    }
+                ]
+            }
             schema = generate([rtype])
             # Disable standard value short form
-            schema['definitions']['filters']['valuekv'] = {'type': 'number'}
+            schema["definitions"]["filters"]["valuekv"] = {"type": "number"}
             validator = Validator(schema)
             errors = list(validator.iter_errors(data))
             self.assertEqual(len(errors), 1)
 
     def test_nested_bool_operators(self):
         data = {
-            'policies': [
-                {'name': 'test',
-                 'resource': 'ec2',
-                 'filters': [
-                     {'or': [
-                         {'tag:Role': 'webserver'},
-                         {'type': 'value', 'key': 'x', 'value': []},
-                         {'and': [
-                             {'tag:Name': 'cattle'},
-                             {'tag:Env': 'prod'}]
-                          }]
-                      }]
-                 }]
-            }
+            "policies": [
+                {
+                    "name": "test",
+                    "resource": "ec2",
+                    "filters": [
+                        {
+                            "or": [
+                                {"tag:Role": "webserver"},
+                                {"type": "value", "key": "x", "value": []},
+                                {"and": [{"tag:Name": "cattle"}, {"tag:Env": "prod"}]},
+                            ]
+                        }
+                    ],
+                }
+            ]
+        }
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(errors, [])
 
     def test_value_filter_short_form(self):
         data = {
-            'policies': [
-                {'name': 'instance-policy',
-                 'resource': 'elb',
-                 'filters': [
-                     {"tag:Role": "webserver"}]}
-                ]}
+            "policies": [
+                {
+                    "name": "instance-policy",
+                    "resource": "elb",
+                    "filters": [{"tag:Role": "webserver"}],
+                }
+            ]
+        }
 
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(errors, [])
 
     def test_event_inherited_value_filter(self):
         data = {
-            'policies': [
-                {'name': 'test',
-                 'resource': 'ec2',
-                 'filters': [
-                     {'type': 'event',
-                      'key': "detail.requestParameters",
-                      "value": "absent"}]}]
-            }
+            "policies": [
+                {
+                    "name": "test",
+                    "resource": "ec2",
+                    "filters": [
+                        {
+                            "type": "event",
+                            "key": "detail.requestParameters",
+                            "value": "absent",
+                        }
+                    ],
+                }
+            ]
+        }
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(errors, [])
 
     def test_ebs_inherited_value_filter(self):
         data = {
-            'policies': [
-                {'name': 'test',
-                 'resource': 'ec2',
-                 'filters': [
-                     {'type': 'ebs',
-                      'key': 'Encrypted',
-                      'value': False,
-                      'skip-devices': [
-                          '/dev/sda1',
-                          '/dev/xvda']}
-                     ]}
-                ]}
+            "policies": [
+                {
+                    "name": "test",
+                    "resource": "ec2",
+                    "filters": [
+                        {
+                            "type": "ebs",
+                            "key": "Encrypted",
+                            "value": False,
+                            "skip-devices": ["/dev/sda1", "/dev/xvda"],
+                        }
+                    ],
+                }
+            ]
+        }
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(errors, [])
 
     def test_offhours_stop(self):
         data = {
-            'policies': [
-                {'name': 'ec2-offhours-stop',
-                 'resource': 'ec2',
-                 'filters': [
-                     {'tag:aws:autoscaling:groupName': 'absent'},
-                     {'type': 'offhour',
-                      'tag': 'c7n_downtime',
-                      'default_tz': 'et',
-                      'offhour': 19}]
-                 }]
-            }
-        schema = generate(['ec2'])
+            "policies": [
+                {
+                    "name": "ec2-offhours-stop",
+                    "resource": "ec2",
+                    "filters": [
+                        {"tag:aws:autoscaling:groupName": "absent"},
+                        {
+                            "type": "offhour",
+                            "tag": "c7n_downtime",
+                            "default_tz": "et",
+                            "offhour": 19,
+                        },
+                    ],
+                }
+            ]
+        }
+        schema = generate(["ec2"])
         validator = Validator(schema)
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 0)
 
     def test_instance_age(self):
         data = {
-            'policies': [
-                {'name': 'ancient-instances',
-                 'resource': 'ec2',
-                 'query': [{'instance-state-name': 'running'}],
-                 'filters': [{'days': 60, 'type': 'instance-age'}]
-             }]}
-        schema = generate(['ec2'])
+            "policies": [
+                {
+                    "name": "ancient-instances",
+                    "resource": "ec2",
+                    "query": [{"instance-state-name": "running"}],
+                    "filters": [{"days": 60, "type": "instance-age"}],
+                }
+            ]
+        }
+        schema = generate(["ec2"])
         validator = Validator(schema)
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 0)
 
     def test_mark_for_op(self):
         data = {
-            'policies': [{
-                'name': 'ebs-mark-delete',
-                'resource': 'ebs',
-                'filters': [],
-                'actions': [{
-                    'type': 'mark-for-op',
-                    'op': 'delete',
-                    'days': 30}]}]
-            }
-        schema = generate(['ebs'])
+            "policies": [
+                {
+                    "name": "ebs-mark-delete",
+                    "resource": "ebs",
+                    "filters": [],
+                    "actions": [{"type": "mark-for-op", "op": "delete", "days": 30}],
+                }
+            ]
+        }
+        schema = generate(["ebs"])
         validator = Validator(schema)
 
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 0)
 
     def test_runtime(self):
-        data = lambda runtime: {
-            'policies': [{
-                'name': 'test',
-                'resource': 's3',
-                'mode': {
-                    'execution-options': {'metrics_enabled': False},
-                    'type': 'periodic',
-                    'schedule': 'xyz',
-                    'runtime': runtime}}]
-            }
-        errors_with = lambda r: list(Validator(generate()).iter_errors(data(r)))
-        self.assertEqual(len(errors_with('python2.7')), 0)
-        self.assertEqual(len(errors_with('python3.6')), 0)
-        self.assertEqual(len(errors_with('python4.5')), 1)
+        data = lambda runtime: {   # NOQA
+            "policies": [
+                {
+                    "name": "test",
+                    "resource": "s3",
+                    "mode": {
+                        "execution-options": {"metrics_enabled": False},
+                        "type": "periodic",
+                        "schedule": "xyz",
+                        "runtime": runtime,
+                    },
+                }
+            ]
+        }
+        errors_with = lambda r: list( # NOQA
+            Validator(generate()).iter_errors(data(r)))
+        self.assertEqual(len(errors_with("python2.7")), 0)
+        self.assertEqual(len(errors_with("python3.6")), 0)
+        self.assertEqual(len(errors_with("python4.5")), 1)

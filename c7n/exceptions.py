@@ -13,14 +13,31 @@
 # limitations under the License.
 
 
-from .common import BaseTest
+class CustodianError(Exception):
+    """Custodian Exception Base Class
+    """
 
-from c7n.provider import clouds
+
+class PolicySyntaxError(CustodianError):
+    """Policy Syntax Error
+    """
 
 
-class ProviderTest(BaseTest):
+class PolicyYamlError(PolicySyntaxError):
+    """Policy Yaml Structural Error
+    """
 
-    def test_available_clouds(self):
-        # the other providers are currently distributed as separate
-        # installs (tools/c7n_azure and tools/c7n_gcp)
-        self.assertEqual(sorted(clouds.keys()), ["aws", "azure", "gcp"])
+
+class PolicyValidationError(PolicySyntaxError):
+    """Policy Validation Error
+    """
+
+
+class DeprecationError(PolicySyntaxError):
+    """Policy using deprecated syntax
+    """
+
+
+class PolicyExecutionError(CustodianError):
+    """Error running a Policy.
+    """

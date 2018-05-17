@@ -46,7 +46,8 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def azure_matcher(self, r1, r2):
         """Replace all subscription ID's and ignore api-version"""
-        if [k for k in set(r1.query) if k[0] != 'api-version'] != [k for k in set(r2.query) if k[0] != 'api-version']:
+        if [k for k in set(r1.query) if k[0] != 'api-version'] != [
+                k for k in set(r2.query) if k[0] != 'api-version']:
             return False
 
         r1_path = re.sub(
@@ -148,10 +149,9 @@ class TextTestIO(io.StringIO):
 def arm_template(template):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            template_file_path = os.path.dirname(__file__) + "/templates/"+template
+            template_file_path = os.path.dirname(__file__) + "/templates/" + template
             if not os.path.isfile(template_file_path):
                 return args[0].fail("ARM template {} is not found".format(template_file_path))
             return func(*args, **kwargs)
         return wrapper
     return decorator
-

@@ -62,15 +62,15 @@ def deserialize(obj):
     # Be careful of shallow copy here
     target = dict(obj)
     class_name = None
-    if '__class__' in target:
-        class_name = target.pop('__class__')
-    if '__module__' in obj:
-        module_name = obj.pop('__module__')
+    if "__class__" in target:
+        class_name = target.pop("__class__")
+    if "__module__" in obj:
+        obj.pop("__module__")
     # Use getattr(module, class_name) for custom types if needed
-    if class_name == 'datetime':
+    if class_name == "datetime":
         return datetime(tzinfo=utc, **target)
-    if class_name == 'StreamingBody':
-        return StringIO(target['body'])
+    if class_name == "StreamingBody":
+        return StringIO(target["body"])
     # Return unrecognized structures as-is
     return obj
 
@@ -78,24 +78,24 @@ def deserialize(obj):
 def serialize(obj):
     """Convert objects into JSON structures."""
     # Record class and module information for deserialization
-    result = {'__class__': obj.__class__.__name__}
+    result = {"__class__": obj.__class__.__name__}
     try:
-        result['__module__'] = obj.__module__
+        result["__module__"] = obj.__module__
     except AttributeError:
         pass
     # Convert objects to dictionary representation based on type
     if isinstance(obj, datetime):
-        result['year'] = obj.year
-        result['month'] = obj.month
-        result['day'] = obj.day
-        result['hour'] = obj.hour
-        result['minute'] = obj.minute
-        result['second'] = obj.second
-        result['microsecond'] = obj.microsecond
+        result["year"] = obj.year
+        result["month"] = obj.month
+        result["day"] = obj.day
+        result["hour"] = obj.hour
+        result["minute"] = obj.minute
+        result["second"] = obj.second
+        result["microsecond"] = obj.microsecond
         return result
     if isinstance(obj, StreamingBody):
-        result['body'] = obj.read()
-        obj._raw_stream = StringIO(result['body'])
+        result["body"] = obj.read()
+        obj._raw_stream = StringIO(result["body"])
         obj._amount_read = 0
         return result
     # Raise a TypeError if the object isn't recognized
@@ -104,23 +104,24 @@ def serialize(obj):
 
 placebo.pill.serialize = serialize
 placebo.pill.deserialize = deserialize
-## END PLACEBO MONKEY
+
+# END PLACEBO MONKEY
 ##########################################################################
 
 
 class BluePill(pill.Pill):
 
     def playback(self):
-        result = super(BluePill, self).playback()
+        super(BluePill, self).playback()
         self._avail = self.get_available()
 
     def get_available(self):
         return set(
-            [os.path.join(self.data_path, n)
-             for n in
-             fnmatch.filter(
-                 os.listdir(self.data_path),
-                 '*.json')])
+            [
+                os.path.join(self.data_path, n)
+                for n in fnmatch.filter(os.listdir(self.data_path), "*.json")
+            ]
+        )
 
     def get_next_file_path(self, service, operation):
         fn = super(BluePill, self).get_next_file_path(service, operation)
@@ -134,11 +135,8 @@ class BluePill(pill.Pill):
     def stop(self):
         result = super(BluePill, self).stop()
         if self._avail:
-            print("Unused json files \n %s" % (
-                "\n".join(sorted(self._avail))))
+            print("Unused json files \n %s" % ("\n".join(sorted(self._avail))))
         return result
-        #else:
-        #    print("emptied available")
 
 
 class ZippedPill(pill.Pill):
@@ -150,16 +148,15 @@ class ZippedPill(pill.Pill):
         self.archive = None
 
     def playback(self):
-        self.archive = zipfile.ZipFile(self.path, 'r')
+        self.archive = zipfile.ZipFile(self.path, "r")
         self._files = set(self.archive.namelist())
         return super(ZippedPill, self).playback()
 
     def record(self):
-        self.archive = zipfile.ZipFile(self.path, 'a', zipfile.ZIP_DEFLATED)
+        self.archive = zipfile.ZipFile(self.path, "a", zipfile.ZIP_DEFLATED)
         self._files = set()
 
-        files = set([n for n in self.archive.namelist()
-                     if n.startswith(self.prefix)])
+        files = set([n for n in self.archive.namelist() if n.startswith(self.prefix)])
 
         if not files:
             return super(ZippedPill, self).record()
@@ -167,10 +164,9 @@ class ZippedPill(pill.Pill):
         # We can't update files in a zip, so copy
         self.archive.close()
         os.rename(self.path, "%s.tmp" % self.path)
-        src = zipfile.ZipFile("%s.tmp" % self.path, 'r')
+        src = zipfile.ZipFile("%s.tmp" % self.path, "r")
 
-        self.archive = zipfile.ZipFile(
-            self.path, 'w', zipfile.ZIP_DEFLATED)
+        self.archive = zipfile.ZipFile(self.path, "w", zipfile.ZIP_DEFLATED)
 
         for n in src.namelist():
             if n in files:
@@ -184,57 +180,56 @@ class ZippedPill(pill.Pill):
         if self.archive:
             self.archive.close()
 
-    def save_response(self, service, operation, response_data,
-                      http_response=200):
+    def save_response(self, service, operation, response_data, http_response=200):
 
         filepath = self.get_new_file_path(service, operation)
-        pill.LOG.debug('save_response: path=%s', filepath)
-        json_data = {'status_code': http_response,
-                     'data': response_data}
+        pill.LOG.debug("save_response: path=%s", filepath)
+        json_data = {"status_code": http_response, "data": response_data}
         self.archive.writestr(
             filepath,
             json.dumps(json_data, indent=4, default=pill.serialize),
-            zipfile.ZIP_DEFLATED)
+            zipfile.ZIP_DEFLATED,
+        )
         self._files.add(filepath)
 
     def load_response(self, service, operation):
         response_file = self.get_next_file_path(service, operation)
         self._used.add(response_file)
-        pill.LOG.debug('load_responses: %s', response_file)
+        pill.LOG.debug("load_responses: %s", response_file)
         response_data = json.loads(
-            self.archive.read(response_file), object_hook=pill.deserialize)
-        return (pill.FakeHttpResponse(response_data['status_code']),
-                response_data['data'])
+            self.archive.read(response_file), object_hook=pill.deserialize
+        )
+        return (
+            pill.FakeHttpResponse(response_data["status_code"]), response_data["data"]
+        )
 
     def get_new_file_path(self, service, operation):
-        base_name = '{0}.{1}'.format(service, operation)
+        base_name = "{0}.{1}".format(service, operation)
         if self.prefix:
-            base_name = '{0}.{1}'.format(self.prefix, base_name)
-        pill.LOG.debug('get_new_file_path: %s', base_name)
+            base_name = "{0}.{1}".format(self.prefix, base_name)
+        pill.LOG.debug("get_new_file_path: %s", base_name)
         index = 0
-        glob_pattern = os.path.join(self._data_path, base_name + '*')
+        glob_pattern = os.path.join(self._data_path, base_name + "*")
 
         for file_path in fnmatch.filter(self._files, glob_pattern):
             file_name = os.path.basename(file_path)
             m = self.filename_re.match(file_name)
             if m:
-                i = int(m.group('index'))
+                i = int(m.group("index"))
                 if i > index:
                     index = i
         index += 1
-        return os.path.join(
-            self._data_path, '{0}_{1}.json'.format(base_name, index))
+        return os.path.join(self._data_path, "{0}_{1}.json".format(base_name, index))
 
     def get_next_file_path(self, service, operation):
-        base_name = '{0}.{1}'.format(service, operation)
+        base_name = "{0}.{1}".format(service, operation)
         if self.prefix:
-            base_name = '{0}.{1}'.format(self.prefix, base_name)
-        pill.LOG.debug('get_next_file_path: %s', base_name)
+            base_name = "{0}.{1}".format(self.prefix, base_name)
+        pill.LOG.debug("get_next_file_path: %s", base_name)
         next_file = None
         while next_file is None:
             index = self._index.setdefault(base_name, 1)
-            fn = os.path.join(
-                self._data_path, base_name + '_{0}.json'.format(index))
+            fn = os.path.join(self._data_path, base_name + "_{0}.json".format(index))
             if fn in self._files:
                 next_file = fn
                 self._index[base_name] += 1
@@ -243,7 +238,7 @@ class ZippedPill(pill.Pill):
                 self._index[base_name] = 1
             else:
                 # we are looking for the first index and it's not here
-                raise IOError('response file ({0}) not found'.format(fn))
+                raise IOError("response file ({0}) not found".format(fn))
         return fn
 
 
@@ -256,13 +251,16 @@ def attach(session, data_path, prefix=None, debug=False):
 class PillTest(unittest.TestCase):
 
     archive_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), 'placebo_data.zip')
+        os.path.dirname(os.path.abspath(__file__)), "placebo_data.zip"
+    )
 
     placebo_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), 'data', 'placebo')
+        os.path.dirname(os.path.abspath(__file__)), "data", "placebo"
+    )
 
     output_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), 'data', 'output')
+        os.path.dirname(os.path.abspath(__file__)), "data", "output"
+    )
 
     recording = False
 
@@ -310,22 +308,20 @@ class PillTest(unittest.TestCase):
         default region. It is unused when replaying stored data.
         """
 
-        if os.environ.get('C7N_FUNCTIONAL') == 'yes':
+        if os.environ.get("C7N_FUNCTIONAL") == "yes":
             self.recording = True
-            return lambda region=region, assume=None: boto3.Session(
-                region_name=region)
+            return lambda region=region, assume=None: boto3.Session(region_name=region)
 
         if not zdata:
             test_dir = os.path.join(self.placebo_dir, test_case)
             if not os.path.exists(test_dir):
-                raise RuntimeError(
-                    "Invalid Test Dir for flight data %s" % test_dir)
+                raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)
 
         session = boto3.Session()
         if not zdata:
             pill = placebo.attach(session, test_dir)
-            #pill = BluePill()
-            #pill.attach(session, test_dir)
+            # pill = BluePill()
+            # pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, False)
 

@@ -15,8 +15,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest
 from c7n_azure.utils import ResourceIdParser
 
-RESOURCE_ID = ("/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
-                            "rgtest/providers/Microsoft.Compute/virtualMachines/nametest")
+RESOURCE_ID = (
+    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
+    "rgtest/providers/Microsoft.Compute/virtualMachines/nametest")
+
 
 class UtilsTest(BaseTest):
     def setUp(self):

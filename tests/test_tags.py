@@ -26,27 +26,32 @@ class UniversalTagRetry(BaseTest):
 
     def test_retry_no_error(self):
         mock = MagicMock()
-        mock.side_effect = [{'Result': 42}]
-        self.assertEqual(universal_retry(mock, []), {'Result': 42})
+        mock.side_effect = [{"Result": 42}]
+        self.assertEqual(universal_retry(mock, []), {"Result": 42})
         mock.assert_called_once()
 
     def test_retry_failure_reduced_set(self):
         sleep = MagicMock()
-        self.patch(time, 'sleep', sleep)
+        self.patch(time, "sleep", sleep)
         method = MagicMock()
         method.side_effect = [
-            {'FailedResourcesMap': {'arn:abc': {'ErrorCode': 'ThrottlingException'}}},
-            {'Result': 32}]
-        self.assertEqual(universal_retry(method, ['arn:abc', 'arn:def']),
-                         {'Result': 32})
+            {"FailedResourcesMap": {"arn:abc": {"ErrorCode": "ThrottlingException"}}},
+            {"Result": 32},
+        ]
+        self.assertEqual(
+            universal_retry(method, ["arn:abc", "arn:def"]), {"Result": 32}
+        )
         sleep.assert_called_once()
         self.assertTrue(
             method.call_args_list == [
-                call(ResourceARNList=['arn:abc', 'arn:def']),
-                call(ResourceARNList=['arn:abc'])])
+                call(ResourceARNList=["arn:abc", "arn:def"]),
+                call(ResourceARNList=["arn:abc"]),
+            ]
+        )
 
     def test_retry_pass_error(self):
         method = MagicMock()
         method.side_effect = [
-            {'FailedResourcesMap': {'arn:abc': {'ErrorCode': 'PermissionDenied'}}}]
-        self.assertRaises(Exception, universal_retry, method, ['arn:abc'])
+            {"FailedResourcesMap": {"arn:abc": {"ErrorCode": "PermissionDenied"}}}
+        ]
+        self.assertRaises(Exception, universal_retry, method, ["arn:abc"])

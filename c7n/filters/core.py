@@ -30,6 +30,7 @@ import jmespath
 import six
 
 from c7n import ipaddress
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
@@ -136,14 +137,14 @@ class FilterRegistry(PluginRegistry):
         else:
             filter_type = data.get('type')
         if not filter_type:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "%s Invalid Filter %s" % (
                     self.plugin_type, data))
         filter_class = self.get(filter_type)
         if filter_class is not None:
             return filter_class(data, manager)
         else:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "%s Invalid filter type %s" % (
                     self.plugin_type, data))
 
@@ -339,17 +340,17 @@ class ValueFilter(Filter):
         """
         for field in ('op', 'value'):
             if field not in self.data:
-                raise FilterValidationError(
+                raise PolicyValidationError(
                     "Missing '%s' in value filter %s" % (field, self.data))
 
         if not (isinstance(self.data['value'], int) or
                 isinstance(self.data['value'], list)):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
         if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "Invalid operator in value filter %s" % self.data)
 
         return self
@@ -364,21 +365,21 @@ class ValueFilter(Filter):
             return self._validate_resource_count()
 
         if 'key' not in self.data:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "Missing 'key' in value filter %s" % self.data)
         if 'value' not in self.data and 'value_from' not in self.data:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
             if not self.data['op'] in OPERATORS:
-                raise FilterValidationError(
+                raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
             if self.data['op'] == 'regex':
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['value'])
                 except re.error as e:
-                    raise FilterValidationError(
+                    raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
         return self
 
@@ -589,8 +590,9 @@ class EventFilter(ValueFilter):
 
     def validate(self):
         if 'mode' not in self.manager.data:
-            raise FilterValidationError(
-                "Event filters can only be used with lambda policies")
+            raise PolicyValidationError(
+                "Event filters can only be used with lambda policies in %s" % (
+                    self.manager.data,))
         return self
 
     def process(self, resources, event=None):

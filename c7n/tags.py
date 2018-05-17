@@ -31,7 +31,8 @@ import itertools
 import time
 
 from c7n.actions import BaseAction as Action, AutoTagUser
-from c7n.filters import Filter, OPERATORS, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import utils
 
@@ -264,12 +265,14 @@ class TagActionFilter(Filter):
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
-            raise FilterValidationError("Invalid marked-for-op op:%s" % op)
+            raise PolicyValidationError(
+                "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
         tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
-            raise FilterValidationError(
-                "Invalid timezone specified '%s'" % self.data.get('tz'))
+            raise PolicyValidationError(
+                "Invalid timezone specified '%s' in %s" % (
+                    self.data.get('tz'), self.manager.data))
         return self
 
     def __call__(self, i):
@@ -365,8 +368,9 @@ class Tag(Action):
 
     def validate(self):
         if self.data.get('key') and self.data.get('tag'):
-            raise FilterValidationError(
-                "Can't specify both key and tag, choose one")
+            raise PolicyValidationError(
+                "Can't specify both key and tag, choose one in %s" % (
+                    self.manager.data,))
         return self
 
     def process(self, resources):
@@ -587,14 +591,16 @@ class TagDelayedAction(Action):
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
-            raise FilterValidationError(
-                "mark-for-op specifies invalid op:%s" % op)
+            raise PolicyValidationError(
+                "mark-for-op specifies invalid op:%s in %s" % (
+                    op, self.manager.data))
 
         self.tz = zoneinfo.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.tz)
+            raise PolicyValidationError(
+                "Invalid timezone specified %s in %s" % (
+                    self.tz, self.manager.data))
         return self
 
     def generate_timestamp(self, days, hours):
