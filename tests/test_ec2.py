@@ -22,7 +22,7 @@ from dateutil import tz, zoneinfo
 from mock import mock
 from jsonschema.exceptions import ValidationError
 
-from c7n.filters import FilterValidationError
+from c7n.exceptions import PolicyValidationError
 from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
@@ -500,7 +500,7 @@ class TestTag(BaseTest):
                 {"type": "tag", "key": "Testing", "tag": "foo", "value": "TestingError"}
             ],
         }
-        self.assertRaises(FilterValidationError, self.load_policy, policy)
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)
 
         # Invalid op for 'mark-for-op' action
         policy = {
@@ -508,7 +508,7 @@ class TestTag(BaseTest):
             "resource": "ec2",
             "actions": [{"type": "mark-for-op", "op": "fake"}],
         }
-        self.assertRaises(FilterValidationError, self.load_policy, policy)
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)
 
     def test_ec2_untag(self):
         session_factory = self.replay_flight_data("test_ec2_untag")
@@ -991,7 +991,7 @@ class TestEC2QueryFilter(unittest.TestCase):
             isinstance(QueryFilter.parse([{"tag:ASV": "REALTIMEMSG"}])[0], QueryFilter)
         )
 
-        self.assertRaises(ValueError, QueryFilter.parse, [{"tag:ASV": None}])
+        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"tag:ASV": None}])
 
 
 class TestTerminate(BaseTest):

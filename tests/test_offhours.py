@@ -23,7 +23,7 @@ from mock import mock
 
 from .common import BaseTest, instance
 
-from c7n.filters import FilterValidationError
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
 
 
@@ -109,11 +109,11 @@ class OffHoursFilterTest(BaseTest):
     def test_validate(self):
         url_test = "s3://test-dest/holidays.csv"
         self.assertRaises(
-            FilterValidationError, OffHour({"default_tz": "zmta"}).validate
+            PolicyValidationError, OffHour({"default_tz": "zmta"}).validate
         )
-        self.assertRaises(FilterValidationError, OffHour({"offhour": 25}).validate)
+        self.assertRaises(PolicyValidationError, OffHour({"offhour": 25}).validate)
         self.assertRaises(
-            FilterValidationError,
+            PolicyValidationError,
             OffHour(
                 {
                     "skip-days": ["2017-01-01"],

@@ -26,6 +26,7 @@ from unittest import TestCase
 from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
 
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
@@ -1882,7 +1883,7 @@ class S3Test(BaseTest):
 
     def test_attach_encrypt_requires_role(self):
         self.assertRaises(
-            ValueError,
+            PolicyValidationError,
             self.load_policy,
             {
                 "name": "attach-encrypt",

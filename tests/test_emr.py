@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import unittest
 
+from c7n.exceptions import PolicyValidationError
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
 
@@ -200,15 +201,15 @@ class TestEMRQueryFilter(unittest.TestCase):
             isinstance(QueryFilter.parse([{"tag:ASV": "REALTIMEMSG"}])[0], QueryFilter)
         )
 
-        self.assertRaises(ValueError, QueryFilter.parse, [{"tag:ASV": None}])
+        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"tag:ASV": None}])
 
-        self.assertRaises(ValueError, QueryFilter.parse, [{"foo": "bar"}])
+        self.assertRaises(PolicyValidationError, QueryFilter.parse, [{"foo": "bar"}])
 
         self.assertRaises(
-            ValueError, QueryFilter.parse, [{"too": "many", "keys": "error"}]
+            PolicyValidationError, QueryFilter.parse, [{"too": "many", "keys": "error"}]
         )
 
-        self.assertRaises(ValueError, QueryFilter.parse, ["Not a dictionary"])
+        self.assertRaises(PolicyValidationError, QueryFilter.parse, ["Not a dictionary"])
 
 
 class TestTerminate(BaseTest):

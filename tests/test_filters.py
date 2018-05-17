@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 from dateutil import tz
 import unittest
 
+from c7n.exceptions import PolicyValidationError
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
@@ -48,7 +49,7 @@ class TestFilter(unittest.TestCase):
 
     def test_filter_validation(self):
         self.assertRaises(
-            base_filters.FilterValidationError,
+            PolicyValidationError,
             filters.factory,
             {"type": "ax", "xyz": 1},
         )
@@ -172,7 +173,7 @@ class TestRegexValue(unittest.TestCase):
 
     def test_regex_validate(self):
         self.assertRaises(
-            base_filters.FilterValidationError,
+            PolicyValidationError,
             filters.factory(
                 {"type": "value", "key": "Color", "value": "*green", "op": "regex"}
             ).validate,
@@ -300,7 +301,7 @@ class TestValueTypes(BaseFilterTest):
         # Bad `op`
         f = {"type": "value", "value_type": "resource_count", "op": "regex", "value": 1}
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory(f, {}).validate
+            PolicyValidationError, filters.factory(f, {}).validate
         )
 
         # Bad `value`
@@ -308,13 +309,13 @@ class TestValueTypes(BaseFilterTest):
             "type": "value", "value_type": "resource_count", "op": "eq", "value": "foo"
         }
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory(f, {}).validate
+            PolicyValidationError, filters.factory(f, {}).validate
         )
 
         # Missing `op`
         f = {"type": "value", "value_type": "resource_count", "value": 1}
         self.assertRaises(
-            base_filters.FilterValidationError, filters.factory(f, {}).validate
+            PolicyValidationError, filters.factory(f, {}).validate
         )
 
 
@@ -427,7 +428,7 @@ class EventFilterTest(BaseFilterTest):
         b = Bag(data={"resource": "something"})
         f = {"type": "event", "key": "detail.state", "value": "pending"}
         f = filters.factory(f, b)
-        self.assertRaises(base_filters.FilterValidationError, f.validate)
+        self.assertRaises(PolicyValidationError, f.validate)
 
 
 class TestInstanceValue(BaseFilterTest):
@@ -468,16 +469,16 @@ class TestInstanceValue(BaseFilterTest):
 
     def test_complex_validator(self):
         self.assertRaises(
-            base_filters.FilterValidationError,
+            PolicyValidationError,
             filters.factory({"key": "xyz", "type": "value"}).validate,
         )
         self.assertRaises(
-            base_filters.FilterValidationError,
+            PolicyValidationError,
             filters.factory({"value": "xyz", "type": "value"}).validate,
         )
 
         self.assertRaises(
-            base_filters.FilterValidationError,
+            PolicyValidationError,
             filters.factory(
                 {"key": "xyz", "value": "xyz", "op": "oo", "type": "value"}
             ).validate,
@@ -662,7 +663,7 @@ class TestFilterRegistry(unittest.TestCase):
 
     def test_filter_registry(self):
         reg = base_filters.FilterRegistry("test.filters")
-        self.assertRaises(base_filters.FilterValidationError, reg.factory, {"type": ""})
+        self.assertRaises(PolicyValidationError, reg.factory, {"type": ""})
 
 
 if __name__ == "__main__":

@@ -27,8 +27,8 @@ from botocore.exceptions import ClientError
 import boto3
 from .common import BaseTest, event_data, TestConfig as Config
 
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.filters import FilterValidationError
 from c7n.resources import rds
 from c7n import tags
 
@@ -844,7 +844,7 @@ class RDSSnapshotTest(BaseTest):
 
     def test_rds_cross_region_copy_lambda(self):
         self.assertRaises(
-            FilterValidationError,
+            PolicyValidationError,
             self.load_policy,
             {
                 "name": "rds-copy-fail",

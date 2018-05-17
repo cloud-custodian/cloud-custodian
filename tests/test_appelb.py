@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import six
 
 from .common import BaseTest, event_data
-from c7n.filters import FilterValidationError
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.appelb import AppELB, AppELBTargetGroup
 
@@ -52,7 +52,7 @@ class AppELBTest(BaseTest):
 
     def test_appelb_validate(self):
         self.assertRaises(
-            FilterValidationError,
+            PolicyValidationError,
             self.load_policy,
             {
                 "name": "appelb-simple-filter",
@@ -88,7 +88,7 @@ class AppELBTest(BaseTest):
                     ],
                 }
             )
-        except FilterValidationError:
+        except PolicyValidationError:
             raise
             self.fail("filter validation should not have failed")
 

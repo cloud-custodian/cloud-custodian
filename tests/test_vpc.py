@@ -14,8 +14,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest, functional, event_data, TestConfig as Config
-from c7n.filters import FilterValidationError
+
 from botocore.exceptions import ClientError as BotoClientError
+from c7n.exceptions import PolicyValidationError
 
 
 class VpcTest(BaseTest):
@@ -1857,7 +1858,7 @@ class SecurityGroupTest(BaseTest):
 
     def test_egress_validation_error(self):
         self.assertRaises(
-            FilterValidationError,
+            PolicyValidationError,
             self.load_policy,
             {
                 "name": "sg-find2",

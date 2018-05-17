@@ -22,6 +22,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS,
     CrossAccountAccessFilter)
@@ -852,8 +853,9 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
         for f in self.manager.filters:
             if isinstance(f, RedshiftSnapshotCrossAccount):
                 return self
-        raise ValueError('`revoke-access` may only be used in '
-                         'conjunction with `cross-account` filter')
+        raise PolicyValidationError(
+            '`revoke-access` may only be used in '
+            'conjunction with `cross-account` filter on %s' % (self.manager.data,))
 
     def process_snapshot_set(self, client, snapshot_set):
         for s in snapshot_set:

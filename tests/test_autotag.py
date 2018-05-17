@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.exceptions import PolicyValidationError
 from c7n.actions import AutoTagUser
 from c7n.utils import query_instances
 from .common import BaseTest, event_data
@@ -98,7 +99,7 @@ class AutoTagCreator(BaseTest):
     def test_error_auto_tag_bad_mode(self):
         # mode type is not cloudtrail
         self.assertRaises(
-            ValueError,
+            PolicyValidationError,
             self.load_policy,
             {
                 "name": "auto-tag-error",

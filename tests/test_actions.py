@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.exceptions import ClientError
+from c7n.exceptions import PolicyValidationError
 from c7n.actions import Action, ActionRegistry
 from .common import BaseTest
 
@@ -43,9 +44,10 @@ class ActionTest(BaseTest):
 class ActionRegistryTest(BaseTest):
 
     def test_error_bad_action_type(self):
-        self.assertRaises(ValueError, ActionRegistry("test.actions").factory, {}, None)
+        self.assertRaises(
+            PolicyValidationError, ActionRegistry("test.actions").factory, {}, None)
 
     def test_error_unregistered_action_type(self):
         self.assertRaises(
-            ValueError, ActionRegistry("test.actions").factory, "foo", None
+            PolicyValidationError, ActionRegistry("test.actions").factory, "foo", None
         )

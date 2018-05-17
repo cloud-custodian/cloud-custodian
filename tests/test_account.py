@@ -14,9 +14,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
-from c7n.filters import FilterValidationError
 from jsonschema.exceptions import ValidationError
 
 import datetime
@@ -277,7 +277,7 @@ class AccountTests(BaseTest):
             "resource": "account",
             "filters": [{"type": "service-limit", "services": ["IAM"]}],
         }
-        self.assertRaises(FilterValidationError, self.load_policy, policy)
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)
 
     def test_service_limit_no_threshold(self):
         # only warns when the default threshold goes to warning or above

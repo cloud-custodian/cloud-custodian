@@ -14,9 +14,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.resources.elb import ELB
-from c7n.filters import FilterValidationError
 
 
 class ELBTagTest(BaseTest):
@@ -281,7 +282,7 @@ class SSLPolicyTest(BaseTest):
 
     def test_filter_validation_no_blacklist(self):
         self.assertRaises(
-            FilterValidationError,
+            PolicyValidationError,
             self.load_policy,
             {
                 "name": "test-ssl-ciphers",
@@ -294,7 +295,7 @@ class SSLPolicyTest(BaseTest):
 
     def test_filter_validation_blacklist_not_iterable(self):
         self.assertRaises(
-            FilterValidationError,
+            PolicyValidationError,
             self.load_policy,
             {
                 "name": "test-ssl-ciphers",
