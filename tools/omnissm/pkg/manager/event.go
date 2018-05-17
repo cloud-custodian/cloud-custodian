@@ -1,18 +1,16 @@
-/*
-Copyright 2018 Capital One Services, LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-
-You may obtain a copy of the License at
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2018 Capital One Services, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package manager
 
@@ -22,27 +20,32 @@ import (
 	"time"
 )
 
-// CloudWatchEvent is only needed to unmarshal specific fields of a
-// CloudWatch event (i.e. not intended to be a holistic representation of a
-// CloudWatch event).
-type CloudWatchEvent struct {
-	Version    string                `json:"version"`
-	ID         string                `json:"id"`
-	DetailType string                `json:"detail-type"`
-	Source     string                `json:"source"`
-	AccountId  string                `json:"account"`
-	Time       time.Time             `json:"time"`
-	Region     string                `json:"region"`
-	Resources  []string              `json:"resources"`
-	Detail     CloudWatchEventDetail `json:"detail"`
+// Event is only necessary to unmarshal specific fields of a CloudWatch event
+// and is not intended to be a holistic representation of a CloudWatch event.
+type Event struct {
+	Version    string      `json:"version"`
+	ID         string      `json:"id"`
+	DetailType string      `json:"detail-type"`
+	Source     string      `json:"source"`
+	AccountId  string      `json:"account"`
+	Time       time.Time   `json:"time"`
+	Region     string      `json:"region"`
+	Resources  []string    `json:"resources"`
+	Detail     EventDetail `json:"detail"`
 }
 
-type CloudWatchEventDetail struct {
-	RecordVersion            string                 `json:"recordVersion"`
-	MessageType              string                 `json:"messageType"`
-	ConfigurationItemDiff    map[string]interface{} `json:"configurationItemDiff"`
-	NotificationCreationTime string                 `json:"notificationCreationTime"`
-	ConfigurationItem        ConfigurationItem      `json:"configurationItem"`
+type EventDetail struct {
+	RecordVersion            string `json:"recordVersion"`
+	MessageType              string `json:"messageType"`
+	NotificationCreationTime string `json:"notificationCreationTime"`
+
+	ConfigurationItemDetail
+	OversizedConfigurationItemDetail
+}
+
+type ConfigurationItemDetail struct {
+	ConfigurationItemDiff map[string]interface{} `json:"configurationItemDiff"`
+	ConfigurationItem     ConfigurationItem      `json:"configurationItem"`
 }
 
 type ConfigurationItem struct {
@@ -77,6 +80,25 @@ type ConfigurationItem struct {
 
 func (c *ConfigurationItem) Name() string {
 	return fmt.Sprintf("%s-%s", c.AWSAccountId, c.ResourceId)
+}
+
+type OversizedConfigurationItemDetail struct {
+	S3DeliverySummary struct {
+		S3BucketLocation string `json:"s3BucketLocation"`
+	} `json:"s3DeliverySummary"`
+	ConfigurationItemSummary struct {
+		ARN                          string `json:"ARN"`
+		AWSAccountId                 string `json:"awsAccountId"`
+		AWSRegion                    string `json:"awsRegion"`
+		ChangeType                   string `json:"changeType"`
+		ConfigurationItemCaptureTime string `json:"configurationItemCaptureTime"`
+		ConfigurationItemStatus      string `json:"configurationItemStatus"`
+		ConfigurationItemVersion     string `json:"configurationItemVersion"`
+		ConfigurationStateId         int    `json:"configurationStateId"`
+		ConfigurationStateMd5Hash    string `json:"configurationStateMd5Hash"`
+		ResourceId                   string `json:"resourceId"`
+		ResourceType                 string `json:"resourceType"`
+	} `json:"configurationItemSummary"`
 }
 
 // ConfigurationState can be a string or object

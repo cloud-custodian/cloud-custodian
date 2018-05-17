@@ -1,18 +1,16 @@
-/*
-Copyright 2018 Capital One Services, LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-
-You may obtain a copy of the License at
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// Copyright 2018 Capital One Services, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package inventory
 
@@ -24,17 +22,17 @@ import (
 )
 
 type Process struct {
-	Pid         int32     `json:"pid"`
+	Pid         int32     `json:"pid,string"`
 	Name        string    `json:"name"`
 	User        string    `json:"user"`
 	Cmdline     string    `json:"cmdline"`
-	ReadBytes   uint64    `json:"read_bytes"`
-	WriteBytes  uint64    `json:"write_bytes"`
-	NumFDs      int       `json:"num_fds"`
-	CreateTime  time.Time `json:"create_time"`
-	ThreadCount int       `json:"thread_count"`
-	RSS         int       `json:"rss"`
-	VMS         int       `json:"vms"`
+	ReadBytes   uint64    `json:"read_bytes,string"`
+	WriteBytes  uint64    `json:"write_bytes,string"`
+	NumFDs      int       `json:"num_fds,string"`
+	CreateTime  time.Time `json:"create_time,string"`
+	ThreadCount int       `json:"thread_count,string"`
+	RSS         int       `json:"rss,string"`
+	VMS         int       `json:"vms,string"`
 }
 
 func ListAllProcesses() ([]Process, error) {

@@ -12,36 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package identity
+package apiutil
 
 import (
-	"strings"
+	"encoding/json"
+	"net/http"
 
-	"github.com/pkg/errors"
+	"github.com/aws/aws-lambda-go/events"
 )
 
-var ErrUnauthorizedAccount = errors.New("unauthorized account")
-
-// A Whitelist stores a map of account values for existential lookups.
-type Whitelist struct {
-	accounts map[string]struct{}
+func Error(err error) (*events.APIGatewayProxyResponse, error) {
+	code := http.StatusInternalServerError
+	if gwErr, ok := err.(APIGatewayError); ok {
+		code = gwErr.StatusCode()
+	}
+	return &events.APIGatewayProxyResponse{StatusCode: code, Body: err.Error()}, nil
 }
 
-// NewWhitelist returns a new whitelist for authorized accounts.
-func NewWhitelist(s string) *Whitelist {
-	w := &Whitelist{
-		accounts: make(map[string]struct{}),
+func JSON(resp json.Marshaler, err error) (*events.APIGatewayProxyResponse, error) {
+	if err != nil {
+		return nil, err
 	}
-	for _, acctId := range strings.Split(s, ",") {
-		w.accounts[acctId] = struct{}{}
+	data, err := json.Marshal(resp)
+	if err != nil {
+		return nil, err
 	}
-	return w
-}
-
-func (w *Whitelist) Exists(acct string) (ok bool) {
-	if acct == "" {
-		return
-	}
-	_, ok = w.accounts[acct]
-	return
+	return &events.APIGatewayProxyResponse{StatusCode: http.StatusOK, Body: string(data)}, nil
 }

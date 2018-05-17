@@ -5,6 +5,11 @@ build:
 	@mkdir -p bin
 	@go build -o bin/omnissm ./cmd/omnissm
 
+lambda:
+	@mkdir -p bin
+	@go build -o bin/register ./functions/register
+	@go build -o bin/subscribe ./functions/subscribe
+
 dist:
 	@mkdir -p dist
 	@GOOS=linux GOARCH=amd64 go build -o dist/omnissm ./cmd/omnissm

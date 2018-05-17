@@ -12,25 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package apiutil
 
-import (
-	"fmt"
+import "net/http"
 
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/cobra"
-
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager/client"
-)
-
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "",
-	Run: func(cmd *cobra.Command, args []string) {
-		info, err := client.GetInstanceInformation()
-		if err != nil {
-			log.Fatal().Err(err).Msgf("cannot get instance info")
-		}
-		fmt.Println(info.ReleaseVersion)
-	},
+type APIGatewayError interface {
+	StatusCode() int
 }
+
+type NotFoundError struct {
+	Message string
+}
+
+func (e NotFoundError) Error() string {
+	return e.Message
+}
+func (NotFoundError) StatusCode() int { return http.StatusNotFound }
