@@ -60,17 +60,6 @@
   version = "v1.13.51"
 
 [[projects]]
-  name = "github.com/aws/aws-sdk-go-v2"
-  packages = [
-    "aws",
-    "aws/awserr",
-    "internal/awsutil",
-    "internal/sdk"
-  ]
-  revision = "3383499f1024e86a3c68200f9bdc6759ee20eb70"
-  version = "v2.0.0-preview.3"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
@@ -255,6 +244,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "21739e7b55b792ba83e1d9bcb5108efd48ff99972b8e1d5bc7577f013529f033"
+  inputs-digest = "572f64afe572162a913aaa1c690cc6d8c149a7a4ba5c56fefdf332f9ec8be63a"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/pkg/errors"
@@ -60,6 +60,15 @@ func init() {
 }
 
 func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error {
+	cfg, err := awsutil.LoadDefaultAWSConfig()
+	if err != nil {
+		return err
+	}
+	m := manager.NewManager(&manager.Config{
+		Config:             cfg,
+		RegistrationsTable: RegistrationsTable,
+		ResourceTags:       strings.Split(ResourceTags, ","),
+	})
 	managedId := identity.Hash(detail.ConfigurationItem.Name())
 	_, err, ok := m.Get(managedId)
 	if err != nil {
@@ -85,14 +94,14 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 func downloadS3ConfigurationItem(path string) ([]byte, error) {
 	cfg, err := awsutil.LoadDefaultAWSConfig()
 	if err != nil {
-		return
+		return nil, err
 	}
-	s3 := s3.New(session.New(cfg))
+	svc := s3.New(session.New(cfg))
 	parts := strings.SplitN(path, "/", 2)
 	if len(parts) != 2 {
 		return nil, errors.Errorf("invalid path: %#v", path)
 	}
-	resp, err := s3.GetObject(&s3.GetObjectInput{
+	resp, err := svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(parts[0]),
 		Key:    aws.String(parts[1]),
 	})
@@ -112,15 +121,6 @@ func main() {
 		if event.Source != "aws.config" {
 			return
 		}
-		cfg, err := awsutil.LoadDefaultAWSConfig()
-		if err != nil {
-			return
-		}
-		m := manager.NewManager(&manager.Config{
-			Config:             cfg,
-			RegistrationsTable: RegistrationsTable,
-			ResourceTags:       strings.Split(ResourceTags, ","),
-		})
 		switch event.Detail.MessageType {
 		case "ConfigurationItemChangeNotification":
 			if _, ok := resourceTypes[event.Detail.ConfigurationItem.ResourceType]; !ok {
@@ -129,7 +129,7 @@ func main() {
 			if _, ok := resourceStatusTypes[event.Detail.ConfigurationItem.ConfigurationItemStatus]; !ok {
 				return
 			}
-			return handleConfigurationItemChange(event.Detail)
+			return handleConfigurationItemChange(event.Detail.ConfigurationItemDetail)
 		case "OversizedConfigurationItemChangeNotification":
 			if _, ok := resourceTypes[event.Detail.ConfigurationItemSummary.ResourceType]; !ok {
 				return
