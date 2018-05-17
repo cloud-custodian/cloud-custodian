@@ -30,6 +30,13 @@ class StorageUtilsTest(BaseTest):
         return matching_account[0]
 
     @arm_template('storage.json')
+    def test_get_queue_client_by_uri(self):
+        account = self.setup_account();
+        url = "https://" + account.name + ".queue.core.windows.net/testcc"
+        client = StorageUtilities.get_queue_client_by_uri(url)
+        self.assertIsNotNone(client)
+
+    @arm_template('storage.json')
     def test_get_account_by_name(self):
         account = self.setup_account()
         found = StorageUtilities.get_storage_account_by_name(account.name)

@@ -15,9 +15,33 @@
 from c7n.utils import local_session
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-
+from six.moves.urllib.parse import urlparse
+from azure.storage.queue import QueueService
+from azure.storage.blob import BlockBlobService
 
 class StorageUtilities(object):
+
+    @staticmethod
+    def get_storage_client_by_uri(storage_uri):
+        parts = urlparse(storage_uri)
+        storage_name = parts.netloc
+        container_name = parts.partition[1]
+
+        account = StorageUtilities.get_storage_account_by_name(storage_name)
+        key = StorageUtilities.get_storage_keys(account.id)[0]
+
+        return BlockBlobService(account_name=storage_name, account_key=key)
+
+    @staticmethod
+    def get_queue_client_by_uri(queue_uri):
+        parts = urlparse(queue_uri)
+        storage_name = parts.netloc.lpartition('.')[0]
+        queue_name = parts.path.partition('/')[2]
+
+        account = StorageUtilities.get_storage_account_by_name(storage_name)
+        key = StorageUtilities.get_storage_keys(account.id)[0]
+
+        return QueueService(account_name=storage_name, account_key=key)
 
     @staticmethod
     def get_storage_account_by_name(storage_account_name):
