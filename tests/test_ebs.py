@@ -56,7 +56,7 @@ class SnapshotDetachTest(BaseTest):
                 'name': 'volume-detach',
                 'resource': 'ebs',
                 'filters': [ 
-                    {'VolumeId' :  'vol-03cef4fb8917f8232'}],
+                    {'VolumeId' :  'vol-0850cf7c8e949c318'}],
                 'actions': [
                     {'type' : 'detach'}]
                 }, config=Config.empty(), session_factory=factory)
@@ -70,7 +70,7 @@ class SnapshotDetachTest(BaseTest):
 
              for resp in response['Volumes']:
                  for attachment in resp['Attachments']:
-                     self.assertEqual(attachment['State'], "detached")
+                     self.assertTrue(attachment['State'] == "detached" or attachment['State'] == "detaching")
 
 class SnapshotCopyTest(BaseTest):
 
