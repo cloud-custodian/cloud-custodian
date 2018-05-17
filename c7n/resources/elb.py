@@ -23,8 +23,9 @@ import re
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter,
+    Filter, FilterRegistry, DefaultVpcBase, ValueFilter,
     ShieldMetrics)
 import c7n.filters.vpc as net_filters
 from datetime import datetime
@@ -558,23 +559,25 @@ class SSLPolicyFilter(Filter):
 
     def validate(self):
         if 'whitelist' in self.data and 'blacklist' in self.data:
-            raise FilterValidationError(
-                "cannot specify whitelist and black list")
-
+            raise PolicyValidationError(
+                "cannot specify whitelist and black list on %s" % (
+                    self.manager.data,))
         if 'whitelist' not in self.data and 'blacklist' not in self.data:
-            raise FilterValidationError(
-                "must specify either policy blacklist or whitelist")
+            raise PolicyValidationError(
+                "must specify either policy blacklist or whitelist on %s" % (
+                    self.manager.data,))
         if ('blacklist' in self.data and
                 not isinstance(self.data['blacklist'], list)):
-            raise FilterValidationError("blacklist must be a list")
+            raise PolicyValidationError("blacklist must be a list on %s" % (
+                self.manager.data,))
 
         if 'matching' in self.data:
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['matching'])
                 except re.error as e:
-                    raise FilterValidationError(
-                        "Invalid regex: %s %s" % (e, self.data))
+                    raise PolicyValidationError(
+                        "Invalid regex: %s %s" % (e, self.manager.data))
 
         return self
 

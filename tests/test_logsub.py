@@ -21,14 +21,12 @@ from c7n.ufuncs import logsub
 class TestLogsub(TestCase):
 
     def setUp(self):
-        logsub.config = {
-            'test': 'data',
-        }
+        logsub.config = {"test": "data"}
 
     def test_message_event(self):
         event = {
-            'message': 'This is a test',
-            'timestamp': _timestamp_from_string('Fri Feb 13 18:31:31 2009'),
+            "message": "This is a test",
+            "timestamp": _timestamp_from_string("Fri Feb 13 18:31:31 2009"),
         }
         msg = logsub.message_event(event)
-        self.assertEqual(msg, 'Fri Feb 13 18:31:31 2009: This is a test')
+        self.assertEqual(msg, "Fri Feb 13 18:31:31 2009: This is a test")

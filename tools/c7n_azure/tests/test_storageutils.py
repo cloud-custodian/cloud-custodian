@@ -84,4 +84,3 @@ class StorageUtilsTest(BaseTest):
         account = self.setup_account()
         keys = StorageUtilities.get_storage_keys(account.id)
         self.assertEqual(len(keys), 2)
-

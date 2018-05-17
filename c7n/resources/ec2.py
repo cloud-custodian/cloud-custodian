@@ -26,6 +26,7 @@ from concurrent.futures import as_completed
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
@@ -1472,18 +1473,18 @@ class QueryFilter(object):
 
     def validate(self):
         if not len(list(self.data.keys())) == 1:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filter Invalid %s" % self.data)
         self.key = list(self.data.keys())[0]
         self.value = list(self.data.values())[0]
 
         if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filter invalid filter name %s" % (self.data))
 
         if self.value is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)
