@@ -19,33 +19,53 @@
   version = "v1.2.0"
 
 [[projects]]
-  name = "github.com/aws/aws-sdk-go-v2"
+  name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
     "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/stscreds",
     "aws/defaults",
     "aws/ec2metadata",
-    "aws/ec2rolecreds",
-    "aws/endpointcreds",
     "aws/endpoints",
-    "aws/external",
+    "aws/request",
+    "aws/session",
     "aws/signer/v4",
-    "aws/stscreds",
-    "internal/awsutil",
-    "internal/sdk",
+    "internal/sdkio",
+    "internal/sdkrand",
+    "internal/shareddefaults",
     "private/protocol",
     "private/protocol/json/jsonutil",
     "private/protocol/jsonrpc",
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
+    "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
     "service/dynamodb",
     "service/dynamodb/dynamodbattribute",
     "service/dynamodb/dynamodbiface",
+    "service/s3",
     "service/ssm",
     "service/ssm/ssmiface",
     "service/sts"
+  ]
+  revision = "95ba34afe9f6b3e8e10a38c81a51cdffc34f9443"
+  version = "v1.13.51"
+
+[[projects]]
+  name = "github.com/aws/aws-sdk-go-v2"
+  packages = [
+    "aws",
+    "aws/awserr",
+    "internal/awsutil",
+    "internal/sdk"
   ]
   revision = "3383499f1024e86a3c68200f9bdc6759ee20eb70"
   version = "v2.0.0-preview.3"
@@ -235,6 +255,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e8271b105df5913905ac4e5825ddde9958f5db6f153b9228136022b61253086a"
+  inputs-digest = "21739e7b55b792ba83e1d9bcb5108efd48ff99972b8e1d5bc7577f013529f033"
   solver-name = "gps-cdcl"
   solver-version = 1

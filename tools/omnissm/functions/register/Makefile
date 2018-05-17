@@ -7,7 +7,7 @@ build:
 	@zip main.zip main
 
 clean:
-	@rm -f main main.zip built-template.yaml
+	@rm -f main main.zip built-template.yml
 
 deploy:
 	GOOS=linux go build -o main main.go
@@ -22,7 +22,7 @@ delete:
 update:
 	GOOS=linux go build -o main main.go
 	zip main.zip main
-	aws lambda update-function-code --function-name="omnissm-register" --zip-file fileb://main.zip	
+	aws lambda update-function-code --function-name="omnissm-register" --zip-file fileb://main.zip
 	rm main main.zip
 
 

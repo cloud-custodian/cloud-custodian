@@ -6,7 +6,7 @@ build:
 	@zip main.zip main
 
 clean:
-	@rm -f main main.zip built-template.yaml
+	@rm -f main main.zip built-template.yml
 
 deploy: build
 	aws cloudformation package --template-file cfn.yml --s3-bucket $(bucket) --s3-prefix builds --output-template built-template.yml
