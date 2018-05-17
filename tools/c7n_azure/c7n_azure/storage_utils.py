@@ -15,33 +15,59 @@
 from c7n.utils import local_session
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-from six.moves.urllib.parse import urlparse
+
 from azure.storage.queue import QueueService
 from azure.storage.blob import BlockBlobService
+from pylru import lrudecorator
+from six.moves.urllib.parse import urlparse
+
 
 class StorageUtilities(object):
 
     @staticmethod
+    @lrudecorator(100)
     def get_storage_client_by_uri(storage_uri):
         parts = urlparse(storage_uri)
-        storage_name = parts.netloc
-        container_name = parts.partition[1]
+        storage_name = str(parts.netloc).partition('.')[0]
+        container_name = parts.path.partition('/')[2]
 
         account = StorageUtilities.get_storage_account_by_name(storage_name)
-        key = StorageUtilities.get_storage_keys(account.id)[0]
+        key = StorageUtilities.get_storage_keys(account.id)[0].value
 
-        return BlockBlobService(account_name=storage_name, account_key=key)
+        blob_service = BlockBlobService(account_name=storage_name, account_key=key)
+        blob_service.create_container(container_name)
+
+        return blob_service, container_name
 
     @staticmethod
+    @lrudecorator(100)
     def get_queue_client_by_uri(queue_uri):
         parts = urlparse(queue_uri)
-        storage_name = parts.netloc.lpartition('.')[0]
+        storage_name = str(parts.netloc).partition('.')[0]
         queue_name = parts.path.partition('/')[2]
 
         account = StorageUtilities.get_storage_account_by_name(storage_name)
-        key = StorageUtilities.get_storage_keys(account.id)[0]
+        key = StorageUtilities.get_storage_keys(account.id)[0].value
 
-        return QueueService(account_name=storage_name, account_key=key)
+        queue_service = QueueService(account_name=storage_name, account_key=key)
+        queue_service.create_queue(queue_name)
+
+        return queue_service, queue_name
+
+    @staticmethod
+    def put_queue_message(queue_service, queue_name, content):
+        queue_service.put_message(queue_name, content)
+
+    @staticmethod
+    def get_queue_messages(queue_service, queue_name):
+        # Default message visibility timeout is 30 seconds
+        # so you are expected to delete message within 30 seconds
+        # if you have successfully processed it
+        return queue_service.get_messages(queue_name)
+
+    @staticmethod
+    def delete_queue_message(queue_service, queue_name, message):
+        queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
     @staticmethod
     def get_storage_account_by_name(storage_account_name):

@@ -41,17 +41,17 @@ interactions:
       content-encoding: [gzip]
       content-length: ['1211']
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 17 May 2018 19:37:12 GMT']
+      date: ['Thu, 17 May 2018 19:50:11 GMT']
       expires: ['-1']
       pragma: [no-cache]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [4dc3b885-8854-49f8-bed1-533a8523153f]
-      x-ms-original-request-ids: [1040e71e-3422-439d-833f-69f0f69003a6, fa1e8632-830f-46dd-a914-4a00cb0681ec]
+      x-ms-correlation-request-id: [e82e6c74-6af3-4e9a-b7d9-1194f044a6e1]
+      x-ms-original-request-ids: [f4405daa-6a85-4207-a0c7-0513edde82e7, 6f4a5296-3ef2-4875-af15-37a563b90705]
       x-ms-ratelimit-remaining-subscription-reads: ['14999']
-      x-ms-request-id: [4dc3b885-8854-49f8-bed1-533a8523153f]
-      x-ms-routing-request-id: ['WESTUS2:20180517T193713Z:4dc3b885-8854-49f8-bed1-533a8523153f']
+      x-ms-request-id: [e82e6c74-6af3-4e9a-b7d9-1194f044a6e1]
+      x-ms-routing-request-id: ['WESTUS2:20180517T195011Z:e82e6c74-6af3-4e9a-b7d9-1194f044a6e1']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -95,17 +95,17 @@ interactions:
       content-encoding: [gzip]
       content-length: ['1211']
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 17 May 2018 19:37:13 GMT']
+      date: ['Thu, 17 May 2018 19:50:11 GMT']
       expires: ['-1']
       pragma: [no-cache]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [e86810e3-30d1-4186-95c1-39548ece4373]
-      x-ms-original-request-ids: [26244a81-5134-4640-b009-ad2ee01eaf05, 12d43072-1c1e-4909-858e-0040d2e86ff0]
+      x-ms-correlation-request-id: [54b6db6c-dd95-4638-9c86-97663c2082b3]
+      x-ms-original-request-ids: [e4f0a3ad-c0d7-44a7-955b-bcbaf1471813, 53e48fe7-04f3-4335-9c21-64f8e8b80041]
       x-ms-ratelimit-remaining-subscription-reads: ['14999']
-      x-ms-request-id: [e86810e3-30d1-4186-95c1-39548ece4373]
-      x-ms-routing-request-id: ['WESTUS2:20180517T193714Z:e86810e3-30d1-4186-95c1-39548ece4373']
+      x-ms-request-id: [54b6db6c-dd95-4638-9c86-97663c2082b3]
+      x-ms-routing-request-id: ['WESTUS2:20180517T195012Z:54b6db6c-dd95-4638-9c86-97663c2082b3']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -134,7 +134,7 @@ interactions:
       cache-control: [no-cache]
       content-encoding: [gzip]
       content-type: [application/json]
-      date: ['Thu, 17 May 2018 19:37:14 GMT']
+      date: ['Thu, 17 May 2018 19:50:11 GMT']
       expires: ['-1']
       pragma: [no-cache]
       server: ['Microsoft-Azure-Storage-Resource-Provider/1.0,Microsoft-HTTPAPI/2.0
@@ -142,10 +142,10 @@ interactions:
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [47008c02-628b-42f4-9f5d-2dc460e8caa8]
+      x-ms-correlation-request-id: [3259a10c-290b-413c-a379-f02f291c1b4e]
       x-ms-ratelimit-remaining-subscription-writes: ['1199']
-      x-ms-request-id: [dac433bd-357d-4ce5-aadb-23b2ea89b822]
-      x-ms-routing-request-id: ['WESTUS2:20180517T193714Z:47008c02-628b-42f4-9f5d-2dc460e8caa8']
+      x-ms-request-id: [0a170811-9b8e-4b63-938e-9e0fc00a69c3]
+      x-ms-routing-request-id: ['WESTUS2:20180517T195012Z:3259a10c-290b-413c-a379-f02f291c1b4e']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -153,17 +153,18 @@ interactions:
       Connection: [keep-alive]
       Content-Length: ['0']
       User-Agent: [Azure-Storage/0.34.3 (Python CPython 2.7.13; Windows 10)]
-      x-ms-date: ['Thu, 17 May 2018 19:37:12 GMT']
+      x-ms-date: ['Thu, 17 May 2018 19:50:10 GMT']
       x-ms-version: ['2016-05-31']
     method: PUT
-    uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcc
+    uri: https://cctstoragey6akyqpagdt3o.blob.core.windows.net/testcontainer?restype=container
   response:
     body: {string: !!python/unicode ''}
     headers:
-      content-length: ['0']
-      date: ['Thu, 17 May 2018 19:37:14 GMT']
-      server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [84d0dfc7-f003-00d4-4f16-ee1023000000]
+      date: ['Thu, 17 May 2018 19:50:12 GMT']
+      etag: ['"0x8D5BC2F676839EA"']
+      last-modified: ['Thu, 17 May 2018 19:50:12 GMT']
+      server: [Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0]
+      x-ms-request-id: [a6bb07ed-401e-0028-4f18-ee2ebc000000]
       x-ms-version: ['2016-05-31']
-    status: {code: 204, message: No Content}
+    status: {code: 201, message: Created}
 version: 1
