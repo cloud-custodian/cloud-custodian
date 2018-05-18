@@ -35,6 +35,3 @@ class ResourceGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
-
-
-

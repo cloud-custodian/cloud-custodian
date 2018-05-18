@@ -371,9 +371,9 @@ class SetState(BaseAction):
         for service_set in chunks(c_instances, chunk_size):
             try:
                 client.update_container_instances_state(
-                    cluster = cluster,
-                    containerInstances = service_set,
-                    status = self.data.get('state'))
+                    cluster=cluster,
+                    containerInstances=service_set,
+                    status=self.data.get('state'))
             except ClientError:
                 self.manager.log.warning(
                     'Failed to update Container Instances State: %s, cluster %s' %
@@ -400,8 +400,8 @@ class UpdateAgent(BaseAction):
         client = local_session(self.manager.session_factory).client('ecs')
         try:
             client.update_container_agent(
-                cluster = cluster,
-                containerInstance = instance)
+                cluster=cluster,
+                containerInstance=instance)
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoUpdateAvailableException':
                 self.manager.log.warning(

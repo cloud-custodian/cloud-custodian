@@ -77,6 +77,7 @@ def load_resources():
     import c7n.resources.route53
     import c7n.resources.s3
     import c7n.resources.sagemaker
+    import c7n.resources.secretsmanager
     import c7n.resources.sfn
     import c7n.resources.shield
     import c7n.resources.simpledb

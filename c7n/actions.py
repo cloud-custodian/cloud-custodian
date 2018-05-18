@@ -26,6 +26,7 @@ import zlib
 import six
 from botocore.exceptions import ClientError
 
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
 from c7n.manager import resources
 from c7n.registry import PluginRegistry
@@ -102,7 +103,7 @@ class ActionRegistry(PluginRegistry):
         if isinstance(data, dict):
             action_type = data.get('type')
             if action_type is None:
-                raise ValueError(
+                raise PolicyValidationError(
                     "Invalid action type found in %s" % (data))
         else:
             action_type = data
@@ -110,7 +111,7 @@ class ActionRegistry(PluginRegistry):
 
         action_class = self.get(action_type)
         if action_class is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "Invalid action type %s, valid actions %s" % (
                     action_type, list(self.keys())))
         # Construct a ResourceManager
@@ -630,9 +631,11 @@ class AutoTagUser(EventAction):
 
     def validate(self):
         if self.manager.data.get('mode', {}).get('type') != 'cloudtrail':
-            raise ValueError("Auto tag owner requires an event")
+            raise PolicyValidationError(
+                "Auto tag owner requires an event %s" % (self.manager.data,))
         if self.manager.action_registry.get('tag') is None:
-            raise ValueError("Resource does not support tagging")
+            raise PolicyValidationError(
+                "Resource does not support tagging %s" % (self.manager.data,))
         return self
 
     def process(self, resources, event):

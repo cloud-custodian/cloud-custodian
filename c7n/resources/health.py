@@ -17,6 +17,7 @@ import itertools
 
 import six
 
+from c7n.exceptions import PolicyValidationError
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
 from c7n.utils import local_session, chunks
@@ -116,7 +117,7 @@ class QueryFilter(object):
         results = []
         for d in data:
             if not isinstance(d, dict):
-                raise ValueError(
+                raise PolicyValidationError(
                     "Health Query Filter Invalid structure %s" % d)
             results.append(cls(d).validate())
         return results
@@ -134,11 +135,11 @@ class QueryFilter(object):
         self.value = list(self.data.values())[0]
 
         if self.key not in HEALTH_VALID_FILTERS:
-            raise ValueError(
+            raise PolicyValidationError(
                 "Health Query Filter invalid filter name %s" % (self.data))
 
         if self.value is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "Health Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)

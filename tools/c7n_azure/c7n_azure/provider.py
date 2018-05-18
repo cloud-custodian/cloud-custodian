@@ -17,6 +17,8 @@ from c7n.registry import PluginRegistry
 
 from .session import Session
 
+from functools import partial
+
 
 @clouds.register('azure')
 class Azure(Provider):
@@ -31,7 +33,7 @@ class Azure(Provider):
         return policy_collection
 
     def get_session_factory(self, options):
-        return Session
+        return partial(Session, subscription_id=options.account_id)
 
 
 resources = Azure.resources
