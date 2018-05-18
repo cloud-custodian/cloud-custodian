@@ -45,7 +45,7 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 lint:
-	flake8 c7n tools
+	flake8 c7n tools tests
 
 clean:
 	rm -rf .tox .Python bin include lib pip-selfcheck.json

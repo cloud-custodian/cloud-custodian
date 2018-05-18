@@ -19,7 +19,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
-from c7n.filters.core import Filter, OPERATORS, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters.core import Filter, OPERATORS
 from c7n.utils import local_session, type_schema, chunks
 
 
@@ -211,10 +212,11 @@ class ShieldMetrics(MetricsFilter):
 
     def validate(self):
         if self.data.get('name') not in self.metrics:
-            raise FilterValidationError(
-                "invalid shield metric %s valid:%s" % (
+            raise PolicyValidationError(
+                "invalid shield metric %s valid:%s on %s" % (
                     self.data['name'],
-                    ", ".join(self.metrics)))
+                    ", ".join(self.metrics),
+                    self.manager.data))
 
     def get_dimensions(self, resource):
         return [{

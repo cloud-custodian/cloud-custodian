@@ -35,7 +35,8 @@ setup(
                       "c7n",
                       "click",
                       "azure-cli-core",
-                      "adal",
+                      "adal~=0.5.0",
                       "backports.functools_lru_cache",
                       "futures==3.1.1"],
+
 )

@@ -242,7 +242,8 @@ from os.path import join
 
 from dateutil import zoneinfo
 
-from c7n.filters import Filter, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter
 from c7n.utils import type_schema, dumps
 from c7n.resolver import ValuesFrom
 
@@ -327,14 +328,17 @@ class Time(Filter):
 
     def validate(self):
         if self.get_tz(self.default_tz) is None:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.default_tz)
+            raise PolicyValidationError(
+                "Invalid timezone specified %s" % (
+                    self.default_tz))
         hour = self.data.get("%shour" % self.time_type, self.DEFAULT_HR)
         if hour not in self.parser.VALID_HOURS:
-            raise FilterValidationError("Invalid hour specified %s" % hour)
+            raise PolicyValidationError(
+                "Invalid hour specified %s" % (hour,))
         if 'skip-days' in self.data and 'skip-days-from' in self.data:
-            raise FilterValidationError(
-                "Cannot specify two sets of skip days %s" % self.data)
+            raise PolicyValidationError(
+                "Cannot specify two sets of skip days %s" % (
+                    self.data,))
         return self
 
     def process(self, resources, event=None):
