@@ -66,7 +66,6 @@ class StorageUtilsTest(BaseTest):
         messages = StorageUtilities.get_queue_messages(*queue_settings)
         self.assertEqual(len(messages), 0)
 
-
     @arm_template('storage.json')
     def test_get_account_by_name(self):
         account = self.setup_account()
