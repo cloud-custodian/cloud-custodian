@@ -18,14 +18,18 @@ from c7n_azure.utils import ResourceIdParser
 
 from azure.storage.queue import QueueService
 from azure.storage.blob import BlockBlobService
-from pylru import lrudecorator
 from six.moves.urllib.parse import urlparse
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache
 
 
 class StorageUtilities(object):
 
     @staticmethod
-    @lrudecorator(100)
+    @lru_cache()
     def get_storage_client_by_uri(storage_uri):
         parts = urlparse(storage_uri)
         storage_name = str(parts.netloc).partition('.')[0]
@@ -40,7 +44,7 @@ class StorageUtilities(object):
         return blob_service, container_name
 
     @staticmethod
-    @lrudecorator(100)
+    @lru_cache()
     def get_queue_client_by_uri(queue_uri):
         parts = urlparse(queue_uri)
         storage_name = str(parts.netloc).partition('.')[0]

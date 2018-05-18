@@ -31,5 +31,11 @@ setup(
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
     },
-    install_requires=["azure", "c7n", "click", "azure-cli-core", "adal", "pylru", "futures==3.1.1"],
+    install_requires=["azure",
+                      "c7n",
+                      "click",
+                      "azure-cli-core",
+                      "adal",
+                      "backports.functools_lru_cache",
+                      "futures==3.1.1"],
 )

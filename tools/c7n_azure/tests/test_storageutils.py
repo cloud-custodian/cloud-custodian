@@ -31,7 +31,7 @@ class StorageUtilsTest(BaseTest):
 
     @arm_template('storage.json')
     def test_get_storage_client_by_uri(self):
-        account = self.setup_account();
+        account = self.setup_account()
         url = "https://" + account.name + ".blob.core.windows.net/testcontainer"
         blob_service, container_name = StorageUtilities.get_storage_client_by_uri(url)
         self.assertIsNotNone(blob_service)
@@ -39,7 +39,7 @@ class StorageUtilsTest(BaseTest):
 
     @arm_template('storage.json')
     def test_get_queue_client_by_uri(self):
-        account = self.setup_account();
+        account = self.setup_account()
         url = "https://" + account.name + ".queue.core.windows.net/testcc"
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url)
         self.assertIsNotNone(queue_service)
@@ -47,7 +47,7 @@ class StorageUtilsTest(BaseTest):
 
     @arm_template('storage.json')
     def test_cycle_queue_message_by_uri(self):
-        account = self.setup_account();
+        account = self.setup_account()
         url = "https://" + account.name + ".queue.core.windows.net/testcyclemessage"
 
         queue_settings = StorageUtilities.get_queue_client_by_uri(url)
