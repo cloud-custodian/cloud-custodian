@@ -714,13 +714,12 @@ class DaxUpdateCluster(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in (
                         'ClusterNotFoundFault',
-                        'InvalidClusterStateFault',
-                        'ParameterGroupNotFoundFault'):
+                        'InvalidClusterStateFault'):
                     self.log.warning(
                         'Exception updating dax cluster %s: \n%s' % (
                             r['ClusterName'], e))
-                else:
-                    raise
+                    continue
+                raise
 
 
 @DynamoDbAccelerator.action_registry.register('modify-security-groups')
