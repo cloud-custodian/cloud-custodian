@@ -65,7 +65,8 @@ We also distribute scripts to generate the necessary config file.
     
 ```shell
 python orgaccounts.py -f output.yml
-OR
+```
+```shell
 python azuresubs.py -f output.yml
 ```
 
@@ -118,7 +119,7 @@ See `c7n-org run --help` for more information.
 
 ## Other commands
 
-c7n-org also supports running arbitrary scripts on AWS against accounts via the run command, which
+c7n-org also supports running arbitrary scripts on AWS against accounts via the run-script command, which
 exports standard AWS SDK credential information into the process environment before executing.
 
 c7n-org also supports generating reports for a given policy execution across accounts via
