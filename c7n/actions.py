@@ -249,7 +249,7 @@ class ModifyVpcSecurityGroupsAction(Action):
                 else:
                     rgroups = [g['GroupId'] for g in r['Groups']]
             elif r.get('SecurityGroups'):
-                # elb, ec2, elasticache, efs, vpc resource security groups
+                # elb, ec2, elasticache, efs, dax vpc resource security groups
                 if metadata_key and isinstance(r['SecurityGroups'][0], dict):
                     rgroups = [g[metadata_key] for g in r['SecurityGroups']]
                 else:
