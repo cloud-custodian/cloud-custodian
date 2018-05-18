@@ -33,7 +33,7 @@ class StorageUtilsTest(BaseTest):
     def test_get_storage_client_by_uri(self):
         account = self.setup_account()
         url = "https://" + account.name + ".blob.core.windows.net/testcontainer"
-        blob_service, container_name = StorageUtilities.get_storage_client_by_uri(url)
+        blob_service, container_name = StorageUtilities.get_blob_client_by_uri(url)
         self.assertIsNotNone(blob_service)
         self.assertIsNotNone(container_name)
 

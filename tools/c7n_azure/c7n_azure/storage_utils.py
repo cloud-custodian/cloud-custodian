@@ -29,14 +29,8 @@ except ImportError:
 class StorageUtilities(object):
 
     @staticmethod
-    @lru_cache()
-    def get_storage_client_by_uri(storage_uri):
-        parts = urlparse(storage_uri)
-        storage_name = str(parts.netloc).partition('.')[0]
-        container_name = parts.path.partition('/')[2]
-
-        account = StorageUtilities.get_storage_account_by_name(storage_name)
-        key = StorageUtilities.get_storage_keys(account.id)[0].value
+    def get_blob_client_by_uri(storage_uri):
+        container_name, storage_name, key = StorageUtilities.get_storage_from_uri(storage_uri)
 
         blob_service = BlockBlobService(account_name=storage_name, account_key=key)
         blob_service.create_container(container_name)
@@ -44,14 +38,8 @@ class StorageUtilities(object):
         return blob_service, container_name
 
     @staticmethod
-    @lru_cache()
     def get_queue_client_by_uri(queue_uri):
-        parts = urlparse(queue_uri)
-        storage_name = str(parts.netloc).partition('.')[0]
-        queue_name = parts.path.partition('/')[2]
-
-        account = StorageUtilities.get_storage_account_by_name(storage_name)
-        key = StorageUtilities.get_storage_keys(account.id)[0].value
+        queue_name, storage_name, key = StorageUtilities.get_storage_from_uri(queue_uri)
 
         queue_service = QueueService(account_name=storage_name, account_key=key)
         queue_service.create_queue(queue_name)
@@ -92,3 +80,13 @@ class StorageUtilities(object):
         resource_name = ResourceIdParser.get_resource_name(storage_account_id)
         keys = client.storage_accounts.list_keys(resource_group, resource_name)
         return keys.keys
+
+    @staticmethod
+    @lru_cache()
+    def get_storage_from_uri(storage_uri):
+        parts = urlparse(storage_uri)
+        storage_name = str(parts.netloc).partition('.')[0]
+        container_name = parts.path.partition('/')[2]
+        account = StorageUtilities.get_storage_account_by_name(storage_name)
+        key = StorageUtilities.get_storage_keys(account.id)[0].value
+        return container_name, storage_name, key
