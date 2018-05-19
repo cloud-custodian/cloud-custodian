@@ -97,7 +97,7 @@ as well, either on the command line or in an environment variable:
 
 .. code-block:: bash
 
-    AWS_DEFAULT_REGION=us-west-1
+  $ AWS_DEFAULT_REGION=us-west-1
 
 
 The policy is validated automatically when you run it, but you can also
@@ -125,6 +125,9 @@ Run ``custodian -h`` to see a list of available commands.
 Run ``custodian schema`` to see the complete list of AWS resources against
 which you can run policies. To invoke command-line help with more information
 about policy schema details, run ``custodian schema -h``.
+
+Run ``custodian schema <cloud-provider>`` to see the available resources for a specific
+cloud provider: ``custodian schema aws``
 
 Run ``custodian schema <resource>`` to see the available :ref:`filters and
 actions <policy>` for each resource.

@@ -1,6 +1,22 @@
 S3 - Encryption
 ===============
 
+Enable Bucket Encryption
+------------------------
+
+The following policy will enable bucket encryption on all s3 buckets.
+
+.. code-block:: yaml
+
+   policies:
+     - name: s3-set-bucket-encryption
+       resource: s3
+       actions:
+         - type: set-bucket-encryption
+           crypto: AES256
+           enabled: True
+
+
 Remediate Existing
 ------------------
 
@@ -33,6 +49,9 @@ Options
 Remediate Incoming
 ------------------
 
+Note: the ``set-bucket-encryption`` action is a much more effective way of
+enabling encryption on a bucket.
+
 Will scan all newly created objects and remediate them such that they are
 encrypted.
 
@@ -60,6 +79,9 @@ Options
 
 Bucket Policy
 -------------
+
+Note: the ``set-bucket-encryption`` action is a much more effective way of
+enabling encryption on a bucket.
 
 Adds an encryption required bucket policy and merges with extant policy
 statements. Note filters should be used to avoid hitting any buckets
