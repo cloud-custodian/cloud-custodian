@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from datetime import datetime
 import json
 import fnmatch
 import itertools
@@ -445,19 +446,6 @@ class LambdaMode(PolicyExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
-    def expand_variables(self, variables):
-        """expand variables in the mode role and output_dir fields.
-        """
-        p = self.policy.data
-        if 'mode' in p:
-            if 'role' in p['mode']:
-                p['mode']['role'] = utils.format_string_values(p['mode']['role'], **variables)
-            if 'execution-options' in p['mode']:
-                if 'output_dir' in p['mode']['execution-options']:
-                    p['mode']['execution-options']['output_dir'] = utils.format_string_values(
-                        p['mode']['execution-options']['output_dir'], **variables)
-        return p
-
     def provision(self):
         # Avoiding runtime lambda dep, premature optimization?
         from c7n.mu import PolicyLambda, LambdaManager
@@ -465,11 +453,6 @@ class LambdaMode(PolicyExecutionMode):
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
-            variables = {
-                'account_id': self.policy.options.account_id,
-                'region': self.policy.options.region
-            }
-            self.policy.data = self.expand_variables(variables)
             try:
                 manager = LambdaManager(self.policy.session_factory)
             except ClientError:
@@ -718,7 +701,7 @@ class Policy(object):
 
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        return self.EXEC_MODE_MAP[exec_mode_type](self)
+        return execution[exec_mode_type](self)
 
     @property
     def is_lambda(self):
@@ -727,12 +710,48 @@ class Policy(object):
         return True
 
     def validate(self):
+        self.expand_variables(self.get_variables())
         m = self.get_execution_mode()
         m.validate()
         for f in self.resource_manager.filters:
             f.validate()
         for a in self.resource_manager.actions:
             a.validate()
+
+    def get_variables(self):
+        # Global policy variable expansion, we have to carry forward on
+        # various filter/action local vocabularies. Where possible defer
+        # by using a format string.
+        return {
+            'account': '{account}',
+            'account_id': self.options.account_id,
+            'policy': self.data,
+            'event': '{event}',
+            'region': self.region,
+            # mark for op
+            'op': '{op}',
+            'action_date': '{action_date}',
+            # tag action pyformat-date handling
+            'now': datetime.utcnow(),
+            # account increase limit
+            'service': '{service}',
+            # s3 set logging :-( see if we can revisit this one.
+            'bucket_region': '{bucket_region}',
+            'bucket_name': '{bucket_name}',
+            'source_bucket_name': '{source_bucket_name}',
+            'target_bucket_name': '{source_bucket_name}',
+            'target_prefix': '{target_prefix}',
+            'LoadBalancerName': '{LoadBalancerName}'
+        }
+
+    def expand_variables(self, variables):
+        """expand variables in the mode role and output_dir fields.
+        """
+        updated = utils.format_string_values(self.data, **variables)
+        # Several keys should only be expanded at runtime, perserve them.
+        if 'member-role' in updated.get('mode', {}):
+            updated['mode']['member-role'] = self.data['mode']['member-role']
+        self.data = updated
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()
