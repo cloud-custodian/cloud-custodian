@@ -439,7 +439,7 @@ class Notify(BaseNotify):
                region: us-east-1
                queue: xyz
     """
-    
+
     C7N_DATA_MESSAGE = "maidmsg/1.0"
 
     schema = {
