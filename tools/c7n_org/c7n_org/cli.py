@@ -39,8 +39,10 @@ from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_resources
+from c7n.resources import LOADED
 from c7n.manager import resources as resource_registry
 from c7n.utils import CONN_CACHE, dumps
+
 
 from c7n_org.utils import environ, account_tags
 from c7n.utils import UnicodeWriter
@@ -138,7 +140,6 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     filter_policies(custodian_config, policy_tags, policies, resource)
 
     filter_accounts(accounts_config, tags, accounts)
-
     load_resources()
     MainThreadExecutor.async = False
     executor = debug and MainThreadExecutor or ProcessPoolExecutor
@@ -415,6 +416,8 @@ def run_account(account, region, policies_config, output_path,
                 cache_period, metrics, dryrun, debug):
     """Execute a set of policies on an account.
     """
+    if not debug or not LOADED:
+        load_resources()
     logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
     CONN_CACHE.session = None
     CONN_CACHE.time = None
