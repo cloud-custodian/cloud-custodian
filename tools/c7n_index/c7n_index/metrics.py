@@ -210,7 +210,7 @@ class InfluxIndexer(Indexer):
 
 def index_metric_set(indexer, account, region, metric_set, start, end, period):
     session = local_session(
-        lambda : assumed_session(account['role'], 'PolicyIndex'))
+        lambda : assumed_session(account['role'], 'PolicyIndex')) # NOQA E203
     client = session.client('cloudwatch', region_name=region)
 
     t = time.time()

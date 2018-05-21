@@ -23,6 +23,4 @@ class ProviderTest(BaseTest):
     def test_available_clouds(self):
         # the other providers are currently distributed as separate
         # installs (tools/c7n_azure and tools/c7n_gcp)
-        self.assertEqual(
-            sorted(clouds.keys()),
-            ['aws', 'azure', 'gcp'])
+        self.assertEqual(sorted(clouds.keys()), ["aws", "azure", "gcp"])

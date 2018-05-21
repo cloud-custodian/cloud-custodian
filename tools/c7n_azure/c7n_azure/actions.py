@@ -28,23 +28,24 @@ def utcnow():
     return datetime.datetime.utcnow()
 
 
-def update_resource_tags(self, session, client, resource, tags):
+def update_resource_tags(self, resource, tags):
+
     # resource group type
     if self.manager.type == 'resourcegroup':
         params_patch = ResourceGroupPatchable(
             tags=tags
         )
-        client.resource_groups.update(
+        self.client.resource_groups.update(
             resource['name'],
             params_patch,
         )
     # other Azure resources
     else:
         az_resource = GenericResource.deserialize(resource)
-        api_version = session.resource_api_version(az_resource.id)
+        api_version = self.session.resource_api_version(az_resource.id)
         az_resource.tags = tags
 
-        client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+        self.client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
 
 
 class Tag(BaseAction):
@@ -72,6 +73,11 @@ class Tag(BaseAction):
         }
     )
 
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Tag, self).__init__(data, manager, log_dir)
+        self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
     def validate(self):
         if not self.data.get('tags') and not (self.data.get('tag') and self.data.get('value')):
             raise FilterValidationError(
@@ -84,19 +90,19 @@ class Tag(BaseAction):
         return self
 
     def process(self, resources):
-        session = utils.local_session(self.manager.session_factory)
-        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+    def process_resource(self, resource):
+        # get existing tags
+        tags = resource.get('tags', {})
 
-            # add or update tags
-            new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
-            for key in new_tags:
-                tags[key] = new_tags[key]
+        # add or update tags
+        new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
+        for key in new_tags:
+            tags[key] = new_tags[key]
 
-            update_resource_tags(self, session, client, resource, tags)
+        update_resource_tags(self, resource, tags)
 
 
 class RemoveTag(BaseAction):
@@ -117,24 +123,29 @@ class RemoveTag(BaseAction):
         'untag',
         tags={'type': 'array', 'items': {'type': 'string'}})
 
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(RemoveTag, self).__init__(data, manager, log_dir)
+        self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
     def validate(self):
         if not self.data.get('tags'):
             raise FilterValidationError("Must specify tags")
         return self
 
     def process(self, resources):
-        session = utils.local_session(self.manager.session_factory)
-        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+    def process_resource(self, resource):
+        # get existing tags
+        tags = resource.get('tags', {})
 
-            # delete tag
-            tags_to_delete = self.data.get('tags')
-            resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
+        # delete tag
+        tags_to_delete = self.data.get('tags')
+        resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
 
-            update_resource_tags(self, session, client, resource, resource_tags)
+        update_resource_tags(self, resource, resource_tags)
 
 
 class AutoTagUser(BaseAction):
@@ -172,6 +183,8 @@ class AutoTagUser(BaseAction):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
         delta_days = self.data.get('days', self.max_query_days)
         self.start_time = utcnow() - datetime.timedelta(days=delta_days)
+        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        self.tag_action = self.manager.action_registry.get('tag')
 
     def validate(self):
         if self.manager.action_registry.get('tag') is None:
@@ -184,55 +197,55 @@ class AutoTagUser(BaseAction):
         return self
 
     def process(self, resources):
-        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
-        tag_action = self.manager.action_registry.get('tag')
-        tag_key = self.data['tag']
-        should_update = self.data.get('update', False)
+        self.tag_key = self.data['tag']
+        self.should_update = self.data.get('update', False)
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-        for resource in resources:
-            # if the auto-tag-user policy set update to False (or it's unset) then we
-            # will skip writing their UserName tag and not overwrite pre-existing values
-            if not should_update and resource.get('tags', {}).get(tag_key, None):
-                continue
+    def process_resource(self, resource):
+        # if the auto-tag-user policy set update to False (or it's unset) then we
+        # will skip writing their UserName tag and not overwrite pre-existing values
+        if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
+            return
 
-            user = self.default_user
+        user = self.default_user
 
-            # resource group type
-            if self.manager.type == 'resourcegroup':
-                resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
-                query_filter = " and ".join([
-                    "eventTimestamp ge '%s'" % self.start_time,
-                    "resourceGroupName eq '%s'" % resource['name'],
-                    "eventChannels eq 'Operation'"
-                ])
-            # other Azure resources
-            else:
-                resource_type = resource['type']
-                query_filter = " and ".join([
-                    "eventTimestamp ge '%s'" % self.start_time,
-                    "resourceUri eq '%s'" % resource['id'],
-                    "eventChannels eq 'Operation'"
-                ])
+        # resource group type
+        if self.manager.type == 'resourcegroup':
+            resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % self.start_time,
+                "resourceGroupName eq '%s'" % resource['name'],
+                "eventChannels eq 'Operation'"
+            ])
+        # other Azure resources
+        else:
+            resource_type = resource['type']
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % self.start_time,
+                "resourceUri eq '%s'" % resource['id'],
+                "eventChannels eq 'Operation'"
+            ])
 
-            # fetch activity logs
-            logs = client.activity_logs.list(
-                filter=query_filter,
-                select=self.query_select
-            )
+        # fetch activity logs
+        logs = self.client.activity_logs.list(
+            filter=query_filter,
+            select=self.query_select
+        )
 
-            # get the user who issued the first operation
-            operation_name = "%s/write" % resource_type
-            first_op = self.get_first_operation(logs, operation_name)
-            if first_op is not None:
-                user = first_op.caller
+        # get the user who issued the first operation
+        operation_name = "%s/write" % resource_type
+        first_op = self.get_first_operation(logs, operation_name)
+        if first_op is not None:
+            user = first_op.caller
 
-            # issue tag action to label user
-            try:
-                tag_action({'tag': tag_key, 'value': user}, self.manager).process([resource])
-            except CloudError as e:
-                # resources can be locked
-                if e.inner_exception.error == 'ScopeLocked':
-                    pass
+        # issue tag action to label user
+        try:
+            self.tag_action({'tag': self.tag_key, 'value': user}, self.manager).process([resource])
+        except CloudError as e:
+            # resources can be locked
+            if e.inner_exception.error == 'ScopeLocked':
+                pass
 
     @staticmethod
     def get_first_operation(logs, operation_name):
@@ -291,6 +304,10 @@ class TagTrim(BaseAction):
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
 
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(TagTrim, self).__init__(data, manager, log_dir)
+        self.untag_action = self.manager.action_registry.get('untag')
+
     def validate(self):
         if self.data.get('space') < 0 or self.data.get('space') > 15:
             raise FilterValidationError("Space must be between 0 and 15")
@@ -298,31 +315,33 @@ class TagTrim(BaseAction):
         return self
 
     def process(self, resources):
-        preserve = set(self.data.get('preserve', {}))
-        space = self.data.get('space')
-        untag_action = self.manager.action_registry.get('untag')
+        self.preserve = set(self.data.get('preserve', {}))
+        self.space = self.data.get('space', 1)
 
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+        with self.executor_factory(max_workers=3) as w:
+            list(w.map(self.process_resource, resources))
 
-            if space and len(tags) + space <= self.max_tag_count:
-                continue
+    def process_resource(self, resource):
+        # get existing tags
+        tags = resource.get('tags', {})
 
-            # delete tags
-            keys = set(tags)
-            tags_to_preserve = preserve.intersection(keys)
-            candidates = keys - tags_to_preserve
+        if self.space and len(tags) + self.space <= self.max_tag_count:
+            return
 
-            if space:
-                # Free up slots to fit
-                remove = len(candidates) - (
-                    self.max_tag_count - (space + len(tags_to_preserve)))
-                candidates = list(sorted(candidates))[:remove]
+        # delete tags
+        keys = set(tags)
+        tags_to_preserve = self.preserve.intersection(keys)
+        candidates = keys - tags_to_preserve
 
-            if not candidates:
-                self.log.warning(
-                    "Could not find any candidates to trim %s" % resource['id'])
-                continue
+        if self.space:
+            # Free up slots to fit
+            remove = len(candidates) - (
+                self.max_tag_count - (self.space + len(tags_to_preserve)))
+            candidates = list(sorted(candidates))[:remove]
 
-            untag_action({'tags': candidates}, self.manager).process([resource])
+        if not candidates:
+            self.log.warning(
+                "Could not find any candidates to trim %s" % resource['id'])
+            return
+
+        self.untag_action({'tags': candidates}, self.manager).process([resource])

@@ -23,10 +23,11 @@ from c7n_azure.utils import ResourceIdParser
 
 class Session(object):
 
-    def __init__(self):
+    def __init__(self, subscription_id=None):
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
 
+        self.subscription_id = subscription_id
         tenant_auth_variables = [
             'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
             'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
@@ -37,9 +38,11 @@ class Session(object):
         # then load up the cached CLI credentials
         if 'AZURE_CLI_AUTH' in os.environ:
             (self.credentials,
-             self.subscription_id,
+             subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
+            if self.subscription_id is None:
+                self.subscription_id = subscription_id
             return
 
         # Try to do token auth which supports unit tests or other integrations
@@ -49,7 +52,8 @@ class Session(object):
                 token={
                     'access_token': os.environ['AZURE_ACCESS_TOKEN']
                 })
-            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            if self.subscription_id is None:
+                self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             return
 
         # Set credentials with environment variables if all
@@ -61,7 +65,8 @@ class Session(object):
                 secret=os.environ['AZURE_CLIENT_SECRET'],
                 tenant=os.environ['AZURE_TENANT_ID']
             )
-            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            if self.subscription_id is None:
+                self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.tenant_id = os.environ['AZURE_TENANT_ID']
             return
 

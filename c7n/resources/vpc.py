@@ -22,8 +22,9 @@ import jmespath
 from botocore.exceptions import ClientError as BotoClientError
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
+    DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
@@ -280,7 +281,7 @@ class DhcpOptionsFilter(Filter):
 
     def validate(self):
         if not any([self.data.get(k) for k in self.option_keys]):
-            raise ValueError("one of %s required" % (self.option_keys,))
+            raise PolicyValidationError("one of %s required" % (self.option_keys,))
         return self
 
     def process(self, resources, event=None):
@@ -493,7 +494,7 @@ class SecurityGroupApplyPatch(BaseAction):
         diff_filters = [n for n in self.manager.filters if isinstance(
             n, SecurityGroupDiffFilter)]
         if not len(diff_filters):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "resource patching requires diff filter")
         return self
 
@@ -857,7 +858,8 @@ class SGPermission(Filter):
         delta = set(self.data.keys()).difference(self.attrs)
         delta.remove('type')
         if delta:
-            raise FilterValidationError("Unknown keys %s" % ", ".join(delta))
+            raise PolicyValidationError("Unknown keys %s on %s" % (
+                ", ".join(delta), self.manager.data))
         return self
 
     def process(self, resources, event=None):
@@ -1737,11 +1739,13 @@ class CreateFlowLogs(BaseAction):
         self.state = self.data.get('state', True)
         if self.state:
             if not self.data.get('DeliverLogsPermissionArn'):
-                raise ValueError('DeliverLogsPermissionArn required when '
-                                 'creating flow-logs')
+                raise PolicyValidationError(
+                    'DeliverLogsPermissionArn required when '
+                    'creating flow-logs on %s' % (self.manager.data,))
             if not self.data.get('LogGroupName'):
-                raise ValueError('LogGroupName required when '
-                                 'creating flow-logs')
+                raise ValueError(
+                    'LogGroupName required when creating flow-logs on %s' % (
+                        self.manager.data))
         return self
 
     def delete_flow_logs(self, client, rids):

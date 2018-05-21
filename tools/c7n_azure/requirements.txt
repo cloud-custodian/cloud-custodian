@@ -1,2 +1,3 @@
 vcrpy==1.11.0
 vcrpy_unittest
+adal~=0.5.0
