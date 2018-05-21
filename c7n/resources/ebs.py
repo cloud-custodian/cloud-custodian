@@ -405,6 +405,9 @@ class VolumeDetach(BaseAction):
     """
     Detach an EBS volume from an Instance.
 
+    If 'Force' Param is True, then we'll do a forceful detach
+    of the Volume. The default value for 'Force' is False.
+
      :example:
 
          .. code-block:: yaml
@@ -420,7 +423,7 @@ class VolumeDetach(BaseAction):
 
     """
 
-    schema = type_schema('delete', force={'type': 'boolean'})
+    schema = type_schema('detach', force={'type': 'boolean'})
     permissions = ('ec2:DetachVolume')
 
     def process(self, volumes, event=None):
