@@ -47,7 +47,7 @@ class OutputTest(BaseTest):
         gm.return_value = None, "logs", "xyz"
 
         output = self.get_azure_output()
-        self.assertEqual(output.key_prefix, "xyz")
+        self.assertEqual(output.file_prefix, "xyz")
 
         # Generate fake output file
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:

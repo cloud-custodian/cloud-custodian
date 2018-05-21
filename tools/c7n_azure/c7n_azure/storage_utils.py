@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+from collections import namedtuple
 
 from c7n.utils import local_session
 from c7n_azure.session import Session
@@ -32,21 +32,20 @@ class StorageUtilities(object):
 
     @staticmethod
     def get_blob_client_by_uri(storage_uri):
-        container_name, storage_name, key, key_prefix = \
-            StorageUtilities.get_storage_from_uri(storage_uri)
+        storage = StorageUtilities.get_storage_from_uri(storage_uri)
 
-        blob_service = BlockBlobService(account_name=storage_name, account_key=key)
-        blob_service.create_container(container_name)
-        return blob_service, container_name, key_prefix
+        blob_service = BlockBlobService(account_name=storage.storage_name, account_key=storage.key)
+        blob_service.create_container(storage.container_name)
+        return blob_service, storage.container_name, storage.file_prefix
 
     @staticmethod
     def get_queue_client_by_uri(queue_uri):
-        queue_name, storage_name, key, unused = StorageUtilities.get_storage_from_uri(queue_uri)
+        storage = StorageUtilities.get_storage_from_uri(queue_uri)
 
-        queue_service = QueueService(account_name=storage_name, account_key=key)
-        queue_service.create_queue(queue_name)
+        queue_service = QueueService(account_name=storage.storage_name, account_key=storage.key)
+        queue_service.create_queue(storage.container_name)
 
-        return queue_service, queue_name
+        return queue_service, storage.container_name
 
     @staticmethod
     def put_queue_message(queue_service, queue_name, content):
@@ -89,13 +88,20 @@ class StorageUtilities(object):
         parts = urlparse(storage_uri)
         storage_name = str(parts.netloc).partition('.')[0]
 
-        path_parts = os.path.split(parts.path)
-        container_name = path_parts[0].strip('/')
+        path_parts = parts.path.strip('/').split('/', 1)
+        container_name = path_parts[0]
         if len(path_parts) > 1:
-            key_prefix = path_parts[1].strip('/')
+            prefix = path_parts[1]
         else:
-            key_prefix = ""
+            prefix = ""
 
         account = StorageUtilities.get_storage_account_by_name(storage_name)
         key = StorageUtilities.get_storage_keys(account.id)[0].value
-        return container_name, storage_name, key, key_prefix
+
+        Storage = namedtuple('Storage', 'container_name, storage_name, key, file_prefix')
+
+        return Storage(
+            container_name=container_name,
+            storage_name=storage_name,
+            key=key,
+            file_prefix=prefix)

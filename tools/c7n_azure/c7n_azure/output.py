@@ -43,7 +43,7 @@ class AzureStorageOutput(FSOutput):
         self.log = logging.getLogger('custodian.output')
         self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
         self.root_dir = tempfile.mkdtemp()
-        self.blob_service, self.container, self.key_prefix = \
+        self.blob_service, self.container, self.file_prefix = \
             StorageUtilities.get_blob_client_by_uri(self.ctx.output_path)
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
@@ -60,7 +60,7 @@ class AzureStorageOutput(FSOutput):
         for root, dirs, files in os.walk(self.root_dir):
             for f in files:
                 blob_name = "%s/%s%s" % (
-                    self.key_prefix,
+                    self.file_prefix,
                     self.date_path,
                     "%s/%s" % (
                         root[len(self.root_dir):], f))
@@ -69,3 +69,5 @@ class AzureStorageOutput(FSOutput):
                     self.container,
                     blob_name,
                     os.path.join(root, f))
+
+                self.log.debug("%s uploaded" % blob_name)

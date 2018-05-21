@@ -38,6 +38,16 @@ class StorageUtilsTest(BaseTest):
         self.assertEqual(container_name, "testcontainer")
         self.assertEqual(key_prefix, "extrafolder")
 
+        @arm_template('storage.json')
+        def test_get_storage_client_by_uri_extra_directories(self):
+            account = self.setup_account()
+            url = "https://" + account.name + \
+                  ".blob.core.windows.net/testcontainer/extrafolder/foo/bar"
+            blob_service, container_name, key_prefix = StorageUtilities.get_blob_client_by_uri(url)
+            self.assertIsNotNone(blob_service)
+            self.assertEqual(container_name, "testcontainer")
+            self.assertEqual(key_prefix, "extrafolder/foo/bar")
+
     @arm_template('storage.json')
     def test_get_queue_client_by_uri(self):
         account = self.setup_account()
