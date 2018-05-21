@@ -347,7 +347,7 @@ class TagTrim(BaseAction):
 class Notify(BaseNotify):
 
     batch_size = 50
-    
+
     schema = {
         'type': 'object',
         'anyOf': [
@@ -404,5 +404,4 @@ class Notify(BaseNotify):
 
     def send_to_azure_queue(self, queue_uri, message):
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri)
-        queue_message = StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message))
-        return queue_message.id
+        return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id

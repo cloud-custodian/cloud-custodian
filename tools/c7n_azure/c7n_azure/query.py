@@ -128,4 +128,3 @@ class QueryResourceManager(ResourceManager):
 
 
 resources.subscribe(resources.EVENT_FINAL, QueryResourceManager.register_actions_and_filters)
-

@@ -31,12 +31,10 @@ class NotifyTest(BaseTest):
                  'subject': 'testing notify action',
                  'to': ['user@domain.com'],
                  'transport':
-                     {'type':'asq',
-                      'queue': 'https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcc'
-                     }
-                 }]
+                     {'type': 'asq',
+                      'queue': 'https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcc'}
+                 }
+            ]
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-

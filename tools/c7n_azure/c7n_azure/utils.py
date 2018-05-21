@@ -32,8 +32,8 @@ class ResourceIdParser(object):
     def get_resource_name(resource_id):
         return resource_id.split('/')[8]
 
+
 def utcnow():
     """The datetime object for the current time in UTC
     """
     return datetime.datetime.utcnow()
-    
