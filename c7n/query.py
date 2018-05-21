@@ -463,6 +463,12 @@ class QueryResourceManager(ResourceManager):
         """
         return self.config.account_id
 
+    @property
+    def region(self):
+        """ Return the current region.
+        """
+        return self.config.region
+
     def get_arns(self, resources):
         arns = []
         for r in resources:
