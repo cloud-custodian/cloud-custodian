@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from c7n.utils import local_session
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
@@ -30,16 +32,16 @@ class StorageUtilities(object):
 
     @staticmethod
     def get_blob_client_by_uri(storage_uri):
-        container_name, storage_name, key = StorageUtilities.get_storage_from_uri(storage_uri)
+        container_name, storage_name, key, key_prefix = \
+            StorageUtilities.get_storage_from_uri(storage_uri)
 
         blob_service = BlockBlobService(account_name=storage_name, account_key=key)
         blob_service.create_container(container_name)
-
-        return blob_service, container_name
+        return blob_service, container_name, key_prefix
 
     @staticmethod
     def get_queue_client_by_uri(queue_uri):
-        queue_name, storage_name, key = StorageUtilities.get_storage_from_uri(queue_uri)
+        queue_name, storage_name, key, unused = StorageUtilities.get_storage_from_uri(queue_uri)
 
         queue_service = QueueService(account_name=storage_name, account_key=key)
         queue_service.create_queue(queue_name)
@@ -86,7 +88,14 @@ class StorageUtilities(object):
     def get_storage_from_uri(storage_uri):
         parts = urlparse(storage_uri)
         storage_name = str(parts.netloc).partition('.')[0]
-        container_name = parts.path.partition('/')[2]
+
+        path_parts = os.path.split(parts.path)
+        container_name = path_parts[0].strip('/')
+        if len(path_parts) > 1:
+            key_prefix = path_parts[1].strip('/')
+        else:
+            key_prefix = ""
+
         account = StorageUtilities.get_storage_account_by_name(storage_name)
         key = StorageUtilities.get_storage_keys(account.id)[0].value
-        return container_name, storage_name, key
+        return container_name, storage_name, key, key_prefix
