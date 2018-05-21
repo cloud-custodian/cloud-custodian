@@ -139,7 +139,6 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
     filter_accounts(accounts_config, tags, accounts)
 
-    load_resources()
     MainThreadExecutor.async = False
     executor = debug and MainThreadExecutor or ProcessPoolExecutor
     return accounts_config, custodian_config, executor
@@ -415,6 +414,8 @@ def run_account(account, region, policies_config, output_path,
                 cache_period, metrics, dryrun, debug):
     """Execute a set of policies on an account.
     """
+    load_resources()
+
     logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
     CONN_CACHE.session = None
     CONN_CACHE.time = None
