@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3233aa49-5d30-11e8-84d1-e5f8c9137976", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3233aa49-5d30-11e8-84d1-e5f8c9137976", 
+                "date": "Mon, 21 May 2018 19:50:21 GMT", 
+                "content-length": "11", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Tags": []
+    }
+}

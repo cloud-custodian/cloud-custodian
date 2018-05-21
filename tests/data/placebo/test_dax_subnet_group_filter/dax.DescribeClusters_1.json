@@ -1,0 +1,66 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [
+            {
+                "Status": "available", 
+                "SubnetGroup": "c7n-dax-subnet-group", 
+                "NodeType": "dax.t2.small", 
+                "ClusterName": "dax-test", 
+                "ActiveNodes": 1, 
+                "TotalNodes": 1, 
+                "IamRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/dax.amazonaws.com/AWSServiceRoleForDAX", 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupIdentifier": "sg-4b9ada34"
+                    }
+                ], 
+                "ClusterArn": "arn:aws:dax:us-east-1:644160558196:cache/dax-test", 
+                "Nodes": [
+                    {
+                        "Endpoint": {
+                            "Port": 8111, 
+                            "Address": "dax-test-a.qgcgte.0001.dax.use1.cache.amazonaws.com"
+                        }, 
+                        "NodeStatus": "available", 
+                        "ParameterGroupStatus": "in-sync", 
+                        "NodeId": "dax-test-a", 
+                        "AvailabilityZone": "us-east-1a", 
+                        "NodeCreateTime": {
+                            "hour": 15, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 59, 
+                            "microsecond": 311000, 
+                            "year": 2018, 
+                            "day": 21, 
+                            "minute": 3
+                        }
+                    }
+                ], 
+                "ClusterDiscoveryEndpoint": {
+                    "Port": 8111, 
+                    "Address": "dax-test.qgcgte.clustercfg.dax.use1.cache.amazonaws.com"
+                }, 
+                "ParameterGroup": {
+                    "NodeIdsToReboot": [], 
+                    "ParameterGroupName": "default.dax1.0", 
+                    "ParameterApplyStatus": "in-sync"
+                }, 
+                "PreferredMaintenanceWindow": "wed:10:00-wed:11:00"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "31bcf2ed-5d30-11e8-9eae-6dc372acd377", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "31bcf2ed-5d30-11e8-9eae-6dc372acd377", 
+                "date": "Mon, 21 May 2018 19:50:20 GMT", 
+                "content-length": "920", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

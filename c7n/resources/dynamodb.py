@@ -25,7 +25,7 @@ from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 from c7n.utils import (
     local_session, get_retry, chunks, type_schema, snapshot_identifier)
-from c7n.filters.vpc import SecurityGroupFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 
 
 filters = FilterRegistry('dynamodb-table.filters')
@@ -736,3 +736,51 @@ class DaxModifySecurityGroup(ModifyVpcSecurityGroupsAction):
             client.update_cluster(
                 ClusterName=r['ClusterName'],
                 SecurityGroupIds=groups[idx])
+
+
+@resources.register('dax-subnet-group')
+class DaxSubnetGroup(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'dax'
+        type = 'subnet-group'
+        enum_spec = ('describe_subnet_groups',
+                     'SubnetGroups', None)
+        name = id = 'SubnetGroupName'
+        filter_name = 'SubnetGroupNames'
+        filter_type = 'list'
+        date = None
+        dimension = None
+
+
+@DynamoDbAccelerator.filter_registry.register('subnet')
+class DaxSubnetFilter(SubnetFilter):
+    """Filters DAX clusters based on their associated subnet group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dax-no-auto-public
+            resource: dax
+            filters:
+              - type: subnet
+                key: MapPublicIpOnLaunch
+                value: False
+    """
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = set()
+        for r in resources:
+            group_ids.update(
+                [s['SubnetIdentifier'] for s in
+                 self.groups[r['SubnetGroup']]['Subnets']])
+        return group_ids
+
+    def process(self, resources, event=None):
+        self.groups = {
+            r['SubnetGroupName']: r for r in self.manager.get_resource_manager(
+                'dax-subnet-group').resources()}
+        return super(DaxSubnetFilter, self).process(resources)
