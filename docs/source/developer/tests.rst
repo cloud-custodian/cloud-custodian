@@ -26,18 +26,11 @@ Coverage reports can be generated and viewed with the following:
    # on gnomeish linux
    $ gnome-open coverage/index.html
 
+Linting can be run with:
 
-Ratcheting down Python 3.6 Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
 
-We are in the process of porting Custodian to run on both Python 3.6 in
-addition to 2.7. As part of this process, we record tests that are known to
-fail under Python 3.6 in a file called ``ratchet.txt``, and we require these
-and only these tests to fail under the ``py36`` environment during continuous
-integration. If you make changes that fix some failing tests under Python 3.6,
-then the ``py36`` test environment will remove the newly pasing tests from the
-``ratchet.txt`` file and will fail with a message prompting you to commit the
-changes to ``ratchet.txt``.
+  $ make lint
 
 
 Decorating tests
@@ -46,8 +39,12 @@ Decorating tests
 The ``functional`` decorator marks tests that don't require any pre-existing
 AWS context, and can therefore be run cleanly against live AWS.
 
-Writing Placebo Tests
-~~~~~~~~~~~~~~~~~~~~~
+Writing Placebo Tests for AWS Resources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note: These instructions are only for recording data in AWS. For Azure, GCP, or
+other cloud providers, see the corresponding documentation for information on how
+to record data there.
 
 The `Placebo <http://placebo.readthedocs.io/en/latest/>`_ library is used to
 record and replay AWS responses so that tests can run locally, and in a fraction
@@ -119,3 +116,16 @@ When the test is completed, change to using `replay_flight_data`:
 Now when the test is run it will use the data previously recorded and will not
 contact AWS.  When committing your test, don't forget to include the 
 `tests/data/placebo/test_example` directory!
+
+Note: if it's necessary to delay CLI calls due to delays in the time it takes
+for an attribute on a resource to be reflected in an API call or any other reason,
+use ``self.recording`` to only sleep when recording json like so:
+
+  .. code-block:: python
+
+    import time
+
+    ...
+
+    if self.recording:
+      time.sleep(10)

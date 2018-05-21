@@ -2,7 +2,7 @@ Capabilities
 ------------
 
 Custodian currently provides policy definition around the following
-AWS resources:
+AWS resources, and much more:
 
 - :ref:`ami`
 - :ref:`asg`
@@ -31,7 +31,7 @@ and region specified by the user. Custodian will iterate over all resources
 defined in the policy. In the CLI, users specify the account and region they want
 to target. During the run, each policy in the config will generate metrics that
 are sent to CloudWatch in the account that is targeted. The run will also
-generate structured record output and logs that will be sent to an S3 Bucket and
+generate structured record output and logs that can be sent to an S3 Bucket and
 CloudWatch Log Groups in the account Custodian was run from. If Custodian is being
 run without Assume Roles, all output will be put into the same account. Custodian
 is built with the ability to be run from different accounts and leverage STS

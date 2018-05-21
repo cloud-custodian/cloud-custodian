@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
-from c7n_azure.storageutils import StorageUtilities
+from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.session import Session
 
 
@@ -28,6 +28,43 @@ class StorageUtilsTest(BaseTest):
         accounts = list(client.storage_accounts.list())
         matching_account = [a for a in accounts if a.name.startswith("cctstorage")]
         return matching_account[0]
+
+    @arm_template('storage.json')
+    def test_get_storage_client_by_uri(self):
+        account = self.setup_account()
+        url = "https://" + account.name + ".blob.core.windows.net/testcontainer"
+        blob_service, container_name = StorageUtilities.get_blob_client_by_uri(url)
+        self.assertIsNotNone(blob_service)
+        self.assertIsNotNone(container_name)
+
+    @arm_template('storage.json')
+    def test_get_queue_client_by_uri(self):
+        account = self.setup_account()
+        url = "https://" + account.name + ".queue.core.windows.net/testcc"
+        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url)
+        self.assertIsNotNone(queue_service)
+        self.assertIsNotNone(queue_name)
+
+    @arm_template('storage.json')
+    def test_cycle_queue_message_by_uri(self):
+        account = self.setup_account()
+        url = "https://" + account.name + ".queue.core.windows.net/testcyclemessage"
+
+        queue_settings = StorageUtilities.get_queue_client_by_uri(url)
+        StorageUtilities.put_queue_message(*queue_settings, content=u"hello queue")
+
+        # Pull messages, should be 1
+        messages = StorageUtilities.get_queue_messages(*queue_settings)
+        self.assertEqual(len(messages), 1)
+
+        # Read message and delete it from queue
+        for message in messages:
+            self.assertEqual(message.content, u"hello queue")
+            StorageUtilities.delete_queue_message(*queue_settings, message=message)
+
+        # Pull messages again, should be empty
+        messages = StorageUtilities.get_queue_messages(*queue_settings)
+        self.assertEqual(len(messages), 0)
 
     @arm_template('storage.json')
     def test_get_account_by_name(self):

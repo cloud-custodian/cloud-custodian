@@ -348,6 +348,51 @@ class DynamoDbAccelerator(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory(region="us-east-1").client("dax")
-        clusters = client.describe_clusters()["Clusters"]
-        self.assertEqual(clusters[0]["Status"], "deleting")
+        client = session_factory(region='us-east-1').client('dax')
+        clusters = client.describe_clusters()['Clusters']
+        self.assertEqual(clusters[0]['Status'], 'deleting')
+
+    def test_update_cluster(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_update_cluster')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{
+                'ParameterGroup.ParameterGroupName': 'default.dax1.0'}],
+            'actions': [{
+                'type': 'update-cluster',
+                'ParameterGroupName': 'testparamgroup'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        clusters = client.describe_clusters()['Clusters']
+        self.assertEqual(clusters[0]['ParameterGroup']['ParameterGroupName'],
+                         'testparamgroup')
+
+    def test_modify_security_groups(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_update_security_groups')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{
+                'type': 'security-group',
+                'key': 'GroupName',
+                'value': 'default'}],
+            'actions': [{
+                'type': 'modify-security-groups',
+                'remove': 'matched',
+                'add': 'sg-72916c3b'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        sgs = client.describe_clusters()['Clusters'][0]['SecurityGroups']
+        self.assertDictEqual(sgs[0], {"Status": "adding",
+                                      "SecurityGroupIdentifier": "sg-72916c3b"})
+        self.assertDictEqual(sgs[1], {"Status": "removing",
+                                      "SecurityGroupIdentifier": "sg-4b9ada34"})
