@@ -22,7 +22,6 @@ from c7n.config import Bag, Config
 
 from azure_common import BaseTest
 from c7n_azure.output import AzureStorageOutput
-from c7n_azure.storage_utils import StorageUtilities
 
 
 class OutputTest(BaseTest):
@@ -64,4 +63,3 @@ class OutputTest(BaseTest):
             "xyz/%s/foo.txt" % output.date_path,
             fh.name
         )
-
