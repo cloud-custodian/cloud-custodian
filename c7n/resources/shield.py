@@ -131,10 +131,18 @@ class SetShieldProtection(BaseAction):
         # Get all resources unfiltered
         resources = self.manager.get_resource_manager(self.manager.type).resources()
         resource_arns = set(map(self.manager.get_arn, resources))
-        protections = {p['ResourceArn']: p for p in protections}
+
+        pmap = {}
+        # Only process stale resources in region for non global resources.
+        global_resource = getattr(self.manager.resource_type, 'global_resource', False)
+        for p in protections:
+            if not global_resource and self.manager.region not in p['ResourceArn']:
+                continue
+            pmap[p['ResourceArn']] = p
+
         # Find any protections for resources that don't exist
-        stale = set(protections).difference(resource_arns)
+        stale = set(pmap).difference(resource_arns)
         self.log.info("clearing %d stale protections", len(stale))
         for s in stale:
             client.delete_protection(
-                ProtectionId=protections[s]['Id'])
+                ProtectionId=pmap[s]['Id'])
