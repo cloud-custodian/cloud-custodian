@@ -43,6 +43,7 @@ class OutputTest(BaseTest):
 
     def test_azure_output_upload(self):
         # Mock storage utilities to avoid calling azure to get a real client
+        real_client_get = StorageUtilities.get_blob_client_by_uri
         StorageUtilities.get_blob_client_by_uri = gm = mock.MagicMock()
         gm.return_value = None, "logs", "xyz"
 
@@ -64,3 +65,5 @@ class OutputTest(BaseTest):
             "xyz/%s/foo.txt" % output.date_path,
             fh.name
         )
+
+        StorageUtilities.get_blob_client_by_uri = real_client_get
