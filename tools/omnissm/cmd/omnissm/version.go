@@ -16,11 +16,8 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/rs/zerolog/log"
+	
 	"github.com/spf13/cobra"
-
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager/client"
 )
 
 var (
