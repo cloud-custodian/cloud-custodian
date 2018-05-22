@@ -424,7 +424,7 @@ class VolumeDetach(BaseAction):
     """
 
     schema = type_schema('detach', force={'type': 'boolean'})
-    permissions = ('ec2:DetachVolume')
+    permissions = ('ec2:DetachVolume',)
 
     def process(self, volumes, event=None):
         client = local_session(self.manager.session_factory).client('ec2')
