@@ -23,14 +23,14 @@ import (
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager/client"
 )
 
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "",
-	Run: func(cmd *cobra.Command, args []string) {
-		info, err := client.GetInstanceInformation()
-		if err != nil {
-			log.Fatal().Err(err).Msgf("cannot get instance info")
-		}
-		fmt.Println(info.ReleaseVersion)
-	},
-}
+var (
+	Version = "unknown"
+	
+	VersionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(Version)
+		},
+	}
+)
