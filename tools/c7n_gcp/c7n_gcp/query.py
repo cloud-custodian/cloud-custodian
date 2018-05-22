@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import six
-import os
 import jmespath
 
 from c7n.actions import ActionRegistry
@@ -27,21 +26,19 @@ class ResourceQuery(object):
 
     def __init__(self, session_factory):
         self.session_factory = session_factory
-        self.default_region = get_default_region()
-        self.default_project = get_default_project()
-        self.default_zone = get_default_zone()
 
     def filter(self, resource_manager, **params):
         m = resource_manager.resource_type
-        client = local_session(self.session_factory).client(
+        session = local_session(self.session_factory)
+        client = session.client(
             m.service, m.version, m.component)
 
         # depends on resource scope
-        if m.scope in ('project', 'zone') and self.default_project:
-            params['project'] = self.default_project
+        if m.scope in ('project', 'zone'):
+            params['project'] = session.get_default_project()
 
         if m.scope == 'zone' and self.default_zone:
-            params['zone'] = self.default_zone
+            params['zone'] = session.get_default_zone()
 
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
@@ -58,25 +55,6 @@ class ResourceQuery(object):
         else:
             return jmespath.search(path,
                 client.execute_query(enum_op, verb_arguments=params))
-
-
-# We use env vars per terraform gcp precedence order.
-def get_default_region():
-    for k in ('GOOGLE_REGION', 'GCLOUD_REGION', 'CLOUDSDK_COMPUTE_REGION'):
-        if k in os.environ:
-            return os.environ[k]
-
-
-def get_default_project():
-    for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
-        if k in os.environ:
-            return os.environ[k]
-
-
-def get_default_zone():
-    for k in ('GOOGLE_ZONE', 'GCLOUD_ZONE', 'CLOUDSDK_COMPUTE_ZONE'):
-        if k in os.environ:
-            return os.environ[k]
 
 
 @sources.register('describe-gcp')
