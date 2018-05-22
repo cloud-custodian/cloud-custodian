@@ -722,6 +722,8 @@ class Policy(object):
         # Global policy variable expansion, we have to carry forward on
         # various filter/action local vocabularies. Where possible defer
         # by using a format string.
+        #
+        # See https://github.com/capitalone/cloud-custodian/issues/2330
         return {
             # standard runtime variables for interpolation
             'account': '{account}',
