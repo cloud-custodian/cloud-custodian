@@ -1,6 +1,6 @@
 .PHONY: build dist
 bucket=c7n-ssm-build
-LDFLAGS="-X github.com/capitalone/cloud-custodian/tools/omnissm/cmd/omnissm.Version=`git rev-parse HEAD`"
+LDFLAGS="-X main.Version=`git rev-parse HEAD`"
 
 build:
 	@mkdir -p bin
