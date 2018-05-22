@@ -287,6 +287,25 @@ class TestPolicyCollection(BaseTest):
 
 class TestPolicy(BaseTest):
 
+    def test_policy_variable_interpolation(self):
+
+        p = self.load_policy({
+            'name': 'compute',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'role': 'arn:iam::{account_id}/role/FooBar'},
+            'actions': [
+                {'type': 'tag',
+                 'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'}
+            ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
+
+        self.assertEqual(
+            p.data['actions'][0]['value'],
+            'bad monkey 12312311 zanzibar %s' % (
+                (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d')))
+        self.assertEqual(p.data['mode']['role'], 'arn:iam::12312311/role/FooBar')
+
     def test_child_resource_trail_validation(self):
         self.assertRaises(
             ValueError,

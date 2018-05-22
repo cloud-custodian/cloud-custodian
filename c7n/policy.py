@@ -723,19 +723,23 @@ class Policy(object):
         # various filter/action local vocabularies. Where possible defer
         # by using a format string.
         return {
+            # standard runtime variables for interpolation
             'account': '{account}',
             'account_id': self.options.account_id,
+            'region': self.options.region,
+            # non-standard runtime variables from local filter/action vocabularies
+            #
+            # notify action
             'policy': self.data,
             'event': '{event}',
-            'region': self.region,
-            # mark for op
+            # mark for op action
             'op': '{op}',
             'action_date': '{action_date}',
             # tag action pyformat-date handling
-            'now': datetime.utcnow(),
-            # account increase limit
+            'now': utils.FormatDate(datetime.utcnow()),
+            # account increase limit action
             'service': '{service}',
-            # s3 set logging :-( see if we can revisit this one.
+            # s3 set logging action :-( see if we can revisit this one.
             'bucket_region': '{bucket_region}',
             'bucket_name': '{bucket_name}',
             'source_bucket_name': '{source_bucket_name}',
