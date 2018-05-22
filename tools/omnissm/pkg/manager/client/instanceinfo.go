@@ -19,6 +19,8 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -55,13 +57,17 @@ type InstanceInfo struct {
 }
 
 func GetInstanceInformation() (*InstanceInfo, error) {
-	out, err := exec.Command(SSMCLI.Path(), "get-instance-information").Output()
+	cmd, err := exec.LookPath("ssm-cli")
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
+	}
+	out, err := exec.Command(cmd, "get-instance-information").Output()
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 	var info InstanceInfo
 	if err := json.Unmarshal(out, &info); err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	return &info, nil
 }

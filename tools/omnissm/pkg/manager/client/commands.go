@@ -21,27 +21,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var (
-	SSMAgent = Cmd("amazon-ssm-agent")
-	SSMCLI   = Cmd("ssm-cli")
-
-	// The Initctl command is used to control upstart jobs
-	Initctl = Cmd("initctl")
-
-	// The Systemctl command is used to control systemd services
-	Systemctl = Cmd("systemctl")
-)
-
-type Cmd string
-
-func (c Cmd) Path() string {
-	cmd, err := exec.LookPath(string(c))
-	if err != nil {
-		log.Fatal().Err(err).Msgf("cannot find executable: %#v", c)
-	}
-	return cmd
-}
-
 func restartAgent() error {
 	cmd, err := exec.LookPath("systemctl")
 	if err != nil {

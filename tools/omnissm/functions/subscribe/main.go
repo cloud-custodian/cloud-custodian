@@ -24,12 +24,12 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/awsutil"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 )
@@ -46,8 +46,11 @@ var (
 	}
 	resourceTags = make(map[string]struct{})
 
+	CrossAccountRole   = os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE")
 	RegistrationsTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 	ResourceTags       = os.Getenv("OMNISSM_RESOURCE_TAGS")
+
+	mgr *manager.Manager
 )
 
 func init() {
@@ -57,20 +60,16 @@ func init() {
 	if ResourceTags == "" {
 		ResourceTags = "App,OwnerContact,Name"
 	}
-}
-
-func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error {
-	cfg, err := awsutil.LoadDefaultAWSConfig()
-	if err != nil {
-		return err
-	}
-	m := manager.NewManager(&manager.Config{
-		Config:             cfg,
+	mgr = manager.NewManager(&manager.Config{
+		Config:             aws.NewConfig(),
 		RegistrationsTable: RegistrationsTable,
 		ResourceTags:       strings.Split(ResourceTags, ","),
 	})
+}
+
+func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error {
 	managedId := identity.Hash(detail.ConfigurationItem.Name())
-	_, err, ok := m.Get(managedId)
+	_, err, ok := mgr.Get(managedId)
 	if err != nil {
 		return err
 	}
@@ -80,11 +79,11 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 	}
 	switch detail.ConfigurationItem.ResourceType {
 	case "ResourceDiscovered", "OK":
-		if err := m.Update(managedId, detail.ConfigurationItem); err != nil {
+		if err := mgr.Update(managedId, detail.ConfigurationItem); err != nil {
 			return err
 		}
 	case "ResourceDeleted":
-		if err := m.Delete(managedId); err != nil {
+		if err := mgr.Delete(managedId); err != nil {
 			return err
 		}
 	}
@@ -92,11 +91,12 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 }
 
 func downloadS3ConfigurationItem(path string) ([]byte, error) {
-	cfg, err := awsutil.LoadDefaultAWSConfig()
-	if err != nil {
-		return nil, err
+	config := aws.NewConfig()
+	sess := session.New(config)
+	if CrossAccountRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, CrossAccountRole)
 	}
-	svc := s3.New(session.New(cfg))
+	svc := s3.New(sess, config)
 	parts := strings.SplitN(path, "/", 2)
 	if len(parts) != 2 {
 		return nil, errors.Errorf("invalid path: %#v", path)

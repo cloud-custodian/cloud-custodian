@@ -17,7 +17,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
@@ -69,32 +68,36 @@ func (c *Client) Register() error {
 		Signature: c.config.Signature,
 	})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot marshal new registration request")
 	}
-	log.Info().Msgf("reqistration request: %#v", string(data))
+	log.Info().Msgf("registration request: %#v", string(data))
 	resp, err := c.Post(c.config.RegistrationURL, "application/json", bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("register error: %#v", string(data))
+		return errors.Errorf("cannot register new resource: %d, %s", resp.StatusCode, string(data))
 	}
 	var r api.RegistrationResponse
 	if err := json.Unmarshal(data, &r); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
-	out, err := exec.Command(SSMAgent.Path(), "-register", "-y",
+	cmd, err := exec.LookPath("amazon-ssm-agent")
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	out, err := exec.Command(cmd, "-register", "-y",
 		"-id", r.ActivationId,
 		"-code", r.ActivationCode,
 		"-i", r.ManagedId,
 		"--region", r.Region).CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("SSM Register Error %s %s", err, string(out))
+		return errors.Wrapf(err, "amazon-ssm-agent failed: %v\noutput: %s", err, string(out))
 	}
 	return restartAgent()
 }
@@ -116,7 +119,7 @@ func (c *Client) Update() error {
 		ManagedId: info.InstanceId,
 	})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot marshal registration request")
 	}
 	req, err := http.NewRequest("PATCH", c.config.RegistrationURL, bytes.NewReader(data))
 	if err != nil {
@@ -130,10 +133,10 @@ func (c *Client) Update() error {
 	defer resp.Body.Close()
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot read body for Register/Update")
 	}
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error recording SSM Instance Id %s %s", err, data)
+		return errors.Errorf("cannot update ManagedId: %d, %s", resp.StatusCode, string(data))
 	}
 	return nil
 }

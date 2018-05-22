@@ -21,10 +21,10 @@ import (
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/api"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/apiutil"
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/awsutil"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 )
@@ -38,20 +38,22 @@ var (
 
 	// The list of accounts authorized to use the register API
 	AccountWhitelist = os.Getenv("OMNISSM_ACCOUNT_WHITELIST")
+
+	mgr *manager.Manager
 )
+
+func init() {
+	mgr = manager.NewManager(&manager.Config{
+		Config:             aws.NewConfig(),
+		RegistrationsTable: RegistrationsTable,
+		InstanceRole:       InstanceRole,
+	})
+}
 
 func main() {
 	apiutil.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 		whitelist := identity.NewWhitelist(AccountWhitelist)
-		cfg, err := awsutil.LoadDefaultAWSConfig()
-		if err != nil {
-			return nil, err
-		}
-		r := api.RegistrationHandler{manager.NewManager(&manager.Config{
-			Config:             cfg,
-			RegistrationsTable: RegistrationsTable,
-			InstanceRole:       InstanceRole,
-		})}
+		r := api.RegistrationHandler{mgr}
 		switch req.Resource {
 		case "/register":
 			var registerReq api.RegistrationRequest

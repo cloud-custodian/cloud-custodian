@@ -31,9 +31,9 @@ func Start(fn func(context.Context, events.APIGatewayProxyRequest) (*events.APIG
 	lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 		resp, err := fn(ctx, req)
 		if err != nil {
-			log.Info().Err(err).Msg("received error from handler")
+			log.Info().Msgf("received error from handler:\n%+v", err)
 			return Error(err)
 		}
-		return resp, err
+		return resp, nil
 	})
 }
