@@ -404,11 +404,13 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 
 def accounts_iterator(config):
-    for a in config.get('accounts'):
-        yield a
-    for a in config.get('subscriptions'):
-        d = {'account_id': a['subscription_id'], 'name': a['name']}
-        yield d
+    if config.get('accounts'):
+        for a in config.get('accounts'):
+            yield a
+    elif config.get('subscriptions'):
+        for a in config.get('subscriptions'):
+            d = {'account_id': a['subscription_id'], 'name': a['name']}
+            yield d
 
 
 def run_account(account, region, policies_config, output_path,
