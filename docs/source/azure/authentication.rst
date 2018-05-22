@@ -44,6 +44,19 @@ You will need to map it to environment variables for Custodian like this:
     AZURE_CLIENT_SECRET=password
 
 
+If you're using a Service Principal across subscriptions with `c7n-org` you'll
+need to grant it access to each of the subscriptions.
+
+Once the service principal is created, follow these steps:
+
+- Open the `Subscriptions` tab
+- Select a subscription you'd like to manage with Cloud Custodian
+- Click `Access Control (IAM)`
+- Click `Add`
+- Set Role to `Contributor`
+- Type name of service principal in search bar and select it
+- Click `Save`
+
 
 Azure CLI
 ---------
