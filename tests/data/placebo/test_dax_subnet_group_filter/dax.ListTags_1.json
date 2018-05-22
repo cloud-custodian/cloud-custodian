@@ -1,17 +1,20 @@
 {
-    "status_code": 200, 
+    "status_code": 400, 
     "data": {
         "ResponseMetadata": {
             "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "3233aa49-5d30-11e8-84d1-e5f8c9137976", 
+            "HTTPStatusCode": 400, 
+            "RequestId": "d929ba21-5dbe-11e8-999e-454883316b27", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "3233aa49-5d30-11e8-84d1-e5f8c9137976", 
-                "date": "Mon, 21 May 2018 19:50:21 GMT", 
-                "content-length": "11", 
+                "x-amzn-requestid": "d929ba21-5dbe-11e8-999e-454883316b27", 
+                "date": "Tue, 22 May 2018 12:51:29 GMT", 
+                "content-length": "93", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
-        "Tags": []
+        "Error": {
+            "Message": "c7n-test is either not present or not available", 
+            "Code": "ClusterNotFoundFault"
+        }
     }
 }

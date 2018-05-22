@@ -36,7 +36,7 @@
                         "Key": "Name"
                     }
                 ], 
-                "AvailableIpAddressCount": 25, 
+                "AvailableIpAddressCount": 27, 
                 "DefaultForAz": false, 
                 "Ipv6CidrBlockAssociationSet": [], 
                 "VpcId": "vpc-f1516b97", 
@@ -50,13 +50,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "ab7ef77c-44ad-4730-8b38-9c93c7975aad", 
+            "RequestId": "83b95332-f64b-4913-97f1-04ea58514187", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 21 May 2018 19:50:22 GMT"
+                "date": "Tue, 22 May 2018 12:51:31 GMT"
             }
         }
     }

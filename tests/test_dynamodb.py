@@ -409,4 +409,4 @@ class DynamoDbAccelerator(BaseTest):
                 "value": False}]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['ClusterName'], 'dax-test')
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-test')
