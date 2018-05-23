@@ -14,6 +14,7 @@
 import argparse
 import json
 import os
+import glob
 import logging
 
 from c7n.credentials import SessionFactory
@@ -104,10 +105,18 @@ def resources_gc_prefix(options, policy_collection):
 
 
 def setup_parser():
+    class ExtendAction(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            items = getattr(namespace, self.dest) or []
+            items.extend(values)
+            setattr(namespace, self.dest, items)
+
     parser = argparse.ArgumentParser()
+    parser.register('action', 'extend', ExtendAction)
     parser.add_argument(
         '-c', '--config',
-        required=True, dest="config_files", action="append")
+        required=True, dest="config_files", action="extend", nargs="+")
+    parser.add_argument('-e', '--extension', help='File extension to filter by.')
     parser.add_argument(
         '-r', '--region', default=os.environ.get(
             'AWS_DEFAULT_REGION', 'us-east-1'))
@@ -130,6 +139,17 @@ def setup_parser():
 def main():
     parser = setup_parser()
     options = parser.parse_args()
+    full_paths = [os.path.join(os.getcwd(), path) for path in options.config_files]
+    files = []
+    for path in full_paths:
+        if os.path.isfile(path):
+            files.append(path)
+        elif options.extension is not None:
+            files.extend(glob.glob(path + '/*' + options.extension))
+        else:
+            print "Given path \"%s\" is not file nor extension (-e) for file matching was given. Exiting" % path
+            exit(1)
+    options.config_files = files
     options.policy_filter = None
     options.log_group = None
     options.external_id = None
