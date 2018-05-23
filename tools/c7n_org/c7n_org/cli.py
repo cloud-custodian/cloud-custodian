@@ -426,11 +426,13 @@ def accounts_iterator(config):
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
              'name': a.get('name', a['subscription_id']),
+             'regions': ['global'],
              'tags': a.get('tags', ())}
         yield d
     for a in config.get('projects', ()):
         d = {'account_id': a['project_id'],
              'name': a.get('name', a['project_id']),
+             'regions': ['global'],
              'tags': a.get('tags', ())}
         yield d
 
