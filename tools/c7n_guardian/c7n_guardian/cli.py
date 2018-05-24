@@ -15,6 +15,7 @@
 import datetime
 import logging
 import operator
+import time
 
 import boto3
 from botocore.exceptions import ClientError
@@ -200,8 +201,8 @@ def enable(config, master, tags, accounts, debug, message, region):
     for r in regions:
         log.info("Processing Region:%s", r)
         enable_region(master_info, accounts_config, executor, message, r)
-
-
+    
+    
 def enable_region(master_info, accounts_config, executor, message, region):
     master_session = get_session(
         master_info.get('role'), 'c7n-guardian',
@@ -210,6 +211,9 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     master_client = master_session.client('guardduty')
     detector_id = get_or_create_detector_id(master_client)
+    ip_set = get_or_create_ip_set(master_client, detector_id, master_info.get('trustedIP'))
+
+    log.info("Region:%s master successfully uploaded ipset %s for guard duty", region, ip_set)
 
     results = master_client.get_paginator(
         'list_members').paginate(DetectorId=detector_id, OnlyAssociated="FALSE")
@@ -218,17 +222,28 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find active members
     active_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Enabled'}
+                      if m['RelationshipStatus'] == 'Enabled'}
     # Find invited members
     invited_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Invited'}
+                       if m['RelationshipStatus'] == 'Invited'}
+    # Find extant members who currently have guardduty disabled(not suspended)
+    resigned_ids = {m['AccountId'] for m in extant_members
+                       if m['RelationshipStatus'] == 'Resigned'}
+
+    resigned_ids = {a['account_id'] for a in accounts_config['accounts']
+                     if a['account_id'] in resigned_ids}    
+    
+    if resigned_ids:
+        master_client.delete_members(DetectorId=detector_id, AccountIds=list(resigned_ids))
+        log.info("Region:%s Resigned %d members are deleted from master to re-enable guard duty", region, len(resigned_ids))
+        extant_ids = extant_ids.difference(resigned_ids)
 
     # Find extant members not currently enabled
     suspended_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Disabled'}
+                     if m['RelationshipStatus'] == 'Disabled'}
     # Filter by accounts under consideration per config and cli flags
     suspended_ids = {a['account_id'] for a in accounts_config['accounts']
-        if a['account_id'] in suspended_ids}
+                     if a['account_id'] in suspended_ids}
 
     if suspended_ids:
         unprocessed = master_client.start_monitoring_members(
@@ -288,7 +303,7 @@ def enable_region(master_info, accounts_config, executor, message, region):
                if account['account_id'] not in active_ids]
 
     log.info("Region:%s Accepting %d invitations in members", region, len(members))
-
+   
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
@@ -296,6 +311,7 @@ def enable_region(master_info, accounts_config, executor, message, region):
                 continue
             if a['account_id'] in active_ids:
                 continue
+            time.sleep(5)
             futures[w.submit(enable_account, a, master_info['account_id'], region)] = a
 
         for f in as_completed(futures):
@@ -309,14 +325,13 @@ def enable_region(master_info, accounts_config, executor, message, region):
                          region, a['name'])
     return members
 
-
 def enable_account(account, master_account_id, region):
     member_session = get_session(
         account.get('role'), 'c7n-guardian',
         profile=account.get('profile'),
         region=region)
     member_client = member_session.client('guardduty')
-    m_detector_id = get_or_create_detector_id(member_client)
+    m_detector_id = get_or_create_detector_id(member_client)    
     all_invitations = member_client.list_invitations().get('Invitations', [])
     invitations = [
         i for i in all_invitations
@@ -340,7 +355,16 @@ def get_or_create_detector_id(client):
     if detectors:
         return detectors[0]
     else:
-        return client.create_detector().get('DetectorId')
+        return client.create_detector(Enable=True).get('DetectorId')
+
+def get_or_create_ip_set(client, detector_id, trustedIP):
+    ip_set = client.list_ip_sets(DetectorId=detector_id).get('IpSetIds')
+    if ip_set:
+        client.update_ip_set(Activate=True, DetectorId=detector_id, IpSetId=ip_set[0], Location=trustedIP)
+        return ip_set
+    else:
+        return client.create_ip_set(Activate=True, DetectorId=detector_id, Format='TXT', Location=trustedIP, 
+        Name='IpSet').get('IpSetId')
 
 
 def get_master_info(accounts_config, master):
