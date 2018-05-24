@@ -43,7 +43,7 @@ var (
 )
 
 func init() {
-	mgr = manager.NewManager(&manager.Config{
+	mgr = manager.New(&manager.Config{
 		Config:             aws.NewConfig(),
 		RegistrationsTable: RegistrationsTable,
 		InstanceRole:       InstanceRole,
