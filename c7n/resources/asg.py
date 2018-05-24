@@ -34,6 +34,7 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
+from c7n import utils
 from c7n.manager import resources
 from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
@@ -705,6 +706,75 @@ class VpcIdFilter(ValueFilter):
             for a in s_asgs:
                 a['VpcId'] = all_subnets[s]['VpcId']
         return super(VpcIdFilter, self).process(asgs)
+
+
+@filters.register('launch-activity')
+class LaunchActivityFilter(Filter):
+    """Filter ASG based on launch activity status
+
+    :example:
+
+        .. code-block: yaml
+
+            policies:
+              - name: asg-launch-failures-weekly
+                resource: asg
+                filters:
+                  - type: launch-activity
+                    status: ['Failed']
+                    days: 7
+    """
+    schema = type_schema(
+        'launch-activity',
+        status={
+            'type': 'array',
+            'items': {
+                'enum': [
+                    'Successful', 'Failed', 'Cancelled', 'PreInService',
+                    'InProgress', 'PendingSpotBidPlacement',
+                    'WaitingForSpotInstanceRequestId', 'WaitingForInstanceId',
+                    'WaitingForSpotInstanceId', 'MidLifecycleAction',
+                    'WaitingForELBConnectionDraining',
+                    'WaitingForInstanceWarmup']}},
+        days={'type': 'number'},
+        required=('status',))
+    permissions = ('autoscaling:DescribeScalingActivities',)
+
+    @worker
+    def asg_activities(self, asg):
+        events_until = None
+        if self.data.get('days'):
+            events_until = (datetime.now(tz=tzutc()) - timedelta(
+                days=self.data.get('days')))
+
+        client = local_session(
+            self.manager.session_factory).client('autoscaling')
+        p = client.get_paginator('describe_scaling_activities')
+
+        expire = False
+        asg['c7n:Status'] = set()
+        for activity in p.paginate(
+                AutoScalingGroupName=asg['AutoScalingGroupName']):
+            for a in activity['Activities']:
+                if events_until and a['StartTime'].replace(
+                        tzinfo=tzutc()) < events_until:
+                    expire = True
+                    break
+                asg['c7n:Status'].add(a['StatusCode'])
+            if expire:
+                break
+
+    def process(self, asgs, event=None):
+        with self.executor_factory(max_workers=2) as w:
+            for asg_set in utils.chunks(asgs, size=10):
+                list(w.map(self.asg_activities, asg_set))
+        results = []
+        for a in asgs:
+            a['c7n:Status'] = list(a['c7n:Status'])
+            for s in a['c7n:Status']:
+                if s in self.data.get('status'):
+                    results.append(a)
+        return results
 
 
 @filters.register('progagated-tags')

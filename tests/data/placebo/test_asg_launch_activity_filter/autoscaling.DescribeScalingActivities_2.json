@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Activities": [
+            {
+                "Description": "Launching a new EC2 instance: i-07064e7c7e5c1e68b", 
+                "AutoScalingGroupName": "c7n-asg-launch-success", 
+                "ActivityId": "6c3ea37b-028b-4aa7-9cc5-8c9a55e80b99", 
+                "Details": "{\"Subnet ID\":\"subnet-ea6429a3\",\"Availability Zone\":\"us-east-1b\"}", 
+                "StartTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 38, 
+                    "microsecond": 277000, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 28
+                }, 
+                "Progress": 100, 
+                "EndTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 29
+                }, 
+                "Cause": "At 2017-01-20T15:28:25Z a user request created an AutoScalingGroup changing the desired capacity from 0 to 1.  At 2017-01-20T15:28:36Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 1.", 
+                "StatusCode": "Successful"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1f8a7a24-df52-11e6-a399-0f68647bade6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1f8a7a24-df52-11e6-a399-0f68647bade6", 
+                "date": "Fri, 20 Jan 2017 20:50:48 GMT", 
+                "content-length": "1204", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

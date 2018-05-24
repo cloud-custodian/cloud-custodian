@@ -17,8 +17,10 @@ from datetime import datetime
 from dateutil import zoneinfo
 
 from .common import BaseTest
-from botocore.exceptions import ClientError
+from c7n.resources.asg import LaunchActivityFilter
+from c7n.executor import MainThreadExecutor
 from c7n.resources.asg import NotEncryptedFilter
+from botocore.exceptions import ClientError
 
 
 class LaunchConfigTest(BaseTest):
@@ -626,6 +628,23 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "ContainersFTW")
+
+    def test_asg_activity_filter(self):
+        self.patch(LaunchActivityFilter, 'executor_factory', MainThreadExecutor)
+        session = self.replay_flight_data('test_asg_launch_activity_filter')
+        p = self.load_policy({
+            'name': 'asg-activities',
+            'resource': 'asg',
+            'filters': [{
+                "or": [
+                    {'type': 'launch-activity', 'status': ['Successful']},
+                    {'type': 'launch-activity', 'status': ['Failed']}
+                ]}]}, session_factory=session)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            sorted([r['AutoScalingGroupName'] for r in resources]),
+            ['c7n-asg-launch-failure', 'c7n-asg-launch-success'])
 
     def test_asg_propagate_tag_filter(self):
         session = self.replay_flight_data("test_asg_propagate_tag_filter")

@@ -1,0 +1,106 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:185106417252:autoScalingGroup:5f7c9d0f-3b3e-44a3-aea0-461b637871d5:autoScalingGroupName/c7n-asg-launch-failure", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 1, 
+                "Tags": [], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "c7n-asg-launch-failure", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-0ffe2c33", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "c7n.launchconfig.test", 
+                "CreatedTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 50, 
+                    "microsecond": 350000, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 28
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1e"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }, 
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:185106417252:autoScalingGroup:a031a28e-4265-415e-a3a6-3f1b6487e102:autoScalingGroupName/c7n-asg-launch-success", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 1, 
+                "Tags": [
+                    {
+                        "ResourceType": "auto-scaling-group", 
+                        "ResourceId": "c7n-asg-launch-success", 
+                        "PropagateAtLaunch": true, 
+                        "Value": "c7n.success.ec2", 
+                        "Key": "Name"
+                    }
+                ], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "c7n-asg-launch-success", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-1b", 
+                        "InstanceId": "i-07064e7c7e5c1e68b", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "c7n.launchconfig.test"
+                    }
+                ], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-ea6429a3", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "c7n.launchconfig.test", 
+                "CreatedTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 25, 
+                    "microsecond": 175000, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 28
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1b"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1e7894e0-df52-11e6-b42a-ed5355e0fc63", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1e7894e0-df52-11e6-b42a-ed5355e0fc63", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3456", 
+                "content-type": "text/xml", 
+                "date": "Fri, 20 Jan 2017 20:50:46 GMT"
+            }
+        }
+    }
+}
