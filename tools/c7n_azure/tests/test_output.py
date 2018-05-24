@@ -41,7 +41,8 @@ class OutputTest(BaseTest):
         return output
 
     def test_azure_output_upload(self):
-        # Mock storage utilities to avoid calling azure to get a real client
+        # Mock storage utilities to avoid calling azure to get a real client.
+
         AzureStorageOutput.get_blob_client_wrapper = gm = mock.MagicMock()
         gm.return_value = None, "logs", "xyz"
 
