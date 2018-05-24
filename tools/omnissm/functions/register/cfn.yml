@@ -18,8 +18,8 @@ Resources:
       Role: arn:aws:iam::644160558196:role/CloudCustodianRole
       Environment:
         Variables:
-          REGISTRATION_TABLE: !Ref RegistrationTable
-          ACCOUNT_WHITELIST: !Join [ ",", !Ref AccountIDs ]
+          OMNISSM_REGISTRATIONS_TABLE: !Ref RegistrationsTable
+          OMNISSM_ACCOUNT_WHITELIST: !Join [ ",", !Ref AccountIDs ]
       Events:
         RegisterInstance:
           Properties:
@@ -31,7 +31,7 @@ Resources:
             Method: PATCH
             Path: /register
           Type: Api
-  RegistrationTable:
+  RegistrationsTable:
     Type: 'AWS::Serverless::SimpleTable'
     Properties:
       TableName: omnissm-registrations
