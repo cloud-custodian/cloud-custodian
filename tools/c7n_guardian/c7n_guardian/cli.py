@@ -222,16 +222,15 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find active members
     active_ids = {m['AccountId'] for m in extant_members
-                      if m['RelationshipStatus'] == 'Enabled'}
+        if m['RelationshipStatus'] == 'Enabled'}
     # Find invited members
     invited_ids = {m['AccountId'] for m in extant_members
-                       if m['RelationshipStatus'] == 'Invited'}
+        if m['RelationshipStatus'] == 'Invited'}
     # Find extant members who currently have guardduty disabled(not suspended)
     resigned_ids = {m['AccountId'] for m in extant_members
-                       if m['RelationshipStatus'] == 'Resigned'}
-
+        if m['RelationshipStatus'] == 'Resigned'}
     resigned_ids = {a['account_id'] for a in accounts_config['accounts']
-                     if a['account_id'] in resigned_ids}    
+        if a['account_id'] in resigned_ids}    
     
     if resigned_ids:
         master_client.delete_members(DetectorId=detector_id, AccountIds=list(resigned_ids))
