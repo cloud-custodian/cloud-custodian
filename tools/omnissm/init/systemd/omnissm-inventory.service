@@ -1,0 +1,7 @@
+[Unit]
+Description=Service for OMNISSM Inventory
+
+[Service]
+Type=simple
+ExecStart=omnissm ps
+StandardError=journal
