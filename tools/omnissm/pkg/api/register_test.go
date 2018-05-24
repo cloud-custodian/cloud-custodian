@@ -34,7 +34,7 @@ func TestRegistrationRequestUnmarshal(t *testing.T) {
 			data: []byte(`{"provider":"provider","document":"document","signature":"signature","managedId":"managedId"}`),
 			expected: &api.RegistrationRequest{
 				Provider:  "provider",
-				Document:  []byte("\"document\""),
+				Document:  "document",
 				Signature: "signature",
 				ManagedId: "managedId",
 			},
@@ -67,7 +67,7 @@ func TestRegistrationResponseMarshal(t *testing.T) {
 				},
 				Region: "us-east-2",
 			},
-			expected: []byte(`{"Id":"id","ActivationId":"aid","ActivationCode":"code","ManagedId":"managedId","region":"us-east-2"}`),
+			expected: []byte(`{"id":"id","ActivationId":"aid","ActivationCode":"code","ManagedId":"managedId","region":"us-east-2"}`),
 		},
 	}
 
@@ -77,7 +77,7 @@ func TestRegistrationResponseMarshal(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if diff := cmp.Diff(data, tc.expected); diff != "" {
+		if diff := cmp.Diff(string(data), string(tc.expected)); diff != "" {
 			t.Errorf("TestCase %d: after json.Marshal: (-got +want)\n%s", i, diff)
 		}
 	}
