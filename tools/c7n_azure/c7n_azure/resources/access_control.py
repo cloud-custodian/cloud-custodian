@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from c7n_azure.query import QueryResourceManager
-from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.utils import type_schema
 from c7n_azure.session import Session
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
+
 
 @resources.register('roleassignment')
 class RoleAssignment(QueryResourceManager):
@@ -35,6 +35,7 @@ class RoleAssignment(QueryResourceManager):
             'properties.scope',
             'properties.roleDefinitionId'
         )
+
 
 @resources.register('roledefinition')
 class RoleDefinition(QueryResourceManager):
@@ -56,6 +57,7 @@ class RoleDefinition(QueryResourceManager):
             'properties.type',
             'properties.permissions'
         )
+
 
 @RoleAssignment.filter_registry.register('role')
 class UserRole(RelatedResourceFilter):
@@ -79,4 +81,3 @@ class UserRole(RelatedResourceFilter):
 
     RelatedResource = "c7n_azure.resources.access_control.RoleDefinition"
     RelatedIdsExpression = "properties.roleDefinitionId"
-

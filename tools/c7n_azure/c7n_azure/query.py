@@ -120,7 +120,7 @@ class QueryResourceManager(ResourceManager):
 
         if extra_args:
             params.update(extra_args)
-            
+
         op = getattr(getattr(resource_client, get_client), get_op)
         data = [
             op(rid, **params)
