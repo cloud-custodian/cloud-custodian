@@ -846,10 +846,10 @@ class SGPermission(Filter):
           value: x.y.z
 
     `Cidr` can match ipv4 and ipv6 rules.  In this example we are blocking
-    global inbound connections to SSH or RDP. 
+    global inbound connections to SSH or RDP.
 
     .. code-block:: yaml
-    
+
       - type: ingress
         Ports: [22, 3389]
         Cidr:
@@ -912,13 +912,14 @@ class SGPermission(Filter):
         found = None
         if 'Cidr' in self.data:
             # Looping over CidrIp and CidrIpv6 will allow Cidr to match both.
-            for type in [['CidrIp', 'IpRanges'],['CidrIpv6', 'Ipv6Ranges']]:
-                ip_perms = perm.get(type[1], [])
+            for cidr_type, range_type in [['CidrIp', 'IpRanges'], ['CidrIpv6', 'Ipv6Ranges']]:
+                ip_perms = perm.get(range_type, [])
                 if not ip_perms:
+                    found = False
                     break
 
                 match_range = self.data['Cidr']
-                match_range['key'] = type[0] 
+                match_range['key'] = cidr_type
 
                 vf = ValueFilter(match_range)
                 vf.annotate = False
