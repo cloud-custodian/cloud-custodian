@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SubnetGroups": [
+            {
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-05cf9b60", 
+                        "SubnetAvailabilityZone": "us-east-1c"
+                    }, 
+                    {
+                        "SubnetIdentifier": "subnet-ecfb30a4", 
+                        "SubnetAvailabilityZone": "us-east-1a"
+                    }
+                ], 
+                "SubnetGroupName": "c7n-dax-subnet-group", 
+                "VpcId": "vpc-f1516b97", 
+                "Description": "Subnet group for dax"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d98547a9-5dbe-11e8-999e-454883316b27", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d98547a9-5dbe-11e8-999e-454883316b27", 
+                "date": "Tue, 22 May 2018 12:51:30 GMT", 
+                "content-length": "287", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

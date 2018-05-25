@@ -48,6 +48,8 @@ class Group(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Group"
+        # Denotes this resource type exists across regions
+        global_resource = True
 
 
 @resources.register('iam-role')
@@ -64,6 +66,8 @@ class Role(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Role"
+        # Denotes this resource type exists across regions
+        global_resource = True
 
 
 @resources.register('iam-user')
@@ -78,6 +82,8 @@ class User(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::User"
+        # Denotes this resource type exists across regions
+        global_resource = True
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -113,6 +119,8 @@ class Policy(QueryResourceManager):
         dimension = None
         config_type = "AWS::IAM::Policy"
         filter_name = None
+        # Denotes this resource type exists across regions
+        global_resource = True
 
     arn_path_prefix = "aws:policy/"
 
@@ -149,6 +157,8 @@ class InstanceProfile(QueryResourceManager):
         name = 'InstanceProfileId'
         date = 'CreateDate'
         dimension = None
+        # Denotes this resource type exists across regions
+        global_resource = True
 
 
 @resources.register('iam-certificate')
@@ -165,6 +175,8 @@ class ServerCertificate(QueryResourceManager):
         name = 'ServerCertificateName'
         date = 'Expiration'
         dimension = None
+        # Denotes this resource type exists across regions
+        global_resource = True
 
 
 class IamRoleUsage(Filter):

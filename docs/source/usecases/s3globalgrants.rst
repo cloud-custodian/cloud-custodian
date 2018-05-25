@@ -2,7 +2,7 @@ S3 - Global Grants
 ==================
 
 Scan buckets that allow for global access in their
-ACLs and report them and the ACL permissions granted.
+ACLs and delete the associated ACL permissions.
 
 
 .. code-block:: yaml
