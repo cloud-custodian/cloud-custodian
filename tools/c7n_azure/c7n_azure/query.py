@@ -84,6 +84,9 @@ class QueryResourceManager(ResourceManager):
         super(QueryResourceManager, self).__init__(data, options)
         self.source = self.get_source(self.source_type)
 
+    def augment(self, resources):
+        return resources
+
     def get_permissions(self):
         return ()
 
@@ -109,7 +112,7 @@ class QueryResourceManager(ResourceManager):
 
     def resources(self, query=None):
         key = self.get_cache_key(query)
-        resources = self.source.get_resources(query)
+        resources = self.augment(self.source.get_resources(query))
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 

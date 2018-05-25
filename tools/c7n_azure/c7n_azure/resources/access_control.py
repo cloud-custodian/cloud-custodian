@@ -44,7 +44,7 @@ class RoleDefinition(QueryResourceManager):
         s = Session()
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
-        enum_spec = ('role_definitions', 'list', f'/subscriptions/{s.subscription_id}')
+        enum_spec = ('role_definitions', 'list', '/subscriptions/%s' % (s.subscription_id))
         get_spec = ('role_definitions', 'get_by_id', None)
         type = 'roleDefinition'
         id = 'id'
@@ -68,7 +68,7 @@ class UserRole(RelatedResourceFilter):
         .. code-block:: yaml
 
             policies:
-               - name: loadbalancer-with-ipv6-frontend
+               - name: assignments-by-role-definition
                  resource: azure.roleassignment
                  filters:
                     - type: role

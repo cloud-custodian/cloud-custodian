@@ -42,12 +42,6 @@ class ArmResourceManager(QueryResourceManager):
                 resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
         return resources
 
-    def resources(self, query=None):
-        key = self.get_cache_key(query)
-        resources = self.augment(self.source.get_resources(query))
-        self._cache.save(key, resources)
-        return self.filter_resources(resources)
-
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
         session = local_session(self.session_factory)
