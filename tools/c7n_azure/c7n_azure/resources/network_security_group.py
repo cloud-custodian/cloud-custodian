@@ -24,7 +24,7 @@ class NetworkSecurityGroup(ArmResourceManager):
     class resource_type(object):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
-        enum_spec = ('network_security_groups', 'list_all')
+        enum_spec = ('network_security_groups', 'list_all', None)
         id = 'id'
         name = 'name'
         default_report_fields = (

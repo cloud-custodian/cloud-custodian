@@ -25,6 +25,7 @@ import c7n_azure.resources.vm
 import c7n_azure.resources.vnet
 import c7n_azure.resources.network_security_group
 import c7n_azure.resources.web_app  # noqa: F401
+import c7n_azure.resources.access_control
 
 
 def initialize_azure():
