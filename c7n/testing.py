@@ -185,4 +185,4 @@ class TextTestIO(io.StringIO):
 
         if not isinstance(b, six.text_type):
             b = b.decode("utf8")
-        return super(TextTestIO, self).write(b)    
+        return super(TextTestIO, self).write(b)
