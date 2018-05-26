@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import itertools
 import json
 import os
-import glob
 import logging
+import sys
 
 from c7n.credentials import SessionFactory
 from c7n.policy import load as policy_load
@@ -105,18 +106,11 @@ def resources_gc_prefix(options, policy_collection):
 
 
 def setup_parser():
-    class ExtendAction(argparse.Action):
-        def __call__(self, parser, namespace, values, option_string=None):
-            items = getattr(namespace, self.dest) or []
-            items.extend(values)
-            setattr(namespace, self.dest, items)
-
     parser = argparse.ArgumentParser()
-    parser.register('action', 'extend', ExtendAction)
+    parser.add_argument("configs", nargs='*', help="Policy configuration file(s)")
     parser.add_argument(
-        '-c', '--config',
-        required=True, dest="config_files", action="extend", nargs="+")
-    parser.add_argument('-e', '--extension', help='File extension to filter by.')
+        '-c', '--config', dest="config_files", nargs="*", action='append',
+        help="Policy configuration files(s)")
     parser.add_argument(
         '-r', '--region', default=os.environ.get(
             'AWS_DEFAULT_REGION', 'us-east-1'))
@@ -139,17 +133,7 @@ def setup_parser():
 def main():
     parser = setup_parser()
     options = parser.parse_args()
-    full_paths = [os.path.join(os.getcwd(), path) for path in options.config_files]
-    files = []
-    for path in full_paths:
-        if os.path.isfile(path):
-            files.append(path)
-        elif options.extension is not None:
-            files.extend(glob.glob(path + '/*' + options.extension))
-        else:
-            print "Given path \"%s\" is not file nor extension (-e) for file matching was given. Exiting" % path
-            exit(1)
-    options.config_files = files
+
     options.policy_filter = None
     options.log_group = None
     options.external_id = None
@@ -163,6 +147,15 @@ def main():
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('c7n.cache').setLevel(logging.WARNING)
+
+    files = []
+    files.extend(itertools.chain(*options.config_files))
+    files.extend(options.configs)
+    options.config_files = files
+    if not files:
+        parser.print_help()
+        sys.exit(1)
+
     resources.load_resources()
 
     policies = load_policies(options)
