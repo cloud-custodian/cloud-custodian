@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 from statistics import mean, median
-from c7n.filters import Filter
+
 from c7n_azure.metrics import Metrics
+
+from c7n.filters import Filter
 
 
 class MetricFilter(Filter):
