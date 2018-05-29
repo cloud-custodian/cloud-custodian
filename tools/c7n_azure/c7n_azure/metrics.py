@@ -77,9 +77,10 @@ class Metrics(object):
                     for data in series.data:
                         data_points.append({
                             'time_stamp': data.time_stamp,
-                            'total': data.total
+                            'value': data.total
                         })
-                result["{} ({})".format(item.name.localized_value, item.unit.name)] = data_points
+                # result["{} ({})".format(item.name.localized_value, item.unit.name)] = data_points
+                result[item.name.localized_value] = data_points
 
         return result
 
