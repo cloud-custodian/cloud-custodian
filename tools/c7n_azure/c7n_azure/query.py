@@ -19,6 +19,8 @@ from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
 from c7n.utils import local_session
+from c7n_azure.provider import resources
+from c7n_azure.actions import Notify
 
 
 class ResourceQuery(object):
@@ -130,3 +132,12 @@ class QueryResourceManager(ResourceManager):
             for rid in resource_ids
         ]
         return [r.serialize(True) for r in data]
+
+    @staticmethod
+    def register_actions_and_filters(registry, _):
+        for resource in registry.keys():
+            klass = registry.get(resource)
+            klass.action_registry.register('notify', Notify)
+
+
+resources.subscribe(resources.EVENT_FINAL, QueryResourceManager.register_actions_and_filters)

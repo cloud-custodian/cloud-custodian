@@ -18,14 +18,11 @@ import datetime
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
 from msrestazure.azure_exceptions import CloudError
 from c7n import utils
-from c7n.actions import BaseAction
+from c7n_azure.utils import utcnow
+from c7n.actions import BaseAction, BaseNotify
 from c7n.filters import FilterValidationError
-
-
-def utcnow():
-    """The datetime object for the current time in UTC
-    """
-    return datetime.datetime.utcnow()
+from c7n.resolver import ValuesFrom
+from c7n_azure.storage_utils import StorageUtilities
 
 
 def update_resource_tags(self, resource, tags):
@@ -345,3 +342,66 @@ class TagTrim(BaseAction):
             return
 
         self.untag_action({'tags': candidates}, self.manager).process([resource])
+
+
+class Notify(BaseNotify):
+
+    batch_size = 50
+
+    schema = {
+        'type': 'object',
+        'anyOf': [
+            {'required': ['type', 'transport', 'to']},
+            {'required': ['type', 'transport', 'to_from']}],
+        'properties': {
+            'type': {'enum': ['notify']},
+            'to': {'type': 'array', 'items': {'type': 'string'}},
+            'owner_absent_contact': {'type': 'array', 'items': {'type': 'string'}},
+            'to_from': ValuesFrom.schema,
+            'cc': {'type': 'array', 'items': {'type': 'string'}},
+            'cc_from': ValuesFrom.schema,
+            'cc_manager': {'type': 'boolean'},
+            'from': {'type': 'string'},
+            'subject': {'type': 'string'},
+            'template': {'type': 'string'},
+            'transport': {
+                'oneOf': [
+                    {'type': 'object',
+                     'required': ['type', 'queue'],
+                     'properties': {
+                         'queue': {'type': 'string'},
+                         'type': {'enum': ['asq']}
+                     }}],
+            },
+        }
+    }
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Notify, self).__init__(data, manager, log_dir)
+
+    def process(self, resources, event=None):
+        session = utils.local_session(self.manager.session_factory)
+        message = {
+            'event': event,
+            'account_id': session.subscription_id,
+            'account': 'subscription',
+            'region': 'all',
+            'policy': self.manager.data}
+
+        message['action'] = self.expand_variables(message)
+
+        for batch in utils.chunks(resources, self.batch_size):
+            message['resources'] = batch
+            receipt = self.send_data_message(message)
+            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
+                receipt, self.manager.data['name'],
+                self.data.get('template', 'default'), len(batch)))
+
+    def send_data_message(self, message):
+        if self.data['transport']['type'] == 'asq':
+            queue_uri = self.data['transport']['queue']
+            return self.send_to_azure_queue(queue_uri, message)
+
+    def send_to_azure_queue(self, queue_uri, message):
+        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri)
+        return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id

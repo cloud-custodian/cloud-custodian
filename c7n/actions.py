@@ -378,7 +378,36 @@ class LambdaInvoke(EventAction):
         return results
 
 
-class Notify(EventAction):
+class BaseNotify(EventAction):
+
+    batch_size = 250
+
+    def expand_variables(self, message):
+        """expand any variables in the action to_from/cc_from fields.
+        """
+        p = copy.deepcopy(self.data)
+        if 'to_from' in self.data:
+            to_from = self.data['to_from'].copy()
+            to_from['url'] = to_from['url'].format(**message)
+            if 'expr' in to_from:
+                to_from['expr'] = to_from['expr'].format(**message)
+            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
+        if 'cc_from' in self.data:
+            cc_from = self.data['cc_from'].copy()
+            cc_from['url'] = cc_from['url'].format(**message)
+            if 'expr' in cc_from:
+                cc_from['expr'] = cc_from['expr'].format(**message)
+            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
+        return p
+
+    def pack(self, message):
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
+
+class Notify(BaseNotify):
     """
     Flexible notifications require quite a bit of implementation support
     on pluggable transports, templates, address resolution, variable
@@ -447,8 +476,6 @@ class Notify(EventAction):
         }
     }
 
-    batch_size = 250
-
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Notify, self).__init__(data, manager, log_dir)
         self.assume_role = data.get('assume_role', True)
@@ -459,24 +486,6 @@ class Notify(EventAction):
         if self.data.get('transport', {'type': 'sqs'}).get('type') == 'sqs':
             return ('sqs:SendMessage',)
         return ()
-
-    def expand_variables(self, message):
-        """expand any variables in the action to_from/cc_from fields.
-        """
-        p = copy.deepcopy(self.data)
-        if 'to_from' in self.data:
-            to_from = self.data['to_from'].copy()
-            to_from['url'] = to_from['url'].format(**message)
-            if 'expr' in to_from:
-                to_from['expr'] = to_from['expr'].format(**message)
-            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
-        if 'cc_from' in self.data:
-            cc_from = self.data['cc_from'].copy()
-            cc_from['url'] = cc_from['url'].format(**message)
-            if 'expr' in cc_from:
-                cc_from['expr'] = cc_from['expr'].format(**message)
-            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
-        return p
 
     def process(self, resources, event=None):
         alias = utils.get_account_alias_from_sts(
@@ -501,12 +510,6 @@ class Notify(EventAction):
             return self.send_sqs(message)
         elif self.data['transport']['type'] == 'sns':
             return self.send_sns(message)
-
-    def pack(self, message):
-        dumped = utils.dumps(message)
-        compressed = zlib.compress(dumped.encode('utf8'))
-        b64encoded = base64.b64encode(compressed)
-        return b64encoded.decode('ascii')
 
     def send_sns(self, message):
         topic = self.data['transport']['topic'].format(**message)
