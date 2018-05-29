@@ -22,4 +22,4 @@ class Vnet(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'
-        enum_spec = ('servers', 'list')
+        enum_spec = ('servers', 'list', None)

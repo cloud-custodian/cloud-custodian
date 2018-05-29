@@ -22,4 +22,4 @@ class KeyVault(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
-        enum_spec = ('vaults', 'list')
+        enum_spec = ('vaults', 'list', None)

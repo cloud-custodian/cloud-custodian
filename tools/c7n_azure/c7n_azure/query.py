@@ -28,9 +28,13 @@ class ResourceQuery(object):
 
     def filter(self, resource_manager, **params):
         m = resource_manager.resource_type
-        enum_op, list_op = m.enum_spec
+        enum_op, list_op, extra_args = m.enum_spec
+
+        if extra_args:
+            params.update(extra_args)
+
         op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
-        data = [r.serialize(True) for r in op()]
+        data = [r.serialize(True) for r in op(**params)]
 
         return data
 
@@ -80,6 +84,9 @@ class QueryResourceManager(ResourceManager):
         super(QueryResourceManager, self).__init__(data, options)
         self.source = self.get_source(self.source_type)
 
+    def augment(self, resources):
+        return resources
+
     def get_permissions(self):
         return ()
 
@@ -109,11 +116,17 @@ class QueryResourceManager(ResourceManager):
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
-    def get_resources(self, resource_ids):
-        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
-        session = local_session(self.session_factory)
+    def get_resources(self, resource_ids, **params):
+        resource_client = self.get_client()
+        m = self.resource_type
+        get_client, get_op, extra_args = m.get_spec
+
+        if extra_args:
+            params.update(extra_args)
+
+        op = getattr(getattr(resource_client, get_client), get_op)
         data = [
-            resource_client.resources.get_by_id(rid, session.resource_api_version(rid))
+            op(rid, **params)
             for rid in resource_ids
         ]
         return [r.serialize(True) for r in data]
