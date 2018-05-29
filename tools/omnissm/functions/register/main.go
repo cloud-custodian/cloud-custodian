@@ -39,21 +39,20 @@ var (
 	// The list of accounts authorized to use the register API
 	AccountWhitelist = os.Getenv("OMNISSM_ACCOUNT_WHITELIST")
 
-	mgr *manager.Manager
+	// If provided, SSM API requests that are throttled will be sent to this
+	// queue
+	QueueName = os.Getenv("OMNISSM_SPILLOVER_QUEUE")
 )
 
-func init() {
-	mgr = manager.NewManager(&manager.Config{
+func main() {
+	whitelist := identity.NewWhitelist(AccountWhitelist)
+	r := api.RegistrationHandler{manager.NewManager(&manager.Config{
 		Config:             aws.NewConfig(),
 		RegistrationsTable: RegistrationsTable,
 		InstanceRole:       InstanceRole,
-	})
-}
-
-func main() {
+		QueueName:          QueueName,
+	})}
 	apiutil.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-		whitelist := identity.NewWhitelist(AccountWhitelist)
-		r := api.RegistrationHandler{mgr}
 		switch req.Resource {
 		case "/register":
 			var registerReq api.RegistrationRequest
