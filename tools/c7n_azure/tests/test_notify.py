@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
+from c7n_azure.session import Session
 
 
 class NotifyTest(BaseTest):
@@ -21,6 +22,8 @@ class NotifyTest(BaseTest):
 
     @arm_template('keyvault.json')
     def test_notify_though_storage_queue(self):
+        account = self.setup_account()
+        queue_url = "https://" + account.name + ".queue.core.windows.net/testcc"
         p = self.load_policy({
             'name': 'test-notify-for-keyvault',
             'resource': 'azure.keyvault',
@@ -32,7 +35,7 @@ class NotifyTest(BaseTest):
                  'to': ['user@domain.com'],
                  'transport':
                      {'type': 'asq',
-                      'queue': 'https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcc'}
+                      'queue': queue_url}
                  }
             ]
         })
