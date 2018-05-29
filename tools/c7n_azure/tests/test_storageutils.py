@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
 from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.session import Session
 
 
 class StorageUtilsTest(BaseTest):
