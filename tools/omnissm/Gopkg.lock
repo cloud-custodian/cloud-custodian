@@ -52,6 +52,8 @@
     "service/dynamodb/dynamodbattribute",
     "service/dynamodb/dynamodbiface",
     "service/s3",
+    "service/sqs",
+    "service/sqs/sqsiface",
     "service/ssm",
     "service/ssm/ssmiface",
     "service/sts"
@@ -93,6 +95,12 @@
   version = "v0.2.0"
 
 [[projects]]
+  name = "github.com/google/uuid"
+  packages = ["."]
+  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
+  version = "0.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [
@@ -119,6 +127,12 @@
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   revision = "0b12d6b5"
+
+[[projects]]
+  name = "github.com/jpillora/backoff"
+  packages = ["."]
+  revision = "8eab2debe79d12b7bd3d10653910df25fa9552ba"
+  version = "1.0.0"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -244,6 +258,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "572f64afe572162a913aaa1c690cc6d8c149a7a4ba5c56fefdf332f9ec8be63a"
+  inputs-digest = "32eced7ded211be830b2b158234b1edde5cc10ae7a0bbb3f2249657227562836"
   solver-name = "gps-cdcl"
   solver-version = 1
