@@ -25,7 +25,7 @@ class ResourceGroup(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
-        enum_spec = ('resource_groups', 'list')
+        enum_spec = ('resource_groups', 'list', None)
 
 
 @ResourceGroup.filter_registry.register('empty-group')
