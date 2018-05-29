@@ -16,6 +16,7 @@ package identity
 
 import (
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -67,6 +68,15 @@ func GetLocalInstanceDocument() []byte {
 		return nil
 	}
 	return data
+}
+
+func GetLocalInstanceRegion() string {
+	var d Document
+	if err := json.Unmarshal(GetLocalInstanceDocument(), &d); err != nil {
+		log.Debug().Err(err).Msg("invalid instance document")
+		return ""
+	}
+	return d.Region
 }
 
 // GetLocalInstanceDocument returns the signature for the instance identity
