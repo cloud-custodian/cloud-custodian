@@ -396,3 +396,17 @@ class DynamoDbAccelerator(BaseTest):
                                       "SecurityGroupIdentifier": "sg-72916c3b"})
         self.assertDictEqual(sgs[1], {"Status": "removing",
                                       "SecurityGroupIdentifier": "sg-4b9ada34"})
+
+    def test_subnet_group_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_dax_subnet_group_filter")
+        p = self.load_policy({
+            "name": "dax-cluster",
+            "resource": "dax",
+            "filters": [{
+                "type": "subnet",
+                "key": "MapPublicIpOnLaunch",
+                "value": False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-test')
