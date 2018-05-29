@@ -27,7 +27,6 @@ class Metrics(object):
     '''
     If no metric is specified, returns object for all metrics
     available to resource. Schema:
-    
     {
         'Metric 1 (unit value)': [
             {
@@ -42,9 +41,8 @@ class Metrics(object):
         'Metric 2 (unit value)': [
             ...
         ],
-        ...          
+        ...
     }
-    
     If no timespan is specified, defaults to last 24 hours
     '''
     def metric_data(self, start_time=None, end_time=None,
