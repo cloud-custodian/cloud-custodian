@@ -35,13 +35,13 @@ class MetricFilter(Filter):
         values = [item['value'] for item in m_data[self.metric]]
         f_value = self.func(values)
 
-        if self.op == '>=':
+        if self.op == 'ge':
             return f_value >= self.threshold
-        if self.op == '>':
+        if self.op == 'gt':
             return f_value > self.threshold
-        if self.op == '<=':
+        if self.op == 'le':
             return f_value <= self.threshold
-        if self.op == '<':
+        if self.op == 'lt':
             return f_value < self.threshold
-        if self.op == '=':
+        if self.op == 'eq':
             return f_value == self.threshold
