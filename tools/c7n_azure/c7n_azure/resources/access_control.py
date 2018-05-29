@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.query import QueryResourceManager
 from c7n_azure.provider import resources
-from c7n.utils import type_schema
+from c7n_azure.query import QueryResourceManager
 from c7n_azure.session import Session
+
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
+from c7n.utils import type_schema
 
 
 @resources.register('roleassignment')
