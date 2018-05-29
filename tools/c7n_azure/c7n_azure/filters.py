@@ -1,9 +1,17 @@
 from datetime import datetime, timedelta
-from statistics import mean, median
 
 from c7n_azure.metrics import Metrics
 
 from c7n.filters import Filter
+
+
+def mean(numbers):
+    total = 0.0
+    count = 0.0
+    for n in numbers:
+        total += n
+        count += 1
+    return total / count
 
 
 class MetricFilter(Filter):
@@ -11,8 +19,7 @@ class MetricFilter(Filter):
     funcs = {
         'max': max,
         'min': min,
-        'avg': mean,
-        'med': median
+        'avg': mean
     }
 
     def validate(self):
