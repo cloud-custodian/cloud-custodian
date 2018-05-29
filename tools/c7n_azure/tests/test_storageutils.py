@@ -20,6 +20,7 @@ from c7n_azure.session import Session
 class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()
+        StorageUtilities.get_storage_from_uri.cache_clear()
 
     def setup_account(self):
         # Find actual name of storage account provisioned in our test environment
@@ -32,10 +33,21 @@ class StorageUtilsTest(BaseTest):
     @arm_template('storage.json')
     def test_get_storage_client_by_uri(self):
         account = self.setup_account()
-        url = "https://" + account.name + ".blob.core.windows.net/testcontainer"
-        blob_service, container_name = StorageUtilities.get_blob_client_by_uri(url)
+        url = "https://" + account.name + ".blob.core.windows.net/testcontainer/extrafolder"
+        blob_service, container_name, key_prefix = StorageUtilities.get_blob_client_by_uri(url)
         self.assertIsNotNone(blob_service)
-        self.assertIsNotNone(container_name)
+        self.assertEqual(container_name, "testcontainer")
+        self.assertEqual(key_prefix, "extrafolder")
+
+    @arm_template('storage.json')
+    def test_get_storage_client_by_uri_extra_directories(self):
+        account = self.setup_account()
+        url = "https://" + account.name + \
+              ".blob.core.windows.net/testcontainer/extrafolder/foo/bar"
+        blob_service, container_name, key_prefix = StorageUtilities.get_blob_client_by_uri(url)
+        self.assertIsNotNone(blob_service)
+        self.assertEqual(container_name, "testcontainer")
+        self.assertEqual(key_prefix, "extrafolder/foo/bar")
 
     @arm_template('storage.json')
     def test_get_queue_client_by_uri(self):
@@ -43,7 +55,7 @@ class StorageUtilsTest(BaseTest):
         url = "https://" + account.name + ".queue.core.windows.net/testcc"
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url)
         self.assertIsNotNone(queue_service)
-        self.assertIsNotNone(queue_name)
+        self.assertEqual(queue_name, "testcc")
 
     @arm_template('storage.json')
     def test_cycle_queue_message_by_uri(self):

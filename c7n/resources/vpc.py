@@ -1359,6 +1359,8 @@ class MissingRoute(Filter):
             for k in ('AccepterVpcInfo', 'RequesterVpcInfo'):
                 if r[k]['OwnerId'] != self.manager.config.account_id:
                     continue
+                if r[k].get('Region') and r['k']['Region'] != self.manager.config.region:
+                    continue
                 if r[k]['VpcId'] not in routed_vpcs[r['VpcPeeringConnectionId']]:
                     results.append(r)
                     break

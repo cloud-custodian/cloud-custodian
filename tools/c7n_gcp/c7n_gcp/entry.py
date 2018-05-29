@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 
 import c7n_gcp.resources.resourcemanager
 import c7n_gcp.resources.compute
 import c7n_gcp.resources.storage  # noqa: F401
+
+logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
 
 
 def initialize_gcp():

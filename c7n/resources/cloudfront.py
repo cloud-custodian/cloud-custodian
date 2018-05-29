@@ -39,6 +39,8 @@ class Distribution(QueryResourceManager):
         universal_taggable = True
         filter_name = None
         config_type = "AWS::CloudFront::Distribution"
+        # Denotes this resource type exists across regions
+        global_resource = True
 
     def get_arn(self, r):
         return r['ARN']
