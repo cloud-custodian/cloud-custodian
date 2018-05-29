@@ -22,4 +22,4 @@ class Vnet(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
-        enum_spec = ('virtual_networks', 'list_all')
+        enum_spec = ('virtual_networks', 'list_all', None)
