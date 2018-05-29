@@ -54,6 +54,9 @@ func (r *Registrations) Get(id string) (*RegistrationEntry, error, bool) {
 		}
 		return nil, err, false
 	}
+	if resp.Item == nil {
+		return nil, nil, false
+	}
 	var entry RegistrationEntry
 	if err := dynamodbattribute.UnmarshalMap(resp.Item, &entry); err != nil {
 		return nil, err, false
