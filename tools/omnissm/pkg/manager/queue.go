@@ -71,20 +71,15 @@ func NewQueue(name string, config *aws.Config) *Queue {
 }
 
 func (q *Queue) Send(m *Message) error {
+	data, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
 	resp, err := q.SQSAPI.SendMessage(&sqs.SendMessageInput{
-		DelaySeconds: aws.Int64(10),
-		MessageAttributes: map[string]*sqs.MessageAttributeValue{
-			"Title": &sqs.MessageAttributeValue{
-				DataType:    aws.String("String"),
-				StringValue: aws.String("The Whistler"),
-			},
-			"WeeksOn": &sqs.MessageAttributeValue{
-				DataType:    aws.String("Number"),
-				StringValue: aws.String("6"),
-			},
-		},
-		MessageBody: aws.String(string(m.Body)),
-		QueueUrl:    aws.String(q.queueURL),
+		MessageDeduplicationId: aws.String(m.MessageId),
+		MessageGroupId:         aws.String("omnissm"),
+		MessageBody:            aws.String(string(data)),
+		QueueUrl:               aws.String(q.queueURL),
 	})
 	if err != nil {
 		return err
