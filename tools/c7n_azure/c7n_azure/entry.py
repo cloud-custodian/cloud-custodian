@@ -14,6 +14,7 @@
 
 from c7n_azure.provider import resources
 import c7n_azure.actions
+import c7n_azure.output
 import c7n_azure.resources.cosmos_db
 import c7n_azure.resources.key_vault
 import c7n_azure.resources.load_balancer
@@ -24,7 +25,8 @@ import c7n_azure.resources.sqlserver
 import c7n_azure.resources.vm
 import c7n_azure.resources.vnet
 import c7n_azure.resources.network_security_group
-import c7n_azure.resources.web_app  # noqa: F401
+import c7n_azure.resources.web_app
+import c7n_azure.resources.access_control  # noqa: F401
 
 
 def initialize_azure():

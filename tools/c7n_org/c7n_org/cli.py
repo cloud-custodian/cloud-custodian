@@ -82,17 +82,30 @@ CONFIG_SCHEMA = {
         },
         'subscription': {
             'type': 'object',
-            'additionalProperties': True,
+            'additionalProperties': False,
+            'required': ['subscription_id'],
             'properties': {
                 'subscription_id': {'type': 'string'},
+                'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'name': {'type': 'string'},
             }
-        }
+        },
+        'project': {
+            'type': 'object',
+            'additionalProperties': False,
+            'required': ['project_id'],
+            'properties': {
+                'project_id': {'type': 'string'},
+                'tags': {'type': 'array', 'items': {'type': 'string'}},
+                'name': {'type': 'string'},
+            }
+        },
     },
     'type': 'object',
     'additionalProperties': False,
     'oneOf': [
         {'required': ['accounts']},
+        {'required': ['projects']},
         {'required': ['subscriptions']}
     ],
     'properties': {
@@ -104,6 +117,10 @@ CONFIG_SCHEMA = {
         'subscriptions': {
             'type': 'array',
             'items': {'$ref': '#/definitions/subscription'}
+        },
+        'projects': {
+            'type': 'array',
+            'items': {'$ref': '#/definitions/project'}
         }
     }
 }
@@ -135,8 +152,8 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     else:
         custodian_config = {}
 
+    accounts_config['accounts'] = list(accounts_iterator(accounts_config))
     filter_policies(custodian_config, policy_tags, policies, resource)
-
     filter_accounts(accounts_config, tags, accounts)
 
     load_resources()
@@ -404,10 +421,19 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 
 def accounts_iterator(config):
-    for a in config.get('accounts'):
+    for a in config.get('accounts', ()):
         yield a
-    for a in config.get('subscriptions'):
-        d = {'account_id': a['subscription_id'], 'name': a['name']}
+    for a in config.get('subscriptions', ()):
+        d = {'account_id': a['subscription_id'],
+             'name': a.get('name', a['subscription_id']),
+             'regions': ['global'],
+             'tags': a.get('tags', ())}
+        yield d
+    for a in config.get('projects', ()):
+        d = {'account_id': a['project_id'],
+             'name': a.get('name', a['project_id']),
+             'regions': ['global'],
+             'tags': a.get('tags', ())}
         yield d
 
 
@@ -498,7 +524,7 @@ def run(config, use, output_dir, accounts, tags,
     policy_counts = Counter()
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
-        for a in accounts_iterator(accounts_config):
+        for a in accounts_config['accounts']:
             for r in resolve_regions(region or a.get('regions', ())):
                 futures[w.submit(
                     run_account,

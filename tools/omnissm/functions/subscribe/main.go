@@ -60,7 +60,7 @@ func init() {
 	if ResourceTags == "" {
 		ResourceTags = "App,OwnerContact,Name"
 	}
-	mgr = manager.NewManager(&manager.Config{
+	mgr = manager.New(&manager.Config{
 		Config:             aws.NewConfig(),
 		RegistrationsTable: RegistrationsTable,
 		ResourceTags:       strings.Split(ResourceTags, ","),

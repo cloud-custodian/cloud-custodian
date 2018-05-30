@@ -69,7 +69,7 @@ type Manager struct {
 	queue           *Queue
 }
 
-func NewManager(config *Config) *Manager {
+func New(config *Config) *Manager {
 	if config.InstanceRole == "" {
 		config.InstanceRole = DefaultSSMServiceRole
 	}

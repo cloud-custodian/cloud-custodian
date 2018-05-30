@@ -20,21 +20,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 import itertools
-import jmespath
 import json
+from concurrent.futures import as_completed
 
+import jmespath
 import six
 from botocore.client import ClientError
 from botocore.paginate import set_value_from_jmespath
-from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.manager import ResourceManager
+from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource)
-from c7n.registry import PluginRegistry
-from c7n.manager import ResourceManager
 
 
 class ResourceQuery(object):
