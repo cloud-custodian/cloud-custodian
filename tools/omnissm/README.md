@@ -60,4 +60,3 @@ Either the register endpoints map, or the single register endpoint override must
 - systemd timer example for initialize & inventory
 - custom inventory output directly to agent pickup location
 - osquery inventory example
-
