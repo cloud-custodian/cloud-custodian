@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
 
 
@@ -33,3 +34,33 @@ class ArmResourceTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    def test_metric_filter_find_network_in(self):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'op': 'gt',
+                 'func': 'avg',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    @arm_template('vm.json')
+    def test_metric_filter_not_find_network_in(self):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'op': 'lt',
+                 'func': 'avg',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
