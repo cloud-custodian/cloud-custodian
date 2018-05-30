@@ -49,7 +49,7 @@ class StorageUtilities(object):
 
     @staticmethod
     def put_queue_message(queue_service, queue_name, content):
-        queue_service.put_message(queue_name, content)
+        return queue_service.put_message(queue_name, content)
 
     @staticmethod
     def get_queue_messages(queue_service, queue_name):

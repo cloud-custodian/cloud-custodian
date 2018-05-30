@@ -29,6 +29,16 @@ var RegisterCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		url := viper.GetString("register_endpoint")
 		if url == "" {
+			endpoints := viper.GetStringMapString("register_endpoints")
+			if endpoints != nil {
+				region := identity.GetLocalInstanceRegion()
+				if region == "" {
+					log.Fatal().Msg("unable to determine instance region from metadata")
+				}
+				url = endpoints[region]
+			}
+		}
+		if url == "" {
 			log.Fatal().Msg("registration url (OMNISSM_REGISTER_ENDPOINT) cannot be blank")
 		}
 		c, err := client.New(&client.Config{
@@ -40,7 +50,8 @@ var RegisterCmd = &cobra.Command{
 			log.Fatal().Msgf("unable to initialize node: %v", err)
 		}
 		if c.ManagedId() != "" {
-			log.Fatal().Str("managedId", c.ManagedId()).Msg("instance already registered")
+			log.Info().Str("managedId", c.ManagedId()).Msg("instance already registered")
+			return
 		}
 		log.Info().Msg("attempting to register instance ...")
 		if err := c.Register(); err != nil {
