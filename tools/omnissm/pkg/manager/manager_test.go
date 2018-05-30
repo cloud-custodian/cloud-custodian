@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
+	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
 	"github.com/google/go-cmp/cmp"
@@ -149,7 +151,16 @@ func (d *mockDynamoDBAPI) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutIt
 var (
 	d = &mockDynamoDBAPI{values: make(map[string]map[string]*dynamodb.AttributeValue)}
 	s = &mockSSMAPI{}
+	q = &mockSQSAPI{}
 )
+
+type mockSQSAPI struct {
+	sqsiface.SQSAPI
+}
+
+func (s *mockSQSAPI) SendMessage(input *sqs.SendMessageInput) (*sqs.SendMessageOutput, error) {
+	return &sqs.SendMessageOutput{MessageId: aws.String("1234")}, nil
+}
 
 func newMockManager() *Manager {
 	resourceTags := map[string]struct{}{
@@ -162,8 +173,10 @@ func newMockManager() *Manager {
 		Registrations: &store.Registrations{
 			DynamoDBAPI: d,
 		},
+		maxRetries:      DefaultMaxRetries,
 		resourceTags:    resourceTags,
 		ssmInstanceRole: DefaultSSMServiceRole,
+		queue:           &Queue{q, "queueName"},
 	}
 	return m
 }

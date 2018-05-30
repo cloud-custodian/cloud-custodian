@@ -28,7 +28,7 @@ type Message struct {
 
 	ReceiptHandle string
 
-	DeleteFunc func() error
+	DeleteFunc func() error `json:"-"`
 }
 
 func NewMessage(t MessageType, v interface{}) (*Message, error) {
@@ -73,7 +73,7 @@ func NewQueue(name string, config *aws.Config) *Queue {
 func (q *Queue) Send(m *Message) error {
 	data, err := json.Marshal(m)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot marshal SQS message")
 	}
 	resp, err := q.SQSAPI.SendMessage(&sqs.SendMessageInput{
 		MessageDeduplicationId: aws.String(m.MessageId),
