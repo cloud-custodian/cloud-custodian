@@ -46,6 +46,7 @@ func retry(maxRetries int, fn func() error) error {
 			}
 			return err
 		}
+		return nil
 	}
 	return ErrMaxRetriesExceeded
 }
