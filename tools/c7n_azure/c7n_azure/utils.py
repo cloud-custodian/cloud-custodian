@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import datetime
 
 
 class ResourceIdParser(object):
@@ -30,3 +31,9 @@ class ResourceIdParser(object):
     @staticmethod
     def get_resource_name(resource_id):
         return resource_id.split('/')[8]
+
+
+def utcnow():
+    """The datetime object for the current time in UTC
+    """
+    return datetime.datetime.utcnow()

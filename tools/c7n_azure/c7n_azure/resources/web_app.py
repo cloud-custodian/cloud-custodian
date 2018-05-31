@@ -22,7 +22,7 @@ class WebApp(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.web'
         client = 'WebSiteManagementClient'
-        enum_spec = ('web_apps', 'list')
+        enum_spec = ('web_apps', 'list', None)
         default_report_fields = (
             'name',
             'location',

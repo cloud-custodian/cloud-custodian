@@ -6,6 +6,8 @@ from c7n.schema import generate
 from c7n.resources import load_resources
 from c7n.testing import TestUtils
 
+from c7n_azure.session import Session
+
 load_resources()
 C7N_SCHEMA = generate()
 DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
@@ -64,9 +66,20 @@ class AzureVCRBaseTest(VCRTestCase):
         return request
 
 
+
 class BaseTest(TestUtils, AzureVCRBaseTest):
     """ Azure base testing class.
     """
+
+    @staticmethod
+    def setup_account():
+        # Find actual name of storage account provisioned in our test environment
+        s = Session()
+        client = s.client('azure.mgmt.storage.StorageManagementClient')
+        accounts = list(client.storage_accounts.list())
+        matching_account = [a for a in accounts if a.name.startswith("cctstorage")]
+        return matching_account[0]
+
 
 
 def arm_template(template):
