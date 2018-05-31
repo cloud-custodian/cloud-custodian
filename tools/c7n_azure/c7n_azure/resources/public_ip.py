@@ -22,7 +22,7 @@ class PublicIPAddress(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
-        enum_spec = ('public_ip_addresses', 'list_all')
+        enum_spec = ('public_ip_addresses', 'list_all', None)
         type = 'publicip'
         default_report_fields = (
             'name',

@@ -61,6 +61,7 @@ from dateutil.parser import parse as parse_date
 
 from c7n.actions import (
     ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
@@ -1225,7 +1226,9 @@ class ToggleLogging(BucketActionBase):
     def validate(self):
         if self.data.get('enabled', True):
             if not self.data.get('target_bucket'):
-                raise ValueError("target_bucket must be specified")
+                raise PolicyValidationError(
+                    "target_bucket must be specified on %s" % (
+                        self.manager.data,))
         return self
 
     def process(self, resources):
@@ -1304,9 +1307,9 @@ class AttachLambdaEncrypt(BucketActionBase):
     def validate(self):
         if (not getattr(self.manager.config, 'dryrun', True) and
                 not self.data.get('role', self.manager.config.assume_role)):
-            raise ValueError(
+            raise PolicyValidationError(
                 "attach-encrypt: role must be specified either "
-                "via assume or in config")
+                "via assume or in config on %s" % (self.manager.data,))
 
         return self
 
@@ -2752,18 +2755,25 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 region: us-east-1
                 filters:
                   - type: bucket-encryption
+                    state: True
                     crypto: AES256
               - name: s3-bucket-encryption-KMS
                 resource: s3
                 region: us-east-1
                 filters
                   - type: bucket-encryption
+                    state: True
                     crypto: aws:kms
                     key: alias/some/alias/key
-
+              - name: s3-bucket-encryption-off
+                resource: s3
+                region: us-east-1
+                filters
+                  - type: bucket-encryption
+                    state: False
     """
     schema = type_schema('bucket-encryption',
-                         required=['crypto'],
+                         state={'type': 'boolean'},
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
                          key={'type': 'string'})
 
@@ -2795,9 +2805,16 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             if e.response['Error']['Code'] != 'ServerSideEncryptionConfigurationNotFoundError':
                 raise
 
-        for sse in rules:
-            if self.filter_bucket(b, sse):
-                return True
+        # default `state` to True as previous impl assumed state == True
+        # to preserve backwards compatibility
+        if self.data.get('state', True):
+            for sse in rules:
+                return self.filter_bucket(b, sse)
+            return False
+        else:
+            for sse in rules:
+                return not self.filter_bucket(b, sse)
+            return True
 
     def filter_bucket(self, b, sse):
         allowed = ['AES256', 'aws:kms']

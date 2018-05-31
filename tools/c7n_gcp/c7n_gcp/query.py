@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
-import os
 import jmespath
+import json
+import logging
+import six
+
+from googleapiclient.errors import HttpError
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
@@ -23,25 +26,27 @@ from c7n.query import sources
 from c7n.utils import local_session
 
 
+log = logging.getLogger('c7n_gcp.query')
+
+
 class ResourceQuery(object):
 
     def __init__(self, session_factory):
         self.session_factory = session_factory
-        self.default_region = get_default_region()
-        self.default_project = get_default_project()
-        self.default_zone = get_default_zone()
 
     def filter(self, resource_manager, **params):
         m = resource_manager.resource_type
-        client = local_session(self.session_factory).client(
+        session = local_session(self.session_factory)
+        client = session.client(
             m.service, m.version, m.component)
 
         # depends on resource scope
-        if m.scope in ('project', 'zone') and self.default_project:
-            params['project'] = self.default_project
+        if m.scope in ('project', 'zone'):
+            params['project'] = session.get_default_project()
 
-        if m.scope == 'zone' and self.default_zone:
-            params['zone'] = self.default_zone
+        if m.scope == 'zone':
+            if session.get_default_zone():
+                params['zone'] = session.get_default_zone()
 
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
@@ -53,30 +58,13 @@ class ResourceQuery(object):
         if client.supports_pagination(enum_op):
             results = []
             for page in client.execute_paged_query(enum_op, params):
-                results.extend(jmespath.search(path, page))
+                page_items = jmespath.search(path, page)
+                if page_items:
+                    results.extend(page_items)
             return results
         else:
             return jmespath.search(path,
                 client.execute_query(enum_op, verb_arguments=params))
-
-
-# We use env vars per terraform gcp precedence order.
-def get_default_region():
-    for k in ('GOOGLE_REGION', 'GCLOUD_REGION', 'CLOUDSDK_COMPUTE_REGION'):
-        if k in os.environ:
-            return os.environ[k]
-
-
-def get_default_project():
-    for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
-        if k in os.environ:
-            return os.environ[k]
-
-
-def get_default_zone():
-    for k in ('GOOGLE_ZONE', 'GCLOUD_ZONE', 'CLOUDSDK_COMPUTE_ZONE'):
-        if k in os.environ:
-            return os.environ[k]
 
 
 @sources.register('describe-gcp')
@@ -131,7 +119,19 @@ class QueryResourceManager(ResourceManager):
 
     def resources(self, query=None):
         key = self.get_cache_key(query)
-        resources = self.augment(self.source.get_resources(query))
+        try:
+            resources = self.augment(self.source.get_resources(query))
+        except HttpError as e:
+            error = extract_error(e)
+            if error is None:
+                raise
+            elif error == 'accessNotConfigured':
+                log.warning(
+                    "Resource:%s not available -> Service:%s not enabled on %s",
+                    self.type,
+                    self.resource_type.service,
+                    local_session(self.session_factory).get_default_project())
+                return []
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 
@@ -139,9 +139,32 @@ class QueryResourceManager(ResourceManager):
         return resources
 
 
+class TypeMeta(type):
+
+    def __repr__(cls):
+        return "<TypeInfo service:%s component:%s scope:%s version:%s>" % (
+            cls.service,
+            cls.component,
+            cls.scope,
+            cls.version)
+
+
+@six.add_metaclass(TypeMeta)
 class TypeInfo(object):
 
     service = None
     version = None
     scope = 'project'
     enum_spec = ('list', 'items', None)
+
+
+ERROR_REASON = jmespath.compile('error.errors[0].reason')
+
+
+def extract_error(e):
+
+    try:
+        edata = json.loads(e.content)
+    except Exception:
+        return None
+    return ERROR_REASON.search(edata)

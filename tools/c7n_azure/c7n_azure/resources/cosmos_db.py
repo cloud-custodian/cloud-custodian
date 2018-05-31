@@ -22,7 +22,7 @@ class CosmosDB(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.cosmosdb'
         client = 'CosmosDB'
-        enum_spec = ('database_accounts', 'list')
+        enum_spec = ('database_accounts', 'list', None)
         default_report_fields = (
             'name',
             'location',

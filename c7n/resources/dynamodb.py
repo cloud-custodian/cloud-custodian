@@ -18,14 +18,14 @@ import logging
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 from c7n.utils import (
     local_session, get_retry, chunks, type_schema, snapshot_identifier)
-from c7n.filters.vpc import SecurityGroupFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 
 
 filters = FilterRegistry('dynamodb-table.filters')
@@ -670,3 +670,102 @@ class DaxDeleteCluster(BaseAction):
                         r['ClusterName'], e))
                     continue
                 raise
+
+
+@DynamoDbAccelerator.action_registry.register('update-cluster')
+class DaxUpdateCluster(BaseAction):
+    """Updates a DAX cluster configuration
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: dax-update-cluster
+            resource: dax
+            filters:
+              - ParameterGroup.ParameterGroupName: 'default.dax1.0'
+            actions:
+              - type: update-cluster
+                ParameterGroupName: 'testparamgroup'
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['update-cluster']},
+            'Description': {'type': 'string'},
+            'PreferredMaintenanceWindow': {'type': 'string'},
+            'NotificationTopicArn': {'type': 'string'},
+            'NotificationTopicStatus': {'type': 'string'},
+            'ParameterGroupName': {'type': 'string'}
+        }
+    }
+    permissions = ('dax:UpdateCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dax')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            params['ClusterName'] = r['ClusterName']
+            try:
+                client.update_cluster(**params)
+            except ClientError as e:
+                if e.response['Error']['Code'] in (
+                        'ClusterNotFoundFault',
+                        'InvalidClusterStateFault'):
+                    self.log.warning(
+                        'Exception updating dax cluster %s: \n%s' % (
+                            r['ClusterName'], e))
+                    continue
+                raise
+
+
+@DynamoDbAccelerator.action_registry.register('modify-security-groups')
+class DaxModifySecurityGroup(ModifyVpcSecurityGroupsAction):
+
+    permissions = ('dax:UpdateCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dax')
+        groups = super(DaxModifySecurityGroup, self).get_groups(
+            resources, metadata_key='SecurityGroupIdentifier')
+
+        for idx, r in enumerate(resources):
+            client.update_cluster(
+                ClusterName=r['ClusterName'],
+                SecurityGroupIds=groups[idx])
+
+
+@DynamoDbAccelerator.filter_registry.register('subnet')
+class DaxSubnetFilter(SubnetFilter):
+    """Filters DAX clusters based on their associated subnet group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dax-no-auto-public
+            resource: dax
+            filters:
+              - type: subnet
+                key: MapPublicIpOnLaunch
+                value: False
+    """
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = set()
+        for r in resources:
+            group_ids.update(
+                [s['SubnetIdentifier'] for s in
+                 self.groups[r['SubnetGroup']]['Subnets']])
+        return group_ids
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dax')
+        subnet_groups = client.describe_subnet_groups()['SubnetGroups']
+        self.groups = {s['SubnetGroupName']: s for s in subnet_groups}
+        return super(DaxSubnetFilter, self).process(resources)

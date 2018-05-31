@@ -19,66 +19,79 @@ from .common import BaseTest, Bag
 from botocore.vendored import requests
 from c7n.filters.locked import SignatureAuth, Locked
 
+
 def noop(*args):
     return
+
 
 class LockedTests(BaseTest):
 
     def test_auth(self):
         auth = SignatureAuth(
-            Bag(secret_key='foo', access_key='bar', method='env', token=None),
-            'us-east-1',
-            'execute-api')
+            Bag(secret_key="foo", access_key="bar", method="env", token=None),
+            "us-east-1",
+            "execute-api",
+        )
 
-        req = requests.Request('POST', 'http://example.com', auth=auth)
+        req = requests.Request("POST", "http://example.com", auth=auth)
         prepped = req.prepare()
         self.assertTrue(
-            prepped.headers['Authorization'].startswith(
-                'AWS4-HMAC-SHA256 Credential=bar/'))
+            prepped.headers["Authorization"].startswith(
+                "AWS4-HMAC-SHA256 Credential=bar/"
+            )
+        )
 
     def test_unlocked(self):
+
         def get(*args, **kw):
-            return {'LockStatus': 'unlocked'}
-        self.patch(Locked, 'get_api_credentials', noop)
-        self.patch(Locked, 'get_lock_status', get)
-        p = self.load_policy({
-            'name': 'ltest',
-            'resource': 'security-group',
-            'filters': [
-                {'type': 'locked', 'endpoint': 'http://example.com/bar'}]})
+            return {"LockStatus": "unlocked"}
+
+        self.patch(Locked, "get_api_credentials", noop)
+        self.patch(Locked, "get_lock_status", get)
+        p = self.load_policy(
+            {
+                "name": "ltest",
+                "resource": "security-group",
+                "filters": [{"type": "locked", "endpoint": "http://example.com/bar"}],
+            }
+        )
         f_locked = p.resource_manager.filters[0]
-        result = f_locked.process([
-            {'GroupId': 'sg-123', 'VpcId': 'vpc-123'}])
+        result = f_locked.process([{"GroupId": "sg-123", "VpcId": "vpc-123"}])
         self.assertEqual(len(result), 0)
 
     def test_status_error(self):
+
         def get(*args, **kw):
-            return {'Message': 'unknown'}
-        self.patch(Locked, 'get_api_credentials', noop)
-        self.patch(Locked, 'get_lock_status', get)
-        p = self.load_policy({
-            'name': 'ltest',
-            'resource': 'security-group',
-            'filters': [
-                {'type': 'locked', 'endpoint': 'http://example.com/bar'}]})
+            return {"Message": "unknown"}
+
+        self.patch(Locked, "get_api_credentials", noop)
+        self.patch(Locked, "get_lock_status", get)
+        p = self.load_policy(
+            {
+                "name": "ltest",
+                "resource": "security-group",
+                "filters": [{"type": "locked", "endpoint": "http://example.com/bar"}],
+            }
+        )
         f_locked = p.resource_manager.filters[0]
         self.assertRaises(
-            RuntimeError,
-            f_locked.process,
-            [{'GroupId': 'sg-123', 'VpcId': 'vpc-123'}])
+            RuntimeError, f_locked.process, [{"GroupId": "sg-123", "VpcId": "vpc-123"}]
+        )
 
     def test_locked(self):
-        def get(*args, **kw):
-            return {'LockStatus': 'locked', 'RevisionDate': time.time()}
-        self.patch(Locked, 'get_api_credentials', noop)
-        self.patch(Locked, 'get_lock_status', get)
-        p = self.load_policy({
-            'name': 'ltest',
-            'resource': 'security-group',
-            'filters': [
-                {'type': 'locked', 'endpoint': 'http://example.com/bar'}]})
-        f_locked = p.resource_manager.filters[0]
-        result = f_locked.process([
-            {'GroupId': 'sg-123', 'VpcId': 'vpc-123'}])
-        self.assertEqual(len(result), 1)
 
+        def get(*args, **kw):
+            return {"LockStatus": "locked", "RevisionDate": time.time()}
+
+        self.patch(Locked, "get_api_credentials", noop)
+        self.patch(Locked, "get_lock_status", get)
+        p = self.load_policy(
+            {
+                "name": "ltest",
+                "resource": "security-group",
+                "filters": [{"type": "locked", "endpoint": "http://example.com/bar"}],
+            }
+        )
+        f_locked = p.resource_manager.filters[0]
+        result = f_locked.process([{"GroupId": "sg-123", "VpcId": "vpc-123"}])
+        self.assertEqual(len(result), 1)
