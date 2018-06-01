@@ -14,6 +14,12 @@ Filters
   .. c7n-schema:: AttachedInstanceFilter
       :module: c7n.resources.ebs
 
+``age``
+  Filter volumes based on their age (source: ``CreateTime``) in days, and/or hours, and/or minutes
+
+  .. c7n-schema:: VolumeAgeFilter
+      :module: c7n.resources.ebs
+
 Actions
 -------
 
