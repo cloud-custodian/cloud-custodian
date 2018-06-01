@@ -540,6 +540,38 @@ class HealthFilter(HealthEventFilter):
         return {"VolumeId": rid}
 
 
+@filters.register('age')
+class VolumeAgeFilter(AgeFilter):
+    """EBS Volume Age Filter
+
+    Filters an EBS volume based on the age of the volume (in days/hours/minutes)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ebs-volumes-recent-but-not-too-old
+                resource: ebs
+                filters:
+                  - type: age
+                    days: 1
+                    op: le
+                  - type: age
+                    minutes: 10
+                    op: ge
+    """
+
+    date_attribute = 'CreateTime'
+
+    schema = type_schema(
+        'age',
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        days={'type': 'number'},
+        hours={'type': 'number'},
+        minutes={'type': 'number'})
+
+
 @actions.register('copy-instance-tags')
 class CopyInstanceTags(BaseAction):
     """Copy instance tags to its attached volume.
