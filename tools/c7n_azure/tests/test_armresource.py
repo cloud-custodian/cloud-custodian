@@ -21,7 +21,7 @@ from mock import patch
 
 class ArmResourceTest(BaseTest):
 
-    TEST_DATE = datetime(2018, 6, 4, 0, 0, 0)
+    TEST_DATE = datetime(2018, 6, 1, 0, 0, 0)
 
     def setUp(self):
         super(ArmResourceTest, self).setUp()
@@ -43,11 +43,16 @@ class ArmResourceTest(BaseTest):
 
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_filter_find_network_in(self):
+    def test_metric_filter_find(self, utcnow_mock):
         p = self.load_policy({
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
                  'op': 'gt',
@@ -55,15 +60,20 @@ class ArmResourceTest(BaseTest):
                  'threshold': 0}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_filter_not_find_network_in(self):
+    def test_metric_filter_not_find(self, utcnow_mock):
         p = self.load_policy({
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
                  'op': 'lt',
