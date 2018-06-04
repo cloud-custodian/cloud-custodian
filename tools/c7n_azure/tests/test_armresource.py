@@ -14,9 +14,15 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
+from c7n_azure.actions import utcnow
+from datetime import datetime
+from mock import patch
 
 
 class ArmResourceTest(BaseTest):
+
+    TEST_DATE = datetime(2018, 6, 4, 0, 0, 0)
+
     def setUp(self):
         super(ArmResourceTest, self).setUp()
 
@@ -36,6 +42,7 @@ class ArmResourceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_metric_filter_find_network_in(self):
         p = self.load_policy({
             'name': 'test-azure-metric',
@@ -51,6 +58,7 @@ class ArmResourceTest(BaseTest):
         self.assertEqual(len(resources), 3)
 
     @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_metric_filter_not_find_network_in(self):
         p = self.load_policy({
             'name': 'test-azure-metric',

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from datetime import datetime, timedelta
+from c7n_azure.actions import utcnow
 
 
 class Metrics(object):
@@ -51,7 +52,7 @@ class Metrics(object):
         result = {}
 
         if not start_time and not end_time:
-            end_time = datetime.now()
+            end_time = utcnow()
             start_time = end_time - timedelta(hours=24)
 
         if not metric:
@@ -77,7 +78,6 @@ class Metrics(object):
                             'time_stamp': data.time_stamp,
                             'value': data.total
                         })
-                # result["{} ({})".format(item.name.localized_value, item.unit.name)] = data_points
                 result[item.name.localized_value] = data_points
 
         return result
