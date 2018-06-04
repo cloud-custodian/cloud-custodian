@@ -197,12 +197,15 @@ def enable(config, master, tags, accounts, debug, message, region):
     """enable guard duty on a set of accounts"""
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
+    
     regions = expand_regions(region)
+    
     for r in regions:
         log.info("Processing Region:%s", r)
         enable_region(master_info, accounts_config, executor, message, r)
     
     
+
 def enable_region(master_info, accounts_config, executor, message, region):
     master_session = get_session(
         master_info.get('role'), 'c7n-guardian',
@@ -222,15 +225,16 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find active members
     active_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Enabled'}
+                      if m['RelationshipStatus'] == 'Enabled'}
     # Find invited members
     invited_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Invited'}
-    # Find extant members who currently have guardduty disabled(not suspended)
+                       if m['RelationshipStatus'] == 'Invited'}
+    # Find extant members currently have guardduty disabled(removed)
     resigned_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Resigned'}
+                       if m['RelationshipStatus'] == 'Resigned'}
+
     resigned_ids = {a['account_id'] for a in accounts_config['accounts']
-        if a['account_id'] in resigned_ids}    
+                     if a['account_id'] in resigned_ids}    
     
     if resigned_ids:
         master_client.delete_members(DetectorId=detector_id, AccountIds=list(resigned_ids))
@@ -239,10 +243,10 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find extant members not currently enabled
     suspended_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Disabled'}
+                     if m['RelationshipStatus'] == 'Disabled'}
     # Filter by accounts under consideration per config and cli flags
     suspended_ids = {a['account_id'] for a in accounts_config['accounts']
-        if a['account_id'] in suspended_ids}
+                     if a['account_id'] in suspended_ids}
 
     if suspended_ids:
         unprocessed = master_client.start_monitoring_members(
@@ -302,6 +306,7 @@ def enable_region(master_info, accounts_config, executor, message, region):
                if account['account_id'] not in active_ids]
 
     log.info("Region:%s Accepting %d invitations in members", region, len(members))
+    time.sleep(5)
    
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
@@ -310,7 +315,6 @@ def enable_region(master_info, accounts_config, executor, message, region):
                 continue
             if a['account_id'] in active_ids:
                 continue
-            time.sleep(5)
             futures[w.submit(enable_account, a, master_info['account_id'], region)] = a
 
         for f in as_completed(futures):
@@ -330,7 +334,7 @@ def enable_account(account, master_account_id, region):
         profile=account.get('profile'),
         region=region)
     member_client = member_session.client('guardduty')
-    m_detector_id = get_or_create_detector_id(member_client)
+    m_detector_id = get_or_create_detector_id(member_client)    
     all_invitations = member_client.list_invitations().get('Invitations', [])
     invitations = [
         i for i in all_invitations
@@ -356,6 +360,8 @@ def get_or_create_detector_id(client):
     else:
         return client.create_detector(Enable=True).get('DetectorId')
 
+# Call to Create/Update IPset
+# Note : There is a hard limit of one Ipset per Master/Account
 def get_or_create_ip_set(client, detector_id, trustedIP):
     ip_set = client.list_ip_sets(DetectorId=detector_id).get('IpSetIds')
     if ip_set:
