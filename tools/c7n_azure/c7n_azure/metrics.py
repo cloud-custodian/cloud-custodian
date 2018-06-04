@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime, timedelta
-from c7n_azure.actions import utcnow
-
 
 class Metrics(object):
 
@@ -50,10 +47,10 @@ class Metrics(object):
                 interval=None, metric=None, aggregation=None):
 
         result = {}
-
-        if not start_time and not end_time:
-            end_time = utcnow()
-            start_time = end_time - timedelta(hours=24)
+        if start_time and end_time:
+            timespan = "{}/{}".format(start_time, end_time)
+        else:
+            timespan = None
 
         if not metric:
             metrics = [m['id'] for m in self.available_metrics()]
@@ -64,7 +61,7 @@ class Metrics(object):
 
             metrics_data = self.client.metrics.list(
                 self.resource_id,
-                timespan="{}/{}".format(start_time, end_time),
+                timespan=timespan,
                 interval=interval,
                 metric=metric,
                 aggregation=aggregation

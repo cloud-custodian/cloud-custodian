@@ -1,7 +1,18 @@
-from datetime import datetime, timedelta
-
+# Copyright 2015-2017 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from datetime import timedelta
 from c7n_azure.metrics import Metrics
-
 from c7n.filters import Filter
 
 
@@ -47,7 +58,8 @@ class MetricFilter(Filter):
     def __call__(self, resource):
 
         m = Metrics(self.client, resource['id'])
-        end_time = datetime.now()
+        from c7n_azure.actions import utcnow
+        end_time = utcnow()
         start_time = end_time - timedelta(hours=self.timeframe)
         m_data = m.metric_data(metric=self.metric, start_time=start_time, end_time=end_time)
         values = [item['value'] for item in m_data[self.metric]]
