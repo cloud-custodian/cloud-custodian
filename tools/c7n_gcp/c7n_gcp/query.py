@@ -75,7 +75,9 @@ class DescribeSource(object):
         self.query = ResourceQuery(manager.session_factory)
 
     def get_resources(self, query):
-        return self.query.filter(self.manager)
+        if query is None:
+            query = {}
+        return self.query.filter(self.manager, **query)
 
     def get_permissions(self):
         return ()
@@ -117,10 +119,15 @@ class QueryResourceManager(ResourceManager):
     def source_type(self):
         return self.data.get('source', 'describe-gcp')
 
+    def get_resource_query(self):
+        if 'query' in self.data:
+            return {'filter': self.data.get('query')}
+
     def resources(self, query=None):
-        key = self.get_cache_key(query)
+        q = query or self.get_resource_query()
+        key = self.get_cache_key(q)
         try:
-            resources = self.augment(self.source.get_resources(query))
+            resources = self.augment(self.source.get_resources(q))
         except HttpError as e:
             error = extract_error(e)
             if error is None:
@@ -132,6 +139,7 @@ class QueryResourceManager(ResourceManager):
                     self.resource_type.service,
                     local_session(self.session_factory).get_default_project())
                 return []
+            raise
         self._cache.save(key, resources)
         return self.filter_resources(resources)
 

@@ -11,7 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Base GCP client which uses the discovery API."""
+"""Base GCP client which uses the discovery API.
+"""
+# modifications (c7n)
+# - flight recorder support
+# - env creds sourcing
+# - various minor bug fixes
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
@@ -178,8 +184,7 @@ class Session(object):
         Returns:
             str: The object representation.
         """
-        return '<GCPSession: name=%s, versions=%s>' % (
-            self.name, self.versions)
+        return '<gcp-session: http=%s>' % (self._http,)
 
     def get_default_project(self):
         if self.project_id:
