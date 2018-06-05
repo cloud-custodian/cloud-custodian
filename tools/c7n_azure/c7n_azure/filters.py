@@ -13,7 +13,9 @@
 # limitations under the License.
 from datetime import timedelta
 from c7n.filters import Filter
+from threading import Thread
 from c7n_azure.utils import Math
+from c7n.exceptions import PolicyValidationError
 
 
 class MetricFilter(Filter):
@@ -27,8 +29,8 @@ class MetricFilter(Filter):
     '''
 
     DEFAULT_TIMEFRAME = 24
-    DEFAULT_INTERVAL = 'P1D' # 1 Day is the largest possible interval
-    DEFAULT_AGGREGATION = 'Average' # Average, Total
+    DEFAULT_INTERVAL = 'P1D'
+    DEFAULT_AGGREGATION = 'Average'
 
     aggregation_funcs = {
         'Average': Math.mean,
@@ -50,20 +52,24 @@ class MetricFilter(Filter):
         # Aggregation as defined by Azure SDK
         self.aggregation = self.data.get('aggregation', self.DEFAULT_AGGREGATION)
         # Aggregation function to be used locally
-        self.func = self.aggregation_funcs[self.aggregation]
-
+        self.func = self.aggregation_funcs[self.aggregation]        
+    
+    def validate(self):
         # Give appropriate error messages for missing information
         if self.metric is None:
-            raise ValueError("Need to define a metric")
+            raise PolicyValidationError("Need to define a metric")
         if self.func is None:
-            raise ValueError("Need to define a func (avg, min, max)")
+            raise PolicyValidationError("Need to define a func (avg, min, max)")
         if self.op is None:
-            raise ValueError("Need to define an opeartor (gt, ge, eq, le, lt)")
+            raise PolicyValidationError("Need to define an opeartor (gt, ge, eq, le, lt)")
         if self.threshold is None:
-            raise ValueError("Need to define a threshold")
-        
-        # Make threshold a float
-        self.threshold = float(self.threshold)
+            raise PolicyValidationError("Need to define a threshold")
+        try:
+            self.threshold = float(self.threshold)
+        except ValueError:
+            raise PolicyValidationError("Threshold needs to be a valid number")
+
+    def process(self, resources, event=None):
         
         # Import utcnow function as it may have been overridden for testing purposes
         from c7n_azure.actions import utcnow
@@ -76,6 +82,12 @@ class MetricFilter(Filter):
         # Create Azure Monitor client
         self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
 
+        # Process each resource in a separate thread, returning all that pass filter
+        with self.executor_factory(max_workers=3) as w:
+            processed = list(w.map(self.process_resource, resources))
+            return [item for item in processed if item is not None]
+
+    
     def get_metric_data(self, resource):
         metrics_data = self.client.metrics.list(
             resource['id'],
@@ -86,8 +98,7 @@ class MetricFilter(Filter):
         )
         return [item.total for item in metrics_data.value[0].timeseries[0].data]
 
-    def __call__(self, resource):
-
+    def passes_op_filter(self, resource):
         m_data = self.get_metric_data(resource)
         aggregate_value = self.func(m_data)
 
@@ -101,3 +112,7 @@ class MetricFilter(Filter):
             return aggregate_value < self.threshold
         if self.op == 'eq':
             return aggregate_value == self.threshold
+
+    def process_resource(self, resource):
+        return resource if self.passes_op_filter(resource) else None
+        
