@@ -28,7 +28,7 @@ class FlightRecorder(Http):
         self._discovery_path = discovery_path
         self._index = {}
         super(FlightRecorder, self).__init__()
-    
+
     def get_next_file_path(self, uri, method, record=True):
         base_name = "%s%s" % (
             method.lower(), urlparse(uri).path.replace('/', '-'))
@@ -58,7 +58,7 @@ class FlightRecorder(Http):
             else:
                 return IOError('response file ({0}) not found'.format(fn))
         return fn
-    
+
 
 class HttpRecorder(FlightRecorder):
 
@@ -99,5 +99,3 @@ class HttpReplay(FlightRecorder):
             response = Response(data['headers'])
             # serialize again, this runtime helps keep on the disk pretty.
             return response, json.dumps(data['body'])
-
-        

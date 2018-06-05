@@ -44,11 +44,11 @@ class FlightRecorderTest(TestUtils):
         if os.path.exists(test_dir):
             shutil.rmtree(test_dir)
         os.makedirs(test_dir)
-        
+
         self.addCleanup(self.cleanUp)
         recorder = HttpRecorder(test_dir, discovery_dir)
         return functools.partial(Session, http=recorder)
-        
+
     def replay_flight_data(self, test_case):
         test_dir = os.path.join(DATA_DIR, test_case)
         discovery_dir = os.path.join(DATA_DIR, "discovery")
