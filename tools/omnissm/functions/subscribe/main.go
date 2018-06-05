@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -50,6 +51,10 @@ var (
 	RegistrationsTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 	ResourceTags       = os.Getenv("OMNISSM_RESOURCE_TAGS")
 
+	// Sets the number of retries attempted for AWS API calls. Defaults to 0
+	// if not specified.
+	MaxRetries = os.Getenv("OMNISSM_MAX_RETRIES")
+
 	mgr *manager.Manager
 )
 
@@ -60,11 +65,23 @@ func init() {
 	if ResourceTags == "" {
 		ResourceTags = "App,OwnerContact,Name"
 	}
-	mgr = manager.New(&manager.Config{
-		Config:             aws.NewConfig(),
+	var maxRetries int
+	if MaxRetries != "" {
+		var err error
+		maxRetries, err = strconv.Atoi(MaxRetries)
+		if err != nil {
+			panic(err)
+		}
+	}
+	var err error
+	mgr, err = manager.New(&manager.Config{
+		Config:             aws.NewConfig().WithMaxRetries(maxRetries),
 		RegistrationsTable: RegistrationsTable,
 		ResourceTags:       strings.Split(ResourceTags, ","),
 	})
+	if err != nil {
+		panic(err)
+	}
 }
 
 func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error {

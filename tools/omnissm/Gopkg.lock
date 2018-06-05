@@ -129,12 +129,6 @@
   revision = "0b12d6b5"
 
 [[projects]]
-  name = "github.com/jpillora/backoff"
-  packages = ["."]
-  revision = "8eab2debe79d12b7bd3d10653910df25fa9552ba"
-  version = "1.0.0"
-
-[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
@@ -258,6 +252,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "32eced7ded211be830b2b158234b1edde5cc10ae7a0bbb3f2249657227562836"
+  inputs-digest = "a87b0305559d7efd36a8b8bfb1f33da7fead11d89e8fff3fc8707fe2e9f78a84"
   solver-name = "gps-cdcl"
   solver-version = 1

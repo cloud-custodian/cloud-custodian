@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
@@ -42,16 +43,32 @@ var (
 	// If provided, SSM API requests that are throttled will be sent to this
 	// queue
 	QueueName = os.Getenv("OMNISSM_SPILLOVER_QUEUE")
+
+	// Sets the number of retries attempted for AWS API calls. Defaults to 0
+	// if not specified.
+	MaxRetries = os.Getenv("OMNISSM_MAX_RETRIES")
 )
 
 func main() {
 	whitelist := identity.NewWhitelist(AccountWhitelist)
-	r := api.RegistrationHandler{manager.NewManager(&manager.Config{
-		Config:             aws.NewConfig(),
+	var maxRetries int
+	if MaxRetries != "" {
+		var err error
+		maxRetries, err = strconv.Atoi(MaxRetries)
+		if err != nil {
+			panic(err)
+		}
+	}
+	mgr, err := manager.New(&manager.Config{
+		Config:             aws.NewConfig().WithMaxRetries(maxRetries),
 		RegistrationsTable: RegistrationsTable,
 		InstanceRole:       InstanceRole,
 		QueueName:          QueueName,
-	})}
+	})
+	if err != nil {
+		panic(err)
+	}
+	r := api.RegistrationHandler{mgr}
 	apiutil.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 		switch req.Resource {
 		case "/register":

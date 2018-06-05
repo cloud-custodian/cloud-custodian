@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
 type MessageType int
@@ -53,7 +52,7 @@ type Queue struct {
 	queueURL string
 }
 
-func NewQueue(name string, config *aws.Config) *Queue {
+func NewQueue(name string, config *aws.Config) (*Queue, error) {
 	sess := session.New(config)
 	q := &Queue{
 		SQSAPI: sqs.New(sess),
@@ -63,11 +62,10 @@ func NewQueue(name string, config *aws.Config) *Queue {
 		//QueueOwnerAWSAccountId: config.AccountId,
 	})
 	if err != nil {
-		log.Info().Err(err).Msg("cannot get SQS queue url")
-	} else {
-		q.queueURL = *resp.QueueUrl
+		return nil, err
 	}
-	return q
+	q.queueURL = *resp.QueueUrl
+	return q, nil
 }
 
 func (q *Queue) Send(m *Message) error {
@@ -75,7 +73,7 @@ func (q *Queue) Send(m *Message) error {
 	if err != nil {
 		return errors.Wrap(err, "cannot marshal SQS message")
 	}
-	resp, err := q.SQSAPI.SendMessage(&sqs.SendMessageInput{
+	_, err = q.SQSAPI.SendMessage(&sqs.SendMessageInput{
 		MessageDeduplicationId: aws.String(m.MessageId),
 		MessageGroupId:         aws.String("omnissm"),
 		MessageBody:            aws.String(string(data)),
@@ -84,6 +82,5 @@ func (q *Queue) Send(m *Message) error {
 	if err != nil {
 		return err
 	}
-	log.Info().Str("MessageId", *resp.MessageId).Msg("unable to create activation, will attempt later ...")
 	return nil
 }

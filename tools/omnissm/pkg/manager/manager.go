@@ -15,41 +15,18 @@
 package manager
 
 import (
-	"errors"
-	"time"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
-	"github.com/jpillora/backoff"
+	"github.com/pkg/errors"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/store"
 )
 
-const (
-	DefaultMaxRetries     = 5
-	DefaultSSMServiceRole = "service-role/AmazonEC2RunCommandRoleForManagedInstances"
-)
-
-var ErrMaxRetriesExceeded = errors.New("max retries exceeded")
-
-func retry(maxRetries int, fn func() error) error {
-	b := &backoff.Backoff{Min: 1 * time.Second, Max: 30 * time.Second, Factor: 2}
-	for int(b.Attempt()) < maxRetries {
-		if err := fn(); err != nil {
-			if request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				time.Sleep(b.Duration())
-				continue
-			}
-			return err
-		}
-		return nil
-	}
-	return ErrMaxRetriesExceeded
-}
+const DefaultSSMServiceRole = "service-role/AmazonEC2RunCommandRoleForManagedInstances"
 
 type Config struct {
 	*aws.Config
@@ -63,20 +40,18 @@ type Manager struct {
 	ssmiface.SSMAPI
 	*store.Registrations
 
-	maxRetries      int
 	resourceTags    map[string]struct{}
 	ssmInstanceRole string
 	queue           *Queue
 }
 
-func New(config *Config) *Manager {
+func New(config *Config) (*Manager, error) {
 	if config.InstanceRole == "" {
 		config.InstanceRole = DefaultSSMServiceRole
 	}
 	m := &Manager{
-		SSMAPI:          ssm.New(session.New(config.Config), aws.NewConfig().WithMaxRetries(0)),
+		SSMAPI:          ssm.New(session.New(config.Config)),
 		Registrations:   store.NewRegistrations(config.Config, config.RegistrationsTable),
-		maxRetries:      DefaultMaxRetries,
 		resourceTags:    make(map[string]struct{}),
 		ssmInstanceRole: config.InstanceRole,
 	}
@@ -87,39 +62,52 @@ func New(config *Config) *Manager {
 		m.resourceTags[t] = struct{}{}
 	}
 	if config.QueueName != "" {
-		m.queue = NewQueue(config.QueueName, config.Config)
+		var err error
+		m.queue, err = NewQueue(config.QueueName, config.Config)
+		if err != nil {
+			return nil, errors.Wrap(err, "cannot get SQS queue url")
+		}
 	}
-	return m
+	return m, nil
 }
 
 func (m *Manager) Register(doc *identity.Document) (*store.RegistrationEntry, error) {
-	var entry *store.RegistrationEntry
-	err := retry(m.maxRetries, func() error {
-		resp, err := m.SSMAPI.CreateActivation(&ssm.CreateActivationInput{
-			DefaultInstanceName: aws.String(doc.Name()),
-			IamRole:             aws.String(m.ssmInstanceRole),
-			Description:         aws.String(doc.Name()),
-		})
-		if err != nil {
-			return err
-		}
-		entry = &store.RegistrationEntry{
-			Id:             identity.Hash(doc.Name()),
-			ActivationId:   *resp.ActivationId,
-			ActivationCode: *resp.ActivationCode,
-		}
-		return m.Put(entry)
+	resp, err := m.SSMAPI.CreateActivation(&ssm.CreateActivationInput{
+		DefaultInstanceName: aws.String(doc.Name()),
+		IamRole:             aws.String(m.ssmInstanceRole),
+		Description:         aws.String(doc.Name()),
 	})
-	if err == ErrMaxRetriesExceeded {
-		msg, err := NewMessage(CreateActivation, doc)
-		if err != nil {
-			return nil, err
+	if err != nil {
+		if request.IsErrorThrottle(err) || request.IsErrorRetryable(err) && m.queue != nil {
+			msg, mErr := NewMessage(CreateActivation, doc)
+			if mErr != nil {
+				return nil, mErr
+			}
+			if mErr := m.queue.Send(msg); err != nil {
+				return nil, mErr
+			}
 		}
-		if err := m.queue.Send(msg); err != nil {
-			return nil, err
-		}
+		return nil, errors.Wrapf(err, "ssm.CreateActivation failed: %#v", doc.Name())
 	}
-	return entry, err
+	entry := &store.RegistrationEntry{
+		Id:             identity.Hash(doc.Name()),
+		ActivationId:   *resp.ActivationId,
+		ActivationCode: *resp.ActivationCode,
+	}
+	err = m.Put(entry)
+	if err != nil {
+		if request.IsErrorThrottle(err) || request.IsErrorRetryable(err) && m.queue != nil {
+			msg, mErr := NewMessage(CreateActivation, doc)
+			if mErr != nil {
+				return nil, mErr
+			}
+			if mErr := m.queue.Send(msg); err != nil {
+				return nil, mErr
+			}
+		}
+		return nil, errors.Wrapf(err, "dynamodb.PutItem failed for RegistrationEntry Id: %#v", doc.Name())
+	}
+	return entry, nil
 }
 
 func (m *Manager) Update(id string, ci ConfigurationItem) error {
@@ -134,33 +122,29 @@ func (m *Manager) Update(id string, ci ConfigurationItem) error {
 		}
 		tags = append(tags, &ssm.Tag{Key: aws.String(k), Value: aws.String(v)})
 	}
-	err := retry(m.maxRetries, func() error {
-		_, err := m.SSMAPI.AddTagsToResource(&ssm.AddTagsToResourceInput{
-			ResourceType: aws.String(ssm.ResourceTypeForTaggingManagedInstance),
-			ResourceId:   aws.String(id),
-			Tags:         tags,
-		})
-		return err
+	_, err := m.SSMAPI.AddTagsToResource(&ssm.AddTagsToResourceInput{
+		ResourceType: aws.String(ssm.ResourceTypeForTaggingManagedInstance),
+		ResourceId:   aws.String(id),
+		Tags:         tags,
 	})
-	if err == ErrMaxRetriesExceeded && m.queue != nil {
-		body := struct {
-			Id   string
-			Tags []*ssm.Tag
-		}{
-			Id:   id,
-			Tags: tags,
-		}
-		msg, err := NewMessage(AddTagsToResource, &body)
-		if err != nil {
-			return err
-		}
-		if err := m.queue.Send(msg); err != nil {
-			return err
-		}
-		return ErrMaxRetriesExceeded
-	}
 	if err != nil {
-		return err
+		if request.IsErrorThrottle(err) || request.IsErrorRetryable(err) && m.queue != nil {
+			body := struct {
+				Id   string
+				Tags []*ssm.Tag
+			}{
+				Id:   id,
+				Tags: tags,
+			}
+			msg, mErr := NewMessage(AddTagsToResource, &body)
+			if mErr != nil {
+				return mErr
+			}
+			if mErr := m.queue.Send(msg); err != nil {
+				return mErr
+			}
+		}
+		return errors.Wrapf(err, "ssm.AddTagsToResource failed: %#v", id)
 	}
 	content := map[string]string{
 		"Region":       ci.AWSRegion,
@@ -176,55 +160,53 @@ func (m *Manager) Update(id string, ci ConfigurationItem) error {
 		"Platform":     platform,
 		"State":        string(ci.Configuration.State),
 	}
-	err = retry(m.maxRetries, func() error {
-		_, err := m.SSMAPI.PutInventory(&ssm.PutInventoryInput{
-			InstanceId: aws.String(id),
-			Items: []*ssm.InventoryItem{{
-				CaptureTime:   aws.String(ci.ConfigurationItemCaptureTime), // "2006-01-02T15:04:05Z"
-				Content:       []map[string]*string{aws.StringMap(content)},
-				SchemaVersion: aws.String("1.0"),
-				TypeName:      aws.String("Custom:CloudInfo"),
-			}},
-		})
-		return err
+	_, err = m.SSMAPI.PutInventory(&ssm.PutInventoryInput{
+		InstanceId: aws.String(id),
+		Items: []*ssm.InventoryItem{{
+			CaptureTime:   aws.String(ci.ConfigurationItemCaptureTime), // "2006-01-02T15:04:05Z"
+			Content:       []map[string]*string{aws.StringMap(content)},
+			SchemaVersion: aws.String("1.0"),
+			TypeName:      aws.String("Custom:CloudInfo"),
+		}},
 	})
-	if err == ErrMaxRetriesExceeded {
-		body := struct {
-			CaptureTime string
-			Content     map[string]string
-		}{
-			CaptureTime: ci.ConfigurationItemCaptureTime,
-			Content:     content,
+	if err != nil {
+		if request.IsErrorThrottle(err) || request.IsErrorRetryable(err) && m.queue != nil {
+			body := struct {
+				CaptureTime string
+				Content     map[string]string
+			}{
+				CaptureTime: ci.ConfigurationItemCaptureTime,
+				Content:     content,
+			}
+			msg, mErr := NewMessage(PutInventory, &body)
+			if mErr != nil {
+				return mErr
+			}
+			if mErr := m.queue.Send(msg); err != nil {
+				return mErr
+			}
 		}
-		msg, err := NewMessage(PutInventory, &body)
-		if err != nil {
-			return err
-		}
-		if err := m.queue.Send(msg); err != nil {
-			return err
-		}
-		return ErrMaxRetriesExceeded
+		return errors.Wrapf(err, "ssm.PutInventory failed: %#v", id)
 	}
-	return err
+	return nil
 }
 
 func (m *Manager) Delete(managedId string) error {
-	err := retry(m.maxRetries, func() error {
-		_, err := m.SSMAPI.DeregisterManagedInstance(&ssm.DeregisterManagedInstanceInput{
-			InstanceId: aws.String(managedId),
-		})
-		return err
+	_, err := m.SSMAPI.DeregisterManagedInstance(&ssm.DeregisterManagedInstanceInput{
+		InstanceId: aws.String(managedId),
 	})
-	if err == ErrMaxRetriesExceeded {
-		body := struct{ ManagedId string }{ManagedId: managedId}
-		msg, err := NewMessage(DeregisterManagedInstance, &body)
-		if err != nil {
-			return err
+	if err != nil {
+		if request.IsErrorThrottle(err) || request.IsErrorRetryable(err) && m.queue != nil {
+			body := struct{ ManagedId string }{ManagedId: managedId}
+			msg, mErr := NewMessage(DeregisterManagedInstance, &body)
+			if mErr != nil {
+				return mErr
+			}
+			if mErr := m.queue.Send(msg); err != nil {
+				return mErr
+			}
 		}
-		if err := m.queue.Send(msg); err != nil {
-			return err
-		}
-		return ErrMaxRetriesExceeded
+		return errors.Wrapf(err, "ssm.DeregisterManagedInstance failed: %#v", managedId)
 	}
-	return err
+	return nil
 }
