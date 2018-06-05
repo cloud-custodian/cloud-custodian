@@ -28,6 +28,7 @@ import six
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
+from c7n.exceptions import PolicyValidationError
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
@@ -665,7 +666,7 @@ class Policy(object):
             session_factory = clouds[self.provider_name]().get_session_factory(options)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
 
     def __repr__(self):
         return "<Policy resource: %s name: %s region: %s>" % (
@@ -701,7 +702,10 @@ class Policy(object):
 
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        return execution[exec_mode_type](self)
+        exec_mode = execution[exec_mode_type]
+        if exec_mode is None:
+            return None
+        return exec_mode(self)
 
     @property
     def is_lambda(self):
@@ -710,8 +714,10 @@ class Policy(object):
         return True
 
     def validate(self):
-        self.expand_variables(self.get_variables())
         m = self.get_execution_mode()
+        if m is None:
+            raise PolicyValidationError(
+                "Invalid Execution mode in policy %s" % (self.data,))
         m.validate()
         for f in self.resource_manager.filters:
             f.validate()
@@ -801,7 +807,7 @@ class Policy(object):
         else:
             resources = mode.run()
         # clear out resource manager post run, to clear cache
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
         return resources
 
     run = __call__
@@ -810,7 +816,7 @@ class Policy(object):
         with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
-    def get_resource_manager(self):
+    def load_resource_manager(self):
         resource_type = self.data.get('resource')
 
         provider = clouds.get(self.provider_name)

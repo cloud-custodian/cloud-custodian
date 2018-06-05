@@ -300,6 +300,7 @@ class TestPolicy(BaseTest):
                  'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'}
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        p.expand_variables(p.get_variables())
         self.assertEqual(
             p.data['actions'][0]['value'],
             'bad monkey 12312311 zanzibar %s' % (
@@ -539,7 +540,7 @@ class TestPolicy(BaseTest):
             }
         )
         p = collection.policies[0]
-        self.assertTrue(isinstance(p.get_resource_manager(), EC2))
+        self.assertTrue(isinstance(p.load_resource_manager(), EC2))
 
     def test_get_logs_from_group(self):
         p_data = {

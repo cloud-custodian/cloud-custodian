@@ -130,7 +130,7 @@ class FilterRegistry(PluginRegistry):
                 return And(data, self, manager)
             elif op == 'not':
                 return Not(data, self, manager)
-            return ValueFilter(data, manager).validate()
+            return ValueFilter(data, manager)
         if isinstance(data, six.string_types):
             filter_type = data
             data = {'type': data}

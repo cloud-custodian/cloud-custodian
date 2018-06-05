@@ -123,6 +123,12 @@ def policy_command(f):
                     log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)
 
+        # Variable expansion
+        for p in policies:
+            p.expand_variables(p.get_variables())
+            # Reconstruct filters/actions with expanded data
+            p.resource_manager = p.load_resource_manager()
+
         return f(options, list(policies))
 
     return _load_policies
