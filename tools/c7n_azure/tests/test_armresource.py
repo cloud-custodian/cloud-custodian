@@ -54,8 +54,8 @@ class ArmResourceTest(BaseTest):
                  'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
+                 'aggregation': 'Total',
                  'op': 'gt',
-                 'func': 'avg',
                  'threshold': 0}],
         })
         resources = p.run()
@@ -75,8 +75,8 @@ class ArmResourceTest(BaseTest):
                  'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
+                 'aggregation': 'Total',
                  'op': 'lt',
-                 'func': 'avg',
                  'threshold': 0}],
         })
         resources = p.run()

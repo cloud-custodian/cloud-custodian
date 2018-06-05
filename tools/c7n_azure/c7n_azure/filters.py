@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,37 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import timedelta
-from c7n_azure.metrics import Metrics
 from c7n.filters import Filter
-
-
-def mean(numbers):
-    if numbers is None:
-        return None
-    total = 0.0
-    count = 0.0
-    for n in numbers:
-        if n is not None:
-            total += n
-            count += 1
-    if count == 0:
-        return None
-    return total / count
+from c7n_azure.utils import Math
 
 
 class MetricFilter(Filter):
 
-    funcs = {
-        'max': max,
-        'min': min,
-        'avg': mean
+    '''
+    Available intervals
+    PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D
+
+    Available aggregations
+    Total, Average
+    '''
+
+    DEFAULT_TIMEFRAME = 24
+    DEFAULT_INTERVAL = 'P1D' # 1 Day is the largest possible interval
+    DEFAULT_AGGREGATION = 'Average' # Average, Total
+
+    aggregation_funcs = {
+        'Average': Math.mean,
+        'Total': Math.sum
     }
 
-    def validate(self):
-        self.metric = self.data.get('metric')
-        self.func = self.funcs[self.data.get('func', 'avg')]
+    def __init__(self, data, manager=None):
+        super(MetricFilter, self).__init__(data, manager)
+        # Metric name as defined by Azure SDK
+        self.metric = self.data.get('metric')        
+        # gt (>), ge (>=), eq (==), le (<=), lt (<)
         self.op = self.data.get('op')
+        # Value to compare metric value with self.op
         self.threshold = self.data.get('threshold')
+        # Number of hours from current UTC time 
+        self.timeframe = float(self.data.get('timeframe', self.DEFAULT_TIMEFRAME))
+        # Interval as defined by Azure SDK
+        self.interval = self.data.get('interval', self.DEFAULT_INTERVAL)
+        # Aggregation as defined by Azure SDK
+        self.aggregation = self.data.get('aggregation', self.DEFAULT_AGGREGATION)
+        # Aggregation function to be used locally
+        self.func = self.aggregation_funcs[self.aggregation]
+
+        # Give appropriate error messages for missing information
         if self.metric is None:
             raise ValueError("Need to define a metric")
         if self.func is None:
@@ -51,29 +61,43 @@ class MetricFilter(Filter):
             raise ValueError("Need to define an opeartor (gt, ge, eq, le, lt)")
         if self.threshold is None:
             raise ValueError("Need to define a threshold")
+        
+        # Make threshold a float
         self.threshold = float(self.threshold)
-        self.timeframe = float(self.data.get('timeframe', 24))
+        
+        # Import utcnow function as it may have been overridden for testing purposes
+        from c7n_azure.actions import utcnow
+        
+        # Get timespan
+        end_time = utcnow()
+        start_time = end_time - timedelta(hours=self.timeframe)
+        self.timespan = "{}/{}".format(start_time, end_time)
+
+        # Create Azure Monitor client
         self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+
+    def get_metric_data(self, resource):
+        metrics_data = self.client.metrics.list(
+            resource['id'],
+            timespan=self.timespan,
+            interval=self.interval,
+            metric=self.metric,
+            aggregation=self.aggregation
+        )
+        return [item.total for item in metrics_data.value[0].timeseries[0].data]
 
     def __call__(self, resource):
 
-        m = Metrics(self.client, resource['id'])
-        from c7n_azure.actions import utcnow
-        end_time = utcnow()
-        start_time = end_time - timedelta(hours=self.timeframe)
-        m_data = m.metric_data(metric=self.metric, start_time=start_time, end_time=end_time)
-        values = [item['value'] for item in m_data[self.metric]]
-        f_value = self.func(values)
-        if f_value is None:
-            f_value = 0
+        m_data = self.get_metric_data(resource)
+        aggregate_value = self.func(m_data)
 
         if self.op == 'ge':
-            return f_value >= self.threshold
+            return aggregate_value >= self.threshold
         if self.op == 'gt':
-            return f_value > self.threshold
+            return aggregate_value > self.threshold
         if self.op == 'le':
-            return f_value <= self.threshold
+            return aggregate_value <= self.threshold
         if self.op == 'lt':
-            return f_value < self.threshold
+            return aggregate_value < self.threshold
         if self.op == 'eq':
-            return f_value == self.threshold
+            return aggregate_value == self.threshold
