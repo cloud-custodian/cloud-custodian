@@ -528,7 +528,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
 
     def get_snapshots(self, ec2, snap_ids):
         """get snapshots corresponding to id, but tolerant of invalid id's."""
-        while True:
+        while snap_ids:
             try:
                 result = ec2.describe_snapshots(SnapshotIds=snap_ids)
             except ClientError as e:
@@ -539,6 +539,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                 raise
             else:
                 return result.get('Snapshots', ())
+        return ()
 
     @staticmethod
     def get_bad_snapshot(e):
