@@ -757,13 +757,17 @@ class Policy(object):
         }
 
     def expand_variables(self, variables):
-        """expand variables in the mode role and output_dir fields.
+        """Expand variables in policy data.
+
+        Updates the policy data in-place.
         """
         updated = utils.format_string_values(self.data, **variables)
         # Several keys should only be expanded at runtime, perserve them.
         if 'member-role' in updated.get('mode', {}):
             updated['mode']['member-role'] = self.data['mode']['member-role']
         self.data = updated
+        # Reload filters/actions using updated data.
+        self.manager = self.load_resource_manager()
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()

@@ -126,8 +126,6 @@ def policy_command(f):
         # Variable expansion
         for p in policies:
             p.expand_variables(p.get_variables())
-            # Reconstruct filters/actions with expanded data
-            p.resource_manager = p.load_resource_manager()
 
         return f(options, list(policies))
 
