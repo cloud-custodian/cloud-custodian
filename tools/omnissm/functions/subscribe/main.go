@@ -77,7 +77,7 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 		log.Info().Err(err).Msgf("instance not found: %#v", managedId)
 		return nil
 	}
-	switch detail.ConfigurationItem.ResourceType {
+	switch detail.ConfigurationItem.ConfigurationItemStatus {
 	case "ResourceDiscovered", "OK":
 		if err := mgr.Update(managedId, detail.ConfigurationItem); err != nil {
 			return err
