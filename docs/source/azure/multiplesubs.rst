@@ -13,6 +13,5 @@ subscriptions. For instructions on creating a service principal and granting acc
 across subscriptions, visit the `Azure authentication docs
 page <http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html>`_
 
-**Note**: There are pending issues with running Cloud Custodian on Windows & MacOS 
-with multiple subscriptions in Azure. It is recommended to run on Linux or to 
-use the ``--debug`` flag when running on MacOS or Windows. 
+**Note**: There are pending issues with running C7N-Org on Windows. It may be required to 
+use the ``--debug`` flag when running on Windows. 
