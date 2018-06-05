@@ -767,7 +767,15 @@ class Policy(object):
             updated['mode']['member-role'] = self.data['mode']['member-role']
         self.data = updated
         # Reload filters/actions using updated data.
-        self.manager = self.load_resource_manager()
+        m = self.resource_manager
+        self.resource_manager = self.load_resource_manager()
+
+        # XXX: Compatiblity hack
+        # Preserve notify action subject lines which support
+        # embedded jinja2 as a passthrough to the mailer.
+        for old_a, new_a in zip(m.actions, self.resource_manager.actions):
+            if old_a.type == 'notify' and 'subject' in old_a.data:
+                new_a.data['subject'] = old_a.data['subject']
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()

@@ -300,12 +300,12 @@ class TestPolicy(BaseTest):
                  'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'}
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
+        ivalue = 'bad monkey 12312311 zanzibar %s' % (
+            (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d'))
         p.expand_variables(p.get_variables())
-        self.assertEqual(
-            p.data['actions'][0]['value'],
-            'bad monkey 12312311 zanzibar %s' % (
-                (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d')))
+        self.assertEqual(p.data['actions'][0]['value'], ivalue)
         self.assertEqual(p.data['mode']['role'], 'arn:iam::12312311/role/FooBar')
+        self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
 
     def test_child_resource_trail_validation(self):
         self.assertRaises(
