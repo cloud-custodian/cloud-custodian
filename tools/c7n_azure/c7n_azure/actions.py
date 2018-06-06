@@ -39,7 +39,7 @@ def update_resource_tags(self, resource, tags):
     # other Azure resources
     else:
         if self.manager.type == 'armresource':
-            raise NotImplementedError('Can not tag generic ARM resources.')
+            raise NotImplementedError('Cannot tag generic ARM resources.')
 
         az_resource = GenericResource.deserialize(resource)
         api_version = self.session.resource_api_version(az_resource.id)
