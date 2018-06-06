@@ -131,6 +131,15 @@ class BaseTest(AzureVCRBaseTest):
 
         return log_file
 
+    @staticmethod
+    def setup_account():
+        # Find actual name of storage account provisioned in our test environment
+        s = Session()
+        client = s.client('azure.mgmt.storage.StorageManagementClient')
+        accounts = list(client.storage_accounts.list())
+        matching_account = [a for a in accounts if a.name.startswith("cctstorage")]
+        return matching_account[0]
+
 
 class TextTestIO(io.StringIO):
 

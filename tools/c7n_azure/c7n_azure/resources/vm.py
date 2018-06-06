@@ -23,7 +23,7 @@ class VirtualMachine(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
-        enum_spec = ('virtual_machines', 'list_all')
+        enum_spec = ('virtual_machines', 'list_all', None)
         default_report_fields = (
             'name',
             'location',

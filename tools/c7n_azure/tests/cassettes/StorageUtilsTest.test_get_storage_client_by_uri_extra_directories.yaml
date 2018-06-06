@@ -47,11 +47,11 @@ interactions:
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [c16ecccd-3c3b-4fc9-bb1b-be9c38dfa044]
-      x-ms-original-request-ids: [9e98e281-80a5-40a0-bac5-92c235202541, c6026736-6b68-48b7-9230-c68b1650f68a]
-      x-ms-ratelimit-remaining-subscription-reads: ['14997']
-      x-ms-request-id: [c16ecccd-3c3b-4fc9-bb1b-be9c38dfa044]
-      x-ms-routing-request-id: ['WESTUS2:20180521T172420Z:c16ecccd-3c3b-4fc9-bb1b-be9c38dfa044']
+      x-ms-correlation-request-id: [0f42e709-003f-4f5b-8826-266e56b38170]
+      x-ms-original-request-ids: [f5ae4617-2efb-411d-80d2-27a3bc3aeecc, 34a50691-2c82-4f3c-b9cc-ab4609ccfda4]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [0f42e709-003f-4f5b-8826-266e56b38170]
+      x-ms-routing-request-id: ['WESTUS2:20180521T172421Z:0f42e709-003f-4f5b-8826-266e56b38170']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -95,17 +95,17 @@ interactions:
       content-encoding: [gzip]
       content-length: ['1205']
       content-type: [application/json; charset=utf-8]
-      date: ['Mon, 21 May 2018 17:24:20 GMT']
+      date: ['Mon, 21 May 2018 17:24:21 GMT']
       expires: ['-1']
       pragma: [no-cache]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [66443bc7-547a-4f0b-a4ce-5d42212e3220]
-      x-ms-original-request-ids: [04f8b596-3104-4e63-90d1-3295b5fa9768, 9a323a59-e8d3-4e60-8e40-5d224124858e]
-      x-ms-ratelimit-remaining-subscription-reads: ['14996']
-      x-ms-request-id: [66443bc7-547a-4f0b-a4ce-5d42212e3220]
-      x-ms-routing-request-id: ['WESTUS2:20180521T172421Z:66443bc7-547a-4f0b-a4ce-5d42212e3220']
+      x-ms-correlation-request-id: [07ffe62a-5a6e-4125-974e-ccd75fdfda2a]
+      x-ms-original-request-ids: [d8f5b3d4-5e30-456f-8a38-d06607504846, 7566d42d-be34-42e4-9a2b-4fa9a27c7149]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [07ffe62a-5a6e-4125-974e-ccd75fdfda2a]
+      x-ms-routing-request-id: ['WESTUS2:20180521T172421Z:07ffe62a-5a6e-4125-974e-ccd75fdfda2a']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -142,10 +142,10 @@ interactions:
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [a0646eee-c468-4d73-9855-c36cbff51f0f]
+      x-ms-correlation-request-id: [d438e76f-0741-4f7c-a03d-ecd6d9533d51]
       x-ms-ratelimit-remaining-subscription-writes: ['1199']
-      x-ms-request-id: [d694054d-49d8-4196-acc6-de38e6e4d937]
-      x-ms-routing-request-id: ['WESTUS2:20180521T172421Z:a0646eee-c468-4d73-9855-c36cbff51f0f']
+      x-ms-request-id: [deb77e60-8dab-49f6-8fd7-b382e8448998]
+      x-ms-routing-request-id: ['WESTUS2:20180521T172421Z:d438e76f-0741-4f7c-a03d-ecd6d9533d51']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -156,100 +156,17 @@ interactions:
       x-ms-date: ['Mon, 21 May 2018 17:24:19 GMT']
       x-ms-version: ['2016-05-31']
     method: PUT
-    uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcyclemessage
+    uri: https://cctstoragey6akyqpagdt3o.blob.core.windows.net/testcontainer?restype=container
   response:
-    body: {string: !!python/unicode ''}
+    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><Error><Code>ContainerAlreadyExists</Code><Message>The\
+        \ specified container already exists.\nRequestId:a4a1ac5c-501e-001e-1b28-f183ee000000\n\
+        Time:2018-05-21T17:24:22.1517826Z</Message></Error>"}
     headers:
-      content-length: ['0']
-      date: ['Mon, 21 May 2018 17:24:21 GMT']
-      server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [825f41cd-8003-00bd-0c28-f14f8f000000]
-      x-ms-version: ['2016-05-31']
-    status: {code: 204, message: No Content}
-- request:
-    body: !!python/unicode '<?xml version=''1.0'' encoding=''utf-8''?>
-
-      <QueueMessage><MessageText>hello queue</MessageText></QueueMessage>'
-    headers:
-      Connection: [keep-alive]
-      Content-Length: ['106']
-      User-Agent: [Azure-Storage/0.34.3 (Python CPython 2.7.13; Windows 10)]
-      x-ms-date: ['Mon, 21 May 2018 17:24:20 GMT']
-      x-ms-version: ['2016-05-31']
-    method: POST
-    uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcyclemessage/messages
-  response:
-    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><QueueMessagesList><QueueMessage><MessageId>2daa2a7d-86a2-491f-a5d9-d6ab51fbbd8f</MessageId><InsertionTime>Mon,\
-        \ 21 May 2018 17:24:22 GMT</InsertionTime><ExpirationTime>Mon, 28 May 2018\
-        \ 17:24:22 GMT</ExpirationTime><PopReceipt>AgAAAAMAAAAAAAAAyR3Ejijx0wE=</PopReceipt><TimeNextVisible>Mon,\
-        \ 21 May 2018 17:24:22 GMT</TimeNextVisible></QueueMessage></QueueMessagesList>"}
-    headers:
+      content-length: ['230']
       content-type: [application/xml]
       date: ['Mon, 21 May 2018 17:24:21 GMT']
-      server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [825f41de-8003-00bd-1a28-f14f8f000000]
+      server: [Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0]
+      x-ms-request-id: [a4a1ac5c-501e-001e-1b28-f183ee000000]
       x-ms-version: ['2016-05-31']
-    status: {code: 201, message: Created}
-- request:
-    body: null
-    headers:
-      Connection: [keep-alive]
-      User-Agent: [Azure-Storage/0.34.3 (Python CPython 2.7.13; Windows 10)]
-      x-ms-date: ['Mon, 21 May 2018 17:24:20 GMT']
-      x-ms-version: ['2016-05-31']
-    method: GET
-    uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcyclemessage/messages
-  response:
-    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><QueueMessagesList><QueueMessage><MessageId>2daa2a7d-86a2-491f-a5d9-d6ab51fbbd8f</MessageId><InsertionTime>Mon,\
-        \ 21 May 2018 17:24:22 GMT</InsertionTime><ExpirationTime>Mon, 28 May 2018\
-        \ 17:24:22 GMT</ExpirationTime><PopReceipt>AgAAAAMAAAAAAAAA8T/eoCjx0wE=</PopReceipt><TimeNextVisible>Mon,\
-        \ 21 May 2018 17:24:52 GMT</TimeNextVisible><DequeueCount>1</DequeueCount><MessageText>hello\
-        \ queue</MessageText></QueueMessage></QueueMessagesList>"}
-    headers:
-      cache-control: [no-cache]
-      content-type: [application/xml]
-      date: ['Mon, 21 May 2018 17:24:21 GMT']
-      server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [825f4229-8003-00bd-5d28-f14f8f000000]
-      x-ms-version: ['2016-05-31']
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Connection: [keep-alive]
-      Content-Length: ['0']
-      User-Agent: [Azure-Storage/0.34.3 (Python CPython 2.7.13; Windows 10)]
-      x-ms-date: ['Mon, 21 May 2018 17:24:20 GMT']
-      x-ms-version: ['2016-05-31']
-    method: DELETE
-    uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcyclemessage/messages/2daa2a7d-86a2-491f-a5d9-d6ab51fbbd8f?popreceipt=AgAAAAMAAAAAAAAA8T%2FeoCjx0wE%3D
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      content-length: ['0']
-      date: ['Mon, 21 May 2018 17:24:21 GMT']
-      server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [825f4241-8003-00bd-7328-f14f8f000000]
-      x-ms-version: ['2016-05-31']
-    status: {code: 204, message: No Content}
-- request:
-    body: null
-    headers:
-      Connection: [keep-alive]
-      User-Agent: [Azure-Storage/0.34.3 (Python CPython 2.7.13; Windows 10)]
-      x-ms-date: ['Mon, 21 May 2018 17:24:20 GMT']
-      x-ms-version: ['2016-05-31']
-    method: GET
-    uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testcyclemessage/messages
-  response:
-    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><QueueMessagesList\
-        \ />"}
-    headers:
-      cache-control: [no-cache]
-      content-type: [application/xml]
-      date: ['Mon, 21 May 2018 17:24:21 GMT']
-      server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [825f424d-8003-00bd-7e28-f14f8f000000]
-      x-ms-version: ['2016-05-31']
-    status: {code: 200, message: OK}
+    status: {code: 409, message: The specified container already exists.}
 version: 1
