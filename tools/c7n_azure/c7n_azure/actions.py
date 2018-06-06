@@ -248,7 +248,7 @@ class AutoTagUser(BaseAction):
     def get_first_operation(logs, operation_name):
         first_operation = None
         for l in logs:
-            if l.operation_name.value == operation_name:
+            if l.operation_name.value.lower() == operation_name.lower():
                 first_operation = l
 
         return first_operation
