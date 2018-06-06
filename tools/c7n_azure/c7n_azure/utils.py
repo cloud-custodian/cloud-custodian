@@ -38,6 +38,7 @@ def utcnow():
     """
     return datetime.datetime.utcnow()
 
+
 class Math(object):
 
     @staticmethod
