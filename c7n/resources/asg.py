@@ -335,7 +335,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
             if snapshot_id in self.image_snaps:
                 continue
             if snapshot_id not in self.snapshots:
-                errors.append(('invalid-snapshot', bd['Ebs']['SnapshotId']))
+                errors.append(('invalid-EBS-snapshot', bd['Ebs']['SnapshotId']))
         return errors
 
 
