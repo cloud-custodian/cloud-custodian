@@ -484,6 +484,17 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
         # to refetch against current to guard against any staleness in
         # our cached representation across multiple policies or concurrent
         # modifications.
+
+        if 'get_bucket_tagging' in bucket.get('c7n:DeniedMethods', []):
+            # avoid the additional API call if we already know that it's going
+            # to result in AccessDenied. The chances that the resource's perms
+            # would have changed between fetching the resource and acting on it
+            # here are pretty low-- so the check here should suffice.
+            log.warning(
+                "Unable to get new set of bucket tags needed to modify tags,"
+                "skipping tag action for bucket: %s" % bucket["Name"])
+            continue
+
         try:
             bucket['Tags'] = client.get_bucket_tagging(
                 Bucket=bucket['Name']).get('TagSet', [])
