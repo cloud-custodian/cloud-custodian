@@ -44,7 +44,6 @@ class Session(object):
         ]
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
 
-
         if all(k in os.environ for k in token_auth_variables):
             # Token authentication
             self.credentials = BasicTokenAuthentication(
@@ -76,6 +75,8 @@ class Session(object):
         # Let provided id parameter override everything else
         if subscription_id is not None:
             self.subscription_id = subscription_id
+
+        self.log.info("Session using Subscription ID: " % self.subscription_id)
 
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
