@@ -17,7 +17,7 @@ so cloning the repository is required.
 .. code-block:: bash
 
   $ git clone https://github.com/capitalone/cloud-custodian.git
-  $ virtualenv --python=python2 custodian
+  $ virtualenv custodian
   $ source custodian/bin/activate
   (custodian) $ pip install cloud-custodian
   (custodian) $ pip install cloud-custodian/tools/c7n_azure
