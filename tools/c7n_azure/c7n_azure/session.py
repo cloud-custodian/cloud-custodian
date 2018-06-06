@@ -76,7 +76,7 @@ class Session(object):
         if subscription_id is not None:
             self.subscription_id = subscription_id
 
-        self.log.info("Session using Subscription ID: " % self.subscription_id)
+        self.log.info("Session using Subscription ID: %s" % self.subscription_id)
 
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
