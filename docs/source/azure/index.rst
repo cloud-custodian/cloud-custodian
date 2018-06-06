@@ -1,18 +1,25 @@
 .. _azure_overview:
 
 Overview
-===============================
+=========
 
-Azure support for Cloud Custodian is under development as a plugin.  It is not yet suitable for production use.
+Azure support for Cloud Custodian is implemented as a plugin which provides
+access to Azure resource types, actions and filters.
 
 
-Contribute
------------
+Getting Started
+----------------
 
-How to :ref:`contribute to the Azure plugin <azure_contribute>`
+A summary of installing and using Cloud Custodian for Azure is available on :ref:`our Getting Started page <azure_gettingstarted>`
 
 
 Example Policies
 ----------------
 
 See :ref:`Use Cases <azure_usecases>`
+
+
+Contribute
+-----------
+
+How to :ref:`contribute to the Azure plugin <azure_contribute>`
