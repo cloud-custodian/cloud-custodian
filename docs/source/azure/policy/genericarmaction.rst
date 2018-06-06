@@ -7,7 +7,8 @@ Tags
 -------
 
 ``AutoTagUser``
-  Tag a created by user on a resource based on scanning activity log history.
+  Create a tag listing name of user who created a resource based on scanning
+  activity log history.
 
   .. c7n-schema:: AutoTagUser
       :module: c7n_azure.actions
@@ -25,7 +26,7 @@ Tags
                    days: 10
 
 ``RemoveTag``
-  Tag a created by user on a resource based on scanning activity log history.
+  Remove a set of tags.
 
   .. c7n-schema:: RemoveTag
       :module: c7n_azure.actions
