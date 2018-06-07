@@ -1,4 +1,4 @@
-.. _nsg:
+.. _azure_nsg:
 
 Network Security Groups
 =======================

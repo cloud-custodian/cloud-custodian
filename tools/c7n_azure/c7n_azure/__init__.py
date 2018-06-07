@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import adal
+import logging
 
-# Don't log about basic token retrieval on each API call
+# Quiet logging from dependencies
 adal.set_logging_options({'level': 'WARNING'})
+logging.getLogger("keyring").setLevel(logging.WARNING)

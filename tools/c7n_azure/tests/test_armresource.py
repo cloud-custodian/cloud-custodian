@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
+from datetime import datetime
+from mock import patch
+from jsonschema.exceptions import ValidationError
 
 
 class ArmResourceTest(BaseTest):
+
+    TEST_DATE = datetime(2018, 6, 1, 0, 0, 0)
+
     def setUp(self):
         super(ArmResourceTest, self).setUp()
 
@@ -33,3 +40,138 @@ class ArmResourceTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    def test_metric_filter_find(self, utcnow_mock):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'total',
+                 'op': 'gt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    def test_metric_filter_find_average(self, utcnow_mock):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
+                 'op': 'gt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    def test_metric_filter_not_find(self, utcnow_mock):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'total',
+                 'op': 'lt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    def test_metric_filter_not_find_average(self, utcnow_mock):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
+                 'op': 'lt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_metric_filter_invalid_missing_metric(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'aggregation': 'total',
+                 'op': 'lt',
+                 'threshold': 0}],
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+
+    def test_metric_filter_invalid_missing_op(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'total',
+                 'threshold': 0}],
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+
+    def test_metric_filter_invalid_missing_threshold(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'total',
+                 'op': 'lt'}],
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
