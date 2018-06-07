@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import timedelta
+import operator
 from c7n.filters import Filter
 from c7n_azure.utils import Math
 from c7n.exceptions import PolicyValidationError
@@ -36,12 +37,20 @@ class MetricFilter(Filter):
         'Total': Math.sum
     }
 
+    ops = {
+        'lt': operator.lt,
+        'le': operator.le,
+        'eq': operator.eq,
+        'ge': operator.ge,
+        'gt': operator.gt
+    }
+
     def __init__(self, data, manager=None):
         super(MetricFilter, self).__init__(data, manager)
         # Metric name as defined by Azure SDK
         self.metric = self.data.get('metric')
         # gt (>), ge (>=), eq (==), le (<=), lt (<)
-        self.op = self.data.get('op')
+        self.op = self.ops[self.data.get('op')]
         # Value to compare metric value with self.op
         self.threshold = self.data.get('threshold')
         # Number of hours from current UTC time
@@ -98,17 +107,7 @@ class MetricFilter(Filter):
     def passes_op_filter(self, resource):
         m_data = self.get_metric_data(resource)
         aggregate_value = self.func(m_data)
-
-        if self.op == 'ge':
-            return aggregate_value >= self.threshold
-        if self.op == 'gt':
-            return aggregate_value > self.threshold
-        if self.op == 'le':
-            return aggregate_value <= self.threshold
-        if self.op == 'lt':
-            return aggregate_value < self.threshold
-        if self.op == 'eq':
-            return aggregate_value == self.threshold
-
+        return self.op(aggregate_value, self.threshold)
+        
     def process_resource(self, resource):
         return resource if self.passes_op_filter(resource) else None
