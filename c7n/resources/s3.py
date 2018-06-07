@@ -1182,26 +1182,33 @@ class ToggleVersioning(BucketActionBase):
         enabled={'type': 'boolean'})
     permissions = ("s3:PutBucketVersioning",)
 
+    def process_versioning(self, resource, state):
+        client = bucket_client(
+            local_session(self.manager.session_factory), resource)
+        try:
+            client.put_bucket_versioning(
+                Bucket=resource['Name'],
+                VersioningConfiguration={
+                    'Status': state})
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'AccessDenied':
+                log.error(
+                    "Unable to put bucket versioning on bucket %s: %s" % resource['Name'], e)
+                raise
+            log.warning(
+                "Access Denied Bucket:%s while put bucket versioning" % resource['Name'])
+
     # mfa delete enablement looks like it needs the serial and a current token.
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-
         for r in resources:
-            client = bucket_client(
-                local_session(self.manager.session_factory), r)
             if 'Versioning' not in r or not r['Versioning']:
                 r['Versioning'] = {'Status': 'Suspended'}
             if enabled and (
                     r['Versioning']['Status'] == 'Suspended'):
-                client.put_bucket_versioning(
-                    Bucket=r['Name'],
-                    VersioningConfiguration={
-                        'Status': 'Enabled'})
-                continue
+                self.process_versioning(r, 'Enabled')
             if not enabled and r['Versioning']['Status'] == 'Enabled':
-                client.put_bucket_versioning(
-                    Bucket=r['Name'],
-                    VersioningConfiguration={'Status': 'Suspended'})
+                self.process_versioning(r, 'Suspended')
 
 
 @actions.register('toggle-logging')
