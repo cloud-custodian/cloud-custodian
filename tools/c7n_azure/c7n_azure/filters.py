@@ -21,11 +21,11 @@ class MetricFilter(Filter):
 
     DEFAULT_TIMEFRAME = 24
     DEFAULT_INTERVAL = 'P1D'
-    DEFAULT_AGGREGATION = 'Average'
+    DEFAULT_AGGREGATION = 'average'
 
     aggregation_funcs = {
-        'Average': Math.mean,
-        'Total': Math.sum
+        'average': Math.mean,
+        'total': Math.sum
     }
 
     ops = {
@@ -53,7 +53,7 @@ class MetricFilter(Filter):
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
-            'aggregation': {'enum': ['Total', 'Average']}
+            'aggregation': {'enum': ['total', 'average']}
         }
     }
 
@@ -88,7 +88,7 @@ class MetricFilter(Filter):
         self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
 
         # Process each resource in a separate thread, returning all that pass filter
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=1) as w:
             processed = list(w.map(self.process_resource, resources))
             return [item for item in processed if item is not None]
 
@@ -100,11 +100,12 @@ class MetricFilter(Filter):
             metric=self.metric,
             aggregation=self.aggregation
         )
-        return [item.total for item in metrics_data.value[0].timeseries[0].data]
+        return [getattr(item, self.aggregation) for item in metrics_data.value[0].timeseries[0].data]
 
     def passes_op_filter(self, resource):
         m_data = self.get_metric_data(resource)
         aggregate_value = self.func(m_data)
+        import pdb; pdb.set_trace()
         return self.op(aggregate_value, self.threshold)
 
     def process_resource(self, resource):

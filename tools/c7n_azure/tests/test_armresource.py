@@ -76,7 +76,7 @@ class ArmResourceTest(BaseTest):
                  'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
-                 'aggregation': 'Total',
+                 'aggregation': 'total',
                  'op': 'lt',
                  'threshold': 0}],
         })
@@ -94,7 +94,7 @@ class ArmResourceTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctestvm'},
                 {'type': 'metric',
-                 'aggregation': 'Total',
+                 'aggregation': 'total',
                  'op': 'lt',
                  'threshold': 0}],
         }
