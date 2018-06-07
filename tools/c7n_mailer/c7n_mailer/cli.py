@@ -6,14 +6,18 @@ import logging
 
 import boto3
 import jsonschema
+from c7n_azure.session import Session
 from c7n_mailer import deploy, utils
+from c7n_mailer.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from ruamel import yaml
+
+from c7n.utils import local_session
 
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['queue_url', 'role'],
+    'required': ['queue_url'],
     'properties': {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
@@ -73,6 +77,8 @@ CONFIG_SCHEMA = {
 
 
 def session_factory(mailer_config):
+    if azure(mailer_config):
+        return local_session(Session)
     return boto3.Session(
         region_name=mailer_config['region'],
         profile_name=mailer_config.get('profile', None))
@@ -114,36 +120,44 @@ def get_c7n_mailer_parser():
     return parser
 
 
-def run_mailer_in_parallel(mailer_config, aws_session, logger, max_num_processes):
+def run_mailer_in_parallel(processor, max_num_processes):
     max_num_processes = int(max_num_processes)
     if max_num_processes < 1:
         raise Exception
-    sqs_queue_processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
-    sqs_queue_processor.max_num_processes = max_num_processes
-    sqs_queue_processor.run(parallel=True)
+    processor.max_num_processes = max_num_processes
+    processor.run(parallel=True)
+
+
+def azure(mailer_config):
+    return mailer_config.get('queue_url').startswith('asq')
 
 
 def main():
     parser = get_c7n_mailer_parser()
     args = parser.parse_args()
     mailer_config = get_and_validate_mailer_config(args)
-    aws_session = session_factory(mailer_config)
     args_dict = vars(args)
     logger = get_logger(debug=args_dict.get('debug', False))
+    session = session_factory(mailer_config)
     if args_dict.get('update_lambda'):
+        if azure(mailer_config):
+            print('not yet implemented')
         if args_dict.get('debug'):
             print('\n** --debug is only supported with --run, not --update-lambda **\n')
             return
         if args_dict.get('max_num_processes'):
-            print('\n** --max-num-processes is only supported with --run, not --update-lambda **\n')
+            print('\n** --max-num-processes is only supported '
+                  'with --run, not --update-lambda **\n')
             return
         deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
     if args_dict.get('run'):
         max_num_processes = args_dict.get('max_num_processes')
+        processor = MailerAzureQueueProcessor(mailer_config, logger) if azure(mailer_config) \
+            else MailerSqsQueueProcessor(mailer_config, session, logger)
         if max_num_processes:
-            run_mailer_in_parallel(mailer_config, aws_session, logger, max_num_processes)
+            run_mailer_in_parallel(processor, max_num_processes)
         else:
-            MailerSqsQueueProcessor(mailer_config, aws_session, logger).run()
+            processor.run()
 
 
 if __name__ == '__main__':
