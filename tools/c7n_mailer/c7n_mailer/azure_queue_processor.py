@@ -37,7 +37,7 @@ class MailerAzureQueueProcessor(object):
 
     def run(self, parallel=False):
         if parallel:
-            print("Parallel processing with Azure Queue is not yet implemented")
+            self.logger.info("Parallel processing with Azure Queue is not yet implemented")
 
         self.logger.info("Downloading messages from the Azure Storage queue.")
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(self.receive_queue)
