@@ -57,17 +57,17 @@ interactions:
       Content-Encoding: [gzip]
       Content-Length: ['2101']
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Thu, 07 Jun 2018 17:15:55 GMT']
+      Date: ['Thu, 07 Jun 2018 23:20:33 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [978a8f66-58ab-4385-b506-92a109c1d527]
-      x-ms-original-request-ids: [da25834b-8a5f-43f6-8202-068e0e39cdff, e029758d-6eb6-4260-ae7d-a4519369855b]
-      x-ms-ratelimit-remaining-subscription-reads: ['14998']
-      x-ms-request-id: [978a8f66-58ab-4385-b506-92a109c1d527]
-      x-ms-routing-request-id: ['SOUTHCENTRALUS:20180607T171555Z:978a8f66-58ab-4385-b506-92a109c1d527']
+      x-ms-correlation-request-id: [8dc3b953-eeb6-490f-a7d4-072b21ed60e9]
+      x-ms-original-request-ids: [8fdd3662-94fd-48ce-81de-d437c271d79a, 38444d95-203c-48a0-8716-4602b7b7bfff]
+      x-ms-ratelimit-remaining-subscription-reads: ['14996']
+      x-ms-request-id: [8dc3b953-eeb6-490f-a7d4-072b21ed60e9]
+      x-ms-routing-request-id: ['SOUTHCENTRALUS:20180607T232033Z:8dc3b953-eeb6-490f-a7d4-072b21ed60e9']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -81,7 +81,7 @@ interactions:
           Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/microsoft.insights/metrics?timespan=2018-05-31%2000%3A00%3A00%2F2018-06-01%2000%3A00%3A00&interval=P1D&metric=Network%20In&aggregation=Total&api-version=2017-05-01-preview
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/microsoft.insights/metrics?timespan=2018-05-31%2000%3A00%3A00%2F2018-06-01%2000%3A00%3A00&interval=P1D&metric=Network%20In&aggregation=total&api-version=2017-05-01-preview
   response:
     body:
       string: !!binary |
@@ -97,17 +97,17 @@ interactions:
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json]
-      Date: ['Thu, 07 Jun 2018 17:15:55 GMT']
+      Date: ['Thu, 07 Jun 2018 23:20:33 GMT']
       Server: [Microsoft-IIS/8.5]
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: ['Accept-Encoding,Accept-Encoding']
       X-AspNet-Version: [4.0.30319]
       X-Content-Type-Options: [nosniff]
       X-Powered-By: [ASP.NET]
-      __HandlingServerId__: [shoeboxproxyustwo_shoeboxproxyustwo-red_MetricsMP_IN_2]
-      x-ms-correlation-request-id: [821d4384-3cb0-4ca2-9208-87ea58adca9c]
-      x-ms-ratelimit-remaining-subscription-reads: ['14999']
-      x-ms-request-id: ['{821d4384-3cb0-4ca2-9208-87ea58adca9c}']
-      x-ms-routing-request-id: ['SOUTHCENTRALUS:20180607T171556Z:821d4384-3cb0-4ca2-9208-87ea58adca9c']
+      __HandlingServerId__: [shoeboxproxyustwo_shoeboxproxyustwo-red_MetricsMP_IN_7]
+      x-ms-correlation-request-id: [d7720479-eea6-4626-91e8-880ea50d3f67]
+      x-ms-ratelimit-remaining-subscription-reads: ['14995']
+      x-ms-request-id: ['{d7720479-eea6-4626-91e8-880ea50d3f67}']
+      x-ms-routing-request-id: ['SOUTHCENTRALUS:20180607T232033Z:d7720479-eea6-4626-91e8-880ea50d3f67']
     status: {code: 200, message: OK}
 version: 1

@@ -55,7 +55,28 @@ class ArmResourceTest(BaseTest):
                  'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
-                 'aggregation': 'Total',
+                 'aggregation': 'total',
+                 'op': 'gt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    def test_metric_filter_find_average(self, utcnow_mock):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
                  'op': 'gt',
                  'threshold': 0}],
         })
@@ -77,6 +98,27 @@ class ArmResourceTest(BaseTest):
                 {'type': 'metric',
                  'metric': 'Network In',
                  'aggregation': 'total',
+                 'op': 'lt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    def test_metric_filter_not_find_average(self, utcnow_mock):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
                  'op': 'lt',
                  'threshold': 0}],
         })
@@ -112,7 +154,7 @@ class ArmResourceTest(BaseTest):
                  'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
-                 'aggregation': 'Total',
+                 'aggregation': 'total',
                  'threshold': 0}],
         }
         self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
@@ -129,7 +171,7 @@ class ArmResourceTest(BaseTest):
                  'value': 'cctestvm'},
                 {'type': 'metric',
                  'metric': 'Network In',
-                 'aggregation': 'Total',
+                 'aggregation': 'total',
                  'op': 'lt'}],
         }
         self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
