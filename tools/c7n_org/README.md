@@ -86,8 +86,8 @@ be looking to incorporate them into a new c7n-org subcommand.
 - For **Azure**, the script `azuresubs.py` generates a config file
   from the Azure Resource Management API
 
-    - Please see the **Additional Azure Instructions** section at the
-      bottom of the page for initial setup
+    - Please see the [Additional Azure Instructions](http://capitalone.github.io/cloud-custodian/docs/azure/multiplesubs.html) 
+    - for initial setup and other important info
 
 - For **GCP**, the script `gcpprojects.py` generates a config file from
   the GCP Resource Management API
@@ -163,14 +163,3 @@ credential information into the process environment before executing.
 
 c7n-org also supports generating reports for a given policy execution
 across accounts via the `c7n-org report` subcommand.
-
-## Additional Azure Instructions
-
-If you're using an Azure Service Principal for executing c7n-org
-you'll need to ensure that the principal has access to multiple
-subscriptions.
-
-For instructions on creating a service principal and granting access
-across subscriptions, visit the [Azure authentication docs
-page](http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html).
-
