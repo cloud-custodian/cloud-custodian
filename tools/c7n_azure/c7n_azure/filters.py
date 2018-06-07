@@ -38,11 +38,18 @@ class MetricFilter(Filter):
     }
 
     ops = {
-        'lt': operator.lt,
-        'le': operator.le,
         'eq': operator.eq,
+        'equal': operator.eq,
+        'ne': operator.ne,
+        'not-equal': operator.ne,
+        'gt': operator.gt,
+        'greater-than': operator.gt,
         'ge': operator.ge,
-        'gt': operator.gt
+        'gte': operator.ge,
+        'le': operator.le,
+        'lte': operator.le,
+        'lt': operator.lt,
+        'less-than': operator.lt
     }
 
     def __init__(self, data, manager=None):
@@ -108,6 +115,6 @@ class MetricFilter(Filter):
         m_data = self.get_metric_data(resource)
         aggregate_value = self.func(m_data)
         return self.op(aggregate_value, self.threshold)
-        
+
     def process_resource(self, resource):
         return resource if self.passes_op_filter(resource) else None
