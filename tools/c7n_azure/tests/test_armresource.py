@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 from datetime import datetime
 from mock import patch
+from jsonschema.exceptions import ValidationError
 
 
 class ArmResourceTest(BaseTest):
@@ -81,3 +82,54 @@ class ArmResourceTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_metric_filter_invalid_missing_metric(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'aggregation': 'Total',
+                 'op': 'lt',
+                 'threshold': 0}],
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+
+    def test_metric_filter_invalid_missing_op(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'Total',
+                 'threshold': 0}],
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+
+    def test_metric_filter_invalid_missing_threshold(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'Total',
+                 'op': 'lt'}],
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)

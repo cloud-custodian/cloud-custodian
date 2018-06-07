@@ -45,10 +45,11 @@ class MetricFilter(Filter):
 
     schema = {
         'type': 'object',
-        'required': ['type', 'metric', 'op'],
+        'required': ['type', 'metric', 'op', 'threshold'],
         'properties': {
             'metric': {'type': 'string'},
             'op': {'enum': list(ops.keys())},
+            'threshold': {'type': 'number'},
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
