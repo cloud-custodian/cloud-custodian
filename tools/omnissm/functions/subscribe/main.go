@@ -31,9 +31,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"../../pkg/manager"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
-	// "github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 )
 
 var (
