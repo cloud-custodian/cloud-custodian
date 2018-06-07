@@ -61,6 +61,7 @@ Navigate below and get started with Cloud Custodian!
    azure/authentication
    azure/usecases/index
    azure/policy/index
+   azure/multiplesubs
    azure/contribute
 
 .. toctree::
