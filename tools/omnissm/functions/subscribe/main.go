@@ -27,11 +27,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
+	"../../pkg/manager"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
+	// "github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 )
 
 var (
@@ -49,6 +51,7 @@ var (
 	CrossAccountRole   = os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE")
 	RegistrationsTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 	ResourceTags       = os.Getenv("OMNISSM_RESOURCE_TAGS")
+	SnsTopic           = os.Getenv("OMNISSM_SNS_TOPIC")
 
 	mgr *manager.Manager
 )
@@ -69,7 +72,7 @@ func init() {
 
 func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error {
 	managedId := identity.Hash(detail.ConfigurationItem.Name())
-	_, err, ok := mgr.Get(managedId)
+	managerInstance, err, ok := mgr.Get(managedId)
 	if err != nil {
 		return err
 	}
@@ -85,6 +88,44 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 	case "ResourceDeleted":
 		if err := mgr.Delete(managedId); err != nil {
 			return err
+		}
+		if SnsTopic != "" {
+			config := aws.NewConfig()
+			sess := session.New(config)
+			if CrossAccountRole != "" {
+				config.Credentials = stscreds.NewCredentials(sess, CrossAccountRole)
+			}
+			svc := sns.New(sess, config)
+
+			type resourceObj struct {
+				ResourceID   string
+				ManagerID    string
+				AWSAccountID string
+				AWSRegion    string
+			}
+
+			toSend := resourceObj{
+				detail.ConfigurationItem.ResourceId,
+				managerInstance.ManagedId,
+				detail.ConfigurationItem.AWSAccountId,
+				detail.ConfigurationItem.AWSRegion,
+			}
+			if toSend.ResourceID != "" && toSend.ManagerID != "" && toSend.AWSAccountID != "" && toSend.AWSRegion != "" {
+				b, error := json.Marshal(toSend)
+
+				if error != nil {
+					return error
+				}
+				params := &sns.PublishInput{
+					Message:  aws.String(string(b)),
+					TopicArn: aws.String(SnsTopic),
+				}
+
+				_, err := svc.Publish(params)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
