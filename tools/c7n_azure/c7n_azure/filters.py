@@ -15,18 +15,9 @@ from datetime import timedelta
 import operator
 from c7n.filters import Filter
 from c7n_azure.utils import Math
-from c7n.exceptions import PolicyValidationError
 
 
 class MetricFilter(Filter):
-
-    '''
-    Available intervals
-    PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D
-
-    Available aggregations
-    Total, Average
-    '''
 
     DEFAULT_TIMEFRAME = 24
     DEFAULT_INTERVAL = 'P1D'
@@ -52,10 +43,24 @@ class MetricFilter(Filter):
         'less-than': operator.lt
     }
 
+    schema = {
+        'type': 'object',
+        'required': ['type', 'metric', 'op'],
+        'properties': {
+            'metric': {'type': 'string'},
+            'op': {'enum': list(ops.keys())},
+            'timeframe': {'type': 'number'},
+            'interval': {'enum': [
+                'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
+            'aggregation': {'enum': ['Total', 'Average']}
+        }
+    }
+
     def __init__(self, data, manager=None):
         super(MetricFilter, self).__init__(data, manager)
         # Metric name as defined by Azure SDK
         self.metric = self.data.get('metric')
+        print(self.metric)
         # gt (>), ge (>=), eq (==), le (<=), lt (<)
         self.op = self.ops[self.data.get('op')]
         # Value to compare metric value with self.op
@@ -68,21 +73,6 @@ class MetricFilter(Filter):
         self.aggregation = self.data.get('aggregation', self.DEFAULT_AGGREGATION)
         # Aggregation function to be used locally
         self.func = self.aggregation_funcs[self.aggregation]
-
-    def validate(self):
-        # Give appropriate error messages for missing information
-        if self.metric is None:
-            raise PolicyValidationError("Need to define a metric")
-        if self.func is None:
-            raise PolicyValidationError("Need to define a func (avg, min, max)")
-        if self.op is None:
-            raise PolicyValidationError("Need to define an opeartor (gt, ge, eq, le, lt)")
-        if self.threshold is None:
-            raise PolicyValidationError("Need to define a threshold")
-        try:
-            self.threshold = float(self.threshold)
-        except ValueError:
-            raise PolicyValidationError("Threshold needs to be a valid number")
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes

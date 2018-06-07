@@ -36,7 +36,7 @@ class UtilsTest(BaseTest):
 
     def test_resource_name(self):
         self.assertEqual(ResourceIdParser.get_resource_name(RESOURCE_ID), "nametest")
-    
+
     def test_math_mean(self):
         self.assertEqual(Math.mean([4, 5, None, 3]), 4)
         self.assertEqual(Math.mean([None]), 0)
