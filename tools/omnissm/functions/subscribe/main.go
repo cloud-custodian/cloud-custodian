@@ -33,6 +33,7 @@ import (
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/store"
 )
 
 var (
@@ -89,47 +90,52 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 			return err
 		}
 		if SnsTopic != "" {
-			config := aws.NewConfig()
-			sess := session.New(config)
-			if CrossAccountRole != "" {
-				config.Credentials = stscreds.NewCredentials(sess, CrossAccountRole)
-			}
-			svc := sns.New(sess, config)
-
-			type resourceObj struct {
-				ResourceID   string
-				ManagerID    string
-				AWSAccountID string
-				AWSRegion    string
-			}
-
-			toSend := resourceObj{
-				detail.ConfigurationItem.ResourceId,
-				managerInstance.ManagedId,
-				detail.ConfigurationItem.AWSAccountId,
-				detail.ConfigurationItem.AWSRegion,
-			}
-			if toSend.ResourceID != "" && toSend.ManagerID != "" && toSend.AWSAccountID != "" && toSend.AWSRegion != "" {
-				b, error := json.Marshal(toSend)
-
-				if error != nil {
-					return error
-				}
-				params := &sns.PublishInput{
-					Message:  aws.String(string(b)),
-					TopicArn: aws.String(SnsTopic),
-				}
-
-				_, err := svc.Publish(params)
-				if err != nil {
-					return err
-				}
-			}
+			publishSNSTopic(managerInstance, detail)
 		}
 	}
 	return nil
 }
 
+func publishSNSTopic(managerInstance *store.RegistrationEntry, detail manager.ConfigurationItemDetail) error {
+	config := aws.NewConfig()
+	sess := session.New(config)
+	if CrossAccountRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, CrossAccountRole)
+	}
+	svc := sns.New(sess, config)
+
+	type resourceObj struct {
+		ResourceID   string
+		ManagerID    string
+		AWSAccountID string
+		AWSRegion    string
+	}
+
+	toSend := resourceObj{
+		detail.ConfigurationItem.ResourceId,
+		managerInstance.ManagedId,
+		detail.ConfigurationItem.AWSAccountId,
+		detail.ConfigurationItem.AWSRegion,
+	}
+	if toSend.ResourceID != "" && toSend.ManagerID != "" && toSend.AWSAccountID != "" && toSend.AWSRegion != "" {
+		b, error := json.Marshal(toSend)
+
+		if error != nil {
+			return error
+		}
+		params := &sns.PublishInput{
+			Message:  aws.String(string(b)),
+			TopicArn: aws.String(SnsTopic),
+		}
+
+		_, err := svc.Publish(params)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 func downloadS3ConfigurationItem(path string) ([]byte, error) {
 	config := aws.NewConfig()
 	sess := session.New(config)
