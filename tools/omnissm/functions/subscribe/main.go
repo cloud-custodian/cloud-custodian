@@ -31,7 +31,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/store"
 )
@@ -71,26 +70,26 @@ func init() {
 }
 
 func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error {
-	managedId := identity.Hash(detail.ConfigurationItem.Name())
-	managerInstance, err, ok := mgr.Get(managedId)
+	entry, err, ok := mgr.Get(detail.ConfigurationItem.Name())
 	if err != nil {
 		return err
 	}
 	if !ok {
-		log.Info().Err(err).Msgf("instance not found: %#v", managedId)
+		log.Info().Err(err).Msgf("instance not found: %#v", entry.ManagedId)
 		return nil
 	}
 	switch detail.ConfigurationItem.ConfigurationItemStatus {
 	case "ResourceDiscovered", "OK":
-		if err := mgr.Update(managedId, detail.ConfigurationItem); err != nil {
+		if err := mgr.Update(entry.ManagedId, detail.ConfigurationItem); err != nil {
 			return err
 		}
 	case "ResourceDeleted":
-		if err := mgr.Delete(managedId); err != nil {
+		if err := mgr.Delete(entry.ManagedId); err != nil {
 			return err
 		}
 		if SnsTopic != "" {
-			publishSNSTopic(managerInstance, detail)
+			err := publishSNSTopic(entry, detail)
+			return err
 		}
 	}
 	return nil
