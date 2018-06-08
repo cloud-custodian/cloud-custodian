@@ -17,7 +17,7 @@ from c7n_azure.provider import resources
 
 
 @resources.register('appserviceplan')
-class AppService(ArmResourceManager):
+class AppServicePlan(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.web'
