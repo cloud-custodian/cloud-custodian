@@ -24,53 +24,62 @@ from c7n_azure.utils import ResourceIdParser
 class Session(object):
 
     def __init__(self, subscription_id=None):
+        """
+        Creates a session using available authentication type.
+
+        Auth priority:
+        1. Token Auth
+        2. Tenant Auth
+        3. Azure CLI Auth
+
+        :param subscription_id: If provided, overrides environment variables.
+        """
+
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
 
-        self.subscription_id = subscription_id
         tenant_auth_variables = [
             'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
             'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
         ]
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
 
-        # If the user has specified they want to auth with Azure CLI
-        # then load up the cached CLI credentials
-        if 'AZURE_CLI_AUTH' in os.environ:
-            (self.credentials,
-             subscription_id,
-             self.tenant_id) = Profile().get_login_credentials(
-                resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
-            if self.subscription_id is None:
-                self.subscription_id = subscription_id
-            return
-
-        # Try to do token auth which supports unit tests or other integrations
-        # which want to pass an existing token
         if all(k in os.environ for k in token_auth_variables):
+            # Token authentication
             self.credentials = BasicTokenAuthentication(
                 token={
                     'access_token': os.environ['AZURE_ACCESS_TOKEN']
                 })
-            if self.subscription_id is None:
-                self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
-            return
+            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            self.log.info("Creating session with Token Authentication")
 
-        # Set credentials with environment variables if all
-        # required variables are present
-        if all(k in os.environ for k in tenant_auth_variables):
-
+        elif all(k in os.environ for k in tenant_auth_variables):
+            # Tenant (service principal) authentication
             self.credentials = ServicePrincipalCredentials(
                 client_id=os.environ['AZURE_CLIENT_ID'],
                 secret=os.environ['AZURE_CLIENT_SECRET'],
                 tenant=os.environ['AZURE_TENANT_ID']
             )
-            if self.subscription_id is None:
-                self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.tenant_id = os.environ['AZURE_TENANT_ID']
-            return
+            self.log.info("Creating session with Service Principal Authentication")
 
-        self.log.error('Unable to locate credentials for Azure session.')
+        else:
+            # Azure CLI authentication
+            (self.credentials,
+             self.subscription_id,
+             self.tenant_id) = Profile().get_login_credentials(
+                resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
+            self.log.info("Creating session with Azure CLI Authentication")
+
+        # Let provided id parameter override everything else
+        if subscription_id is not None:
+            self.subscription_id = subscription_id
+
+        self.log.info("Session using Subscription ID: %s" % self.subscription_id)
+
+        if self.credentials is None:
+            self.log.error('Unable to locate credentials for Azure session.')
 
     def client(self, client):
         service_name, client_name = client.rsplit('.', 1)
