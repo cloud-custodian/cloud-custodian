@@ -51,7 +51,7 @@ class InstanceViewFilter(ValueFilter):
 
 
 @VirtualMachine.action_registry.register('stop')
-class VmShutdown(BaseAction):
+class VmStopAction(BaseAction):
 
     schema = type_schema('stop')
 
@@ -61,7 +61,7 @@ class VmShutdown(BaseAction):
 
 
 @VirtualMachine.action_registry.register('start')
-class VmShutdown(BaseAction):
+class VmStartAction(BaseAction):
 
     schema = type_schema('start')
 
@@ -71,7 +71,7 @@ class VmShutdown(BaseAction):
 
 
 @VirtualMachine.action_registry.register('restart')
-class VmShutdown(BaseAction):
+class VmRestartAction(BaseAction):
 
     schema = type_schema('restart')
 
@@ -81,7 +81,7 @@ class VmShutdown(BaseAction):
 
 
 @VirtualMachine.action_registry.register('delete')
-class VmShutdown(BaseAction):
+class VmDeleteAction(BaseAction):
 
     schema = type_schema('delete')
 
