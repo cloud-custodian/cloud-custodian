@@ -141,7 +141,8 @@ def main():
     session = session_factory(mailer_config)
     if args_dict.get('update_lambda'):
         if azure(mailer_config):
-            print('not yet implemented')
+            print('\n** Azure functions support not yet implemented. **\n')
+            return
         if args_dict.get('debug'):
             print('\n** --debug is only supported with --run, not --update-lambda **\n')
             return
