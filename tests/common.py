@@ -13,26 +13,18 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import io
 import json
 import logging
 import os
-import shutil
-import tempfile
 import unittest
 import uuid
 from functools import partial
 
-import six
-import yaml
-
-from c7n import policy
-from c7n.schema import generate, validate as schema_validate
-from c7n.ctx import ExecutionContext
+from c7n.schema import generate
 from c7n.resources import load_resources
-from c7n.utils import CONN_CACHE
 from c7n.config import Bag, Config
 
+from c7n.testing import TestUtils, TextTestIO # NOQA
 from .zpill import PillTest
 
 
@@ -44,8 +36,9 @@ load_resources()
 
 ACCOUNT_ID = "644160558196"
 
-C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
+
 C7N_SCHEMA = generate()
+C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
 
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason="We are not validating schemas."
@@ -67,140 +60,9 @@ if "AWS_DEFAULT_REGION" not in os.environ:
     os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
 
-class BaseTest(PillTest):
+class BaseTest(TestUtils, PillTest):
 
-    def cleanUp(self):
-        # Clear out thread local session cache
-        CONN_CACHE.session = None
-
-    def write_policy_file(self, policy, format="yaml"):
-        """ Write a policy file to disk in the specified format.
-
-        Input a dictionary and a format. Valid formats are `yaml` and `json`
-        Returns the file path.
-        """
-        fh = tempfile.NamedTemporaryFile(mode="w+b", suffix="." + format)
-        if format == "json":
-            fh.write(json.dumps(policy).encode("utf8"))
-        else:
-            fh.write(yaml.dump(policy, encoding="utf8", Dumper=yaml.SafeDumper))
-
-        fh.flush()
-        self.addCleanup(fh.close)
-        return fh.name
-
-    def get_temp_dir(self):
-        """ Return a temporary directory that will get cleaned up. """
-        temp_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, temp_dir)
-        return temp_dir
-
-    def get_context(self, config=None, session_factory=None, policy=None):
-        if config is None:
-            self.context_output_dir = self.get_temp_dir()
-            config = Config.empty(output_dir=self.context_output_dir)
-        ctx = ExecutionContext(
-            session_factory, policy or Bag({"name": "test-policy"}), config
-        )
-        return ctx
-
-    def load_policy(
-        self,
-        data,
-        config=None,
-        session_factory=None,
-        validate=C7N_VALIDATE,
-        output_dir=None,
-        cache=False,
-    ):
-        if validate:
-            errors = schema_validate({"policies": [data]}, C7N_SCHEMA)
-            if errors:
-                raise errors[0]
-
-        config = config or {}
-        if not output_dir:
-            temp_dir = self.get_temp_dir()
-            config["output_dir"] = temp_dir
-        if cache:
-            config["cache"] = os.path.join(temp_dir, "c7n.cache")
-            config["cache_period"] = 300
-        conf = Config.empty(**config)
-        p = policy.Policy(data, conf, session_factory)
-        p.validate()
-        return p
-
-    def load_policy_set(self, data, config=None):
-        filename = self.write_policy_file(data)
-        if config:
-            config["account_id"] = ACCOUNT_ID
-            e = Config.empty(**config)
-        else:
-            e = Config.empty(account_id=ACCOUNT_ID)
-        return policy.load(e, filename)
-
-    def patch(self, obj, attr, new):
-        old = getattr(obj, attr, None)
-        setattr(obj, attr, new)
-        self.addCleanup(setattr, obj, attr, old)
-
-    def change_cwd(self, work_dir=None):
-        if work_dir is None:
-            work_dir = self.get_temp_dir()
-
-        cur_dir = os.path.abspath(os.getcwd())
-
-        def restore():
-            os.chdir(cur_dir)
-
-        self.addCleanup(restore)
-
-        os.chdir(work_dir)
-        return work_dir
-
-    def change_environment(self, **kwargs):
-        """Change the environment to the given set of variables.
-
-        To clear an environment variable set it to None.
-        Existing environment restored after test.
-        """
-        # preserve key elements needed for testing
-        for env in ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_DEFAULT_REGION"]:
-            if env not in kwargs:
-                kwargs[env] = os.environ.get(env, "")
-
-        original_environ = dict(os.environ)
-
-        @self.addCleanup
-        def cleanup_env():
-            os.environ.clear()
-            os.environ.update(original_environ)
-
-        os.environ.clear()
-        for key, value in kwargs.items():
-            if value is None:
-                del (kwargs[key])
-        os.environ.update(kwargs)
-
-    def capture_logging(
-        self, name=None, level=logging.INFO, formatter=None, log_file=None
-    ):
-        if log_file is None:
-            log_file = TextTestIO()
-        log_handler = logging.StreamHandler(log_file)
-        if formatter:
-            log_handler.setFormatter(formatter)
-        logger = logging.getLogger(name)
-        logger.addHandler(log_handler)
-        old_logger_level = logger.level
-        logger.setLevel(level)
-
-        @self.addCleanup
-        def reset_logging():
-            logger.removeHandler(log_handler)
-            logger.setLevel(old_logger_level)
-
-        return log_file
+    custodian_schema = C7N_SCHEMA
 
     @property
     def account_id(self):
@@ -284,20 +146,6 @@ class ConfigTest(BaseTest):
         )
         self.addCleanup(sns.unsubscribe, SubscriptionArn=subscription)
         return queue_url
-
-
-class TextTestIO(io.StringIO):
-
-    def write(self, b):
-
-        # print handles both str/bytes and unicode/str, but io.{String,Bytes}IO
-        # requires us to choose. We don't have control over all of the places
-        # we want to print from (think: traceback.print_exc) so we can't
-        # standardize the arg type up at the call sites. Hack it here.
-
-        if not isinstance(b, six.text_type):
-            b = b.decode("utf8")
-        return super(TextTestIO, self).write(b)
 
 
 def placebo_dir(name):

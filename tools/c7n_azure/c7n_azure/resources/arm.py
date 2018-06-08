@@ -13,10 +13,12 @@
 # limitations under the License.
 
 import six
-from c7n_azure.query import QueryResourceManager, QueryMeta
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim
-from c7n_azure.utils import ResourceIdParser
+from c7n_azure.filters import MetricFilter
 from c7n_azure.provider import resources
+from c7n_azure.query import QueryResourceManager, QueryMeta
+from c7n_azure.utils import ResourceIdParser
+
 from c7n.utils import local_session
 
 
@@ -60,6 +62,7 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('untag', RemoveTag)
                 klass.action_registry.register('auto-tag-user', AutoTagUser)
                 klass.action_registry.register('tag-trim', TagTrim)
+                klass.filter_registry.register('metric', MetricFilter)
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)
