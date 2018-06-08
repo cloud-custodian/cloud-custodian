@@ -15,6 +15,8 @@
 package manager
 
 import (
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -26,40 +28,22 @@ import (
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/store"
 )
 
-const DefaultSSMServiceRole = "service-role/AmazonEC2RunCommandRoleForManagedInstances"
-
-type Config struct {
-	*aws.Config
-	RegistrationsTable string
-	ResourceTags       []string
-	InstanceRole       string
-	QueueName          string
-}
-
 type Manager struct {
 	ssmiface.SSMAPI
 	*store.Registrations
 
-	resourceTags    map[string]struct{}
-	ssmInstanceRole string
-	queue           *Queue
+	config *Config
+	queue  *Queue
 }
 
 func New(config *Config) (*Manager, error) {
-	if config.InstanceRole == "" {
-		config.InstanceRole = DefaultSSMServiceRole
-	}
 	m := &Manager{
-		SSMAPI:          ssm.New(session.New(config.Config)),
-		Registrations:   store.NewRegistrations(config.Config, config.RegistrationsTable),
-		resourceTags:    make(map[string]struct{}),
-		ssmInstanceRole: config.InstanceRole,
+		SSMAPI:        ssm.New(session.New(config.Config)),
+		Registrations: store.NewRegistrations(config.Config, config.RegistrationsTable),
+		config:        config,
 	}
 	if len(config.ResourceTags) == 0 {
 		config.ResourceTags = []string{"App", "OwnerContact", "Name"}
-	}
-	for _, t := range config.ResourceTags {
-		m.resourceTags[t] = struct{}{}
 	}
 	if config.QueueName != "" {
 		var err error
@@ -74,7 +58,7 @@ func New(config *Config) (*Manager, error) {
 func (m *Manager) Register(doc *identity.Document) (*store.RegistrationEntry, error) {
 	resp, err := m.SSMAPI.CreateActivation(&ssm.CreateActivationInput{
 		DefaultInstanceName: aws.String(doc.Name()),
-		IamRole:             aws.String(m.ssmInstanceRole),
+		IamRole:             aws.String(m.config.InstanceRole),
 		Description:         aws.String(doc.Name()),
 	})
 	if err != nil {
@@ -91,8 +75,12 @@ func (m *Manager) Register(doc *identity.Document) (*store.RegistrationEntry, er
 	}
 	entry := &store.RegistrationEntry{
 		Id:             identity.Hash(doc.Name()),
+		CreatedAt:      time.Now().UTC(),
 		ActivationId:   *resp.ActivationId,
 		ActivationCode: *resp.ActivationCode,
+		AccountId:      doc.AccountId,
+		Region:         doc.Region,
+		InstanceId:     doc.InstanceId,
 	}
 	err = m.Put(entry)
 	if err != nil {
@@ -110,21 +98,17 @@ func (m *Manager) Register(doc *identity.Document) (*store.RegistrationEntry, er
 	return entry, nil
 }
 
-func (m *Manager) Update(id string, ci ConfigurationItem) error {
-	platform := "Linux"
-	if ci.Configuration.Platform != "" {
-		platform = ci.Configuration.Platform
-	}
+func (m *Manager) Update(managedId string, ci ConfigurationItem) error {
 	tags := make([]*ssm.Tag, 0)
 	for k, v := range ci.Tags {
-		if _, ok := m.resourceTags[k]; !ok {
+		if !m.config.HasResourceTag(k) {
 			continue
 		}
 		tags = append(tags, &ssm.Tag{Key: aws.String(k), Value: aws.String(v)})
 	}
 	_, err := m.SSMAPI.AddTagsToResource(&ssm.AddTagsToResourceInput{
 		ResourceType: aws.String(ssm.ResourceTypeForTaggingManagedInstance),
-		ResourceId:   aws.String(id),
+		ResourceId:   aws.String(managedId),
 		Tags:         tags,
 	})
 	if err != nil {
@@ -133,7 +117,7 @@ func (m *Manager) Update(id string, ci ConfigurationItem) error {
 				Id   string
 				Tags []*ssm.Tag
 			}{
-				Id:   id,
+				Id:   managedId,
 				Tags: tags,
 			}
 			msg, mErr := NewMessage(AddTagsToResource, &body)
@@ -144,7 +128,11 @@ func (m *Manager) Update(id string, ci ConfigurationItem) error {
 				return mErr
 			}
 		}
-		return errors.Wrapf(err, "ssm.AddTagsToResource failed: %#v", id)
+		return errors.Wrapf(err, "ssm.AddTagsToResource failed: %#v", managedId)
+	}
+	platform := "Linux"
+	if ci.Configuration.Platform != "" {
+		platform = ci.Configuration.Platform
 	}
 	content := map[string]string{
 		"Region":       ci.AWSRegion,
@@ -161,7 +149,7 @@ func (m *Manager) Update(id string, ci ConfigurationItem) error {
 		"State":        string(ci.Configuration.State),
 	}
 	_, err = m.SSMAPI.PutInventory(&ssm.PutInventoryInput{
-		InstanceId: aws.String(id),
+		InstanceId: aws.String(managedId),
 		Items: []*ssm.InventoryItem{{
 			CaptureTime:   aws.String(ci.ConfigurationItemCaptureTime), // "2006-01-02T15:04:05Z"
 			Content:       []map[string]*string{aws.StringMap(content)},
@@ -186,7 +174,7 @@ func (m *Manager) Update(id string, ci ConfigurationItem) error {
 				return mErr
 			}
 		}
-		return errors.Wrapf(err, "ssm.PutInventory failed: %#v", id)
+		return errors.Wrapf(err, "ssm.PutInventory failed: %#v", managedId)
 	}
 	return nil
 }

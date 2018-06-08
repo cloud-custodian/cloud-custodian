@@ -60,6 +60,10 @@ type ConfigurationItem struct {
 			ARN string `json:"arn"`
 			Id  string `json:"id"`
 		} `json:"iamInstanceProfile"`
+		Tags []struct {
+			Key   string `json:"key"`
+			Value string `json:"Value"`
+		} `json:"tags"`
 		VPCId string `json:"vpcId"`
 	} `json:"configuration"`
 	SupplementaryConfiguration   struct{}          `json:"supplementaryConfiguration"`

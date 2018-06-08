@@ -1,0 +1,12 @@
+accountWhitelist:
+  - 123445678901
+assumeRoles:
+  123445678901: omnisssm-iam-role
+instanceRole: null
+maxRetries: 10
+queueName: omnissm-spillover.fifo
+registrationsTable: omnissm-registrations
+resourceTags:
+  - Name
+  - OwnerContact
+  - App

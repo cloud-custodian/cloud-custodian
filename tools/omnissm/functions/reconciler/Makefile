@@ -1,3 +1,4 @@
+
 bucket = c7n-ssm-build
 stack = omnissm
 
@@ -21,7 +22,7 @@ delete:
 update:
 	GOOS=linux go build -o main main.go
 	zip main.zip main
-	aws lambda update-function-code --function-name="omnissm-register" --zip-file fileb://main.zip
+	aws lambda update-function-code --function-name="omnissm-reconciler" --zip-file fileb://main.zip
 	rm main main.zip
 
 
