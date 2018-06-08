@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
 import sendgrid
 import six
+from python_http_client import exceptions
 from sendgrid.helpers.mail import Email, Content, Mail
 
 from .utils import (
@@ -27,7 +26,7 @@ class SendGridDelivery(object):
     def __init__(self, config, logger):
         self.config = config
         self.logger = logger
-        self.sendgrid_client = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+        self.sendgrid_client = sendgrid.SendGridAPIClient(apikey=self.config['sendgrid_api_key'])
 
     def get_to_addrs_sendgrid_messages_map(self, queue_message):
         targets = queue_message['action']['to']
@@ -72,14 +71,17 @@ class SendGridDelivery(object):
                 mail = Mail(from_email, subject, to_email, content)
                 try:
                     self.sendgrid_client.client.mail.send.post(request_body=mail.get())
-                except Exception as error:
+                except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
                     self.logger.warning(
-                        "Error policy:%s account:%s sending to:%s \n\n error:"
-                        " %s\n\n mailer.yml: %s" % (
+                        "\n**Error \nPolicy:%s \nAccount:%s \nSending to:%s \n\nRequest body:"
+                        "\n%s\n\nRequest headers:\n%s\n\n mailer.yml: %s" % (
                             queue_message['policy'],
                             queue_message.get('account', ''),
                             email_to_addrs,
-                            error,
+                            e.body,
+                            e.headers,
                             self.config
                         )
                     )
+                    return False
+        return True

@@ -6,13 +6,10 @@ import logging
 
 import boto3
 import jsonschema
-from c7n_azure.session import Session
 from c7n_mailer import deploy, utils
 from c7n_mailer.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from ruamel import yaml
-
-from c7n.utils import local_session
 
 CONFIG_SCHEMA = {
     'type': 'object',
@@ -64,6 +61,7 @@ CONFIG_SCHEMA = {
         'datadog_application_key': {'type': 'string'},      # TODO: encrypt with KMS?
         'slack_token': {'type': 'string'},
         'slack_webhook': {'type': 'string'},
+        'sendgrid_api_key': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},
@@ -77,8 +75,6 @@ CONFIG_SCHEMA = {
 
 
 def session_factory(mailer_config):
-    if azure(mailer_config):
-        return local_session(Session)
     return boto3.Session(
         region_name=mailer_config['region'],
         profile_name=mailer_config.get('profile', None))
@@ -128,7 +124,7 @@ def run_mailer_in_parallel(processor, max_num_processes):
     processor.run(parallel=True)
 
 
-def azure(mailer_config):
+def is_azure_cloud(mailer_config):
     return mailer_config.get('queue_url').startswith('asq')
 
 
@@ -138,10 +134,10 @@ def main():
     mailer_config = get_and_validate_mailer_config(args)
     args_dict = vars(args)
     logger = get_logger(debug=args_dict.get('debug', False))
-    session = session_factory(mailer_config)
+
     if args_dict.get('update_lambda'):
-        if azure(mailer_config):
-            print('\n** Azure functions support not yet implemented. **\n')
+        if is_azure_cloud(mailer_config):
+            print('\n** Lambda support not available for Azure queues **\n')
             return
         if args_dict.get('debug'):
             print('\n** --debug is only supported with --run, not --update-lambda **\n')
@@ -151,10 +147,18 @@ def main():
                   'with --run, not --update-lambda **\n')
             return
         deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
+
     if args_dict.get('run'):
         max_num_processes = args_dict.get('max_num_processes')
-        processor = MailerAzureQueueProcessor(mailer_config, logger) if azure(mailer_config) \
-            else MailerSqsQueueProcessor(mailer_config, session, logger)
+
+        # Select correct processor
+        if is_azure_cloud(mailer_config):
+            processor = MailerAzureQueueProcessor(mailer_config, logger)
+        else:
+            aws_session = session_factory(mailer_config)
+            processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+
+        # Execute
         if max_num_processes:
             run_mailer_in_parallel(processor, max_num_processes)
         else:
