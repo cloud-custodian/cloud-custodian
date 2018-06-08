@@ -15,6 +15,7 @@
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.filters.core import ValueFilter, type_schema
+from c7n.actions import BaseAction
 
 
 @resources.register('vm')
@@ -47,3 +48,43 @@ class InstanceViewFilter(ValueFilter):
             i['instanceView'] = instance.serialize()
 
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
+
+
+@VirtualMachine.action_registry.register('stop')
+class VmShutdown(BaseAction):
+
+    schema = type_schema('stop')
+
+    def process(self, vms):
+        for vm in vms:
+            self.manager.get_client().virtual_machines.power_off(vm['resourceGroup'], vm['name'])
+
+
+@VirtualMachine.action_registry.register('start')
+class VmShutdown(BaseAction):
+
+    schema = type_schema('start')
+
+    def process(self, vms):
+        for vm in vms:
+            self.manager.get_client().virtual_machines.start(vm['resourceGroup'], vm['name'])
+
+
+@VirtualMachine.action_registry.register('restart')
+class VmShutdown(BaseAction):
+
+    schema = type_schema('restart')
+
+    def process(self, vms):
+        for vm in vms:
+            self.manager.get_client().virtual_machines.restart(vm['resourceGroup'], vm['name'])
+
+
+@VirtualMachine.action_registry.register('delete')
+class VmShutdown(BaseAction):
+
+    schema = type_schema('delete')
+
+    def process(self, vms):
+        for vm in vms:
+            self.manager.get_client().virtual_machines.delete(vm['resourceGroup'], vm['name'])
