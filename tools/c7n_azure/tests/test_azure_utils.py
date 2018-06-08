@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest
 from c7n_azure.utils import ResourceIdParser
+from c7n_azure.utils import Math
 
 RESOURCE_ID = (
     "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
@@ -35,3 +36,13 @@ class UtilsTest(BaseTest):
 
     def test_resource_name(self):
         self.assertEqual(ResourceIdParser.get_resource_name(RESOURCE_ID), "nametest")
+
+    def test_math_mean(self):
+        self.assertEqual(Math.mean([4, 5, None, 3]), 4)
+        self.assertEqual(Math.mean([None]), 0)
+        self.assertEqual(Math.mean([3, 4]), 3.5)
+
+    def test_math_sum(self):
+        self.assertEqual(Math.sum([4, 5, None, 3]), 12)
+        self.assertEqual(Math.sum([None]), 0)
+        self.assertEqual(Math.sum([3.5, 4]), 7.5)
