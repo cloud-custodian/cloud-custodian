@@ -11,16 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import logging
-
-import c7n_gcp.resources.compute
-import c7n_gcp.resources.function
-import c7n_gcp.resources.resourcemanager
-import c7n_gcp.resources.storage  # noqa: F401
-
-logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
+from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.provider import resources
 
 
-def initialize_gcp():
-    pass
+@resources.register('function')
+class Instance(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudfunctions'
+        version = 'v1'
+        component = 'projects.locations.functions'
+        enum_spec = ('list', 'functions[]', None)
+        scope = 'project'
+        scope_key = 'parent'
+        scope_template = "projects/{}/locations/-"
