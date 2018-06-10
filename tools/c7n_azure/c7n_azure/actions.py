@@ -38,6 +38,9 @@ def update_resource_tags(self, resource, tags):
         )
     # other Azure resources
     else:
+        if self.manager.type == 'armresource':
+            raise NotImplementedError('Cannot tag generic ARM resources.')
+
         az_resource = GenericResource.deserialize(resource)
         api_version = self.session.resource_api_version(az_resource.id)
         az_resource.tags = tags
@@ -248,7 +251,7 @@ class AutoTagUser(BaseAction):
     def get_first_operation(logs, operation_name):
         first_operation = None
         for l in logs:
-            if l.operation_name.value == operation_name:
+            if l.operation_name.value.lower() == operation_name.lower():
                 first_operation = l
 
         return first_operation

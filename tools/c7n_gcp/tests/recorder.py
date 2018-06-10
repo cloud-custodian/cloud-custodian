@@ -14,6 +14,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import bz2
 import json
 import os
 
@@ -33,21 +34,24 @@ class FlightRecorder(Http):
         base_name = "%s%s" % (
             method.lower(), urlparse(uri).path.replace('/', '-'))
         data_dir = self._data_path
+        is_discovery = False
         # We don't record authentication
         if base_name.startswith('post-oauth2-v4'):
             return
         # Use a common directory for discovery metadata across tests.
         if base_name.startswith('get-discovery'):
             data_dir = self._discovery_path
+            is_discovery = True
 
         next_file = None
         while next_file is None:
             index = self._index.setdefault(base_name, 1)
-            fn = os.path.join(
-                data_dir, '{}_{}.json'.format(base_name, index))
+            fn = os.path.join(data_dir, '{}_{}.json'.format(base_name, index))
+            if is_discovery:
+                fn += '.bz2'
             if os.path.exists(fn):
                 # if we already have discovery metadata, don't re-record it.
-                if record and data_dir == self._discovery_path:
+                if record and is_discovery:
                     return None
                 next_file = fn
                 self._index[base_name] += 1
@@ -56,7 +60,6 @@ class FlightRecorder(Http):
             elif record:
                 return fn
             else:
-                return IOError('response file ({0}) not found'.format(fn))
         return fn
 
 
@@ -69,7 +72,10 @@ class HttpRecorder(FlightRecorder):
         fpath = self.get_next_file_path(uri, method)
         if fpath is None:
             return response, content
-        with open(fpath, 'w') as fh:
+        fopen = open
+        if fpath.endswith('.bz2'):
+            fopen = bz2.BZ2File
+        with fopen(fpath, 'w') as fh:
             recorded = {}
             recorded['headers'] = dict(response)
             recorded['body'] = json.loads(content)
@@ -84,6 +90,8 @@ class HttpReplay(FlightRecorder):
             {'access_token': 'ya29', 'token_type': 'Bearer',
              'expires_in': 3600})}
 
+    _cache = {}
+
     def request(self, uri, method="GET", body=None, headers=None,
                 redirections=1, connection_type=None):
         if (method, uri) in self.static_responses:
@@ -94,8 +102,17 @@ class HttpReplay(FlightRecorder):
                 self.static_responses[(method, uri)])
 
         fpath = self.get_next_file_path(uri, method, record=False)
-        with open(fpath, 'r') as fh:
+        fopen = open
+        if fpath.endswith('.bz2'):
+            if fpath in self._cache:
+                return self._cache[fpath]
+            fopen = bz2.BZ2File
+        with fopen(fpath, 'r') as fh:
             data = json.load(fh)
             response = Response(data['headers'])
+            serialized = json.dumps(data['body'])
+            if fpath.endswith('bz2'):
+                self._cache[fpath] = response, serialized
             # serialize again, this runtime helps keep on the disk pretty.
-            return response, json.dumps(data['body'])
+            return response, serialized
+
