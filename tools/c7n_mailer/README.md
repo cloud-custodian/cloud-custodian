@@ -357,6 +357,8 @@ For reference purposes, the JSON Schema of the `notify` action:
 
 ## Using on Azure
 
+Requires `c7n_azure` package.  See [Installing Azure Plugin](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html#install-cloud-custodian)
+
 The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.  
 Configuration for this scenario requires only minor changes from AWS deployments.
 

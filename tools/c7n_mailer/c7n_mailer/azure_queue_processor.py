@@ -21,14 +21,21 @@ import json
 import traceback
 import zlib
 
-from c7n_azure.storage_utils import StorageUtilities
-
 from .sendgrid_delivery import SendGridDelivery
+
+try:
+    from c7n_azure.storage_utils import StorageUtilities
+except ImportError:
+    StorageUtilities = None
+    pass
 
 
 class MailerAzureQueueProcessor(object):
 
     def __init__(self, config, logger, max_num_processes=16):
+        if StorageUtilities is None:
+            raise Exception("Using Azure queue requires package c7n_azure to be installed.")
+
         self.max_num_processes = max_num_processes
         self.config = config
         self.logger = logger
