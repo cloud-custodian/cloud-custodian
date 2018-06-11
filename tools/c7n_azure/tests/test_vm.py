@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
+from mock import patch
 
 
 class VMTest(BaseTest):
@@ -54,25 +55,15 @@ class VMTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    fake_running_vms = [{
+        'resourceGroup': 'test_resource_group',
+        'name': 'test_vm'
+    }]
+
     @arm_template('vm.json')
-    def test_stop(self):
-        p = self.load_policy({
-            'name': 'test-azure-vm',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'},
-                {'type': 'instance-view',
-                 'key': 'statuses[].code',
-                 'op': 'in',
-                 'value_type': 'swap',
-                 'value': 'PowerState/running'}],
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmStopAction.stop')
+    def test_stop(self, filter_mock, stop_action_mock):
 
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -93,27 +84,13 @@ class VMTest(BaseTest):
             ]
         })
         p.run()
-
-        p = self.load_policy({
-            'name': 'test-azure-vm',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'},
-                {'type': 'instance-view',
-                 'key': 'statuses[].code',
-                 'op': 'in',
-                 'value_type': 'swap',
-                 'value': 'PowerState/running'}],
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
+        stop_action_mock.assert_called()
 
     @arm_template('vm.json')
-    def test_start(self):
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmStartAction.start')
+    def test_start(self, filter_mock, start_action_mock):
+
         p = self.load_policy({
             'name': 'test-azure-vm',
             'resource': 'azure.vm',
@@ -128,24 +105,17 @@ class VMTest(BaseTest):
                  'op': 'in',
                  'value_type': 'swap',
                  'value': 'PowerState/running'}],
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
-
-        p = self.load_policy({
-            'name': 'test-azure-vm',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'}],
             'actions': [
                 {'type': 'start'}
             ]
         })
         p.run()
+        start_action_mock.assert_called()
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmRestartAction.restart')
+    def test_restart(self, filter_mock, restart_action_mock):
 
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -161,6 +131,35 @@ class VMTest(BaseTest):
                  'op': 'in',
                  'value_type': 'swap',
                  'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'restart'}
+            ]
         })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        p.run()
+        restart_action_mock.assert_called()
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmDeleteAction.delete')
+    def test_delete(self, filter_mock, delete_action_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        })
+        p.run()
+        delete_action_mock.assert_called()

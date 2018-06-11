@@ -55,9 +55,13 @@ class VmStopAction(BaseAction):
 
     schema = type_schema('stop')
 
+    def stop(self, resource_group, vm_name):
+        self.client.virtual_machines.power_off(resource_group, vm_name)
+
     def process(self, vms):
+        self.client = self.manager.get_client()
         for vm in vms:
-            self.manager.get_client().virtual_machines.power_off(vm['resourceGroup'], vm['name'])
+            self.stop(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('start')
@@ -65,9 +69,13 @@ class VmStartAction(BaseAction):
 
     schema = type_schema('start')
 
+    def start(self, resource_group, vm_name):
+        self.client.virtual_machines.start(resource_group, vm_name)
+
     def process(self, vms):
+        self.client = self.manager.get_client()
         for vm in vms:
-            self.manager.get_client().virtual_machines.start(vm['resourceGroup'], vm['name'])
+            self.start(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('restart')
@@ -75,9 +83,13 @@ class VmRestartAction(BaseAction):
 
     schema = type_schema('restart')
 
+    def restart(self, resource_group, vm_name):
+        self.client.virtual_machines.restart(resource_group, vm_name)
+
     def process(self, vms):
+        self.client = self.manager.get_client()
         for vm in vms:
-            self.manager.get_client().virtual_machines.restart(vm['resourceGroup'], vm['name'])
+            self.restart(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('delete')
@@ -85,6 +97,10 @@ class VmDeleteAction(BaseAction):
 
     schema = type_schema('delete')
 
+    def delete(self, resource_group, vm_name):
+        self.client.virtual_machines.delete(resource_group, vm_name)
+
     def process(self, vms):
+        self.client = self.manager.get_client()
         for vm in vms:
-            self.manager.get_client().virtual_machines.delete(vm['resourceGroup'], vm['name'])
+            self.delete(vm['resourceGroup'], vm['name'])
