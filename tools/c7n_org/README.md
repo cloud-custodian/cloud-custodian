@@ -163,3 +163,13 @@ credential information into the process environment before executing.
 
 c7n-org also supports generating reports for a given policy execution
 across accounts via the `c7n-org report` subcommand.
+
+## Additional Azure Instructions
+
+If you're using an Azure Service Principal for executing c7n-org
+you'll need to ensure that the principal has access to multiple
+subscriptions.
+
+For instructions on creating a service principal and granting access
+across subscriptions, visit the [Azure authentication docs
+page](http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html).
