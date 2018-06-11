@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "clusters": [
+            "dev"
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3a9c3493-6d8a-11e8-99fa-5325624316ba", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3a9c3493-6d8a-11e8-99fa-5325624316ba", 
+                "content-length": "37", 
+                "x-amz-apigw-id": "IUu_jHfVIAMFwjg=", 
+                "x-amzn-trace-id": "Root=1-5b1e91fd-6878f5a013f076a0a8ca4d20", 
+                "connection": "keep-alive", 
+                "date": "Mon, 11 Jun 2018 15:15:09 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

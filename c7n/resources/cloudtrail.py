@@ -28,7 +28,7 @@ class CloudTrail(QueryResourceManager):
         #    'get_event_selectors', 'TrailName', 'TrailArn', None)
         filter_name = 'trailNameList'
         filter_type = 'list'
-        id = 'TrailArn'
+        id = 'TrailARN'
         name = 'Name'
         dimension = None
         config_type = "AWS::CloudTrail::Trail"
