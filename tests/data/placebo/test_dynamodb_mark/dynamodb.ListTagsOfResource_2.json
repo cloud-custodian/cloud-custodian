@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "V1QVBPF0LUUBBM9MQIDKSNM13NVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "V1QVBPF0LUUBBM9MQIDKSNM13NVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "88", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "547662945", 
+                "date": "Fri, 08 Jun 2018 23:17:26 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "Resource does not meet policy: delete@2018/06/08", 
+                "Key": "test_tag"
+            }
+        ]
+    }
+}
