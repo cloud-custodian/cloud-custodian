@@ -1,0 +1,85 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1d", 
+                "Tags": [
+                    {
+                        "Value": "shared", 
+                        "Key": "kubernetes.io/cluster/dev"
+                    }, 
+                    {
+                        "Value": "Default-48", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AvailableIpAddressCount": 4088, 
+                "DefaultForAz": true, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-d2d616b5", 
+                "State": "available", 
+                "MapPublicIpOnLaunch": true, 
+                "SubnetId": "subnet-3a334610", 
+                "CidrBlock": "172.31.48.0/20", 
+                "AssignIpv6AddressOnCreation": false
+            }, 
+            {
+                "AvailabilityZone": "us-east-1b", 
+                "Tags": [
+                    {
+                        "Value": "", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "shared", 
+                        "Key": "kubernetes.io/cluster/dev"
+                    }
+                ], 
+                "AvailableIpAddressCount": 4089, 
+                "DefaultForAz": true, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-d2d616b5", 
+                "State": "available", 
+                "MapPublicIpOnLaunch": true, 
+                "SubnetId": "subnet-efbcccb7", 
+                "CidrBlock": "172.31.16.0/20", 
+                "AssignIpv6AddressOnCreation": false
+            }, 
+            {
+                "AvailabilityZone": "us-east-1a", 
+                "Tags": [
+                    {
+                        "Value": "shared", 
+                        "Key": "kubernetes.io/cluster/dev"
+                    }, 
+                    {
+                        "Value": "Pluto", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AvailableIpAddressCount": 4090, 
+                "DefaultForAz": true, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-d2d616b5", 
+                "State": "available", 
+                "MapPublicIpOnLaunch": true, 
+                "SubnetId": "subnet-914763e7", 
+                "CidrBlock": "172.31.0.0/20", 
+                "AssignIpv6AddressOnCreation": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f66c34d5-e655-4b90-9174-8e03fe65d49c", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Mon, 11 Jun 2018 15:12:41 GMT"
+            }
+        }
+    }
+}
