@@ -37,3 +37,16 @@ def utcnow():
     """The datetime object for the current time in UTC
     """
     return datetime.datetime.utcnow()
+
+
+class Math(object):
+
+    @staticmethod
+    def mean(numbers):
+        clean_numbers = [e for e in numbers if e is not None]
+        return float(sum(clean_numbers)) / max(len(clean_numbers), 1)
+
+    @staticmethod
+    def sum(numbers):
+        clean_numbers = [e for e in numbers if e is not None]
+        return float(sum(clean_numbers))

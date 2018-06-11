@@ -58,6 +58,7 @@ def load_resources():
     import c7n.resources.elasticbeanstalk
     import c7n.resources.elasticsearch
     import c7n.resources.elb
+    import c7n.resources.eks
     import c7n.resources.emr
     import c7n.resources.gamelift
     import c7n.resources.glacier
