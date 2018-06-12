@@ -15,6 +15,7 @@
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.filters.core import ValueFilter, type_schema
+from c7n.actions import BaseAction
 
 
 @resources.register('vm')
@@ -47,3 +48,71 @@ class InstanceViewFilter(ValueFilter):
             i['instanceView'] = instance.serialize()
 
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
+
+
+@VirtualMachine.action_registry.register('stop')
+class VmStopAction(BaseAction):
+
+    schema = type_schema('stop')
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(VmStopAction, self).__init__(data, manager, log_dir)
+        self.client = self.manager.get_client()
+
+    def stop(self, resource_group, vm_name):
+        self.client.virtual_machines.power_off(resource_group, vm_name)
+
+    def process(self, vms):
+        for vm in vms:
+            self.stop(vm['resourceGroup'], vm['name'])
+
+
+@VirtualMachine.action_registry.register('start')
+class VmStartAction(BaseAction):
+
+    schema = type_schema('start')
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(VmStartAction, self).__init__(data, manager, log_dir)
+        self.client = self.manager.get_client()
+
+    def start(self, resource_group, vm_name):
+        self.client.virtual_machines.start(resource_group, vm_name)
+
+    def process(self, vms):
+        for vm in vms:
+            self.start(vm['resourceGroup'], vm['name'])
+
+
+@VirtualMachine.action_registry.register('restart')
+class VmRestartAction(BaseAction):
+
+    schema = type_schema('restart')
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(VmRestartAction, self).__init__(data, manager, log_dir)
+        self.client = self.manager.get_client()
+
+    def restart(self, resource_group, vm_name):
+        self.client.virtual_machines.restart(resource_group, vm_name)
+
+    def process(self, vms):
+        for vm in vms:
+            self.restart(vm['resourceGroup'], vm['name'])
+
+
+@VirtualMachine.action_registry.register('delete')
+class VmDeleteAction(BaseAction):
+
+    schema = type_schema('delete')
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(VmDeleteAction, self).__init__(data, manager, log_dir)
+        self.client = self.manager.get_client()
+
+    def delete(self, resource_group, vm_name):
+        self.client.virtual_machines.delete(resource_group, vm_name)
+
+    def process(self, vms):
+        for vm in vms:
+            self.delete(vm['resourceGroup'], vm['name'])
