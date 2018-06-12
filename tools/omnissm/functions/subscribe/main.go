@@ -47,10 +47,10 @@ var (
 	}
 	resourceTags = make(map[string]struct{})
 
-	CrossAccountRole   = os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE")
-	RegistrationsTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
-	ResourceTags       = os.Getenv("OMNISSM_RESOURCE_TAGS")
-	SnsTopic           = os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC")
+	CrossAccountRole        = os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE")
+	RegistrationsTable      = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
+	ResourceTags            = os.Getenv("OMNISSM_RESOURCE_TAGS")
+	ResourceDeletedSNSTopic = os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC")
 
 	mgr *manager.Manager
 )
@@ -87,8 +87,8 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 		if err := mgr.Delete(entry.ManagedId); err != nil {
 			return err
 		}
-		if SnsTopic != "" {
-			if err := publishSNSTopic(entry, detail); err != nil {
+		if ResourceDeletedSNSTopic != "" {
+			if err := publishResourceDeletedSNSTopic(entry, detail); err != nil {
 				return err
 			}
 		}
@@ -97,7 +97,7 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 	return nil
 }
 
-func publishSNSTopic(managerInstance *store.RegistrationEntry, detail manager.ConfigurationItemDetail) error {
+func publishResourceDeletedSNSTopic(managerInstance *store.RegistrationEntry, detail manager.ConfigurationItemDetail) error {
 	config := aws.NewConfig()
 	sess := session.New(config)
 	if CrossAccountRole != "" {
@@ -126,7 +126,7 @@ func publishSNSTopic(managerInstance *store.RegistrationEntry, detail manager.Co
 		}
 		params := &sns.PublishInput{
 			Message:  aws.String(string(b)),
-			TopicArn: aws.String(SnsTopic),
+			TopicArn: aws.String(ResourceDeletedSNSTopic),
 		}
 
 		_, err := svc.Publish(params)
