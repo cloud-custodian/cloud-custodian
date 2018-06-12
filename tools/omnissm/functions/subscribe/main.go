@@ -50,7 +50,7 @@ var (
 	CrossAccountRole   = os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE")
 	RegistrationsTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 	ResourceTags       = os.Getenv("OMNISSM_RESOURCE_TAGS")
-	SnsTopic           = os.Getenv("OMNISSM_SNS_TOPIC")
+	SnsTopic           = os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC")
 
 	mgr *manager.Manager
 )
@@ -88,10 +88,12 @@ func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error
 			return err
 		}
 		if SnsTopic != "" {
-			err := publishSNSTopic(entry, detail)
-			return err
+			if err := publishSNSTopic(entry, detail); err != nil {
+				return err
+			}
 		}
 	}
+
 	return nil
 }
 
