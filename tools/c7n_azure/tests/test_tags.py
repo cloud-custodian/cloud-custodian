@@ -18,6 +18,7 @@ import logging
 from mock import patch
 from c7n_azure.session import Session
 from c7n.filters import FilterValidationError
+from jsonschema.exceptions import ValidationError
 from azure_common import BaseTest, arm_template
 
 
@@ -643,3 +644,28 @@ class TagsTest(BaseTest):
         )
 
         logger_mock.assert_called_with(expected_warning)
+
+    @arm_template('vm.json')
+    def test_tag_filter_find(self):
+        pass
+
+    @arm_template('vm.json')
+    def test_tag_filter_not_find(self):
+        pass
+
+    def test_tag_filter_invalid(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'tag',
+                 'metric': 'Network In',
+                 'aggregation': 'total',
+                 'threshold': 0}],
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)

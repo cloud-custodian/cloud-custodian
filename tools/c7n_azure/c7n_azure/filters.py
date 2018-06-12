@@ -110,3 +110,14 @@ class MetricFilter(Filter):
 
     def process_resource(self, resource):
         return resource if self.passes_op_filter(resource) else None
+
+class TagFilter(Filter):
+
+    def __init__(self, data, manager=None):
+        super(TagFilter, self).__init__(data, manager)
+
+    def process(self, resources, event=None):
+        pass
+
+    def __call__(self, resource):
+        return True
