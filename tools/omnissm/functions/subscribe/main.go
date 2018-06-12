@@ -118,11 +118,12 @@ func publishResourceDeletedSNSTopic(managerInstance *store.RegistrationEntry, de
 		detail.ConfigurationItem.AWSAccountId,
 		detail.ConfigurationItem.AWSRegion,
 	}
-	if toSend.ResourceID != "" && toSend.ManagerID != "" && toSend.AWSAccountID != "" && toSend.AWSRegion != "" {
-		b, error := json.Marshal(toSend)
 
-		if error != nil {
-			return error
+	if toSend.ResourceID != "" && toSend.ManagerID != "" && toSend.AWSAccountID != "" && toSend.AWSRegion != "" {
+		b, jsonError := json.Marshal(toSend)
+
+		if jsonError != nil {
+			return jsonError
 		}
 		params := &sns.PublishInput{
 			Message:  aws.String(string(b)),
