@@ -56,12 +56,11 @@ Navigate below and get started with Cloud Custodian!
    :maxdepth: 2
    :caption: Azure
 
-   azure/index
    azure/gettingstarted
    azure/authentication
-   azure/usecases/index
+   azure/examples/index
    azure/policy/index
-   azure/multiplesubs
+   azure/advanced/index
    azure/contribute
 
 .. toctree::
