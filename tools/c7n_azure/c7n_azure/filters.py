@@ -25,7 +25,7 @@ class MetricFilter(Filter):
     :example: Find all VMs with an average Percentage CPU greater than 75% over last 2 hours
 
     .. code-block:: yaml
-            
+
             policies:
               - name: vm-percentage-cpu
                 resource: azure.vm
