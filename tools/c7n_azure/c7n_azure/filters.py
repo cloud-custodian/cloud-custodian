@@ -13,7 +13,7 @@
 # limitations under the License.
 from datetime import timedelta
 import operator
-from c7n.filters import Filter
+from c7n.filters import Filter, OPERATORS
 from c7n_azure.utils import Math
 
 
@@ -28,27 +28,15 @@ class MetricFilter(Filter):
         'total': Math.sum
     }
 
-    ops = {
-        'eq': operator.eq,
-        'equal': operator.eq,
-        'ne': operator.ne,
-        'not-equal': operator.ne,
-        'gt': operator.gt,
-        'greater-than': operator.gt,
-        'ge': operator.ge,
-        'gte': operator.ge,
-        'le': operator.le,
-        'lte': operator.le,
-        'lt': operator.lt,
-        'less-than': operator.lt
-    }
-
     schema = {
         'type': 'object',
         'required': ['type', 'metric', 'op', 'threshold'],
         'properties': {
             'metric': {'type': 'string'},
-            'op': {'enum': list(ops.keys())},
+            'op': {'enum': [
+                'eq', 'equal', 'ne', 'not-equal', 'gt', 'greater-than', 'ge',
+                'gte', 'le', 'lte', 'lt', 'less-than'
+            ]},
             'threshold': {'type': 'number'},
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
@@ -61,9 +49,8 @@ class MetricFilter(Filter):
         super(MetricFilter, self).__init__(data, manager)
         # Metric name as defined by Azure SDK
         self.metric = self.data.get('metric')
-        print(self.metric)
         # gt (>), ge (>=), eq (==), le (<=), lt (<)
-        self.op = self.ops[self.data.get('op')]
+        self.op = OPERATORS[self.data.get('op')]
         # Value to compare metric value with self.op
         self.threshold = self.data.get('threshold')
         # Number of hours from current UTC time
@@ -113,11 +100,34 @@ class MetricFilter(Filter):
 
 class TagFilter(Filter):
 
+    schema = {
+        'type': 'object',
+        'required': ['type', 'op', 'value'],
+        'properties': {
+            'metric': {'type': 'string'},
+            'op': {'enum': [
+                'eq', 'equal', 'ne', 'not-equal', 'in', 'ni', 'not-in', 'contains'
+            ]},
+            'tags': {'type': 'object'},
+            'set_op': {'enum': ['any', 'all']}
+        }
+    }
+
+    set_ops = {
+        'any': any,
+        'all': all
+    }
+
     def __init__(self, data, manager=None):
         super(TagFilter, self).__init__(data, manager)
-
-    def process(self, resources, event=None):
-        pass
+        self.tag = self.data.get('tag')
+        self.op = OPERATORS[self.data.get('op')]
+        self.tags = self.data.get('tags')
+        self.set_op = self.set_ops[self.data.get('set_op', 'all')]
 
     def __call__(self, resource):
+        result = []
+        for tag in self.tags:
+            # Need to decide whether or not to allow multiple tags
+            pass
         return True
