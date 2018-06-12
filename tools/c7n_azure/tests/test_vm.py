@@ -63,7 +63,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     @patch('c7n_azure.resources.vm.VmStopAction.stop')
-    def test_stop(self, filter_mock, stop_action_mock):
+    def test_stop(self, stop_action_mock, filter_mock):
 
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -84,12 +84,14 @@ class VMTest(BaseTest):
             ]
         })
         p.run()
-        stop_action_mock.assert_called()
+        stop_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
 
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     @patch('c7n_azure.resources.vm.VmStartAction.start')
-    def test_start(self, filter_mock, start_action_mock):
+    def test_start(self, start_action_mock, filter_mock):
 
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -110,12 +112,14 @@ class VMTest(BaseTest):
             ]
         })
         p.run()
-        start_action_mock.assert_called()
+        start_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
 
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     @patch('c7n_azure.resources.vm.VmRestartAction.restart')
-    def test_restart(self, filter_mock, restart_action_mock):
+    def test_restart(self, restart_action_mock, filter_mock):
 
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -136,12 +140,14 @@ class VMTest(BaseTest):
             ]
         })
         p.run()
-        restart_action_mock.assert_called()
+        restart_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
 
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     @patch('c7n_azure.resources.vm.VmDeleteAction.delete')
-    def test_delete(self, filter_mock, delete_action_mock):
+    def test_delete(self, delete_action_mock, filter_mock):
 
         p = self.load_policy({
             'name': 'test-azure-vm',
@@ -162,4 +168,6 @@ class VMTest(BaseTest):
             ]
         })
         p.run()
-        delete_action_mock.assert_called()
+        delete_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
