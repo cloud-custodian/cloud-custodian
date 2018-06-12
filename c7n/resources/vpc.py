@@ -845,8 +845,9 @@ class SGPermission(Filter):
           op: in
           value: x.y.z
 
-    `Cidr` can match ipv4 and ipv6 rules.  In this example we are blocking
-    global inbound connections to SSH or RDP.
+    `Cidr` can match ipv4 rules and `CidrV6` can match ipv6 rules.  In
+    this example we are blocking global inbound connections to SSH or
+    RDP.
 
     .. code-block:: yaml
 
