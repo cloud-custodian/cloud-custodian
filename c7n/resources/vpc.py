@@ -863,7 +863,7 @@ class SGPermission(Filter):
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts', 'SelfReference'))
+    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
@@ -908,30 +908,37 @@ class SGPermission(Filter):
                 found = found is None or found and True or False
         return found
 
-    def process_cidrs(self, perm):
+    def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
         found = None
-        if 'Cidr' in self.data:
-            # Looping over CidrIp and CidrIpv6 will allow Cidr to match both.
-            for cidr_type, range_type in [['CidrIp', 'IpRanges'], ['CidrIpv6', 'Ipv6Ranges']]:
-                ip_perms = perm.get(range_type, [])
-                if not ip_perms:
-                    found = False
-                    break
+        ip_perms = perm.get(range_type, [])
+        if not ip_perms:
+            return False
 
-                match_range = self.data['Cidr']
-                match_range['key'] = cidr_type
+        match_range = self.data[cidr_key]
+        match_range['key'] = cidr_type
 
-                vf = ValueFilter(match_range)
-                vf.annotate = False
-                for ip_range in ip_perms:
-                    found = vf(ip_range)
-                    if found:
-                        break
-                    else:
-                        found = False
-                if found:
-                    break
+        vf = ValueFilter(match_range)
+        vf.annotate = False
+
+        for ip_range in ip_perms:
+            found = vf(ip_range)
+            if found:
+                break
+            else:
+                found = False
         return found
+
+    def process_cidrs(self, perm):
+        found_v6 = found_v4 = None
+        if 'CidrV6' in self.data:
+            found_v6 = self._process_cidr('CidrV6', 'CidrIpv6', 'Ipv6Ranges', perm)
+        if 'Cidr' in self.data:
+            found_v4 = self._process_cidr('Cidr', 'CidrIp', 'IpRanges', perm)
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
+        cidr_match = [k for k in (found_v6, found_v4) if k is not None]
+        if not cidr_match:
+            return None
+        return match_op(cidr_match)
 
     def process_self_reference(self, perm, sg_id):
         found = None
