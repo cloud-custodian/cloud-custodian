@@ -254,6 +254,40 @@ class IamUserTest(BaseTest):
         users = client.list_users(PathPrefix="/test/").get("Users", [])
         self.assertEqual(users, [])
 
+    @functional
+    def test_iam_user_delete_some_access(self):
+        factory = self.replay_flight_data("test_iam_user_delete_options")
+        p = self.load_policy(
+            {
+                "name": "iam-user-delete",
+                "resource": "iam-user",
+                "filters": [
+                    {"UserName": "test_user"},
+                    {"type": "access-key", "key": "Status", "value": "Active"},
+                    {"type": "credential", "key": "password_enabled", "value": True}],
+                "actions": [{
+                    "type": "delete",
+                    "options": ["console-access", "access-keys"]}],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        resources = p.run()
+        self.assertFalse(resources)
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-delete",
+                "resource": "iam-user",
+                "filters": [{"UserName": "test_user"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_iam_user_policy(self):
         session_factory = self.replay_flight_data("test_iam_user_admin_policy")
         self.patch(UserPolicy, "executor_factory", MainThreadExecutor)
