@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
+from mock import patch
 
 
 class VMTest(BaseTest):
@@ -53,3 +54,120 @@ class VMTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    fake_running_vms = [{
+        'resourceGroup': 'test_resource_group',
+        'name': 'test_vm'
+    }]
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmStopAction.stop')
+    def test_stop(self, stop_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'stop'}
+            ]
+        })
+        p.run()
+        stop_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmStartAction.start')
+    def test_start(self, start_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'start'}
+            ]
+        })
+        p.run()
+        start_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmRestartAction.restart')
+    def test_restart(self, restart_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'restart'}
+            ]
+        })
+        p.run()
+        restart_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmDeleteAction.delete')
+    def test_delete(self, delete_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        })
+        p.run()
+        delete_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
