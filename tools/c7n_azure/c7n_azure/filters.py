@@ -18,6 +18,26 @@ from c7n_azure.utils import Math
 
 
 class MetricFilter(Filter):
+    """
+
+    Filters Azure resources based on live metrics from the Azure monitor
+
+    :example: Find all VMs with an average Percentage CPU greater than 75% over last 2 hours
+
+    .. code-block:: yaml
+            
+            policies:
+              - name: vm-percentage-cpu
+                resource: azure.vm
+                filters:
+                  - type: metric
+                    metric: Percentage CPU
+                    aggregation: average,
+                    op: gt
+                    threshold: 75
+                    timeframe: 2
+
+    """
 
     DEFAULT_TIMEFRAME = 24
     DEFAULT_INTERVAL = 'P1D'
@@ -110,3 +130,14 @@ class MetricFilter(Filter):
 
     def process_resource(self, resource):
         return resource if self.passes_op_filter(resource) else None
+
+class TagFilter(Filter):
+
+    def __init__(self, data, manager=None):
+        super(TagFilter, self).__init__(data, manager)
+
+    def process(self, resources, event=None):
+        pass
+
+    def __call__(self, resource):
+        return True
