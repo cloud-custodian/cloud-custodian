@@ -1157,6 +1157,7 @@ class UserDelete(BaseAction):
     ORDERED_OPTIONS = OrderedDict([
         ('console-access', 'delete_console_access'),
         ('access-keys', 'delete_access_keys'),
+        ('attached-user-policies', 'delete_attached_user_policies'),
         ('user-policies', 'delete_user_policies'),
         ('mfa-devices', 'delete_hw_mfa_devices'),
         ('groups', 'delete_groups'),
@@ -1189,6 +1190,7 @@ class UserDelete(BaseAction):
         'iam:DeleteSigningCertificate',
         'iam:DeleteSSHPublicKey',
         'iam:DeleteUser',
+        'iam:DeleteUserPolicy',
         'iam:DetachUserPolicy',
         'iam:RemoveUserFromGroup')
 
@@ -1209,11 +1211,18 @@ class UserDelete(BaseAction):
                                      AccessKeyId=access_key['AccessKeyId'])
 
     @staticmethod
-    def delete_user_policies(client, r):
+    def delete_attached_user_policies(client, r):
         response = client.list_attached_user_policies(UserName=r['UserName'])
         for user_policy in response['AttachedPolicies']:
             client.detach_user_policy(
                 UserName=r['UserName'], PolicyArn=user_policy['PolicyArn'])
+
+    @staticmethod
+    def delete_user_policies(client, r):
+        response = client.list_user_policies(UserName=r['UserName'])
+        for user_policy_name in response['PolicyNames']:
+            client.delete_user_policy(
+                UserName=r['UserName'], PolicyName=user_policy_name)
 
     @staticmethod
     def delete_hw_mfa_devices(client, r):
