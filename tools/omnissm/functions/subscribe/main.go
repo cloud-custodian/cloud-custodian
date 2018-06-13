@@ -107,7 +107,7 @@ func publishResourceDeletedSNSTopic(managerInstance *store.RegistrationEntry, de
 
 	type resourceObj struct {
 		ResourceID   string
-		ManagerID    string
+		ManagedID    string
 		AWSAccountID string
 		AWSRegion    string
 	}
@@ -119,7 +119,7 @@ func publishResourceDeletedSNSTopic(managerInstance *store.RegistrationEntry, de
 		detail.ConfigurationItem.AWSRegion,
 	}
 
-	if toSend.ResourceID == "" || toSend.ManagerID == "" || toSend.AWSAccountID == "" || toSend.AWSRegion == "" {
+	if toSend.ResourceID == "" || toSend.ManagedID == "" || toSend.AWSAccountID == "" || toSend.AWSRegion == "" {
 		return fmt.Errorf("Unable to publish SNS Delete Message. Should contain AWSAccountID, AWSRegion, ManagedID, and ResourceID")
 	}
 
