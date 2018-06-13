@@ -1109,7 +1109,8 @@ class UserDelete(BaseAction):
             - delete
 
     Additionally, you can specify the options to delete properties of an iam-user,
-    including console-access, access-keys, user-policies, mfa-devices, groups,
+    including console-access, access-keys, attached-user-policies,
+    inline-user-policies, mfa-devices, groups,
     ssh-keys, signing-certificates, and service-specific-credentials.
 
     Note: using options will _not_ delete the user itself, only the items specified
@@ -1158,7 +1159,7 @@ class UserDelete(BaseAction):
         ('console-access', 'delete_console_access'),
         ('access-keys', 'delete_access_keys'),
         ('attached-user-policies', 'delete_attached_user_policies'),
-        ('user-policies', 'delete_user_policies'),
+        ('inline-user-policies', 'delete_inline_user_policies'),
         ('mfa-devices', 'delete_hw_mfa_devices'),
         ('groups', 'delete_groups'),
         ('ssh-keys', 'delete_ssh_keys'),
@@ -1218,7 +1219,7 @@ class UserDelete(BaseAction):
                 UserName=r['UserName'], PolicyArn=user_policy['PolicyArn'])
 
     @staticmethod
-    def delete_user_policies(client, r):
+    def delete_inline_user_policies(client, r):
         response = client.list_user_policies(UserName=r['UserName'])
         for user_policy_name in response['PolicyNames']:
             client.delete_user_policy(
