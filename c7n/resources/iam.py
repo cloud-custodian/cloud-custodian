@@ -24,6 +24,7 @@ from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 import six
 from botocore.exceptions import ClientError
+from collections import OrderedDict
 
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter, Filter, OPERATORS
@@ -956,7 +957,7 @@ class GroupMembership(ValueFilter):
 
         matched = []
         for r in resources:
-            for p in r['c7n:Groups']:
+            for p in r.get('c7n:Groups', []):
                 if self.match(p) and r not in matched:
                     matched.append(r)
         return matched
@@ -1053,7 +1054,7 @@ class UserMfaDevice(ValueFilter):
 
 @User.action_registry.register('delete')
 class UserDelete(BaseAction):
-    """Delete a user.
+    """Delete a user or properties of a user.
 
     For example if you want to have a whitelist of valid (machine-)users
     and want to ensure that no users have been clicked without documentation.
@@ -1107,8 +1108,73 @@ class UserDelete(BaseAction):
           actions:
             - delete
 
+    Additionally, you can specify the options to delete properties of an iam-user,
+    including console-access, access-keys, user-policies, mfa-devices, groups,
+    ssh-keys, signing-certificates, and service-specific-credentials.
+
+    Note: using options will _not_ delete the user itself, only the items specified
+    by ``options`` that are attached to the respective iam-user. To delete a user
+    completely, use the ``delete`` action without specifying ``options``.
+
+    :example:
+
+        .. code-block:: yaml
+
+            - name: delete-console-access-unless-valid
+              comment: |
+                finds iam-users with console access and deletes console access unless
+                the username is included in whitelist
+              resource: iam-user
+              filters:
+                - type: username
+                  key: UserName
+                  op: not-in
+                  value:
+                    - valid-user-1
+                    - valid-user-2
+                - type: credential
+                  key: Status
+                  value: Active
+              actions:
+                - type: delete
+                  options:
+                    - console-access
+
+            - name: delete-misc-access-for-iam-user
+              comment: |
+                deletes multiple options from test_user
+              resource: iam-user
+              filters:
+                - UserName: test_user
+              actions:
+                - type: delete
+                  options:
+                    - mfa-devices
+                    - access-keys
+                    - ssh-keys
     """
-    schema = type_schema('delete')
+
+    ORDERED_OPTIONS = OrderedDict([
+        ('console-access', 'delete_console_access'),
+        ('access-keys', 'delete_access_keys'),
+        ('user-policies', 'delete_user_policies'),
+        ('mfa-devices', 'delete_hw_mfa_devices'),
+        ('groups', 'delete_groups'),
+        ('ssh-keys', 'delete_ssh_keys'),
+        ('signing-certificates', 'delete_signing_certificates'),
+        ('service-specific-credentials', 'delete_service_specific_credentials'),
+    ])
+
+    schema = type_schema(
+        'delete',
+        options={
+            'type': 'array',
+            'items': {
+                'type': 'string',
+                'enum': list(ORDERED_OPTIONS.keys()),
+            }
+        })
+
     permissions = (
         'iam:ListAttachedUserPolicies',
         'iam:ListAccessKeys',
@@ -1126,13 +1192,8 @@ class UserDelete(BaseAction):
         'iam:DetachUserPolicy',
         'iam:RemoveUserFromGroup')
 
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('iam')
-        for r in resources:
-            self.log.debug('Deleting user %s' % r['UserName'])
-            self.process_user(client, r)
-
-    def process_user(self, client, r):
+    @staticmethod
+    def delete_console_access(client, r):
         try:
             client.delete_login_profile(
                 UserName=r['UserName'])
@@ -1140,42 +1201,50 @@ class UserDelete(BaseAction):
             if e.response['Error']['Code'] not in ('NoSuchEntity',):
                 raise
 
-        # Access Keys
+    @staticmethod
+    def delete_access_keys(client, r):
         response = client.list_access_keys(UserName=r['UserName'])
         for access_key in response['AccessKeyMetadata']:
             client.delete_access_key(UserName=r['UserName'],
                                      AccessKeyId=access_key['AccessKeyId'])
 
-        # User Policies
+    @staticmethod
+    def delete_user_policies(client, r):
         response = client.list_attached_user_policies(UserName=r['UserName'])
         for user_policy in response['AttachedPolicies']:
             client.detach_user_policy(
                 UserName=r['UserName'], PolicyArn=user_policy['PolicyArn'])
 
-        # HW MFA Devices
+    @staticmethod
+    def delete_hw_mfa_devices(client, r):
         response = client.list_mfa_devices(UserName=r['UserName'])
         for mfa_device in response['MFADevices']:
             client.deactivate_mfa_device(
                 UserName=r['UserName'], SerialNumber=mfa_device['SerialNumber'])
 
-        # Groups
+    @staticmethod
+    def delete_groups(client, r):
         response = client.list_groups_for_user(UserName=r['UserName'])
         for user_group in response['Groups']:
             client.remove_user_from_group(
                 UserName=r['UserName'], GroupName=user_group['GroupName'])
 
-        # SSH Keys
+    @staticmethod
+    def delete_ssh_keys(client, r):
         response = client.list_ssh_public_keys(UserName=r['UserName'])
         for key in response.get('SSHPublicKeys', ()):
             client.delete_ssh_public_key(
                 UserName=r['UserName'], SSHPublicKeyId=key['SSHPublicKeyId'])
 
-        # Signing Certificates
+    @staticmethod
+    def delete_signing_certificates(client, r):
         response = client.list_signing_certificates(UserName=r['UserName'])
         for cert in response.get('Certificates', ()):
             client.delete_signing_certificate(
                 UserName=r['UserName'], CertificateId=cert['CertificateId'])
 
+    @staticmethod
+    def delete_service_specific_credentials(client, r):
         # Service specific user credentials (codecommit)
         response = client.list_service_specific_credentials(UserName=r['UserName'])
         for screds in response.get('ServiceSpecificCredentials', ()):
@@ -1183,7 +1252,25 @@ class UserDelete(BaseAction):
                 UserName=r['UserName'],
                 ServiceSpecificCredentialId=screds['ServiceSpecificCredentialId'])
 
+    @staticmethod
+    def delete_user(client, r):
         client.delete_user(UserName=r['UserName'])
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        self.log.debug('Deleting user %s options: %s' %
+            (len(resources), self.data.get('options', 'all')))
+        for r in resources:
+            self.process_user(client, r)
+
+    def process_user(self, client, r):
+        user_options = self.data.get('options', list(self.ORDERED_OPTIONS.keys()))
+        for cmd in self.ORDERED_OPTIONS:
+            if cmd in user_options:
+                op = getattr(self, self.ORDERED_OPTIONS[cmd])
+                op(client, r)
+        if not self.data.get('options'):
+            self.delete_user(client, r)
 
 
 @User.action_registry.register('remove-keys')

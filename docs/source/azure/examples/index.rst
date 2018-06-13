@@ -1,6 +1,6 @@
-.. _azure_usecases:
+.. _azure_examples:
 
-Use Cases
+Examples
 =========
 
 These use cases provide examples of specific policies.
