@@ -119,21 +119,23 @@ func publishResourceDeletedSNSTopic(managerInstance *store.RegistrationEntry, de
 		detail.ConfigurationItem.AWSRegion,
 	}
 
-	if toSend.ResourceID != "" && toSend.ManagerID != "" && toSend.AWSAccountID != "" && toSend.AWSRegion != "" {
-		b, jsonError := json.Marshal(toSend)
+	if toSend.ResourceID == "" || toSend.ManagerID == "" || toSend.AWSAccountID == "" || toSend.AWSRegion == "" {
+		return fmt.Errorf("Unable to publish SNS Delete Message. Should contain AWSAccountID, AWSRegion, ManagedID, and ResourceID")
+	}
 
-		if jsonError != nil {
-			return jsonError
-		}
-		params := &sns.PublishInput{
-			Message:  aws.String(string(b)),
-			TopicArn: aws.String(ResourceDeletedSNSTopic),
-		}
+	b, jsonError := json.Marshal(toSend)
 
-		_, err := svc.Publish(params)
-		if err != nil {
-			return err
-		}
+	if jsonError != nil {
+		return jsonError
+	}
+	params := &sns.PublishInput{
+		Message:  aws.String(string(b)),
+		TopicArn: aws.String(ResourceDeletedSNSTopic),
+	}
+
+	_, err := svc.Publish(params)
+	if err != nil {
+		return err
 	}
 
 	return nil
