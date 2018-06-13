@@ -17,10 +17,13 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
+from c7n.filters import Filter, ValueFilter
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
+from c7n.utils import get_retry, local_session, type_schema
 from c7n import utils
-
+from c7n import tags
+from c7n.filters.offhours import OffHour, OnHour
 
 class StateTransitionFilter(object):
     """Filter instances by state.
@@ -56,6 +59,55 @@ class OpsworkStack(QueryResourceManager):
         name = 'Name'
         date = 'CreatedAt'
         dimension = "StackId"
+
+    retry = staticmethod(get_retry(('ThrottlingException',)))
+    permissions = ('opsworks:ListTags',)
+
+    def augment(self, stacks):
+        filter(None, _opsworks_tags(
+            stacks, self.session_factory, self.executor_factory, self.retry
+        ))
+        return stacks
+
+def _opsworks_tags(stacks, session_factory, executor_factory, retry):
+    """Augment ElasticBeanstalk Environments with their tags."""
+
+    def process_tags(stack):
+        client = local_session(session_factory).client('opsworks')
+        try:
+            tl = retry(
+                client.list_tags,
+                ResourceArn=stack['Arn']
+            )['Tags']
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                log.warning(
+                    "Exception getting opsworks tags ", e
+                )
+            return None
+
+        tag_list=[]
+        for x,v in tl.items():
+            entry = {
+                 "Key": x,
+                 "Value": v
+            }
+            tag_list.append(entry)
+        stack['Tags'] = tag_list
+        return stack
+
+    # Handle API rate-limiting, which is a problem for accounts with many
+    # EB Environments
+    with executor_factory(max_workers=1) as w:
+        return list(w.map(process_tags, stacks))
+
+@OpsworkStack.filter_registry.register('offhour')
+class StackOffHour(OffHour):
+    """Scheduled action on OpsWorks stack."""
+
+@OpsworkStack.filter_registry.register('onhour')
+class StackOnHour(OnHour):
+    """Scheduled action on OpsWorks stack."""
 
 
 @OpsworkStack.action_registry.register('delete')
@@ -155,6 +207,106 @@ class StopStack(BaseAction):
             self.log.exception(
                 "Exception stopping stack:\n %s" % e)
 
+@OpsworkStack.action_registry.register('start')
+class StartStack(BaseAction):
+    """Action to start Opswork Stack
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: opswork-stop
+                resource: opswork-stack
+                actions:
+                  - start
+    """
+
+    schema = type_schema('start')
+    permissions = ("opsworks:StartStack",)
+
+    def process(self, stacks):
+        with self.executor_factory(max_workers=10) as w:
+            list(w.map(self.process_stack, stacks))
+
+    def process_stack(self, stack):
+        client = local_session(
+            self.manager.session_factory).client('opsworks')
+        try:
+            stack_id = stack['StackId']
+            client.start_stack(StackId=stack_id)
+        except ClientError as e:
+            self.log.exception(
+                "Exception starting stack:\n %s" % e)
+
+@OpsworkStack.action_registry.register('tag')
+@OpsworkStack.action_registry.register('mark')
+class Tag(tags.Tag):
+    """Action to add a tag to an OpsWorks stack
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: opswork-stack-add-owner-tag
+                resource: opswork-stack
+                filters:
+                  - "tag:OwnerName": absent
+                actions:
+                  - type: tag
+                    key: OwnerName
+                    value: OwnerName
+    """
+    schema = type_schema(
+        'tag',
+        key={'type': 'string'},
+        value={'type': 'string'},
+        aliases=('mark',)
+    )
+
+    permissions = ('opsworks:TagResource',)
+    batch_size = 1
+
+    def process_resource_set(self, stacks, tags):
+        client = local_session(
+            self.manager.session_factory
+        ).client('opsworks')
+        tag_dict = {}
+        for t in tags:
+           tag_dict[t['Key']] = t['Value']
+
+        for stack in stacks:
+            client.tag_resource(ResourceArn=stack['Arn'], Tags=tag_dict)
+
+@OpsworkStack.action_registry.register('remove-tag')
+@OpsworkStack.action_registry.register('untag')
+@OpsworkStack.action_registry.register('unmark')
+class RemoveTag(tags.RemoveTag):
+    """Action to remove tag(s) from OpsWorks stack
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: opswork-remove-tag
+                resource: opswork-stack
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """
+    concurrency = 2
+    batch_size = 5
+    permissions = ('opsworks:UntagResource',)
+
+    def process_resource_set(self, stacks, tag_keys):
+        client = local_session(
+            self.manager.session_factory).client('opsworks')
+        for stack in stacks:
+            client.untag_resource(ResourceArn=stack['Arn'], TagKeys=tag_keys)
 
 @resources.register('opswork-cm')
 class OpsworksCM(QueryResourceManager):
