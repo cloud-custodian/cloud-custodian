@@ -1158,6 +1158,7 @@ class UserDelete(BaseAction):
     ORDERED_OPTIONS = OrderedDict([
         ('console-access', 'delete_console_access'),
         ('access-keys', 'delete_access_keys'),
+        ('user-policies', 'delete_attached_user_policies'),
         ('attached-user-policies', 'delete_attached_user_policies'),
         ('inline-user-policies', 'delete_inline_user_policies'),
         ('mfa-devices', 'delete_hw_mfa_devices'),
