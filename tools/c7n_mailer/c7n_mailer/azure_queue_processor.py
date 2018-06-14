@@ -65,7 +65,6 @@ class MailerAzureQueueProcessor(object):
                 queue_service, queue_name, self.max_num_of_messages_in_queue_batch)
 
         self.logger.info('No messages left on the azure storage queue, exiting c7n_mailer.')
-        return
 
     def process_azure_queue_message(self, encoded_azure_queue_message):
         queue_message = json.loads(
@@ -83,6 +82,6 @@ class MailerAzureQueueProcessor(object):
         try:
             sendgrid_delivery = SendGridDelivery(self.config, self.logger)
             sendgrid_messages = sendgrid_delivery.get_to_addrs_sendgrid_messages_map(queue_message)
-            sendgrid_delivery.sendgrid_handler(queue_message, sendgrid_messages)
+            return sendgrid_delivery.sendgrid_handler(queue_message, sendgrid_messages)
         except Exception:
             traceback.print_exc()
