@@ -484,6 +484,17 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
         # to refetch against current to guard against any staleness in
         # our cached representation across multiple policies or concurrent
         # modifications.
+
+        if 'get_bucket_tagging' in bucket.get('c7n:DeniedMethods', []):
+            # avoid the additional API call if we already know that it's going
+            # to result in AccessDenied. The chances that the resource's perms
+            # would have changed between fetching the resource and acting on it
+            # here are pretty low-- so the check here should suffice.
+            log.warning(
+                "Unable to get new set of bucket tags needed to modify tags,"
+                "skipping tag action for bucket: %s" % bucket["Name"])
+            continue
+
         try:
             bucket['Tags'] = client.get_bucket_tagging(
                 Bucket=bucket['Name']).get('TagSet', [])
@@ -1171,26 +1182,33 @@ class ToggleVersioning(BucketActionBase):
         enabled={'type': 'boolean'})
     permissions = ("s3:PutBucketVersioning",)
 
+    def process_versioning(self, resource, state):
+        client = bucket_client(
+            local_session(self.manager.session_factory), resource)
+        try:
+            client.put_bucket_versioning(
+                Bucket=resource['Name'],
+                VersioningConfiguration={
+                    'Status': state})
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'AccessDenied':
+                log.error(
+                    "Unable to put bucket versioning on bucket %s: %s" % resource['Name'], e)
+                raise
+            log.warning(
+                "Access Denied Bucket:%s while put bucket versioning" % resource['Name'])
+
     # mfa delete enablement looks like it needs the serial and a current token.
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-
         for r in resources:
-            client = bucket_client(
-                local_session(self.manager.session_factory), r)
             if 'Versioning' not in r or not r['Versioning']:
                 r['Versioning'] = {'Status': 'Suspended'}
             if enabled and (
                     r['Versioning']['Status'] == 'Suspended'):
-                client.put_bucket_versioning(
-                    Bucket=r['Name'],
-                    VersioningConfiguration={
-                        'Status': 'Enabled'})
-                continue
+                self.process_versioning(r, 'Enabled')
             if not enabled and r['Versioning']['Status'] == 'Enabled':
-                client.put_bucket_versioning(
-                    Bucket=r['Name'],
-                    VersioningConfiguration={'Status': 'Suspended'})
+                self.process_versioning(r, 'Suspended')
 
 
 @actions.register('toggle-logging')

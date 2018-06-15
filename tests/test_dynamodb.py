@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest
 import datetime
+from dateutil import zoneinfo
 
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
@@ -86,11 +87,14 @@ class DynamodbTest(BaseTest):
             {
                 "name": "dynamodb-mark",
                 "resource": "dynamodb-table",
-                "filters": [{"TableName": "rolltop"}],
+                "filters": [
+                    {"TableName": "c7n-test"},
+                    {'tag:test_tag': 'absent'}
+                ],
                 "actions": [
                     {
                         "type": "mark-for-op",
-                        "days": 4,
+                        "days": 0,
                         "op": "delete",
                         "tag": "test_tag",
                     }
@@ -103,7 +107,16 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.list_tags_of_resource(ResourceArn=arn)
         tag_map = {t["Key"]: t["Value"] for t in tags["Tags"]}
-        self.assertTrue("test_key" in tag_map)
+
+        localtz = zoneinfo.gettz("America/New_York")
+        dt = datetime.datetime.now(localtz)
+        dt = dt.replace(year=2018, month=6, day=8, hour=7, minute=00)
+        result = datetime.datetime.strptime(
+            tag_map["test_tag"].strip().split("@", 1)[-1], "%Y/%m/%d"
+        ).replace(
+            tzinfo=localtz
+        )
+        self.assertEqual(result.date(), dt.date())
 
     def test_dynamodb_tag(self):
         session_factory = self.replay_flight_data("test_dynamodb_tag")

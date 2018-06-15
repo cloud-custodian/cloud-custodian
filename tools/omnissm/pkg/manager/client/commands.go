@@ -34,7 +34,6 @@ func restartAgent() error {
 		if err != nil {
 			return errors.New("cannot find systemctl or initctl")
 		}
-		// initctl expects commands then job name
 		// to better ensure that it restarts successfully stop and start are
 		// called rather than relying on proper implementation of restart
 		if out, err := exec.Command(cmd, "stop", "amazon-ssm-agent").CombinedOutput(); err != nil {
@@ -46,7 +45,7 @@ func restartAgent() error {
 		}
 		return nil
 	}
-	if out, err := exec.Command(cmd, "amazon-ssm-agent", "restart").CombinedOutput(); err != nil {
+	if out, err := exec.Command(cmd, "restart", "amazon-ssm-agent").CombinedOutput(); err != nil {
 		log.Debug().Str("combinedOutput", string(out)).Msg("cannot restart SSM agent")
 		return err
 	}

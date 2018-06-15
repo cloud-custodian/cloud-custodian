@@ -43,6 +43,9 @@ func checkDebug(cmd *cobra.Command, args []string) {
 func init() {
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("OMNISSM")
+	viper.SetConfigName("omnissm")
+	viper.AddConfigPath("/etc/omnissm/")
+	viper.AddConfigPath(".")
 
 	RootCmd.PersistentFlags().CountP("verbose", "v", "increase logging level (debug)")
 	viper.BindPFlags(RootCmd.PersistentFlags())
@@ -52,6 +55,10 @@ func main() {
 	RootCmd.AddCommand(RegisterCmd)
 	RootCmd.AddCommand(VersionCmd)
 	RootCmd.AddCommand(inventory.ProcessCmd)
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal().Err(err).Msg("unable to read config file")
+	}
 	if err := RootCmd.Execute(); err != nil {
 		log.Fatal().Err(err).Msg("failed to execute RootCmd")
 	}
