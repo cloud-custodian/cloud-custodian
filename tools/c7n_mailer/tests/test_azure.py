@@ -27,7 +27,7 @@ class AzureTest(unittest.TestCase):
 
     def setUp(self):
         self.compressed_message = MagicMock()
-        self.compressed_message.content = base64.b64encode(zlib.compress(ASQ_MESSAGE))
+        self.compressed_message.content = base64.b64encode(zlib.compress(ASQ_MESSAGE.encode('utf8')))
         self.loaded_message = json.loads(ASQ_MESSAGE)
 
     @patch('c7n_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler')
