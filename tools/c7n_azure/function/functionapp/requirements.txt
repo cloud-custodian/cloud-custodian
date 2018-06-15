@@ -1,5 +1,0 @@
-grpcio==1.9.1
-grpcio-tools==1.9.1
-protobuf==3.5.2.post1
-six==1.11.0
-git+https://github.com/Azure/azure-functions-python-worker.git@dev#egg=azure_functions_python
