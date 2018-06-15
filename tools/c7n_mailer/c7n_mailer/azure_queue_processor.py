@@ -40,7 +40,7 @@ class MailerAzureQueueProcessor(object):
         self.config = config
         self.logger = logger
         self.receive_queue = self.config['queue_url']
-        self.max_num_of_messages_in_queue_batch = 16
+        self.batch_size = 16
         self.max_message_retry = 3
 
     def run(self, parallel=False):
@@ -48,9 +48,9 @@ class MailerAzureQueueProcessor(object):
             self.logger.info("Parallel processing with Azure Queue is not yet implemented.")
 
         self.logger.info("Downloading messages from the Azure Storage queue.")
-        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(self.receive_queue)
+        queue_settings = StorageUtilities.get_queue_client_by_uri(self.receive_queue)
         queue_messages = StorageUtilities.get_queue_messages(
-            queue_service, queue_name, self.max_num_of_messages_in_queue_batch)
+            *queue_settings, num_messages=self.batch_size)
 
         while len(queue_messages) > 0:
             for queue_message in queue_messages:
@@ -59,10 +59,10 @@ class MailerAzureQueueProcessor(object):
                 if (self.process_azure_queue_message(queue_message) or
                         queue_message.dequeue_count > self.max_message_retry):
                     # If message handled successfully or max retry hit, delete
-                    StorageUtilities.delete_queue_message(queue_service, queue_name, queue_message)
+                    StorageUtilities.delete_queue_message(*queue_settings, message=queue_message)
 
             queue_messages = StorageUtilities.get_queue_messages(
-                queue_service, queue_name, self.max_num_of_messages_in_queue_batch)
+                *queue_settings, num_messages=self.batch_size)
 
         self.logger.info('No messages left on the azure storage queue, exiting c7n_mailer.')
 
