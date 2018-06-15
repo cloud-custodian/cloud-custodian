@@ -51,7 +51,8 @@ class AzurePackageArchive(object):
         # linux
         if platform == "linux" or platform == "linux2":
             self.pkg.add_file(os.path.join(site_pkg, '_cffi_backend.cpython-36m-x86_64-linux-gnu.so'))
-            self.pkg.add_file(os.path.join(site_pkg, '.libs_cffi_backend/libffi-d78936b1.so.6.0.4'))
+            self.pkg.add_file(os.path.join(site_pkg, '.libs_cffi_backend/libffi-d78936b1.so.6.0.4',
+                                           '.libs_cffi_backend/libffi-d78936b1.so.6.0.4'))
         # OS X
         elif platform == "darwin":
             # raise NotImplementedError('Cannot package Azure Function in Windows host OS.')
