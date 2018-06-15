@@ -1,0 +1,6 @@
+2018-06-15 11:06:13,473 - custodian.policy - INFO - policy: tag-add resource:azure.storage region: count:8 time:7.62
+2018-06-15 11:06:16,999 - custodian.policy - INFO - policy: tag-add action: tag resources: 8 execution_time: 3.45
+2018-06-15 11:06:38,507 - custodian.policy - INFO - policy: tag-add resource:azure.storage region: count:8 time:3.13
+2018-06-15 11:06:40,677 - custodian.policy - INFO - policy: tag-add action: tag resources: 8 execution_time: 2.16
+2018-06-15 11:11:04,078 - custodian.policy - INFO - policy: tag-add resource:azure.storage region: count:8 time:0.95
+2018-06-15 11:11:06,972 - custodian.policy - INFO - policy: tag-add action: tag resources: 8 execution_time: 2.79

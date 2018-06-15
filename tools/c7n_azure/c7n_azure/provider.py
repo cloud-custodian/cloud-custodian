@@ -25,6 +25,7 @@ class Azure(Provider):
 
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
+    execution = PluginRegistry('%s.execution' % resource_prefix)
 
     def initialize(self, options):
         return options
@@ -37,3 +38,4 @@ class Azure(Provider):
 
 
 resources = Azure.resources
+execution = Azure.execution

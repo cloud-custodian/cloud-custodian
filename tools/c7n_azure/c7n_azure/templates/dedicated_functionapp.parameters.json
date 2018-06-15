@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "linuxcontainer1"
+        },
+        "storageName": {
+            "value": "linuxcontainer1"
+        },
+        "location": {
+            "value": "westus"
+        },
+        "sku": {
+            "value": "Standard"
+        },
+        "workerSize": {
+            "value": "0"
+        },
+        "skuCode": {
+            "value": "S1"
+        }
+    }
+}

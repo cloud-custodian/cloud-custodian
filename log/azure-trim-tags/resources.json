@@ -1,0 +1,362 @@
+[
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/erwelch-testing-again/providers/Microsoft.Storage/storageAccounts/erwelchfunctiona93d2",
+    "name": "erwelchfunctiona93d2",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "westus",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://erwelchfunctiona93d2.blob.core.windows.net/",
+        "queue": "https://erwelchfunctiona93d2.queue.core.windows.net/",
+        "table": "https://erwelchfunctiona93d2.table.core.windows.net/",
+        "file": "https://erwelchfunctiona93d2.file.core.windows.net/"
+      },
+      "primaryLocation": "westus",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-06-14T16:22:42.29091Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-06-14T16:22:42.43152799999999997Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-06-14T16:22:42.43152799999999997Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "erwelch-testing-again"
+  },
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
+    "name": "cctstoragey6akyqpagdt3o",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "southcentralus",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+        "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+        "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+        "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+      },
+      "primaryLocation": "southcentralus",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-05-04T16:18:35.493826Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-05-04T16:18:35.5563159999999999Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-05-04T16:18:35.5563159999999999Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "test_storage"
+  },
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/anzoloch-test-vm/providers/Microsoft.Storage/storageAccounts/anzolochtestvmdiag951",
+    "name": "anzolochtestvmdiag951",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "southcentralus",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://anzolochtestvmdiag951.blob.core.windows.net/",
+        "queue": "https://anzolochtestvmdiag951.queue.core.windows.net/",
+        "table": "https://anzolochtestvmdiag951.table.core.windows.net/",
+        "file": "https://anzolochtestvmdiag951.file.core.windows.net/"
+      },
+      "primaryLocation": "southcentralus",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-04-17T21:27:23.48179Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-04-17T21:27:23.54432Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-04-17T21:27:23.54432Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "anzoloch-test-vm"
+  },
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
+    "name": "45mqcga7pkswisalinuxvm",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "southcentralus",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/",
+        "queue": "https://45mqcga7pkswisalinuxvm.queue.core.windows.net/",
+        "table": "https://45mqcga7pkswisalinuxvm.table.core.windows.net/",
+        "file": "https://45mqcga7pkswisalinuxvm.file.core.windows.net/"
+      },
+      "primaryLocation": "southcentralus",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-04-19T19:02:14.601506Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-04-19T19:02:14.648382Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-04-19T19:02:14.648382Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "test_vm"
+  },
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/erwelch-testing-again/providers/Microsoft.Storage/storageAccounts/erwelchfunctiona93d",
+    "name": "erwelchfunctiona93d",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "centralus",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://erwelchfunctiona93d.blob.core.windows.net/",
+        "queue": "https://erwelchfunctiona93d.queue.core.windows.net/",
+        "table": "https://erwelchfunctiona93d.table.core.windows.net/",
+        "file": "https://erwelchfunctiona93d.file.core.windows.net/"
+      },
+      "primaryLocation": "centralus",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-06-14T01:05:17.9921559999999999Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-06-14T01:05:18.150282Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-06-14T01:05:18.150282Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "erwelch-testing-again"
+  },
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/linuxcontainer3/providers/Microsoft.Storage/storageAccounts/linuxcontainer39017",
+    "name": "linuxcontainer39017",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "westus2",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://linuxcontainer39017.blob.core.windows.net/",
+        "queue": "https://linuxcontainer39017.queue.core.windows.net/",
+        "table": "https://linuxcontainer39017.table.core.windows.net/",
+        "file": "https://linuxcontainer39017.file.core.windows.net/"
+      },
+      "primaryLocation": "westus2",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-06-14T23:11:52.246695Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-06-14T23:11:52.48108399999999996Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-06-14T23:11:52.48108399999999996Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "linuxcontainer3"
+  },
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/andy-python-func/providers/Microsoft.Storage/storageAccounts/andypythonfunc",
+    "name": "andypythonfunc",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "westus2",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://andypythonfunc.blob.core.windows.net/",
+        "queue": "https://andypythonfunc.queue.core.windows.net/",
+        "table": "https://andypythonfunc.table.core.windows.net/",
+        "file": "https://andypythonfunc.file.core.windows.net/"
+      },
+      "primaryLocation": "westus2",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-05-04T00:56:48.22419599999999998Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-05-04T00:56:48.302305Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-05-04T00:56:48.302305Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "andy-python-func"
+  },
+  {
+    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/andy-python-func/providers/Microsoft.Storage/storageAccounts/andypythonfuncdiag891",
+    "name": "andypythonfuncdiag891",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "westus2",
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "properties": {
+      "provisioningState": "Succeeded",
+      "primaryEndpoints": {
+        "blob": "https://andypythonfuncdiag891.blob.core.windows.net/",
+        "queue": "https://andypythonfuncdiag891.queue.core.windows.net/",
+        "table": "https://andypythonfuncdiag891.table.core.windows.net/",
+        "file": "https://andypythonfuncdiag891.file.core.windows.net/"
+      },
+      "primaryLocation": "westus2",
+      "statusOfPrimary": "available",
+      "creationTime": "2018-05-15T13:23:59.17693399999999998Z",
+      "encryption": {
+        "services": {
+          "blob": {
+            "enabled": true,
+            "lastEnabledTime": "2018-05-15T13:23:59.23943399999999998Z"
+          },
+          "file": {
+            "enabled": true,
+            "lastEnabledTime": "2018-05-15T13:23:59.23943399999999998Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "supportsHttpsTrafficOnly": false,
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      }
+    },
+    "resourceGroup": "andy-python-func"
+  }
+]

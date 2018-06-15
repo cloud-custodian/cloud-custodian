@@ -147,9 +147,6 @@ class PolicyExecutionMode(object):
         """Run the actual policy."""
         raise NotImplementedError("subclass responsibility")
 
-    def provision(self):
-        """Provision any resources needed for the policy."""
-
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
         raise NotImplementedError("subclass responsibility")
@@ -195,6 +192,11 @@ class PolicyExecutionMode(object):
                 MetricName=m)
             values[m] = results['Datapoints']
         return values
+
+class ServerlessExecutionMode(PolicyExecutionMode):
+    def provision(self):
+        """Provision any resources needed for the policy."""
+        raise NotImplementedError("subclass responsibility")
 
 
 execution = PluginRegistry('c7n.execution')
@@ -308,7 +310,7 @@ class PullMode(PolicyExecutionMode):
         )
 
 
-class LambdaMode(PolicyExecutionMode):
+class LambdaMode(ServerlessExecutionMode):
     """A policy that runs/executes in lambda."""
 
     POLICY_METRICS = ('ResourceCount',)
@@ -661,6 +663,61 @@ class ConfigRuleMode(LambdaMode):
         return resources
 
 
+from c7n_azure.arm_template_util import ArmTemplateUtil
+@execution.register('azure-function')
+class AzureFunctionMode(ServerlessExecutionMode):
+    """A policy that runs/executes in azure functions."""
+    azure_function_schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'execution-options': {
+                'type': 'object',
+                'sku': 'string',
+                'location': 'string',
+                'workerSize': 'number',
+                'skuCode': 'string'
+            }
+        }
+    }
+
+    schema = utils.type_schema('azure-function', rinherit=azure_function_schema)
+
+    POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
+
+    def run(self, event=None, lambda_context=None):
+        """Run the actual policy."""
+        print('gets into run')
+
+    def provision(self):
+        """Provision any resources needed for the policy."""
+        util = ArmTemplateUtil()
+        name = self.policy.data['name'].replace(' ', '-').lower()
+        util.create_resource_group(name)
+        parameters = self.get_parameters()
+        util.deploy_resource_template(name, 'dedicated_functionapp.json', parameters)
+
+    def get_parameters(self):
+        util = ArmTemplateUtil()
+        name = self.policy.data['name'].replace(' ', '-').lower()
+        parameters = util.get_default_parameters('dedicated_functionapp.parameters.json')
+        p = self.policy.data
+        if 'mode' in p:
+            if 'execution-options' in p['mode']:
+                updated_parameters = p['mode']['execution-options']
+                updated_parameters['name'] = name
+                util.update_parameters(parameters, updated_parameters)
+
+        return parameters
+
+    def get_logs(self, start, end):
+        """Retrieve logs for the policy"""
+        print ('gets into logs')
+
+    def validate(self):
+        """Validate configuration settings for execution mode."""
+
+
 class Policy(object):
 
     EXEC_MODE_MAP = {
@@ -670,7 +727,9 @@ class Policy(object):
         'ec2-instance-state': EC2InstanceState,
         'asg-instance-state': ASGInstanceState,
         'guard-duty': GuardDutyMode,
-        'config-rule': ConfigRuleMode}
+        'config-rule': ConfigRuleMode,
+        'azure-function': AzureFunctionMode
+        }
 
     log = logging.getLogger('custodian.policy')
 
@@ -771,7 +830,7 @@ class Policy(object):
         mode = self.get_execution_mode()
         if self.options.dryrun:
             resources = PullMode(self).run()
-        elif isinstance(mode, LambdaMode):
+        elif isinstance(mode, ServerlessExecutionMode):
             resources = mode.provision()
         else:
             resources = mode.run()
