@@ -1158,7 +1158,7 @@ class UserDelete(BaseAction):
     ORDERED_OPTIONS = OrderedDict([
         ('console-access', 'delete_console_access'),
         ('access-keys', 'delete_access_keys'),
-        ('user-policies', 'delete_attached_user_policies'),
+        ('user-policies', 'delete_attached_user_policies'), # keep this for backwards-compatibility
         ('attached-user-policies', 'delete_attached_user_policies'),
         ('inline-user-policies', 'delete_inline_user_policies'),
         ('mfa-devices', 'delete_hw_mfa_devices'),
@@ -1275,7 +1275,11 @@ class UserDelete(BaseAction):
             self.process_user(client, r)
 
     def process_user(self, client, r):
-        user_options = self.data.get('options', list(self.ORDERED_OPTIONS.keys()))
+        # filter out options that yield the same operation,
+        # see definition of ORDERED_OPTIONS above
+        default_options = {v: k for k, v in self.ORDERED_OPTIONS.items()}.values()
+
+        user_options = self.data.get('options', list(default_options))
         for cmd in self.ORDERED_OPTIONS:
             if cmd in user_options:
                 op = getattr(self, self.ORDERED_OPTIONS[cmd])
