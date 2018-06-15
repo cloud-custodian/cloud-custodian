@@ -1,0 +1,20 @@
+grpcio==1.9.1
+grpcio-tools==1.9.1
+protobuf==3.5.2.post1
+six==1.11.0
+git+https://github.com/Azure/azure-functions-python-worker.git@533e94660fc5abdcfa05b9d29ac285128b265cdf#egg=azure_functions_python
+
+# Cusotdian
+argcomplete>=1.8.2
+boto3>=1.5.15
+botocore>=1.8.35
+jsonschema>=2.5.1
+PyYAML>=3.12
+tabulate>=0.7.7
+jsonpatch>=1.2.1
+futures==3.1.1
+
+# azure
+azure
+adal~=0.5
+azure-cli-core

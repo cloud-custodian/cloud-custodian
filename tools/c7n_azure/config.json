@@ -1,0 +1,24 @@
+{
+  "policies": [
+    {
+      "name": "functions test",
+      "resource": "azure.vm",
+      "filters": [
+        {
+          "type": "value",
+           "key": "name",
+           "op": "eq",
+           "value_type": "normalize",
+           "value": "cctestvm"
+        }
+      ],
+      "actions": [
+        {
+          "type": "tag",
+          "tag": "Pythontest",
+          "value": "ItWorks"
+        }
+      ]
+    }
+  ]
+}
