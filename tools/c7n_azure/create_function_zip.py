@@ -37,7 +37,6 @@ class AzurePackageArchive(object):
 
     def _add_functions_required_files(self):
         self.pkg.add_directory(os.path.join(self.basedir, 'functionapp/HttpTrigger'))
-        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/.deployment'))
         self.pkg.add_file(os.path.join(self.basedir, 'functionapp/host.json'))
         self.pkg.add_file(os.path.join(self.basedir, 'functionapp/config.json'))
 
