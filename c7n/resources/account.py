@@ -667,15 +667,16 @@ class EnableTrail(BaseAction):
         kms_key = self.data.get('kms-key', '')
 
         s3client = session.client('s3')
-        try:
-            s3client.create_bucket(
-                Bucket=bucket_name,
-                CreateBucketConfiguration={'LocationConstraint': bucket_region}
-            )
-        except ClientError as ce:
-            if not ('Error' in ce.response and
-            ce.response['Error']['Code'] == 'BucketAlreadyOwnedByYou'):
-                raise ce
+        if not s3.meta.client.head_bucket(Bucket=bucket_name):
+            try:
+                s3client.create_bucket(
+                    Bucket=bucket_name,
+                    CreateBucketConfiguration={'LocationConstraint': bucket_region}
+                )
+            except ClientError as ce:
+                if not ('Error' in ce.response and
+                ce.response['Error']['Code'] == 'BucketAlreadyOwnedByYou'):
+                    raise ce
 
         try:
             current_policy = s3client.get_bucket_policy(Bucket=bucket_name)
