@@ -106,6 +106,6 @@ if __name__ == "__main__":
         shutil.rmtree(test_app_path)
         os.makedirs(test_app_path)
 
+    shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'test_app.zip'))
     zip = zipfile.ZipFile(archive.pkg.path, 'r')
     zip.extractall(test_app_path)
-
