@@ -64,42 +64,41 @@ class OpsworkStack(QueryResourceManager):
     permissions = ('opsworks:ListTags',)
 
     def augment(self, stacks):
-        filter(None, _opsworks_tags(
+        filter(None, OpsworkStack.opsworks_tags(
             stacks, self.session_factory, self.executor_factory, self.retry
         ))
         return stacks
 
-def _opsworks_tags(stacks, session_factory, executor_factory, retry):
-    """Augment ElasticBeanstalk Environments with their tags."""
+    def opsworks_tags(stacks, session_factory, executor_factory, retry):
+        """Augment OpsWorks Stacks with their tags."""
 
-    def process_tags(stack):
-        client = local_session(session_factory).client('opsworks')
-        try:
-            tl = retry(
-                client.list_tags,
-                ResourceArn=stack['Arn']
-            )['Tags']
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                log.warning(
-                    "Exception getting opsworks tags ", e
-                )
-            return None
+        def process_tags(stack):
+            client = local_session(session_factory).client('opsworks')
+            try:
+                tl = retry(
+                   client.list_tags,
+                   ResourceArn=stack['Arn']
+                )['Tags']
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                   log.warning(
+                     "Exception getting opsworks tags ", e
+                   )
+                return None
 
-        tag_list=[]
-        for x,v in tl.items():
-            entry = {
-                 "Key": x,
-                 "Value": v
-            }
-            tag_list.append(entry)
-        stack['Tags'] = tag_list
-        return stack
+            tag_list=[]
+            for x,v in tl.items():
+                entry = {
+                   "Key": x,
+                   "Value": v
+                }
+                tag_list.append(entry)
+            stack['Tags'] = tag_list
+            return stack
 
-    # Handle API rate-limiting, which is a problem for accounts with many
-    # EB Environments
-    with executor_factory(max_workers=1) as w:
-        return list(w.map(process_tags, stacks))
+        # Handle API rate-limiting, which is a problem for accounts with many stacks
+        with executor_factory(max_workers=1) as w:
+             return list(w.map(process_tags, stacks))
 
 @OpsworkStack.filter_registry.register('offhour')
 class StackOffHour(OffHour):
@@ -170,8 +169,7 @@ class DeleteStack(BaseAction, StateTransitionFilter):
             client.delete_stack(StackId=stack_id)
         except ClientError as e:
             self.log.exception(
-                "Exception deleting stack:\n %s" % e)
-
+                "Exception deleting stack: %s" % e)
 
 @OpsworkStack.action_registry.register('stop')
 class StopStack(BaseAction):
@@ -205,7 +203,7 @@ class StopStack(BaseAction):
             client.stop_stack(StackId=stack_id)
         except ClientError as e:
             self.log.exception(
-                "Exception stopping stack:\n %s" % e)
+                "Exception stopping stack: %s" % e)
 
 @OpsworkStack.action_registry.register('start')
 class StartStack(BaseAction):
@@ -237,7 +235,7 @@ class StartStack(BaseAction):
             client.start_stack(StackId=stack_id)
         except ClientError as e:
             self.log.exception(
-                "Exception starting stack:\n %s" % e)
+                "Exception starting stack: %s" % e)
 
 @OpsworkStack.action_registry.register('tag')
 @OpsworkStack.action_registry.register('mark')
@@ -266,7 +264,6 @@ class Tag(tags.Tag):
     )
 
     permissions = ('opsworks:TagResource',)
-    batch_size = 1
 
     def process_resource_set(self, stacks, tags):
         client = local_session(
@@ -298,8 +295,6 @@ class RemoveTag(tags.RemoveTag):
                   - type: remove-tag
                     tags: ["OutdatedTag"]
     """
-    concurrency = 2
-    batch_size = 5
     permissions = ('opsworks:UntagResource',)
 
     def process_resource_set(self, stacks, tag_keys):
@@ -352,4 +347,4 @@ class CMDelete(BaseAction):
             client.delete_server(ServerName=server['ServerName'])
         except ClientError as e:
             self.log.exception(
-                "Exception deleting server:\n %s" % e)
+                "Exception deleting server: %s" % e)
