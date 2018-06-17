@@ -1,12 +1,12 @@
-from c7n.mu import PythonPackageArchive, custodian_archive
-from c7n.utils import local_session
-from c7n_azure.session import Session
 import requests
-import zipfile
 import os
 import shutil
 import site
-from sys import platform
+import sys
+
+from c7n.mu import PythonPackageArchive
+from c7n.utils import local_session
+from c7n_azure.session import Session
 
 
 class AzurePackageArchive(object):
@@ -48,6 +48,7 @@ class AzurePackageArchive(object):
         site_pkg = site.getsitepackages()[0]
 
         # linux
+        platform = sys.platform
         if platform == "linux" or platform == "linux2":
             self.pkg.add_file(os.path.join(site_pkg, '_cffi_backend.cpython-36m-x86_64-linux-gnu.so'))
             self.pkg.add_file(os.path.join(site_pkg, '.libs_cffi_backend/libffi-d78936b1.so.6.0.4'),
@@ -59,6 +60,9 @@ class AzurePackageArchive(object):
         # Windows
         elif platform == "win32":
             raise NotImplementedError('Cannot package Azure Function in Windows host OS.')
+
+    def _update_perms_package(self):
+        os.chmod(self.pkg.path, 0o0644)
 
     def build_azure_package(self):
         # Get dependencies for azure entry point
@@ -82,6 +86,12 @@ class AzurePackageArchive(object):
 
         self.pkg.close()
 
+        # update perms of the package
+        self._update_perms_package()
+
+    def close(self):
+        self.pkg.close()
+
 
 def publish(app_name, pkg):
     s = local_session(Session)
@@ -99,13 +109,13 @@ def publish(app_name, pkg):
 if __name__ == "__main__":
     archive = AzurePackageArchive()
     archive.build_azure_package()
+    archive.close()
 
     # Unzip the archive for testing
-    test_app_path = os.path.join(archive.basedir, 'test_app2')
+    test_app_path = sys.argv[1]
     if os.path.exists(test_app_path):
         shutil.rmtree(test_app_path)
         os.makedirs(test_app_path)
 
-    shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'test_app.zip'))
-    zip = zipfile.ZipFile(archive.pkg.path, 'r')
-    zip.extractall(test_app_path)
+    shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
+    archive.pkg.get_reader().extractall(test_app_path)
