@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n.policy import PolicyExecutionMode, Policy
-from c7n.registry import PluginRegistry
-from c7n_azure.arm_template_util import ArmTemplateUtil
-from c7n import utils
+from c7n_azure.template_utils import TemplateUtil
 
-execution = PluginRegistry('azure.execution')
+from c7n import utils
+from c7n.policy import ServerlessExecutionMode, execution
+
 
 @execution.register('azure-function')
-class AzureFunctionMode(PolicyExecutionMode):
+class AzureFunctionMode(ServerlessExecutionMode):
     """A policy that runs/executes in azure functions."""
 
     azure_function_schema = {
@@ -31,6 +30,7 @@ class AzureFunctionMode(PolicyExecutionMode):
                 'type': 'object',
                 'sku': 'string',
                 'location': 'string',
+                'appInsightsLocation': 'string',
                 'workerSize': 'number',
                 'skuCode': 'string'
             }
@@ -41,28 +41,34 @@ class AzureFunctionMode(PolicyExecutionMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
+    def __init__(self, policy):
+        super(policy)
+        self.template_util = TemplateUtil()
+
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
         """Provision any resources needed for the policy."""
-        util = ArmTemplateUtil()
-        name = self.policy.data['name'].replace(' ', '-').lower()
-        util.create_resource_group(name)
-        parameters = self.get_parameters()
-        util.deploy_resource_template('dedicated_functionapp.json', parameters)
+        policy_name = self.policy.data['name'].replace(' ', '-').lower()
 
-    def get_parameters(self):
-        util = ArmTemplateUtil()
-        name = self.policy.data['name'].replace(' ', '-').lower()
-        parameters = util.get_default_parameters('dedicated_functionapp.parameters.json')
+        parameters = self.get_parameters(policy_name)
+        self.template_util.create_resource_group(policy_name, {'location': parameters['location']['value']})
+        self.template_util.deploy_resource_template(policy_name, 'dedicated_functionapp.json', parameters)
+
+    def get_parameters(self, policy_name):
+        parameters = self.template_utilutil.get_default_parameters('dedicated_functionapp.parameters.json')
+        updated_parameters = {}
+
         p = self.policy.data
         if 'mode' in p:
             if 'execution-options' in p['mode']:
                 updated_parameters = p['mode']['execution-options']
-                updated_parameters['name'] = name
-                util.update_parameters(parameters, updated_parameters)
+
+        updated_parameters['name'] = policy_name
+        updated_parameters['storageName'] = policy_name.replace('-', '')
+        self.template_util.update_parameters(parameters, updated_parameters)
 
         return parameters
 
@@ -72,14 +78,3 @@ class AzureFunctionMode(PolicyExecutionMode):
 
     def validate(self):
         """Validate configuration settings for execution mode."""
-
-
-class AzurePolicy(Policy):
-
-    EXEC_MODE_MAP = {
-        'azure-function': AzureFunctionMode
-    }
-
-    def get_execution_mode(self):
-        exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        return self.EXEC_MODE_MAP[exec_mode_type](self)

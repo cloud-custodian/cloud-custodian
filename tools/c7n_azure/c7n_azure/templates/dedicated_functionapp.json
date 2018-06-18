@@ -9,6 +9,9 @@
         "location": {
             "type": "string"
         },
+        "appInsightsLocation": {
+            "type": "string"
+        },
         "sku": {
             "type": "string"
         },
@@ -48,11 +51,26 @@
             "kind": "linux"
         },
         {
+            "apiVersion": "2015-05-01",
+            "name": "[parameters('name')]",
+            "type": "microsoft.insights/components",
+            "location": "[parameters('appInsightsLocation')]",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('name'))]": "Resource"
+            },
+            "properties": {
+                "ApplicationId": "[parameters('name')]",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        },
+        {
             "name": "[parameters('name')]",
             "type": "Microsoft.Web/sites",
             "dependsOn": [
                 "[concat('Microsoft.Web/serverfarms/', parameters('name'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
+                "[resourceId('microsoft.insights/components/', parameters('name'))]"
+
             ],
             "properties": {
                 "siteConfig": {
@@ -74,20 +92,8 @@
                             "value": "python"
                         },
                         {
-                            "name": "AZURE_TENANT_ID",
-                            "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
-                        },
-                        {
-                            "name": "AZURE_CLIENT_ID",
-                            "value": "fee7b372-b4d4-4369-a8fc-20a72ac4eefc"
-                        },
-                        {
-                            "name": "AZURE_CLIENT_SECRET",
-                            "value": "JC720HYh0e2KAsJhrlHVLVCbX1mDfYZ6CR1aMHFiJDw="
-                        },
-                        {
-                            "name": "AZURE_SUBSCRIPTION_ID",
-                            "value": "aa98974b-5d2a-4d98-a78a-382f3715d07e"
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('name')), '2015-05-01').InstrumentationKey]"
                         }
                     ],
                     "alwaysOn": true,
