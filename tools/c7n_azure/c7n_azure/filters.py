@@ -13,8 +13,9 @@
 # limitations under the License.
 from datetime import timedelta
 import operator
-from c7n.filters import Filter, OPERATORS
+from c7n.filters import Filter, ValueFilter, OPERATORS
 from c7n_azure.utils import Math
+import jmespath
 
 
 class MetricFilter(Filter):
@@ -98,36 +99,21 @@ class MetricFilter(Filter):
     def process_resource(self, resource):
         return resource if self.passes_op_filter(resource) else None
 
-class TagFilter(Filter):
+class TagFilter(ValueFilter):
 
-    schema = {
-        'type': 'object',
-        'required': ['type', 'op', 'value'],
-        'properties': {
-            'metric': {'type': 'string'},
-            'op': {'enum': [
-                'eq', 'equal', 'ne', 'not-equal', 'in', 'ni', 'not-in', 'contains'
-            ]},
-            'tags': {'type': 'object'},
-            'set_op': {'enum': ['any', 'all']}
-        }
-    }
-
-    set_ops = {
-        'any': any,
-        'all': all
-    }
-
-    def __init__(self, data, manager=None):
-        super(TagFilter, self).__init__(data, manager)
-        self.tag = self.data.get('tag')
-        self.op = OPERATORS[self.data.get('op')]
-        self.tags = self.data.get('tags')
-        self.set_op = self.set_ops[self.data.get('set_op', 'all')]
-
-    def __call__(self, resource):
-        result = []
-        for tag in self.tags:
-            # Need to decide whether or not to allow multiple tags
-            pass
-        return True
+    def get_resource_value(self, k, i):
+        if k.startswith('tag:'):
+            tk = k.split(':', 1)[1]
+            r = None
+            for t in i.get("tags", []):
+                if t.get('Key') == tk:
+                    r = t.get('Value')
+                    break
+        elif k in i:
+            r = i.get(k)
+        elif k not in self.expr:
+            self.expr[k] = jmespath.compile(k)
+            r = self.expr[k].search(i)
+        else:
+            r = self.expr[k].search(i)
+        return r
