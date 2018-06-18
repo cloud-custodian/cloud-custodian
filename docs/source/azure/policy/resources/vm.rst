@@ -13,20 +13,40 @@ Filters
   .. c7n-schema:: InstanceViewFilter
        :module: c7n_azure.resources.vm
 
+- Arm Filters (see :ref:`azure_genericarmfilter`)
+
+``metric``
+  Filter based on metrics from Azure Monitor
+
+  .. c7n-schema:: MetricFilter
+       :module: c7n_azure.filters
+
 Actions
 -------
 
 ``start``
   Start the VMs
 
+  .. c7n-schema:: VmStartAction
+       :module: c7n_azure.resources.vm 
+
 ``stop``
   Stop the VMs
+
+.. c7n-schema:: VmStartAction
+      :module: c7n_azure.resources.vm 
 
 ``restart``
   Restart the VMs
 
+.. c7n-schema:: VmRestartAction
+      :module: c7n_azure.resources.vm 
+
 ``delete``
   Delete the VMs
+
+.. c7n-schema:: VmDeleteAction
+    :module: c7n_azure.resources.vm 
 
 Example Policies
 ----------------
