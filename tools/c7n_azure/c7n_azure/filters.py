@@ -98,25 +98,3 @@ class MetricFilter(Filter):
 
     def process_resource(self, resource):
         return resource if self.passes_op_filter(resource) else None
-
-class AzureValueFilter(ValueFilter):
-
-    def get_resource_value(self, k, i):
-        #print(k)
-        #import pdb; pdb.set_trace()
-        if k.startswith('tag:'):
-            import pdb; pdb.set_trace()
-            tk = k.split(':', 1)[1]
-            r = None
-            for t in i.get("tags", []):
-                if t.get('Key') == tk:
-                    r = t.get('Value')
-                    break
-        elif k in i:
-            r = i.get(k)
-        elif k not in self.expr:
-            self.expr[k] = jmespath.compile(k)
-            r = self.expr[k].search(i)
-        else:
-            r = self.expr[k].search(i)
-        return r
