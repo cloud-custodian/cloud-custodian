@@ -1158,8 +1158,6 @@ class UserDelete(BaseAction):
     ORDERED_OPTIONS = OrderedDict([
         ('console-access', 'delete_console_access'),
         ('access-keys', 'delete_access_keys'),
-        # keep 'user-policies' for backwards-compatibility
-        ('user-policies', 'delete_attached_user_policies'),
         ('attached-user-policies', 'delete_attached_user_policies'),
         ('inline-user-policies', 'delete_inline_user_policies'),
         ('mfa-devices', 'delete_hw_mfa_devices'),
@@ -1168,6 +1166,9 @@ class UserDelete(BaseAction):
         ('signing-certificates', 'delete_signing_certificates'),
         ('service-specific-credentials', 'delete_service_specific_credentials'),
     ])
+    COMPOUND_OPTIONS = {
+        'user-policies': ['attached-user-policies', 'inline-user-policies'],
+    }
 
     schema = type_schema(
         'delete',
@@ -1175,7 +1176,7 @@ class UserDelete(BaseAction):
             'type': 'array',
             'items': {
                 'type': 'string',
-                'enum': list(ORDERED_OPTIONS.keys()),
+                'enum': list(ORDERED_OPTIONS.keys() + COMPOUND_OPTIONS.keys()),
             }
         })
 
@@ -1276,11 +1277,12 @@ class UserDelete(BaseAction):
             self.process_user(client, r)
 
     def process_user(self, client, r):
-        # filter out options that yield the same operation,
-        # see definition of ORDERED_OPTIONS above
-        default_options = {v: k for k, v in self.ORDERED_OPTIONS.items()}.values()
-
-        user_options = self.data.get('options', list(default_options))
+        user_options = self.data.get('options', list(self.ORDERED_OPTIONS.keys()))
+        # resolve compound options
+        for cmd in self.COMPOUND_OPTIONS:
+            if cmd in user_options:
+                user_options += self.COMPOUND_OPTIONS[cmd]
+        # process options in ordered fashion
         for cmd in self.ORDERED_OPTIONS:
             if cmd in user_options:
                 op = getattr(self, self.ORDERED_OPTIONS[cmd])
