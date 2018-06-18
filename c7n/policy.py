@@ -147,6 +147,9 @@ class PolicyExecutionMode(object):
         """Run the actual policy."""
         raise NotImplementedError("subclass responsibility")
 
+    def provision(self):
+        """Provision any resources needed for the policy."""
+
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
         raise NotImplementedError("subclass responsibility")

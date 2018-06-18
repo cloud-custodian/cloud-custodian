@@ -65,5 +65,3 @@ class TemplateUtil(object):
             parameters[key]['value'] = value
 
         return parameters
-
-

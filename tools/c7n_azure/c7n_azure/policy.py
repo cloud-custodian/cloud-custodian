@@ -52,13 +52,17 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def provision(self):
         """Provision any resources needed for the policy."""
         policy_name = self.policy.data['name'].replace(' ', '-').lower()
-
         parameters = self.get_parameters(policy_name)
-        self.template_util.create_resource_group(policy_name, {'location': parameters['location']['value']})
-        self.template_util.deploy_resource_template(policy_name, 'dedicated_functionapp.json', parameters)
+
+        self.template_util.create_resource_group(
+            policy_name, {'location': parameters['location']['value']})
+
+        self.template_util.deploy_resource_template(
+            policy_name, 'dedicated_functionapp.json', parameters)
 
     def get_parameters(self, policy_name):
-        parameters = self.template_utilutil.get_default_parameters('dedicated_functionapp.parameters.json')
+        parameters = self.template_utilutil.get_default_parameters(
+            'dedicated_functionapp.parameters.json')
         updated_parameters = {}
 
         p = self.policy.data
