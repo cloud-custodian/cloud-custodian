@@ -387,7 +387,7 @@ class Notify(BaseNotify):
         message = {
             'event': event,
             'account_id': session.subscription_id,
-            'account': 'subscription',
+            'account': session.subscription_id,
             'region': 'all',
             'policy': self.manager.data}
 
