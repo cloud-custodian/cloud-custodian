@@ -8,11 +8,20 @@ Getting Started
 
 .. _azure_install-cc:
 
-Install Cloud Custodian
------------------------
+Install Cloud Custodian and Azure Plugin
+----------------------------------------
 
-The Azure provider must be installed as a separate package in addition to c7n.  The Azure package is not yet published
-so cloning the repository is required.
+The Azure provider must be installed as a separate package in addition to c7n.
+
+.. code-block:: bash
+
+  $ virtualenv custodian
+  $ source custodian/bin/activate
+  (custodian) $ pip install c7n
+  (custodian) $ pip install c7n_azure
+
+
+If you prefer to install the latest from source control you can do so as follows:
 
 .. code-block:: bash
 
