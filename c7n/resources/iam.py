@@ -1176,7 +1176,7 @@ class UserDelete(BaseAction):
             'type': 'array',
             'items': {
                 'type': 'string',
-                'enum': list(ORDERED_OPTIONS.keys() + COMPOUND_OPTIONS.keys()),
+                'enum': list(ORDERED_OPTIONS.keys()) + list(COMPOUND_OPTIONS.keys()),
             }
         })
 
