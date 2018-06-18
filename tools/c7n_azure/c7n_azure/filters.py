@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import timedelta
-import operator
-from c7n.filters import Filter, ValueFilter, OPERATORS
+from c7n.filters import Filter, OPERATORS
 from c7n_azure.utils import Math
-import jmespath
 
 
 class MetricFilter(Filter):

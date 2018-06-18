@@ -660,7 +660,6 @@ class TagsTest(BaseTest):
         p = self.load_policy(policy)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
 
     @arm_template('vm.json')
     def test_tag_filter_absent(self):
