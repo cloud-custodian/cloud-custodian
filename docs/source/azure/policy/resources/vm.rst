@@ -33,20 +33,20 @@ Actions
 ``stop``
   Stop the VMs
 
-.. c7n-schema:: VmStartAction
-      :module: c7n_azure.resources.vm 
+  .. c7n-schema:: VmStartAction
+        :module: c7n_azure.resources.vm 
 
 ``restart``
   Restart the VMs
 
-.. c7n-schema:: VmRestartAction
-      :module: c7n_azure.resources.vm 
+  .. c7n-schema:: VmRestartAction
+        :module: c7n_azure.resources.vm 
 
 ``delete``
   Delete the VMs
 
-.. c7n-schema:: VmDeleteAction
-    :module: c7n_azure.resources.vm 
+  .. c7n-schema:: VmDeleteAction
+      :module: c7n_azure.resources.vm 
 
 Example Policies
 ----------------
