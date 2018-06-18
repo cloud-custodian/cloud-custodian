@@ -37,6 +37,7 @@ class Session(object):
 
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
+        self.auth_mode = None
 
         tenant_auth_variables = [
             'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
@@ -51,6 +52,7 @@ class Session(object):
                     'access_token': os.environ['AZURE_ACCESS_TOKEN']
                 })
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            self.auth_mode = "TOKEN"
             self.log.info("Creating session with Token Authentication")
 
         elif all(k in os.environ for k in tenant_auth_variables):
@@ -62,6 +64,7 @@ class Session(object):
             )
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.tenant_id = os.environ['AZURE_TENANT_ID']
+            self.auth_mode = "SERVICE_PRINCIPAL"
             self.log.info("Creating session with Service Principal Authentication")
 
         else:
@@ -70,6 +73,7 @@ class Session(object):
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
+            self.auth_mode="CLI"
             self.log.info("Creating session with Azure CLI Authentication")
 
         # Let provided id parameter override everything else
@@ -80,6 +84,16 @@ class Session(object):
 
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
+
+    def get_bearer_token(self):
+        token = None
+        if self.auth_mode == "CLI":
+            # TODO: Find a better way to fetch the token
+            token = self.credentials._token_retriever()[1]
+        elif self.auth_mode == "SERVICE_PRINCIPAL" or self.auth_mode == "TOKEN":
+            token = self.credentials.token['access_token']
+
+        return token
 
     def client(self, client):
         service_name, client_name = client.rsplit('.', 1)

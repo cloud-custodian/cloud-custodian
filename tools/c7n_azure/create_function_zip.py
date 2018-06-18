@@ -96,7 +96,7 @@ class AzurePackageArchive(object):
 def publish(app_name, pkg):
     s = local_session(Session)
     zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
-    bearer_token = 'Bearer %s' % (s.credentials._token_retriever()[1])
+    bearer_token = 'Bearer %s' % (s.get_bearer_token())
     headers = {
         'Content-type': 'application/zip',
         'Authorization': bearer_token
