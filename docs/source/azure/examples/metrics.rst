@@ -1,18 +1,5 @@
-.. _azure_genericarmfilter:
-
-Generic Filters
-================
-
-
-``MetricFilter``
-Filters Azure resources based on live metrics from the Azure monitor.
-
-.. c7n-schema:: MetricFilter
-    :module: c7n_azure.filters
-
-
-Example Policies
-----------------
+Filter resources by metrics from Azure Monitor
+==============================================
 
 Find VMs with an average Percentage CPU greater than or equal to 75% over the last 12 hours
 
