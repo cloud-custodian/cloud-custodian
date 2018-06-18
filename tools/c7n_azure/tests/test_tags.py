@@ -18,7 +18,6 @@ import logging
 from mock import patch
 from c7n_azure.session import Session
 from c7n.filters import FilterValidationError
-from jsonschema.exceptions import ValidationError
 from azure_common import BaseTest, arm_template
 
 
