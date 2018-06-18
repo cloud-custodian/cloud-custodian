@@ -646,14 +646,7 @@ class TagsTest(BaseTest):
         logger_mock.assert_called_with(expected_warning)
 
     @arm_template('vm.json')
-    def test_tag_filter_find(self):
-        pass
-
-    @arm_template('vm.json')
-    def test_tag_filter_not_find(self):
-        pass
-
-    def test_tag_filter_invalid(self):
+    def test_tag_filter_present(self):
         policy = {
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
@@ -663,9 +656,43 @@ class TagsTest(BaseTest):
                  'op': 'eq',
                  'value_type': 'normalize',
                  'value': 'cctestvm'},
-                {'type': 'tag',
-                 'metric': 'Network In',
-                 'aggregation': 'total',
-                 'threshold': 0}],
+                {'tag:Pythontest': 'present'}]
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        
+
+    @arm_template('vm.json')
+    def test_tag_filter_absent(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'absent'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    def test_tag_filter_value(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'ItWorks'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

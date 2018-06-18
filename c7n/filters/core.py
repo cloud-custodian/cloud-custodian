@@ -406,10 +406,17 @@ class ValueFilter(Filter):
         if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
             r = None
-            for t in i.get("Tags", []):
-                if t.get('Key') == tk:
-                    r = t.get('Value')
-                    break
+            if 'Tags' in i:
+                for t in i.get("Tags", []):
+                    if t.get('Key') == tk:
+                        r = t.get('Value')
+                        break
+            elif 'tags' in i:
+                tags = i.get("tags", [])
+                for key in tags:
+                    if key == tk:
+                        r = tags[key]
+                        break
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
