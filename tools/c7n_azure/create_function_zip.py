@@ -105,7 +105,7 @@ def publish(app_name, pkg):
     zip_file = open(pkg.path, 'rb').read()
     r = requests.post(zip_api_url, headers=headers, data=zip_file)
 
-
+# ex: python create_function_zip.py /home/test_app linuxcontainer1 
 if __name__ == "__main__":
     archive = AzurePackageArchive()
     archive.build_azure_package()
@@ -119,3 +119,5 @@ if __name__ == "__main__":
 
     shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
     archive.pkg.get_reader().extractall(test_app_path)
+
+    publish(sys.argv[2], archive.pkg)
