@@ -35,7 +35,8 @@ class TemplateUtilsTest(BaseTest):
     def test_deploy_template_with_parameters(self):
         template_file = 'dedicated_functionapp.json'
         group_name = 'cloud-custodian-test'
-        parameters = self.template_util.get_default_parameters('dedicated_functionapp.test.parameters.json')
+        parameters = self.template_util.get_default_parameters(
+            'dedicated_functionapp.test.parameters.json')
         self.template_util.deploy_resource_template(group_name, template_file, parameters)
 
         s = Session()
@@ -69,4 +70,5 @@ class TemplateUtilsTest(BaseTest):
         updated_params = self.template_util.update_parameters(params, params_to_update)
 
         self.assertEqual(updated_params['location']['value'], params_to_update['location'])
-        self.assertEqual(updated_params['appInsightsLocation']['value'], params_to_update['appInsightsLocation'])
+        self.assertEqual(
+            updated_params['appInsightsLocation']['value'], params_to_update['appInsightsLocation'])
