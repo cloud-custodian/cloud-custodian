@@ -13,8 +13,10 @@ build-linux:
 
 build-lambda:
 	@mkdir -p bin
-	@go build -o bin/register ./functions/register
-	@go build -o bin/subscribe ./functions/subscribe
+	@go build -o bin/enrich-registrations ./functions/enrich-registrations
+	@go build -o bin/handle-registrations ./functions/handle-registrations
+	@go build -o bin/process-config-events ./functions/process-config-events
+	@go build -o bin/process-deferred-actions ./functions/process-deferred-actions
 
 dist: build-linux
 	@mkdir -p dist

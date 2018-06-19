@@ -19,8 +19,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager/client"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ec2metadata"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/omnissm"
 )
 
 var RegisterCmd = &cobra.Command{
@@ -31,7 +31,7 @@ var RegisterCmd = &cobra.Command{
 		if url == "" {
 			endpoints := viper.GetStringMapString("register_endpoints")
 			if endpoints != nil {
-				region := identity.GetLocalInstanceRegion()
+				region := ec2metadata.GetLocalInstanceRegion()
 				if region == "" {
 					log.Fatal().Msg("unable to determine instance region from metadata")
 				}
@@ -41,26 +41,22 @@ var RegisterCmd = &cobra.Command{
 		if url == "" {
 			log.Fatal().Msg("registration url (OMNISSM_REGISTER_ENDPOINT) cannot be blank")
 		}
-		c, err := client.New(&client.Config{
-			Document:        string(identity.GetLocalInstanceDocument()),
-			Signature:       string(identity.GetLocalInstanceSignature()),
-			RegistrationURL: url,
-		})
+		c, err := omnissm.NewClient(url)
 		if err != nil {
 			log.Fatal().Msgf("unable to initialize node: %v", err)
 		}
-		if c.ManagedId() != "" {
-			log.Info().Str("managedId", c.ManagedId()).Msg("instance already registered")
+		if c.ManagedId != "" {
+			log.Info().Str("ManagedId", c.ManagedId).Msg("instance already registered")
 			return
 		}
 		log.Info().Msg("attempting to register instance ...")
 		if err := c.Register(); err != nil {
-			log.Fatal().Msgf("Error registering node %v", err)
+			log.Fatal().Msgf("cannot register instance: %v", err)
 		}
 		if err := c.Update(); err != nil {
-			log.Fatal().Msgf("Error recording node ssm id %v", err)
+			log.Fatal().Msgf("cannot update instance ManagedId: %v", err)
 		}
-		log.Info().Str("managedId", c.ManagedId()).Msg("instance registered")
+		log.Info().Str("ManagedId", c.ManagedId).Msg("instance registered")
 	},
 }
 

@@ -23,20 +23,20 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/inventory"
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager/client"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/sysmon"
 )
 
 var ProcessCmd = &cobra.Command{
 	Use:   "ps",
 	Short: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		info, err := client.GetInstanceInformation()
+		info, err := ssm.GetInstanceInformation()
 		if err != nil {
 			log.Fatal().Err(err).Msg("cannot get instance information")
 		}
-		logger := log.With().Str("managedId", info.InstanceId).Logger()
-		processes, err := inventory.ListAllProcesses()
+		logger := log.With().Str("ManagedId", info.InstanceId).Logger()
+		processes, err := sysmon.ListAllProcesses()
 		if err != nil {
 			log.Fatal().Err(err).Msg("cannot list processes")
 		}

@@ -17,6 +17,7 @@ package configservice
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"sync"
 
@@ -25,11 +26,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
+	"github.com/golang/time/rate"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
-
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
 )
 
 type Config struct {
@@ -41,7 +41,8 @@ type Config struct {
 type ConfigService struct {
 	configserviceiface.ConfigServiceAPI
 
-	config *Config
+	config            *Config
+	configServiceRate *rate.Limiter
 }
 
 func New(config *Config) *ConfigService {
@@ -50,10 +51,47 @@ func New(config *Config) *ConfigService {
 		config.Config.WithCredentials(stscreds.NewCredentials(sess, config.AssumeRole))
 	}
 	c := &ConfigService{
-		ConfigServiceAPI: configservice.New(session.New(config.Config)),
-		config:           config,
+		ConfigServiceAPI:  configservice.New(session.New(config.Config)),
+		config:            config,
+		configServiceRate: rate.NewLimiter(100, 100),
 	}
 	return c
+}
+
+func (c *ConfigService) GetLatestResourceConfig(resourceType, resourceId string) (*ConfigurationItem, error) {
+	c.configServiceRate.Wait(context.TODO())
+	resp, err := c.ConfigServiceAPI.GetResourceConfigHistoryWithContext(context.Background(), &configservice.GetResourceConfigHistoryInput{
+		ResourceId:   aws.String(resourceId),
+		ResourceType: aws.String(resourceType),
+		Limit:        aws.Int64(1),
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, item := range resp.ConfigurationItems {
+		var ci ConfigurationItem
+		if err := json.Unmarshal([]byte(*item.Configuration), &ci.Configuration); err != nil {
+			return nil, errors.Wrap(err, "cannot unmarshal ConfigurationItem")
+		}
+		ci.AWSAccountId = aws.StringValue(item.AccountId)
+		ci.ARN = aws.StringValue(item.Arn)
+		ci.AvailabilityZone = aws.StringValue(item.AvailabilityZone)
+		ci.AWSRegion = aws.StringValue(item.AwsRegion)
+		ci.ConfigurationItemCaptureTime = aws.TimeValue(item.ConfigurationItemCaptureTime).Format("2006-01-02T15:04:05Z")
+		ci.ConfigurationItemStatus = aws.StringValue(item.ConfigurationItemStatus)
+		ci.ConfigurationStateId, _ = strconv.ParseFloat(aws.StringValue(item.ConfigurationStateId), 64)
+		ci.ResourceCreationTime = aws.TimeValue(item.ResourceCreationTime).Format("2006-01-02T15:04:05Z")
+		ci.ResourceId = aws.StringValue(item.ResourceId)
+		ci.ResourceType = aws.StringValue(item.ResourceType)
+		if ci.Tags == nil {
+			ci.Tags = make(map[string]string)
+		}
+		for _, tag := range ci.Configuration.Tags {
+			ci.Tags[tag.Key] = tag.Value
+		}
+		return &ci, nil
+	}
+	return nil, errors.Errorf("resource not found: %s/%s", resourceType, resourceId)
 }
 
 func min(a, b int) int {
@@ -63,14 +101,15 @@ func min(a, b int) int {
 	return b
 }
 
-func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*manager.ConfigurationItem, error) {
+func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*ConfigurationItem, error) {
 	resourceKeys := make([]*configservice.ResourceKey, 0)
 	for k, v := range resources {
 		resourceKeys = append(resourceKeys, &configservice.ResourceKey{ResourceId: aws.String(k), ResourceType: aws.String(v)})
 	}
+	fmt.Printf("resourceKeys = %+v\n", resourceKeys)
 	var mu sync.Mutex
 	var g errgroup.Group
-	items := make([]*manager.ConfigurationItem, 0)
+	items := make([]*ConfigurationItem, 0)
 	for i := 0; i < len(resourceKeys); i += 100 {
 		batchResourceKeys := resourceKeys[i:min(i+100, len(resourceKeys))]
 		g.Go(func() error {
@@ -90,7 +129,8 @@ func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*
 	return items, nil
 }
 
-func (c *ConfigService) batchGetResourceConfig(resourceKeys []*configservice.ResourceKey) ([]*manager.ConfigurationItem, error) {
+func (c *ConfigService) batchGetResourceConfig(resourceKeys []*configservice.ResourceKey) ([]*ConfigurationItem, error) {
+	c.configServiceRate.Wait(context.TODO())
 	resp, err := c.ConfigServiceAPI.BatchGetResourceConfigWithContext(context.Background(), &configservice.BatchGetResourceConfigInput{
 		ResourceKeys: resourceKeys,
 	})
@@ -98,9 +138,9 @@ func (c *ConfigService) batchGetResourceConfig(resourceKeys []*configservice.Res
 		return nil, err
 	}
 	var mErr error
-	items := make([]*manager.ConfigurationItem, 0)
+	items := make([]*ConfigurationItem, 0)
 	for _, item := range resp.BaseConfigurationItems {
-		var ci manager.ConfigurationItem
+		var ci ConfigurationItem
 		if err := json.Unmarshal([]byte(*item.Configuration), &ci.Configuration); err != nil {
 			mErr = multierror.Append(mErr, errors.Wrap(err, "cannot unmarshal ConfigurationItem"))
 			continue
