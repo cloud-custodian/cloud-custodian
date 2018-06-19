@@ -10,31 +10,11 @@ from c7n.mu import PythonPackageArchive
 from c7n.utils import local_session
 
 
-class AzurePackageArchive(object):
+class FunctionPackage(object):
 
     def __init__(self):
         self.basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'function_template')
         self.pkg = PythonPackageArchive()
-
-    @staticmethod
-    def _get_dependencies(entry_point):
-        # Dynamically find all imported modules
-        from modulefinder import ModuleFinder
-        finder = ModuleFinder()
-        finder.run_script(os.path.join(os.path.dirname(os.path.realpath(__file__)), entry_point))
-        imports = list(set([v.__file__.split('site-packages/', 1)[-1].split('/')[0]
-                            for (k, v) in finder.modules.items()
-                            if v.__file__ is not None and "site-packages" in v.__file__]))
-
-        # Get just the modules, ignore the so and py now (maybe useful for calls to add_file)
-        modules = [i.split('.py')[0] for i in imports if ".so" not in i]
-
-        so_files = list(set([v.__file__
-                             for (k, v) in finder.modules.items()
-                             if v.__file__ is not None and "site-packages" in v.__file__
-                             and ".so" in v.__file__]))
-
-        return set(modules), so_files
 
     def _add_functions_required_files(self, policy_name):
         self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/__init__.py'),
@@ -52,7 +32,7 @@ class AzurePackageArchive(object):
         self.pkg.add_modules('cffi')
 
         # Add native libraries that are missing
-        site_pkg = getsitepackages()[0]
+        site_pkg = FunctionPackage.get_site_packages()[0]
 
         # linux
         platform = sys.platform
@@ -72,7 +52,7 @@ class AzurePackageArchive(object):
 
     def build_azure_package(self, policy_name):
         # Get dependencies for azure entry point
-        modules, so_files = AzurePackageArchive._get_dependencies('c7n_azure/entry.py')
+        modules, so_files = FunctionPackage._get_dependencies('c7n_azure/entry.py')
 
         # add all loaded modules
         modules.remove('azure')
@@ -105,52 +85,72 @@ class AzurePackageArchive(object):
     def close(self):
         self.pkg.close()
 
+    @staticmethod
+    def publish(app_name, pkg):
+        s = local_session(Session)
+        zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
+        headers = {
+            'Content-type': 'application/zip',
+            'Authorization': 'Bearer %s' % (s.get_bearer_token())
+        }
 
-def publish(app_name, pkg):
-    s = local_session(Session)
-    zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
-    bearer_token = 'Bearer %s' % (s.get_bearer_token())
-    headers = {
-        'Content-type': 'application/zip',
-        'Authorization': bearer_token
-    }
+        zip_file = open(pkg.path, 'rb').read()
+        r = requests.post(zip_api_url, headers=headers, data=zip_file)
+        print(r)
 
-    zip_file = open(pkg.path, 'rb').read()
-    r = requests.post(zip_api_url, headers=headers, data=zip_file)
-    print(r)
+    @staticmethod
+    def get_site_packages():
+        """Returns a list containing all global site-packages directories
+        (and possibly site-python).
+        For each directory present in the global ``PREFIXES``, this function
+        will find its `site-packages` subdirectory depending on the system
+        environment, and will return a list of full paths.
+        """
+        site_packages = []
+        seen = set()
+        prefixes = [sys.prefix, sys.exec_prefix]
 
-def getsitepackages():
-    """Returns a list containing all global site-packages directories
-    (and possibly site-python).
-    For each directory present in the global ``PREFIXES``, this function
-    will find its `site-packages` subdirectory depending on the system
-    environment, and will return a list of full paths.
-    """
-    sitepackages = []
-    seen = set()
-    prefixes = [sys.prefix, sys.exec_prefix]
+        for prefix in prefixes:
+            if not prefix or prefix in seen:
+                continue
+            seen.add(prefix)
 
-    for prefix in prefixes:
-        if not prefix or prefix in seen:
-            continue
-        seen.add(prefix)
+            if sys.platform in ('os2emx', 'riscos'):
+                site_packages.append(os.path.join(prefix, "Lib", "site-packages"))
+            elif os.sep == '/':
+                site_packages.append(os.path.join(prefix, "lib",
+                                                 "python" + sys.version[:3],
+                                                 "site-packages"))
+                site_packages.append(os.path.join(prefix, "lib", "site-python"))
+            else:
+                site_packages.append(prefix)
+                site_packages.append(os.path.join(prefix, "lib", "site-packages"))
+        return site_packages
 
-        if sys.platform in ('os2emx', 'riscos'):
-            sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
-        elif os.sep == '/':
-            sitepackages.append(os.path.join(prefix, "lib",
-                                             "python" + sys.version[:3],
-                                             "site-packages"))
-            sitepackages.append(os.path.join(prefix, "lib", "site-python"))
-        else:
-            sitepackages.append(prefix)
-            sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
-    return sitepackages
+    @staticmethod
+    def _get_dependencies(entry_point):
+        # Dynamically find all imported modules
+        from modulefinder import ModuleFinder
+        finder = ModuleFinder()
+        finder.run_script(os.path.join(os.path.dirname(os.path.realpath(__file__)), entry_point))
+        imports = list(set([v.__file__.split('site-packages/', 1)[-1].split('/')[0]
+                            for (k, v) in finder.modules.items()
+                            if v.__file__ is not None and "site-packages" in v.__file__]))
+
+        # Get just the modules, ignore the so and py now (maybe useful for calls to add_file)
+        modules = [i.split('.py')[0] for i in imports if ".so" not in i]
+
+        so_files = list(set([v.__file__
+                             for (k, v) in finder.modules.items()
+                             if v.__file__ is not None and "site-packages" in v.__file__
+                             and ".so" in v.__file__]))
+
+        return set(modules), so_files
 
 
 # ex: python create_function_zip.py /home/test_app linuxcontainer1 policy_name
 if __name__ == "__main__":
-    archive = AzurePackageArchive()
+    archive = FunctionPackage()
     archive.build_azure_package(sys.argv[3])
     archive.close()
 
@@ -165,4 +165,4 @@ if __name__ == "__main__":
     # debug extract
     archive.pkg.get_reader().extractall(test_app_path)
 
-    publish(sys.argv[2], archive.pkg)
+    FunctionPackage.publish(sys.argv[2], archive.pkg)

@@ -1,5 +1,5 @@
 {
-  "scriptFile": "main.py",
+  "scriptFile": "function.py",
   "bindings": [
     {
       "authLevel": "anonymous",
