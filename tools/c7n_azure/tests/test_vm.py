@@ -55,6 +55,22 @@ class VMTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @arm_template('vm.json')
+    def test_find_vm_with_public_ip(self):
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'public-vm'}]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     fake_running_vms = [{
         'resourceGroup': 'test_resource_group',
         'name': 'test_vm'
