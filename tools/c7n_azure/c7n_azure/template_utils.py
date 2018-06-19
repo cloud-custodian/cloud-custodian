@@ -23,7 +23,7 @@ from c7n_azure.session import Session
 from c7n.utils import local_session
 
 
-class TemplateUtil(object):
+class TemplateUtilities(object):
     def __init__(self):
         s = local_session(Session)
         #: :type: azure.mgmt.resource.ResourceManagementClient

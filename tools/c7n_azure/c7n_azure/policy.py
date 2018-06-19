@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.template_utils import TemplateUtil
+from c7n_azure.template_utils import TemplateUtilities
 
 from c7n import utils
 from c7n.policy import ServerlessExecutionMode, execution
@@ -43,7 +43,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def __init__(self, policy):
         self.policy = policy
-        self.template_util = TemplateUtil()
+        self.template_util = TemplateUtilities()
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -51,16 +51,16 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def provision(self):
         """Provision any resources needed for the policy."""
-        policy_name = self.policy.data['name'].replace(' ', '-').lower()
-        parameters = self.get_parameters(policy_name)
+        parameters = self.get_parameters()
+        group_name = parameters['name']['value']
 
         self.template_util.create_resource_group(
-            policy_name, {'location': parameters['location']['value']})
+            group_name, {'location': parameters['location']['value']})
 
         self.template_util.deploy_resource_template(
-            policy_name, 'dedicated_functionapp.json', parameters)
+            group_name, 'dedicated_functionapp.json', parameters)
 
-    def get_parameters(self, policy_name):
+    def get_parameters(self):
         parameters = self.template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
         updated_parameters = {}
@@ -70,8 +70,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
             if 'provision-options' in p['mode']:
                 updated_parameters = p['mode']['provision-options']
 
-        updated_parameters['name'] = policy_name
-        updated_parameters['storageName'] = policy_name.replace('-', '')
         self.template_util.update_parameters(parameters, updated_parameters)
 
         return parameters
