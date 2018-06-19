@@ -42,7 +42,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
     def __init__(self, policy):
-        super(policy)
+        self.policy = policy
         self.template_util = TemplateUtil()
 
     def run(self, event=None, lambda_context=None):
@@ -61,7 +61,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             policy_name, 'dedicated_functionapp.json', parameters)
 
     def get_parameters(self, policy_name):
-        parameters = self.template_utilutil.get_default_parameters(
+        parameters = self.template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
         updated_parameters = {}
 
