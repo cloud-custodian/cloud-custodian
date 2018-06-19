@@ -26,7 +26,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         'type': 'object',
         'additionalProperties': False,
         'properties': {
-            'execution-options': {
+            'provision-options': {
                 'type': 'object',
                 'sku': 'string',
                 'location': 'string',
@@ -67,8 +67,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         p = self.policy.data
         if 'mode' in p:
-            if 'execution-options' in p['mode']:
-                updated_parameters = p['mode']['execution-options']
+            if 'provision-options' in p['mode']:
+                updated_parameters = p['mode']['provision-options']
 
         updated_parameters['name'] = policy_name
         updated_parameters['storageName'] = policy_name.replace('-', '')

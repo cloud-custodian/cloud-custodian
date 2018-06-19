@@ -47,7 +47,7 @@ class TemplateUtil(object):
         deployment_async_op.wait()
 
     def get_default_parameters(self, file_name):
-        # deployment client expects only the parameters, not full parameters file
+        # deployment client expects only the parameters, not the full parameters file
         json_parameters_file = self.get_json_template(file_name)
         return json_parameters_file['parameters']
 
