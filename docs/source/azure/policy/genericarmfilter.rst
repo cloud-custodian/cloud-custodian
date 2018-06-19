@@ -12,7 +12,7 @@ Filters Azure resources based on live metrics from the Azure monitor.
 
 
 Example Policies
-----------------
+-----------------
 
 Find VMs with an average Percentage CPU greater than or equal to 75% over the last 12 hours
 
