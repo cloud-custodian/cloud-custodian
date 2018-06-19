@@ -13,7 +13,7 @@ from c7n.utils import local_session
 class AzurePackageArchive(object):
 
     def __init__(self):
-        self.basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'function')
+        self.basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'function_template')
         self.pkg = PythonPackageArchive()
 
     @staticmethod
