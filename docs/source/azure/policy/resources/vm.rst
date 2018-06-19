@@ -6,17 +6,16 @@ Virtual Machines
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
+- Arm Filters (see :ref:`azure_genericarmfilter`)
 
 ``instance-view``
-  Filter based on VM attributes
+  Filter based on VM attributes in instance view, such as power state.
 
   .. c7n-schema:: InstanceViewFilter
        :module: c7n_azure.resources.vm
 
-- Arm Filters (see :ref:`azure_genericarmfilter`)
-
 ``metric``
-  Filter based on metrics from Azure Monitor
+  Filter based on metrics from Azure Monitor, such as CPU usage.
 
   .. c7n-schema:: MetricFilter
        :module: c7n_azure.filters
