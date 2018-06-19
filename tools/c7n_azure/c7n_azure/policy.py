@@ -63,14 +63,12 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def get_parameters(self):
         parameters = self.template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
-        updated_parameters = {}
 
         p = self.policy.data
         if 'mode' in p:
             if 'provision-options' in p['mode']:
                 updated_parameters = p['mode']['provision-options']
-
-        self.template_util.update_parameters(parameters, updated_parameters)
+                parameters = self.template_util.update_parameters(parameters, updated_parameters)
 
         return parameters
 

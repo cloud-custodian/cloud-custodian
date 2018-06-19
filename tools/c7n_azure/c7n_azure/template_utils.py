@@ -56,8 +56,7 @@ class TemplateUtilities(object):
         file_path = os.path.join(os.path.dirname(__file__), 'templates', file_name)
         with open(file_path, 'r') as template_file:
             json_template = json.load(template_file)
-
-        return json_template
+            return json_template
 
     @staticmethod
     def update_parameters(parameters, updated_parameters):
