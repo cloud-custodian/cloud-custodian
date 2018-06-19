@@ -100,7 +100,7 @@ class SlackDelivery(object):
                 sqs_message['policy']['resource'],
                 str(len(sqs_message['resources'])),
                 sqs_message['action'].get('slack_template', 'slack_default'),
-                json.loads(payload)["channel"])
+                json.loads(payload, strict=False)["channel"])
             )
 
             self.send_slack_msg(key, payload)
@@ -123,19 +123,20 @@ class SlackDelivery(object):
                 headers={'Content-Type': 'application/x-www-form-urlencoded',
                          'Authorization': 'Bearer %s' % self.config.get('slack_token')}).json()
 
-            if not response["ok"] and "Retry-After" in response["headers"]:
-                self.logger.info(
-                    "Slack API rate limiting. Waiting %d seconds",
-                    int(response.headers['retry-after']))
-                time.sleep(int(response.headers['Retry-After']))
-                continue
-            elif not response["ok"] and response["error"] == "invalid_auth":
-                raise Exception("Invalid Slack token.")
-            elif not response["ok"] and response["error"] == "users_not_found":
-                self.logger.info("Slack user ID not found.")
-                if self.caching:
-                    self.caching.set(address, {})
-                continue
+            if not response["ok"]:
+                if "headers" in response.keys() and "Retry-After" in response["headers"]:
+                    self.logger.info(
+                        "Slack API rate limiting. Waiting %d seconds",
+                        int(response.headers['retry-after']))
+                    time.sleep(int(response.headers['Retry-After']))
+                    continue
+                elif response["error"] == "invalid_auth":
+                    raise Exception("Invalid Slack token.")
+                elif response["error"] == "users_not_found":
+                    self.logger.info("Slack user ID not found.")
+                    if self.caching:
+                        self.caching.set(address, {})
+                    continue
             else:
                 slack_user_id = response['user']['id']
                 if 'enterprise_user' in response['user'].keys():
