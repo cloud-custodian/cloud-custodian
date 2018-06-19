@@ -29,6 +29,6 @@ setup(
         "jsonschema",
         "jsonpatch>=1.21",
         "argcomplete",
-        "tabulate",
+        "tabulate"
     ],
 )

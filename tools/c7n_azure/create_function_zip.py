@@ -1,12 +1,13 @@
-import requests
 import os
 import shutil
-import site
 import sys
+import tempfile
+
+import requests
+from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
 from c7n.utils import local_session
-from c7n_azure.session import Session
 
 
 class AzurePackageArchive(object):
@@ -35,17 +36,23 @@ class AzurePackageArchive(object):
 
         return set(modules), so_files
 
-    def _add_functions_required_files(self):
-        self.pkg.add_directory(os.path.join(self.basedir, 'functionapp/HttpTrigger'))
+    def _add_functions_required_files(self, policy_name):
+        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/__init__.py'),
+                          dest=policy_name + '/__init__.py')
+        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/main.py'),
+                          dest=policy_name + '/main.py')
         self.pkg.add_file(os.path.join(self.basedir, 'functionapp/host.json'))
-        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/config.json'))
+        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/function.json'),
+                          dest=policy_name + '/function.json')
+        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/config.json'),
+                          dest=policy_name + '/config.json')
 
     def _add_cffi_module(self):
         # adding special modules
         self.pkg.add_modules('cffi')
 
         # Add native libraries that are missing
-        site_pkg = site.getsitepackages()[0]
+        site_pkg = getsitepackages()[0]
 
         # linux
         platform = sys.platform
@@ -53,33 +60,39 @@ class AzurePackageArchive(object):
             self.pkg.add_file(os.path.join(site_pkg, '_cffi_backend.cpython-36m-x86_64-linux-gnu.so'))
             self.pkg.add_file(os.path.join(site_pkg, '.libs_cffi_backend/libffi-d78936b1.so.6.0.4'),
                               '.libs_cffi_backend/libffi-d78936b1.so.6.0.4')
-        # OS X
+        # MacOS
         elif platform == "darwin":
-            # raise NotImplementedError('Cannot package Azure Function in Windows host OS.')
-            self.pkg.add_file(os.path.join(site_pkg, '_cffi_backend.cpython-36m-darwin.so'))
+            raise NotImplementedError('Cannot package Azure Function in MacOS host OS, please use linux.')
         # Windows
         elif platform == "win32":
-            raise NotImplementedError('Cannot package Azure Function in Windows host OS.')
+            raise NotImplementedError('Cannot package Azure Function in Windows host OS, please use linux or WSL.')
 
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
 
-    def build_azure_package(self):
+    def build_azure_package(self, policy_name):
         # Get dependencies for azure entry point
         modules, so_files = AzurePackageArchive._get_dependencies('c7n_azure/entry.py')
 
         # add all loaded modules
         modules.remove('azure')
         modules = modules.union({'c7n', 'c7n_azure', 'pkg_resources'})
-        self.pkg.add_modules(*modules)
+        self.pkg.add_modules(None, *modules)
 
         # adding azure manually
         # we need to ignore the __init__.py of the azure namespace for packaging
         # https://www.python.org/dev/peps/pep-0420/
-        self.pkg.add_modules('azure', ignore=lambda f: f == 'azure/__init__.py')
+        self.pkg.add_modules(lambda f: f == 'azure/__init__.py', 'azure')
 
         # add Functions HttpTrigger
-        self._add_functions_required_files()
+        self._add_functions_required_files(policy_name)
+
+        # generate and add auth file
+        s = local_session(Session)
+
+        with tempfile.NamedTemporaryFile() as auth:
+            s.write_auth_file(auth.name)
+            self.pkg.add_file(auth.name, dest=policy_name + '/auth.json')
 
         # cffi module needs special handling
         self._add_cffi_module()
@@ -104,11 +117,41 @@ def publish(app_name, pkg):
 
     zip_file = open(pkg.path, 'rb').read()
     r = requests.post(zip_api_url, headers=headers, data=zip_file)
+    print(r)
 
-# ex: python create_function_zip.py /home/test_app linuxcontainer1 
+def getsitepackages():
+    """Returns a list containing all global site-packages directories
+    (and possibly site-python).
+    For each directory present in the global ``PREFIXES``, this function
+    will find its `site-packages` subdirectory depending on the system
+    environment, and will return a list of full paths.
+    """
+    sitepackages = []
+    seen = set()
+    prefixes = [sys.prefix, sys.exec_prefix]
+
+    for prefix in prefixes:
+        if not prefix or prefix in seen:
+            continue
+        seen.add(prefix)
+
+        if sys.platform in ('os2emx', 'riscos'):
+            sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
+        elif os.sep == '/':
+            sitepackages.append(os.path.join(prefix, "lib",
+                                             "python" + sys.version[:3],
+                                             "site-packages"))
+            sitepackages.append(os.path.join(prefix, "lib", "site-python"))
+        else:
+            sitepackages.append(prefix)
+            sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
+    return sitepackages
+
+
+# ex: python create_function_zip.py /home/test_app linuxcontainer1 policy_name
 if __name__ == "__main__":
     archive = AzurePackageArchive()
-    archive.build_azure_package()
+    archive.build_azure_package(sys.argv[3])
     archive.close()
 
     # Unzip the archive for testing
@@ -118,6 +161,8 @@ if __name__ == "__main__":
         os.makedirs(test_app_path)
 
     shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
+
+    # debug extract
     archive.pkg.get_reader().extractall(test_app_path)
 
     publish(sys.argv[2], archive.pkg)
