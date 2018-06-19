@@ -32,7 +32,7 @@ Actions
 ``stop``
   Stop the VMs
 
-  .. c7n-schema:: VmStartAction
+  .. c7n-schema:: VmStopAction
         :module: c7n_azure.resources.vm 
 
 ``restart``
