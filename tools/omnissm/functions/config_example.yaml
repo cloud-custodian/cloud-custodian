@@ -4,9 +4,10 @@ assumeRoles:
   123445678901: omnisssm-iam-role
 instanceRole: null
 maxRetries: 10
-queueName: omnissm-spillover.fifo
+queueName: omnissm-deferred-actions-queue
 registrationsTable: omnissm-registrations
 resourceTags:
   - Name
   - OwnerContact
   - App
+s3DownloadRole: null

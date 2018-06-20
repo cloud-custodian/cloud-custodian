@@ -1,18 +1,13 @@
-bucket = c7n-ssm-build
-stack = omnissm-config-subscribe
+function-name=process-config-events
+config-file=../config.yaml
 
 build:
-	@GOOS=linux GOARCH=amd64 go build -o subscribe-main *.go
-	@zip main.zip subscribe-main config.yaml
-
-clean:
-	@rm -f subscribe-main main.zip built-template.yml
-
-deploy: build
-	aws cloudformation package --template-file cfn.yml --s3-bucket $(bucket) --s3-prefix builds --output-template built-template.yml
-	aws cloudformation deploy --template-file built-template.yml --stack-name $(stack)
-	$(MAKE) clean
+	@GOOS=linux GOARCH=amd64 go build -o main *.go
+	@zip main.zip main $(config-file)
 
 update: build
-	aws lambda update-function-code --function-name="omnissm-config-subscribe" --zip-file fileb://main.zip
+	aws lambda update-function-code --function-name=omnissm-$(function-name) --zip-file fileb://main.zip
 	$(MAKE) clean
+
+clean:
+	@rm -f main main.zip built-template.yaml
