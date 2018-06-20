@@ -27,11 +27,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/identity"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/manager"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/store"
 )
 
 var (
@@ -46,9 +47,10 @@ var (
 	}
 	resourceTags = make(map[string]struct{})
 
-	CrossAccountRole   = os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE")
-	RegistrationsTable = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
-	ResourceTags       = os.Getenv("OMNISSM_RESOURCE_TAGS")
+	CrossAccountRole        = os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE")
+	RegistrationsTable      = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
+	ResourceTags            = os.Getenv("OMNISSM_RESOURCE_TAGS")
+	ResourceDeletedSNSTopic = os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC")
 
 	mgr *manager.Manager
 )
@@ -68,28 +70,76 @@ func init() {
 }
 
 func handleConfigurationItemChange(detail manager.ConfigurationItemDetail) error {
-	managedId := identity.Hash(detail.ConfigurationItem.Name())
-	_, err, ok := mgr.Get(managedId)
+	entry, err, ok := mgr.Get(detail.ConfigurationItem.Name())
 	if err != nil {
 		return err
 	}
 	if !ok {
-		log.Info().Err(err).Msgf("instance not found: %#v", managedId)
+		log.Info().Err(err).Msgf("instance not found: %#v", entry.ManagedId)
 		return nil
 	}
-	switch detail.ConfigurationItem.ResourceType {
+	switch detail.ConfigurationItem.ConfigurationItemStatus {
 	case "ResourceDiscovered", "OK":
-		if err := mgr.Update(managedId, detail.ConfigurationItem); err != nil {
+		if err := mgr.Update(entry.ManagedId, detail.ConfigurationItem); err != nil {
 			return err
 		}
 	case "ResourceDeleted":
-		if err := mgr.Delete(managedId); err != nil {
+		if err := mgr.Delete(entry.ManagedId); err != nil {
 			return err
 		}
+		if ResourceDeletedSNSTopic != "" {
+			if err := publishResourceDeletedSNSTopic(entry, detail); err != nil {
+				return err
+			}
+		}
 	}
+
 	return nil
 }
 
+func publishResourceDeletedSNSTopic(managerInstance *store.RegistrationEntry, detail manager.ConfigurationItemDetail) error {
+	config := aws.NewConfig()
+	sess := session.New(config)
+	if CrossAccountRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, CrossAccountRole)
+	}
+	svc := sns.New(sess, config)
+
+	type resourceObj struct {
+		ResourceID   string
+		ManagedID    string
+		AWSAccountID string
+		AWSRegion    string
+	}
+
+	toSend := resourceObj{
+		detail.ConfigurationItem.ResourceId,
+		managerInstance.ManagedId,
+		detail.ConfigurationItem.AWSAccountId,
+		detail.ConfigurationItem.AWSRegion,
+	}
+
+	if toSend.ResourceID == "" || toSend.ManagedID == "" || toSend.AWSAccountID == "" || toSend.AWSRegion == "" {
+		return fmt.Errorf("Unable to publish SNS Delete Message. Should contain AWSAccountID, AWSRegion, ManagedID, and ResourceID")
+	}
+
+	b, jsonError := json.Marshal(toSend)
+
+	if jsonError != nil {
+		return jsonError
+	}
+	params := &sns.PublishInput{
+		Message:  aws.String(string(b)),
+		TopicArn: aws.String(ResourceDeletedSNSTopic),
+	}
+
+	_, err := svc.Publish(params)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 func downloadS3ConfigurationItem(path string) ([]byte, error) {
 	config := aws.NewConfig()
 	sess := session.New(config)
