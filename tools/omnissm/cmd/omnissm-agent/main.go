@@ -26,7 +26,7 @@ import (
 )
 
 var RootCmd = &cobra.Command{
-	Use:              "omnissm",
+	Use:              "omnissm-agent",
 	Short:            "",
 	PersistentPreRun: checkDebug,
 }

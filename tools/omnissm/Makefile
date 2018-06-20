@@ -5,11 +5,11 @@ LDFLAGS="-X main.Version=`git rev-parse HEAD`"
 
 build:
 	@mkdir -p bin
-	@go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm ./cmd/omnissm
+	@go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent ./cmd/omnissm-agent
 	
 build-linux:
 	@mkdir -p bin
-	@GOOS=linux GOARCH=amd64 go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-linux-amd64 ./cmd/omnissm
+	@GOOS=linux GOARCH=amd64 go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent-linux-amd64 ./cmd/omnissm-agent
 
 build-lambda:
 	@mkdir -p bin
@@ -20,9 +20,9 @@ build-lambda:
 
 dist: build-linux
 	@mkdir -p dist
-	@cp bin/omnissm-linux-amd64 dist/omnissm
-	@gzip -c dist/omnissm > dist/omnissm-linux-amd64.gz
-	@rm -f dist/omnissm
+	@cp bin/omnissm-agent-linux-amd64 dist/omnissm-agent
+	@gzip -c dist/omnissm-agent > dist/omnissm-agent-linux-amd64.gz
+	@rm -f dist/omnissm-agent
 
 test:
 	@go test -v ./pkg/... | grep -v '^\?'
