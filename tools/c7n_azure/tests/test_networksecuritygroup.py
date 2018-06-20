@@ -46,7 +46,7 @@ class NetworkSecurityGroupTest(BaseTest):
             }]
         }
     }]
-    
+
     closed_fake_nsgs = [{
         'resourceGroup': 'test_resource_group',
         'name': 'test_nsg',
@@ -60,10 +60,12 @@ class NetworkSecurityGroupTest(BaseTest):
     }]
 
     empty_nsgs = []
-    
+
     @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process', return_value=open_fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process', return_value=closed_fake_nsgs)
+    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process',
+        return_value=open_fake_nsgs)
+    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
+        return_value=closed_fake_nsgs)
     def test_close_ssh_ports_range(self, rules_action_mock, filter_mock):
         p = self.load_policy({
             'name': 'test-azure-network-security-group',
@@ -78,8 +80,10 @@ class NetworkSecurityGroupTest(BaseTest):
         rules_action_mock.assert_called_with(self.open_fake_nsgs)
 
     @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process', return_value=empty_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process', return_value=empty_nsgs)
+    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process',
+        return_value=empty_nsgs)
+    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
+        return_value=empty_nsgs)
     def test_ports_filter_empty(self, rules_action_mock, filter_mock):
         p = self.load_policy({
             'name': 'test-azure-network-security-group',
@@ -93,8 +97,10 @@ class NetworkSecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process', return_value=open_fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process', return_value=closed_fake_nsgs)
+    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process',
+        return_value=open_fake_nsgs)
+    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
+        return_value=closed_fake_nsgs)
     def test_except_ports_filter_nonempty(self, rules_action_mock, filter_mock):
         p = self.load_policy({
             'name': 'test-azure-network-security-group',

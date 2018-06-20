@@ -39,6 +39,7 @@ PORTS = 'Ports'
 EXCEPT_PORTS = 'ExceptPorts'
 IP_PROTOCOL = 'IpProtocol'
 
+
 class SecurityRuleFilter(Filter):
     """
     Filter on Security Rules within a Network Security Group
@@ -158,7 +159,7 @@ class SecurityRuleFilter(Filter):
         {} - Upper bound of port range (inclusive)
         {} - TCP/UDP protocol
     """.format(PORTS, EXCEPT_PORTS, FROM_PORT, TO_PORT, IP_PROTOCOL)
-    
+
     def is_match(self, security_rule):
         if self.direction_key != security_rule['properties']['direction']:
             return False
