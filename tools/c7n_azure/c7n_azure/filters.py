@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import timedelta
-from c7n.filters import Filter, OPERATORS
+import operator
+from c7n.filters import Filter
 from c7n_azure.utils import Math
 
 
@@ -27,15 +28,27 @@ class MetricFilter(Filter):
         'total': Math.sum
     }
 
+    ops = {
+        'eq': operator.eq,
+        'equal': operator.eq,
+        'ne': operator.ne,
+        'not-equal': operator.ne,
+        'gt': operator.gt,
+        'greater-than': operator.gt,
+        'ge': operator.ge,
+        'gte': operator.ge,
+        'le': operator.le,
+        'lte': operator.le,
+        'lt': operator.lt,
+        'less-than': operator.lt
+    }
+
     schema = {
         'type': 'object',
         'required': ['type', 'metric', 'op', 'threshold'],
         'properties': {
             'metric': {'type': 'string'},
-            'op': {'enum': [
-                'eq', 'equal', 'ne', 'not-equal', 'gt', 'greater-than', 'ge',
-                'gte', 'le', 'lte', 'lt', 'less-than'
-            ]},
+            'op': {'enum': list(ops.keys())},
             'threshold': {'type': 'number'},
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
@@ -49,7 +62,7 @@ class MetricFilter(Filter):
         # Metric name as defined by Azure SDK
         self.metric = self.data.get('metric')
         # gt (>), ge (>=), eq (==), le (<=), lt (<)
-        self.op = OPERATORS[self.data.get('op')]
+        self.op = self.ops[self.data.get('op')]
         # Value to compare metric value with self.op
         self.threshold = self.data.get('threshold')
         # Number of hours from current UTC time
