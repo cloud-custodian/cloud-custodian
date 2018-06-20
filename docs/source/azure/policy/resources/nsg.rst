@@ -56,7 +56,7 @@ This policy will deny access to all security rules with any Inbound SSH ports th
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            OnlyPorts: [22,23,24]
+            ExceptPorts: [22,23,24]
          actions:
           - type: close
 

@@ -33,39 +33,46 @@ class NetworkSecurityGroup(ArmResourceManager):
             'resourceGroup'
         )
 
+FROM_PORT = 'FromPort'
+TO_PORT = 'ToPort'
+PORTS = 'Ports'
+EXCEPT_PORTS = 'ExceptPorts'
+IP_PROTOCOL = 'IpProtocol'
 
 class SecurityRuleFilter(Filter):
     """
     Filter on Security Rules within a Network Security Group
     """
-    perm_attrs = set((
-        'IpProtocol', 'FromPort', 'ToPort'))
 
-    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts'))
+    perm_attrs = set((
+        IP_PROTOCOL, FROM_PORT, TO_PORT))
+
+    filter_attrs = set(('Cidr', PORTS, EXCEPT_PORTS))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
     def validate(self):
         # Check that variable values are valid
-        if self.data.get('FromPort') and self.data.get('ToPort') and \
-                self.data.get('FromPort') > self.data.get('ToPort'):
-            raise ValueError('FromPort should be lower than ToPort')
+        if self.data.get(FROM_PORT) and self.data.get(TO_PORT) and \
+                self.data.get(FROM_PORT) > self.data.get(TO_PORT):
+            raise ValueError('{} should be lower than {}'.format(FROM_PORT, TO_PORT))
         if (
-                (self.data.get('FromPort') or self.data.get('ToPort')) and
-                (self.data.get('Ports') or self.data.get('OnlyPorts'))
-        ) or (self.data.get('Ports') and self.data.get('OnlyPorts')):
+                (self.data.get(FROM_PORT) or self.data.get(TO_PORT)) and
+                (self.data.get(PORTS) or self.data.get(EXCEPT_PORTS))
+        ) or (self.data.get(PORTS) and self.data.get(EXCEPT_PORTS)):
             raise ValueError(
-                'Invalid port parameters. Choose port range (FromPort and/or ToPort) '
-                'or specify specific ports (Ports or OnlyPorts)')
+                'Invalid port parameters. Choose port range ({} and/or {}) '
+                'or specify specific ports ({} or {})'.format(
+                    FROM_PORT, TO_PORT, PORTS, EXCEPT_PORTS))
 
     def process(self, network_security_groups, event=None):
 
         # Get variables
-        self.ip_protocol = self.data.get('IpProtocol')
-        self.from_port = self.data.get('FromPort')
-        self.to_port = self.data.get('ToPort')
-        self.ports = self.data.get('Ports')
-        self.only_ports = self.data.get('OnlyPorts')
+        self.ip_protocol = self.data.get(IP_PROTOCOL)
+        self.from_port = self.data.get(FROM_PORT)
+        self.to_port = self.data.get(TO_PORT)
+        self.ports = self.data.get(PORTS)
+        self.only_ports = self.data.get(EXCEPT_PORTS)
         self.match_op = self.data.get('match-operator', 'and') == 'and' and all or any
 
         """
@@ -145,12 +152,13 @@ class SecurityRuleFilter(Filter):
     Determine if SecurityRule matches criteria as entered in policy
 
     Currently supporting filters:
-        Ports - Specific Ports to target
-        OnlyPorts - Ports to IGNORE
-        FromPort - Lower bound of port range (inclusive)
-        ToPort - Upper bound of port range (inclusive)
-        IpProtocol - TCP/UDP protocol
-    """
+        {} - Specific Ports to target
+        {} - Ports to IGNORE
+        {} - Lower bound of port range (inclusive)
+        {} - Upper bound of port range (inclusive)
+        {} - TCP/UDP protocol
+    """.format(PORTS, EXCEPT_PORTS, FROM_PORT, TO_PORT, IP_PROTOCOL)
+    
     def is_match(self, security_rule):
         if self.direction_key != security_rule['properties']['direction']:
             return False
@@ -169,11 +177,11 @@ class IngressFilter(SecurityRuleFilter):
         'properties': {
             'type': {'enum': ['ingress']},
             'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-            'FromPort': {'type': 'integer'},
-            'ToPort': {'type': 'integer'},
-            'IpProtocol': {'type': 'string', 'enum': ['TCP', 'UDP']}
+            PORTS: {'type': 'array', 'items': {'type': 'integer'}},
+            EXCEPT_PORTS: {'type': 'array', 'items': {'type': 'integer'}},
+            FROM_PORT: {'type': 'integer'},
+            TO_PORT: {'type': 'integer'},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP']}
         },
         'required': ['type']
     }
@@ -189,11 +197,11 @@ class EgressFilter(SecurityRuleFilter):
         'properties': {
             'type': {'enum': ['egress']},
             'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-            'FromPort': {'type': 'integer'},
-            'ToPort': {'type': 'integer'},
-            'IpProtocol': {'type': 'string', 'enum': ['TCP', 'UDP']}
+            PORTS: {'type': 'array', 'items': {'type': 'integer'}},
+            EXCEPT_PORTS: {'type': 'array', 'items': {'type': 'integer'}},
+            FROM_PORT: {'type': 'integer'},
+            TO_PORT: {'type': 'integer'},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP']}
             # 'SelfReference': {'type': 'boolean'}
         },
         'required': ['type']}
