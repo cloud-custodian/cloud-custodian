@@ -85,12 +85,14 @@ func main() {
 							log.Info().Err(err).Msg("")
 							continue
 						}
-						if ssm.IsManagedInstance(m.ManagedId) {
-							entry.ManagedId = m.ManagedId
-							if err := omni.Registrations.Put(entry); err != nil {
-								log.Info().Err(err).Msg("")
-								continue
-							}
+						if !ssm.IsManagedInstance(m.ManagedId) {
+							log.Info().Msgf("invalid ManagedId: %#v", m.ManagedId)
+							continue
+						}
+						entry.ManagedId = m.ManagedId
+						if err := omni.Registrations.Put(entry); err != nil {
+							log.Info().Err(err).Msg("")
+							continue
 						}
 					}
 					if !entry.IsTagged {
