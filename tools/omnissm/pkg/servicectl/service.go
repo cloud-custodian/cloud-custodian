@@ -17,6 +17,7 @@ package servicectl
 import (
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -139,6 +140,13 @@ func isSysV() bool {
 func isUpstart() bool {
 	if _, err := os.Stat("/sbin/upstart-udev-bridge"); err == nil {
 		return true
+	}
+	if _, err := os.Stat("/sbin/init"); err == nil {
+		if out, err := exec.Command("/sbin/init", "--version").Output(); err == nil {
+			if strings.Contains(string(out), "init (upstart") {
+				return true
+			}
+		}
 	}
 	return false
 }
