@@ -199,6 +199,55 @@ class CloudFront(BaseTest):
         resp = client.list_distributions()
         self.assertEqual(resp["DistributionList"]["Items"][0]["Enabled"], False)
 
+    def test_distribution_check_s3_origin_exists_true(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_origin_exists_true")
+
+        p = self.load_policy(
+            {
+                "name": "distribution-check-s3-origin-exists-true",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "check-s3-origin",
+                        "accounts_from": {
+                            "url": "s3://c7n-test-bucket/bucket_id",
+                            "format": "json",
+                            "expr": "*"
+                        }
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['c7n:s3-origin'])
+
+    def test_distribution_check_s3_origin_exists_false(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_origin_exists_false")
+
+        p = self.load_policy(
+            {
+                "name": "distribution-check-s3-origin-exists-false",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "check-s3-origin",
+                        "accounts_from": {
+                            "url": "s3://c7n-test-bucket/bucket_id",
+                            "format": "json",
+                            "expr": "*"
+                        }
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
 

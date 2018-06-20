@@ -211,7 +211,6 @@ class CheckS3Origin(Filter):
     def process(self, resources, event=None):
 
         accounts = ValuesFrom(self.data['accounts_from'], self.manager).get_values()
-
         results = []
 
         client = local_session(self.manager.session_factory).client(
@@ -229,6 +228,7 @@ class CheckS3Origin(Filter):
                         if accounts and b['Owner']['ID'] not in accounts:
                             self.log.debug("Bucket {0} owner not in accounts list.".format(target_bucket))
                         else:
+                            r['c7n:s3-origin'] = True
                             results.append(r)
                     except ClientError as e:
                         if e.response['Error']['Code'] == 'AccessDenied':
