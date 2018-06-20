@@ -170,9 +170,13 @@ func (c *Config) setDefaults() {
 }
 
 func (c *Config) HasAssumeRole(accountId string) (roleArn string, ok bool) {
+	if c.AssumeRoleName != "" {
+		return fmt.Sprintf("arn:aws:iam::%s:role/%s", accountId, c.AssumeRoleName), true
+	}
 	roleArn, ok = c.roleMap[accountId]
 	return
 }
+
 func (c *Config) HasResourceTag(tagName string) (ok bool) {
 	_, ok = c.resourceTags[tagName]
 	return
