@@ -15,6 +15,7 @@
 package s3
 
 import (
+	"context"
 	"io/ioutil"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -22,6 +23,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/golang/time/rate"
 )
 
 type Config struct {
@@ -32,7 +34,8 @@ type Config struct {
 type S3 struct {
 	s3iface.S3API
 
-	config *Config
+	config  *Config
+	getRate *rate.Limiter
 }
 
 func New(config *Config) *S3 {
@@ -41,8 +44,9 @@ func New(config *Config) *S3 {
 		config.Config.WithCredentials(stscreds.NewCredentials(sess, config.AssumeRole))
 	}
 	s := &S3{
-		S3API:  s3.New(session.New(config.Config)),
-		config: config,
+		S3API:   s3.New(session.New(config.Config)),
+		config:  config,
+		getRate: rate.NewLimiter(300, 300),
 	}
 	return s
 }
@@ -52,7 +56,8 @@ func (s *S3) GetObject(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.S3API.GetObject(&s3.GetObjectInput{
+	s.getRate.Wait(context.TODO())
+	resp, err := s.S3API.GetObjectWithContext(context.TODO(), &s3.GetObjectInput{
 		Bucket: aws.String(u.Bucket),
 		Key:    aws.String(u.Path),
 	})

@@ -19,6 +19,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -120,4 +121,36 @@ func (s *SSM) DeregisterManagedInstance(managedId string) error {
 		InstanceId: aws.String(managedId),
 	})
 	return errors.Wrapf(err, "ssm.DeregisterManagedInstance failed: %#v", managedId)
+}
+
+type ManagedInstance struct {
+	ActivationId     string
+	ManagedId        string
+	Name             string
+	RegistrationDate time.Time
+}
+
+func (s *SSM) DescribeInstanceInformation(activationId string) (*ManagedInstance, error) {
+	resp, err := s.SSMAPI.DescribeInstanceInformationWithContext(context.TODO(), &ssm.DescribeInstanceInformationInput{
+		InstanceInformationFilterList: []*ssm.InstanceInformationFilter{
+			{
+				Key:      aws.String(ssm.InstanceInformationFilterKeyActivationIds),
+				ValueSet: aws.StringSlice([]string{activationId}),
+			},
+		},
+		MaxResults: aws.Int64(5),
+	})
+	if err != nil {
+		return nil, errors.Wrapf(err, "ssm.DescribeInstanceInformation failed: %#v", activationId)
+	}
+	for _, instance := range resp.InstanceInformationList {
+		m := &ManagedInstance{
+			ActivationId:     aws.StringValue(instance.ActivationId),
+			ManagedId:        aws.StringValue(instance.InstanceId),
+			Name:             aws.StringValue(instance.Name),
+			RegistrationDate: aws.TimeValue(instance.RegistrationDate),
+		}
+		return m, nil
+	}
+	return nil, errors.Errorf("activation not found: %#v", activationId)
 }

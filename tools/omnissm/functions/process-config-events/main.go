@@ -61,11 +61,11 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 		return err
 	}
 	if !ok {
-		return errors.Errorf("instance not found: %#v", detail.ConfigurationItem.Name())
+		return errors.Errorf("registration entry not found: %#v", detail.ConfigurationItem.Name())
 	}
 	log.Info().Interface("entry", entry).Msg("existing registration entry found")
-	if entry.ManagedId == "" {
-		return errors.Errorf("instance entry for ManagedId not found: '%v/%v'", entry.AccountId, entry.InstanceId)
+	if !ssm.IsManagedInstance(entry.ManagedId) {
+		return errors.Errorf("ManagedId %#v invalid for %s/%s", entry.AccountId, entry.InstanceId)
 	}
 	switch detail.ConfigurationItem.ConfigurationItemStatus {
 	case "ResourceDiscovered", "OK":

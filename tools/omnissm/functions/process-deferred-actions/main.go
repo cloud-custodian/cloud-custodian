@@ -17,7 +17,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -158,7 +157,6 @@ func main() {
 					continue
 				}
 				for _, m := range resp {
-					fmt.Printf("m = %+v\n", m)
 					messages <- m
 				}
 			}
@@ -173,6 +171,8 @@ func main() {
 				if err := omni.SQS.Delete(m.ReceiptHandle); err != nil {
 					log.Info().Err(err).Interface("message", m).Msg("removing from SQS queue failed")
 				}
+			case <-ctx.Done():
+				return nil
 			}
 		}
 		return nil

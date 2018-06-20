@@ -16,7 +16,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -75,18 +74,23 @@ func main() {
 				})
 				i := 0
 				for _, entry := range entries {
-					fmt.Printf("entry = %+v\n", entry)
 					ci, err := cs.GetLatestResourceConfig("AWS::EC2::Instance", entry.InstanceId)
 					if err != nil {
 						log.Info().Err(err).Msg("configservice.GetLatestResourceConfig failed")
 						continue
 					}
-					resourceId := entry.ManagedId
-					if resourceId == "" {
-						resourceId = entry.InstanceId
-						if entry.InstanceId == "" {
-							log.Info().Interface("entry", entry).Msg("instance entry for ManagedId/InstanceId not found")
+					if !ssm.IsManagedInstance(entry.ManagedId) {
+						m, err := omni.SSM.DescribeInstanceInformation(entry.ActivationId)
+						if err != nil {
+							log.Info().Err(err).Msg("")
 							continue
+						}
+						if ssm.IsManagedInstance(m.ManagedId) {
+							entry.ManagedId = m.ManagedId
+							if err := omni.Registrations.Put(entry); err != nil {
+								log.Info().Err(err).Msg("")
+								continue
+							}
 						}
 					}
 					if !entry.IsTagged {
@@ -100,7 +104,7 @@ func main() {
 						if err := omni.SQS.Send(&omnissm.DeferredActionMessage{
 							Type: omnissm.AddTagsToResource,
 							Value: &ssm.ResourceTags{
-								ManagedId: resourceId,
+								ManagedId: entry.ManagedId,
 								Tags:      tags,
 							},
 						}); err != nil {
@@ -112,7 +116,7 @@ func main() {
 							Type: omnissm.PutInventory,
 							Value: &ssm.CustomInventory{
 								TypeName:    "Custom:CloudInfo",
-								ManagedId:   resourceId,
+								ManagedId:   entry.ManagedId,
 								CaptureTime: ci.ConfigurationItemCaptureTime,
 								Content:     configservice.ConfigurationItemContentMap(*ci),
 							},
