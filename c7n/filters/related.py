@@ -45,10 +45,12 @@ class RelatedResourceFilter(ValueFilter):
         return super(RelatedResourceFilter, self).validate()
 
     def get_related_ids(self, resources):
+        import pdb; pdb.set_trace()
         return set(jmespath.search(
             "[].%s" % self.RelatedIdsExpression, resources))
 
     def get_related(self, resources):
+
         resource_manager = self.get_resource_manager()
         related_ids = self.get_related_ids(resources)
         model = resource_manager.get_model()

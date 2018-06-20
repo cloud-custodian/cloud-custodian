@@ -15,6 +15,7 @@
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 from c7n.filters.core import ValueFilter, Filter, type_schema
+from c7n.filters.related import RelatedResourceFilter
 from c7n.actions import BaseAction
 
 
@@ -50,23 +51,12 @@ class InstanceViewFilter(ValueFilter):
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
 
 @VirtualMachine.filter_registry.register('public-ip')
-class PublicIpFilter(Filter):
+class PublicIpFilter(RelatedResourceFilter):
 
-    def passes_filter(self, resource):
-        network_interface = 
+    schema = type_schema('public-ip', rinherit=ValueFilter.schema)
 
-    def process_resource(self, resource):
-        return resource if self.passes_filter(resource) else None
-
-    def process(self, resources, event=None):
-        
-        # Create Azure Monitor client
-        self.client = self.manager.get_client('azure.mgmt.network.NetworkManagementClient')
-
-        # Process each resource in a separate thread, returning all that pass filter
-        with self.executor_factory(max_workers=3) as w:
-            processed = list(w.map(self.process_resource, resources))
-            return [item for item in processed if item is not None]
+    RelatedResource = "c7n_azure.resources.network_interface.NetworkInterface"
+    RelatedIdsExpression = "properties.networkProfile.networkInterfaces[0].id"
 
 
 @VirtualMachine.action_registry.register('stop')
