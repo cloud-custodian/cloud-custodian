@@ -185,7 +185,7 @@ class IsWafEnabled(Filter):
 
 @Distribution.filter_registry.register('check-s3-origin')
 class CheckS3Origin(Filter):
-    """Targeted CloudFront S3 origin does not exist. Optional owner check.
+    """Check for existence of S3 bucket owner referenced by Cloudfront, and verify ownership.
 
     :example:
 
@@ -225,10 +225,10 @@ class CheckS3Origin(Filter):
                         b = client.get_bucket_acl(
                             Bucket=target_bucket
                         )
+                        self.log.debug("Target bucket {0} exists.".format(target_bucket))
                         if accounts and b['Owner']['ID'] not in accounts:
-                            self.log.debug("Bucket owner not in accounts list.")
+                            self.log.debug("Bucket {0} owner not in accounts list.".format(target_bucket))
                         else:
-                            self.log.debug("Bucket owner matched to accounts list.")
                             results.append(r)
                     except ClientError as e:
                         if e.response['Error']['Code'] == 'AccessDenied':
