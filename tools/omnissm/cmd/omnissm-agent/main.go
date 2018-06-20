@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/cmd/omnissm/inventory"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/cmd/omnissm-agent/inventory"
 )
 
 var RootCmd = &cobra.Command{

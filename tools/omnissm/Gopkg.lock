@@ -48,10 +48,13 @@
     "private/protocol/rest",
     "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
+    "service/configservice",
+    "service/configservice/configserviceiface",
     "service/dynamodb",
     "service/dynamodb/dynamodbattribute",
     "service/dynamodb/dynamodbiface",
     "service/s3",
+    "service/s3/s3iface",
     "service/sqs",
     "service/sqs/sqsiface",
     "service/ssm",
@@ -83,6 +86,12 @@
   version = "v1.2.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/golang/time"
+  packages = ["rate"]
+  revision = "fbb02b2291d28baffd63558aa44b4b56f178d650"
+
+[[projects]]
   name = "github.com/google/go-cmp"
   packages = [
     "cmp",
@@ -95,10 +104,16 @@
   version = "v0.2.0"
 
 [[projects]]
-  name = "github.com/google/uuid"
+  branch = "master"
+  name = "github.com/hashicorp/errwrap"
   packages = ["."]
-  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
-  version = "0.2"
+  revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-multierror"
+  packages = ["."]
+  revision = "b7773ae218740a7be65057fc60b366a49b538a44"
 
 [[projects]]
   branch = "master"
@@ -223,6 +238,18 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context"]
+  revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sync"
+  packages = ["errgroup"]
+  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = [
     "unix",
@@ -252,6 +279,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a87b0305559d7efd36a8b8bfb1f33da7fead11d89e8fff3fc8707fe2e9f78a84"
+  inputs-digest = "faffca75a35f3d019ddb148ee17aaa9799e31a750f31cd3f1ef3397297330c75"
   solver-name = "gps-cdcl"
   solver-version = 1
