@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
+from mock import patch
 
 
 class NetworkSecurityGroupTest(BaseTest):
@@ -20,7 +21,50 @@ class NetworkSecurityGroupTest(BaseTest):
         super(NetworkSecurityGroupTest, self).setUp()
 
     @arm_template('networksecuritygroup.json')
-    def test_close_ssh_ports_range(self):
+    def test_find_by_name(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'anzoloch-test-vm-nsg'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    open_fake_nsgs = [{
+        'resourceGroup': 'test_resource_group',
+        'name': 'test_nsg',
+        'properties': {
+            'securityRules': [{
+                'properties': {
+                    'access': 'Allow'
+                }
+            }]
+        }
+    }]
+    
+    closed_fake_nsgs = [{
+        'resourceGroup': 'test_resource_group',
+        'name': 'test_nsg',
+        'properties': {
+            'securityRules': [{
+                'properties': {
+                    'access': 'Deny'
+                }
+            }]
+        }
+    }]
+
+    empty_nsgs = []
+    
+    @arm_template('networksecuritygroup.json')
+    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process', return_value=open_fake_nsgs)
+    @patch('c7n_azure.resources.network_security_group.RulesAction.process', return_value=closed_fake_nsgs)
+    def test_close_ssh_ports_range(self, rules_action_mock, filter_mock):
         p = self.load_policy({
             'name': 'test-azure-network-security-group',
             'resource': 'azure.networksecuritygroup',
@@ -30,13 +74,13 @@ class NetworkSecurityGroupTest(BaseTest):
                  'ToPort': 8084}],
             'actions': [
                 {'type': 'close'}]})
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'tabarlow-test-open-ssh')
-        self.assertEqual(len(resources[0]['properties']['securityRules']), 1)
+        p.run()
+        rules_action_mock.assert_called_with(self.open_fake_nsgs)
 
     @arm_template('networksecuritygroup.json')
-    def test_ports_filter_empty(self):
+    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process', return_value=empty_nsgs)
+    @patch('c7n_azure.resources.network_security_group.RulesAction.process', return_value=empty_nsgs)
+    def test_ports_filter_empty(self, rules_action_mock, filter_mock):
         p = self.load_policy({
             'name': 'test-azure-network-security-group',
             'resource': 'azure.networksecuritygroup',
@@ -49,19 +93,19 @@ class NetworkSecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('networksecuritygroup.json')
-    def test_only_ports_filter_nonempty(self):
+    @patch('c7n_azure.resources.network_security_group.SecurityRuleFilter.process', return_value=open_fake_nsgs)
+    @patch('c7n_azure.resources.network_security_group.RulesAction.process', return_value=closed_fake_nsgs)
+    def test_except_ports_filter_nonempty(self, rules_action_mock, filter_mock):
         p = self.load_policy({
             'name': 'test-azure-network-security-group',
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'OnlyPorts': [22]}],
+                 'ExceptPorts': [22]}],
             'actions': [
                 {'type': 'close'}]})
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'tabarlow-test-open-ssh')
-        self.assertEqual(len(resources[0]['properties']['securityRules']), 1)
+        p.run()
+        rules_action_mock.assert_called_with(self.open_fake_nsgs)
 
     @arm_template('networksecuritygroup.json')
     def test_invalid_policy_range(self):
@@ -84,7 +128,7 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'ingress',
                  'FromPort': 22,
                  'ToPort': 20,
-                 'OnlyPorts': [20, 30],
+                 'ExceptPorts': [20, 30],
                  'Ports': [8080]}],
             'actions': [
                 {'type': 'close'}]}))
@@ -96,7 +140,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'OnlyPorts': [20, 30],
+                 'ExceptPorts': [20, 30],
                  'Ports': [8080]}],
             'actions': [
                 {'type': 'close'}]}))
