@@ -51,10 +51,9 @@ func (u *upstart) Stop() error {
 }
 
 func (u *upstart) Restart() error {
-	err := u.Stop()
-	if err != nil {
-		return err
-	}
+	// ignoring error for cases where Stop is called and the service is not
+	// already running
+	_ = u.Stop()
 	time.Sleep(50 * time.Millisecond)
 	return u.Start()
 }
