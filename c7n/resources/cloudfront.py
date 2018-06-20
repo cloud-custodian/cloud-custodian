@@ -185,7 +185,7 @@ class IsWafEnabled(Filter):
 
 @Distribution.filter_registry.register('check-s3-origin')
 class CheckS3Origin(Filter):
-    """Check for existence of S3 bucket owner referenced by Cloudfront, and verify ownership.
+    """Check for existence of S3 bucket referenced by Cloudfront, and verify ownership.
 
     :example:
 
