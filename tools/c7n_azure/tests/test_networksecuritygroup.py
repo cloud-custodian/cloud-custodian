@@ -153,39 +153,39 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'close'}]})
         p.run()
         expected = [{
-        'resourceGroup': 'test_resource_group',
-        'name': 'test_nsg',
-        'properties': {
-            'securityRules': [
-                {
-                    'name': 'test_1',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'TCP',
-                        'destinationPortRange': '8081-8083'
-                    }
-                },
-                {
-                    'name': 'test_3',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRange': '8081-8089'
-                    }
-                },
-                {
-                    'name': 'test_4',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRanges': ['10-12', '14-15', '16-19']
-                    }
-                },
-            ]
-        }}]
+            'resourceGroup': 'test_resource_group',
+            'name': 'test_nsg',
+            'properties': {
+                'securityRules': [
+                    {
+                        'name': 'test_1',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'TCP',
+                            'destinationPortRange': '8081-8083'
+                        }
+                    },
+                    {
+                        'name': 'test_3',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP',
+                            'destinationPortRange': '8081-8089'
+                        }
+                    },
+                    {
+                        'name': 'test_4',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP',
+                            'destinationPortRanges': ['10-12', '14-15', '16-19']
+                        }
+                    },
+                ]
+            }}]
         rules_action_mock.assert_called_with(expected)
 
     @arm_template('networksecuritygroup.json')
@@ -204,30 +204,30 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'close'}]})
         p.run()
         expected = [{
-        'resourceGroup': 'test_resource_group',
-        'name': 'test_nsg',
-        'properties': {
-            'securityRules': [
-                {
-                    'name': 'test_3',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRange': '8081-8089'
-                    }
-                },
-                {
-                    'name': 'test_4',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRanges': ['10-12', '14-15', '16-19']
-                    }
-                },
-            ]
-        }}]
+            'resourceGroup': 'test_resource_group',
+            'name': 'test_nsg',
+            'properties': {
+                'securityRules': [
+                    {
+                        'name': 'test_3',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP',
+                            'destinationPortRange': '8081-8089'
+                        }
+                    },
+                    {
+                        'name': 'test_4',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP',
+                            'destinationPortRanges': ['10-12', '14-15', '16-19']
+                        }
+                    },
+                ]
+            }}]
         rules_action_mock.assert_called_with(expected)
 
     @arm_template('networksecuritygroup.json')
@@ -248,21 +248,21 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'close'}]})
         p.run()
         expected = [{
-        'resourceGroup': 'test_resource_group',
-        'name': 'test_nsg',
-        'properties': {
-            'securityRules': [
-                {
-                    'name': 'test_3',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRange': '8081-8089'
+            'resourceGroup': 'test_resource_group',
+            'name': 'test_nsg',
+            'properties': {
+                'securityRules': [
+                    {
+                        'name': 'test_3',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP',
+                            'destinationPortRange': '8081-8089'
+                        }
                     }
-                }
-            ]
-        }}]
+                ]
+            }}]
         rules_action_mock.assert_called_with(expected)
 
     @arm_template('networksecuritygroup.json')
@@ -283,41 +283,40 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'close'}]})
         p.run()
         expected = [{
-        'resourceGroup': 'test_resource_group',
-        'name': 'test_nsg',
-        'properties': {
-            'securityRules': [
-                {
-                    'name': 'test_2',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'TCP',
-                        'destinationPortRange': '22'
-                    }
-                },
-                {
-                    'name': 'test_3',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRange': '8081-8089'
-                    }
-                },
-                {
-                    'name': 'test_4',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRanges': ['10-12', '14-15', '16-19']
-                    }
-                },
-            ]
-        }}]
+            'resourceGroup': 'test_resource_group',
+            'name': 'test_nsg',
+            'properties': {
+                'securityRules': [
+                    {
+                        'name': 'test_2',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'TCP',
+                            'destinationPortRange': '22'
+                        }
+                    },
+                    {
+                        'name': 'test_3',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP',
+                            'destinationPortRange': '8081-8089'
+                        }
+                    },
+                    {
+                        'name': 'test_4',
+                        'properties': {
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP',
+                            'destinationPortRanges': ['10-12', '14-15', '16-19']
+                        }
+                    },
+                ]
+            }}]
         rules_action_mock.assert_called_with(expected)
-        
 
     @arm_template('networksecuritygroup.json')
     def test_invalid_policy_range(self):

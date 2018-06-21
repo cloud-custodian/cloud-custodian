@@ -82,7 +82,7 @@ class SecurityRuleFilter(Filter):
         For each Network Security Group, set the 'securityRules' property to contain
         only rules where there is a match, as defined in 'is_match'
         """
-        # Because the filtering actually takes elements out of the list, 
+        # Because the filtering actually takes elements out of the list,
         # seemed best to create a copy.
         # Without the deepcopy, in testing, the list is being accessed and
         # altered by different tests, causing each other to fail
