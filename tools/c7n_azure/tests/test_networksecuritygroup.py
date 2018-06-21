@@ -15,6 +15,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 from mock import patch
 
+FROM_PORT = 'from_port'
+TO_PORT = 'to_port'
+PORTS = 'ports'
+EXCEPT_PORTS = 'except_ports'
+IP_PROTOCOL = 'ip_protocol'
+
 
 class NetworkSecurityGroupTest(BaseTest):
     def setUp(self):
@@ -72,8 +78,8 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'FromPort': 8080,
-                 'ToPort': 8084}],
+                 FROM_PORT: 8080,
+                 TO_PORT: 8084}],
             'actions': [
                 {'type': 'close'}]})
         p.run()
@@ -90,7 +96,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'Ports': [93]}],
+                 PORTS: [93]}],
             'actions': [
                 {'type': 'close'}]})
         resources = p.run()
@@ -107,7 +113,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'ExceptPorts': [22]}],
+                 EXCEPT_PORTS: [22]}],
             'actions': [
                 {'type': 'close'}]})
         p.run()
@@ -120,8 +126,8 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'FromPort': 22,
-                 'ToPort': 20}],
+                 FROM_PORT: 22,
+                 TO_PORT: 20}],
             'actions': [
                 {'type': 'close'}]}))
 
@@ -132,10 +138,10 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'FromPort': 22,
-                 'ToPort': 20,
-                 'ExceptPorts': [20, 30],
-                 'Ports': [8080]}],
+                 FROM_PORT: 22,
+                 TO_PORT: 20,
+                 EXCEPT_PORTS: [20, 30],
+                 PORTS: [8080]}],
             'actions': [
                 {'type': 'close'}]}))
 
@@ -146,7 +152,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'ExceptPorts': [20, 30],
-                 'Ports': [8080]}],
+                 EXCEPT_PORTS: [20, 30],
+                 PORTS: [8080]}],
             'actions': [
                 {'type': 'close'}]}))
