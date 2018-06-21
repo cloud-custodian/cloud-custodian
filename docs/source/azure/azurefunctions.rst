@@ -19,14 +19,14 @@ Plan so it is recommended that you only provision one and continue to use the sa
 providing the same servicePlanName with all policies or use the default name.
 
 Execution in Azure functions comes with a default set of configurations for the provisioned
-resources. To override these setting you must set 'provision-options' with one of the following
+resources. To override these settings you must set 'provision-options' with one of the following
 keys:
 
 - location (default: West US 2)
 - appInsightsLocation (default: West US 2)
 - servicePlanName (default: cloud-custodian)
-- sku (default: Standard)
-- skuCode (default: S1)
+- sku (default: Basic)
+- skuCode (default: B1)
 - workerSize (default: 0)
 
 The location allows you to choose the region to deploy the resource group and resources that will be
@@ -34,7 +34,7 @@ provisioned. Application Insights has six available locations and thus can not a
 region as the other resources: West US 2, East US, North Europe, South Central US, Southeast Asia, and
 West Europe. The sku, skuCode, and workerSize correlate to scaling up the App Service Plan.
 
-An example on how to set the provision-options when running in azure-functions mode:
+An example on how to set the provision-options when running in azure functions mode:
 
 .. code-block:: yaml
 
@@ -45,6 +45,8 @@ An example on how to set the provision-options when running in azure-functions m
             provision-options:
               location: East US
               appInsightsLocation: East US
+              sku: Standard
+              skuCode: S1
          resource: azure.vm
          filters:
           - type: instance-view

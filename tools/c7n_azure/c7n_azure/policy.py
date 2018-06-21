@@ -50,7 +50,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def provision(self):
         """Provision any resources needed for the policy."""
         parameters = self.get_parameters()
-        group_name = 'cloud-custodian'
+        group_name = parameters['servicePlanName']['value']
 
         self.template_util.create_resource_group(
             group_name, {'location': parameters['location']['value']})
