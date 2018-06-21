@@ -47,7 +47,7 @@ class Group(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Group"
-        # Denotes this resource type exists across regions
+        #Denotes this resource type exists across regions
         global_resource = True
 
     def get_resources(self, resource_ids, cache=True):
@@ -78,7 +78,7 @@ class Role(QueryResourceManager):
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Role"
-        # Denotes this resource type exists across regions
+        #Denotes this resource type exists across regions
         global_resource = True
 
     def get_resources(self, resource_ids, cache=True):
