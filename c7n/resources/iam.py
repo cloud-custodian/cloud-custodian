@@ -37,20 +37,32 @@ from c7n.utils import local_session, type_schema, chunks
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'group'
         enum_spec = ('list_groups', 'Groups', None)
         detail_spec = None
-        id = 'GroupId'
-        name = 'GroupName'
         filter_name = None
+        id = name = 'GroupName'
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Group"
         # Denotes this resource type exists across regions
         global_resource = True
+
+    def get_resources(self, resource_ids, cache=True):
+        """For IAM Groups on events, resource ids are Group Names."""
+        client = local_session(self.session_factory).client('iam')
+        resources = []
+        for rid in resource_ids:
+            try:
+                result = client.get_group(GroupName=rid)
+            except client.exceptions.NoSuchEntityException:
+                continue
+            group = result.pop('Group')
+            group['c7n:Users'] = result['Users']
+            resources.append(group)
+        return resources
 
 
 @resources.register('iam-role')
@@ -61,14 +73,24 @@ class Role(QueryResourceManager):
         type = 'role'
         enum_spec = ('list_roles', 'Roles', None)
         detail_spec = None
-        id = 'RoleId'
         filter_name = None
-        name = 'RoleName'
+        id = name = 'RoleName'
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Role"
         # Denotes this resource type exists across regions
         global_resource = True
+
+    def get_resources(self, resource_ids, cache=True):
+        """For IAM Roles on events, resource ids are role names."""
+        resources = []
+        client = local_session(self.session_factory).client('iam')
+        for rid in resource_ids:
+            try:
+                resources.append(client.get_role(RoleName=rid)['Role'])
+            except client.exceptions.NoSuchEntityException:
+                continue
+        return resources
 
 
 @resources.register('iam-user')
@@ -1109,7 +1131,8 @@ class UserDelete(BaseAction):
             - delete
 
     Additionally, you can specify the options to delete properties of an iam-user,
-    including console-access, access-keys, user-policies, mfa-devices, groups,
+    including console-access, access-keys, attached-user-policies,
+    inline-user-policies, mfa-devices, groups,
     ssh-keys, signing-certificates, and service-specific-credentials.
 
     Note: using options will _not_ delete the user itself, only the items specified
@@ -1157,13 +1180,17 @@ class UserDelete(BaseAction):
     ORDERED_OPTIONS = OrderedDict([
         ('console-access', 'delete_console_access'),
         ('access-keys', 'delete_access_keys'),
-        ('user-policies', 'delete_user_policies'),
+        ('attached-user-policies', 'delete_attached_user_policies'),
+        ('inline-user-policies', 'delete_inline_user_policies'),
         ('mfa-devices', 'delete_hw_mfa_devices'),
         ('groups', 'delete_groups'),
         ('ssh-keys', 'delete_ssh_keys'),
         ('signing-certificates', 'delete_signing_certificates'),
         ('service-specific-credentials', 'delete_service_specific_credentials'),
     ])
+    COMPOUND_OPTIONS = {
+        'user-policies': ['attached-user-policies', 'inline-user-policies'],
+    }
 
     schema = type_schema(
         'delete',
@@ -1171,7 +1198,7 @@ class UserDelete(BaseAction):
             'type': 'array',
             'items': {
                 'type': 'string',
-                'enum': list(ORDERED_OPTIONS.keys()),
+                'enum': list(ORDERED_OPTIONS.keys()) + list(COMPOUND_OPTIONS.keys()),
             }
         })
 
@@ -1189,6 +1216,7 @@ class UserDelete(BaseAction):
         'iam:DeleteSigningCertificate',
         'iam:DeleteSSHPublicKey',
         'iam:DeleteUser',
+        'iam:DeleteUserPolicy',
         'iam:DetachUserPolicy',
         'iam:RemoveUserFromGroup')
 
@@ -1209,11 +1237,18 @@ class UserDelete(BaseAction):
                                      AccessKeyId=access_key['AccessKeyId'])
 
     @staticmethod
-    def delete_user_policies(client, r):
+    def delete_attached_user_policies(client, r):
         response = client.list_attached_user_policies(UserName=r['UserName'])
         for user_policy in response['AttachedPolicies']:
             client.detach_user_policy(
                 UserName=r['UserName'], PolicyArn=user_policy['PolicyArn'])
+
+    @staticmethod
+    def delete_inline_user_policies(client, r):
+        response = client.list_user_policies(UserName=r['UserName'])
+        for user_policy_name in response['PolicyNames']:
+            client.delete_user_policy(
+                UserName=r['UserName'], PolicyName=user_policy_name)
 
     @staticmethod
     def delete_hw_mfa_devices(client, r):
@@ -1265,6 +1300,11 @@ class UserDelete(BaseAction):
 
     def process_user(self, client, r):
         user_options = self.data.get('options', list(self.ORDERED_OPTIONS.keys()))
+        # resolve compound options
+        for cmd in self.COMPOUND_OPTIONS:
+            if cmd in user_options:
+                user_options += self.COMPOUND_OPTIONS[cmd]
+        # process options in ordered fashion
         for cmd in self.ORDERED_OPTIONS:
             if cmd in user_options:
                 op = getattr(self, self.ORDERED_OPTIONS[cmd])
