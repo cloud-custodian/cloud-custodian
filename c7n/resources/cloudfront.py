@@ -15,9 +15,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 
+from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
+from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.tags import universal_augment
 from c7n.utils import generate_arn, local_session, type_schema, get_retry
@@ -178,6 +180,66 @@ class IsWafEnabled(Filter):
                 results.append(r)
             elif not state and target_acl_id and r['WebACLId'] != target_acl_id:
                 results.append(r)
+        return results
+
+
+@Distribution.filter_registry.register('check-s3-origin')
+class CheckS3Origin(Filter):
+    """Check for existence of S3 bucket referenced by Cloudfront, and verify ownership.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cfront-test
+                resource: distribution
+                filters:
+                - type: check-s3-origin
+                  accounts_from:
+                    url: *accounts-list
+                    expr: accounts-list.canonical_id
+    """
+
+    schema = type_schema(
+        'check-s3-origin',
+        accounts_from=ValuesFrom.schema)
+
+    permissions = ('s3:GetBucketAcl',)
+    retry = staticmethod(get_retry(('Throttling',)))
+
+    def process(self, resources, event=None):
+
+        accounts = ValuesFrom(self.data['accounts_from'], self.manager).get_values()
+        results = []
+
+        client = local_session(self.manager.session_factory).client(
+            's3', region_name=self.manager.config.region)
+
+        for r in resources:
+            for x in r['Origins']['Items']:
+                if 'S3OriginConfig' in x:
+                    target_bucket = x['DomainName'].split('.', 1)[0]
+                    try:
+                        b = client.get_bucket_acl(
+                            Bucket=target_bucket
+                        )
+                        self.log.debug("Target bucket {0} exists.".format(target_bucket))
+                        if accounts and b['Owner']['ID'] not in accounts:
+                            self.log.debug("Bucket {0} owner not in accounts list.".
+                                           format(target_bucket))
+                        else:
+                            r['c7n:s3-origin'] = True
+                            results.append(r)
+                    except ClientError as e:
+                        if e.response['Error']['Code'] == 'AccessDenied':
+                            self.log.debug({'state': 'error', 'reason':
+                                'Non-accessible bucket: {0}'.format(target_bucket)})
+                        elif e.response['Error']['Code'] == 'NoSuchBucket':
+                            self.log.debug({'state': 'error', 'reason':
+                                'Non-existent bucket: {0}'.format(target_bucket)})
+                        else:
+                            raise
         return results
 
 

@@ -1,0 +1,33 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "test.user",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Grants": [
+            {
+                "Grantee": {
+                    "Type": "CanonicalUser", 
+                    "DisplayName": "test.user",
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "Permission": "FULL_CONTROL"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "ofvEWAJI3EQTyfmsSKMe7wF/yupHwUC14IaWYGFi1FEBgWSd7Wg+Tt+Nqcjvh87k0RR1soqo2bQ=", 
+            "RequestId": "F0B2AA542AA0D87E", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ofvEWAJI3EQTyfmsSKMe7wF/yupHwUC14IaWYGFi1FEBgWSd7Wg+Tt+Nqcjvh87k0RR1soqo2bQ=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "F0B2AA542AA0D87E", 
+                "date": "Wed, 20 Jun 2018 19:38:44 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}
