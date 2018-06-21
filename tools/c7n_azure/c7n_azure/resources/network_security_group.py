@@ -35,6 +35,7 @@ class NetworkSecurityGroup(ArmResourceManager):
             'resourceGroup'
         )
 
+
 FROM_PORT = 'fromPort'
 TO_PORT = 'toPort'
 PORTS = 'ports'
