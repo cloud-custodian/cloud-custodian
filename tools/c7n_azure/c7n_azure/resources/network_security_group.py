@@ -33,11 +33,11 @@ class NetworkSecurityGroup(ArmResourceManager):
             'resourceGroup'
         )
 
-FROM_PORT = 'from_port'
-TO_PORT = 'to_port'
+FROM_PORT = 'fromPort'
+TO_PORT = 'toPort'
 PORTS = 'ports'
-EXCEPT_PORTS = 'except_ports'
-IP_PROTOCOL = 'ip_protocol'
+EXCEPT_PORTS = 'exceptPorts'
+IP_PROTOCOL = 'ipProtocol'
 
 
 class SecurityRuleFilter(Filter):

@@ -13,13 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
+from c7n_azure.resources.network_security_group \
+    import FROM_PORT, TO_PORT, PORTS, EXCEPT_PORTS
 from mock import patch
-
-FROM_PORT = 'from_port'
-TO_PORT = 'to_port'
-PORTS = 'ports'
-EXCEPT_PORTS = 'except_ports'
-IP_PROTOCOL = 'ip_protocol'
 
 
 class NetworkSecurityGroupTest(BaseTest):
@@ -38,6 +34,7 @@ class NetworkSecurityGroupTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'anzoloch-test-vm-nsg'}],
         })
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
