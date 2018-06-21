@@ -5,14 +5,18 @@ Azure Functions Support
 
 Cloud Custodian Integration
 ===========================
-Support of Azure Functions in Cloud Custodian is still in progress.
+Support of Azure Functions in Cloud Custodian is still in development.
 
 
 Provision Options
 #################
 
-When running in Azure functions, a storage account, application insights instance, and an app service
-plan is provisioned in your subscription to enable running the functions in an app service.
+When running in Azure functions, a storage account, Application Insights instance, and an App Service
+is provisioned in your subscription per policy to enable running the functions in an App Service.
+
+An App Service Plan is also required to run, but Plans can have multiple App Services to one App Service
+Plan so it is recommended that you only provision one and continue to use the same App Service plan by
+providing the same servicePlanName with all policies or use the default name.
 
 Execution in Azure functions comes with a default set of configurations for the provisioned
 resources. To override these setting you must set 'provision-options' with one of the following
@@ -20,6 +24,7 @@ keys:
 
 - location (default: West US 2)
 - appInsightsLocation (default: West US 2)
+- servicePlanName (default: cloud-custodian)
 - sku (default: Standard)
 - skuCode (default: S1)
 - workerSize (default: 0)
@@ -36,7 +41,7 @@ An example on how to set the provision-options when running in azure-functions m
     policies:
       - name: stopped-vm
         mode:
-            type: azure-functions
+            type: azure-periodic
             provision-options:
               location: East US
               appInsightsLocation: East US

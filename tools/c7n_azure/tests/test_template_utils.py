@@ -23,28 +23,26 @@ class TemplateUtilsTest(BaseTest):
         super(TemplateUtilsTest, self).setUp()
         self.template_util = TemplateUtilities()
 
-    def test_create_resource_group(self):
+    def test_deploy_template_with_parameters(self):
+        s = Session()
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+
         group_name = 'cloud-custodian-test'
         self.template_util.create_resource_group(group_name, {'location': 'West US 2'})
-        s = Session()
-        #: :type: azure.mgmt.resource.ResourceManagementClient
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
         resource_group = client.resource_groups.get(group_name)
+
         self.assertIsNotNone(resource_group)
 
-    def test_deploy_template_with_parameters(self):
         template_file = 'dedicated_functionapp.json'
-        group_name = 'cloud-custodian-test'
         parameters = self.template_util.get_default_parameters(
             'dedicated_functionapp.test.parameters.json')
         self.template_util.deploy_resource_template(group_name, template_file, parameters)
 
-        s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-
         resources = client.resources.list_by_resource_group(group_name)
-
         self.assertIsNotNone(resources)
+
+        # Cleaning up resource group
+        client.resource_groups.delete('cloud-custodian-test')
 
     def test_get_json_template(self):
         template_file_name = 'dedicated_functionapp.json'

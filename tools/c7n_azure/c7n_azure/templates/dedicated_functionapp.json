@@ -3,6 +3,9 @@
         "name": {
             "type": "string"
         },
+        "servicePlanName": {
+            "type": "string"
+        },
         "storageName": {
             "type": "string"
         },
@@ -34,11 +37,11 @@
         },
         {
             "apiVersion": "2016-09-01",
-            "name": "[parameters('name')]",
+            "name": "[parameters('servicePlanName')]",
             "type": "Microsoft.Web/serverfarms",
             "location": "[parameters('location')]",
             "properties": {
-                "name": "[parameters('name')]",
+                "name": "[parameters('servicePlanName')]",
                 "workerSizeId": "[parameters('workerSize')]",
                 "reserved": true,
                 "numberOfWorkers": "1",
@@ -67,7 +70,7 @@
             "name": "[parameters('name')]",
             "type": "Microsoft.Web/sites",
             "dependsOn": [
-                "[concat('Microsoft.Web/serverfarms/', parameters('name'))]",
+                "[concat('Microsoft.Web/serverfarms/', parameters('servicePlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
                 "[resourceId('microsoft.insights/components/', parameters('name'))]"
 
@@ -102,7 +105,7 @@
                 },
                 "name": "[parameters('name')]",
                 "clientAffinityEnabled": false,
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlanName'))]",
                 "hostingEnvironment": ""
             },
             "apiVersion": "2016-03-01",

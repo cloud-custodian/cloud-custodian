@@ -14,14 +14,17 @@
         "appInsightsLocation": {
             "value": "westus2"
         },
+        "servicePlanName": {
+            "value": "cloud-custodian-test"
+        },
         "sku": {
-            "value": "Standard"
+            "value": "Basic"
         },
         "workerSize": {
             "value": "0"
         },
         "skuCode": {
-            "value": "S1"
+            "value": "B1"
         }
     }
 }

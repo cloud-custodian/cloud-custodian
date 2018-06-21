@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Generic arm template resource utilities
+Generic ARM template resource utilities
 """
 import json
 import os.path
@@ -42,9 +42,8 @@ class TemplateUtilities(object):
         if template_parameters:
             deployment_properties['parameters'] = template_parameters
 
-        deployment_async_op = self.client.deployments.create_or_update(
+        return self.client.deployments.create_or_update(
             group_name, group_name, deployment_properties)
-        deployment_async_op.wait()
 
     def get_default_parameters(self, file_name):
         # deployment client expects only the parameters, not the full parameters file

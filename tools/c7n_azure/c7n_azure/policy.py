@@ -18,26 +18,24 @@ from c7n import utils
 from c7n.policy import ServerlessExecutionMode, execution
 
 
-@execution.register('azure-function')
 class AzureFunctionMode(ServerlessExecutionMode):
     """A policy that runs/executes in azure functions."""
 
-    azure_function_schema = {
+    schema = {
         'type': 'object',
         'additionalProperties': False,
         'properties': {
             'provision-options': {
                 'type': 'object',
-                'sku': 'string',
                 'location': 'string',
                 'appInsightsLocation': 'string',
+                'servicePlanName': 'string',
+                'sku': 'string',
                 'workerSize': 'number',
                 'skuCode': 'string'
             }
         }
     }
-
-    schema = utils.type_schema('azure-function', rinherit=azure_function_schema)
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
@@ -52,23 +50,29 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def provision(self):
         """Provision any resources needed for the policy."""
         parameters = self.get_parameters()
-        group_name = parameters['name']['value']
+        group_name = 'cloud-custodian'
 
         self.template_util.create_resource_group(
             group_name, {'location': parameters['location']['value']})
 
         self.template_util.deploy_resource_template(
-            group_name, 'dedicated_functionapp.json', parameters)
+            group_name, 'dedicated_functionapp.json', parameters).wait()
 
     def get_parameters(self):
         parameters = self.template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
 
-        p = self.policy.data
-        if 'mode' in p:
-            if 'provision-options' in p['mode']:
-                updated_parameters = p['mode']['provision-options']
-                parameters = self.template_util.update_parameters(parameters, updated_parameters)
+        data = self.policy.data
+        updated_parameters = {
+            'name': data['name'].replace(' ', '-').lower(),
+            'storageName': data['name'].replace('-', '').lower()
+        }
+
+        if 'mode' in data:
+            if 'provision-options' in data['mode']:
+                updated_parameters.update(data['mode']['provision-options'])
+
+        parameters = self.template_util.update_parameters(parameters, updated_parameters)
 
         return parameters
 
@@ -78,3 +82,35 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def validate(self):
         """Validate configuration settings for execution mode."""
+
+
+@execution.register('azure-periodic')
+class AzurePeriodicMode(AzureFunctionMode):
+    """A policy that runs/executes in azure functions at specified
+    time intervals."""
+
+    schema = utils.type_schema('azure-periodic', rinherit=AzureFunctionMode.schema)
+
+    def run(self, event=None, lambda_context=None):
+        """Run the actual policy."""
+        raise NotImplementedError("error - not implemented")
+
+    def get_logs(self, start, end):
+        """Retrieve logs for the policy"""
+        raise NotImplementedError("error - not implemented")
+
+
+@execution.register('azure-stream')
+class AzureStreamMode(AzureFunctionMode):
+    """A policy that runs/executes in azure functions from an
+    azure activity log stream."""
+
+    schema = utils.type_schema('azure-stream', rinherit=AzureFunctionMode.schema)
+
+    def run(self, event=None, lambda_context=None):
+        """Run the actual policy."""
+        raise NotImplementedError("error - not implemented")
+
+    def get_logs(self, start, end):
+        """Retrieve logs for the policy"""
+        raise NotImplementedError("error - not implemented")
