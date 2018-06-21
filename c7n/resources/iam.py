@@ -37,20 +37,32 @@ from c7n.utils import local_session, type_schema, chunks
 
 @resources.register('iam-group')
 class Group(QueryResourceManager):
-
     class resource_type(object):
         service = 'iam'
         type = 'group'
         enum_spec = ('list_groups', 'Groups', None)
         detail_spec = None
-        id = 'GroupId'
-        name = 'GroupName'
         filter_name = None
+        id = name = 'GroupName'
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Group"
         # Denotes this resource type exists across regions
         global_resource = True
+
+    def get_resources(self, resource_ids, cache=True):
+        """For IAM Groups on events, resource ids are Group Names."""
+        client = local_session(self.session_factory).client('iam')
+        resources = []
+        for rid in resource_ids:
+            try:
+                result = client.get_group(GroupName=rid)
+            except client.exceptions.NoSuchEntityException:
+                continue
+            group = result.pop('Group')
+            group['c7n:Users'] = result['Users']
+            resources.append(group)
+        return resources
 
 
 @resources.register('iam-role')
@@ -61,14 +73,24 @@ class Role(QueryResourceManager):
         type = 'role'
         enum_spec = ('list_roles', 'Roles', None)
         detail_spec = None
-        id = 'RoleId'
         filter_name = None
-        name = 'RoleName'
+        id = name = 'RoleName'
         date = 'CreateDate'
         dimension = None
         config_type = "AWS::IAM::Role"
         # Denotes this resource type exists across regions
         global_resource = True
+
+    def get_resources(self, resource_ids, cache=True):
+        """For IAM Roles on events, resource ids are role names."""
+        resources = []
+        client = local_session(self.session_factory).client('iam')
+        for rid in resource_ids:
+            try:
+                resources.append(client.get_role(RoleName=rid)['Role'])
+            except client.exceptions.NoSuchEntityException:
+                continue
+        return resources
 
 
 @resources.register('iam-user')
