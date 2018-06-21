@@ -42,8 +42,8 @@ This policy will deny access to all security rules with Inbound SSH ports in the
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            FromPort: 8080
-            ToPort: 8090
+            from_port: 8080
+            to_port: 8090
          actions:
           - type: close
 
@@ -56,7 +56,7 @@ This policy will deny access to all security rules with any Inbound SSH ports th
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            ExceptPorts: [22,23,24]
+            except_ports: [22,23,24]
          actions:
           - type: close
 
@@ -69,6 +69,6 @@ This policy will deny access to all security rules with any Outbound SSH ports w
          resource: azure.networksecuritygroup
          filters:
           - type: egress
-            IpProtocol: TCP
+            ip_protocol: TCP
          actions:
           - type: close
