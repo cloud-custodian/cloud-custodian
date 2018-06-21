@@ -20,6 +20,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ec2metadata"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/omnissm"
 )
 
@@ -45,7 +46,7 @@ var RegisterCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal().Msgf("unable to initialize node: %v", err)
 		}
-		if c.ManagedId != "" {
+		if ssm.IsManagedInstance(c.ManagedId) {
 			log.Info().Str("ManagedId", c.ManagedId).Msg("instance already registered")
 			return
 		}
