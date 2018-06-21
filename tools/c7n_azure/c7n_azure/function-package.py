@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import tempfile
+import json
 
 import requests
 from c7n_azure.session import Session
@@ -13,19 +14,80 @@ from c7n.utils import local_session
 class FunctionPackage(object):
 
     def __init__(self):
-        self.basedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'function_template')
+        self.basedir = os.path.dirname(os.path.realpath(__file__))
         self.pkg = PythonPackageArchive()
 
-    def _add_functions_required_files(self, policy_name):
-        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/__init__.py'),
-                          dest=policy_name + '/__init__.py')
-        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/main.py'),
-                          dest=policy_name + '/main.py')
-        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/host.json'))
-        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/function.json'),
-                          dest=policy_name + '/function.json')
-        self.pkg.add_file(os.path.join(self.basedir, 'functionapp/HttpTrigger/config.json'),
-                          dest=policy_name + '/config.json')
+    def _add_functions_required_files(self, policy):
+        policy_name = policy['name']
+
+        self.pkg.add_file(os.path.join(self.basedir, 'function.py'),
+                          dest=policy_name + '/function.py')
+
+        self.pkg.add_contents(dest=policy_name + '/__init__.py', contents='')
+
+        self._add_host_config()
+        self._add_function_config(policy)
+        self._add_policy(policy)
+
+    def _add_host_config(self):
+        config = \
+            {
+                "http": {
+                    "routePrefix": "api",
+                    "maxConcurrentRequests": 5,
+                    "maxOutstandingRequests": 30
+                },
+                "logger": {
+                    "defaultLevel": "Trace",
+                    "categoryLevels": {
+                        "Worker": "Trace"
+                    }
+                },
+                "queues": {
+                    "visibilityTimeout": "00:00:10"
+                },
+                "swagger": {
+                    "enabled": True
+                },
+                "eventHub": {
+                    "maxBatchSize": 1000,
+                    "prefetchCount": 1000,
+                    "batchCheckpointFrequency": 1
+                },
+                "healthMonitor": {
+                    "enabled": True,
+                    "healthCheckInterval": "00:00:10",
+                    "healthCheckWindow": "00:02:00",
+                    "healthCheckThreshold": 6,
+                    "counterThreshold": 0.80
+                },
+                "functionTimeout": "00:05:00"
+            }
+        self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
+
+    def _add_function_config(self, policy):
+        config = \
+            {
+              "scriptFile": "function.py",
+              "bindings": [
+                {
+                  "authLevel": "anonymous",
+                  "type": "httpTrigger",
+                  "direction": "in",
+                  "name": "req"
+                },
+                {
+                  "type": "http",
+                  "direction": "out",
+                  "name": "$return"
+                }
+              ]
+            }
+
+        self.pkg.add_contents(dest=policy['name'] + '/function.json', contents=json.dumps(config))
+
+    def _add_policy(self, policy):
+        self.pkg.add_contents(dest=policy['name'] + '/config.json', contents=json.dumps(policy))
 
     def _add_cffi_module(self):
         # adding special modules
@@ -50,7 +112,7 @@ class FunctionPackage(object):
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
 
-    def build_azure_package(self, policy_name):
+    def build_azure_package(self, policy):
         # Get dependencies for azure entry point
         modules, so_files = FunctionPackage._get_dependencies('c7n_azure/entry.py')
 
@@ -65,14 +127,11 @@ class FunctionPackage(object):
         self.pkg.add_modules(lambda f: f == 'azure/__init__.py', 'azure')
 
         # add Functions HttpTrigger
-        self._add_functions_required_files(policy_name)
+        self._add_functions_required_files(policy)
 
-        # generate and add auth file
+        # generate and add auth
         s = local_session(Session)
-
-        with tempfile.NamedTemporaryFile() as auth:
-            s.write_auth_file(auth.name)
-            self.pkg.add_file(auth.name, dest=policy_name + '/auth.json')
+        self.pkg.add_contents(dest=policy['name'] + '/auth.json', contents=s.get_auth_string())
 
         # cffi module needs special handling
         self._add_cffi_module()
@@ -152,7 +211,6 @@ class FunctionPackage(object):
 if __name__ == "__main__":
     archive = FunctionPackage()
     archive.build_azure_package(sys.argv[3])
-    archive.close()
 
     # Unzip the archive for testing
     test_app_path = sys.argv[1]

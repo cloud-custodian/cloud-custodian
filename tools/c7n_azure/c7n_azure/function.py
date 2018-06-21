@@ -8,7 +8,7 @@ sys.path.append(dirname(dirname(__file__)))
 from c7n_azure import handler, entry
 import azure.functions as func
 
-def main(req: func.HttpRequest):
+def main(req):
     logging.info('Python HTTP trigger function processed a request.')
 
     logging.info("Running Azure Cloud Custodian Policy")

@@ -130,7 +130,7 @@ class Session(object):
                 tenant=data['credentials']['tenant']
             ), data['subscription'])
 
-    def write_auth_file(self, path):
+    def get_auth_string(self):
         if type(self.credentials) is not ServicePrincipalCredentials:
             raise NotImplementedError("Writing auth file only supported for Service Principal credentials.")
 
@@ -144,5 +144,4 @@ class Session(object):
             'subscription': self.subscription_id
         }
 
-        with open(path, 'w') as outfile:
-            json.dump(auth, outfile)
+        return json.dumps(auth)

@@ -34,6 +34,7 @@ setup(
     install_requires=["azure",
                       "c7n",
                       "click",
+                      "requests"
                       "azure-cli-core",
                       "adal~=0.5.0",
                       "backports.functools_lru_cache",
