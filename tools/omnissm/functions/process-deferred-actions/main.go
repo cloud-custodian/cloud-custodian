@@ -98,7 +98,7 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 				if sqsErr != nil {
 					return sqsErr
 				}
-				return errors.Wrap(err, "deferred action queued")
+				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
 			}
 			return err
 		}
@@ -147,6 +147,8 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 
 func main() {
 	lambda.Start(func(ctx context.Context) error {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
 		messages := make(chan *sqs.Message)
 		go func() {
 			defer close(messages)
@@ -155,6 +157,10 @@ func main() {
 				if err != nil {
 					log.Info().Err(err).Msg("cannot receive from SQS queue")
 					continue
+				}
+				if len(resp) == 0 {
+					cancel()
+					return
 				}
 				for _, m := range resp {
 					messages <- m
