@@ -17,11 +17,12 @@ package omnissm_test
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/omnissm"
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/store"
 )
 
 func TestRegistrationResponseMarshal(t *testing.T) {
@@ -31,15 +32,23 @@ func TestRegistrationResponseMarshal(t *testing.T) {
 	}{
 		{
 			input: &omnissm.RegistrationResponse{
-				RegistrationEntry: store.RegistrationEntry{
-					Id:             "id",
-					ActivationId:   "aid",
-					ActivationCode: "code",
-					ManagedId:      "managedId",
+				RegistrationEntry: omnissm.RegistrationEntry{
+					Id:            "id",
+					CreatedAt:     time.Time{},
+					ManagedId:     "managedId",
+					AccountId:     "accountId",
+					Region:        "region",
+					InstanceId:    "instanceId",
+					IsTagged:      false,
+					IsInventoried: false,
+					Activation: ssm.Activation{
+						ActivationId:   "aid",
+						ActivationCode: "code",
+					},
 				},
 				Region: "us-east-2",
 			},
-			expected: []byte(`{"id":"id","ActivationId":"aid","ActivationCode":"code","ManagedId":"managedId","region":"us-east-2"}`),
+			expected: []byte(`{"id":"id","CreatedAt":"0001-01-01T00:00:00Z","ManagedId":"managedId","AccountId":"accountId","Region":"region","InstanceId":"instanceId","IsTagged":false,"IsInventoried":false,"ActivationId":"aid","ActivationCode":"code","region":"us-east-2"}`),
 		},
 	}
 

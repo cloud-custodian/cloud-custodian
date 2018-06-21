@@ -167,7 +167,9 @@ var configurationItemChangeStateNull = `{
 }`
 
 func TestConfigurationStateNull(t *testing.T) {
-	var ev Event
+	var ev struct {
+		Detail CloudWatchEventDetail `json:"detail"`
+	}
 	err := json.Unmarshal([]byte(configurationItemChangeStateNull), &ev)
 	if err != nil {
 		t.Fatal(err)
