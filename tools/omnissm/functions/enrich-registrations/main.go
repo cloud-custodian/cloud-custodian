@@ -72,7 +72,7 @@ func main() {
 					Config:     awsConfig,
 					AssumeRole: roleArn,
 				})
-				i := 0
+				var i, j int
 				for _, entry := range entries {
 					ci, err := cs.GetLatestResourceConfig("AWS::EC2::Instance", entry.InstanceId)
 					if err != nil {
@@ -112,6 +112,7 @@ func main() {
 						}); err != nil {
 							log.Info().Err(err).Msg("unable to defer AddTagsToResource")
 						}
+						i++
 					}
 					if !entry.IsInventoried {
 						if err := omni.SQS.Send(&omnissm.DeferredActionMessage{
@@ -125,10 +126,13 @@ func main() {
 						}); err != nil {
 							log.Info().Err(err).Msg("unable to defer PutInventory")
 						}
+						j++
 					}
-					i++
 				}
-				log.Info().Str("accountId", accountId).Msgf("successfully deferred enriching %d instances", i)
+				log.Info().Str("accountId", accountId).
+					Int("AddTagsToResource", i).
+					Int("PutInventory", j).
+					Msg("enqueued deferred actions")
 			}(omni.Config.Copy().WithRegion(region), accountId, entries)
 		}
 		wg.Wait()

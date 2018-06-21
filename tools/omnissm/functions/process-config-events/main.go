@@ -83,13 +83,14 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 		err := omni.SSM.AddTagsToResource(resourceTags)
 		if err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				err := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
 					Type:  omnissm.AddTagsToResource,
 					Value: resourceTags,
 				})
-				if err != nil {
-					return err
+				if sqsErr != nil {
+					return sqsErr
 				}
+				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
 			}
 			return err
 		}
@@ -103,13 +104,14 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 		err = omni.SSM.PutInventory(inv)
 		if err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				err := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
 					Type:  omnissm.PutInventory,
 					Value: inv,
 				})
-				if err != nil {
-					return err
+				if sqsErr != nil {
+					return sqsErr
 				}
+				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
 			}
 			return err
 		}
@@ -117,13 +119,14 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 	case "ResourceDeleted":
 		if err := omni.SSM.DeregisterManagedInstance(entry.ManagedId); err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				err := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
 					Type:  omnissm.DeregisterManagedInstance,
 					Value: entry.ManagedId,
 				})
-				if err != nil {
-					return err
+				if sqsErr != nil {
+					return sqsErr
 				}
+				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
 			}
 			return err
 		}

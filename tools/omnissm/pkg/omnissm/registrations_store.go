@@ -24,8 +24,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 	"github.com/pkg/errors"
+
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 )
 
 type RegistrationEntry struct {
@@ -73,7 +74,7 @@ func (r *Registrations) Scan() ([]*RegistrationEntry, error) {
 		TableName:        aws.String(r.config.TableName),
 	}
 	items := make([]map[string]*dynamodb.AttributeValue, 0)
-	err := r.DynamoDBAPI.ScanPagesWithContext(context.Background(), input, func(page *dynamodb.ScanOutput, lastPage bool) bool {
+	err := r.DynamoDBAPI.ScanPagesWithContext(context.TODO(), input, func(page *dynamodb.ScanOutput, lastPage bool) bool {
 		items = append(items, page.Items...)
 		return !lastPage
 	})
@@ -92,7 +93,7 @@ func (r *Registrations) Scan() ([]*RegistrationEntry, error) {
 }
 
 func (r *Registrations) Get(id string) (*RegistrationEntry, error, bool) {
-	resp, err := r.DynamoDBAPI.GetItem(&dynamodb.GetItemInput{
+	resp, err := r.DynamoDBAPI.GetItemWithContext(context.TODO(), &dynamodb.GetItemInput{
 		TableName: aws.String(r.config.TableName),
 		//AttributesToGet: aws.StringSlice([]string{"id", "ActivationId", "ActivationCode", "ManagedId"}),
 		Key: map[string]*dynamodb.AttributeValue{"id": {S: aws.String(id)}},
@@ -116,7 +117,7 @@ func (r *Registrations) Get(id string) (*RegistrationEntry, error, bool) {
 }
 
 func (r *Registrations) GetByManagedId(managedId string) (*RegistrationEntry, error, bool) {
-	resp, err := r.DynamoDBAPI.Query(&dynamodb.QueryInput{
+	resp, err := r.DynamoDBAPI.QueryWithContext(context.TODO(), &dynamodb.QueryInput{
 		TableName: aws.String(r.config.TableName),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":v1": {S: aws.String(managedId)},
@@ -147,7 +148,7 @@ func (r *Registrations) Put(entry *RegistrationEntry) error {
 	if err != nil {
 		return err
 	}
-	_, err = r.DynamoDBAPI.PutItem(&dynamodb.PutItemInput{
+	_, err = r.DynamoDBAPI.PutItemWithContext(context.TODO(), &dynamodb.PutItemInput{
 		TableName: aws.String(r.config.TableName),
 		Item:      item,
 	})
@@ -155,7 +156,7 @@ func (r *Registrations) Put(entry *RegistrationEntry) error {
 }
 
 func (r *Registrations) Update(entry *RegistrationEntry) error {
-	_, err := r.DynamoDBAPI.UpdateItem(&dynamodb.UpdateItemInput{
+	_, err := r.DynamoDBAPI.UpdateItemWithContext(context.TODO(), &dynamodb.UpdateItemInput{
 		TableName:        aws.String(r.config.TableName),
 		Key:              map[string]*dynamodb.AttributeValue{"id": {S: aws.String(entry.Id)}},
 		UpdateExpression: aws.String("SET ManagedId=:v1, IsTagged=:v2, IsInventoried=:v3"),
@@ -169,7 +170,7 @@ func (r *Registrations) Update(entry *RegistrationEntry) error {
 }
 
 func (r *Registrations) Delete(id string) error {
-	_, err := r.DynamoDBAPI.DeleteItem(&dynamodb.DeleteItemInput{
+	_, err := r.DynamoDBAPI.DeleteItemWithContext(context.TODO(), &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.config.TableName),
 		Key:       map[string]*dynamodb.AttributeValue{"id": {S: aws.String(id)}},
 	})

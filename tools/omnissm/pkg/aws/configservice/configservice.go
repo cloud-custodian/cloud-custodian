@@ -60,7 +60,7 @@ func New(config *Config) *ConfigService {
 
 func (c *ConfigService) GetLatestResourceConfig(resourceType, resourceId string) (*ConfigurationItem, error) {
 	c.configServiceRate.Wait(context.TODO())
-	resp, err := c.ConfigServiceAPI.GetResourceConfigHistoryWithContext(context.Background(), &configservice.GetResourceConfigHistoryInput{
+	resp, err := c.ConfigServiceAPI.GetResourceConfigHistoryWithContext(context.TODO(), &configservice.GetResourceConfigHistoryInput{
 		ResourceId:   aws.String(resourceId),
 		ResourceType: aws.String(resourceType),
 		Limit:        aws.Int64(1),
@@ -131,7 +131,7 @@ func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*
 
 func (c *ConfigService) batchGetResourceConfig(resourceKeys []*configservice.ResourceKey) ([]*ConfigurationItem, error) {
 	c.configServiceRate.Wait(context.TODO())
-	resp, err := c.ConfigServiceAPI.BatchGetResourceConfigWithContext(context.Background(), &configservice.BatchGetResourceConfigInput{
+	resp, err := c.ConfigServiceAPI.BatchGetResourceConfigWithContext(context.TODO(), &configservice.BatchGetResourceConfigInput{
 		ResourceKeys: resourceKeys,
 	})
 	if err != nil {

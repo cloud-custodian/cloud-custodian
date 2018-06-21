@@ -47,13 +47,14 @@ func (r *registrationHandler) RequestActivation(ctx context.Context, req *omniss
 	activation, err := r.SSM.CreateActivation(req.Identity().Name())
 	if err != nil {
 		if r.OmniSSM.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-			err := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
+			sqsErr := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
 				Type:  omnissm.CreateActivation,
 				Value: req.Identity(),
 			})
-			if err != nil {
-				return nil, err
+			if sqsErr != nil {
+				return nil, sqsErr
 			}
+			return nil, errors.Wrapf(err, "deferred action to SQS queue: %#v", r.OmniSSM.Config.QueueName)
 		}
 		return nil, err
 	}
@@ -68,13 +69,14 @@ func (r *registrationHandler) RequestActivation(ctx context.Context, req *omniss
 	}
 	if err := r.OmniSSM.Registrations.Put(entry); err != nil {
 		if r.OmniSSM.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-			err := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
+			sqsErr := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
 				Type:  omnissm.PutRegistrationEntry,
 				Value: entry,
 			})
-			if err != nil {
-				return nil, err
+			if sqsErr != nil {
+				return nil, sqsErr
 			}
+			return nil, errors.Wrapf(err, "deferred action to SQS queue: %#v", r.OmniSSM.Config.QueueName)
 		}
 		return nil, err
 	}

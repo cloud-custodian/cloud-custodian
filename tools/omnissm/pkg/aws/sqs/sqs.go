@@ -47,7 +47,7 @@ func New(config *Config) (*SQS, error) {
 		config: config,
 	}
 	if s.config.QueueURL == "" {
-		resp, err := s.SQSAPI.GetQueueUrl(&sqs.GetQueueUrlInput{
+		resp, err := s.SQSAPI.GetQueueUrlWithContext(context.TODO(), &sqs.GetQueueUrlInput{
 			QueueName: aws.String(s.config.QueueName),
 		})
 		if err != nil {
@@ -63,7 +63,7 @@ func (s *SQS) Send(m json.Marshaler) error {
 	if err != nil {
 		return errors.Wrap(err, "cannot marshal SQS message")
 	}
-	_, err = s.SQSAPI.SendMessage(&sqs.SendMessageInput{
+	_, err = s.SQSAPI.SendMessageWithContext(context.TODO(), &sqs.SendMessageInput{
 		MessageBody: aws.String(string(data)),
 		QueueUrl:    aws.String(s.config.QueueURL),
 	})
