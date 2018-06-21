@@ -61,7 +61,7 @@ class MetricFilter(Filter):
         super(MetricFilter, self).__init__(data, manager)
         # Metric name as defined by Azure SDK
         self.metric = self.data.get('metric')
-        # gt (>), ge (>=), eq (==), le (<=), lt (<)
+        # gt (>), ge  (>=), eq (==), le (<=), lt (<)
         self.op = self.ops[self.data.get('op')]
         # Value to compare metric value with self.op
         self.threshold = self.data.get('threshold')
