@@ -90,7 +90,6 @@ class Role(QueryResourceManager):
                 resources.append(client.get_role(RoleName=rid)['Role'])
             except client.exceptions.NoSuchEntityException:
                 continue
-                raise
         return resources
 
 
