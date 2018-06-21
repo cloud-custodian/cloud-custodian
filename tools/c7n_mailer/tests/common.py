@@ -53,6 +53,12 @@ MAILER_CONFIG = {
     'ldap_uid_tags': ['CreatorName', 'Owner'],
 }
 
+MAILER_CONFIG_AZURE = {
+    'queue_url': 'asq://storageaccount.queue.core.windows.net/queuename',
+    'from_address': 'you@youremail.com',
+    'sendgrid_api_key': 'SENDGRID_API_KEY'
+}
+
 RESOURCE_1 = {
     'AvailabilityZone': 'us-east-1a',
     'Attachments': [],
@@ -181,6 +187,57 @@ SQS_MESSAGE_3 = {
     'event': None,
     'resources': [RESOURCE_2]
 }
+
+ASQ_MESSAGE = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "user@domain.com"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "user@domain.com"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
 
 
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
