@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Body": {
+            "body": "{\n  \"bucket_id\": \"e7c8cc65a5fc49df906715ebe09de9e4cc7861aa5461ba79b833aa45f6833b15\"\n}\n", 
+            "__module__": "botocore.response", 
+            "__class__": "StreamingBody"
+        }, 
+        "AcceptRanges": "bytes", 
+        "ContentType": "binary/octet-stream", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "3sgF/9dwXpi8SX6v5VaLVvWenbaZYM61YF7nxgSB/Ll36NVPKHha4Zf+NAaLNKdHVj58HTHdGuY=", 
+            "RequestId": "6943E6FAA2004F69", 
+            "HTTPHeaders": {
+                "content-length": "86", 
+                "x-amz-id-2": "3sgF/9dwXpi8SX6v5VaLVvWenbaZYM61YF7nxgSB/Ll36NVPKHha4Zf+NAaLNKdHVj58HTHdGuY=", 
+                "accept-ranges": "bytes", 
+                "server": "AmazonS3", 
+                "last-modified": "Wed, 20 Jun 2018 20:00:31 GMT", 
+                "x-amz-request-id": "6943E6FAA2004F69", 
+                "etag": "\"9b260fcf488f540beca12b2944bb182d\"", 
+                "date": "Wed, 20 Jun 2018 20:01:24 GMT", 
+                "x-amz-server-side-encryption": "AES256", 
+                "content-type": "binary/octet-stream"
+            }
+        }, 
+        "LastModified": {
+            "hour": 20, 
+            "__class__": "datetime", 
+            "month": 6, 
+            "second": 31, 
+            "microsecond": 0, 
+            "year": 2018, 
+            "day": 20, 
+            "minute": 0
+        }, 
+        "ContentLength": 86, 
+        "ETag": "\"9b260fcf488f540beca12b2944bb182d\"", 
+        "ServerSideEncryption": "AES256", 
+        "Metadata": {}
+    }
+}
