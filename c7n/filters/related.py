@@ -89,7 +89,7 @@ class RelatedResourceFilter(ValueFilter):
         if self.AnnotationKey is not None and found:
             akey = 'c7n:%s' % self.AnnotationKey
             resource[akey] = list(set(found).union(resource.get(akey, [])))
-        
+
         if op == 'or' and found:
             return True
         elif op == 'and' and len(found) == len(related_ids):
