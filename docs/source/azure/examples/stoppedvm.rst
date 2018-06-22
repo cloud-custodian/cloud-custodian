@@ -1,5 +1,5 @@
 Find Stopped Virtual Machines
-=============================
+==============================
 
 .. code-block:: yaml
 
