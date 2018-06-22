@@ -14,7 +14,7 @@
 
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
-from c7n.filters.core import ValueFilter, Filter, type_schema
+from c7n.filters.core import ValueFilter, type_schema
 from c7n.filters.related import RelatedResourceFilter
 from c7n.actions import BaseAction
 
@@ -49,6 +49,7 @@ class InstanceViewFilter(ValueFilter):
             i['instanceView'] = instance.serialize()
 
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
+
 
 @VirtualMachine.filter_registry.register('network-interface')
 class NetworkInterfaceFilter(RelatedResourceFilter):

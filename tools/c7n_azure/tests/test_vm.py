@@ -187,8 +187,8 @@ class VMTest(BaseTest):
                 {'type': 'network-interface',
                  'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
                  'op': 'eq',
-                 'value': 'not-null'
-                }],
+                 'value': 'not-null'}
+            ],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -205,8 +205,8 @@ class VMTest(BaseTest):
                 {'type': 'network-interface',
                  'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
                  'op': 'eq',
-                 'value': 'null'
-                }],
+                 'value': 'null'}
+            ],
         })
         resources = p.run()
         self.assertEqual(len(resources), 0)

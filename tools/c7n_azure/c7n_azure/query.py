@@ -37,7 +37,7 @@ class ResourceQuery(object):
 
         op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
         data = [r.serialize(True) for r in op(**params)]
-        
+
         return data
 
     @staticmethod
