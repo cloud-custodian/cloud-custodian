@@ -50,10 +50,10 @@ class InstanceViewFilter(ValueFilter):
 
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
 
-@VirtualMachine.filter_registry.register('public-ip')
-class PublicIpFilter(RelatedResourceFilter):
+@VirtualMachine.filter_registry.register('network-interface')
+class NetworkInterfaceFilter(RelatedResourceFilter):
 
-    schema = type_schema('public-ip', rinherit=ValueFilter.schema)
+    schema = type_schema('network-interface', rinherit=ValueFilter.schema)
 
     RelatedResource = "c7n_azure.resources.network_interface.NetworkInterface"
     RelatedIdsExpression = "properties.networkProfile.networkInterfaces[0].id"

@@ -45,7 +45,6 @@ class RelatedResourceFilter(ValueFilter):
         return super(RelatedResourceFilter, self).validate()
 
     def get_related_ids(self, resources):
-        import pdb; pdb.set_trace()
         return set(jmespath.search(
             "[].%s" % self.RelatedIdsExpression, resources))
 
@@ -91,7 +90,6 @@ class RelatedResourceFilter(ValueFilter):
         if self.AnnotationKey is not None and found:
             akey = 'c7n:%s' % self.AnnotationKey
             resource[akey] = list(set(found).union(resource.get(akey, [])))
-
         if op == 'or' and found:
             return True
         elif op == 'and' and len(found) == len(related_ids):

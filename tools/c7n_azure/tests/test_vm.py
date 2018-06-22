@@ -55,22 +55,6 @@ class VMTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @arm_template('vm.json')
-    def test_find_vm_with_public_ip(self):
-        p = self.load_policy({
-            'name': 'test-azure-vm',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'},
-                {'type': 'public-vm'}]
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
     fake_running_vms = [{
         'resourceGroup': 'test_resource_group',
         'name': 'test_vm'
@@ -187,3 +171,42 @@ class VMTest(BaseTest):
         delete_action_mock.assert_called_with(
             self.fake_running_vms[0]['resourceGroup'],
             self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    def test_find_vm_with_public_ip(self):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'network-interface',
+                 'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
+                 'op': 'eq',
+                 'value': 'not-null'
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'network-interface',
+                 'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
+                 'op': 'eq',
+                 'value': 'null'
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
