@@ -218,6 +218,18 @@ class IamRoleFilterUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_iam_role_get_resources(self):
+        session_factory = self.replay_flight_data("test_iam_role_get_resource")
+        p = self.load_policy(
+            {"name": "iam-role-exists", "resource": "iam-role"},
+            session_factory=session_factory,
+        )
+        resources = p.resource_manager.get_resources(
+            ['cloudcustodian-test']
+        )
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['RoleId'], "AROAIGK7B2VUDZL4I73HK")
+
 
 class IamUserTest(BaseTest):
 
@@ -470,6 +482,18 @@ class IamGroupFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_iam_group_get_resources(self):
+        session_factory = self.replay_flight_data("test_iam_group_get_resource")
+        p = self.load_policy(
+            {"name": "iam-group-exists", "resource": "iam-group"},
+            session_factory=session_factory,
+        )
+        resources = p.resource_manager.get_resources(
+            ["ServiceCatalogUsers"]
+        )
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["GroupId"], "AGPAI6NICSNT546VPVZGS")
 
 
 class IamManagedPolicyUsage(BaseTest):
