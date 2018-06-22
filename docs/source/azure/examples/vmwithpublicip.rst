@@ -1,5 +1,5 @@
-Find Stopped Virtual Machines
-=============================
+Find Virtual Machines with Public IP address
+============================================
 
 .. code-block:: yaml
 

@@ -27,6 +27,5 @@ class NetworkInterface(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup',
-            'properties.ipConfigurations[0].properties.publicIPAddress.id'
+            'resourceGroup'
         )

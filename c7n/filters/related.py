@@ -49,7 +49,6 @@ class RelatedResourceFilter(ValueFilter):
             "[].%s" % self.RelatedIdsExpression, resources))
 
     def get_related(self, resources):
-
         resource_manager = self.get_resource_manager()
         related_ids = self.get_related_ids(resources)
         model = resource_manager.get_model()
@@ -90,6 +89,7 @@ class RelatedResourceFilter(ValueFilter):
         if self.AnnotationKey is not None and found:
             akey = 'c7n:%s' % self.AnnotationKey
             resource[akey] = list(set(found).union(resource.get(akey, [])))
+        
         if op == 'or' and found:
             return True
         elif op == 'and' and len(found) == len(related_ids):
