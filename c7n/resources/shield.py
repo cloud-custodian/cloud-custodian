@@ -57,8 +57,12 @@ def get_protections_paginator(client):
 
 
 def get_type_protections(client, model):
-    protections = get_protections_paginator(
-        client).paginate().build_full_result().get('Protections')
+    try:
+        protections = get_protections_paginator(
+            client).paginate().build_full_result().get('Protections')
+    except client.exceptions.ResourceNotFoundException:
+        # shield is not enabled in the account, so all resources are not protected
+        return []
     return [p for p in protections if model.type in p['ResourceArn']]
 
 
