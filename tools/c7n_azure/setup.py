@@ -18,6 +18,7 @@ setup(
     name="c7n_azure",
     version='0.1',
     description="Cloud Custodian - Azure Support",
+    include_package_data=True,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
