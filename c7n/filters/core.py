@@ -411,12 +411,9 @@ class ValueFilter(Filter):
                     if t.get('Key') == tk:
                         r = t.get('Value')
                         break
+            # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
-                tags = i.get("tags", [])
-                for key in tags:
-                    if key == tk:
-                        r = tags[key]
-                        break
+                r = i.get('tags', {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
