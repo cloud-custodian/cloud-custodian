@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
@@ -39,21 +40,36 @@ var (
 	// The list of accounts authorized to use the register API
 	AccountWhitelist = os.Getenv("OMNISSM_ACCOUNT_WHITELIST")
 
-	mgr *manager.Manager
+	// If provided, SSM API requests that are throttled will be sent to this
+	// queue
+	QueueName = os.Getenv("OMNISSM_SPILLOVER_QUEUE")
+
+	// Sets the number of retries attempted for AWS API calls. Defaults to 0
+	// if not specified.
+	MaxRetries = os.Getenv("OMNISSM_MAX_RETRIES")
 )
 
-func init() {
-	mgr = manager.New(&manager.Config{
-		Config:             aws.NewConfig(),
+func main() {
+	whitelist := identity.NewWhitelist(AccountWhitelist)
+	var maxRetries int
+	if MaxRetries != "" {
+		var err error
+		maxRetries, err = strconv.Atoi(MaxRetries)
+		if err != nil {
+			panic(err)
+		}
+	}
+	mgr, err := manager.New(&manager.Config{
+		Config:             aws.NewConfig().WithMaxRetries(maxRetries),
 		RegistrationsTable: RegistrationsTable,
 		InstanceRole:       InstanceRole,
+		QueueName:          QueueName,
 	})
-}
-
-func main() {
+	if err != nil {
+		panic(err)
+	}
+	r := api.RegistrationHandler{mgr}
 	apiutil.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-		whitelist := identity.NewWhitelist(AccountWhitelist)
-		r := api.RegistrationHandler{mgr}
 		switch req.Resource {
 		case "/register":
 			var registerReq api.RegistrationRequest

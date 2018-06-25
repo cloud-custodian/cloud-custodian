@@ -52,6 +52,8 @@
     "service/dynamodb/dynamodbattribute",
     "service/dynamodb/dynamodbiface",
     "service/s3",
+    "service/sqs",
+    "service/sqs/sqsiface",
     "service/ssm",
     "service/ssm/ssmiface",
     "service/sts"
@@ -91,6 +93,12 @@
   ]
   revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
   version = "v0.2.0"
+
+[[projects]]
+  name = "github.com/google/uuid"
+  packages = ["."]
+  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
+  version = "0.2"
 
 [[projects]]
   branch = "master"
@@ -244,6 +252,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2395bc866e01cbed5d8fddb126e29ab53aeec950404f0881b6296477bc1449d8"
+  inputs-digest = "a87b0305559d7efd36a8b8bfb1f33da7fead11d89e8fff3fc8707fe2e9f78a84"
   solver-name = "gps-cdcl"
   solver-version = 1

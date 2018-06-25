@@ -59,7 +59,7 @@ func TestRegistrationResponseMarshal(t *testing.T) {
 	}{
 		{
 			input: &api.RegistrationResponse{
-				RegistrationEntry: &store.RegistrationEntry{
+				RegistrationEntry: store.RegistrationEntry{
 					Id:             "id",
 					ActivationId:   "aid",
 					ActivationCode: "code",

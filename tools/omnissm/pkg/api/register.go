@@ -60,7 +60,7 @@ func (r *RegistrationRequest) Verify() error {
 }
 
 type RegistrationResponse struct {
-	*store.RegistrationEntry
+	store.RegistrationEntry
 
 	Region string `json:"region,omitempty"`
 }
@@ -81,7 +81,7 @@ func (r *RegistrationHandler) Create(ctx context.Context, req *RegistrationReque
 	if err != nil {
 		return nil, err
 	}
-	if ok {
+	if !ok {
 		entry, err = r.Manager.Register(req.Identity())
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to register: %#v", req.Identity().Name())
@@ -91,10 +91,7 @@ func (r *RegistrationHandler) Create(ctx context.Context, req *RegistrationReque
 		logger.Info().Interface("entry", entry).Msg("existing registration entry found")
 	}
 	logger.Info().Interface("entry", entry).Msg("registration entry found")
-	return &RegistrationResponse{
-		RegistrationEntry: entry,
-		Region:            req.Identity().Region,
-	}, nil
+	return &RegistrationResponse{RegistrationEntry: *entry, Region: req.Identity().Region}, nil
 }
 
 func (r *RegistrationHandler) Update(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
@@ -117,5 +114,5 @@ func (r *RegistrationHandler) Update(ctx context.Context, req *RegistrationReque
 		}
 		logger.Info().Interface("entry", entry).Msg("registration entry updated")
 	}
-	return &RegistrationResponse{RegistrationEntry: entry}, nil
+	return &RegistrationResponse{RegistrationEntry: *entry}, nil
 }
