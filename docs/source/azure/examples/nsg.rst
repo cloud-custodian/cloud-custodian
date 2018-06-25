@@ -11,7 +11,7 @@ For more examples see :ref:`azure_nsg`
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            OnlyPorts: [22,23,24]
+            exceptPorts: [22,23,24]
          actions:
           - type: close
 
