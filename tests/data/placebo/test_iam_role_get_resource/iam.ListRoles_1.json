@@ -1,0 +1,58 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IsTruncated": false,
+        "Roles": [
+            {
+                "Description": "testing using roles from the aws cli", 
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "MaxSessionDuration": 3600, 
+                "RoleId": "AROAIWQ6CPRT7GUJ6DKPS", 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 2, 
+                    "minute": 1
+                }, 
+                "RoleName": "cli-admin-test", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::redacted:role/cli-admin-test"
+            }, 
+            {
+                "Description": "Allows EC2 instances to call AWS services on your behalf.", 
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "MaxSessionDuration": 3600, 
+                "RoleId": "AROAIGK7B2VUDZL4I73HK", 
+                "CreateDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 24, 
+                    "minute": 34
+                }, 
+                "RoleName": "cloudcustodian-test", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::redacted:role/cloudcustodian-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "922df601-7419-11e8-af68-7df0e161ba1f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "922df601-7419-11e8-af68-7df0e161ba1f", 
+                "vary": "Accept-Encoding", 
+                "content-length": "70997", 
+                "content-type": "text/xml", 
+                "date": "Tue, 19 Jun 2018 23:36:20 GMT"
+            }
+        }
+    }
+}
