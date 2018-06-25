@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 
 from botocore.exceptions import ClientError
+
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
@@ -29,7 +30,6 @@ from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 @resources.register('distribution')
 class Distribution(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudfront'
         type = 'distribution'
@@ -74,7 +74,6 @@ class DescribeDistribution(DescribeSource):
 
 @resources.register('streaming-distribution')
 class StreamingDistribution(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudfront'
         type = 'streaming-distribution'
@@ -183,8 +182,8 @@ class IsWafEnabled(Filter):
         return results
 
 
-@Distribution.filter_registry.register('check-s3-origin')
-class CheckS3Origin(Filter):
+@Distribution.filter_registry.register('check-origin')
+class CheckOrigin(Filter):
     """Check for existence of S3 bucket referenced by Cloudfront, and verify ownership.
 
     :example:
@@ -192,60 +191,121 @@ class CheckS3Origin(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: cfront-test
+              - name: cloudfront-origin-check
                 resource: distribution
                 filters:
-                - type: check-s3-origin
+                  origins:
+                    - S3
+                    - CUSTOM
+                    - S3-CUSTOM
+                  accounts:
+                    - c7n-test-domain.com
                   accounts_from:
                     url: *accounts-list
                     expr: accounts-list.canonical_id
     """
 
     schema = type_schema(
-        'check-s3-origin',
+        'check-origin',
+        origins={'type': 'array', 'items': {
+            'type': 'string',
+            'enum': ['S3', 'CUSTOM', 'S3-CUSTOM']}
+        },
+        accounts={'type': 'array', 'items': {'type': 'string'}},
         accounts_from=ValuesFrom.schema)
 
     permissions = ('s3:GetBucketAcl',)
     retry = staticmethod(get_retry(('Throttling',)))
 
-    def process(self, resources, event=None):
+    def process_s3_target(self, r, target_bucket, client, accounts):
+        try:
+            b = client.get_bucket_acl(
+                Bucket=target_bucket
+            )
+            self.log.debug("Target bucket %s exists." % target_bucket)
+            if accounts and b['Owner']['ID'] not in accounts:
+                self.log.debug("Bucket %s owner not in accounts whitelist." % target_bucket)
+            else:
+                self.log.debug("Bucket %s owner found in accounts whitelist." % target_bucket)
+                r['c7n:s3-origin'] = True
+                return r
 
-        accounts = ValuesFrom(self.data['accounts_from'], self.manager).get_values()
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                self.log.debug({'state': 'error', 'reason':
+                    'Non-accessible bucket: %s' % target_bucket})
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                self.log.debug({'state': 'error', 'reason':
+                    'Non-existent bucket: %s' % target_bucket})
+
+        return None
+
+    def process_custom_target(self, r, target_origin, accounts):
+        try:
+            if accounts and target_origin not in accounts:
+                self.log.debug("Custom origin %s not in origins whitelist." % target_origin)
+            else:
+                self.log.debug("Custom origin %s found in origins whitelist." % target_origin)
+                r['c7n:target-origin'] = True
+                return r
+
+        except ClientError as e:
+            self.log.debug(e)
+
+        return None
+
+    def process_resource_origins(self, resources, accounts):
         results = []
 
-        client = local_session(self.manager.session_factory).client(
-            's3', region_name=self.manager.config.region)
+        if 'S3' in self.data['origins'] or 'S3-CUSTOM' in self.data['origins']:
+            client = local_session(self.manager.session_factory).client(
+                's3', region_name=self.manager.config.region)
 
         for r in resources:
             for x in r['Origins']['Items']:
-                if 'S3OriginConfig' in x:
+                if 'S3' in self.data['origins'] and 'S3OriginConfig' in x:
                     target_bucket = x['DomainName'].split('.', 1)[0]
-                    try:
-                        b = client.get_bucket_acl(
-                            Bucket=target_bucket
-                        )
-                        self.log.debug("Target bucket {0} exists.".format(target_bucket))
-                        if accounts and b['Owner']['ID'] not in accounts:
-                            self.log.debug("Bucket {0} owner not in accounts list.".
-                                           format(target_bucket))
-                        else:
-                            r['c7n:s3-origin'] = True
-                            results.append(r)
-                    except ClientError as e:
-                        if e.response['Error']['Code'] == 'AccessDenied':
-                            self.log.debug({'state': 'error', 'reason':
-                                'Non-accessible bucket: {0}'.format(target_bucket)})
-                        elif e.response['Error']['Code'] == 'NoSuchBucket':
-                            self.log.debug({'state': 'error', 'reason':
-                                'Non-existent bucket: {0}'.format(target_bucket)})
-                        else:
-                            raise
+                    resource = self.process_s3_target(r, target_bucket, client, accounts)
+                    results += [resource] if resource else []
+                elif 'S3-CUSTOM' in self.data['origins'] and 'CustomOriginConfig' in x \
+                        and self.is_s3_domain(x['DomainName']):
+                    target_bucket = self.get_s3_domain(x['DomainName'])
+                    resource = self.process_s3_target(r, target_bucket, client, accounts)
+                    results += [resource] if resource else []
+                elif 'CUSTOM' in self.data['origins'] and 'CustomOriginConfig' in x:
+                    target_origin = x['DomainName']
+                    resource = self.process_custom_target(r, target_origin, accounts)
+                    results += [resource] if resource else []
+
+        return results
+
+    def is_s3_domain(self, domain_name):
+        if domain_name.endswith('.s3.amazonaws.com'):
+            return True
+        else:
+            return False
+
+    def get_s3_domain(self, domain_name):
+        if domain_name.endswith('.s3.amazonaws.com'):
+            return domain_name[:-len('.s3.amazonaws.com')]
+
+    def process(self, resources, event=None):
+
+        accounts = set(self.data.get('accounts', ()))
+        if 'accounts_from' in self.data:
+            values = ValuesFrom(self.data['accounts_from'], self.manager).get_values()
+            accounts = accounts.union(values)
+
+        if accounts:
+            results = self.process_resource_origins(resources, accounts)
+        else:
+            raise ValueError('Accounts whitelist is empty. Policy failure.')
+
         return results
 
 
 @Distribution.action_registry.register('set-waf')
 class SetWaf(BaseAction):
-
     permissions = ('cloudfront:UpdateDistribution', 'waf:ListWebACLs')
     schema = type_schema(
         'set-waf', required=['web-acl'], **{

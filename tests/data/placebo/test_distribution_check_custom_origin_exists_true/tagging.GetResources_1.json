@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "07764fba-75b3-11e8-9b17-8b063114cdcf", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "07764fba-75b3-11e8-9b17-8b063114cdcf", 
+                "date": "Fri, 22 Jun 2018 00:27:21 GMT", 
+                "content-length": "50", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
