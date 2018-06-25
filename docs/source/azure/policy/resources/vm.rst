@@ -20,6 +20,9 @@ Filters
   .. c7n-schema:: MetricFilter
        :module: c7n_azure.filters
 
+``network-interface``
+  Filter based on properties of the network interfaces associated with the virtual machine.
+
 Actions
 -------
 
@@ -101,3 +104,12 @@ Delete specific VM by name
             value: fake_vm_name
         actions:
           - type: delete
+
+Find all VMs with a Public IP address
+
+    policies:
+      - name: vms-with-public-ip
+        resource: azure.vm
+        filters:
+          - type: network-interface
+            key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
