@@ -115,3 +115,4 @@ Find all VMs with a Public IP address
         filters:
           - type: network-interface
             key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
+            value: not-null
