@@ -107,6 +107,8 @@ Delete specific VM by name
 
 Find all VMs with a Public IP address
 
+.. code-block:: yaml
+
     policies:
       - name: vms-with-public-ip
         resource: azure.vm
