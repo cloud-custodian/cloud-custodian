@@ -1492,7 +1492,7 @@ class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
-        type = 'network-addr'
+        type = 'eip-allocation'
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
@@ -1510,7 +1510,7 @@ class NetworkAddress(query.QueryResourceManager):
                 self.get_model().service,
                 region=self.config.region,
                 account_id=self.account_id,
-                resource_type='eip-allocation',
+                resource_type=self.type,
                 separator='/')
         return self._generate_arn
 
