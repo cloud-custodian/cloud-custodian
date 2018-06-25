@@ -2,10 +2,10 @@
     "status_code": 200, 
     "data": {
         "Table": {
-            "TableArn": "arn:aws:dynamodb:us-west-2:644160558196:table/rolltop", 
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-test", 
             "AttributeDefinitions": [
                 {
-                    "AttributeName": "customer_id", 
+                    "AttributeName": "test", 
                     "AttributeType": "S"
                 }
             ], 
@@ -15,29 +15,40 @@
                 "ReadCapacityUnits": 5
             }, 
             "TableSizeBytes": 0, 
-            "TableName": "rolltop", 
+            "TableName": "c7n-test", 
             "TableStatus": "ACTIVE", 
+            "TableId": "192b379a-ecc4-4bd9-8619-916aa281b3e7", 
             "KeySchema": [
                 {
                     "KeyType": "HASH", 
-                    "AttributeName": "customer_id"
+                    "AttributeName": "test"
                 }
             ], 
             "ItemCount": 0, 
             "CreationDateTime": {
-                "hour": 7, 
+                "hour": 9, 
                 "__class__": "datetime", 
-                "month": 6, 
-                "second": 39, 
-                "microsecond": 637000, 
-                "year": 2016, 
-                "day": 26, 
-                "minute": 20
+                "month": 2, 
+                "second": 11, 
+                "microsecond": 50000, 
+                "year": 2018, 
+                "day": 16, 
+                "minute": 7
             }
         }, 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "JJVG5SPOKF7HD096BRKVUVNIBFVV4KQNSO5AEMVJF66Q9ASUAAJG"
+            "RequestId": "7GB3UBR2FHP4TAU27100TCKC07VV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7GB3UBR2FHP4TAU27100TCKC07VV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "466", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "3001339236", 
+                "date": "Fri, 08 Jun 2018 23:17:24 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
         }
     }
 }

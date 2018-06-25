@@ -4,20 +4,17 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "57BIJH9PBVC3ERAISL5M6I2DBNVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "RequestId": "IF5IL5I0JQA7E3HIL0CA6F27ERVV4KQNSO5AEMVJF66Q9ASUAAJG", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "57BIJH9PBVC3ERAISL5M6I2DBNVV4KQNSO5AEMVJF66Q9ASUAAJG", 
-                "date": "Tue, 31 Jan 2017 19:34:51 GMT", 
-                "content-length": "160", 
-                "content-type": "application/x-amz-json-1.0", 
-                "x-amz-crc32": "2210834338"
+                "x-amzn-requestid": "IF5IL5I0JQA7E3HIL0CA6F27ERVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "11", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "1756070277", 
+                "date": "Fri, 08 Jun 2018 23:17:25 GMT", 
+                "content-type": "application/x-amz-json-1.0"
             }
         }, 
-        "Tags": [
-            {
-                "Value": "test_value", 
-                "Key": "test_key"
-            }
-        ]
+        "Tags": []
     }
 }
