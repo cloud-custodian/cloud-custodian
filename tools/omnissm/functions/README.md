@@ -20,5 +20,7 @@ A `config.yaml` must be provided alongside the lambda functions to configure any
 | MaxRetries | Sets the number of retries attempted for AWS API calls. Defaults to 0 if not specified. |
 | QueueName | If provided, SSM API requests that are throttled will be sent to this queue. Should be used in conjunction with MaxRetries since the throttling that takes place should retry several times before attempting to queue the request. |
 | RegistrationsTable | The DynamoDb table used for storing instance registrations. |
+| ResourceDeletedSNSTopic | The SNS topic published to when resources are deleted. |
 | ResourceTags | The name of tags that should be added to SSM tags if they are tagged on the EC2 instance. |
 | S3DownloadRole | The IAM role used for downloading OversizedConfigurationItems from S3. |
+| SNSPublishRole | The IAM role used for publishing to the Resource Deleted SNS topic. |

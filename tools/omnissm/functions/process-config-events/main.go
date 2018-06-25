@@ -135,6 +135,20 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 			return err
 		}
 		log.Info().Msgf("Successfully deleted registration entry: %#v", entry.ManagedId)
+		if omni.Config.ResourceDeletedSNSTopic != "" {
+			data, err := json.Marshal(map[string]interface{}{
+				"ManagedId":    entry.ManagedId,
+				"ResourceId":   detail.ConfigurationItem.ResourceId,
+				"AWSAccountId": detail.ConfigurationItem.AWSAccountId,
+				"AWSRegion":    detail.ConfigurationItem.AWSRegion,
+			})
+			if err != nil {
+				return errors.Wrap(err, "cannot marshal SNS message")
+			}
+			if err := omni.SNS.Publish(omni.Config.ResourceDeletedSNSTopic, data); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

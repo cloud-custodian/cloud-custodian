@@ -56,12 +56,18 @@ type Config struct {
 	// The DynamodDb table used for storing instance regisrations.
 	RegistrationsTable string `yaml:"registrationsTable"`
 
+	// The SNS topic published to when resources are deleted (optional).
+	ResourceDeletedSNSTopic string `yaml:"resourceDeletedSNSTopic"`
+
 	// The name of tags that should be added to SSM tags if they are tagged on
 	// the EC2 instance.
 	ResourceTags []string `yaml:"resourceTags"`
 
 	// The IAM role used for downloading Oversized ConfigurationItems from S3.
 	S3DownloadRole string `yaml:"s3DownloadRole"`
+
+	// The IAM role used for publishing to the Resource Deleted SNS topic (optional).
+	SNSPublishRole string `yaml:"snsPublishRole"`
 
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
@@ -102,13 +108,15 @@ func ReadConfig(path string) (*Config, error) {
 func ReadConfigFromEnv() *Config {
 	maxRetries, _ := strconv.Atoi(os.Getenv("OMNISSM_MAX_RETRIES"))
 	c := &Config{
-		AccountWhitelist:   strings.Split(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
-		InstanceRole:       os.Getenv("OMNISSM_INSTANCE_ROLE"),
-		MaxRetries:         maxRetries,
-		RegistrationsTable: os.Getenv("OMNISSM_REGISTRATIONS_TABLE"),
-		QueueName:          os.Getenv("OMNISSM_SPILLOVER_QUEUE"),
-		ResourceTags:       strings.Split(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
-		S3DownloadRole:     os.Getenv("OMNISSM_CROSS_ACCOUNT_ROLE"),
+		AccountWhitelist:        strings.Split(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
+		InstanceRole:            os.Getenv("OMNISSM_INSTANCE_ROLE"),
+		MaxRetries:              maxRetries,
+		RegistrationsTable:      os.Getenv("OMNISSM_REGISTRATIONS_TABLE"),
+		QueueName:               os.Getenv("OMNISSM_SPILLOVER_QUEUE"),
+		ResourceDeletedSNSTopic: os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC"),
+		ResourceTags:            strings.Split(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
+		S3DownloadRole:          os.Getenv("OMNISSM_S3_DOWNLOAD_ROLE"),
+		SNSPublishRole:          os.Getenv("OMNISSM_SNS_PUBLISH_ROLE"),
 	}
 	return c
 }
@@ -129,11 +137,17 @@ func MergeConfig(config *Config, other *Config) {
 	if other.RegistrationsTable != "" {
 		config.RegistrationsTable = other.RegistrationsTable
 	}
+	if other.ResourceDeletedSNSTopic != "" {
+		config.ResourceDeletedSNSTopic = other.ResourceDeletedSNSTopic
+	}
 	if len(other.ResourceTags) > 0 {
 		config.ResourceTags = other.ResourceTags
 	}
 	if other.S3DownloadRole != "" {
 		config.S3DownloadRole = other.S3DownloadRole
+	}
+	if other.SNSPublishRole != "" {
+		config.SNSPublishRole = other.SNSPublishRole
 	}
 	config.setDefaults()
 }

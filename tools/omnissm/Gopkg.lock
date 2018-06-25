@@ -55,6 +55,8 @@
     "service/dynamodb/dynamodbiface",
     "service/s3",
     "service/s3/s3iface",
+    "service/sns",
+    "service/sns/snsiface",
     "service/sqs",
     "service/sqs/sqsiface",
     "service/ssm",
@@ -279,6 +281,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "faffca75a35f3d019ddb148ee17aaa9799e31a750f31cd3f1ef3397297330c75"
+  inputs-digest = "907564446680b8306a48b2293c529c6357d0c6a8d1a7189dc1dc2923dce84949"
   solver-name = "gps-cdcl"
   solver-version = 1

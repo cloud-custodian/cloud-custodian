@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/s3"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/sns"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/sqs"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 )
@@ -26,6 +27,7 @@ type OmniSSM struct {
 	*Config
 	*Registrations
 	*s3.S3
+	*sns.SNS
 	*sqs.SQS
 	*ssm.SSM
 }
@@ -36,6 +38,10 @@ func New(config *Config) (*OmniSSM, error) {
 		Registrations: NewRegistrations(&RegistrationsConfig{
 			Config:    config.Config,
 			TableName: config.RegistrationsTable,
+		}),
+		SNS: sns.New(&sns.Config{
+			Config:     config.Config,
+			AssumeRole: config.S3DownloadRole,
 		}),
 		SSM: ssm.New(&ssm.Config{
 			Config:       config.Config,
