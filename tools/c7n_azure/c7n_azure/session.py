@@ -51,7 +51,7 @@ class Session(object):
                     'access_token': os.environ['AZURE_ACCESS_TOKEN']
                 })
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
-            self.log.info("Creating session with Token Authentication")
+            self.log.debug("Creating session with Token Authentication")
 
         elif all(k in os.environ for k in tenant_auth_variables):
             # Tenant (service principal) authentication
@@ -62,7 +62,7 @@ class Session(object):
             )
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.tenant_id = os.environ['AZURE_TENANT_ID']
-            self.log.info("Creating session with Service Principal Authentication")
+            self.log.debug("Creating session with Service Principal Authentication")
 
         else:
             # Azure CLI authentication
@@ -70,13 +70,13 @@ class Session(object):
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
-            self.log.info("Creating session with Azure CLI Authentication")
+            self.log.debug("Creating session with Azure CLI Authentication")
 
         # Let provided id parameter override everything else
         if subscription_id is not None:
             self.subscription_id = subscription_id
 
-        self.log.info("Session using Subscription ID: %s" % self.subscription_id)
+        self.log.debug("Session using Subscription ID: %s" % self.subscription_id)
 
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
