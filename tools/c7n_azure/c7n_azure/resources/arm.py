@@ -15,9 +15,12 @@
 import six
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim
 from c7n_azure.filters import MetricFilter
+from c7n.filters.core import type_schema
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta
 from c7n_azure.utils import ResourceIdParser
+from c7n.actions import BaseAction
+from c7n.utils import local_session
 
 from c7n.utils import local_session
 
@@ -64,5 +67,17 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('tag-trim', TagTrim)
                 klass.filter_registry.register('metric', MetricFilter)
 
+@ArmResourceManager.action_registry.register('delete')
+class ArmResourceDeleteAction(BaseAction):
+    
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+        for resource in resources:
+            client.resources.delete_by_id(
+                resource['id'], session.resource_api_version(resource['id']))
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)
