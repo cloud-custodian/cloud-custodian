@@ -179,7 +179,7 @@ class ArmResourceTest(BaseTest):
     fake_arm_resources = [
         {
             'id': '/subscriptions/fake-guid/resourceGroups/test-resource-group/providers/'
-                    'Microsoft.Network/networkSecurityGroups/test-nsg-delete',
+                  'Microsoft.Network/networkSecurityGroups/test-nsg-delete',
             'name': 'test-nsg-delete'
         }
     ]

@@ -63,7 +63,8 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('untag', RemoveTag)
                 klass.action_registry.register('auto-tag-user', AutoTagUser)
                 klass.action_registry.register('tag-trim', TagTrim)
-                klass.action_registry.register('delete', DeleteAction)
+                if resource is not 'resourcegroup':
+                    klass.action_registry.register('delete', DeleteAction)
                 klass.filter_registry.register('metric', MetricFilter)
 
 

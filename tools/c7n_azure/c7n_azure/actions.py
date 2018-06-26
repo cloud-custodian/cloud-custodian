@@ -410,8 +410,9 @@ class Notify(BaseNotify):
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri)
         return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
 
+
 class DeleteAction(BaseAction):
-    
+
     schema = type_schema('delete')
 
     def process(self, resources):
@@ -419,6 +420,5 @@ class DeleteAction(BaseAction):
         #: :type: azure.mgmt.resource.ResourceManagementClient
         client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         for resource in resources:
-            client.resources.delete_by_id(
-                resource['id'], session.resource_api_version(resource['id']))
-
+            client.resources.delete_by_id(resource['id'],
+                session.resource_api_version(resource['id']))
