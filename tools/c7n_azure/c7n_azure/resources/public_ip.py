@@ -14,6 +14,8 @@
 
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
+from c7n.filters.core import type_schema
+from c7n.actions import BaseAction
 
 
 @resources.register('publicip')
@@ -32,3 +34,20 @@ class PublicIPAddress(ArmResourceManager):
             'properties.publicIPAllocationMethod',
             'properties.ipAddress'
         )
+
+
+@PublicIPAddress.action_registry.register('delete')
+class PublicIPDeleteAction(BaseAction):
+
+    schema = type_schema('delete')
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(PublicIPDeleteAction, self).__init__(data, manager, log_dir)
+        self.client = self.manager.get_client()
+
+    def delete(self, resource_group, public_ip_name):
+        self.client.public_ip_addresses.delete(resource_group, public_ip_name)
+
+    def process(self, public_ips):
+        for public_ip in public_ips:
+            self.delete(public_ip['resourceGroup'], public_ip['name'])
