@@ -30,7 +30,6 @@ def run(event, context):
         except OSError as error:
             log.warning("Unable to make output directory: {}".format(error))
 
-    # TODO. This enshrines an assumption of a single policy per lambda.
     options_overrides = \
         policy_config['policies'][0].get('mode', {}).get('execution-options', {})
 
@@ -46,6 +45,3 @@ def run(event, context):
         for p in policies:
             p.push(event, context)
     return True
-
-
-#run(None, None)

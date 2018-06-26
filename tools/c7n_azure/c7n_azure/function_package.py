@@ -1,11 +1,10 @@
 import os
-import shutil
 import sys
-import tempfile
+import fnmatch
 import json
 import logging
-
 import requests
+
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
@@ -71,12 +70,10 @@ class FunctionPackage(object):
     def _add_function_config(self):
         config = \
             {
-              "scriptFile": "function.py",
-              "bindings": [
-                {
-                  "direction": "in"
-                }
-              ]
+                "scriptFile": "function.py",
+                "bindings": [{
+                    "direction": "in"
+                }]
             }
 
         if self.policy['mode']['type'] == 'azure-periodic':
@@ -92,15 +89,20 @@ class FunctionPackage(object):
             config['bindings'][0]['connection'] = 'name_of_app_setting_with_read_conn_string'
 
         else:
-            self.log.error("Mode not yet supported for Azure functions (%s)" % self.policy['mode']['type'])
+            self.log.error("Mode not yet supported for Azure functions (%s)"
+                           % self.policy['mode']['type'])
 
-        self.pkg.add_contents(dest=self.policy['name'] + '/function.json', contents=json.dumps(config))
+        self.pkg.add_contents(dest=self.policy['name'] + '/function.json',
+                              contents=json.dumps(config))
 
     def _add_policy(self):
-        self.pkg.add_contents(dest=self.policy['name'] + '/config.json', contents=json.dumps(self.policy))
+        self.pkg.add_contents(dest=self.policy['name'] + '/config.json',
+                              contents=json.dumps(self.policy))
 
     def _add_cffi_module(self):
-        # adding special modules
+        """CFFI native bits aren't discovered automatically
+        so for now we grab them manually from supported platforms"""
+
         self.pkg.add_modules('cffi')
 
         # Add native libraries that are missing
@@ -109,15 +111,20 @@ class FunctionPackage(object):
         # linux
         platform = sys.platform
         if platform == "linux" or platform == "linux2":
-            self.pkg.add_file(os.path.join(site_pkg, '_cffi_backend.cpython-36m-x86_64-linux-gnu.so'))
-            self.pkg.add_file(os.path.join(site_pkg, '.libs_cffi_backend/libffi-d78936b1.so.6.0.4'),
-                              '.libs_cffi_backend/libffi-d78936b1.so.6.0.4')
+            for so_file in os.listdir(site_pkg):
+                if fnmatch.fnmatch(so_file, '*cffi*.so*'):
+                    self.pkg.add_file(os.path.join(site_pkg, so_file))
+
+            self.pkg.add_directory('.libs_cffi_backend')
+
         # MacOS
         elif platform == "darwin":
-            raise NotImplementedError('Cannot package Azure Function in MacOS host OS, please use linux.')
+            raise NotImplementedError('Cannot package Azure Function in MacOS host OS, '
+                                      'please use linux.')
         # Windows
         elif platform == "win32":
-            raise NotImplementedError('Cannot package Azure Function in Windows host OS, please use linux or WSL.')
+            raise NotImplementedError('Cannot package Azure Function in Windows host OS, '
+                                      'please use linux or WSL.')
 
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
@@ -151,17 +158,6 @@ class FunctionPackage(object):
         # update perms of the package
         self._update_perms_package()
 
-        # Unzip the archive for testing
-        test_app_path = '/tmp/package'
-        if os.path.exists(test_app_path):
-            shutil.rmtree(test_app_path)
-            os.makedirs(test_app_path)
-
-        shutil.copy(self.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
-
-        # debug extract
-        self.pkg.get_reader().extractall(test_app_path)
-
     def publish(self, app_name):
         s = local_session(Session)
         zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
@@ -175,7 +171,7 @@ class FunctionPackage(object):
         zip_file = open(self.pkg.path, 'rb').read()
         r = requests.post(zip_api_url, headers=headers, data=zip_file)
 
-        self.log.info("Function publish result: %s" % r.text)
+        self.log.info("Function publish result: %s" % r)
 
     def close(self):
         self.pkg.close()
@@ -224,19 +220,7 @@ class FunctionPackage(object):
 
         so_files = list(set([v.__file__
                              for (k, v) in finder.modules.items()
-                             if v.__file__ is not None and "site-packages" in v.__file__
-                             and ".so" in v.__file__]))
+                             if v.__file__ is not None and "site-packages" in
+                             v.__file__ and ".so" in v.__file__]))
 
         return set(modules), so_files
-
-    # Unzip the archive for testing
-    #test_app_path = sys.argv[1]
-    #if os.path.exists(test_app_path):
-    #    shutil.rmtree(test_app_path)
-    #    os.makedirs(test_app_path)
-
-    #shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
-
-    # debug extract
-    #archive.pkg.get_reader().extractall(test_app_path)
-

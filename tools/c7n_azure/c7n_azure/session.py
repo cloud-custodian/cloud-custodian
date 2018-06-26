@@ -46,8 +46,6 @@ class Session(object):
         ]
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
 
-        auth_file_variable = 'USE_AUTH_FILE'
-
         if authorization_file:
             self.credentials, self.subscription_id = self.load_auth_file(authorization_file)
             self.log.info("Creating session with authorization file")
@@ -132,7 +130,8 @@ class Session(object):
 
     def get_auth_string(self):
         if type(self.credentials) is not ServicePrincipalCredentials:
-            raise NotImplementedError("Writing auth file only supported for Service Principal credentials.")
+            raise NotImplementedError(
+                "Writing auth file only supported for Service Principal credentials.")
 
         auth = {
             'credentials':

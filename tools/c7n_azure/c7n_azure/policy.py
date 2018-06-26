@@ -53,11 +53,12 @@ class AzureFunctionMode(ServerlessExecutionMode):
         parameters = self.get_parameters()
         group_name = parameters['servicePlanName']['value']
 
-        #self.template_util.create_resource_group(
-        #    group_name, {'location': parameters['location']['value']})
+        if not self.template_util.resource_exist(group_name, parameters['name']['value']):
+            self.template_util.create_resource_group(
+                group_name, {'location': parameters['location']['value']})
 
-        #self.template_util.deploy_resource_template(
-        #    group_name, 'dedicated_functionapp.json', parameters).wait()
+            self.template_util.deploy_resource_template(
+                group_name, 'dedicated_functionapp.json', parameters).wait()
 
         archive = FunctionPackage(self.policy.data)
         archive.build()
@@ -70,9 +71,9 @@ class AzureFunctionMode(ServerlessExecutionMode):
         data = self.policy.data
 
         updated_parameters = {
-            'name': (data['mode']['provision-options']['servicePlanName']
-                     + '-'
-                     + data['name']).replace(' ', '-').lower(),
+            'name': (data['mode']['provision-options']['servicePlanName'] +
+                     '-' +
+                     data['name']).replace(' ', '-').lower(),
 
             'storageName': data['mode']['provision-options']['servicePlanName']
         }

@@ -49,6 +49,16 @@ class TemplateUtilities(object):
         return self.client.deployments.create_or_update(
             group_name, group_name, deployment_properties)
 
+    def resource_exist(self, group_name, resource_name):
+        if not self.client.resource_groups.check_existence(group_name):
+            return False
+
+        r_filter = ("name eq '%s'" % resource_name)
+
+        for resource in self.client.resources.list_by_resource_group(group_name, filter=r_filter):
+            return True
+        return False
+
     def get_default_parameters(self, file_name):
         # deployment client expects only the parameters, not the full parameters file
         json_parameters_file = self.get_json_template(file_name)
