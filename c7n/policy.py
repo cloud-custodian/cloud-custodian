@@ -197,6 +197,20 @@ class PolicyExecutionMode(object):
         return values
 
 
+class ServerlessExecutionMode(PolicyExecutionMode):
+    def run(self, event=None, lambda_context=None):
+        """Run the actual policy."""
+        raise NotImplementedError("subclass responsibility")
+
+    def get_logs(self, start, end):
+        """Retrieve logs for the policy"""
+        raise NotImplementedError("subclass responsibility")
+
+    def provision(self):
+        """Provision any resources needed for the policy."""
+        raise NotImplementedError("subclass responsibility")
+
+
 execution = PluginRegistry('c7n.execution')
 
 
@@ -308,7 +322,7 @@ class PullMode(PolicyExecutionMode):
         )
 
 
-class LambdaMode(PolicyExecutionMode):
+class LambdaMode(ServerlessExecutionMode):
     """A policy that runs/executes in lambda."""
 
     POLICY_METRICS = ('ResourceCount',)
@@ -663,15 +677,6 @@ class ConfigRuleMode(LambdaMode):
 
 class Policy(object):
 
-    EXEC_MODE_MAP = {
-        'pull': PullMode,
-        'periodic': PeriodicMode,
-        'cloudtrail': CloudTrailMode,
-        'ec2-instance-state': EC2InstanceState,
-        'asg-instance-state': ASGInstanceState,
-        'guard-duty': GuardDutyMode,
-        'config-rule': ConfigRuleMode}
-
     log = logging.getLogger('custodian.policy')
 
     def __init__(self, data, options, session_factory=None):
@@ -718,7 +723,7 @@ class Policy(object):
 
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        return self.EXEC_MODE_MAP[exec_mode_type](self)
+        return execution.get(exec_mode_type)(self)
 
     @property
     def is_lambda(self):
@@ -771,7 +776,7 @@ class Policy(object):
         mode = self.get_execution_mode()
         if self.options.dryrun:
             resources = PullMode(self).run()
-        elif isinstance(mode, LambdaMode):
+        elif isinstance(mode, ServerlessExecutionMode):
             resources = mode.provision()
         else:
             resources = mode.run()
