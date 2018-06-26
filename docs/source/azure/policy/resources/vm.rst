@@ -23,6 +23,9 @@ Filters
 ``network-interface``
   Filter based on properties of the network interfaces associated with the virtual machine.
 
+  .. c7n-schema:: NetworkInterfaceFilter
+        :module: c7n_azure.resources.vm
+
 Actions
 -------
 
