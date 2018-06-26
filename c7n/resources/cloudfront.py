@@ -194,19 +194,21 @@ class CheckOrigin(Filter):
               - name: cloudfront-origin-check
                 resource: distribution
                 filters:
-                  origins:
-                    - S3
-                    - CUSTOM
-                    - S3-CUSTOM
-                  accounts:
-                    - c7n-test-domain.com
-                  accounts_from:
-                    url: *accounts-list
-                    expr: accounts-list.canonical_id
+                  - type: check-origin
+                    origins:
+                      - S3
+                      - CUSTOM
+                      - S3-CUSTOM
+                    accounts:
+                      - c7n-test-domain.com
+                    accounts_from:
+                      url: *accounts-list
+                      expr: accounts-list.canonical_id
     """
 
     schema = type_schema(
         'check-origin',
+        required=('origins',),
         origins={'type': 'array', 'items': {
             'type': 'string',
             'enum': ['S3', 'CUSTOM', 'S3-CUSTOM']}
@@ -217,6 +219,15 @@ class CheckOrigin(Filter):
     permissions = ('s3:GetBucketAcl',)
     retry = staticmethod(get_retry(('Throttling',)))
 
+    def validate(self):
+
+        if (not self.data.get('accounts') and 'accounts_from' not in self.data) or \
+                not self.data.get('accounts') and ('accounts_from' in self.data and not
+                    ValuesFrom(self.data['accounts_from'], self.manager).get_values()):
+            raise ValueError('Accounts whitelist is empty. Policy failure.')
+
+        return self
+
     def process_s3_target(self, r, target_bucket, client, accounts):
         try:
             b = client.get_bucket_acl(
@@ -225,6 +236,7 @@ class CheckOrigin(Filter):
             self.log.debug("Target bucket %s exists." % target_bucket)
             if accounts and b['Owner']['ID'] not in accounts:
                 self.log.debug("Bucket %s owner not in accounts whitelist." % target_bucket)
+                r['c7n:s3-origin'] = False
             else:
                 self.log.debug("Bucket %s owner found in accounts whitelist." % target_bucket)
                 r['c7n:s3-origin'] = True
@@ -232,10 +244,10 @@ class CheckOrigin(Filter):
 
         except ClientError as e:
             if e.response['Error']['Code'] == 'AccessDenied':
-                self.log.debug({'state': 'error', 'reason':
+                self.log.error({'state': 'error', 'reason':
                     'Non-accessible bucket: %s' % target_bucket})
             if e.response['Error']['Code'] == 'NoSuchBucket':
-                self.log.debug({'state': 'error', 'reason':
+                self.log.error({'state': 'error', 'reason':
                     'Non-existent bucket: %s' % target_bucket})
 
         return None
@@ -244,6 +256,7 @@ class CheckOrigin(Filter):
         try:
             if accounts and target_origin not in accounts:
                 self.log.debug("Custom origin %s not in origins whitelist." % target_origin)
+                r['c7n:target-origin'] = False
             else:
                 self.log.debug("Custom origin %s found in origins whitelist." % target_origin)
                 r['c7n:target-origin'] = True
@@ -254,8 +267,24 @@ class CheckOrigin(Filter):
 
         return None
 
-    def process_resource_origins(self, resources, accounts):
+    def is_s3_domain(self, domain_name):
+        if domain_name.endswith('.s3.amazonaws.com'):
+            return True
+        else:
+            return False
+
+    def get_s3_domain(self, domain_name):
+        if domain_name.endswith('.s3.amazonaws.com'):
+            return domain_name[:-len('.s3.amazonaws.com')]
+
+    def process(self, resources, event=None):
+
         results = []
+
+        accounts = set(self.data.get('accounts', ()))
+        if 'accounts_from' in self.data:
+            values = ValuesFrom(self.data['accounts_from'], self.manager).get_values()
+            accounts = accounts.union(values)
 
         if 'S3' in self.data['origins'] or 'S3-CUSTOM' in self.data['origins']:
             client = local_session(self.manager.session_factory).client(
@@ -276,30 +305,6 @@ class CheckOrigin(Filter):
                     target_origin = x['DomainName']
                     resource = self.process_custom_target(r, target_origin, accounts)
                     results += [resource] if resource else []
-
-        return results
-
-    def is_s3_domain(self, domain_name):
-        if domain_name.endswith('.s3.amazonaws.com'):
-            return True
-        else:
-            return False
-
-    def get_s3_domain(self, domain_name):
-        if domain_name.endswith('.s3.amazonaws.com'):
-            return domain_name[:-len('.s3.amazonaws.com')]
-
-    def process(self, resources, event=None):
-
-        accounts = set(self.data.get('accounts', ()))
-        if 'accounts_from' in self.data:
-            values = ValuesFrom(self.data['accounts_from'], self.manager).get_values()
-            accounts = accounts.union(values)
-
-        if accounts:
-            results = self.process_resource_origins(resources, accounts)
-        else:
-            raise ValueError('Accounts whitelist is empty. Policy failure.')
 
         return results
 
