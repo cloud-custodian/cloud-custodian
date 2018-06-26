@@ -1510,7 +1510,7 @@ class NetworkAddress(query.QueryResourceManager):
                 self.get_model().service,
                 region=self.config.region,
                 account_id=self.account_id,
-                resource_type=self.type,
+                resource_type=self.resource_type.type,
                 separator='/')
         return self._generate_arn
 
