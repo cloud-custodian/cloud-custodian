@@ -3,6 +3,7 @@ import shutil
 import sys
 import tempfile
 import json
+import logging
 
 import requests
 from c7n_azure.session import Session
@@ -13,12 +14,14 @@ from c7n.utils import local_session
 
 class FunctionPackage(object):
 
-    def __init__(self):
+    def __init__(self, policy):
+        self.log = logging.getLogger('custodian.azure.function_package')
         self.basedir = os.path.dirname(os.path.realpath(__file__))
         self.pkg = PythonPackageArchive()
+        self.policy = policy
 
-    def _add_functions_required_files(self, policy):
-        policy_name = policy['name']
+    def _add_functions_required_files(self):
+        policy_name = self.policy['name']
 
         self.pkg.add_file(os.path.join(self.basedir, 'function.py'),
                           dest=policy_name + '/function.py')
@@ -26,8 +29,8 @@ class FunctionPackage(object):
         self.pkg.add_contents(dest=policy_name + '/__init__.py', contents='')
 
         self._add_host_config()
-        self._add_function_config(policy)
-        self._add_policy(policy)
+        self._add_function_config()
+        self._add_policy()
 
     def _add_host_config(self):
         config = \
@@ -65,29 +68,36 @@ class FunctionPackage(object):
             }
         self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
 
-    def _add_function_config(self, policy):
+    def _add_function_config(self):
         config = \
             {
               "scriptFile": "function.py",
               "bindings": [
                 {
-                  "authLevel": "anonymous",
-                  "type": "httpTrigger",
-                  "direction": "in",
-                  "name": "req"
-                },
-                {
-                  "type": "http",
-                  "direction": "out",
-                  "name": "$return"
+                  "direction": "in"
                 }
               ]
             }
 
-        self.pkg.add_contents(dest=policy['name'] + '/function.json', contents=json.dumps(config))
+        if self.policy['mode']['type'] == 'azure-periodic':
+            config['bindings'][0]['type'] = 'timerTrigger'
+            config['bindings'][0]['name'] = 'timer'
+            config['bindings'][0]['schedule'] = self.policy['mode']['schedule']
 
-    def _add_policy(self, policy):
-        self.pkg.add_contents(dest=policy['name'] + '/config.json', contents=json.dumps(policy))
+        elif self.policy['mode']['type'] == 'azure-stream':
+            config['bindings'][0]['type'] = 'eventHubTrigger'
+            config['bindings'][0]['name'] = 'event'
+            config['bindings'][0]['eventHubName'] = 'eventHubName'
+            config['bindings'][0]['consumerGroup'] = 'consumerGroup'
+            config['bindings'][0]['connection'] = 'name_of_app_setting_with_read_conn_string'
+
+        else:
+            self.log.error("Mode not yet supported for Azure functions (%s)" % self.policy['mode']['type'])
+
+        self.pkg.add_contents(dest=self.policy['name'] + '/function.json', contents=json.dumps(config))
+
+    def _add_policy(self):
+        self.pkg.add_contents(dest=self.policy['name'] + '/config.json', contents=json.dumps(self.policy))
 
     def _add_cffi_module(self):
         # adding special modules
@@ -112,9 +122,9 @@ class FunctionPackage(object):
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
 
-    def build_azure_package(self, policy):
+    def build(self):
         # Get dependencies for azure entry point
-        modules, so_files = FunctionPackage._get_dependencies('c7n_azure/entry.py')
+        modules, so_files = FunctionPackage._get_dependencies('entry.py')
 
         # add all loaded modules
         modules.remove('azure')
@@ -127,11 +137,11 @@ class FunctionPackage(object):
         self.pkg.add_modules(lambda f: f == 'azure/__init__.py', 'azure')
 
         # add Functions HttpTrigger
-        self._add_functions_required_files(policy)
+        self._add_functions_required_files()
 
         # generate and add auth
         s = local_session(Session)
-        self.pkg.add_contents(dest=policy['name'] + '/auth.json', contents=s.get_auth_string())
+        self.pkg.add_contents(dest=self.policy['name'] + '/auth.json', contents=s.get_auth_string())
 
         # cffi module needs special handling
         self._add_cffi_module()
@@ -141,11 +151,18 @@ class FunctionPackage(object):
         # update perms of the package
         self._update_perms_package()
 
-    def close(self):
-        self.pkg.close()
+        # Unzip the archive for testing
+        test_app_path = '/tmp/package'
+        if os.path.exists(test_app_path):
+            shutil.rmtree(test_app_path)
+            os.makedirs(test_app_path)
 
-    @staticmethod
-    def publish(app_name, pkg):
+        shutil.copy(self.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
+
+        # debug extract
+        self.pkg.get_reader().extractall(test_app_path)
+
+    def publish(self, app_name):
         s = local_session(Session)
         zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
         headers = {
@@ -153,9 +170,15 @@ class FunctionPackage(object):
             'Authorization': 'Bearer %s' % (s.get_bearer_token())
         }
 
-        zip_file = open(pkg.path, 'rb').read()
+        self.log.info("Publishing package at: %s" % self.pkg.path)
+
+        zip_file = open(self.pkg.path, 'rb').read()
         r = requests.post(zip_api_url, headers=headers, data=zip_file)
-        print(r)
+
+        self.log.info("Function publish result: %s" % r.text)
+
+    def close(self):
+        self.pkg.close()
 
     @staticmethod
     def get_site_packages():
@@ -206,21 +229,14 @@ class FunctionPackage(object):
 
         return set(modules), so_files
 
-
-# ex: python create_function_zip.py /home/test_app linuxcontainer1 policy_name
-if __name__ == "__main__":
-    archive = FunctionPackage()
-    archive.build_azure_package(sys.argv[3])
-
     # Unzip the archive for testing
-    test_app_path = sys.argv[1]
-    if os.path.exists(test_app_path):
-        shutil.rmtree(test_app_path)
-        os.makedirs(test_app_path)
+    #test_app_path = sys.argv[1]
+    #if os.path.exists(test_app_path):
+    #    shutil.rmtree(test_app_path)
+    #    os.makedirs(test_app_path)
 
-    shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
+    #shutil.copy(archive.pkg.path, os.path.join(os.path.dirname(test_app_path), 'archive.zip'))
 
     # debug extract
-    archive.pkg.get_reader().extractall(test_app_path)
+    #archive.pkg.get_reader().extractall(test_app_path)
 
-    FunctionPackage.publish(sys.argv[2], archive.pkg)

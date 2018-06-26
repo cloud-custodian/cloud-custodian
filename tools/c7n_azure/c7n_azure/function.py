@@ -8,7 +8,7 @@ sys.path.append(dirname(dirname(__file__)))
 from c7n_azure import handler, entry
 import azure.functions as func
 
-def main(req):
+def main(input):
     logging.info('Python HTTP trigger function processed a request.')
 
     logging.info("Running Azure Cloud Custodian Policy")
@@ -18,8 +18,6 @@ def main(req):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
     handler.run(None, context)
-
-    return func.HttpResponse("Running Azure Cloud Custodian Policy")
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()

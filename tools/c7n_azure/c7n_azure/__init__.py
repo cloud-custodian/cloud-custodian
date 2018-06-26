@@ -16,4 +16,5 @@ import logging
 
 # Quiet logging from dependencies
 adal.set_logging_options({'level': 'WARNING'})
+logging.getLogger("msrest").setLevel(logging.ERROR)
 logging.getLogger("keyring").setLevel(logging.WARNING)
