@@ -406,10 +406,14 @@ class ValueFilter(Filter):
         if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
             r = None
-            for t in i.get("Tags", []):
-                if t.get('Key') == tk:
-                    r = t.get('Value')
-                    break
+            if 'Tags' in i:
+                for t in i.get("Tags", []):
+                    if t.get('Key') == tk:
+                        r = t.get('Value')
+                        break
+            # Azure schema: 'tags': {'key': 'value'}
+            elif 'tags' in i:
+                r = i.get('tags', {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:

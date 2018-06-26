@@ -14,6 +14,7 @@
 
 from c7n_azure.provider import resources
 import c7n_azure.actions
+import c7n_azure.filters
 import c7n_azure.output
 import c7n_azure.policy
 import c7n_azure.resources.cosmos_db
