@@ -77,7 +77,6 @@ type Config struct {
 func NewConfig() *Config {
 	c := &Config{}
 	MergeConfig(c, ReadConfigFromEnv())
-	c.setDefaults()
 	return c
 }
 
@@ -124,6 +123,7 @@ func ReadConfigFromEnv() *Config {
 func MergeConfig(config *Config, other *Config) {
 	if len(other.AccountWhitelist) > 0 {
 		config.AccountWhitelist = other.AccountWhitelist
+		config.authorizedAccountIds = make(map[string]struct{})
 	}
 	if other.InstanceRole != "" {
 		config.InstanceRole = other.InstanceRole
@@ -142,6 +142,7 @@ func MergeConfig(config *Config, other *Config) {
 	}
 	if len(other.ResourceTags) > 0 {
 		config.ResourceTags = other.ResourceTags
+		config.resourceTags = make(map[string]struct{})
 	}
 	if other.S3DownloadRole != "" {
 		config.S3DownloadRole = other.S3DownloadRole
