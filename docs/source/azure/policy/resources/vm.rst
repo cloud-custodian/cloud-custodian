@@ -1,7 +1,7 @@
 .. _azure_vm:
 
 Virtual Machines
-================+
+================
 
 Filters
 -------
