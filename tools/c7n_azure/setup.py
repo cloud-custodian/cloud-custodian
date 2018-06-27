@@ -33,6 +33,7 @@ setup(
             'azure = c7n_azure.entry:initialize_azure']
     },
     install_requires=["azure-mgmt",
+                      "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
                       "c7n",

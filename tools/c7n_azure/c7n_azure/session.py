@@ -36,6 +36,7 @@ class Session(object):
         self.credentials = None
         self.subscription_id = None
         self.tenant_id = None
+        self._is_token_auth = False
 
     def _initialize_session(self):
         """

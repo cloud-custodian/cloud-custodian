@@ -20,11 +20,16 @@ from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
 from c7n.filters import FilterValidationError
 
+from c7n_azure.provider import resources
+from c7n_azure.query import QueryResourceManager, DescribeSource
+from c7n.utils import local_session
+
 from c7n.actions import BaseAction
 from c7n.handler import Config
 from c7n.filters import ValueFilter, Filter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.utils import local_session
+from c7n.query import sources
 from c7n.utils import type_schema
 from c7n.ctx import ExecutionContext
 
@@ -49,7 +54,7 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = local_session(Session)
+        s = local_session(self.session_factory)
         cred, sub_id = get_azure_cli_credentials(resource='https://graph.windows.net')
         graph_client = GraphRbacManagementClient(cred, s.get_tenant_id())
 
@@ -86,11 +91,8 @@ class RoleAssignment(QueryResourceManager):
 class RoleDefinition(QueryResourceManager):
 
     class resource_type(object):
-        s = Session()
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
-        enum_spec = ('role_definitions', 'list',
-                     {'scope': '/subscriptions/%s' % (s.subscription_id)})
         get_spec = ('role_definitions', 'get_by_id', None)
         type = 'roleDefinition'
         id = 'id'
@@ -103,6 +105,21 @@ class RoleDefinition(QueryResourceManager):
             'properties.type',
             'properties.permissions'
         )
+
+    @property
+    def source_type(self):
+        return self.data.get('source', 'describe-azure-roledefinition')
+
+
+@sources.register('describe-azure-roledefinition')
+class DescribeSource(DescribeSource):
+
+    def get_resources(self, query):
+        s = local_session(self.manager.session_factory)
+        client = s.client('azure.mgmt.authorization.AuthorizationManagementClient')
+        scope = '/subscriptions/%s' % (s.subscription_id)
+        resources = client.role_definitions.list(scope)
+        return [r.serialize(True) for r in resources]
 
 
 @RoleAssignment.filter_registry.register('role')
