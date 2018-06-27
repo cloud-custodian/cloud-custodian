@@ -196,12 +196,12 @@ class MismatchS3Owner(Filter):
                 resource: distribution
                 filters:
                   - type: mismatch-s3-owner
-                    include_missing_buckets: True
+                    ignore_malconfigured_buckets: True
    """
 
     schema = type_schema(
         'mismatch-s3-owner',
-        include_missing_buckets={'type': 'boolean'})
+        ignore_malconfigured_buckets={'type': 'boolean'})
 
     permissions = ('s3:GetBucketAcl',)
     retry = staticmethod(get_retry(('Throttling',)))
@@ -234,16 +234,11 @@ class MismatchS3Owner(Filter):
                             r['c7n:mismatch-s3-origin'] = False
 
                 except ClientError as e:
-                    if e.response['Error']['Code'] == 'AccessDenied':
-                        self.log.debug({'state': 'error', 'reason':
-                            'Non-accessible bucket: %s' % target_bucket})
-                        r['c7n:mismatch-s3-bucket-access-denied'] = True
-                        results.append(r)
-                    if e.response['Error']['Code'] == 'NoSuchBucket':
-                        self.log.debug({'state': 'error', 'reason':
-                            'Non-existent bucket: %s' % target_bucket})
-                        if self.data.get('include_missing_buckets'):
-                            r['c7n:mismatch-s3-bucket-missing'] = True
+                    if e.response['Error']['Code'] == 'AccessDenied' \
+                            or e.response['Error']['Code'] == 'NoSuchBucket':
+                        self.log.debug("Target bucket %s: %s" % (target_bucket, e.message))
+                        if not self.data.get('ignore_malconfigured_buckets'):
+                            r['c7n:mismatch-s3-bucket-malconfigured'] = True
                             results.append(r)
 
         return results

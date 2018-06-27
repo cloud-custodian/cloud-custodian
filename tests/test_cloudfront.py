@@ -257,7 +257,7 @@ class CloudFront(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-missing'])
+        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-malconfigured'])
 
     def test_distribution_check_s3_owner_access_denied(self):
         factory = self.replay_flight_data("test_distribution_check_s3_owner_access_denied")
@@ -277,7 +277,7 @@ class CloudFront(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-access-denied'])
+        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-malconfigured'])
 
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
