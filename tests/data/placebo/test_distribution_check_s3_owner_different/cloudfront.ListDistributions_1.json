@@ -18,32 +18,20 @@
                     "Origins": {
                         "Items": [
                             {
-                                "OriginPath": "", 
-                                "CustomOriginConfig": {
-                                    "OriginSslProtocols": {
-                                        "Items": [
-                                            "TLSv1", 
-                                            "TLSv1.1", 
-                                            "TLSv1.2"
-                                        ], 
-                                        "Quantity": 3
-                                    }, 
-                                    "OriginProtocolPolicy": "http-only", 
-                                    "OriginReadTimeout": 30, 
-                                    "HTTPPort": 80, 
-                                    "HTTPSPort": 443, 
-                                    "OriginKeepaliveTimeout": 5
+                                "S3OriginConfig": {
+                                    "OriginAccessIdentity": ""
                                 }, 
+                                "OriginPath": "", 
                                 "CustomHeaders": {
                                     "Quantity": 0
                                 }, 
-                                "Id": "Custom-test-123.com", 
-                                "DomainName": "test-123.com"
+                                "Id": "S3-c7n-test-bucket", 
+                                "DomainName": "c7n-test-bucket.s3.amazonaws.com"
                             }
                         ], 
                         "Quantity": 1
                     }, 
-                    "DomainName": "d1uwo15uowymel.cloudfront.net", 
+                    "DomainName": "d8re9dzq9dljo.cloudfront.net", 
                     "WebACLId": "", 
                     "PriceClass": "PriceClass_All", 
                     "Enabled": false, 
@@ -56,7 +44,7 @@
                         "LambdaFunctionAssociations": {
                             "Quantity": 0
                         }, 
-                        "TargetOriginId": "Custom-test-123.com", 
+                        "TargetOriginId": "S3-c7n-test-bucket", 
                         "ViewerProtocolPolicy": "allow-all", 
                         "ForwardedValues": {
                             "Headers": {
@@ -101,18 +89,18 @@
                         "Quantity": 0
                     }, 
                     "LastModifiedTime": {
-                        "hour": 0, 
+                        "hour": 19, 
                         "__class__": "datetime", 
                         "month": 6, 
-                        "second": 16, 
-                        "microsecond": 988000, 
+                        "second": 39, 
+                        "microsecond": 576000, 
                         "year": 2018, 
-                        "day": 22, 
-                        "minute": 26
+                        "day": 26, 
+                        "minute": 52
                     }, 
                     "HttpVersion": "HTTP2", 
-                    "Id": "E17HBVUQPWB07X", 
-                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E17HBVUQPWB07X", 
+                    "Id": "EVILVA5AIUTXI", 
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/EVILVA5AIUTXI", 
                     "Aliases": {
                         "Quantity": 0
                     }
@@ -125,13 +113,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "4b26f506-75b3-11e8-b626-a92cc7a7585f", 
+            "RequestId": "51c76e94-797c-11e8-b628-c799e63a4600", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "4b26f506-75b3-11e8-b626-a92cc7a7585f", 
+                "x-amzn-requestid": "51c76e94-797c-11e8-b628-c799e63a4600", 
                 "vary": "Accept-Encoding", 
-                "content-length": "2730", 
+                "content-length": "2410", 
                 "content-type": "text/xml", 
-                "date": "Fri, 22 Jun 2018 00:29:15 GMT"
+                "date": "Tue, 26 Jun 2018 20:05:48 GMT"
             }
         }
     }

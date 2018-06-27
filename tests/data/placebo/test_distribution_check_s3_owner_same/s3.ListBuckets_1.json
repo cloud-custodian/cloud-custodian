@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "test.owner",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 16, 
+                    "minute": 7
+                }, 
+                "Name": "c7n-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "p89qcm/QUPrtdTCig8jWWCCpBTvfTWt/0VT45k5hlh8TdAFAODdjyiSo2qajaI2Ko1+0vTLfS4M=", 
+            "RequestId": "B7CAB849E554B74C", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "p89qcm/QUPrtdTCig8jWWCCpBTvfTWt/0VT45k5hlh8TdAFAODdjyiSo2qajaI2Ko1+0vTLfS4M=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "B7CAB849E554B74C", 
+                "date": "Tue, 26 Jun 2018 20:05:08 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

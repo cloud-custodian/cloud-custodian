@@ -5,7 +5,7 @@
             "Marker": "", 
             "Items": [
                 {
-                    "Status": "Deployed", 
+                    "Status": "InProgress", 
                     "CacheBehaviors": {
                         "Quantity": 0
                     }, 
@@ -31,9 +31,9 @@
                         ], 
                         "Quantity": 1
                     }, 
-                    "DomainName": "d1x6v4gu82iks0.cloudfront.net", 
+                    "DomainName": "d8re9dzq9dljo.cloudfront.net", 
                     "WebACLId": "", 
-                    "PriceClass": "PriceClass_100", 
+                    "PriceClass": "PriceClass_All", 
                     "Enabled": false, 
                     "DefaultCacheBehavior": {
                         "FieldLevelEncryptionId": "", 
@@ -89,18 +89,18 @@
                         "Quantity": 0
                     }, 
                     "LastModifiedTime": {
-                        "hour": 19, 
+                        "hour": 20, 
                         "__class__": "datetime", 
                         "month": 6, 
-                        "second": 22, 
-                        "microsecond": 91000, 
+                        "second": 49, 
+                        "microsecond": 69000, 
                         "year": 2018, 
-                        "day": 20, 
-                        "minute": 17
+                        "day": 26, 
+                        "minute": 39
                     }, 
                     "HttpVersion": "HTTP2", 
-                    "Id": "E3BQ2LKHA3JQY", 
-                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E3BQ2LKHA3JQY", 
+                    "Id": "EVILVA5AIUTXI", 
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/EVILVA5AIUTXI", 
                     "Aliases": {
                         "Quantity": 0
                     }
@@ -113,13 +113,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "8976bba7-74c1-11e8-b003-49503e8160b1", 
+            "RequestId": "75212acd-7981-11e8-b962-9775d32c25d5", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "8976bba7-74c1-11e8-b003-49503e8160b1", 
+                "x-amzn-requestid": "75212acd-7981-11e8-b962-9775d32c25d5", 
                 "vary": "Accept-Encoding", 
-                "content-length": "2409", 
+                "content-length": "2410", 
                 "content-type": "text/xml", 
-                "date": "Wed, 20 Jun 2018 19:38:41 GMT"
+                "date": "Tue, 26 Jun 2018 20:42:35 GMT"
             }
         }
     }

@@ -199,52 +199,16 @@ class CloudFront(BaseTest):
         resp = client.list_distributions()
         self.assertEqual(resp["DistributionList"]["Items"][0]["Enabled"], False)
 
-    def test_distribution_check_s3_origin_exists_true(self):
-        factory = self.replay_flight_data("test_distribution_check_s3_origin_exists_true")
+    def test_distribution_check_s3_owner_same(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_owner_same")
 
         p = self.load_policy(
             {
-                "name": "distribution-check-s3-origin-exists-true",
+                "name": "test_distribution_check_s3_owner_same",
                 "resource": "distribution",
                 "filters": [
                     {
-                        "type": "check-origin",
-                        "origins": [
-                            "S3"
-                        ],
-                        "accounts_from": {
-                            "url": "s3://c7n-test-bucket/bucket_id",
-                            "format": "json",
-                            "expr": "*"
-                        }
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:s3-origin'])
-
-    def test_distribution_check_s3_origin_exists_false(self):
-        factory = self.replay_flight_data("test_distribution_check_s3_origin_exists_false")
-
-        p = self.load_policy(
-            {
-                "name": "distribution-check-s3-origin-exists-false",
-                "resource": "distribution",
-                "filters": [
-                    {
-                        "type": "check-origin",
-                        "origins": [
-                            "S3"
-                        ],
-                        "accounts_from": {
-                            "url": "s3://c7n-test-bucket/bucket_id",
-                            "format": "json",
-                            "expr": "*"
-                        }
+                        "type": "mismatch-s3-owner"
                     }
                 ]
             },
@@ -254,22 +218,16 @@ class CloudFront(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-    def test_distribution_check_custom_origin_exists_true(self):
-        factory = self.replay_flight_data("test_distribution_check_custom_origin_exists_true")
+    def test_distribution_check_s3_owner_different(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_owner_different")
 
         p = self.load_policy(
             {
-                "name": "distribution-check-custom-origin-exists-true",
+                "name": "test_distribution_check_s3_owner_different",
                 "resource": "distribution",
                 "filters": [
                     {
-                        "type": "check-origin",
-                        "origins": [
-                            "CUSTOM"
-                        ],
-                        "accounts": [
-                            "test-123.com"
-                        ]
+                        "type": "mismatch-s3-owner"
                     }
                 ]
             },
@@ -278,24 +236,19 @@ class CloudFront(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:target-origin'])
+        self.assertTrue(resources[0]['c7n:mismatch-s3-origin'])
 
-    def test_distribution_check_custom_origin_exists_false(self):
-        factory = self.replay_flight_data("test_distribution_check_custom_origin_exists_false")
+    def test_distribution_check_s3_owner_missing_bucket(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_owner_missing_bucket")
 
         p = self.load_policy(
             {
-                "name": "distribution-check-custom-origin-exists-false",
+                "name": "test_distribution_check_s3_owner_missing_bucket",
                 "resource": "distribution",
                 "filters": [
                     {
-                        "type": "check-origin",
-                        "origins": [
-                            "CUSTOM"
-                        ],
-                        "accounts": [
-                            "test-idontexist.com"
-                        ]
+                        "type": "mismatch-s3-owner",
+                        "include_missing_buckets": "True"
                     }
                 ]
             },
@@ -303,7 +256,28 @@ class CloudFront(BaseTest):
         )
 
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-missing'])
+
+    def test_distribution_check_s3_owner_access_denied(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_owner_access_denied")
+
+        p = self.load_policy(
+            {
+                "name": "test_distribution_check_s3_owner_access_denied",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "mismatch-s3-owner"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-access-denied'])
 
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
