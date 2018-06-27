@@ -25,7 +25,7 @@ class Session(object):
 
     def __init__(self, subscription_id=None):
         """
-        :param subscription_id: If provided, overrides environment variables.
+        :param subscription_id: If provided overrides environment variables.
 
         """
 
