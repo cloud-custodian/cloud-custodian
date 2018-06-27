@@ -14,7 +14,7 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
-from c7n_azure.session import Session
+from c7n.utils import local_session
 
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
@@ -67,9 +67,10 @@ class RoleDefinition(QueryResourceManager):
 class DescribeSource(DescribeSource):
 
     def get_resources(self, query):
-        s = Session()
+        s = local_session(self.manager.session_factory)
+        client = s.client('azure.mgmt.authorization.AuthorizationManagementClient')
         scope = '/subscriptions/%s' % (s.subscription_id)
-        resources = self.manager.get_client().role_definitions.list(scope)
+        resources = client.role_definitions.list(scope)
         return [r.serialize(True) for r in resources]
 
 
