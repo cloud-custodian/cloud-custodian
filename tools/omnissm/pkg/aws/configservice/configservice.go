@@ -17,7 +17,6 @@ package configservice
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"sync"
 
@@ -106,7 +105,6 @@ func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*
 	for k, v := range resources {
 		resourceKeys = append(resourceKeys, &configservice.ResourceKey{ResourceId: aws.String(k), ResourceType: aws.String(v)})
 	}
-	fmt.Printf("resourceKeys = %+v\n", resourceKeys)
 	var mu sync.Mutex
 	var g errgroup.Group
 	items := make([]*ConfigurationItem, 0)
