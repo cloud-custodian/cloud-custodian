@@ -17,9 +17,6 @@ from mock import MagicMock, patch
 
 
 class AccessControlTest(BaseTest):
-    mock_augmented_assignments = [
-
-    ]
     def setUp(self):
         super(AccessControlTest, self).setUp()
 
