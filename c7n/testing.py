@@ -27,7 +27,7 @@ import yaml
 from c7n import policy
 from c7n.schema import validate as schema_validate
 from c7n.ctx import ExecutionContext
-from c7n.utils import CONN_CACHE
+from c7n.utils import CONN_CACHE, local_session
 from c7n.config import Bag, Config
 
 C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
@@ -37,9 +37,14 @@ skip_if_not_validating = unittest.skipIf(
 )
 
 
+def fake_local_session(factory):
+    return factory()
+
+
 class TestUtils(unittest.TestCase):
 
     custodian_schema = None
+    local_session = fake_local_session
 
     def cleanUp(self):
         # Clear out thread local session cache
