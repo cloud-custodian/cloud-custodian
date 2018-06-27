@@ -69,6 +69,10 @@ type Config struct {
 	// The IAM role used for publishing to the Resource Deleted SNS topic (optional).
 	SNSPublishRole string `yaml:"snsPublishRole"`
 
+	//This is set by AWS when a Lambda instance is configured to use x-ray.
+	//This is optional and x-ray is currently only supported when using lambda.
+	XRayTracingEnabled string
+
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
 	roleMap              map[string]string
@@ -117,6 +121,7 @@ func ReadConfigFromEnv() *Config {
 		ResourceTags:            strings.Split(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
 		S3DownloadRole:          os.Getenv("OMNISSM_S3_DOWNLOAD_ROLE"),
 		SNSPublishRole:          os.Getenv("OMNISSM_SNS_PUBLISH_ROLE"),
+		XRayTracingEnabled:      os.Getenv("_X_AMZN_TRACE_ID"),
 	}
 	return c
 }

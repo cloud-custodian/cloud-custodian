@@ -59,9 +59,15 @@ func New(config *Config) (*OmniSSM, error) {
 			MessageGroupId: "omnissm-event-stream",
 			QueueName:      config.QueueName,
 		})
+
 		if err != nil {
 			return nil, errors.Wrap(err, "cannot initialize SQS")
 		}
 	}
+
+	if config.XRayTracingEnabled != "" {
+		SetupTracing(o)
+	}
+
 	return o, nil
 }
