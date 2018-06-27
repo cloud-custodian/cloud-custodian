@@ -185,7 +185,7 @@ class ResourceAccessFilter(Filter):
     def validate(self):
         if self.factory is None:
             raise FilterValidationError(
-                "The related resource is not a valid azure resource"
+                "The related resource is not a custodian supported azure resource"
             )
         if (self.data['relatedResource'] == 'azure.roleassignment' or
                 self.data['relatedResource'] == 'azure.roledefinition'):
