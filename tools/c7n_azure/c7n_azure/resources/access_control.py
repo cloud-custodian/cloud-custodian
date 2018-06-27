@@ -51,7 +51,7 @@ class RoleAssignment(QueryResourceManager):
     def augment(self, resources):
         s = local_session(Session)
         cred, sub_id = get_azure_cli_credentials(resource='https://graph.windows.net')
-        graph_client = GraphRbacManagementClient(cred, s.tenant_id)
+        graph_client = GraphRbacManagementClient(cred, s.get_tenant_id())
 
         object_ids = list(set(
             resource['properties']['principalId'] for resource in resources

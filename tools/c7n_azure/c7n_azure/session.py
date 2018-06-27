@@ -15,6 +15,7 @@
 import importlib
 import os
 import logging
+import jwt
 from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.cli.core._profile import Profile
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
@@ -37,6 +38,7 @@ class Session(object):
 
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
+        self._is_token_auth = False
 
         tenant_auth_variables = [
             'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
@@ -52,6 +54,7 @@ class Session(object):
                 })
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.log.info("Creating session with Token Authentication")
+            self._is_token_auth = True
 
         elif all(k in os.environ for k in tenant_auth_variables):
             # Tenant (service principal) authentication
@@ -106,3 +109,10 @@ class Session(object):
             api_version = versions[0] if versions else rt.api_versions[0]
             self._provider_cache[resource_type] = api_version
             return api_version
+
+    def get_tenant_id(self):
+        if self._is_token_auth:
+            decoded = jwt.decode(self.credentials['token']['access_token'], verify=False)
+            return decoded['tid']
+
+        return self.tenant_id
