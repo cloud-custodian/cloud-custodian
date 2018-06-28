@@ -48,6 +48,7 @@ func init() {
 	viper.AddConfigPath(".")
 
 	RootCmd.PersistentFlags().CountP("verbose", "v", "increase logging level (debug)")
+	RootCmd.PersistentFlags().String("env", "dev", "runtime `environment` (dev | qa | prod)")
 	viper.BindPFlags(RootCmd.PersistentFlags())
 }
 
