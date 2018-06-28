@@ -103,7 +103,6 @@ func ReadConfig(path string) (*Config, error) {
 	if err := yaml.Unmarshal(data, &c); err != nil {
 		return nil, errors.Wrap(err, "cannot unmarshal")
 	}
-	c.setDefaults()
 	MergeConfig(&c, ReadConfigFromEnv())
 	return &c, nil
 }
@@ -128,7 +127,7 @@ func ReadConfigFromEnv() *Config {
 func MergeConfig(config *Config, other *Config) {
 	if len(other.AccountWhitelist) > 0 {
 		config.AccountWhitelist = other.AccountWhitelist
-		config.authorizedAccountIds = make(map[string]struct{})
+		config.authorizedAccountIds = nil
 	}
 	if other.InstanceRole != "" {
 		config.InstanceRole = other.InstanceRole
@@ -147,7 +146,7 @@ func MergeConfig(config *Config, other *Config) {
 	}
 	if len(other.ResourceTags) > 0 {
 		config.ResourceTags = other.ResourceTags
-		config.resourceTags = make(map[string]struct{})
+		config.resourceTags = nil
 	}
 	if other.S3DownloadRole != "" {
 		config.S3DownloadRole = other.S3DownloadRole

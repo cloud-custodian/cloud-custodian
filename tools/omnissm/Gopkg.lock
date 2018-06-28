@@ -67,6 +67,27 @@
   version = "v1.13.51"
 
 [[projects]]
+  name = "github.com/aws/aws-xray-sdk-go"
+  packages = [
+    "header",
+    "internal/plugins",
+    "pattern",
+    "resources",
+    "strategy/ctxmissing",
+    "strategy/exception",
+    "strategy/sampling",
+    "xray"
+  ]
+  revision = "32670489212454717deeafb8da5dbb1da0299749"
+  version = "v0.9.4"
+
+[[projects]]
+  name = "github.com/cihub/seelog"
+  packages = ["."]
+  revision = "d2c6e5aa9fbfdd1c624e140287063c7730654115"
+  version = "v2.6"
+
+[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
@@ -281,6 +302,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "907564446680b8306a48b2293c529c6357d0c6a8d1a7189dc1dc2923dce84949"
+  inputs-digest = "d32c52836e203055c7e9af6f85bc7698ce8ff9c2b9a0a64f4c935543952063b2"
   solver-name = "gps-cdcl"
   solver-version = 1
