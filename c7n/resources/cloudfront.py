@@ -196,15 +196,22 @@ class MismatchS3Owner(Filter):
                 resource: distribution
                 filters:
                   - type: mismatch-s3-owner
-                    ignore_malconfigured_buckets: True
    """
 
     schema = type_schema(
-        'mismatch-s3-owner',
-        ignore_malconfigured_buckets={'type': 'boolean'})
+        'mismatch-s3-owner')
 
-    permissions = ('s3:GetBucketAcl',)
     retry = staticmethod(get_retry(('Throttling',)))
+
+    def is_s3_domain(self, domain_name):
+        if domain_name.endswith('.s3.amazonaws.com'):
+            return True
+        else:
+            return False
+
+    def get_s3_domain(self, domain_name):
+        if domain_name.endswith('.s3.amazonaws.com'):
+            return domain_name[:-len('.s3.amazonaws.com')]
 
     def process(self, resources, event=None):
         results = []
@@ -212,34 +219,20 @@ class MismatchS3Owner(Filter):
         s3_client = local_session(self.manager.session_factory).client(
             's3', region_name=self.manager.config.region)
 
-        canonical_id = s3_client.list_buckets()['Owner']['ID']
+        buckets = {b['Name'] for b in s3_client.list_buckets()['Buckets']}
 
         for r in resources:
             for x in r['Origins']['Items']:
-                try:
-                    if 'S3OriginConfig' in x:
-                        target_bucket = x['DomainName'].split('.', 1)[0]
-                        b = s3_client.get_bucket_acl(
-                            Bucket=target_bucket
-                        )
-                        self.log.debug("Target bucket %s exists." % target_bucket)
-                        if canonical_id != b['Owner']['ID']:
-                            self.log.debug("Bucket %s owner and Cloudfront %s owner do not match."
-                                           % (target_bucket, r['Id']))
-                            r['c7n:mismatch-s3-origin'] = True
-                            results.append(r)
-                        else:
-                            self.log.debug("Bucket %s owner and Cloudfront %s owner match."
-                                           % (target_bucket, r['Id']))
-                            r['c7n:mismatch-s3-origin'] = False
+                if 'S3OriginConfig' in x:
+                    target_bucket = x['DomainName'].split('.', 1)[0]
+                elif 'CustomOriginConfig' in x and self.is_s3_domain(x['DomainName']):
+                    target_bucket = self.get_s3_domain(x['DomainName'])
 
-                except ClientError as e:
-                    if e.response['Error']['Code'] == 'AccessDenied' \
-                            or e.response['Error']['Code'] == 'NoSuchBucket':
-                        self.log.debug("Target bucket %s: %s" % (target_bucket, e.message))
-                        if not self.data.get('ignore_malconfigured_buckets'):
-                            r['c7n:mismatch-s3-bucket-malconfigured'] = True
-                            results.append(r)
+                if target_bucket and target_bucket not in buckets:
+                    self.log.debug("Bucket %s not found in distribution %s hosting account."
+                                   % (target_bucket, r['Id']))
+                    r['c7n:mismatch-s3-origin'] = True
+                    results.append(r)
 
         return results
 

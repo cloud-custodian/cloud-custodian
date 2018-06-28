@@ -5,7 +5,7 @@
             "Marker": "", 
             "Items": [
                 {
-                    "Status": "InProgress", 
+                    "Status": "Deployed", 
                     "CacheBehaviors": {
                         "Quantity": 0
                     }, 
@@ -25,8 +25,8 @@
                                 "CustomHeaders": {
                                     "Quantity": 0
                                 }, 
-                                "Id": "S3-c7n-test-bucket", 
-                                "DomainName": "c7n-test-bucket.s3.amazonaws.com"
+                                "Id": "S3-c7n-idontexist",
+                                "DomainName": "c7n-idontexist.s3.amazonaws.com"
                             }
                         ], 
                         "Quantity": 1
@@ -89,14 +89,14 @@
                         "Quantity": 0
                     }, 
                     "LastModifiedTime": {
-                        "hour": 20, 
+                        "hour": 13, 
                         "__class__": "datetime", 
                         "month": 6, 
-                        "second": 49, 
-                        "microsecond": 69000, 
+                        "second": 12, 
+                        "microsecond": 629000, 
                         "year": 2018, 
-                        "day": 26, 
-                        "minute": 39
+                        "day": 27, 
+                        "minute": 25
                     }, 
                     "HttpVersion": "HTTP2", 
                     "Id": "EVILVA5AIUTXI", 
@@ -113,13 +113,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "75212acd-7981-11e8-b962-9775d32c25d5", 
+            "RequestId": "3a5b4017-7ae8-11e8-9c6e-eb665a123138", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "75212acd-7981-11e8-b962-9775d32c25d5", 
+                "x-amzn-requestid": "3a5b4017-7ae8-11e8-9c6e-eb665a123138", 
                 "vary": "Accept-Encoding", 
-                "content-length": "2410", 
+                "content-length": "2408", 
                 "content-type": "text/xml", 
-                "date": "Tue, 26 Jun 2018 20:42:35 GMT"
+                "date": "Thu, 28 Jun 2018 15:30:46 GMT"
             }
         }
     }

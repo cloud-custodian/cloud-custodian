@@ -199,45 +199,6 @@ class CloudFront(BaseTest):
         resp = client.list_distributions()
         self.assertEqual(resp["DistributionList"]["Items"][0]["Enabled"], False)
 
-    def test_distribution_check_s3_owner_same(self):
-        factory = self.replay_flight_data("test_distribution_check_s3_owner_same")
-
-        p = self.load_policy(
-            {
-                "name": "test_distribution_check_s3_owner_same",
-                "resource": "distribution",
-                "filters": [
-                    {
-                        "type": "mismatch-s3-owner"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
-
-    def test_distribution_check_s3_owner_different(self):
-        factory = self.replay_flight_data("test_distribution_check_s3_owner_different")
-
-        p = self.load_policy(
-            {
-                "name": "test_distribution_check_s3_owner_different",
-                "resource": "distribution",
-                "filters": [
-                    {
-                        "type": "mismatch-s3-owner"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:mismatch-s3-origin'])
-
     def test_distribution_check_s3_owner_missing_bucket(self):
         factory = self.replay_flight_data("test_distribution_check_s3_owner_missing_bucket")
 
@@ -248,7 +209,6 @@ class CloudFront(BaseTest):
                 "filters": [
                     {
                         "type": "mismatch-s3-owner",
-                        "include_missing_buckets": "True"
                     }
                 ]
             },
@@ -257,27 +217,7 @@ class CloudFront(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-malconfigured'])
-
-    def test_distribution_check_s3_owner_access_denied(self):
-        factory = self.replay_flight_data("test_distribution_check_s3_owner_access_denied")
-
-        p = self.load_policy(
-            {
-                "name": "test_distribution_check_s3_owner_access_denied",
-                "resource": "distribution",
-                "filters": [
-                    {
-                        "type": "mismatch-s3-owner"
-                    }
-                ]
-            },
-            session_factory=factory,
-        )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:mismatch-s3-bucket-malconfigured'])
+        self.assertTrue(resources[0]['c7n:mismatch-s3-origin'])
 
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
