@@ -32,9 +32,10 @@ setup(
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
     },
-    install_requires=["azure",
+    install_requires=["azure-mgmt",
+                      "azure-storage-blob",
+                      "azure-storage-queue",
                       "c7n",
-                      "click",
                       "azure-cli-core",
                       "adal~=0.5.0",
                       "backports.functools_lru_cache",
