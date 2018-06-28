@@ -69,8 +69,8 @@ type Config struct {
 	// The IAM role used for publishing to the Resource Deleted SNS topic (optional).
 	SNSPublishRole string `yaml:"snsPublishRole"`
 
-	//This is set by AWS when a Lambda instance is configured to use x-ray.
-	//This is optional and x-ray is currently only supported when using lambda.
+	// This is set by AWS when a Lambda instance is configured to use x-ray.
+	// This is optional and x-ray is currently only supported when using lambda.
 	XRayTracingEnabled string
 
 	authorizedAccountIds map[string]struct{}
