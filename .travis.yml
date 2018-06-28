@@ -3,6 +3,8 @@ dist: trusty
 sudo: false
 cache:
   pip: true
+env:
+  - C7N_TEST_WORKERS=8
 
 python:
   - "2.7"

@@ -25,6 +25,19 @@ class Session(object):
 
     def __init__(self, subscription_id=None):
         """
+        :param subscription_id: If provided overrides environment variables.
+
+        """
+
+        self.log = logging.getLogger('custodian.azure.session')
+        self._provider_cache = {}
+        self.subscription_id_override = subscription_id
+        self.credentials = None
+        self.subscription_id = None
+        self.tenant_id = None
+
+    def _initialize_session(self):
+        """
         Creates a session using available authentication type.
 
         Auth priority:
@@ -32,11 +45,11 @@ class Session(object):
         2. Tenant Auth
         3. Azure CLI Auth
 
-        :param subscription_id: If provided, overrides environment variables.
         """
 
-        self.log = logging.getLogger('custodian.azure.session')
-        self._provider_cache = {}
+        # Only run once
+        if self.credentials is not None:
+            return
 
         tenant_auth_variables = [
             'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
@@ -73,8 +86,8 @@ class Session(object):
             self.log.info("Creating session with Azure CLI Authentication")
 
         # Let provided id parameter override everything else
-        if subscription_id is not None:
-            self.subscription_id = subscription_id
+        if self.subscription_id_override is not None:
+            self.subscription_id = self.subscription_id_override
 
         self.log.info("Session using Subscription ID: %s" % self.subscription_id)
 
@@ -82,6 +95,7 @@ class Session(object):
             self.log.error('Unable to locate credentials for Azure session.')
 
     def client(self, client):
+        self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
