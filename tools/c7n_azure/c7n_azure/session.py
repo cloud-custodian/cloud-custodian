@@ -137,4 +137,3 @@ class Session(object):
         if self._is_cli_auth:
             return self.credentials._token_retriever()[1]
         return self.credentials.token['access_token']
-

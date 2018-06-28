@@ -188,9 +188,9 @@ class ResourceAccessFilter(Filter):
         }
         for resource in related_resources:
             url = (
-                    'https://management.azure.com%s/'
-                    'providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01'
-                    % (resource['id'])
+                'https://management.azure.com%s/'
+                'providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01'
+                % (resource['id'])
             )
             response = requests.get(url, headers=headers)
             results = response.json()
