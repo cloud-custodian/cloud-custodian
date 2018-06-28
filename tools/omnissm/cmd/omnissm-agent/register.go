@@ -37,7 +37,7 @@ var RegisterCmd = &cobra.Command{
 			switch env {
 			case "dev", "qa", "prod":
 			default:
-				log.Fatal().Msgf("unexpected env: %s", env)
+				log.Fatal().Msgf("invalid env provided: %#v", env)
 			}
 			region := ec2metadata.GetLocalInstanceRegion()
 			if region == "" {
