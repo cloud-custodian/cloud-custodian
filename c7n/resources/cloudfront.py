@@ -201,6 +201,7 @@ class MismatchS3Owner(Filter):
     schema = type_schema(
         'mismatch-s3-owner')
 
+    permissions = ('s3:ListBuckets',)
     retry = staticmethod(get_retry(('Throttling',)))
 
     def is_s3_domain(self, domain_name):
