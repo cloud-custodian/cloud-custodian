@@ -6,8 +6,8 @@ interactions:
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.0 msrest_azure/0.4.32 authorizationmanagementclient/0.30.0 Azure-SDK-For-Python]
+      User-Agent: [python/2.7.15 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.18.4
+          msrest/0.5.1 msrest_azure/0.4.33 authorizationmanagementclient/0.30.0 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01
@@ -51,23 +51,23 @@ interactions:
         03sP93fBk8pgt2mqUMGLy3VZ2nfNB5b1bkcYb0bv3ssPDu6ROtie7JK92N+jZatstkuZoAeT870H
         u5OHn+5/iOK8Ffhf8v1f8v8AuJddoj8kAAA=
     headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 27 Jun 2018 01:14:55 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Server: [Microsoft-IIS/10.0]
-      Set-Cookie: [x-ms-gateway-slice=productionb; path=/; secure; HttpOnly]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Powered-By: [ASP.NET]
-      x-ms-correlation-request-id: [9f90a241-c0a3-43b1-9c55-82084308be58]
-      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      cache-control: [no-cache]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 28 Jun 2018 21:08:50 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      server: [Microsoft-IIS/10.0]
+      set-cookie: [x-ms-gateway-slice=productionb; path=/; secure; HttpOnly]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [9df48b9c-3148-4543-a7a9-08f386db0e19]
+      x-ms-ratelimit-remaining-subscription-reads: ['14997']
       x-ms-request-charge: ['1']
-      x-ms-request-id: [7b6d2ab1-c6e5-447e-99c9-b779d1081efa]
-      x-ms-routing-request-id: ['WESTUS2:20180627T011456Z:9f90a241-c0a3-43b1-9c55-82084308be58']
+      x-ms-request-id: [a0b59352-2781-4812-9538-0ba820440db6]
+      x-ms-routing-request-id: ['WESTUS2:20180628T210850Z:9df48b9c-3148-4543-a7a9-08f386db0e19']
+      x-powered-by: [ASP.NET]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -76,8 +76,8 @@ interactions:
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.0 msrest_azure/0.4.32 computemanagementclient/3.0.1 Azure-SDK-For-Python]
+      User-Agent: [python/2.7.15 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.18.4
+          msrest/0.5.1 msrest_azure/0.4.33 computemanagementclient/3.0.1 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2017-03-30
@@ -116,34 +116,32 @@ interactions:
         n2xPdyc72/s72d72wUOi13728P75wcPZ+cN73AXx6bLlNx7snT88OJicbx98er67TcblfPvhbjbZ
         3qOocLazuzub7D+g6SFcqPHd/9fNDg1GrVPku1/y/V/y/wCBPvIG/Q4AAA==
     headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Length: ['1753']
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 27 Jun 2018 01:14:56 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [d5988547-991e-4dbc-8d87-a23dbc7bfa69]
-      x-ms-original-request-ids: [5013b54a-ce39-40b8-bb39-16f8bb0e0c8a, 4e09a877-6fca-4cc1-a94e-3306528f45bf]
-      x-ms-ratelimit-remaining-subscription-reads: ['14999']
-      x-ms-request-id: [d5988547-991e-4dbc-8d87-a23dbc7bfa69]
-      x-ms-routing-request-id: ['WESTUS2:20180627T011456Z:d5988547-991e-4dbc-8d87-a23dbc7bfa69']
+      cache-control: [no-cache]
+      content-encoding: [gzip]
+      content-length: ['1753']
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 28 Jun 2018 21:08:49 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [374e96c3-cb24-4e47-bc61-0f03ed8ffd27]
+      x-ms-original-request-ids: [85cc8320-1571-40f4-8d8b-b343e806b233, a388d5f0-8fe9-46d3-a50e-61a1f11a4ab7]
+      x-ms-ratelimit-remaining-subscription-reads: ['14996']
+      x-ms-request-id: [374e96c3-cb24-4e47-bc61-0f03ed8ffd27]
+      x-ms-routing-request-id: ['WESTUS2:20180628T210850Z:374e96c3-cb24-4e47-bc61-0f03ed8ffd27']
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
-      Accept: [application/json]
+      Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.0 msrest_azure/0.4.32 authorizationmanagementclient/0.30.0 Azure-SDK-For-Python]
-      accept-language: [en-US]
+      Content-type: [application/json]
+      User-Agent: [python-requests/2.18.4]
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/ANZOLOCH-TEST-VM/providers/Microsoft.Compute/virtualMachines/anzoloch-test-vm/providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ANZOLOCH-TEST-VM/providers/Microsoft.Compute/virtualMachines/anzoloch-test-vm/providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01
   response:
     body:
       string: !!binary |
@@ -182,36 +180,34 @@ interactions:
         5LHnYFOFCl5brsvSvms+sKx1O8J4M3r3Xn5wcI/s0/Zkl8Rjf4+y9NlslwLfB5PzvQe7k4ef7n8I
         n9wK/C/5/i/5fwCtqFRlLiEAAA==
     headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 27 Jun 2018 01:14:57 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Server: [Microsoft-IIS/10.0]
-      Set-Cookie: [x-ms-gateway-slice=productionb; path=/; secure; HttpOnly]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Powered-By: [ASP.NET]
-      x-ms-correlation-request-id: [da0121fe-1aa5-4f08-8734-fb6ef8eb70b4]
-      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      cache-control: [no-cache]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 28 Jun 2018 21:08:51 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      server: [Microsoft-IIS/10.0]
+      set-cookie: [x-ms-gateway-slice=productionb; path=/; secure; HttpOnly]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [a3e28092-bc37-4030-a70c-d6f0a05e1d35]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
       x-ms-request-charge: ['1']
-      x-ms-request-id: [ab56383d-786f-4c9d-8aa9-10a11dc0a9c6]
-      x-ms-routing-request-id: ['WESTUS2:20180627T011457Z:da0121fe-1aa5-4f08-8734-fb6ef8eb70b4']
+      x-ms-request-id: [e244aa6b-8d52-407c-a095-f3fd49b37de7]
+      x-ms-routing-request-id: ['WESTUS2:20180628T210851Z:a3e28092-bc37-4030-a70c-d6f0a05e1d35']
+      x-powered-by: [ASP.NET]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
-      Accept: [application/json]
+      Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.0 msrest_azure/0.4.32 authorizationmanagementclient/0.30.0 Azure-SDK-For-Python]
-      accept-language: [en-US]
+      Content-type: [application/json]
+      User-Agent: [python-requests/2.18.4]
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/ANDY-PYTHON-FUNC/providers/Microsoft.Compute/virtualMachines/function-test-host/providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ANDY-PYTHON-FUNC/providers/Microsoft.Compute/virtualMachines/function-test-host/providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01
   response:
     body:
       string: !!binary |
@@ -252,22 +248,22 @@ interactions:
         j+h/lCre+/TTew/3d8FzykC3aapQwWvLdVnad80HlrVuRxhvRu/eyw8O7pF92p7sknjs71GWPpvt
         UuD7YHK+92B38vDT/Q/hk1uB/yXf/yX/D0gGxMg/JAAA
     headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 27 Jun 2018 01:14:56 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Server: [Microsoft-IIS/10.0]
-      Set-Cookie: [x-ms-gateway-slice=productionb; path=/; secure; HttpOnly]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Powered-By: [ASP.NET]
-      x-ms-correlation-request-id: [c08807c4-0c4f-4f55-90e1-05c8b6d48b6f]
-      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      cache-control: [no-cache]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 28 Jun 2018 21:08:51 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      server: [Microsoft-IIS/10.0]
+      set-cookie: [x-ms-gateway-slice=productionb; path=/; secure; HttpOnly]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [7fd73a81-ead7-401c-b22c-b36f814814a0]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
       x-ms-request-charge: ['1']
-      x-ms-request-id: [a0b917d9-070b-4af1-84c0-a23d55bfcff6]
-      x-ms-routing-request-id: ['WESTUS2:20180627T011457Z:c08807c4-0c4f-4f55-90e1-05c8b6d48b6f']
+      x-ms-request-id: [d0115d17-16fa-4a1d-b4eb-b5d613eceb99]
+      x-ms-routing-request-id: ['WESTUS2:20180628T210851Z:7fd73a81-ead7-401c-b22c-b36f814814a0']
+      x-powered-by: [ASP.NET]
     status: {code: 200, message: OK}
 version: 1

@@ -37,6 +37,7 @@ class Session(object):
         self.subscription_id = None
         self.tenant_id = None
         self._is_token_auth = False
+        self._is_cli_auth = False
 
     def _initialize_session(self):
         """
@@ -82,6 +83,7 @@ class Session(object):
 
         else:
             # Azure CLI authentication
+            self._is_cli_auth = True
             (self.credentials,
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
@@ -130,3 +132,9 @@ class Session(object):
             return decoded['tid']
 
         return self.tenant_id
+
+    def get_bearer_token(self):
+        if self._is_cli_auth:
+            return self.credentials._token_retriever()[1]
+        return self.credentials.token['access_token']
+

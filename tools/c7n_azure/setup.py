@@ -35,11 +35,13 @@ setup(
     install_requires=["azure-mgmt",
                       "azure-graphrbac",
                       "azure-storage-blob",
-                      "azure-storage-queue",
+                      "azure-storage-queue"
+                      "requests",
                       "c7n",
                       "azure-cli-core",
                       "adal~=0.5.0",
                       "backports.functools_lru_cache",
-                      "futures==3.1.1"],
+                      "futures==3.1.1",
+                      "PyJWT"],
 
 )

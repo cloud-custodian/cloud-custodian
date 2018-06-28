@@ -11,27 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import requests
 from azure.common.credentials import get_azure_cli_credentials
 from azure.graphrbac import GraphRbacManagementClient
 from azure.graphrbac.models import GetObjectsParameters
-from c7n_azure.provider import resources, Azure
-from c7n_azure.query import QueryResourceManager
-from c7n_azure.session import Session
-from c7n_azure.utils import ResourceIdParser
-from c7n.filters import FilterValidationError
-
+from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
-from c7n.utils import local_session
+from c7n_azure.session import Session
 
 from c7n.actions import BaseAction
-from c7n.handler import Config
+from c7n.ctx import ExecutionContext
+from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.filters.related import RelatedResourceFilter
-from c7n.utils import local_session
+from c7n.handler import Config
 from c7n.query import sources
+from c7n.utils import local_session
 from c7n.utils import type_schema
-from c7n.ctx import ExecutionContext
 
 
 @resources.register('roleassignment')
@@ -183,18 +180,21 @@ class ResourceAccessFilter(Filter):
 
     def process(self, resources, event=None):
         related_resources = self.get_related()
-        s = Session()
-        client = s.client('azure.mgmt.authorization.AuthorizationManagementClient')
+        s = local_session(self.manager.session_factory)
         assignment_ids = []
+        headers = {
+            'Content-type': 'application/json',
+            'Authorization': 'Bearer %s' % (s.get_bearer_token())
+        }
         for resource in related_resources:
-            results = client.role_assignments.list_for_resource(
-                ResourceIdParser.get_resource_group(resource['id']),
-                ResourceIdParser.get_namespace(resource['id']),
-                '',
-                ResourceIdParser.get_resource_type(resource['id']),
-                resource['name'])
-
-            assignment_ids.extend([r.serialize(True)['id'] for r in results])
+            url = (
+                    'https://management.azure.com%s/'
+                    'providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01'
+                    % (resource['id'])
+            )
+            response = requests.get(url, headers=headers)
+            results = response.json()
+            assignment_ids.extend([r['id'] for r in results['value']])
 
         assignment_ids = list(set(assignment_ids))
         return [r for r in resources if r['id'] in assignment_ids]
