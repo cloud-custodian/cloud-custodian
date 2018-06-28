@@ -373,7 +373,7 @@ class Time(Filter):
             value = ""  # take the defaults
 
         # Resource opt out, track and record
-        if 'off' == value:
+        if 'off' == value.lower():
             self.opted_out.append(i)
             return False
         else:
