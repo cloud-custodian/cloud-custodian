@@ -170,7 +170,10 @@ func main() {
 
 		for {
 			select {
-			case m := <-messages:
+			case m, ok := <-messages:
+				if !ok {
+					return nil
+				}
 				if err := processDeferredActionMessage(m); err != nil {
 					log.Info().Err(err).Interface("message", m).Msg("processing DeferredActionMessage failed")
 				}
