@@ -15,12 +15,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 
-from botocore.exceptions import ClientError
-
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
-from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.tags import universal_augment
 from c7n.utils import generate_arn, local_session, type_schema, get_retry
@@ -236,6 +233,7 @@ class MismatchS3Owner(Filter):
                     results.append(r)
 
         return results
+
 
 @Distribution.action_registry.register('set-waf')
 class SetWaf(BaseAction):
