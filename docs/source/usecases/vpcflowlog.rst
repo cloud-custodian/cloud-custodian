@@ -1,6 +1,6 @@
 .. _accountaccountflowlog:
 
-Account - Flow Log Configuration Check
+VPC - Flow Log Configuration Check
 ======================================
 
 The following example policy will find any VPC Flow Log in your region that is
@@ -15,8 +15,8 @@ https://aws.amazon.com/blogs/aws/cloudwatch-logs-subscription-consumer-elasticse
 .. code-block:: yaml
 
    policies:
-     - name: account-flow-log-check
-       resource: account
+     - name: vpc-flow-log-check
+       resource: vpc
        filters:
          - not:
               - type: flow-logs
