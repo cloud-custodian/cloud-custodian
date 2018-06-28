@@ -71,7 +71,7 @@ type Config struct {
 
 	// This is set by AWS when a Lambda instance is configured to use x-ray.
 	// This is optional and x-ray is currently only supported when using lambda.
-	XRayTracingEnabled string
+	XRayTracingEnabled string `yaml:"xrayTracingEnabled"`
 
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
