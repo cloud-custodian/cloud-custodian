@@ -226,7 +226,7 @@ class MismatchS3Owner(Filter):
                 elif 'CustomOriginConfig' in x and self.is_s3_domain(x['DomainName']):
                     target_bucket = self.get_s3_domain(x['DomainName'])
 
-                if target_bucket and target_bucket not in buckets:
+                if 'target_bucket' in locals() and target_bucket not in buckets:
                     self.log.debug("Bucket %s not found in distribution %s hosting account."
                                    % (target_bucket, r['Id']))
                     r['c7n:mismatch-s3-origin'] = True
