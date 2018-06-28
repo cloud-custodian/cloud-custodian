@@ -15,6 +15,9 @@
 package main
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,14 +33,17 @@ var RegisterCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		url := viper.GetString("register_endpoint")
 		if url == "" {
-			endpoints := viper.GetStringMapString("register_endpoints")
-			if endpoints != nil {
-				region := ec2metadata.GetLocalInstanceRegion()
-				if region == "" {
-					log.Fatal().Msg("unable to determine instance region from metadata")
-				}
-				url = endpoints[region]
+			env := strings.ToLower(viper.GetString("env"))
+			switch env {
+			case "dev", "qa", "prod":
+			default:
+				log.Fatal().Msgf("unexpected env: %s", env)
 			}
+			region := ec2metadata.GetLocalInstanceRegion()
+			if region == "" {
+				log.Fatal().Msg("unable to determine instance region from metadata")
+			}
+			url = viper.GetString(fmt.Sprintf("register_endpoints.%s.%s", env, region))
 		}
 		if url == "" {
 			log.Fatal().Msg("registration url (OMNISSM_REGISTER_ENDPOINT) cannot be blank")
