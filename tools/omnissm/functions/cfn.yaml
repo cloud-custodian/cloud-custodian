@@ -19,6 +19,7 @@ Resources:
       Environment:
         Variables:
           OMNISSM_REGISTRATIONS_TABLE: !Ref RegistrationsTable
+      Tracing: Active
       Events:
         Periodically:
           Type: Schedule
@@ -38,6 +39,7 @@ Resources:
         Variables:
           OMNISSM_REGISTRATIONS_TABLE: !Ref RegistrationsTable
           OMNISSM_ACCOUNT_WHITELIST: !Join [ ",", !Ref AccountIDs ]
+      Tracing: Active
       Events:
         RegisterInstance:
           Type: Api
@@ -60,6 +62,7 @@ Resources:
         App: OmniSSM
       CodeUri: "."
       Role: arn:aws:iam::644160558196:role/CloudCustodianRole
+      Tracing: Active
       Events:
         ConfigFeed:
           Type: CloudWatchEvent
@@ -83,6 +86,7 @@ Resources:
       Environment:
         Variables:
           OMNISSM_REGISTRATIONS_TABLE: !Ref RegistrationsTable
+      Tracing: Active
       Events:
         Periodically:
           Type: Schedule
