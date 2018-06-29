@@ -426,7 +426,7 @@ class ValueFilter(Filter):
     def match(self, i):
         if self.v is None and len(self.data) == 1:
             [(self.k, self.v)] = self.data.items()
-        elif self.v is None:
+        elif self.v is None and not hasattr(self, 'content_initialized'):
             self.k = self.data.get('key')
             self.op = self.data.get('op')
             if 'value_from' in self.data:
@@ -434,6 +434,7 @@ class ValueFilter(Filter):
                 self.v = values.get_values()
             else:
                 self.v = self.data.get('value')
+            self.content_initialized = True
             self.vtype = self.data.get('value_type')
 
         if i is None:
