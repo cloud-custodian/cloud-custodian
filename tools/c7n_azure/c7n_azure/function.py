@@ -20,7 +20,6 @@ from os.path import dirname, join
 sys.path.append(dirname(dirname(__file__)))
 
 from c7n_azure import handler, entry
-import azure.functions as func
 
 def main(input):
     logging.info("Running Azure Cloud Custodian Policy")
