@@ -52,6 +52,9 @@ Tags
       Setting the space value to 0 removes all tags but those
       listed to preserve.
 
+      .. c7n-schema:: TagTrim
+            :module: c7n_azure.actions
+
       .. code-block:: yaml
 
           - policies:
@@ -82,13 +85,15 @@ Tags
                     - downtime
                     - custodian_status
 
-      .. c7n-schema:: TagTrim
-            :module: c7n_azure.actions
+
 
 ``DeleteAction``
       Perform delete operation on any ARM resource. Can be used with 
       generic resource type `armresource` or on any other more specific
       ARM resource type supported by Cloud Custodian.
+
+      .. c7n-schema:: DeleteAction
+            :module: c7n_azure.actions
 
       .. code-block:: yaml
 
@@ -118,6 +123,3 @@ Tags
                    op: in
                 actions:
                  - type: delete
-
-      .. c7n-schema:: DeleteAction
-            :module: c7n_azure.actions
