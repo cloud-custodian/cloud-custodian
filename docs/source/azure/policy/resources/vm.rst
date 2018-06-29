@@ -47,12 +47,6 @@ Actions
   .. c7n-schema:: VmRestartAction
         :module: c7n_azure.resources.vm 
 
-``delete``
-  Delete the VMs
-
-  .. c7n-schema:: VmDeleteAction
-      :module: c7n_azure.resources.vm 
-
 Example Policies
 ----------------
 
