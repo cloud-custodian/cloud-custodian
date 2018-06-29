@@ -59,7 +59,7 @@ class MessageQueue(BaseTest):
         self.assertTrue('c7n.metrics' in resources[0])
 
     def test_delete_mq(self):
-        factory = self.record_flight_data("test_mq_delete")
+        factory = self.replay_flight_data("test_mq_delete")
         p = self.load_policy(
             {
                 "name": "mqdel",

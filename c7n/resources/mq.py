@@ -74,5 +74,3 @@ class Delete(Action):
                 client.delete_broker(BrokerId=r['BrokerId'])
             except client.exceptions.NotFoundException:
                 continue
-
-
