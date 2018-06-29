@@ -99,20 +99,3 @@ class VmRestartAction(BaseAction):
     def process(self, vms):
         for vm in vms:
             self.restart(vm['resourceGroup'], vm['name'])
-
-
-@VirtualMachine.action_registry.register('delete')
-class VmDeleteAction(BaseAction):
-
-    schema = type_schema('delete')
-
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmDeleteAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def delete(self, resource_group, vm_name):
-        self.client.virtual_machines.delete(resource_group, vm_name)
-
-    def process(self, vms):
-        for vm in vms:
-            self.delete(vm['resourceGroup'], vm['name'])
