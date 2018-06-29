@@ -146,7 +146,7 @@ class VMTest(BaseTest):
 
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
-    @patch('c7n_azure.resources.vm.VmDeleteAction.delete')
+    @patch('c7n_azure.actions.DeleteAction.process', return_value='')
     def test_delete(self, delete_action_mock, filter_mock):
 
         p = self.load_policy({
@@ -168,9 +168,7 @@ class VMTest(BaseTest):
             ]
         })
         p.run()
-        delete_action_mock.assert_called_with(
-            self.fake_running_vms[0]['resourceGroup'],
-            self.fake_running_vms[0]['name'])
+        delete_action_mock.assert_called_with(self.fake_running_vms)
 
     @arm_template('vm.json')
     def test_find_vm_with_public_ip(self):
