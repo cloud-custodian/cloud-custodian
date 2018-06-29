@@ -175,3 +175,53 @@ class ArmResourceTest(BaseTest):
                  'op': 'lt'}],
         }
         self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+
+    fake_arm_resources = [
+        {
+            'id': '/subscriptions/fake-guid/resourceGroups/test-resource-group/providers/'
+                  'Microsoft.Network/networkSecurityGroups/test-nsg-delete',
+            'name': 'test-nsg-delete'
+        }
+    ]
+
+    @patch('c7n_azure.query.ResourceQuery.filter',
+        return_value=fake_arm_resources)
+    @patch('c7n_azure.actions.DeleteAction.process',
+        return_value='')
+    def test_delete_armresource(self, delete_action_mock, filter_mock):
+        p = self.load_policy({
+            'name': 'delete-arm-resource',
+            'resource': 'azure.armresource',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'test-nsg-delete'}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        })
+        p.run()
+        delete_action_mock.assert_called_with([self.fake_arm_resources[0]])
+
+    @patch('c7n_azure.query.ResourceQuery.filter',
+        return_value=fake_arm_resources)
+    @patch('c7n_azure.actions.DeleteAction.process',
+        return_value='')
+    def test_delete_armresource_specific_name(self, delete_action_mock, filter_mock):
+        p = self.load_policy({
+            'name': 'delete-arm-resource',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'test-nsg-delete'}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        })
+        p.run()
+        delete_action_mock.assert_called_with([self.fake_arm_resources[0]])
