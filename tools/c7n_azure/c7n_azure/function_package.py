@@ -1,3 +1,17 @@
+# Copyright 2018 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import sys
 import fnmatch
@@ -76,21 +90,24 @@ class FunctionPackage(object):
                 }]
             }
 
-        if self.policy['mode']['type'] == 'azure-periodic':
-            config['bindings'][0]['type'] = 'timerTrigger'
-            config['bindings'][0]['name'] = 'timer'
-            config['bindings'][0]['schedule'] = self.policy['mode']['schedule']
+        mode_type = self.policy['mode']['type']
+        binding = config['bindings'][0]
 
-        elif self.policy['mode']['type'] == 'azure-stream':
-            config['bindings'][0]['type'] = 'eventHubTrigger'
-            config['bindings'][0]['name'] = 'event'
-            config['bindings'][0]['eventHubName'] = 'eventHubName'
-            config['bindings'][0]['consumerGroup'] = 'consumerGroup'
-            config['bindings'][0]['connection'] = 'name_of_app_setting_with_read_conn_string'
+        if mode_type == 'azure-periodic':
+            binding['type'] = 'timerTrigger'
+            binding['name'] = 'timer'
+            binding['schedule'] = self.policy['mode']['schedule']
+
+        elif mode_type == 'azure-stream':
+            binding['type'] = 'eventHubTrigger'
+            binding['name'] = 'event'
+            binding['eventHubName'] = 'eventHubName'
+            binding['consumerGroup'] = 'consumerGroup'
+            binding['connection'] = 'name_of_app_setting_with_read_conn_string'
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"
-                           % self.policy['mode']['type'])
+                           % mode_type)
 
         self.pkg.add_contents(dest=self.policy['name'] + '/function.json',
                               contents=json.dumps(config))
@@ -106,7 +123,7 @@ class FunctionPackage(object):
         self.pkg.add_modules('cffi')
 
         # Add native libraries that are missing
-        site_pkg = FunctionPackage.get_site_packages()[0]
+        site_pkg = FunctionPackage._get_site_packages()[0]
 
         # linux
         platform = sys.platform
@@ -177,7 +194,7 @@ class FunctionPackage(object):
         self.pkg.close()
 
     @staticmethod
-    def get_site_packages():
+    def _get_site_packages():
         """Returns a list containing all global site-packages directories
         (and possibly site-python).
         For each directory present in the global ``PREFIXES``, this function

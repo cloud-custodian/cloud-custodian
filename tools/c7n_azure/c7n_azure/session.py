@@ -36,6 +36,7 @@ class Session(object):
         self.credentials = None
         self.subscription_id = None
         self.tenant_id = None
+        self.authorization_file = authorization_file
 
     def _initialize_session(self):
         """
@@ -58,8 +59,8 @@ class Session(object):
         ]
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
 
-        if authorization_file:
-            self.credentials, self.subscription_id = self.load_auth_file(authorization_file)
+        if self.authorization_file:
+            self.credentials, self.subscription_id = self.load_auth_file(self.authorization_file)
             self.log.info("Creating session with authorization file")
 
         elif all(k in os.environ for k in token_auth_variables):
