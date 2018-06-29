@@ -203,13 +203,9 @@ class MismatchS3Owner(Filter):
 
     def is_s3_domain(self, domain_name):
         if domain_name.endswith('.s3.amazonaws.com'):
-            return True
-        else:
-            return False
-
-    def get_s3_domain(self, domain_name):
-        if domain_name.endswith('.s3.amazonaws.com'):
             return domain_name[:-len('.s3.amazonaws.com')]
+
+        return False
 
     def process(self, resources, event=None):
         results = []
@@ -224,7 +220,7 @@ class MismatchS3Owner(Filter):
                 if 'S3OriginConfig' in x:
                     target_bucket = x['DomainName'].split('.', 1)[0]
                 elif 'CustomOriginConfig' in x and self.is_s3_domain(x['DomainName']):
-                    target_bucket = self.get_s3_domain(x['DomainName'])
+                    target_bucket = self.is_s3_domain(x['DomainName'])
 
                 if 'target_bucket' in locals() and target_bucket not in buckets:
                     self.log.debug("Bucket %s not found in distribution %s hosting account."
