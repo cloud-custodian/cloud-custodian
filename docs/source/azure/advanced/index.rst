@@ -18,3 +18,10 @@ across subscriptions, see
 
 **Note**: There are pending issues with running C7N-Org on Windows. It may be required to
 use the ``--debug`` flag when running on Windows.
+
+.. toctree::
+  :maxdepth: 2
+  :titlesonly:
+  :glob:
+
+  azurefunctions
