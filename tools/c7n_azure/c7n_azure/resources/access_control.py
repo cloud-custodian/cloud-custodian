@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import requests
 from azure.common.credentials import get_azure_cli_credentials
 from azure.graphrbac import GraphRbacManagementClient
 from azure.graphrbac.models import GetObjectsParameters
@@ -23,7 +22,7 @@ from c7n_azure.session import Session
 from c7n.actions import BaseAction
 from c7n.ctx import ExecutionContext
 from c7n.filters import FilterValidationError
-from c7n.filters import ValueFilter, Filter
+from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.handler import Config
 from c7n.query import sources
@@ -144,7 +143,7 @@ class RoleFilter(RelatedResourceFilter):
 
 
 @RoleAssignment.filter_registry.register('resource-access')
-class ResourceAccessFilter(Filter):
+class ResourceAccessFilter(RelatedResourceFilter):
     """Filters role assignments that have access to a certain
     type of azure resource.
 
@@ -163,6 +162,7 @@ class ResourceAccessFilter(Filter):
     schema = type_schema(
         'resource-access',
         relatedResource={'type': 'string'},
+        rinherit=RelatedResourceFilter.schema,
         required=['relatedResource']
     )
 
@@ -172,32 +172,27 @@ class ResourceAccessFilter(Filter):
         self.factory = Azure.resources.get(
             resource_type.rsplit('.', 1)[-1])
 
-    def get_related(self):
+    def get_related_ids(self, resources, related):
+        related_ids = []
+        for r in related:
+            for resource in resources:
+                if resource['properties']['scope'] in r:
+                    related_ids.append(r)
+                    continue
+
+        return related_ids
+
+    def get_related(self, resources):
         ctx = ExecutionContext(local_session(Session), self.data, Config.empty())
-
         manager = self.factory(ctx, self.data)
-        return manager.source.get_resources(None)
+        related = manager.source.get_resources(None)
+        return {r['id']: r for r in related}
 
-    def process(self, resources, event=None):
-        related_resources = self.get_related()
-        s = local_session(self.manager.session_factory)
-        assignment_ids = []
-        headers = {
-            'Content-type': 'application/json',
-            'Authorization': 'Bearer %s' % (s.get_bearer_token())
-        }
-        for resource in related_resources:
-            url = (
-                'https://management.azure.com%s/'
-                'providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01'
-                % (resource['id'])
-            )
-            response = requests.get(url, headers=headers)
-            results = response.json()
-            assignment_ids.extend([r['id'] for r in results['value']])
+    def process_resource(self, resource, related):
+        if not self.data.get('key'):
+            return resource
 
-        assignment_ids = list(set(assignment_ids))
-        return [r for r in resources if r['id'] in assignment_ids]
+        return super(ResourceAccessFilter, self).process_resource(resource, related)
 
     def validate(self):
         if self.factory is None:

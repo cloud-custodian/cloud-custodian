@@ -61,6 +61,24 @@ azure.roleassignments or azure.roledefinitions.
             - type: resource-access
               relatedResource: azure.vm
 
+Return all assignments with the Owner role that have access to virtual machines in westus2:
+
+.. code-block:: yaml
+
+    policies:
+       - name: assignment-by-role-and-resource
+         resource: azure.roleassignment
+         filters:
+            - type: role
+              key: properties.roleName
+              op: eq
+              value: Owner
+            - type: resource-access
+              relatedResource: azure.vm
+              key: location
+              op: eq
+              value: westus2
+
 Return assignments with the principal name custodian@example.com:
 
 .. code-block:: yaml

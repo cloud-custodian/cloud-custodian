@@ -44,7 +44,7 @@ class RelatedResourceFilter(ValueFilter):
                 "%s Filter requires resource manager spec" % name)
         return super(RelatedResourceFilter, self).validate()
 
-    def get_related_ids(self, resources):
+    def get_related_ids(self, resources, related=None):
         return set(jmespath.search(
             "[].%s" % self.RelatedIdsExpression, resources))
 
@@ -66,7 +66,7 @@ class RelatedResourceFilter(ValueFilter):
         return manager_class(self.manager.ctx, {})
 
     def process_resource(self, resource, related):
-        related_ids = self.get_related_ids([resource])
+        related_ids = self.get_related_ids([resource], related)
         model = self.manager.get_model()
         op = self.data.get('operator', 'or')
         found = []
