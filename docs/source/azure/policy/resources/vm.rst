@@ -1,7 +1,7 @@
 .. _azure_vm:
 
 Virtual Machines
-================
+=================
 
 Filters
 -------
@@ -41,12 +41,6 @@ Actions
   .. c7n-schema:: VmRestartAction
         :module: c7n_azure.resources.vm 
 
-``delete``
-  Delete the VMs
-
-  .. c7n-schema:: VmDeleteAction
-      :module: c7n_azure.resources.vm 
-
 Example Policies
 ----------------
 
@@ -85,19 +79,3 @@ Restart all VMs
         resource: azure.vm
         actions:
           - type: restart
-
-Delete specific VM by name
-
-.. code-block:: yaml
-
-    policies:
-      - name: stop-running-vms
-        resource: azure.vm
-        filters:
-          - type: value
-            key: name
-            op: eq
-            value_type: normalize
-            value: fake_vm_name
-        actions:
-          - type: delete
