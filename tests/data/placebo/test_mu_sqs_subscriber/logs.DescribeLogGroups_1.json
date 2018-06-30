@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/c7n-hello-sqs",
+                "creationTime": 1530281121546,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/c7n-hello-sqs:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "aeee679c-7ba5-11e8-a3c4-ed07ccc24f7b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "aeee679c-7ba5-11e8-a3c4-ed07ccc24f7b",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "209",
+                "date": "Fri, 29 Jun 2018 14:06:56 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

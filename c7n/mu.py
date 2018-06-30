@@ -1177,6 +1177,64 @@ class CloudWatchLogSubscription(object):
                     raise
 
 
+class SQSSubscription(object):
+    """ Subscribe a lambda to one or more SQS queues.
+    """
+
+    def __init__(self, session_factory, queue_arns, batch_size=10):
+        self.queue_arns = queue_arns
+        self.session_factory = session_factory
+        self.batch_size = batch_size
+
+    def add(self, func):
+        client = local_session(self.session_factory).client('lambda')
+        event_mappings = {
+            m['EventSourceArn']: m for m in client.list_event_source_mappings(
+                FunctionName=func.name).get('EventSourceMappings', ())}
+
+        modified = False
+        for queue_arn in self.queue_arns:
+            mapping = None
+            if queue_arn in event_mappings:
+                mapping = event_mappings[queue_arn]
+                if (mapping['State'] == 'Enabled' or
+                        mapping['BatchSize'] != self.batch_size):
+                    continue
+                modified = True
+            else:
+                modified = True
+
+            if not modified:
+                return modified
+
+            if mapping is not None:
+                log.info(
+                    "Updating subscription %s on %s", func.name, queue_arn)
+                client.update_event_source_mapping(
+                    UUID=mapping['UUID'],
+                    Enabled=True,
+                    BatchSize=self.batch_size)
+            else:
+                log.info("Subscribing %s to %s", func.name, queue_arn)
+                client.create_event_source_mapping(
+                    FunctionName=func.name,
+                    EventSourceArn=queue_arn,
+                    BatchSize=self.batch_size)
+            return modified
+
+    def remove(self, func):
+        client = local_session(self.session_factory).client('lambda')
+        event_mappings = {
+            m['EventSourceArn']: m for m in client.list_event_source_mappings(
+                FunctionName=func.name).get('EventSourceMappings', ())}
+
+        for queue_arn in self.queue_arns:
+            if queue_arn not in event_mappings:
+                continue
+            client.delete_event_source_mapping(
+                UUID=event_mappings[queue_arn]['UUID'])
+
+
 class SNSSubscription(object):
     """ Subscribe a lambda to one or more SNS topics.
     """
@@ -1186,8 +1244,6 @@ class SNSSubscription(object):
     def __init__(self, session_factory, topic_arns):
         self.topic_arns = topic_arns
         self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('sns')
 
     @staticmethod
     def _parse_arn(arn):
@@ -1197,7 +1253,8 @@ class SNSSubscription(object):
         return region, topic_name, statement_id
 
     def add(self, func):
-        lambda_client = self.session.client('lambda')
+        session = local_session(self.session_factory)
+        lambda_client = session.client('lambda')
         for arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(arn)
 
@@ -1218,12 +1275,16 @@ class SNSSubscription(object):
                 if e.response['Error']['Code'] != 'ResourceConflictException':
                     raise
 
-            # Subscribe the lambda to the topic.
-            topic = self.session.resource('sns').Topic(arn)
-            topic.subscribe(Protocol='lambda', Endpoint=func.arn)  # idempotent
+            # Subscribe the lambda to the topic, idempotent
+            sns_client = session.client('sns')
+            sns_client.subscribe(
+                TopicArn=arn, Protocol='lambda', Endpoint=func.arn)
 
     def remove(self, func):
-        lambda_client = self.session.client('lambda')
+        session = local_session(self.session_factory)
+        lambda_client = session.client('lambda')
+        sns_client = session.client('sns')
+
         for topic_arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(topic_arn)
 
@@ -1236,7 +1297,7 @@ class SNSSubscription(object):
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
                     raise
 
-            paginator = self.client.get_paginator('list_subscriptions_by_topic')
+            paginator = sns_client.get_paginator('list_subscriptions_by_topic')
 
             class Done(Exception):
                 pass
@@ -1246,7 +1307,7 @@ class SNSSubscription(object):
                         if subscription['Endpoint'] != func.arn:
                             continue
                         try:
-                            response = self.client.unsubscribe(
+                            response = sns_client.unsubscribe(
                                 SubscriptionArn=subscription['SubscriptionArn'])
                             log.debug("Unsubscribed %s from %s" %
                                 (func.name, topic_name))
