@@ -51,8 +51,9 @@ class RoleAssignment(QueryResourceManager):
 
     def augment(self, resources):
         s = local_session(self.session_factory)
-        cred, sub_id = get_azure_cli_credentials(resource='https://graph.windows.net')
-        graph_client = GraphRbacManagementClient(cred, s.get_tenant_id())
+        # cred, sub_id = get_azure_cli_credentials(resource='https://graph.windows.net')
+        # graph_client = GraphRbacManagementClient(cred, s.get_tenant_id())
+        graph_client = s.client('azure.graphrbac.GraphRbacManagementClient', resource='https://graph.windows.net')
 
         object_ids = list(set(
             resource['properties']['principalId'] for resource in resources
@@ -190,9 +191,37 @@ class ResourceAccessFilter(RelatedResourceFilter):
 
     def process_resource(self, resource, related):
         if not self.data.get('key'):
-            return resource
+            return True
 
-        return super(ResourceAccessFilter, self).process_resource(resource, related)
+        related_ids = self.get_related_ids([resource], related)
+        model = self.manager.get_model()
+        op = self.data.get('operator', 'or')
+        found = []
+        if self.data.get('match-resource') is True:
+            self.data['value'] = self.get_resource_value(
+                self.data['key'], resource)
+        for rid in related_ids:
+            robj = related.get(rid, None)
+            if robj is None:
+                self.log.warning(
+                    "Resource %s:%s references non existant %s: %s",
+                    model.type,
+                    resource[model.id],
+                    self.RelatedResource.rsplit('.', 1)[-1],
+                    rid)
+                continue
+            if self.match(robj):
+                found.append(rid)
+
+        if self.AnnotationKey is not None and found:
+            akey = 'c7n:%s' % self.AnnotationKey
+            resource[akey] = list(set(found).union(resource.get(akey, [])))
+
+        if op == 'or' and found:
+            return True
+        elif op == 'and' and len(found) == len(related_ids):
+            return True
+        return False
 
     def validate(self):
         if self.factory is None:
