@@ -48,16 +48,44 @@
     "private/protocol/rest",
     "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
+    "service/configservice",
+    "service/configservice/configserviceiface",
     "service/dynamodb",
     "service/dynamodb/dynamodbattribute",
     "service/dynamodb/dynamodbiface",
     "service/s3",
+    "service/s3/s3iface",
+    "service/sns",
+    "service/sns/snsiface",
+    "service/sqs",
+    "service/sqs/sqsiface",
     "service/ssm",
     "service/ssm/ssmiface",
     "service/sts"
   ]
   revision = "95ba34afe9f6b3e8e10a38c81a51cdffc34f9443"
   version = "v1.13.51"
+
+[[projects]]
+  name = "github.com/aws/aws-xray-sdk-go"
+  packages = [
+    "header",
+    "internal/plugins",
+    "pattern",
+    "resources",
+    "strategy/ctxmissing",
+    "strategy/exception",
+    "strategy/sampling",
+    "xray"
+  ]
+  revision = "32670489212454717deeafb8da5dbb1da0299749"
+  version = "v0.9.4"
+
+[[projects]]
+  name = "github.com/cihub/seelog"
+  packages = ["."]
+  revision = "d2c6e5aa9fbfdd1c624e140287063c7730654115"
+  version = "v2.6"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -81,6 +109,12 @@
   version = "v1.2.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/golang/time"
+  packages = ["rate"]
+  revision = "fbb02b2291d28baffd63558aa44b4b56f178d650"
+
+[[projects]]
   name = "github.com/google/go-cmp"
   packages = [
     "cmp",
@@ -91,6 +125,18 @@
   ]
   revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
   version = "v0.2.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/errwrap"
+  packages = ["."]
+  revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-multierror"
+  packages = ["."]
+  revision = "b7773ae218740a7be65057fc60b366a49b538a44"
 
 [[projects]]
   branch = "master"
@@ -215,6 +261,18 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context"]
+  revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sync"
+  packages = ["errgroup"]
+  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = [
     "unix",
@@ -244,6 +302,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2395bc866e01cbed5d8fddb126e29ab53aeec950404f0881b6296477bc1449d8"
+  inputs-digest = "d32c52836e203055c7e9af6f85bc7698ce8ff9c2b9a0a64f4c935543952063b2"
   solver-name = "gps-cdcl"
   solver-version = 1

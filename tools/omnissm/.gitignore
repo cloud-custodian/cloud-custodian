@@ -16,3 +16,5 @@
 bin/
 dist/
 vendor/
+
+*.yaml
