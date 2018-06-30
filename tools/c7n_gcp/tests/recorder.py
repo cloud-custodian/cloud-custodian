@@ -34,6 +34,7 @@ class FlightRecorder(Http):
         base_name = "%s%s" % (
             method.lower(), urlparse(uri).path.replace('/', '-'))
         data_dir = self._data_path
+
         is_discovery = False
         # We don't record authentication
         if base_name.startswith('post-oauth2-v4'):
@@ -60,6 +61,8 @@ class FlightRecorder(Http):
             elif record:
                 return fn
             else:
+                raise IOError('response file ({0}) not found'.format(fn))
+
         return fn
 
 

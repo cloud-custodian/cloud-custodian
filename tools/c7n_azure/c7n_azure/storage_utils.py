@@ -52,11 +52,11 @@ class StorageUtilities(object):
         return queue_service.put_message(queue_name, content)
 
     @staticmethod
-    def get_queue_messages(queue_service, queue_name):
+    def get_queue_messages(queue_service, queue_name, num_messages=None):
         # Default message visibility timeout is 30 seconds
         # so you are expected to delete message within 30 seconds
         # if you have successfully processed it
-        return queue_service.get_messages(queue_name)
+        return queue_service.get_messages(queue_name, num_messages)
 
     @staticmethod
     def delete_queue_message(queue_service, queue_name, message):

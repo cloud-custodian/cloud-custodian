@@ -406,10 +406,14 @@ class ValueFilter(Filter):
         if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
             r = None
-            for t in i.get("Tags", []):
-                if t.get('Key') == tk:
-                    r = t.get('Value')
-                    break
+            if 'Tags' in i:
+                for t in i.get("Tags", []):
+                    if t.get('Key') == tk:
+                        r = t.get('Value')
+                        break
+            # Azure schema: 'tags': {'key': 'value'}
+            elif 'tags' in i:
+                r = i.get('tags', {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
@@ -422,7 +426,7 @@ class ValueFilter(Filter):
     def match(self, i):
         if self.v is None and len(self.data) == 1:
             [(self.k, self.v)] = self.data.items()
-        elif self.v is None:
+        elif self.v is None and not hasattr(self, 'content_initialized'):
             self.k = self.data.get('key')
             self.op = self.data.get('op')
             if 'value_from' in self.data:
@@ -430,6 +434,7 @@ class ValueFilter(Filter):
                 self.v = values.get_values()
             else:
                 self.v = self.data.get('value')
+            self.content_initialized = True
             self.vtype = self.data.get('value_type')
 
         if i is None:

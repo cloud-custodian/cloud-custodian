@@ -643,3 +643,54 @@ class TagsTest(BaseTest):
         )
 
         logger_mock.assert_called_with(expected_warning)
+
+    @arm_template('vm.json')
+    def test_tag_filter_present(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'present'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    def test_tag_filter_absent(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'absent'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    def test_tag_filter_value(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'ItWorks'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

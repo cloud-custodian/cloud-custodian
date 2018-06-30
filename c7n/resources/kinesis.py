@@ -17,11 +17,14 @@ from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('kinesis')
 class KinesisStream(QueryResourceManager):
+    retry = staticmethod(
+        get_retry((
+            'LimitExceededException',)))
 
     class resource_type(object):
         service = 'kinesis'

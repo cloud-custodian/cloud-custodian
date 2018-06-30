@@ -218,6 +218,18 @@ class IamRoleFilterUsage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_iam_role_get_resources(self):
+        session_factory = self.replay_flight_data("test_iam_role_get_resource")
+        p = self.load_policy(
+            {"name": "iam-role-exists", "resource": "iam-role"},
+            session_factory=session_factory,
+        )
+        resources = p.resource_manager.get_resources(
+            ['cloudcustodian-test']
+        )
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['RoleId'], "AROAIGK7B2VUDZL4I73HK")
+
 
 class IamUserTest(BaseTest):
 
@@ -253,6 +265,40 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources), 1)
         users = client.list_users(PathPrefix="/test/").get("Users", [])
         self.assertEqual(users, [])
+
+    @functional
+    def test_iam_user_delete_some_access(self):
+        factory = self.replay_flight_data("test_iam_user_delete_options")
+        p = self.load_policy(
+            {
+                "name": "iam-user-delete",
+                "resource": "iam-user",
+                "filters": [
+                    {"UserName": "test_user"},
+                    {"type": "access-key", "key": "Status", "value": "Active"},
+                    {"type": "credential", "key": "password_enabled", "value": True}],
+                "actions": [{
+                    "type": "delete",
+                    "options": ["console-access", "access-keys"]}],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        resources = p.run()
+        self.assertFalse(resources)
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-delete",
+                "resource": "iam-user",
+                "filters": [{"UserName": "test_user"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_iam_user_policy(self):
         session_factory = self.replay_flight_data("test_iam_user_admin_policy")
@@ -436,6 +482,18 @@ class IamGroupFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_iam_group_get_resources(self):
+        session_factory = self.replay_flight_data("test_iam_group_get_resource")
+        p = self.load_policy(
+            {"name": "iam-group-exists", "resource": "iam-group"},
+            session_factory=session_factory,
+        )
+        resources = p.resource_manager.get_resources(
+            ["ServiceCatalogUsers"]
+        )
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["GroupId"], "AGPAI6NICSNT546VPVZGS")
 
 
 class IamManagedPolicyUsage(BaseTest):
