@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "da4c6bfd-7b7d-11e8-90fa-29cd6ad27cbe",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "1247",
+                "connection": "keep-alive",
+                "date": "Fri, 29 Jun 2018 09:21:49 GMT",
+                "x-amzn-requestid": "da4c6bfd-7b7d-11e8-90fa-29cd6ad27cbe",
+                "x-amz-apigw-id": "JPQHKERxCYcFcLg=",
+                "x-amzn-trace-id": "Root=1-5b35fa2d-1abf99cce0434290fcccf974",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 edd2aa1fcea462364d4033aa6f41f580.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "7mtTV1vDmnxzoAv_FiiV7SNcUs59KLtyfdKq_rZS_MhopFINa_cOZQ=="
+            },
+            "RetryAttempts": 0
+        },
+        "AutoMinorVersionUpgrade": true,
+        "BrokerArn": "arn:aws:mq:us-east-2:644160558196:broker:dev:b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
+        "BrokerId": "b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
+        "BrokerInstances": [
+            {
+                "ConsoleURL": "https://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:8162",
+                "Endpoints": [
+                    "ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:61617",
+                    "amqp+ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:5671",
+                    "stomp+ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:61614",
+                    "mqtt+ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:8883",
+                    "wss://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:61619"
+                ]
+            }
+        ],
+        "BrokerName": "dev",
+        "BrokerState": "RUNNING",
+        "Configurations": {
+            "Current": {
+                "Id": "c-4cf667b5-6201-4625-86ac-4ff1e9b54fc2",
+                "Revision": 1
+            },
+            "History": []
+        },
+        "DeploymentMode": "SINGLE_INSTANCE",
+        "EngineType": "ActiveMQ",
+        "EngineVersion": "5.15.0",
+        "HostInstanceType": "mq.t2.micro",
+        "MaintenanceWindowStartTime": {
+            "DayOfWeek": "SUNDAY",
+            "TimeOfDay": "11:00",
+            "TimeZone": "UTC"
+        },
+        "PubliclyAccessible": true,
+        "SecurityGroups": [
+            "sg-aa6c90c3"
+        ],
+        "SubnetIds": [
+            "subnet-b77a4ffd"
+        ],
+        "Users": [
+            {
+                "Username": "dev"
+            }
+        ]
+    }
+}
