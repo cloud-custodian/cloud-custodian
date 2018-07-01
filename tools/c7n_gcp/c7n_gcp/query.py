@@ -37,7 +37,6 @@ class ResourceQuery(object):
     def filter(self, resource_manager, **params):
         m = resource_manager.resource_type
         session = local_session(self.session_factory)
-        print("session %s" % session)
         client = session.client(
             m.service, m.version, m.component)
 

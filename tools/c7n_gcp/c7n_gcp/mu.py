@@ -40,10 +40,10 @@ def custodian_archive(packages=None):
     #
     requirements = packages and set(packages) or set()
     requirements.add('retrying')
-    requirements.add('ratelimiter==1.2.0.post0')
+    requirements.add('ratelimiter>=1.2.0.post0')
     requirements.add('google-auth>=1.4.1')
     requirements.add('google-auth-httplib2>=0.0.3')
-    requirements.add('google-api-python-client==1.6.7')
+    requirements.add('google-api-python-client>=1.7.3')
 
     archive.add_contents(
         'requirements.txt',

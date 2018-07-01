@@ -69,11 +69,9 @@ class HttpRecorder(FlightRecorder):
 
     def request(self, uri, method="GET", body=None, headers=None,
                 redirections=1, connection_type=None):
-        print("recorder %s %s" % (uri, method))
         response, content = super(HttpRecorder, self).request(
             uri, method, body, headers, redirections, connection_type)
         fpath = self.get_next_file_path(uri, method)
-        print('fpath %s' % fpath)
 
         if fpath is None:
             return response, content
@@ -97,10 +95,7 @@ class HttpReplay(FlightRecorder):
     static_responses = {
         ('POST', 'https://accounts.google.com/o/oauth2/token'): json.dumps({
             'access_token': 'ya29', 'token_type': 'Bearer',
-            'expires_in': 3600}).encode('utf8'),
-        ('POST', 'https://www.googleapis.com/oauth2/v4/token'): json.dumps(
-            {'access_token': 'ya29', 'token_type': 'Bearer',
-             'expires_in': 3600})}
+            'expires_in': 3600}).encode('utf8')}
 
     _cache = {}
 

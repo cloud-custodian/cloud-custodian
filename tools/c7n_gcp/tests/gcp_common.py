@@ -35,7 +35,6 @@ class FlightRecorderTest(TestUtils):
 
     def cleanUp(self):
         LOCAL_THREAD.http = None
-        print(dir(LOCAL_THREAD))
         return super(FlightRecorderTest, self).cleanUp()
 
     def record_flight_data(self, test_case):
