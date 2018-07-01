@@ -14,7 +14,9 @@
 
 # import base64
 import logging
+import hashlib
 
+from c7n_gcp.client import errors
 from c7n.mu import custodian_archive as base_archive
 from c7n.utils import local_session
 
@@ -28,16 +30,25 @@ exports.handler = (req, res) => {
 """
 
 
-def custodian_archive():
-    archive = base_archive()
+def custodian_archive(packages=None):
+    archive = base_archive(['c7n_gcp'])
     archive.add_contents('index.js', handler)
+
+    requirements = packages and set(packages) or set()
+    requirements.add('retrying')
+    requirements.add('ratelimiter==1.2.0.post0')
+    requirements.add('google-api-python-client==1.6.7')
+    archive.add_contents(
+        'requirements.txt',
+        '\n'.join(packages))
+
     archive.close()
     return archive
 
 
 class CloudFunctionManager(object):
 
-    def __init__(self, session_factory, region="-"):
+    def __init__(self, session_factory, region="us-central1"):
         self.session_factory = session_factory
         self.session = local_session(session_factory)
         self.client = self.session.client(
@@ -53,26 +64,60 @@ class CloudFunctionManager(object):
                 self.region)}
         ).get('functions', [])
 
+    def remove(self, func):
+        project = self.session.get_default_project()
+        func_name = "projects/{}/locations/{}/functions/{}".format(
+            project, self.region, func.name)
+        try:
+            return self.client.execute_command('delete', {'name': func_name})
+        except errors.HttpError as e:
+            if e.resp.status != 404:
+                raise
+
     def publish(self, func):
         """publish the given function."""
-
-        region = 'us-central1'
         project = self.session.get_default_project()
+        func_name = "projects/{}/locations/{}/functions/{}".format(
+            project, self.region, func.name)
+        func_info = self.get(func.name)
+        source_url = None
 
-        source_url = self._upload(func, region)
+        archive = func.get_archive()
+        if not func_info or self._delta_source(archive, func_name):
+            source_url = self._upload(archive, self.region)
+
         config = func.get_config()
-        config['name'] = "projects/{}/locations/{}/functions/{}".format(
-            project, region, func.name)
+        config['name'] = func_name
         config['httpsTrigger'] = {}
-        config['sourceUploadUrl'] = source_url
+        if source_url:
+            config['sourceUploadUrl'] = source_url
 
-        params = {
-            'location': "projects/{}/locations/{}".format(
-                self.session.get_default_project(), region),
-            'body': config}
-        response = self.client.execute_command('create', params)
+        if func_info is None:
+            response = self.client.execute_command(
+                'create', {
+                    'location': "projects/{}/locations/{}".format(
+                        project, self.region),
+                    'body': config})
+        else:
+            delta = self.delta_function(func_info, config)
+            if not delta:
+                return
+            response = self.client.execute_command(
+                'patch', {
+                    'name': func_name,
+                    'body': config,
+                    'updateMask': ','.join(delta)})
+        return response
 
-        print response
+    @staticmethod
+    def delta_function(old_config, new_config):
+        found = []
+        for k in new_config:
+            if k in ('httpsTrigger',):
+                continue
+            if new_config[k] != old_config[k]:
+                found.append(k)
+        return found
 
     def metrics(self, funcs, start, end, period=5 * 60):
         """Get the metrics for a set of functions."""
@@ -80,16 +125,39 @@ class CloudFunctionManager(object):
     def logs(self, func, start, end):
         """Get the logs for a given function."""
 
-    def delta_function(self, old_config, new_config):
-        """Determine if the function has changed configuration"""
-
-    def get(self, func_name, qualifier):
+    def get(self, func_name, qualifier=None):
         """Get the details on a given function."""
+        project = self.session.get_default_project()
+        func_name = "projects/{}/locations/{}/functions/{}".format(
+            project, self.region, func_name)
+        try:
+            return self.client.execute_query('get', {'name': func_name})
+        except errors.HttpError as e:
+            if e.resp.status != 404:
+                raise
 
-    def _upload(self, func, region):
+    def _get_http_client(self, client):
+        # Upload source, we need a class sans credentials as we're
+        # posting to a presigned url.
+        http = self.client.http.__class__()
+        return http
+
+    def _delta_source(self, archive, func_name):
+        checksum = archive.get_checksum(hasher=hashlib.md5)
+        source_info = self.client.execute_command(
+            'generateDownloadUrl', {'name': func_name, 'body': {}})
+        http = self._get_http_client(self.client)
+        source_headers, _ = http.request(source_info['downloadUrl'], 'HEAD')
+        # 'x-goog-hash': 'crc32c=tIfQ9A==, md5=DqrN06/NbVGsG+3CdrVK+Q=='
+        deployed_checksum = source_headers['x-goog-hash'].split(',')[-1].split('=', 1)[-1]
+        # print('ghash %s' % source_headers['x-goog-hash'])
+        # print('deployed %s' % deployed_checksum)
+        # print('archive %s' % checksum)
+        return deployed_checksum != checksum
+
+    def _upload(self, archive, region):
         """Upload function source and return source url
         """
-        archive = func.get_archive()
         # Generate source upload url
         url = self.client.execute_command(
             'generateUploadUrl',
@@ -97,9 +165,7 @@ class CloudFunctionManager(object):
                 self.session.get_default_project(),
                 region)}).get('uploadUrl')
         log.info("function upload url %s", url)
-
-        # Upload source
-        http = self.client.http.__class__()
+        http = self._get_http_client(self.client)
         headers, response = http.request(
             url, method='PUT',
             headers={
@@ -132,6 +198,11 @@ class CloudFunction(object):
     def memory_size(self):
         return self.func_data.get('memory-size', 256)
 
+    @property
+    def runtime(self):
+        # see google-cloud-sdk lib/googlecloudsdk/command_lib/functions/flags.py AddRuntimeFlag
+        return self.func_data.get('runtime', 'nodejs6')
+
     def get_archive(self):
         return self.archive
 
@@ -140,10 +211,11 @@ class CloudFunction(object):
             'name': self.name,
             'timeout': self.timeout,
             'entryPoint': 'handler',
+            'runtime': self.runtime,
             'labels': {
                 'deployment-tool': 'custodian',
                 # have to figure out a way to encode this / under 63, alphanum + '-' + '_'
-                #'checksum': self.archive.get_checksum(base64.b16encode).lower(),
+                # 'checksum': self.archive.get_checksum(base64.b16encode).lower(),
             },
             'availableMemoryMb': self.memory_size
         }
@@ -160,7 +232,7 @@ class EventSource(object):
         self.session = session
 
 
-class HTTPEventSource(EventSource):
+class HTTPEvent(EventSource):
 
     def get(self):
         pass
@@ -168,11 +240,11 @@ class HTTPEventSource(EventSource):
     def add(self):
         pass
 
-    def deleta(self):
+    def delete(self):
         pass
 
 
-class BucketEventSource(EventSource):
+class BucketEvent(EventSource):
 
     label = 'cloud.pubsub'
     trigger = 'google.storage.object.finalize'
@@ -185,12 +257,16 @@ class BucketEventSource(EventSource):
         'google.storage.object.metadataUpdate']
 
 
-class PubSubEventSource(EventSource):
+class PubSubSubscriber(EventSource):
 
     label = 'cloud.storage'
     trigger = 'google.pubsub.topic.publish'
     collection_id = 'pubsub.projects.topics'
 
 
-class LogEventSource(object):
+class LogSubscriber(EventSource):
     """Composite as a log sink"""
+
+
+class ScheduledEvent(EventSource):
+    """External scheduled clock event."""

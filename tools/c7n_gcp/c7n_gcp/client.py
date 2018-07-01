@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 import threading
-from googleapiclient import discovery
+from googleapiclient import discovery, errors
 import httplib2
 from oauth2client import client
 import os
@@ -33,6 +33,8 @@ import ssl
 
 from six.moves import http_client
 from six.moves.urllib.error import URLError
+
+errors = errors
 
 CLOUD_SCOPES = frozenset(['https://www.googleapis.com/auth/cloud-platform'])
 

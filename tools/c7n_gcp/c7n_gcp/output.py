@@ -9,8 +9,10 @@ import os
 import tempfile
 import time
 
-# TODO drop these grpc variants for the REST versions, and we can drop protobuf/grpc deps, and
-# also so we can record tests.. gcp has three different python sdks all independently maintained .. hmmm...
+# TODO drop these grpc variants for the REST versions, and we can drop
+# protobuf/grpc deps, and also so we can record tests..
+# gcp has three different python sdks all independently maintained .. hmmm...
+# and random monkey shims on top of those :-(
 
 from google.cloud.monitoring_v3 import MetricServiceClient
 from google.cloud.monitoring_v3.types import TimeSeries
@@ -36,7 +38,7 @@ class StackDriverMonitoring(MetricsOutput):
         # there's not uch useful we can utilize.
         series.resource.type = 'global'
 
-        #series.resource.labels['project_id'] =
+        # series.resource.labels['project_id'] =
         point = series.points.add()
         if unit == 'Count':
             point.value.int64 = value
@@ -51,7 +53,7 @@ class StackDriverMonitoring(MetricsOutput):
         client = MetricServiceClient()
         client.create_time_series(metrics)
 
-            
+
 class StackDriverLogging(LogOutput):
 
     def get_handler(self):
@@ -121,5 +123,3 @@ def parse_gs(gs_path):
     else:
         key_prefix = gs_path[gs_path.find('/', 5):]
     return gs_path, bucket, key_prefix
-    
-    

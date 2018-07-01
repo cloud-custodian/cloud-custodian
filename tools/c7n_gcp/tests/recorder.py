@@ -24,7 +24,7 @@ from six.moves.urllib.parse import urlparse
 
 class FlightRecorder(Http):
 
-    def __init__(self, data_path, discovery_path):
+    def __init__(self, data_path=None, discovery_path=None):
         self._data_path = data_path
         self._discovery_path = discovery_path
         self._index = {}
