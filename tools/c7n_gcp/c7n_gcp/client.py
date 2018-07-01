@@ -188,7 +188,8 @@ class Session(object):
     def get_default_project(self):
         if self.project_id:
             return self.project_id
-        for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
+        for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
+                  'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
             if k in os.environ:
                 return os.environ[k]
         raise ValueError("No GCP Project ID set - set CLOUDSDK_CORE_PROJECT")
@@ -316,6 +317,12 @@ class ServiceClient(object):
             self._local.http = authorized_http
         return authorized_http
 
+    def get_http(self):
+        """Return an http instance sans credentials"""
+        if self._http_replay:
+            return self._http_replay
+        return _build_http()
+
     def _build_request(self, verb, verb_arguments):
         """Builds HttpRequest object.
 
@@ -332,7 +339,7 @@ class ServiceClient(object):
         # Since we initially build our kwargs as a dictionary where one of the
         # keys is a variable (target), we need to convert keys to strings,
         # even though the variable in question is of type str.
-        method_args = {str(k): v for k, v in verb_arguments.iteritems()}
+        method_args = {str(k): v for k, v in verb_arguments.items()}
         return method(**method_args)
 
     def _build_next_request(self, verb, prior_request, prior_response):

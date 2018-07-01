@@ -34,7 +34,7 @@ setup(
     install_requires=[
         "c7n", "click",
         "ratelimiter", "retrying",
-        "google-api-python-client",
+        "google-api-python-client>=1.7.3",
         "google-auth-httplib2>=0.0.3",
         "google-auth>=1.4.1"
     ]

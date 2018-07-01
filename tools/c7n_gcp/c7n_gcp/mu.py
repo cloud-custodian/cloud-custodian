@@ -88,7 +88,6 @@ class CloudFunctionManager(object):
 
         config = func.get_config()
         config['name'] = func_name
-        config['httpsTrigger'] = {}
         if source_url:
             config['sourceUploadUrl'] = source_url
 
@@ -139,8 +138,7 @@ class CloudFunctionManager(object):
     def _get_http_client(self, client):
         # Upload source, we need a class sans credentials as we're
         # posting to a presigned url.
-        http = self.client.http.__class__()
-        return http
+        return self.client.get_http()
 
     def _delta_source(self, archive, func_name):
         checksum = archive.get_checksum(hasher=hashlib.md5)
@@ -150,9 +148,6 @@ class CloudFunctionManager(object):
         source_headers, _ = http.request(source_info['downloadUrl'], 'HEAD')
         # 'x-goog-hash': 'crc32c=tIfQ9A==, md5=DqrN06/NbVGsG+3CdrVK+Q=='
         deployed_checksum = source_headers['x-goog-hash'].split(',')[-1].split('=', 1)[-1]
-        # print('ghash %s' % source_headers['x-goog-hash'])
-        # print('deployed %s' % deployed_checksum)
-        # print('archive %s' % checksum)
         return deployed_checksum != checksum
 
     def _upload(self, archive, region):
@@ -203,6 +198,10 @@ class CloudFunction(object):
         # see google-cloud-sdk lib/googlecloudsdk/command_lib/functions/flags.py AddRuntimeFlag
         return self.func_data.get('runtime', 'nodejs6')
 
+    @property
+    def events(self):
+        return [e for e in self.data.get('events', ())]
+
     def get_archive(self):
         return self.archive
 
@@ -219,6 +218,8 @@ class CloudFunction(object):
             },
             'availableMemoryMb': self.memory_size
         }
+        for e in self.events:
+            conf.update(e.get_config(self))
         return conf
 
 
@@ -228,40 +229,63 @@ class PolicyFunction(CloudFunction):
 
 class EventSource(object):
 
-    def __init__(self, session):
+    def __init__(self, data, session):
+        self.data = data
         self.session = session
+
+    def add(self, func):
+        """Default no-op
+        """
+
+    def remove(self, func):
+        """Default no-op
+        """
+
+    def get_config(self, func):
+        return {}
 
 
 class HTTPEvent(EventSource):
+    """Internet exposed http endpoint for cloud function"""
 
-    def get(self):
-        pass
-
-    def add(self):
-        pass
-
-    def delete(self):
-        pass
+    def get_config(self, func):
+        return {'httpsTrigger': {}}
 
 
 class BucketEvent(EventSource):
 
-    label = 'cloud.pubsub'
+    label = 'cloud.storage'
     trigger = 'google.storage.object.finalize'
     collection_id = 'cloudfunctions.projects.buckets'
 
     events = [
+        # finalize is basically on write
         'google.storage.object.finalize',
         'google.storage.object.archive',
         'google.storage.object.delete',
-        'google.storage.object.metadataUpdate']
+        'google.storage.object.metadataUpdate',
+        'providers/cloud.storage/eventTypes/object.change']
+
+    def get_config(self, func):
+        return {
+            'eventTrigger': {
+                'eventType': self.data.get(
+                    'event', 'google.storage.object.finalize'),
+                'resource': self.data['bucket']
+            }}
 
 
 class PubSubSubscriber(EventSource):
 
-    label = 'cloud.storage'
+    label = 'cloud.pubsub'
     trigger = 'google.pubsub.topic.publish'
     collection_id = 'pubsub.projects.topics'
+
+    def get_config(self, func):
+        return {
+            'eventTrigger': {
+                'eventType': self.trigger,
+                'resource': self.data['topic']}}
 
 
 class LogSubscriber(EventSource):
