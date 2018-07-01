@@ -26,7 +26,7 @@ class InstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 4)
-            
+
 
 class DiskTest(BaseTest):
 
@@ -38,5 +38,3 @@ class DiskTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 6)
-             
-        
