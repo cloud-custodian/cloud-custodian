@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from .common import BaseTest
+from gcp_common import BaseTest
 
 
 class InstanceTest(BaseTest):

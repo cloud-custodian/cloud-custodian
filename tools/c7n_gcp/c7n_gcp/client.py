@@ -29,7 +29,7 @@ import os
 import socket
 import ssl
 
-from googleapiclient import discovery, errors
+from googleapiclient import discovery, errors  # NOQA
 from googleapiclient.http import set_user_agent
 from google.auth.credentials import with_scopes_if_required
 import google.oauth2.credentials
@@ -42,7 +42,6 @@ from retrying import retry
 from six.moves import http_client
 from six.moves.urllib.error import URLError
 
-errors = errors
 
 CLOUD_SCOPES = frozenset(['https://www.googleapis.com/auth/cloud-platform'])
 

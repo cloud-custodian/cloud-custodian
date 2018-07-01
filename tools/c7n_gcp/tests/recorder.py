@@ -54,10 +54,9 @@ class FlightRecorder(Http):
                 # if we already have discovery metadata, don't re-record it.
                 if record and is_discovery:
                     return None
-                next_file = fn
                 self._index[base_name] += 1
-            elif index != 1:
-                self._index[base_name] = 1
+                if not record:
+                    next_file = fn
             elif record:
                 return fn
             else:
@@ -70,19 +69,26 @@ class HttpRecorder(FlightRecorder):
 
     def request(self, uri, method="GET", body=None, headers=None,
                 redirections=1, connection_type=None):
+        print("recorder %s %s" % (uri, method))
         response, content = super(HttpRecorder, self).request(
             uri, method, body, headers, redirections, connection_type)
         fpath = self.get_next_file_path(uri, method)
+        print('fpath %s' % fpath)
+
         if fpath is None:
             return response, content
+
         fopen = open
         if fpath.endswith('.bz2'):
             fopen = bz2.BZ2File
         with fopen(fpath, 'w') as fh:
             recorded = {}
             recorded['headers'] = dict(response)
+            if not content:
+                content = '{}'
             recorded['body'] = json.loads(content)
             json.dump(recorded, fh, indent=2)
+
         return response, content
 
 
@@ -119,5 +125,4 @@ class HttpReplay(FlightRecorder):
             serialized = json.dumps(data['body'])
             if fpath.endswith('bz2'):
                 self._cache[fpath] = response, serialized
-            # serialize again, this runtime helps keep on the disk pretty.
             return response, serialized

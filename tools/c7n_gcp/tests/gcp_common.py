@@ -22,7 +22,7 @@ from c7n.resources import load_resources
 
 from c7n_gcp.client import Session, LOCAL_THREAD
 
-from .recorder import HttpRecorder, HttpReplay
+from recorder import HttpRecorder, HttpReplay
 
 load_resources()
 
@@ -35,6 +35,7 @@ class FlightRecorderTest(TestUtils):
 
     def cleanUp(self):
         LOCAL_THREAD.http = None
+        print(dir(LOCAL_THREAD))
         return super(FlightRecorderTest, self).cleanUp()
 
     def record_flight_data(self, test_case):

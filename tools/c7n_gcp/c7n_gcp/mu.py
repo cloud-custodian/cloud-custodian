@@ -34,15 +34,22 @@ def custodian_archive(packages=None):
     archive = base_archive(['c7n_gcp'])
     archive.add_contents('index.js', handler)
 
+    # requirements are fetched server-side, which helps for binary extensions
+    # but for pure python packages, if we have a local install and its
+    # relatively small, it might be faster to just upload.
+    #
     requirements = packages and set(packages) or set()
     requirements.add('retrying')
     requirements.add('ratelimiter==1.2.0.post0')
+    requirements.add('google-auth>=1.4.1')
+    requirements.add('google-auth-httplib2>=0.0.3')
     requirements.add('google-api-python-client==1.6.7')
+
     archive.add_contents(
         'requirements.txt',
-        '\n'.join(packages))
-
+        '\n'.join(sorted(requirements)))
     archive.close()
+
     return archive
 
 
@@ -199,25 +206,27 @@ class CloudFunction(object):
         return self.func_data.get('runtime', 'nodejs6')
 
     @property
+    def labels(self):
+        return dict(self.func_data.get('labels', {}))
+
+    @property
     def events(self):
-        return [e for e in self.data.get('events', ())]
+        return [e for e in self.func_data.get('events', ())]
 
     def get_archive(self):
         return self.archive
 
     def get_config(self):
+        labels = self.labels
+        labels['deployment-tool'] = 'custodian'
         conf = {
             'name': self.name,
             'timeout': self.timeout,
             'entryPoint': 'handler',
             'runtime': self.runtime,
-            'labels': {
-                'deployment-tool': 'custodian',
-                # have to figure out a way to encode this / under 63, alphanum + '-' + '_'
-                # 'checksum': self.archive.get_checksum(base64.b16encode).lower(),
-            },
-            'availableMemoryMb': self.memory_size
-        }
+            'labels': labels,
+            'availableMemoryMb': self.memory_size}
+
         for e in self.events:
             conf.update(e.get_config(self))
         return conf
@@ -229,7 +238,7 @@ class PolicyFunction(CloudFunction):
 
 class EventSource(object):
 
-    def __init__(self, data, session):
+    def __init__(self, session, data=None):
         self.data = data
         self.session = session
 
@@ -254,7 +263,6 @@ class HTTPEvent(EventSource):
 
 class BucketEvent(EventSource):
 
-    label = 'cloud.storage'
     trigger = 'google.storage.object.finalize'
     collection_id = 'cloudfunctions.projects.buckets'
 
@@ -269,15 +277,12 @@ class BucketEvent(EventSource):
     def get_config(self, func):
         return {
             'eventTrigger': {
-                'eventType': self.data.get(
-                    'event', 'google.storage.object.finalize'),
-                'resource': self.data['bucket']
-            }}
+                'eventType': self.data.get('event', self.trigger),
+                'resource': self.data['bucket']}}
 
 
 class PubSubSubscriber(EventSource):
 
-    label = 'cloud.pubsub'
     trigger = 'google.pubsub.topic.publish'
     collection_id = 'pubsub.projects.topics'
 
