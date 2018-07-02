@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from c7n_azure.template_utils import TemplateUtilities
 from c7n_azure.function_package import FunctionPackage
 
@@ -43,6 +45,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def __init__(self, policy):
         self.policy = policy
         self.template_util = TemplateUtilities()
+        self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -59,6 +62,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
             self.template_util.deploy_resource_template(
                 group_name, 'dedicated_functionapp.json', parameters).wait()
+        else:
+            self.log.info("Using existing App: %s" % parameters['name']['value'])
+
+        self.log.info("Building function package for %s" % parameters['name']['value'])
 
         archive = FunctionPackage(self.policy.data)
         archive.build()

@@ -37,6 +37,7 @@ class Session(object):
         self.subscription_id = None
         self.tenant_id = None
         self.authorization_file = authorization_file
+        self._is_cli_auth = False
 
     def _initialize_session(self):
         """
