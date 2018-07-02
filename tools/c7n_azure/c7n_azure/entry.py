@@ -32,6 +32,8 @@ import c7n_azure.resources.access_control
 import c7n_azure.resources.network_interface
 import c7n_azure.resources.disk
 import c7n_azure.resources.cognitive_service
+import c7n_azure.resources.data_factory
+import c7n_azure.resources.iot_hub
 import c7n_azure.resources.appserviceplan  # noqa: F401
 
 
