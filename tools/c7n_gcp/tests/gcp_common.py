@@ -22,7 +22,7 @@ from c7n.resources import load_resources
 
 from c7n_gcp.client import Session, LOCAL_THREAD
 
-from .recorder import HttpRecorder, HttpReplay
+from recorder import HttpRecorder, HttpReplay
 
 load_resources()
 

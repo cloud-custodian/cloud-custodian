@@ -196,11 +196,11 @@ class PythonPackageArchive(object):
         if self._temp_archive_file:
             self._temp_archive_file = None
 
-    def get_checksum(self):
+    def get_checksum(self, encoder=base64.b64encode, hasher=hashlib.sha256):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
         with open(self._temp_archive_file.name, 'rb') as fh:
-            return base64.b64encode(checksum(fh, hashlib.sha256()))
+            return encoder(checksum(fh, hasher()))
 
     def get_bytes(self):
         """Return the entire zip file as a byte string. """

@@ -39,6 +39,6 @@ setup(
                       "azure-cli-core",
                       "adal~=0.5.0",
                       "backports.functools_lru_cache",
-                      "futures==3.1.1"],
+                      "futures>=3.1.1"],
 
 )
