@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import six
+from c7n_azure.actions import DeleteAction
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim
 from c7n_azure.filters import MetricFilter
-from c7n_azure.actions import DeleteAction
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta
 from c7n_azure.utils import ResourceIdParser

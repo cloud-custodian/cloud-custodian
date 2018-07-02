@@ -15,15 +15,17 @@
 Actions to perform on Azure resources
 """
 import datetime
+
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
-from msrestazure.azure_exceptions import CloudError
-from c7n import utils
-from c7n.utils import local_session, type_schema
+from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import utcnow
+from msrestazure.azure_exceptions import CloudError
+
+from c7n import utils
 from c7n.actions import BaseAction, BaseNotify
 from c7n.filters import FilterValidationError
 from c7n.resolver import ValuesFrom
-from c7n_azure.storage_utils import StorageUtilities
+from c7n.utils import local_session, type_schema
 
 
 def update_resource_tags(self, resource, tags):

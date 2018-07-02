@@ -17,13 +17,14 @@ the 'azure://' prefix
 
 """
 import datetime
-import tempfile
+import logging
 import os
 import shutil
-import logging
+import tempfile
+
+from c7n_azure.storage_utils import StorageUtilities
 
 from c7n.output import FSOutput, blob_outputs
-from c7n_azure.storage_utils import StorageUtilities
 
 
 @blob_outputs.register('azure')
