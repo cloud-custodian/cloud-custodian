@@ -107,16 +107,24 @@ func ReadConfig(path string) (*Config, error) {
 	return &c, nil
 }
 
+// splitNonEmpty returns a nil slice when s is blank
+func splitNonEmpty(s string, sep string) []string {
+	if s == "" {
+		return nil
+	}
+	return strings.Split(s, sep)
+}
+
 func ReadConfigFromEnv() *Config {
 	maxRetries, _ := strconv.Atoi(os.Getenv("OMNISSM_MAX_RETRIES"))
 	c := &Config{
-		AccountWhitelist:        strings.Split(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
+		AccountWhitelist:        splitNonEmpty(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
 		InstanceRole:            os.Getenv("OMNISSM_INSTANCE_ROLE"),
 		MaxRetries:              maxRetries,
 		RegistrationsTable:      os.Getenv("OMNISSM_REGISTRATIONS_TABLE"),
 		QueueName:               os.Getenv("OMNISSM_SPILLOVER_QUEUE"),
 		ResourceDeletedSNSTopic: os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC"),
-		ResourceTags:            strings.Split(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
+		ResourceTags:            splitNonEmpty(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
 		S3DownloadRole:          os.Getenv("OMNISSM_S3_DOWNLOAD_ROLE"),
 		SNSPublishRole:          os.Getenv("OMNISSM_SNS_PUBLISH_ROLE"),
 		XRayTracingEnabled:      os.Getenv("_X_AMZN_TRACE_ID"),
