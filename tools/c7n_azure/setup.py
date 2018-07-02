@@ -36,9 +36,10 @@ setup(
                       "azure-storage-blob",
                       "azure-storage-queue",
                       "c7n",
+                      "requests",
                       "azure-cli-core",
                       "adal~=0.5.0",
                       "backports.functools_lru_cache",
-                      "futures==3.1.1"],
+                      "futures>=3.1.1"],
 
 )

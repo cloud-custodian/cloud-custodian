@@ -43,6 +43,7 @@ class Config(Bag):
             'metrics_enabled': False,
             'output_dir': '',
             'cache_period': 0,
-            'dryrun': False})
+            'dryrun': False,
+            'authorization_file': None})
         d.update(kw)
         return cls(d)
