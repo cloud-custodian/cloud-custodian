@@ -42,7 +42,15 @@ class ResourceQuery(object):
 
         # depends on resource scope
         if m.scope in ('project', 'zone'):
-            params['project'] = session.get_default_project()
+            project = session.get_default_project()
+            scope_t = getattr(m, 'scope_template', None)
+            if scope_t:
+                project = scope_t.format(project)
+
+            if getattr(m, 'scope_key', None):
+                params[m.scope_key] = project
+            else:
+                params['project'] = project
 
         if m.scope == 'zone':
             if session.get_default_zone():

@@ -18,6 +18,7 @@ import datetime
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
 from msrestazure.azure_exceptions import CloudError
 from c7n import utils
+from c7n.utils import local_session, type_schema
 from c7n_azure.utils import utcnow
 from c7n.actions import BaseAction, BaseNotify
 from c7n.filters import FilterValidationError
@@ -408,3 +409,16 @@ class Notify(BaseNotify):
     def send_to_azure_queue(self, queue_uri, message):
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri)
         return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
+
+
+class DeleteAction(BaseAction):
+
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+        for resource in resources:
+            client.resources.delete_by_id(resource['id'],
+                session.resource_api_version(resource['id']))
