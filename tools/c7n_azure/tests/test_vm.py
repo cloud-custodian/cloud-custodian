@@ -143,3 +143,68 @@ class VMTest(BaseTest):
         restart_action_mock.assert_called_with(
             self.fake_running_vms[0]['resourceGroup'],
             self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.actions.DeleteAction.process', return_value='')
+    def test_delete(self, delete_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        })
+        p.run()
+        delete_action_mock.assert_called_with(self.fake_running_vms)
+
+    @arm_template('vm.json')
+    def test_find_vm_with_public_ip(self):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'network-interface',
+                 'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
+                 'op': 'eq',
+                 'value': 'not-null'}
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'network-interface',
+                 'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
+                 'op': 'eq',
+                 'value': 'null'}
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
