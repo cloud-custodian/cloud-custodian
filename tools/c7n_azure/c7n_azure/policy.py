@@ -13,9 +13,10 @@
 # limitations under the License.
 
 from c7n_azure.template_utils import TemplateUtilities
+from c7n_azure.function_package import FunctionPackage
 
 from c7n import utils
-from c7n.policy import ServerlessExecutionMode, execution
+from c7n.policy import ServerlessExecutionMode, PullMode, execution
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -52,20 +53,29 @@ class AzureFunctionMode(ServerlessExecutionMode):
         parameters = self.get_parameters()
         group_name = parameters['servicePlanName']['value']
 
-        self.template_util.create_resource_group(
-            group_name, {'location': parameters['location']['value']})
+        if not self.template_util.resource_exist(group_name, parameters['name']['value']):
+            self.template_util.create_resource_group(
+                group_name, {'location': parameters['location']['value']})
 
-        self.template_util.deploy_resource_template(
-            group_name, 'dedicated_functionapp.json', parameters).wait()
+            self.template_util.deploy_resource_template(
+                group_name, 'dedicated_functionapp.json', parameters).wait()
+
+        archive = FunctionPackage(self.policy.data)
+        archive.build()
+        archive.publish(parameters['name']['value'])
 
     def get_parameters(self):
         parameters = self.template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
 
         data = self.policy.data
+
         updated_parameters = {
-            'name': data['name'].replace(' ', '-').lower(),
-            'storageName': data['name'].replace('-', '').lower()
+            'name': (data['mode']['provision-options']['servicePlanName'] +
+                     '-' +
+                     data['name']).replace(' ', '-').lower(),
+
+            'storageName': data['mode']['provision-options']['servicePlanName']
         }
 
         if 'mode' in data:
@@ -85,15 +95,16 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
 
 @execution.register('azure-periodic')
-class AzurePeriodicMode(AzureFunctionMode):
+class AzurePeriodicMode(AzureFunctionMode, PullMode):
     """A policy that runs/executes in azure functions at specified
     time intervals."""
-
-    schema = utils.type_schema('azure-periodic', rinherit=AzureFunctionMode.schema)
+    schema = utils.type_schema('azure-periodic',
+                               schedule={'type': 'string'},
+                               rinherit=AzureFunctionMode.schema)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
-        raise NotImplementedError("error - not implemented")
+        return PullMode.run(self)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""

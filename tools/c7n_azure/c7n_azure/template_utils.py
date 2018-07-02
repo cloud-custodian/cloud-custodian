@@ -16,6 +16,7 @@ Generic ARM template resource utilities
 """
 import json
 import os.path
+import logging
 
 from azure.mgmt.resource.resources.models import DeploymentMode
 from c7n_azure.session import Session
@@ -28,11 +29,14 @@ class TemplateUtilities(object):
         s = local_session(Session)
         #: :type: azure.mgmt.resource.ResourceManagementClient
         self.client = s.client('azure.mgmt.resource.ResourceManagementClient')
+        self.log = logging.getLogger('custodian.azure.template_utils')
 
     def create_resource_group(self, group_name, group_parameters):
+        self.log.info("Create or update resource group: %s" % group_name)
         self.client.resource_groups.create_or_update(group_name, group_parameters)
 
     def deploy_resource_template(self, group_name, template_file_name, template_parameters=None):
+        self.log.info("Deploy resource template: %s" % template_file_name)
         arm_template = self.get_json_template(template_file_name)
         deployment_properties = {
             'mode': DeploymentMode.incremental,
@@ -44,6 +48,16 @@ class TemplateUtilities(object):
 
         return self.client.deployments.create_or_update(
             group_name, group_name, deployment_properties)
+
+    def resource_exist(self, group_name, resource_name):
+        if not self.client.resource_groups.check_existence(group_name):
+            return False
+
+        r_filter = ("name eq '%s'" % resource_name)
+
+        for resource in self.client.resources.list_by_resource_group(group_name, filter=r_filter):
+            return True
+        return False
 
     def get_default_parameters(self, file_name):
         # deployment client expects only the parameters, not the full parameters file

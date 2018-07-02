@@ -15,6 +15,7 @@
 import importlib
 import os
 import logging
+import json
 from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.cli.core._profile import Profile
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
@@ -23,7 +24,7 @@ from c7n_azure.utils import ResourceIdParser
 
 class Session(object):
 
-    def __init__(self, subscription_id=None):
+    def __init__(self, subscription_id=None, authorization_file=None):
         """
         :param subscription_id: If provided overrides environment variables.
 
@@ -35,6 +36,7 @@ class Session(object):
         self.credentials = None
         self.subscription_id = None
         self.tenant_id = None
+        self.authorization_file = authorization_file
 
     def _initialize_session(self):
         """
@@ -57,7 +59,11 @@ class Session(object):
         ]
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
 
-        if all(k in os.environ for k in token_auth_variables):
+        if self.authorization_file:
+            self.credentials, self.subscription_id = self.load_auth_file(self.authorization_file)
+            self.log.info("Creating session with authorization file")
+
+        elif all(k in os.environ for k in token_auth_variables):
             # Token authentication
             self.credentials = BasicTokenAuthentication(
                 token={
@@ -83,6 +89,7 @@ class Session(object):
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
+            self._is_cli_auth = True
             self.log.info("Creating session with Azure CLI Authentication")
 
         # Let provided id parameter override everything else
@@ -120,3 +127,34 @@ class Session(object):
             api_version = versions[0] if versions else rt.api_versions[0]
             self._provider_cache[resource_type] = api_version
             return api_version
+
+    def get_bearer_token(self):
+        if self._is_cli_auth:
+            return self.credentials._token_retriever()[1]
+        return self.credentials.token['access_token']
+
+    def load_auth_file(self, path):
+        with open(path) as json_file:
+            data = json.load(json_file)
+            return (ServicePrincipalCredentials(
+                client_id=data['credentials']['client_id'],
+                secret=data['credentials']['secret'],
+                tenant=data['credentials']['tenant']
+            ), data['subscription'])
+
+    def get_auth_string(self):
+        if type(self.credentials) is not ServicePrincipalCredentials:
+            raise NotImplementedError(
+                "Writing auth file only supported for Service Principal credentials.")
+
+        auth = {
+            'credentials':
+                {
+                    'client_id': os.environ['AZURE_CLIENT_ID'],
+                    'secret': os.environ['AZURE_CLIENT_SECRET'],
+                    'tenant': os.environ['AZURE_TENANT_ID']
+                },
+            'subscription': self.subscription_id
+        }
+
+        return json.dumps(auth)

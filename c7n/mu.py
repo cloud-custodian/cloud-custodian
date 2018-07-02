@@ -69,7 +69,7 @@ class PythonPackageArchive(object):
             self._temp_archive_file, mode='w',
             compression=zipfile.ZIP_DEFLATED)
         self._closed = False
-        self.add_modules(*modules)
+        self.add_modules(None, *modules)
 
     @property
     def path(self):
@@ -81,7 +81,7 @@ class PythonPackageArchive(object):
             raise ValueError("Archive not closed, size not accurate")
         return os.stat(self._temp_archive_file.name).st_size
 
-    def add_modules(self, *modules):
+    def add_modules(self, ignore, *modules):
         """Add the named Python modules to the archive. For consistency's sake
         we only add ``*.py`` files, not ``*.pyc``. We also don't add other
         files, including compiled modules. You'll have to add such files
@@ -93,7 +93,7 @@ class PythonPackageArchive(object):
             if hasattr(module, '__path__'):
                 # https://docs.python.org/3/reference/import.html#module-path
                 for directory in module.__path__:
-                    self.add_directory(directory)
+                    self.add_directory(directory, ignore)
                 if not hasattr(module, '__file__'):
 
                     # Likely a namespace package. Try to add *.pth files so
@@ -123,16 +123,22 @@ class PythonPackageArchive(object):
 
                 self.add_file(path)
 
-    def add_directory(self, path):
+    def add_directory(self, path, ignore=None):
         """Add ``*.py`` files under the directory ``path`` to the archive.
         """
         for root, dirs, files in os.walk(path):
             arc_prefix = os.path.relpath(root, os.path.dirname(path))
             for f in files:
+                dest_path = os.path.join(arc_prefix, f)
+
+                # ignore specific files
+                if ignore and ignore(dest_path):
+                    continue
+
                 if f.endswith('.pyc') or f.endswith('.c'):
                     continue
                 f_path = os.path.join(root, f)
-                dest_path = os.path.join(arc_prefix, f)
+
                 self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest=None):
