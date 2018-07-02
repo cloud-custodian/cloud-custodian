@@ -15,6 +15,7 @@
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 
+
 @resources.register('cognitiveservice')
 class CognitiveService(ArmResourceManager):
 
