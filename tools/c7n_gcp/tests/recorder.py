@@ -117,7 +117,7 @@ class HttpReplay(FlightRecorder):
         with fopen(fpath, 'r') as fh:
             data = json.load(fh)
             response = Response(data['headers'])
-            serialized = json.dumps(data['body'])
+            serialized = json.dumps(data['body']).encode('utf8')
             if fpath.endswith('bz2'):
                 self._cache[fpath] = response, serialized
             return response, serialized
