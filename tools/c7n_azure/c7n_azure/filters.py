@@ -11,16 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from datetime import timedelta
 import operator
-from c7n.filters import Filter
+from datetime import timedelta
+
 from c7n_azure.utils import Math
-from c7n.utils import type_schema
-from c7n.filters.core import PolicyValidationError
 from c7n_azure.utils import now
 from dateutil import zoneinfo
 from dateutil.parser import parse
+
+from c7n.filters import Filter
+from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
+from c7n.utils import type_schema
 
 
 class MetricFilter(Filter):
