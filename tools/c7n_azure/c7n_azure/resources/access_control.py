@@ -182,54 +182,17 @@ class ResourceAccessFilter(RelatedResourceFilter):
         self.factory = Azure.resources.get(
             resource_type.rsplit('.', 1)[-1])
 
-    def get_related_ids(self, resources, related):
-        related_ids = []
-        for r in related:
-            for resource in resources:
-                if resource['properties']['scope'] in r:
-                    related_ids.append(r)
-                    continue
-
-        return related_ids
-
     def get_related(self, resources):
         ctx = ExecutionContext(local_session(Session), self.data, Config.empty())
         manager = self.factory(ctx, self.data)
         related = manager.source.get_resources(None)
-        return {r['id']: r for r in related}
+        return [r['id'] for r in related if self.match(r)]
 
     def process_resource(self, resource, related):
-        if not self.data.get('key'):
-            return True
+        for r in related:
+            if resource['properties']['scope'] in r:
+                return True
 
-        related_ids = self.get_related_ids([resource], related)
-        model = self.manager.get_model()
-        op = self.data.get('operator', 'or')
-        found = []
-        if self.data.get('match-resource') is True:
-            self.data['value'] = self.get_resource_value(
-                self.data['key'], resource)
-        for rid in related_ids:
-            robj = related.get(rid, None)
-            if robj is None:
-                self.log.warning(
-                    "Resource %s:%s references non existant %s: %s",
-                    model.type,
-                    resource[model.id],
-                    self.RelatedResource.rsplit('.', 1)[-1],
-                    rid)
-                continue
-            if self.match(robj):
-                found.append(rid)
-
-        if self.AnnotationKey is not None and found:
-            akey = 'c7n:%s' % self.AnnotationKey
-            resource[akey] = list(set(found).union(resource.get(akey, [])))
-
-        if op == 'or' and found:
-            return True
-        elif op == 'and' and len(found) == len(related_ids):
-            return True
         return False
 
     def validate(self):
