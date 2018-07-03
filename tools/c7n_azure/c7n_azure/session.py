@@ -25,8 +25,8 @@ from c7n_azure.utils import ResourceIdParser
 
 class Session(object):
 
-    def __init__(self, subscription_id=None,authorization_file=None,
-     resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id):
+    def __init__(self, subscription_id=None, authorization_file=None,
+                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id):
         """
         :param subscription_id: If provided overrides environment variables.
 
