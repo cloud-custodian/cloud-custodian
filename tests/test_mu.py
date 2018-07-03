@@ -36,6 +36,7 @@ from c7n.mu import (
     PythonPackageArchive,
     CloudWatchLogSubscription,
     SNSSubscription,
+    SQSSubscription,
 )
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
@@ -161,6 +162,52 @@ class PolicyLambdaProvision(BaseTest):
         # try and update
         # params['sns_topic'] = "arn:123"
         # manager.publish(func)
+
+    @functional
+    def test_sqs_subscriber(self):
+        session_factory = self.replay_flight_data('test_mu_sqs_subscriber')
+
+        func_name = 'c7n-hello-sqs'
+        queue_name = "my-dev-test-3"
+
+        # Setup Queues
+        session = session_factory()
+        client = session.client('sqs')
+        queue_url = client.create_queue(QueueName=queue_name).get('QueueUrl')
+        queue_arn = client.get_queue_attributes(
+            QueueUrl=queue_url,
+            AttributeNames=['QueueArn'])['Attributes']['QueueArn']
+        self.addCleanup(client.delete_queue, QueueUrl=queue_url)
+
+        # Setup Function
+        params = dict(
+            session_factory=session_factory,
+            name=func_name,
+            role="arn:aws:iam::644160558196:role/custodian-mu",
+            events=[SQSSubscription(session_factory, [queue_arn])])
+
+        func = helloworld.get_function(**params)
+        manager = LambdaManager(session_factory)
+        manager.publish(func)
+        self.addCleanup(manager.remove, func)
+
+        # Send and Receive Check
+        client.send_message(
+            QueueUrl=queue_url, MessageBody=json.dumps({'jurassic': 'block'}))
+
+        if self.recording:
+            time.sleep(60)
+
+        log_events = list(manager.logs(func, "1970-1-1 UTC", "9170-1-1"))
+        messages = [
+            e["message"] for e in log_events if e["message"].startswith('{"Records')
+        ]
+        self.addCleanup(
+            session.client("logs").delete_log_group,
+            logGroupName="/aws/lambda/%s" % func_name)
+        self.assertIn(
+            'jurassic',
+            json.loads(messages[0])["Records"][0]["body"])
 
     @functional
     def test_sns_subscriber_and_ipaddress(self):

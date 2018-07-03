@@ -31,5 +31,13 @@ setup(
         "custodian.resources": [
             'gcp = c7n_gcp.entry:initialize_gcp']
     },
-    install_requires=["c7n", "click", "google-api-python-client", "ratelimiter", "retrying"]
+    install_requires=[
+        "c7n", "click",
+        "ratelimiter", "retrying",
+        "google-api-python-client>=1.7.3",
+        "google-auth-httplib2>=0.0.3",
+        "google-auth>=1.4.1",
+        "google-cloud-logging>=1.6.0",
+        "google-cloud-monitoring>=0.3.0"
+    ]
 )
