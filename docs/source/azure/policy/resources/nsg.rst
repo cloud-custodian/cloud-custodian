@@ -8,28 +8,27 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
       - Model: `NetworkSecurityGroup <https://docs.microsoft.com/en-us/python/api/azure.mgmt.network.v2018_02_01.models.networksecuritygroup?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
-
-``ingress``
+- ``ingress``
   Filter based on Inbound Security Rules
-
   .. c7n-schema:: IngressFilter
       :module: c7n_azure.resources.network_security_group
-
-``egress``
+- ``egress``
   Filter based on Outbound Security Rules
-
   .. c7n-schema:: EgressFilter
       :module: c7n_azure.resources.network_security_group
 
 
 Actions
 -------
-
-``open``
+- ARM Resource Actions (see :ref:`azure_genericarmaction`)
+- ``open``
   Allow access to security rules
-
-``close``
+  .. c7n-schema:: CloseRules
+      :module: c7n_azure.resources.network_security_group
+- ``close``
   Deny access to security rules
+  .. c7n-schema:: OpenRules
+      :module: c7n_azure.resources.network_security_group
 
 
 Example Policies

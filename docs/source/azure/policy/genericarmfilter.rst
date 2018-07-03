@@ -5,9 +5,7 @@ Generic Filters
 
 
 ``MetricFilter``
-
 Filters Azure resources based on live metrics from the Azure monitor.
-
 .. c7n-schema:: MetricFilter
     :module: c7n_azure.filters
 

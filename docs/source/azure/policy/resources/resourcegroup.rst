@@ -8,47 +8,31 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
       - Model: `ResourceGroup <https://docs.microsoft.com/en-us/python/api/azure.mgmt.resource.resources.v2017_05_10.models.resourcegroup?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
+- ``empty-group``
+  Filter based on empty resource groups
+  .. c7n-schema:: EmptyGroup
+      :module: c7n_azure.resources.resourcegroup
 
 Actions
 -------
-
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
+- ``delete``
+  Delete a resource group
+  .. c7n-schema:: DeleteResourceGroup
+      :module: c7n_azure.resources.resourcegroup
+
 
 Example Policies
 ----------------
 
-This policy will
+This policy will delete all empty resource groups
 
 .. code-block:: yaml
 
      policies:
-       - name:
-         resource: azure.
+       - name: delete-empty-groups
+         resource: azure.resourcegroup
          filters:
-          - type:
+          - type: empty-group
          actions:
-          - type:
-
-This policy will
-
-.. code-block:: yaml
-
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
-         actions:
-          - type:
-
-This policy will
-
-.. code-block:: yaml
-
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
-         actions:
-          - type:
+          - type: delete

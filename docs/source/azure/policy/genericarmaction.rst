@@ -9,7 +9,6 @@ Tags
 ``AutoTagUser``
   Create a tag listing name of user who created a resource based on scanning
   activity log history.
-
   .. c7n-schema:: AutoTagUser
       :module: c7n_azure.actions
 
@@ -27,7 +26,6 @@ Tags
 
 ``RemoveTag``
       Remove a set of tags.
-
       .. c7n-schema:: RemoveTag
             :module: c7n_azure.actions
 
@@ -51,7 +49,6 @@ Tags
       desired amount of space while preserving a given set of tags.
       Setting the space value to 0 removes all tags but those
       listed to preserve.
-
       .. c7n-schema:: TagTrim
             :module: c7n_azure.actions
 
@@ -91,7 +88,6 @@ Tags
       Perform delete operation on any ARM resource. Can be used with 
       generic resource type `armresource` or on any other more specific
       ARM resource type supported by Cloud Custodian.
-
       .. c7n-schema:: DeleteAction
             :module: c7n_azure.actions
 

@@ -11,7 +11,6 @@ Filters
 
 Actions
 -------
-
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
 Example Policies
