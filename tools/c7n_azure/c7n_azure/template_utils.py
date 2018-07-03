@@ -56,7 +56,7 @@ class TemplateUtilities(object):
         r_filter = ("name eq '%s'" % resource_name)
 
         for resource in self.client.resources.list_by_resource_group(group_name, filter=r_filter):
-            return True
+            return resource
         return False
 
     def get_default_parameters(self, file_name):
