@@ -6,6 +6,8 @@ Network Security Groups
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
+      - Model: `NetworkSecurityGroup
+      <https://docs.microsoft.com/en-us/python/api/azure.mgmt.network.v2018_02_01.models.networksecuritygroup?view=azure-python> `_
 
 ``ingress``
   Filter based on Inbound Security Rules
