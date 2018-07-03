@@ -186,7 +186,10 @@ class ResourceAccessFilter(RelatedResourceFilter):
         ctx = ExecutionContext(local_session(Session), self.data, Config.empty())
         manager = self.factory(ctx, self.data)
         related = manager.source.get_resources(None)
-        return [r['id'] for r in related if self.match(r)]
+        if self.data['op']:
+            return [r['id'] for r in related if self.match(r)]
+        else:
+            return [r['id'] for r in related]
 
     def process_resource(self, resource, related):
         for r in related:
