@@ -55,7 +55,6 @@ class ArmResourceManager(QueryResourceManager):
 
     @staticmethod
     def register_arm_specific(registry, _):
-        mark_for_op_supported = {'vm'}
         for resource in registry.keys():
             klass = registry.get(resource)
             if issubclass(klass, ArmResourceManager):
@@ -66,9 +65,9 @@ class ArmResourceManager(QueryResourceManager):
                 if resource is not 'resourcegroup':
                     klass.action_registry.register('delete', DeleteAction)
                 klass.filter_registry.register('metric', MetricFilter)
-                if resource in mark_for_op_supported:
-                    klass.filter_registry.register('marked-for-op', TagActionFilter)
-                    klass.action_registry.register('mark-for-op', TagDelayedAction)
+                klass.filter_registry.register('marked-for-op', TagActionFilter)
+                klass.action_registry.register('mark-for-op', TagDelayedAction)
+
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

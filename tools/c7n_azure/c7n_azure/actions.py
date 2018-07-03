@@ -432,7 +432,7 @@ class TagDelayedAction(BaseAction):
     .. code-block :: yaml
 
       - policies:
-        - name: ec2-mark-for-stop-in-future
+        - name: vm-mark-for-stop
           resource: azure.vm
           filters:
             - type: value
