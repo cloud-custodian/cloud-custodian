@@ -1,5 +1,5 @@
 vcrpy==1.11.0
 vcrpy_unittest
 adal~=0.5.0
-mock==2.0.0
+mock
 backports.functools_lru_cache
