@@ -24,7 +24,7 @@ from c7n_azure.utils import ResourceIdParser
 
 class Session(object):
 
-    def __init__(self, subscription_id=None):
+    def __init__(self, subscription_id=None, resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id):
         """
         :param subscription_id: If provided overrides environment variables.
 
@@ -36,10 +36,11 @@ class Session(object):
         self.credentials = None
         self.subscription_id = None
         self.tenant_id = None
+        self.resource_namespace = resource
         self._is_token_auth = False
         self._is_cli_auth = False
 
-    def _initialize_session(self, resource=None):
+    def _initialize_session(self):
         """
         Creates a session using available authentication type.
 
@@ -51,7 +52,7 @@ class Session(object):
         """
 
         # Only run once
-        if self.credentials is not None and resource is None:
+        if self.credentials is not None:
             return
 
         tenant_auth_variables = [
@@ -72,19 +73,11 @@ class Session(object):
 
         elif all(k in os.environ for k in tenant_auth_variables):
             # Tenant (service principal) authentication
-            if resource:
-                self.credentials = ServicePrincipalCredentials(
-                    client_id=os.environ['AZURE_CLIENT_ID'],
-                    secret=os.environ['AZURE_CLIENT_SECRET'],
-                    tenant=os.environ['AZURE_TENANT_ID'],
-                    resource=resource
-                )
-            else:
-                self.credentials = ServicePrincipalCredentials(
-                    client_id=os.environ['AZURE_CLIENT_ID'],
-                    secret=os.environ['AZURE_CLIENT_SECRET'],
-                    tenant=os.environ['AZURE_TENANT_ID']
-                )
+            self.credentials = ServicePrincipalCredentials(
+                client_id=os.environ['AZURE_CLIENT_ID'],
+                secret=os.environ['AZURE_CLIENT_SECRET'],
+                tenant=os.environ['AZURE_TENANT_ID'],
+                resource=self.resource_namespace)
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.tenant_id = os.environ['AZURE_TENANT_ID']
             self.log.info("Creating session with Service Principal Authentication")
@@ -92,12 +85,10 @@ class Session(object):
         else:
             # Azure CLI authentication
             self._is_cli_auth = True
-            if not resource:
-                resource = AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id
             (self.credentials,
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
-                resource=resource)
+                resource=self.resource_namespace)
             self.log.info("Creating session with Azure CLI Authentication")
 
         # Let provided id parameter override everything else
@@ -109,14 +100,16 @@ class Session(object):
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
 
-    def client(self, client, resource=None):
-        self._initialize_session(resource)
+    def client(self, client):
+        self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
-        if resource == 'https://graph.windows.net':
-            return klass(self.credentials, self.tenant_id)
         return klass(self.credentials, self.subscription_id)
+
+    def get_credentials(self):
+        self._initialize_session()
+        return self.credentials
 
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """

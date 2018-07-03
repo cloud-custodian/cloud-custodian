@@ -5,6 +5,12 @@ Access Control
 
 Cloud custodian supports both azure role assignments and role definitions.
 
+In order to get the principal name, display name, and AAD type (User, Service Principal, etc) of role assignments the
+method of authorization must have the necessary permissions to read from the Microsoft AAD Graph. For Service Principal
+Authorization the Service Principal must have the permissions to `read all users' full profiles`. Azure CLI
+authentication will provide the necessary permissions to run the policy locally. Basic token authentication will not
+provide the necessary permissions. 
+
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)

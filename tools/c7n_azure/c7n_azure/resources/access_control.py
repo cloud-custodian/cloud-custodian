@@ -11,13 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from azure.common.credentials import get_azure_cli_credentials
+
+import logging
+
 from azure.graphrbac import GraphRbacManagementClient
 from azure.graphrbac.models import GetObjectsParameters
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
 from c7n_azure.session import Session
+from msrestazure.azure_exceptions import CloudError
 
 from c7n.actions import BaseAction
 from c7n.ctx import ExecutionContext
@@ -28,6 +31,8 @@ from c7n.handler import Config
 from c7n.query import sources
 from c7n.utils import local_session
 from c7n.utils import type_schema
+
+log = logging.getLogger('custodian.azure.access_control')
 
 
 @resources.register('roleassignment')
@@ -50,10 +55,8 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = local_session(self.session_factory)
-        # cred, sub_id = get_azure_cli_credentials(resource='https://graph.windows.net')
-        # graph_client = GraphRbacManagementClient(cred, s.get_tenant_id())
-        graph_client = s.client('azure.graphrbac.GraphRbacManagementClient', resource='https://graph.windows.net')
+        s = Session(resource='https://graph.windows.net')
+        graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
 
         object_ids = list(set(
             resource['properties']['principalId'] for resource in resources
@@ -65,13 +68,19 @@ class RoleAssignment(QueryResourceManager):
 
         aad_objects = graph_client.objects.get_objects_by_object_ids(object_params)
 
-        principal_dics = {aad_object.object_id: aad_object for aad_object in aad_objects}
+        try:
+            principal_dics = {aad_object.object_id: aad_object for aad_object in aad_objects}
 
-        for resource in resources:
-            graph_resource = principal_dics[resource['properties']['principalId']]
-            resource['principalName'] = self.get_principal_name(graph_resource)
-            resource['displayName'] = graph_resource.display_name
-            resource['aadType'] = graph_resource.object_type
+            for resource in resources:
+                graph_resource = principal_dics[resource['properties']['principalId']]
+                resource['principalName'] = self.get_principal_name(graph_resource)
+                resource['displayName'] = graph_resource.display_name
+                resource['aadType'] = graph_resource.object_type
+
+        except CloudError:
+            log.warning('Credentials not authorized for access to read from Microsoft Graph. \n '
+                        'Can not query on principalName, displayName, or aadType. \n'
+                        )
 
         return resources
 
