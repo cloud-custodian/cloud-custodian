@@ -41,6 +41,9 @@ class TestUtils(unittest.TestCase):
 
     custodian_schema = None
 
+    def tearDown(self):
+        self.cleanUp()
+
     def cleanUp(self):
         # Clear out thread local session cache
         CONN_CACHE.session = None

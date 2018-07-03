@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "8ac6e1ae-7ba5-11e8-9ec8-b3ced88feb65",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 29 Jun 2018 14:05:56 GMT",
+                "content-type": "application/json",
+                "content-length": "699",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "8ac6e1ae-7ba5-11e8-9ec8-b3ced88feb65"
+            },
+            "RetryAttempts": 0
+        },
+        "EventSourceMappings": [
+            {
+                "UUID": "0d8c2609-317d-4e2d-a777-721dc33895a3",
+                "BatchSize": 10,
+                "EventSourceArn": "arn:aws:sqs:us-east-1:644160558196:my-dev-test-4",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-hello-sqs",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 6,
+                    "day": 29,
+                    "hour": 9,
+                    "minute": 47,
+                    "second": 29,
+                    "microsecond": 87000
+                },
+                "State": "Disabled",
+                "StateTransitionReason": "USER_INITIATED"
+            },
+            {
+                "UUID": "90282713-22c8-4931-8847-ad391732994e",
+                "BatchSize": 10,
+                "EventSourceArn": "arn:aws:sqs:us-east-1:644160558196:my-dev-test-3",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-hello-sqs",
+                "LastModified": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 6,
+                    "day": 29,
+                    "hour": 9,
+                    "minute": 39,
+                    "second": 3,
+                    "microsecond": 873000
+                },
+                "State": "Disabled",
+                "StateTransitionReason": "USER_INITIATED"
+            }
+        ]
+    }
+}

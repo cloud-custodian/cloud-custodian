@@ -55,7 +55,7 @@
         },
         {
             "apiVersion": "2015-05-01",
-            "name": "[parameters('name')]",
+            "name": "[parameters('servicePlanName')]",
             "type": "microsoft.insights/components",
             "location": "[parameters('appInsightsLocation')]",
             "tags": {
@@ -72,7 +72,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Web/serverfarms/', parameters('servicePlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]",
-                "[resourceId('microsoft.insights/components/', parameters('name'))]"
+                "[resourceId('microsoft.insights/components/', parameters('servicePlanName'))]"
 
             ],
             "properties": {
@@ -96,12 +96,12 @@
                         },
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('name')), '2015-05-01').InstrumentationKey]"
+                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('servicePlanName')), '2015-05-01').InstrumentationKey]"
                         }
                     ],
                     "alwaysOn": true,
                     "appCommandLine": "",
-                    "linuxFxVersion": "DOCKER|microsoft/azure-functions-python3.6:dev-nightly"
+                    "linuxFxVersion": "DOCKER|microsoft/azure-functions-python3.6:latest"
                 },
                 "name": "[parameters('name')]",
                 "clientAffinityEnabled": false,
