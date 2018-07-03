@@ -7,6 +7,7 @@ Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
       - Model: `NetworkSecurityGroup <https://docs.microsoft.com/en-us/python/api/azure.mgmt.network.v2018_02_01.models.networksecuritygroup?view=azure-python>`_
+- ARM Resource Filters (see :ref:`azure_genericarmfilter`)
 
 ``ingress``
   Filter based on Inbound Security Rules
