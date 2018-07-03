@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from c7n.manager import resources
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, iamaccess
 from c7n.query import QueryResourceManager
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
@@ -32,6 +32,17 @@ class SecretsManager(QueryResourceManager):
         name = 'Name'
         dimension = None
         filter_name = None
+
+
+@SecretsManager.filter_registry.register('cross-account')
+class CrossAccountAccessFilter(iamaccess.CrossAccountAccessFilter):
+
+    def process(self, resources):
+        self.client = local_session(self.manager.session_factory).client('secretsmanager')
+        super(CrossAccountAccessFilter, self).process(resources)
+
+    def get_resource_policy(self, r):
+        return self.client.get_resource_policy(r['SecretId']).get('ResourcePolicy', None)
 
 
 @SecretsManager.action_registry.register('tag')

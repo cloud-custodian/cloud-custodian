@@ -91,6 +91,10 @@ class PolicyChecker(object):
     def allowed_vpc(self):
         return self.checker_config.get('allowed_vpc', ())
 
+    @property
+    def allowed_orgs(self):
+        return self.checker_config.get('allowed_orgs', ())
+
     # Policy statement handling
     def check(self, policy_text):
         if isinstance(policy_text, six.string_types):
