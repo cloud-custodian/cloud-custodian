@@ -9,14 +9,19 @@ Filters
 - Arm Filters (see :ref:`azure_genericarmfilter`)
 - ``instance-view``
   Filter based on VM attributes in instance view, such as power state.
+
   .. c7n-schema:: InstanceViewFilter
        :module: c7n_azure.resources.vm
+
 - ``metric``
   Filter based on metrics from Azure Monitor, such as CPU usage.
+
   .. c7n-schema:: MetricFilter
        :module: c7n_azure.filters
+
 - ``network-interface``
   Filter based on properties of the network interfaces associated with the virtual machine.
+
   .. c7n-schema:: NetworkInterfaceFilter
         :module: c7n_azure.resources.vm
 
@@ -24,14 +29,19 @@ Actions
 -------
 - ``start``
   Start the VMs
+
   .. c7n-schema:: VmStartAction
-       :module: c7n_azure.resources.vm 
+       :module: c7n_azure.resources.vm
+
 - ``stop``
   Stop the VMs
+
   .. c7n-schema:: VmStopAction
-        :module: c7n_azure.resources.vm 
+        :module: c7n_azure.resources.vm
+
 - ``restart``
   Restart the VMs
+
   .. c7n-schema:: VmRestartAction
         :module: c7n_azure.resources.vm 
 

@@ -10,6 +10,7 @@ Filters
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
 - ``empty-group``
   Filter based on empty resource groups
+
   .. c7n-schema:: EmptyGroup
       :module: c7n_azure.resources.resourcegroup
 
@@ -18,6 +19,7 @@ Actions
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 - ``delete``
   Delete a resource group
+
   .. c7n-schema:: DeleteResourceGroup
       :module: c7n_azure.resources.resourcegroup
 

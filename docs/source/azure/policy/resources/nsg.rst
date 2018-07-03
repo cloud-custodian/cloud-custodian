@@ -10,10 +10,13 @@ Filters
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
 - ``ingress``
   Filter based on Inbound Security Rules
+
   .. c7n-schema:: IngressFilter
       :module: c7n_azure.resources.network_security_group
+
 - ``egress``
   Filter based on Outbound Security Rules
+
   .. c7n-schema:: EgressFilter
       :module: c7n_azure.resources.network_security_group
 
@@ -23,10 +26,13 @@ Actions
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 - ``open``
   Allow access to security rules
+
   .. c7n-schema:: CloseRules
       :module: c7n_azure.resources.network_security_group
+
 - ``close``
   Deny access to security rules
+
   .. c7n-schema:: OpenRules
       :module: c7n_azure.resources.network_security_group
 

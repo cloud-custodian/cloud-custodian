@@ -10,6 +10,7 @@ Filters
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
 - ``role``
   Filters role assignments based on role definitions
+
   .. c7n-schema:: UserRole
       :module: c7n_azure.resources.access_control
 

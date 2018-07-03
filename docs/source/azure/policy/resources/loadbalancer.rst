@@ -10,6 +10,7 @@ Filters
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
 - ``frontend-public-ip``
   Filters load balancers by the frontend public IP
+
   .. c7n-schema:: FrontEndIp
       :module: c7n_azure.resources.load_balancer
 
