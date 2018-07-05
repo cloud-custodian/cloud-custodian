@@ -140,6 +140,7 @@ class Session(object):
             return api_version
 
     def get_tenant_id(self):
+        self._initialize_session()
         if self._is_token_auth:
             decoded = jwt.decode(self.credentials['token']['access_token'], verify=False)
             return decoded['tid']
@@ -147,6 +148,7 @@ class Session(object):
         return self.tenant_id
 
     def get_bearer_token(self):
+        self._initialize_session()
         if self._is_cli_auth:
             return self.credentials._token_retriever()[1]
         return self.credentials.token['access_token']
