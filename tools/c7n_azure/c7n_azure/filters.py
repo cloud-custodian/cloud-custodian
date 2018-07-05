@@ -24,8 +24,6 @@ from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
 from c7n.utils import type_schema
 
-from c7n.filters import Filter
-
 
 class MetricFilter(Filter):
     """
