@@ -8,8 +8,7 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
       - Model: `Vault <https://docs.microsoft.com/en-us/python/api/azure.mgmt.keyvault.models.vault?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
-    - Metric Filter - Filter on metrics from Azure Monitor
-        - `Cognitive Services Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcognitiveservicesaccounts/>`_
+    - Metric Filter - Filter on metrics from Azure Monitor - (see `Cognitive Services Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcognitiveservicesaccounts/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
@@ -20,7 +19,7 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all IoT Hubs for deletion in 7 days that have 'test' in name (ignore case),
+This set of policies will mark all Cognitive Services accounts for deletion in 7 days that have 'test' in name (ignore case),
 and then perform the delete operation on those ready for deletion.
 
 .. code-block:: yaml

@@ -6,6 +6,8 @@ Generic Filters
 These filters can be applied to a specific resource type, such as ``azure.vm``, or they can be
 applied to all Azure resources by using ``azure.armresource`` as the resource type.
 
+Metric Filter
+-------------
 
 ``MetricFilter``
 Filters Azure resources based on live metrics from the Azure monitor.
@@ -80,8 +82,29 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
             timeframe: 24
 
 
+Tag Filter
+----------
+
+The "tag filter" is implicitly just the ValueFilter (see :ref:`filters`)
+
+Example Policies
+---------------
+
+.. code-block:: yaml
+
+    policies
+      - name: delete-resources-with-Tag1
+        resource: azure.armresource
+        filters:
+          - tag:Tag1: present
+        actions:
+          - type: delete
+
+Marked-For-Op Filter
+--------------------
+
 ``TagActionFilter``
-Filters Azure resources based on previously scheduled operations via tags
+Filters Azure resources based on previously scheduled operations via tags.
 
 .. c7n-schema:: TagActionFilter
     :module: c7n_azure.filters
@@ -103,7 +126,7 @@ Find VMs that have been marked for stopping and stop them
         actions:
           - type: stop
 
-Find VMs that have been marked for stopping tomorrow and notify email address
+Find VMs that have been marked for stopping tomorrow and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -112,13 +135,15 @@ Find VMs that have been marked for stopping tomorrow and notify email address
         resource: azure.vm
         filters:
           - type: marked-for-op
+            # 'Fast-forward' 1 day into future. skew_hours is used for hour increments
             skew: 1
             op: stop
         actions:
           - type: notify
             template: default
             subject: VMs Scheduled To Stop
-            to: user@domain.com
+            to:
+              - user@domain.com
             transport:
               - type: asq
                 queue: https://accountname.queue.core.windows.net/test

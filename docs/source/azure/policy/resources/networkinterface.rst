@@ -18,7 +18,7 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all IoT Hubs for deletion in 7 days that have 'test' in name (ignore case),
+This set of policies will mark all Network Interfaces for deletion in 7 days that have 'test' in name (ignore case),
 and then perform the delete operation on those ready for deletion.
 
 .. code-block:: yaml

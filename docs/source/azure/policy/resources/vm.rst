@@ -7,8 +7,7 @@ Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
 - Arm Filters (see :ref:`azure_genericarmfilter`)
-    - Metric Filter - Filter on metrics from Azure Monitor
-        - `Virtual Machine Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcomputevirtualmachines/>`_
+    - Metric Filter - Filter on metrics from Azure Monitor - (see `Virtual Machine Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcomputevirtualmachines/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 - ``instance-view``

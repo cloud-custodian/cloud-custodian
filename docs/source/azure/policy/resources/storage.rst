@@ -8,8 +8,7 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
       - Model: `StorageAccount <https://docs.microsoft.com/en-us/python/api/azure.mgmt.storage.v2018_02_01.models.storageaccount?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
-    - Metric Filter - Filter on metrics from Azure Monitor
-        - `Storage Account Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftstoragestorageaccounts/>`_
+    - Metric Filter - Filter on metrics from Azure Monitor - (see `Storage Account Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftstoragestorageaccounts/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
@@ -46,7 +45,7 @@ and then perform the delete operation on those ready for deletion.
         actions:
           - type: delete
 
-This policy will find all IoT Hubs with 100 or less transactions over the 72 hours and notify user@domain.com
+This policy will find all Storage Accounts with 100 or less transactions over the 72 hours and notify user@domain.com
 
 .. code-block:: yaml
 

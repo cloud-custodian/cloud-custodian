@@ -8,8 +8,7 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
       - Model: `Server <https://docs.microsoft.com/en-us/python/api/azure.mgmt.sql.models.server?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
-    - Metric Filter - Filter on metrics from Azure Monitor
-        - `SQL Server Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftsqlservers/>`_
+    - Metric Filter - Filter on metrics from Azure Monitor - (see `SQL Server Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftsqlservers/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 

@@ -8,8 +8,7 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
     - Model: `IotHubDescription <https://docs.microsoft.com/en-us/python/api/azure.mgmt.iothub.models.iothubdescription?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
-    - MetricFilter - Filter on metrics from Azure Monitor
-        - `IoT Hub Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftdevicesiothubs/>`_
+    - MetricFilter - Filter on metrics from Azure Monitor - (see `IoT Hub Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftdevicesiothubs/>`_)
     - Tag Filter - Filter on tags for actions previously applied to resource
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
