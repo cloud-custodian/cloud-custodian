@@ -105,6 +105,7 @@ Tags
                 actions:
                  - type: delete
 
+        The delete action also works with a specified resource type:
 
         .. code-block:: yaml
 
