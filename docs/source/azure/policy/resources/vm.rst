@@ -7,6 +7,10 @@ Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
 - Arm Filters (see :ref:`azure_genericarmfilter`)
+    - Metric Filter - Filter on metrics from Azure Monitor
+        - `Virtual Machine Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcomputevirtualmachines/>`_
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 - ``instance-view``
   Filter based on VM attributes in instance view, such as power state.
 
@@ -111,3 +115,56 @@ Find all VMs with a Public IP address
           - type: network-interface
             key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
             value: not-null
+
+This policy will find all VMs that have Percentage CPU usage >= 75% over the last week and notify user@domain.com
+
+.. code-block:: yaml
+
+    policies:
+      - name: notify-busy-vms
+        resource: azure.vm
+        filters:
+          - type: metric
+            metric: Percentage CPU
+            op: ge
+            aggregation: average
+            threshold: 75
+            timeframe: 7
+         actions:
+          - type: notify
+            template: default
+            priority_header: 2
+            subject: Busy VMs
+            to:
+              - user@domain.com
+            transport:
+              - type: asq
+                queue: https://accountname.queue.core.windows.net/queuename
+
+This policy will find all VMs that have Percentage CPU usage <= 1% over the last 30 days, mark for deletion in 7 days and notify user@domain.com
+
+.. code-block:: yaml
+
+    policies:
+      - name: notify-busy-vms
+        resource: azure.vm
+        filters:
+          - type: metric
+            metric: Percentage CPU
+            op: le
+            aggregation: average
+            threshold: 1
+            timeframe: 30
+         actions:
+          - type: mark-for-op
+            op: delete
+            days: 7
+          - type: notify
+            template: default
+            priority_header: 2
+            subject: VMs to be Deleted in 7 Days
+            to:
+              - user@domain.com
+            transport:
+              - type: asq
+                queue: https://accountname.queue.core.windows.net/queuename

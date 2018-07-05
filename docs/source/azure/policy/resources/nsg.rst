@@ -8,6 +8,9 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
       - Model: `NetworkSecurityGroup <https://docs.microsoft.com/en-us/python/api/azure.mgmt.network.v2018_02_01.models.networksecuritygroup?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
+    - Metric Filter - Filter on metrics from Azure Monitor
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 - ``ingress``
   Filter based on Inbound Security Rules
 

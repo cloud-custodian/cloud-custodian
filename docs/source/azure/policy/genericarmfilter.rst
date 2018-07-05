@@ -3,6 +3,9 @@
 Generic Filters
 ================
 
+These filters can be applied to a specific resource type, such as ``azure.vm``, or they can be
+applied to all Azure resources by using ``azure.armresource`` as the resource type.
+
 
 ``MetricFilter``
 Filters Azure resources based on live metrics from the Azure monitor.
@@ -21,7 +24,7 @@ Metrics for Custodian-supported Azure resources:
 - `SQL Server <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftsqlservers/>`_
 - `Storage Accounts <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftstoragestorageaccounts/>`_
 - `Virtual Machine <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcomputevirtualmachines/>`_
-- `Virtual Network <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftnetworkvirtualnetworkgateways/>`_
+- `Web Apps (excluding functions) <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftwebsites-excluding-functions/>`_
 
 Click `here <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics/>`_
 for a full list of metrics supported by Azure resources.

@@ -6,8 +6,10 @@ App Service Plan
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
-      - Model: `AppServicePlan <https://docs.microsoft.com/en-us/python/api/azure.mgmt.web.models.AppServicePlan?view=azure-python>`_
+    - Model: `AppServicePlan <https://docs.microsoft.com/en-us/python/api/azure.mgmt.web.models.AppServicePlan?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
 Actions
 -------
@@ -16,38 +18,28 @@ Actions
 Example Policies
 ----------------
 
-This policy will
+This set of policies will mark all app services for deletion in 7 days that have 'test' in name (ignore case),
+and then perform the delete operation on those ready for deletion.
 
 .. code-block:: yaml
 
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
+    policies:
+      - name: mark-test-appservice-for-deletion
+        resource: azure.appservice
+        filters:
+          - type: value
+            key: name
+            op: in
+            value_type: normalize
+            value: test
          actions:
-          - type:
-
-This policy will
-
-.. code-block:: yaml
-
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
-         actions:
-          - type:
-
-This policy will
-
-.. code-block:: yaml
-
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
-         actions:
-          - type:
+          - type: mark-for-op
+            op: delete
+            days: 7
+      - name: delete-test-iothubs
+        resource: azure.iothub
+        filters:
+          - type: marked-for-op
+            op: delete
+        actions:
+          - type: delete

@@ -8,6 +8,10 @@ Filters
 - Standard Value Filter (see :ref:`filters`)
       - Model: `PublicIPAddress <https://docs.microsoft.com/en-us/python/api/azure.mgmt.network.v2018_02_01.models.publicipaddress?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
+    - Metric Filter - Filter on metrics from Azure Monitor
+        - `Public IP Address Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftnetworkpublicipaddresses/>`_
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
 Actions
 -------
@@ -16,38 +20,52 @@ Actions
 Example Policies
 ----------------
 
-This policy will
+This set of policies will mark all public IP addresses for deletion in 7 days that have 'test' in name (ignore case),
+and then perform the delete operation on those ready for deletion.
 
 .. code-block:: yaml
 
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
+    policies:
+      - name: mark-test-public-ip-for-deletion
+        resource: azure.publicip
+        filters:
+          - type: value
+            key: name
+            op: in
+            value_type: normalize
+            value: test
          actions:
-          - type:
+          - type: mark-for-op
+            op: delete
+            days: 7
+      - name: delete-test-publicips
+        resource: azure.publicip
+        filters:
+          - type: marked-for-op
+            op: delete
+        actions:
+          - type: delete
 
-This policy will
+This policy will find all public IP addresses under DDoS attack over the last week and notify user@domain.com
 
 .. code-block:: yaml
 
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
+    policies:
+      - name: notify-publicip-dropping-packets
+        resource: azure.publicip
+        filters:
+          - type: metric
+            metric: IfUnderDDoSAttack
+            op: gt
+            aggregation: maximum
+            threshold: 0
          actions:
-          - type:
-
-This policy will
-
-.. code-block:: yaml
-
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
-         actions:
-          - type:
+          - type: notify
+            template: default
+            priority_header: 1
+            subject: Public IP Under DDoS Attack
+            to:
+              - user@domain.com
+            transport:
+              - type: asq
+                queue: https://accountname.queue.core.windows.net/queuename

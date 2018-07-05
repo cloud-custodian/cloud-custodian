@@ -12,42 +12,60 @@ Filters
 Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
+    - Metric Filter - Filter on metrics from Azure Monitor
+        - `Key Vault Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftkeyvaultvaults/>`_
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
 Example Policies
 ----------------
 
-This policy will
+This set of policies will mark all IoT Hubs for deletion in 7 days that have 'test' in name (ignore case),
+and then perform the delete operation on those ready for deletion.
 
 .. code-block:: yaml
 
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
+    policies:
+      - name: mark-test-keyvaults-for-deletion
+        resource: azure.keyvault
+        filters:
+          - type: value
+            key: name
+            op: in
+            value_type: normalize
+            value: test
          actions:
-          - type:
+          - type: mark-for-op
+            op: delete
+            days: 7
+      - name: delete-test-keyvaults
+        resource: azure.keyvault
+        filters:
+          - type: marked-for-op
+            op: delete
+        actions:
+          - type: delete
 
-This policy will
+This policy will find all KeyVaults with 10 or less API Hits over the last week and notify user@domain.com
 
 .. code-block:: yaml
 
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
+    policies:
+      - name: notify-inactive-keyvaults
+        resource: azure.keyvault
+        filters:
+          - type: metric
+            metric: ServiceApiHit
+            op: ge
+            aggregation: total
+            threshold: 10
          actions:
-          - type:
-
-This policy will
-
-.. code-block:: yaml
-
-     policies:
-       - name:
-         resource: azure.
-         filters:
-          - type:
-         actions:
-          - type:
+          - type: notify
+            template: default
+            priority_header: 2
+            subject: Inactive Key Vault
+            to:
+              - user@domain.com
+            transport:
+              - type: asq
+                queue: https://accountname.queue.core.windows.net/queuename
