@@ -697,3 +697,65 @@ class TagsTest(BaseTest):
         p = self.load_policy(policy)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    DAYS = 10
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.utils.now', return_value=TEST_DATE)
+    def test_mark_for_op(self, date_mock):
+        policy = {
+            'name': 'test-mark-for-op',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}],
+            'actions': [
+                {'type': 'mark-for-op',
+                 'op': 'stop',
+                 'days': self.DAYS}
+            ]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.utils.now', return_value=TEST_DATE)
+    def test_marked_for_op_empty(self, date_mock):
+        policy = {
+            'name': 'test-mark-for-op',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'marked-for-op',
+                 'op': 'stop'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.utils.now', return_value=TEST_DATE + datetime.timedelta(days=DAYS))
+    def test_marked_for_op(self, date_mock):
+        policy = {
+            'name': 'test-mark-for-op',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'marked-for-op',
+                 'op': 'stop'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

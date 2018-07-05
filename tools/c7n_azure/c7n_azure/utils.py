@@ -39,6 +39,12 @@ def utcnow():
     return datetime.datetime.utcnow()
 
 
+def now(tz=None):
+    """The datetime object for the current time in UTC
+    """
+    return datetime.datetime.now(tz=tz)
+
+
 class Math(object):
 
     @staticmethod
