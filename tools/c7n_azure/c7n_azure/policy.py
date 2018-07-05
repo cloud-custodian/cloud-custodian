@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.template_utils import TemplateUtilities
 from c7n_azure.function_package import FunctionPackage
+from c7n_azure.template_utils import TemplateUtilities
 
 from c7n import utils
 from c7n.policy import ServerlessExecutionMode, PullMode, execution

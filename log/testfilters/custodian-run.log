@@ -1,0 +1,9 @@
+2018-07-03 16:58:57,641 - custodian.policy - DEBUG - Running policy testfilters resource: azure.roleassignment region:default c7n:0.8.28.2
+2018-07-03 16:58:57,743 - custodian.azure.session - INFO - Creating session with Azure CLI Authentication
+2018-07-03 16:58:57,743 - custodian.azure.session - INFO - Session using Subscription ID: aa98974b-5d2a-4d98-a78a-382f3715d07e
+2018-07-03 16:58:58,538 - custodian.azure.session - INFO - Creating session with Azure CLI Authentication
+2018-07-03 16:58:58,538 - custodian.azure.session - INFO - Session using Subscription ID: aa98974b-5d2a-4d98-a78a-382f3715d07e
+2018-07-03 16:59:03,133 - custodian.cache - DEBUG - Disabling cache
+2018-07-03 16:59:27,737 - custodian.resources.roleassignment - DEBUG - Filtered from 15 to 6 roleassignment
+2018-07-03 16:59:27,738 - custodian.policy - INFO - policy: testfilters resource:azure.roleassignment region: count:6 time:30.10
+2018-07-03 16:59:27,738 - custodian.output - DEBUG - metric:ResourceCount Count:6 policy:testfilters restype:azure.roleassignment scope:policy

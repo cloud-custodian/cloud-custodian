@@ -13,12 +13,13 @@
 # limitations under the License.
 
 import importlib
-import os
-import logging
 import jwt
 import json
-from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
+import logging
+import os
+
 from azure.cli.core._profile import Profile
+from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from c7n_azure.utils import ResourceIdParser
 
