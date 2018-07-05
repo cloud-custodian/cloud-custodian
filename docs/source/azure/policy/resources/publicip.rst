@@ -46,7 +46,7 @@ and then perform the delete operation on those ready for deletion.
         actions:
           - type: delete
 
-This policy will find all public IP addresses under DDoS attack over the last week and notify user@domain.com
+This policy will find all public IP addresses under DDoS attack over the last 72 hours and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -59,6 +59,7 @@ This policy will find all public IP addresses under DDoS attack over the last we
             op: gt
             aggregation: maximum
             threshold: 0
+            timeframe: 72
          actions:
           - type: notify
             template: default

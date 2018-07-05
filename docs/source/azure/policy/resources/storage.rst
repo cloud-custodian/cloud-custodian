@@ -46,7 +46,7 @@ and then perform the delete operation on those ready for deletion.
         actions:
           - type: delete
 
-This policy will find all IoT Hubs with 100 or less transactions over the 30 days and notify user@domain.com
+This policy will find all IoT Hubs with 100 or less transactions over the 72 hours and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -59,7 +59,7 @@ This policy will find all IoT Hubs with 100 or less transactions over the 30 day
             op: le
             aggregation: total
             threshold: 100
-            timeframe: 30
+            timeframe: 72
          actions:
           - type: notify
             template: default

@@ -46,7 +46,7 @@ and then perform the delete operation on those ready for deletion.
         actions:
           - type: delete
 
-This policy will find all Cognitive Service accounts with 1000 or more total errors over the last week and notify user@domain.com
+This policy will find all Cognitive Service accounts with 1000 or more total errors over the 72 hours and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -59,7 +59,7 @@ This policy will find all Cognitive Service accounts with 1000 or more total err
             op: ge
             aggregation: total
             threshold: 1000
-            timeframe: 7
+            timeframe: 72
          actions:
           - type: notify
             template: default

@@ -39,7 +39,7 @@ This policy will filter load balancers with an ipv6 frontend public IP
               value_type: normalize
               value: "ipv6"
 
-This policy will find all load balancers with 1000 or less transmitted packets over the last week and notify user@domain.com
+This policy will find all load balancers with 1000 or less transmitted packets over the last 72 hours and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -52,6 +52,7 @@ This policy will find all load balancers with 1000 or less transmitted packets o
             op: ge
             aggregation: total
             threshold: 1000
+            timeframe: 72
          actions:
           - type: notify
             template: default

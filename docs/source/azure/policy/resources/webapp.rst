@@ -46,7 +46,7 @@ and then perform the delete operation on those ready for deletion.
         actions:
           - type: delete
 
-This policy will find all web apps with 10 or less requests over the last 30 days, mark for deletion and notify user@domain.com
+This policy will find all web apps with 10 or less requests over the last 72 hours, mark for deletion and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -59,6 +59,7 @@ This policy will find all web apps with 10 or less requests over the last 30 day
             op: le
             aggregation: total
             threshold: 10
+            timeframe: 72
          actions:
           - type: mark-for-op
             op: delete
@@ -73,7 +74,7 @@ This policy will find all web apps with 10 or less requests over the last 30 day
               - type: asq
                 queue: https://accountname.queue.core.windows.net/queuename
 
-This policy will find all web apps with 1000 or more server errors over the last 30 days and notify user@domain.com
+This policy will find all web apps with 1000 or more server errors over the last 72 hours and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -86,6 +87,7 @@ This policy will find all web apps with 1000 or more server errors over the last
             op: ge
             aggregation: total
             threshold: 1000
+            timeframe: 72
          actions:
           - type: notify
             template: default

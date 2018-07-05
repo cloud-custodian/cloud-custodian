@@ -116,7 +116,7 @@ Find all VMs with a Public IP address
             key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
             value: not-null
 
-This policy will find all VMs that have Percentage CPU usage >= 75% over the last week and notify user@domain.com
+This policy will find all VMs that have Percentage CPU usage >= 75% over the last 72 hours and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -129,7 +129,7 @@ This policy will find all VMs that have Percentage CPU usage >= 75% over the las
             op: ge
             aggregation: average
             threshold: 75
-            timeframe: 7
+            timeframe: 72
          actions:
           - type: notify
             template: default
@@ -141,7 +141,7 @@ This policy will find all VMs that have Percentage CPU usage >= 75% over the las
               - type: asq
                 queue: https://accountname.queue.core.windows.net/queuename
 
-This policy will find all VMs that have Percentage CPU usage <= 1% over the last 30 days, mark for deletion in 7 days and notify user@domain.com
+This policy will find all VMs that have Percentage CPU usage <= 1% over the last 72 hours, mark for deletion in 7 days and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -154,7 +154,7 @@ This policy will find all VMs that have Percentage CPU usage <= 1% over the last
             op: le
             aggregation: average
             threshold: 1
-            timeframe: 30
+            timeframe: 72
          actions:
           - type: mark-for-op
             op: delete
