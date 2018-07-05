@@ -52,7 +52,7 @@ This policy will find all web apps with 10 or less requests over the last 30 day
 
     policies:
       - name: notify-webapp-dropping-messages
-        resource: azure.iothub
+        resource: azure.webapp
         filters:
           - type: metric
             metric: Requests

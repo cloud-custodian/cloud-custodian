@@ -38,32 +38,33 @@ and then perform the delete operation on those ready for deletion.
           - type: mark-for-op
             op: delete
             days: 7
-      - name: delete-test-iothubs
-        resource: azure.iothub
+      - name: delete-test-storage
+        resource: azure.storage
         filters:
           - type: marked-for-op
             op: delete
         actions:
           - type: delete
 
-This policy will find all IoT Hubs with 1000 or more dropped messages over the last week and notify user@domain.com
+This policy will find all IoT Hubs with 100 or less transactions over the 30 days and notify user@domain.com
 
 .. code-block:: yaml
 
     policies:
-      - name: notify-iothubs-dropping-messages
-        resource: azure.iothub
+      - name: notify-storage-dropping-messages
+        resource: azure.storage
         filters:
           - type: metric
-            metric: Dropped Messages
-            op: ge
+            metric: Transactions
+            op: le
             aggregation: total
-            threshold: 1000
+            threshold: 100
+            timeframe: 30
          actions:
           - type: notify
             template: default
             priority_header: 2
-            subject: IOT Hubs Dropping Messages
+            subject: Inactive Storage Account
             to:
               - user@domain.com
             transport:

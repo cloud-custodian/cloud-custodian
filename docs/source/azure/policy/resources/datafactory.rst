@@ -51,8 +51,8 @@ This policy will find all Data Factories with 10 or more failures in pipeline ru
 .. code-block:: yaml
 
     policies:
-      - name: notify-iothubs-dropping-messages
-        resource: azure.iothub
+      - name: notify-datafactory-dropping-messages
+        resource: azure.datafactory
         filters:
           - type: metric
             metric: PipelineFailedRuns

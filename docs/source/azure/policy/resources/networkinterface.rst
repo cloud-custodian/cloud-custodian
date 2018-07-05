@@ -24,8 +24,8 @@ and then perform the delete operation on those ready for deletion.
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-iothubs-for-deletion
-        resource: azure.iothub
+      - name: mark-test-networkinterface-for-deletion
+        resource: azure.networkinterface
         filters:
           - type: value
             key: name
@@ -36,8 +36,8 @@ and then perform the delete operation on those ready for deletion.
           - type: mark-for-op
             op: delete
             days: 7
-      - name: delete-test-iothubs
-        resource: azure.iothub
+      - name: delete-test-networkinterface
+        resource: azure.networkinterface
         filters:
           - type: marked-for-op
             op: delete
