@@ -7,6 +7,7 @@ Find VMs with an average Percentage CPU greater than or equal to 75% over the la
 
     policies:
       - name: find-busy-vms
+        description: Find VMs with avg cpu >= 75% over the last 12 hours
         resource: azure.vm
         filters:
           - type: metric
