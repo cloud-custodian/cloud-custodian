@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 import fnmatch
 import json
 import logging
-import requests
+import os
+import sys
 
+import requests
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive

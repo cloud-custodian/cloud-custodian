@@ -14,11 +14,11 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
-from c7n.utils import local_session
 
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.query import sources
+from c7n.utils import local_session
 from c7n.utils import type_schema
 
 
