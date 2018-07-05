@@ -14,13 +14,13 @@
 
 from collections import namedtuple
 
-from c7n.utils import local_session
+from azure.storage.blob import BlockBlobService
+from azure.storage.queue import QueueService
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
-
-from azure.storage.queue import QueueService
-from azure.storage.blob import BlockBlobService
 from six.moves.urllib.parse import urlparse
+
+from c7n.utils import local_session
 
 try:
     from functools import lru_cache

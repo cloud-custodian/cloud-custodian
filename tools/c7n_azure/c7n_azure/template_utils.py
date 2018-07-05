@@ -15,8 +15,8 @@
 Generic ARM template resource utilities
 """
 import json
-import os.path
 import logging
+import os.path
 
 from azure.mgmt.resource.resources.models import DeploymentMode
 from c7n_azure.session import Session
