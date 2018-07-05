@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import importlib
+import jwt
 import json
 import logging
 import os
@@ -25,7 +26,8 @@ from c7n_azure.utils import ResourceIdParser
 
 class Session(object):
 
-    def __init__(self, subscription_id=None, authorization_file=None):
+    def __init__(self, subscription_id=None, authorization_file=None,
+                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id):
         """
         :param subscription_id: If provided overrides environment variables.
 
@@ -37,6 +39,9 @@ class Session(object):
         self.credentials = None
         self.subscription_id = None
         self.tenant_id = None
+        self.resource_namespace = resource
+        self._is_token_auth = False
+        self._is_cli_auth = False
         self.authorization_file = authorization_file
 
     def _initialize_session(self):
@@ -72,25 +77,26 @@ class Session(object):
                 })
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.log.info("Creating session with Token Authentication")
+            self._is_token_auth = True
 
         elif all(k in os.environ for k in tenant_auth_variables):
             # Tenant (service principal) authentication
             self.credentials = ServicePrincipalCredentials(
                 client_id=os.environ['AZURE_CLIENT_ID'],
                 secret=os.environ['AZURE_CLIENT_SECRET'],
-                tenant=os.environ['AZURE_TENANT_ID']
-            )
+                tenant=os.environ['AZURE_TENANT_ID'],
+                resource=self.resource_namespace)
             self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.tenant_id = os.environ['AZURE_TENANT_ID']
             self.log.info("Creating session with Service Principal Authentication")
 
         else:
             # Azure CLI authentication
+            self._is_cli_auth = True
             (self.credentials,
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
-                resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
-            self._is_cli_auth = True
+                resource=self.resource_namespace)
             self.log.info("Creating session with Azure CLI Authentication")
 
         # Let provided id parameter override everything else
@@ -108,6 +114,10 @@ class Session(object):
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
         return klass(self.credentials, self.subscription_id)
+
+    def get_credentials(self):
+        self._initialize_session()
+        return self.credentials
 
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
@@ -129,7 +139,16 @@ class Session(object):
             self._provider_cache[resource_type] = api_version
             return api_version
 
+    def get_tenant_id(self):
+        self._initialize_session()
+        if self._is_token_auth:
+            decoded = jwt.decode(self.credentials['token']['access_token'], verify=False)
+            return decoded['tid']
+
+        return self.tenant_id
+
     def get_bearer_token(self):
+        self._initialize_session()
         if self._is_cli_auth:
             return self.credentials._token_retriever()[1]
         return self.credentials.token['access_token']
