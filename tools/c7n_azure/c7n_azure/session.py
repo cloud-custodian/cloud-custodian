@@ -43,7 +43,6 @@ class Session(object):
         self._is_token_auth = False
         self._is_cli_auth = False
         self.authorization_file = authorization_file
-        self._is_cli_auth = False
 
     def _initialize_session(self):
         """
