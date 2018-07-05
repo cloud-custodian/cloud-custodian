@@ -41,7 +41,7 @@ class FunctionPackageTest(BaseTest):
         binding = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
 
         self.assertEqual(binding['bindings'][0]['type'], 'timerTrigger')
-        self.assertEqual(binding['bindings'][0]['name'], 'timer')
+        self.assertEqual(binding['bindings'][0]['name'], 'input')
         self.assertEqual(binding['bindings'][0]['schedule'], '0 1 0 0 0')
 
     def test_add_function_config_eventhub(self):

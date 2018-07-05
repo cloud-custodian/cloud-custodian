@@ -95,12 +95,12 @@ class FunctionPackage(object):
 
         if mode_type == 'azure-periodic':
             binding['type'] = 'timerTrigger'
-            binding['name'] = 'timer'
+            binding['name'] = 'input'
             binding['schedule'] = self.policy['mode']['schedule']
 
         elif mode_type == 'azure-stream':
             binding['type'] = 'eventHubTrigger'
-            binding['name'] = 'event'
+            binding['name'] = 'input'
             binding['eventHubName'] = 'eventHubName'
             binding['consumerGroup'] = 'consumerGroup'
             binding['connection'] = 'name_of_app_setting_with_read_conn_string'
@@ -129,10 +129,10 @@ class FunctionPackage(object):
         platform = sys.platform
         if platform == "linux" or platform == "linux2":
             for so_file in os.listdir(site_pkg):
-                if fnmatch.fnmatch(so_file, '*cffi*.so*'):
+                if fnmatch.fnmatch(so_file, '*ffi*.so*'):
                     self.pkg.add_file(os.path.join(site_pkg, so_file))
 
-            self.pkg.add_directory('.libs_cffi_backend')
+            self.pkg.add_directory(os.path.join(site_pkg, '.libs_cffi_backend'))
 
         # MacOS
         elif platform == "darwin":
@@ -188,7 +188,7 @@ class FunctionPackage(object):
         zip_file = open(self.pkg.path, 'rb').read()
         r = requests.post(zip_api_url, headers=headers, data=zip_file)
 
-        self.log.info("Function publish result: %s" % r)
+        self.log.info("Function publish result: %s %s" % (r, r.text))
 
     def close(self):
         self.pkg.close()
