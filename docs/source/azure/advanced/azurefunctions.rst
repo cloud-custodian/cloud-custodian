@@ -1,4 +1,4 @@
-.. azurefunctions:
+.. azure_azurefunctions:
 
 Azure Functions Support
 -----------------------
