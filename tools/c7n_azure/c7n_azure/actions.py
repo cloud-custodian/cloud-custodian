@@ -15,15 +15,21 @@
 Actions to perform on Azure resources
 """
 import datetime
+from datetime import timedelta
+
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
-from msrestazure.azure_exceptions import CloudError
-from c7n import utils
-from c7n.utils import local_session, type_schema
+from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import utcnow
+from dateutil import zoneinfo
+from msrestazure.azure_exceptions import CloudError
+
+from c7n import utils
 from c7n.actions import BaseAction, BaseNotify
 from c7n.filters import FilterValidationError
+from c7n.filters.core import PolicyValidationError
+from c7n.filters.offhours import Time
 from c7n.resolver import ValuesFrom
-from c7n_azure.storage_utils import StorageUtilities
+from c7n.utils import local_session, type_schema
 
 
 def update_resource_tags(self, resource, tags):
@@ -409,6 +415,109 @@ class Notify(BaseNotify):
     def send_to_azure_queue(self, queue_uri, message):
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri)
         return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
+
+
+DEFAULT_TAG = "custodian_status"
+
+
+class TagDelayedAction(BaseAction):
+    """Tag resources for future action.
+
+    The optional 'tz' parameter can be used to adjust the clock to align
+    with a given timezone. The default value is 'utc'.
+
+    If neither 'days' nor 'hours' is specified, Cloud Custodian will default
+    to marking the resource for action 4 days in the future.
+
+    .. code-block :: yaml
+
+      - policies:
+        - name: vm-mark-for-stop
+          resource: azure.vm
+          filters:
+            - type: value
+              key: Name
+              value: instance-to-stop-in-four-days
+          actions:
+            - type: mark-for-op
+              op: stop
+    """
+
+    schema = utils.type_schema(
+        'mark-for-op',
+        tag={'type': 'string'},
+        msg={'type': 'string'},
+        days={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
+        tz={'type': 'string'},
+        op={'type': 'string'})
+
+    default_template = 'Resource does not meet policy: {op}@{action_date}'
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(TagDelayedAction, self).__init__(data, manager, log_dir)
+        self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
+    def validate(self):
+        op = self.data.get('op')
+        if self.manager and op not in self.manager.action_registry.keys():
+            raise PolicyValidationError(
+                "mark-for-op specifies invalid op:%s in %s" % (
+                    op, self.manager.data))
+
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        if not self.tz:
+            raise PolicyValidationError(
+                "Invalid timezone specified %s in %s" % (
+                    self.tz, self.manager.data))
+        return self
+
+    def generate_timestamp(self, days, hours):
+        from c7n_azure.utils import now
+        n = now(tz=self.tz)
+        if days is None or hours is None:
+            # maintains default value of days being 4 if nothing is provided
+            days = 4
+        action_date = (n + timedelta(days=days, hours=hours))
+        if hours > 0:
+            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
+        else:
+            action_date_string = action_date.strftime('%Y/%m/%d')
+
+        return action_date_string
+
+    def process(self, resources):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+
+        msg_tmpl = self.data.get('msg', self.default_template)
+
+        op = self.data.get('op', 'stop')
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
+        action_date = self.generate_timestamp(days, hours)
+
+        self.tag = self.data.get('tag', DEFAULT_TAG)
+
+        self.msg = msg_tmpl.format(
+            op=op, action_date=action_date)
+
+        self.log.info("Tagging %d resources for %s on %s" % (
+            len(resources), op, action_date))
+
+        with self.executor_factory(max_workers=1) as w:
+            list(w.map(self.process_resource, resources))
+
+    def process_resource(self, resource):
+        # get existing tags
+        tags = resource.get('tags', {})
+
+        # add new tag
+        tags[self.tag] = self.msg
+
+        update_resource_tags(self, resource, tags)
 
 
 class DeleteAction(BaseAction):

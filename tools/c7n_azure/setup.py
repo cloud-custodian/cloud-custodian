@@ -37,7 +37,7 @@ setup(
                       "azure-storage-queue",
                       "c7n",
                       "requests",
-                      "azure-cli-core",
+                      "azure-cli-core<=2.0.40",
                       "adal~=0.5.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
