@@ -58,3 +58,63 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
             op: lt
             threshold: 10
             timeframe: 24
+
+
+``TagActionFilter``
+Filters Azure resources based on previously scheduled operations via tags
+
+.. c7n-schema:: TagActionFilter
+    :module: c7n_azure.filters
+
+
+Example Policies
+----------------
+
+Find VMs that have been marked for stopping and stop them
+
+.. code-block:: yaml
+
+    policies
+      - name: find-vms-to-stop
+        resource: azure.vm
+        filters:
+          - type: marked-for-op
+            op: stop
+        actions:
+          - type: stop
+
+Find VMs that have been marked for stopping tomorrow and notify email address
+
+.. code-block:: yaml
+
+    policies
+      - name: find-vms-to-stop
+        resource: azure.vm
+        filters:
+          - type: marked-for-op
+            skew: 1
+            op: stop
+        actions:
+          - type: notify
+            template: default
+            subject: VMs Scheduled To Stop
+            to: user@domain.com
+            transport:
+              - type: asq
+                queue: https://accountname.queue.core.windows.net/test
+
+Cancel operation on resource marked for operation
+
+.. code-block:: yaml
+
+    policies
+      - name: find-vms-to-stop
+        resource: azure.resourcegroup
+        filters:
+          - type: marked-for-op
+            op: delete
+            # custodian_status is default tag, but can be configured
+            tag: custodian_status
+        actions:
+          - type: untag
+            tags: ['custodian_status']

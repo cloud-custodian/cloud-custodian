@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import six
-from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim
-from c7n_azure.filters import MetricFilter
-from c7n_azure.actions import DeleteAction
+from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction, DeleteAction
+from c7n_azure.filters import MetricFilter, TagActionFilter
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta
 from c7n_azure.utils import ResourceIdParser
@@ -66,6 +65,8 @@ class ArmResourceManager(QueryResourceManager):
                 if resource is not 'resourcegroup':
                     klass.action_registry.register('delete', DeleteAction)
                 klass.filter_registry.register('metric', MetricFilter)
+                klass.filter_registry.register('marked-for-op', TagActionFilter)
+                klass.action_registry.register('mark-for-op', TagDelayedAction)
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)
