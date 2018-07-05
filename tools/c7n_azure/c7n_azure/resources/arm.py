@@ -69,5 +69,4 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('mark-for-op', TagDelayedAction)
 
 
-
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)
