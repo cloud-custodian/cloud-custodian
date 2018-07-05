@@ -1,7 +1,7 @@
 .. _azure_vm:
 
 Virtual Machines
-=================
+================
 
 Filters
 -------
@@ -19,6 +19,12 @@ Filters
 
   .. c7n-schema:: MetricFilter
        :module: c7n_azure.filters
+
+``network-interface``
+  Filter based on properties of the network interfaces associated with the virtual machine.
+
+  .. c7n-schema:: NetworkInterfaceFilter
+        :module: c7n_azure.resources.vm
 
 Actions
 -------
@@ -79,3 +85,31 @@ Restart all VMs
         resource: azure.vm
         actions:
           - type: restart
+
+Delete specific VM by name
+
+.. code-block:: yaml
+
+    policies:
+      - name: stop-running-vms
+        resource: azure.vm
+        filters:
+          - type: value
+            key: name
+            op: eq
+            value_type: normalize
+            value: fake_vm_name
+        actions:
+          - type: delete
+
+Find all VMs with a Public IP address
+
+.. code-block:: yaml
+
+    policies:
+      - name: vms-with-public-ip
+        resource: azure.vm
+        filters:
+          - type: network-interface
+            key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
+            value: not-null

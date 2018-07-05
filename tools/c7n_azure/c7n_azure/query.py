@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import six
+from c7n_azure.actions import Notify
+from c7n_azure.provider import resources
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
 from c7n.utils import local_session
-from c7n_azure.provider import resources
-from c7n_azure.actions import Notify
 
 
 class ResourceQuery(object):

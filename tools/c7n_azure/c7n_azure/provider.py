@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import partial
+
 from c7n.provider import Provider, clouds
 from c7n.registry import PluginRegistry
-
 from .session import Session
-
-from functools import partial
 
 
 @clouds.register('azure')
