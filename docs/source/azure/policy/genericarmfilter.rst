@@ -90,6 +90,8 @@ The "tag filter" is implicitly just the ValueFilter (see :ref:`filters`)
 Example Policies
 ---------------
 
+This policy will delete all ARM resources with the tag 'Tag1' present
+
 .. code-block:: yaml
 
     policies
@@ -99,6 +101,26 @@ Example Policies
           - tag:Tag1: present
         actions:
           - type: delete
+
+This policy will find all VMs with the tag 'Tag1' absent
+
+.. code-block:: yaml
+
+    policies
+      - name: find-vms-without-Tag1
+        resource: azure.vm
+        filters:
+          - tag:Tag1: absent
+
+This policy will find all CosmosDBs with the tag 'Tag1' and value 'Value1'
+
+.. code-block:: yaml
+
+    policies
+      - name: find-cosmosdb-tag-value
+        resource: azure.cosmosdb
+        filters:
+          - tag:Tag1: Value1
 
 Marked-For-Op Filter
 --------------------
