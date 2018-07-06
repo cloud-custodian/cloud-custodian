@@ -913,36 +913,43 @@ class TestSnapshot(BaseTest):
 
 class TestSetInstanceProfile(BaseTest):
 
-    def test_ec2_set_instance_profile_assocation(self):
-        session_factory = self.replay_flight_data(
-            "test_ec2_set_instance_profile_association"
-        )
-        policy = self.load_policy(
-            {
-                "name": "ec2-test-set-instance-profile-association",
-                "resource": "ec2",
-                "filters": [
-                    {"tag:Name": "MissingInstanceProfile"},
-                    {"IamInstanceProfile": "absent"},
-                ],
-                "actions": [{"type": "set-instance-profile", "name": "ec2-default"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertGreaterEqual(len(resources), 1)
-        ec2 = session_factory().client("ec2")
-        resources = ec2.describe_instances(
-            InstanceIds=[r["InstanceId"] for r in resources]
-        )
+    def test_ec2_set_instance_profile_existing(self):
+        factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_existing')
+        p = self.load_policy({
+            'name': 'ec2-set-profile-extant',
+            'resource': 'ec2',
+            'filters': [{'tag:Name': 'role-test'}],
+            'actions': [{
+                'type': 'set-instance-profile',
+                'name': 'ecsInstanceRole'}]}, session_factory=factory)
+        client = factory().client('ec2')
+        resources = p.run()
+        # 3 instances covering no role, target role, different role.
+        self.assertEqual(len(resources), 3)
+        previous_associations = {
+            i['InstanceId']: i.get('IamInstanceProfile', {}).get('Arn')
+            for i in resources}
+        self.assertEqual(
+            previous_associations,
+            {u'i-01b7ee380879d3fd8': u'arn:aws:iam::644160558196:instance-profile/CloudCustodianRole', # noqa
+             u'i-06305b4b9f5e3f8b8': u'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
+             u'i-0aef5d5ffb60c8615': None})
 
-        for r in resources["Reservations"]:
-            for i in r["Instances"]:
-                self.assertIn("IamInstanceProfile", i)
-                self.assertIn("Arn", i["IamInstanceProfile"])
-                self.assertIn(
-                    ":instance-profile/ec2-default", i["IamInstanceProfile"]["Arn"]
-                )
+        # verify changes
+        associations = {
+            a['InstanceId']: a['IamInstanceProfile']['Arn']
+            for a in client.describe_iam_instance_profile_associations(
+                Filters=[
+                    {'Name': 'instance-id',
+                     'Values': [i['InstanceId'] for i in resources]},
+                    {'Name': 'state', 'Values': ['associating', 'associated']}]
+            ).get('IamInstanceProfileAssociations', ())}
+        self.assertEqual(
+            associations,
+            {'i-01b7ee380879d3fd8': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
+             'i-06305b4b9f5e3f8b8': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
+             'i-0aef5d5ffb60c8615': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole'})
 
     def test_ec2_set_instance_profile_disassocation(self):
         session_factory = self.replay_flight_data(
