@@ -197,14 +197,13 @@ def enable(config, master, tags, accounts, debug, message, region):
     """enable guard duty on a set of accounts"""
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
-    
+
     regions = expand_regions(region)
-    
+
     for r in regions:
         log.info("Processing Region:%s", r)
         enable_region(master_info, accounts_config, executor, message, r)
-    
-    
+
 
 def enable_region(master_info, accounts_config, executor, message, region):
     master_session = get_session(
@@ -214,9 +213,16 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     master_client = master_session.client('guardduty')
     detector_id = get_or_create_detector_id(master_client)
-    ip_set = get_or_create_ip_set(master_client, detector_id, master_info.get('trustedIP'))
 
-    log.info("Region:%s master successfully uploaded ipset %s for guard duty", region, ip_set)
+    # Temporary (need a separate gd config file).. support master trusted 
+    # ip set mgmt.
+    if 'trusted_ip_uri' in master_info:
+        ip_set, ip_set_change = get_or_create_ip_set(
+            master_client, detector_id, master_info.get('trusted_ip_uri'))
+        if ip_set_change:
+            log.info(
+                "Region:%s master %s ipset %s for guard duty",
+                region, ip_set_change, ip_set)
 
     results = master_client.get_paginator(
         'list_members').paginate(DetectorId=detector_id, OnlyAssociated="FALSE")
@@ -225,20 +231,24 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find active members
     active_ids = {m['AccountId'] for m in extant_members
-                      if m['RelationshipStatus'] == 'Enabled'}
+                  if m['RelationshipStatus'] == 'Enabled'}
+
     # Find invited members
     invited_ids = {m['AccountId'] for m in extant_members
-                       if m['RelationshipStatus'] == 'Invited'}
+                   if m['RelationshipStatus'] == 'Invited'}
+
     # Find extant members currently have guardduty disabled(removed)
     resigned_ids = {m['AccountId'] for m in extant_members
-                       if m['RelationshipStatus'] == 'Resigned'}
-
+                    if m['RelationshipStatus'] == 'Resigned'}
     resigned_ids = {a['account_id'] for a in accounts_config['accounts']
-                     if a['account_id'] in resigned_ids}    
-    
+                    if a['account_id'] in resigned_ids}
+
     if resigned_ids:
-        master_client.delete_members(DetectorId=detector_id, AccountIds=list(resigned_ids))
-        log.info("Region:%s Resigned %d members are deleted from master to re-enable guard duty", region, len(resigned_ids))
+        master_client.delete_members(
+            DetectorId=detector_id, AccountIds=list(resigned_ids))
+        log.info(
+            "Region:%s %d resigned members removed to re-enable.",
+            region, len(resigned_ids))
         extant_ids = extant_ids.difference(resigned_ids)
 
     # Find extant members not currently enabled
@@ -306,8 +316,11 @@ def enable_region(master_info, accounts_config, executor, message, region):
                if account['account_id'] not in active_ids]
 
     log.info("Region:%s Accepting %d invitations in members", region, len(members))
+    # Added in https://github.com/capitalone/cloud-custodian/pull/2445
+    # Not entirely sure this is needed, i haven't needed it across any
+    # of our usage, but the respecting the user report as accurate. -kapil
     time.sleep(5)
-   
+
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
@@ -328,13 +341,14 @@ def enable_region(master_info, accounts_config, executor, message, region):
                          region, a['name'])
     return members
 
+
 def enable_account(account, master_account_id, region):
     member_session = get_session(
         account.get('role'), 'c7n-guardian',
         profile=account.get('profile'),
         region=region)
     member_client = member_session.client('guardduty')
-    m_detector_id = get_or_create_detector_id(member_client)    
+    m_detector_id = get_or_create_detector_id(member_client)
     all_invitations = member_client.list_invitations().get('Invitations', [])
     invitations = [
         i for i in all_invitations
@@ -360,16 +374,27 @@ def get_or_create_detector_id(client):
     else:
         return client.create_detector(Enable=True).get('DetectorId')
 
-# Call to Create/Update IPset
-# Note : There is a hard limit of one Ipset per Master/Account
-def get_or_create_ip_set(client, detector_id, trustedIP):
+
+def get_or_create_ip_set(client, detector_id, trusted_ip_uri):
+    """get, create, or update a trusted ip set for a detector.
+
+    Returns ip set id, change, note only one ip set is allowed per account region.
+    """
     ip_set = client.list_ip_sets(DetectorId=detector_id).get('IpSetIds')
-    if ip_set:
-        client.update_ip_set(Activate=True, DetectorId=detector_id, IpSetId=ip_set[0], Location=trustedIP)
+    if ip_set is None:
+        return client.create_ip_set(
+            Activate=True, DetectorId=detector_id,
+            Format='TXT', Location=trusted_ip_uri,
+            Name='IpSet').get('IpSetId'), "created"
+    ip_set = ip_set[0]
+    ip_set_info = client.get_ip_set(DetectorId=detector_id, IpSetId=ip_set)
+    if (ip_set_info.get('Location', '') != trusted_ip_uri or
+            ip_set_info.get('Status') not in ('ACTIVE', 'ACTIVATING')):
+        client.update_ip_set(
+            Activate=True, DetectorId=detector_id,
+            IpSetId=ip_set, Location=trusted_ip_uri), "updated"
         return ip_set
-    else:
-        return client.create_ip_set(Activate=True, DetectorId=detector_id, Format='TXT', Location=trustedIP, 
-        Name='IpSet').get('IpSetId')
+    return ip_set, None
 
 
 def get_master_info(accounts_config, master):
