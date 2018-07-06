@@ -17,6 +17,7 @@ Provision Options
 #################
 
 When deploying an Azure function the following ARM resources are required and created on demand:
+
 - Storage (shared across functions)
 - Application Insights (shared across functions)
 - Application Service Plan (shared across functions)
