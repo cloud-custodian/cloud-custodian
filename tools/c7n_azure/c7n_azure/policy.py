@@ -70,13 +70,13 @@ class AzureFunctionMode(ServerlessExecutionMode):
             self.log.info("Found existing App %s (%s) in group %s" %
                           (webapp_name, existing_webapp.location, group_name))
 
-        self.log.info("Building function package for %s" % parameters['name']['value'])
+        self.log.info("Building function package for %s" % webapp_name)
 
         archive = FunctionPackage(self.policy.data)
         archive.build()
 
-        if archive.status(parameters['name']['value']):
-            archive.publish(parameters['name']['value'])
+        if archive.status(webapp_name):
+            archive.publish(webapp_name)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
