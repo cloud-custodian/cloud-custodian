@@ -1,22 +1,32 @@
-.. azurefunctions:
+.. _azure_azurefunctions:
 
 Azure Functions Support
 -----------------------
 
-Cloud Custodian Integration
+Overview
 ===========================
-Support of Azure Functions in Cloud Custodian is still in development.
+The Azure provider supports deploying policies into Azure Functions to allow
+them to run inexpensively in your subscription.
+
+Python support in Azure Functions V2 is in preview and this feature is still immature.
+
+Currently periodic (CRON) functions are supported and consumption pricing is not yet supported.
 
 
 Provision Options
 #################
 
-When running in Azure functions, a storage account, Application Insights instance, and an App Service
-is provisioned in your subscription per policy to enable running the functions in an App Service.
+When deploying an Azure function the following ARM resources are required and created on demand:
 
-An App Service Plan is also required to run, but Plans can have multiple App Services to one App Service
-Plan so it is recommended that you only provision one and continue to use the same App Service plan by
-providing the same servicePlanName with all policies or use the default name.
+- Storage (shared across functions)
+- Application Insights (shared across functions)
+- Application Service Plan (shared across functions)
+- Application Service (per function)
+
+A single Application Service Plan (Basic, Standard or Premium) can service a large number
+of Application Service Instances.  If you provide the same servicePlanName with all policies or
+use the default name then only new Applications will be created during deployment, all using the same
+shared plan resources.
 
 Execution in Azure functions comes with a default set of configurations for the provisioned
 resources. To override these settings you must set 'provision-options' with one of the following
@@ -34,7 +44,7 @@ provisioned. Application Insights has six available locations and thus can not a
 region as the other resources: West US 2, East US, North Europe, South Central US, Southeast Asia, and
 West Europe. The sku, skuCode, and workerSize correlate to scaling up the App Service Plan.
 
-An example on how to set the provision-options when running in azure functions mode:
+An example on how to set the servicePlanName and accept defaults for the other values:
 
 .. code-block:: yaml
 
@@ -42,7 +52,29 @@ An example on how to set the provision-options when running in azure functions m
       - name: stopped-vm
         mode:
             type: azure-periodic
+            schedule: '0 0 * * * *'
             provision-options:
+              servicePlanName: functionshost
+         resource: azure.vm
+         filters:
+          - type: instance-view
+            key: statuses[].code
+            op: not-in
+            value_type: swap
+            value: "PowerState/running"
+
+
+An example on how to set size and location as well:
+
+.. code-block:: yaml
+
+    policies:
+      - name: stopped-vm
+        mode:
+            type: azure-periodic
+            schedule: '0 0 * * * *'
+            provision-options:
+              servicePlanName: functionshost
               location: East US
               appInsightsLocation: East US
               sku: Standard
