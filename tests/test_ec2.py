@@ -950,7 +950,7 @@ class TestSetInstanceProfile(BaseTest):
             {'i-01b7ee380879d3fd8': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
              'i-06305b4b9f5e3f8b8': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
              'i-0aef5d5ffb60c8615': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole'})
-        
+
     def test_ec2_set_instance_profile_disassocation(self):
         session_factory = self.replay_flight_data(
             "test_ec2_set_instance_profile_disassociation"
