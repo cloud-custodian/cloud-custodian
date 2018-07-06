@@ -339,13 +339,13 @@ class LambdaInvoke(EventAction):
     schema = utils.type_schema(
         'invoke-lambda',
         function={'type': 'string'},
-        async={'type': 'boolean'},
+        c7n_async={'type': 'boolean'},
         qualifier={'type': 'string'},
         batch_size={'type': 'integer'},
         required=('function',))
 
     def get_permissions(self):
-        if self.data.get('async', True):
+        if self.data.get('c7n_async', True):
             return ('lambda:InvokeAsync',)
         return ('lambda:Invoke',)
 
@@ -359,7 +359,7 @@ class LambdaInvoke(EventAction):
         if self.data.get('qualifier'):
             params['Qualifier'] = self.data['Qualifier']
 
-        if self.data.get('async', True):
+        if self.data.get('c7n_async', True):
             params['InvocationType'] = 'Event'
 
         payload = {
