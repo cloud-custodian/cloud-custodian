@@ -52,6 +52,7 @@ An example on how to set the servicePlanName and accept defaults for the other v
       - name: stopped-vm
         mode:
             type: azure-periodic
+            schedule: '0 0 * * * *'
             provision-options:
               servicePlanName: functionshost
          resource: azure.vm
@@ -71,6 +72,7 @@ An example on how to set size and location as well:
       - name: stopped-vm
         mode:
             type: azure-periodic
+            schedule: '0 0 * * * *'
             provision-options:
               servicePlanName: functionshost
               location: East US
