@@ -4,22 +4,22 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "66b6d48c-3b0d-4305-97ce-e57416b67a93",
+            "RequestId": "ff569f93-6a5a-4788-bceb-b887771439b7", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 23 May 2017 18:10:44 GMT"
+                "date": "Fri, 06 Jul 2018 10:20:20 GMT"
             }
-        },
+        }, 
         "IamInstanceProfileAssociation": {
-            "InstanceId": "i-00fe7967fb7167c62",
+            "InstanceId": "i-01b7ee380879d3fd8", 
             "State": "associating", 
-            "AssociationId": "iip-assoc-0373c3be6ef0e2897",
+            "AssociationId": "iip-assoc-0499952a50fbcbbae", 
             "IamInstanceProfile": {
-                "Id": "AIPAI5AW5I5CLIOSXKFK6", 
-                "Arn": "arn:aws:iam::0:instance-profile/ec2-default"
+                "Id": "AIPAJJOHXXHTHDZB5BVFE", 
+                "Arn": "arn:aws:iam::644160558196:instance-profile/ecsInstanceRole"
             }
         }
     }
