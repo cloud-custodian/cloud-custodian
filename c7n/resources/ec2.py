@@ -1287,14 +1287,14 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
         client = utils.local_session(self.manager.session_factory).client('ec2')
-        profile_name = self.data.get('name', None)
+        profile_name = self.data.get('name')
         profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
 
         associations = {
