@@ -23,11 +23,11 @@ from c7n_azure.session import Session
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.actions import BaseAction
+from c7n.config import Config
 from c7n.ctx import ExecutionContext
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
-from c7n.handler import Config
 from c7n.query import sources
 from c7n.utils import local_session
 from c7n.utils import type_schema
