@@ -13,15 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import shutil
 import os
+import shutil
+
 import mock
-
-from c7n.ctx import ExecutionContext
-from c7n.config import Bag, Config
-
 from azure_common import BaseTest
 from c7n_azure.output import AzureStorageOutput
+
+from c7n.config import Bag, Config
+from c7n.ctx import ExecutionContext
 
 
 class OutputTest(BaseTest):
