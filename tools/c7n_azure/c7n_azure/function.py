@@ -21,6 +21,13 @@ sys.path.append(dirname(dirname(__file__)))
 
 from c7n_azure import handler, entry
 
+try:
+    import azure.functions as func
+    from azure.worker.bindings.http import HttpRequest
+except ImportError:
+    pass
+
+
 def main(input):
     logging.info("Running Azure Cloud Custodian Policy")
 
@@ -28,7 +35,14 @@ def main(input):
         'config_file': join(dirname(__file__), 'config.json'),
         'auth_file': join(dirname(__file__), 'auth.json')
     }
+
+    if type(input) is HttpRequest:
+        context['event'] = input.get_json()
+
     handler.run(None, context)
+
+    if type(input) is HttpRequest:
+        return func.HttpResponse("OK")
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()
