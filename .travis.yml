@@ -1,15 +1,21 @@
 language: python
-dist: trusty
-sudo: false
 cache:
   pip: true
 env:
   - C7N_TEST_WORKERS=8
 
-python:
-  - "2.7"
-  - "3.6"
-  - "3.7"
+matrix:
+    include:
+        - python: 2.7
+          dist: trusty
+          sudo: false
+        - python: 3.6
+          dist: trusty
+          sudo: false
+        - python: 3.7
+          dist: xenial
+          sudo: true
+
 install:
   - pip install coveralls tox
 script:
