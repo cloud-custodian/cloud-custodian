@@ -21,7 +21,7 @@ requires = [
     "Jinja2",
     "boto3",
     "jsonschema",
-    "ruamel.yaml<0.15",
+    "ruamel.yaml<=0.15",
     "datadog",
     "slackclient",
     "sendgrid",
