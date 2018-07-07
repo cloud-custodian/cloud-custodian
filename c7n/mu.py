@@ -94,7 +94,7 @@ class PythonPackageArchive(object):
                 # https://docs.python.org/3/reference/import.html#module-path
                 for directory in module.__path__:
                     self.add_directory(directory, ignore)
-                if not hasattr(module, '__file__'):
+                if getattr(module, '__file__', None) is None:
 
                     # Likely a namespace package. Try to add *.pth files so
                     # submodules are importable under Python 2.7.
