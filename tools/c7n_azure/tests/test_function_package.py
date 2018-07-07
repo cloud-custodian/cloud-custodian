@@ -44,7 +44,7 @@ class FunctionPackageTest(BaseTest):
         self.assertEqual(binding['bindings'][0]['name'], 'input')
         self.assertEqual(binding['bindings'][0]['schedule'], '0 1 0 0 0')
 
-    def test_add_function_config_eventhub(self):
+    def test_add_function_config_events(self):
         p = self.load_policy({
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
@@ -59,7 +59,7 @@ class FunctionPackageTest(BaseTest):
 
         binding = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
 
-        self.assertEqual(binding['bindings'][0]['type'], 'eventHubTrigger')
+        self.assertEqual(binding['bindings'][0]['type'], 'httpTrigger')
 
     def test_add_policy(self):
         p = self.load_policy({

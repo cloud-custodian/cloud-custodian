@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import json
 
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.template_utils import TemplateUtilities
@@ -69,11 +70,15 @@ class AzureFunctionMode(ServerlessExecutionMode):
             self.log.info("Found existing App %s (%s) in group %s" %
                           (webapp_name, existing_webapp.location, group_name))
 
-        self.log.info("Building function package for %s" % parameters['name']['value'])
+        self.log.info("Building function package for %s" % webapp_name)
 
         archive = FunctionPackage(self.policy.data)
         archive.build()
-        archive.publish(parameters['name']['value'])
+
+        if archive.status(webapp_name):
+            archive.publish(webapp_name)
+        else:
+            self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
     def get_parameters(self):
         parameters = self.template_util.get_default_parameters(
@@ -131,6 +136,7 @@ class AzureStreamMode(AzureFunctionMode):
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
+        self.log.info(json.dumps(lambda_context))
         raise NotImplementedError("error - not implemented")
 
     def get_logs(self, start, end):
