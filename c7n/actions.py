@@ -338,7 +338,7 @@ class LambdaInvoke(EventAction):
 
     schema = {
         'type': 'object',
-        'required': ['function'],
+        'required': ['type', 'function'],
         'properties': {
             'type': {'enum': ['invoke-lambda']},
             'function': {'type': 'string'},
@@ -363,7 +363,7 @@ class LambdaInvoke(EventAction):
         if self.data.get('qualifier'):
             params['Qualifier'] = self.data['Qualifier']
 
-        if self.data.get('c7n_async', True):
+        if self.data.get('async', True):
             params['InvocationType'] = 'Event'
 
         payload = {
