@@ -40,6 +40,7 @@ class FlightRecorderTest(TestUtils):
     def record_flight_data(self, test_case, project_id=None):
         test_dir = os.path.join(DATA_DIR, test_case)
         discovery_dir = os.path.join(DATA_DIR, "discovery")
+        self.recording = True
 
         if os.path.exists(test_dir):
             shutil.rmtree(test_dir)
@@ -54,6 +55,7 @@ class FlightRecorderTest(TestUtils):
     def replay_flight_data(self, test_case, project_id=None):
         test_dir = os.path.join(DATA_DIR, test_case)
         discovery_dir = os.path.join(DATA_DIR, "discovery")
+        self.recording = False
 
         if not os.path.exists(test_dir):
             raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)

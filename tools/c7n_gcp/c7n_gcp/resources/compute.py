@@ -32,8 +32,16 @@ class Instance(QueryResourceManager):
         scope = 'project'
 
 
+class InstanceAction(MethodAction):
+
+    def get_resource_params(self, model, resource):
+        project, zone, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instance': instance}
+
+
 @Instance.action_registry.register('stop')
-class Stop(MethodAction):
+class Stop(InstanceAction):
 
     schema = type_schema('stop')
     method_spec = {'op': 'stop'}
@@ -41,10 +49,14 @@ class Stop(MethodAction):
         '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
     attr_filter = ('status', ('RUNNING',))
 
-    def get_resource_param(self, model, resource):
-        project, zone, instance = self.path_param_re.match(
-            resource['selfLink']).groups()
-        return {'project': project, 'zone': zone, 'instance': instance}
+
+@Instance.action_registry.register('delete')
+class Delete(InstanceAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
 
 
 @resources.register('image')
