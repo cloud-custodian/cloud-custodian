@@ -27,6 +27,25 @@ class InstanceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 4)
 
+    def test_stop_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.record_flight_data('instance-stop', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'istop',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'instance-1'}, {'status': 'RUNNING'}],
+             'actions': ['stop']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = instance-1',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertTrue(result['items'][0]['status'] != 'RUNNING')
+
 
 class DiskTest(BaseTest):
 

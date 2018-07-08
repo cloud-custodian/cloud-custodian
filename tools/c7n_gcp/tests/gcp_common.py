@@ -37,7 +37,7 @@ class FlightRecorderTest(TestUtils):
         LOCAL_THREAD.http = None
         return super(FlightRecorderTest, self).cleanUp()
 
-    def record_flight_data(self, test_case):
+    def record_flight_data(self, test_case, project_id=None):
         test_dir = os.path.join(DATA_DIR, test_case)
         discovery_dir = os.path.join(DATA_DIR, "discovery")
 
@@ -46,10 +46,12 @@ class FlightRecorderTest(TestUtils):
         os.makedirs(test_dir)
 
         self.addCleanup(self.cleanUp)
-        recorder = HttpRecorder(test_dir, discovery_dir)
-        return functools.partial(Session, http=recorder)
+        bound = {'http': HttpRecorder(test_dir, discovery_dir)}
+        if project_id:
+            bound['project_id'] = project_id
+        return functools.partial(Session, **bound)
 
-    def replay_flight_data(self, test_case):
+    def replay_flight_data(self, test_case, project_id=None):
         test_dir = os.path.join(DATA_DIR, test_case)
         discovery_dir = os.path.join(DATA_DIR, "discovery")
 
@@ -57,8 +59,10 @@ class FlightRecorderTest(TestUtils):
             raise RuntimeError("Invalid Test Dir for flight data %s" % test_dir)
 
         self.addCleanup(self.cleanUp)
-        replay = HttpReplay(test_dir, discovery_dir)
-        return functools.partial(Session, http=replay)
+        bound = {'http': HttpReplay(test_dir, discovery_dir)}
+        if project_id:
+            bound['project_id'] = project_id
+        return functools.partial(Session, **bound)
 
 
 class BaseTest(FlightRecorderTest):
