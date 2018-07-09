@@ -93,7 +93,7 @@ It can be used to filter resources on the presence, absence or value of a tag.
 
 
 Example Policies
----------------
+----------------
 
 This policy will delete all ARM resources with the tag 'Tag1' present
 
