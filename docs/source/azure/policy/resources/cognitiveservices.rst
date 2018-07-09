@@ -1,7 +1,7 @@
 .. _azure_cognitiveservices:
 
-Key Vault
-=========
+Cognitive Services
+==================
 
 Filters
 -------

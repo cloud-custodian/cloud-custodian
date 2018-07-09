@@ -85,7 +85,12 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
 Tag Filter
 ----------
 
-The "tag filter" is implicitly just the ValueFilter (see :ref:`filters`)
+The "tag filter" is implicitly just the ValueFilter (see :ref:`filters`).
+It can be used to filter resources on the presence, absence or value of a tag.
+
+.. c7n-schema:: ValueFilter
+    :module: c7n.filters.core
+
 
 Example Policies
 ---------------

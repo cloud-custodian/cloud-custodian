@@ -1,7 +1,7 @@
 .. _azure_disk:
 
-Key Vault
-=========
+Disk
+====
 
 Filters
 -------
