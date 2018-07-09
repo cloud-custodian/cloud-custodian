@@ -463,7 +463,7 @@ class CopyTag(Action):
     """
 
     schema = utils.type_schema(
-        'rename-tag',
+        'copy-tag',
         old_key={'type': 'string'},
         new_key={'type': 'string'})
 
