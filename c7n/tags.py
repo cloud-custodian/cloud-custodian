@@ -476,7 +476,7 @@ class CopyTag(Action):
             Resources=ids,
             Tags=[{'Key': key, 'Value': value}])
 
-    def process_rename(self, tag_value, resource_set):
+    def process_copy(self, tag_value, resource_set):
         """
         Copy source tag value to destination tag value
 
@@ -532,7 +532,7 @@ class CopyTag(Action):
             futures = []
             for r in resource_set:
                 futures.append(
-                    w.submit(self.process_rename, r, resource_set[r]))
+                    w.submit(self.process_copy, r, resource_set[r]))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
