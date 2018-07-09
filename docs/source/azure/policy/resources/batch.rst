@@ -4,7 +4,7 @@ Batch
 =====
 
 Filters
--------
+--------
 - Standard Value Filter (see :ref:`filters`)
     - Model: `BatchAccount <https://docs.microsoft.com/en-us/python/api/azure.mgmt.batch.models.batchaccount?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
