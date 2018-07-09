@@ -13,8 +13,7 @@ for more information.
 If you're using an Azure Service Principal for executing c7n-org
 you'll need to ensure that the principal has access to multiple
 subscriptions. For instructions on creating a service principal and granting access
-across subscriptions, see
-`Azure Authentication <http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html>`_
+across subscriptions, see :ref:`azure_authentication`
 
 **Note**: There are pending issues with running C7N-Org on Windows. It may be required to
 use the ``--debug`` flag when running on Windows.
