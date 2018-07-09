@@ -54,6 +54,7 @@ def register_ec2_tags(filters, actions):
     actions.register('untag', RemoveTag)
     actions.register('remove-tag', RemoveTag)
     actions.register('rename-tag', RenameTag)
+    actions.register('copy-tag', CopyTag)
     actions.register('normalize-tag', NormalizeTag)
 
 
@@ -456,6 +457,88 @@ class RemoveTag(Action):
             Tags=[{'Key': k} for k in tag_keys],
             DryRun=self.manager.config.dryrun)
 
+
+class CopyTag(Action):
+    """ Create a new tag with identical value
+    """
+
+    schema = utils.type_schema(
+        'rename-tag',
+        old_key={'type': 'string'},
+        new_key={'type': 'string'})
+
+    permissions = ('ec2:CreateTags')
+
+    tag_count_max = 50
+
+    def create_tag(self, client, ids, key, value):
+        client.create_tags(
+            Resources=ids,
+            Tags=[{'Key': key, 'Value': value}])
+
+    def process_rename(self, tag_value, resource_set):
+        """
+        Copy source tag value to destination tag value
+
+        - Collect value from old tag
+        - Create new tag & assign stored value
+        """
+        self.log.info("Copying tag on %s instances" % (len(resource_set)))
+        old_key = self.data.get('old_key')
+        new_key = self.data.get('new_key')
+
+        c = utils.local_session(self.manager.session_factory).client('ec2')
+
+        # We have a preference to creating the new tag when possible first
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) < self.tag_count_max]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
+
+        # For resources with 50 tags, we need to delete first and then create.
+        resource_ids = [r[self.id_key] for r in resource_set if len(
+            r.get('Tags', [])) > self.tag_count_max - 1]
+        if resource_ids:
+            self.create_tag(c, resource_ids, new_key, tag_value)
+
+    def create_set(self, instances):
+        old_key = self.data.get('old_key', None)
+        resource_set = {}
+        for r in instances:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if tags[old_key] not in resource_set:
+                resource_set[tags[old_key]] = []
+            resource_set[tags[old_key]].append(r)
+        return resource_set
+
+    def filter_resources(self, resources):
+        old_key = self.data.get('old_key', None)
+        res = 0
+        for r in resources:
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if old_key not in tags.keys():
+                resources.pop(res)
+            res += 1
+        return resources
+
+    def process(self, resources):
+        count = len(resources)
+        resources = self.filter_resources(resources)
+        self.log.info(
+            "Filtered from %s resources to %s" % (count, len(resources)))
+        self.id_key = self.manager.get_model().id
+        resource_set = self.create_set(resources)
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for r in resource_set:
+                futures.append(
+                    w.submit(self.process_rename, r, resource_set[r]))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception copying tag set \n %s" % (
+                            f.exception()))
+        return resources
 
 class RenameTag(Action):
     """ Create a new tag with identical value & remove old tag
