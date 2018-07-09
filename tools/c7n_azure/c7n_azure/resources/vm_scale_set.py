@@ -28,4 +28,3 @@ class VMScaleSet(ArmResourceManager):
             'location',
             'resourceGroup'
         )
-

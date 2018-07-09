@@ -28,4 +28,3 @@ class Batch(ArmResourceManager):
             'location',
             'resourceGroup'
         )
-
