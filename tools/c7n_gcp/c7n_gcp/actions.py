@@ -1,5 +1,16 @@
-
-from concurrent.futures import as_completed
+# Copyright 2018 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from c7n.actions import Action as BaseAction
 from c7n.utils import local_session, chunks
@@ -42,13 +53,13 @@ class MethodAction(Action):
                 rcount,
                 len(resources),
                 ", ".join(map(str, valid_enum))
-                )
+            )
         return resources
 
     def process(self, resources):
         if self.attr_filter:
             resources = self.filter_resources(resources)
-        m = self.manager.get_model()            
+        m = self.manager.get_model()
         session = local_session(self.manager.session_factory)
         client = session.client(m.service, m.version, m.component)
         for resource_set in chunks(resources, self.chunk_size):
@@ -66,6 +77,3 @@ class MethodAction(Action):
 
     def get_resource_params(self, m, r):
         raise NotImplementedError("subclass responsibility")
-
-    
-
