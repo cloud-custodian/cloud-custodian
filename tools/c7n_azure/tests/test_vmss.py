@@ -16,15 +16,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 
 
-class VMScaleSetTest(BaseTest):
+class VMSSTest(BaseTest):
     def setUp(self):
-        super(VMScaleSetTest, self).setUp()
+        super(VMSSTest, self).setUp()
 
     @arm_template('vmscaleset.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-vm-scale-set',
-            'resource': 'azure.vmscaleset',
+            'resource': 'azure.vmss',
             'filters': [
                 {'type': 'value',
                  'key': 'name',

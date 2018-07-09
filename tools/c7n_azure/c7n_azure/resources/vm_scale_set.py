@@ -16,7 +16,7 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('vmscaleset')
+@resources.register('vmss')
 class VMScaleSet(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):

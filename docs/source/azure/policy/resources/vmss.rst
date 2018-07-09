@@ -1,4 +1,4 @@
-.. _azure_vmscaleset:
+.. _azure_vmss:
 
 Virtual Machine Scale Set
 =========================
@@ -25,7 +25,7 @@ and then perform the delete operation on those ready for deletion.
 
     policies:
       - name: mark-test-vmscaleset-for-deletion
-        resource: azure.vmscaleset
+        resource: azure.vmss
         filters:
           - type: value
             key: name
@@ -37,7 +37,7 @@ and then perform the delete operation on those ready for deletion.
             op: delete
             days: 7
       - name: delete-test-vmscaleset
-        resource: azure.vmscaleset
+        resource: azure.vmss
         filters:
           - type: marked-for-op
             op: delete
