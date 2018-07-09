@@ -6,7 +6,7 @@ Cognitive Services
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
-      - Model: `Vault <https://docs.microsoft.com/en-us/python/api/azure.mgmt.keyvault.models.vault?view=azure-python>`_
+      - Model: `CognitiveServicesAccount <https://docs.microsoft.com/en-us/python/api/azure.mgmt.cognitiveservices.models.cognitiveservicesaccount?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
     - Metric Filter - Filter on metrics from Azure Monitor - (see `Cognitive Services Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcognitiveservicesaccounts/>`_)
     - Tag Filter - Filter on tag presence and/or values

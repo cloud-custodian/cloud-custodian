@@ -6,7 +6,7 @@ Disk
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
-      - Model: `Vault <https://docs.microsoft.com/en-us/python/api/azure.mgmt.keyvault.models.vault?view=azure-python>`_
+      - Model: `Disk <https://docs.microsoft.com/en-us/python/api/azure.mgmt.devtestlabs.models.Disk?view=azure-python>`_
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
