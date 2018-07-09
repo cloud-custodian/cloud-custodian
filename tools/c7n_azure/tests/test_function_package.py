@@ -76,7 +76,7 @@ class FunctionPackageTest(BaseTest):
 
         policy = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
 
-        self.assertEqual(policy,
+        self.assertEqual(policy['policies'][0],
                          {u'resource': u'azure.publicip',
                           u'name': u'test-azure-public-ip',
                           u'mode': {u'type': u'azure-stream'}})

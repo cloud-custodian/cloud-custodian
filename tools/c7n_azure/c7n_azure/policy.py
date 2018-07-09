@@ -56,7 +56,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         """Provision any resources needed for the policy."""
         template_util = TemplateUtilities()
 
-        parameters = self.get_parameters(template_util)
+        parameters = self._get_parameters(template_util)
         group_name = parameters['servicePlanName']['value']
         webapp_name = parameters['name']['value']
 
@@ -82,7 +82,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
-    def get_parameters(self, template_util):
+    def _get_parameters(self, template_util):
         parameters = template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
 
