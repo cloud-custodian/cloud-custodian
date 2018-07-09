@@ -157,7 +157,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     filter_accounts(accounts_config, tags, accounts)
 
     load_resources()
-    MainThreadExecutor.async = False
+    MainThreadExecutor.c7n_async = False
     executor = debug and MainThreadExecutor or ProcessPoolExecutor
     return accounts_config, custodian_config, executor
 

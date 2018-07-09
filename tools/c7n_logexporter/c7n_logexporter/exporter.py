@@ -35,7 +35,7 @@ from tabulate import tabulate
 import yaml
 
 from c7n.executor import MainThreadExecutor
-MainThreadExecutor.async = False
+MainThreadExecutor.c7n_async = False
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('c7n.worker').setLevel(logging.DEBUG)

@@ -34,7 +34,7 @@ from c7n.executor import MainThreadExecutor
 
 EPOCH_32_MAX = 2147483647
 
-MainThreadExecutor.async = False
+MainThreadExecutor.c7n_async = False
 
 log = logging.getLogger('traffic')
 

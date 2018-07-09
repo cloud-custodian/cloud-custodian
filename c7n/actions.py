@@ -336,13 +336,17 @@ class LambdaInvoke(EventAction):
        function: my-function
     """
 
-    schema = utils.type_schema(
-        'invoke-lambda',
-        function={'type': 'string'},
-        async={'type': 'boolean'},
-        qualifier={'type': 'string'},
-        batch_size={'type': 'integer'},
-        required=('function',))
+    schema = {
+        'type': 'object',
+        'required': ['type', 'function'],
+        'properties': {
+            'type': {'enum': ['invoke-lambda']},
+            'function': {'type': 'string'},
+            'async': {'type': 'boolean'},
+            'qualifier': {'type': 'string'},
+            'batch_size': {'type': 'integer'}
+        }
+    }
 
     def get_permissions(self):
         if self.data.get('async', True):
