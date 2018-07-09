@@ -114,7 +114,7 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify modified tags
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0] # NOQA
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]  # NOQA
         self.assertEqual(
             rg.tags,
             {'tag1': 'value1', 'pre-existing-1': 'modified', 'pre-existing-2': 'unmodified'})
@@ -281,7 +281,7 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify tags removed and pre-existing tags not removed
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0] # NOQA
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]  # NOQA
         end_tags = rg.tags
         self.assertTrue('pre-existing-1' in end_tags)
         self.assertTrue('pre-existing-2' in end_tags)
