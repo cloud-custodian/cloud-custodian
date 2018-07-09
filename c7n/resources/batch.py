@@ -152,3 +152,37 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
             'status', self.valid_origin_status)
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.delete_environment, resources))
+
+
+@JobDefinition.action_registry.register('deregister')
+class DefinitionDeregister(BaseAction, StateTransitionFilter):
+    """Deregisters a batch definition
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: deregister-definition
+            resource: batch-definition
+            filters:
+              - containerProperties.image: amazonlinux
+            actions:
+              - type: deregister
+    """
+    schema = type_schema('deregister')
+    permissions = ('batch:DeregisterJobDefinition',)
+    valid_origin_states = ('ACTIVE',)
+
+    def deregister_definition(self, r):
+        self.client.deregister_job_definition(
+            jobDefinition='%s:%s' % (r['jobDefinitionName'],
+                                     r['revision']))
+
+    def process(self, resources):
+        resources = self.filter_resource_state(
+            resources, 'status', self.valid_origin_states)
+        self.client = local_session(
+            self.manager.session_factory).client('batch')
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.deregister_definition, resources))

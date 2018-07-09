@@ -33,8 +33,11 @@ setup(
             'azure = c7n_azure.entry:initialize_azure']
     },
     install_requires=["azure-mgmt",
+                      "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
+                      "requests",
+                      "PyJWT",
                       "c7n",
                       "requests",
                       "azure-cli-core<=2.0.40",

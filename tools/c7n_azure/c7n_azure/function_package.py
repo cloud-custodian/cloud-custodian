@@ -95,15 +95,18 @@ class FunctionPackage(object):
 
         if mode_type == 'azure-periodic':
             binding['type'] = 'timerTrigger'
-            binding['name'] = 'timer'
+            binding['name'] = 'input'
             binding['schedule'] = self.policy['mode']['schedule']
 
         elif mode_type == 'azure-stream':
-            binding['type'] = 'eventHubTrigger'
-            binding['name'] = 'event'
-            binding['eventHubName'] = 'eventHubName'
-            binding['consumerGroup'] = 'consumerGroup'
-            binding['connection'] = 'name_of_app_setting_with_read_conn_string'
+            binding['type'] = 'httpTrigger'
+            binding['authLevel'] = 'anonymous'
+            binding['name'] = 'input'
+            binding['methods'] = ['post']
+            config['bindings'].append({
+                "name": "$return",
+                "type": "http",
+                "direction": "out"})
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"
@@ -129,10 +132,10 @@ class FunctionPackage(object):
         platform = sys.platform
         if platform == "linux" or platform == "linux2":
             for so_file in os.listdir(site_pkg):
-                if fnmatch.fnmatch(so_file, '*cffi*.so*'):
+                if fnmatch.fnmatch(so_file, '*ffi*.so*'):
                     self.pkg.add_file(os.path.join(site_pkg, so_file))
 
-            self.pkg.add_directory('.libs_cffi_backend')
+            self.pkg.add_directory(os.path.join(site_pkg, '.libs_cffi_backend'))
 
         # MacOS
         elif platform == "darwin":
@@ -175,6 +178,22 @@ class FunctionPackage(object):
         # update perms of the package
         self._update_perms_package()
 
+    def status(self, app_name):
+        s = local_session(Session)
+        status_url = 'https://%s.scm.azurewebsites.net/api/deployments' % (app_name)
+        headers = {
+            'Authorization': 'Bearer %s' % (s.get_bearer_token())
+        }
+
+        r = requests.get(status_url, headers=headers, timeout=30)
+
+        if r.status_code != 200:
+            self.log.error("Application service returned an error.\n%s\n%s"
+                           % (r.status_code, r.text))
+            return False
+
+        return True
+
     def publish(self, app_name):
         s = local_session(Session)
         zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
@@ -188,7 +207,9 @@ class FunctionPackage(object):
         zip_file = open(self.pkg.path, 'rb').read()
         r = requests.post(zip_api_url, headers=headers, data=zip_file)
 
-        self.log.info("Function publish result: %s" % r)
+        r.raise_for_status()
+
+        self.log.info("Function publish result: %s %s" % (r.status_code, r.text))
 
     def close(self):
         self.pkg.close()

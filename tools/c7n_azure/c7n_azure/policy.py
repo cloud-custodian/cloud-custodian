@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import json
+
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.template_utils import TemplateUtilities
 
@@ -43,6 +46,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def __init__(self, policy):
         self.policy = policy
         self.template_util = TemplateUtilities()
+        self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -52,17 +56,29 @@ class AzureFunctionMode(ServerlessExecutionMode):
         """Provision any resources needed for the policy."""
         parameters = self.get_parameters()
         group_name = parameters['servicePlanName']['value']
+        webapp_name = parameters['name']['value']
 
-        if not self.template_util.resource_exist(group_name, parameters['name']['value']):
+        existing_webapp = self.template_util.resource_exist(group_name, webapp_name)
+
+        if not existing_webapp:
             self.template_util.create_resource_group(
                 group_name, {'location': parameters['location']['value']})
 
             self.template_util.deploy_resource_template(
                 group_name, 'dedicated_functionapp.json', parameters).wait()
+        else:
+            self.log.info("Found existing App %s (%s) in group %s" %
+                          (webapp_name, existing_webapp.location, group_name))
+
+        self.log.info("Building function package for %s" % webapp_name)
 
         archive = FunctionPackage(self.policy.data)
         archive.build()
-        archive.publish(parameters['name']['value'])
+
+        if archive.status(webapp_name):
+            archive.publish(webapp_name)
+        else:
+            self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
     def get_parameters(self):
         parameters = self.template_util.get_default_parameters(
@@ -120,6 +136,7 @@ class AzureStreamMode(AzureFunctionMode):
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
+        self.log.info(json.dumps(lambda_context))
         raise NotImplementedError("error - not implemented")
 
     def get_logs(self, start, end):
