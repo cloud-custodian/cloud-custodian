@@ -117,7 +117,7 @@ class FunctionPackage(object):
 
     def _add_policy(self):
         self.pkg.add_contents(dest=self.policy['name'] + '/config.json',
-                              contents=json.dumps(self.policy))
+                              contents=json.dumps({'policies': [self.policy]}, indent=2))
 
     def _add_cffi_module(self):
         """CFFI native bits aren't discovered automatically
@@ -185,7 +185,11 @@ class FunctionPackage(object):
             'Authorization': 'Bearer %s' % (s.get_bearer_token())
         }
 
-        r = requests.get(status_url, headers=headers, timeout=30)
+        try:
+            r = requests.get(status_url, headers=headers, timeout=30)
+        except requests.exceptions.ReadTimeout:
+            self.log.error("Your Function app is not responding to a status request.")
+            return False
 
         if r.status_code != 200:
             self.log.error("Application service returned an error.\n%s\n%s"

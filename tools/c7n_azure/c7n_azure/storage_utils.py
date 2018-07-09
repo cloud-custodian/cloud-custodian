@@ -31,16 +31,16 @@ except ImportError:
 class StorageUtilities(object):
 
     @staticmethod
-    def get_blob_client_by_uri(storage_uri):
-        storage = StorageUtilities.get_storage_from_uri(storage_uri)
+    def get_blob_client_by_uri(storage_uri, session=None):
+        storage = StorageUtilities.get_storage_from_uri(storage_uri, session)
 
         blob_service = BlockBlobService(account_name=storage.storage_name, account_key=storage.key)
         blob_service.create_container(storage.container_name)
         return blob_service, storage.container_name, storage.file_prefix
 
     @staticmethod
-    def get_queue_client_by_uri(queue_uri):
-        storage = StorageUtilities.get_storage_from_uri(queue_uri)
+    def get_queue_client_by_uri(queue_uri, session=None):
+        storage = StorageUtilities.get_storage_from_uri(queue_uri, session)
 
         queue_service = QueueService(account_name=storage.storage_name, account_key=storage.key)
         queue_service.create_queue(storage.container_name)
@@ -63,8 +63,8 @@ class StorageUtilities(object):
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
     @staticmethod
-    def get_storage_account_by_name(storage_account_name):
-        s = local_session(Session)
+    def get_storage_account_by_name(storage_account_name, session=None):
+        s = session or local_session(Session)
         client = s.client('azure.mgmt.storage.StorageManagementClient')
         accounts = list(client.storage_accounts.list())
         matching_account = [a for a in accounts if a.name == storage_account_name]
@@ -74,8 +74,8 @@ class StorageUtilities(object):
         return matching_account[0]
 
     @staticmethod
-    def get_storage_keys(storage_account_id):
-        s = local_session(Session)
+    def get_storage_keys(storage_account_id, session=None):
+        s = session or local_session(Session)
         client = s.client('azure.mgmt.storage.StorageManagementClient')
         resource_group = ResourceIdParser.get_resource_group(storage_account_id)
         resource_name = ResourceIdParser.get_resource_name(storage_account_id)
@@ -84,7 +84,7 @@ class StorageUtilities(object):
 
     @staticmethod
     @lru_cache()
-    def get_storage_from_uri(storage_uri):
+    def get_storage_from_uri(storage_uri, session=None):
         parts = urlparse(storage_uri)
         storage_name = str(parts.netloc).partition('.')[0]
 
@@ -95,8 +95,8 @@ class StorageUtilities(object):
         else:
             prefix = ""
 
-        account = StorageUtilities.get_storage_account_by_name(storage_name)
-        key = StorageUtilities.get_storage_keys(account.id)[0].value
+        account = StorageUtilities.get_storage_account_by_name(storage_name, session)
+        key = StorageUtilities.get_storage_keys(account.id, session)[0].value
 
         Storage = namedtuple('Storage', 'container_name, storage_name, key, file_prefix')
 
