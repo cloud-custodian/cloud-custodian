@@ -77,4 +77,5 @@ class AzureStorageOutput(FSOutput):
     @staticmethod
     def get_blob_client_wrapper(output_path, ctx):
         # provides easier test isolation
-        return StorageUtilities.get_blob_client_by_uri(output_path, local_session(ctx.session_factory))
+        s = local_session(ctx.session_factory)
+        return StorageUtilities.get_blob_client_by_uri(output_path, s)
