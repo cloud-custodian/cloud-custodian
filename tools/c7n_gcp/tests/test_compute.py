@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import time
 from gcp_common import BaseTest
 
 
@@ -26,6 +26,45 @@ class InstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 4)
+
+    def test_stop_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-stop', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'istop',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'instance-1'}, {'status': 'RUNNING'}],
+             'actions': ['stop']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = instance-1',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['status'], 'STOPPING')
+
+    def test_delete_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-terminate', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'iterm',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'instance-1'}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = instance-1',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['status'], 'STOPPING')
 
 
 class DiskTest(BaseTest):

@@ -1,0 +1,33 @@
+{
+  "body": {
+    "status": "PENDING", 
+    "kind": "compute#operation", 
+    "name": "operation-1531056120110-5707cc82b9bb0-8668efbc-9df3e2a8", 
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c", 
+    "insertTime": "2018-07-08T06:22:00.458-07:00", 
+    "targetId": "2529875210063864767", 
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/instance-1", 
+    "operationType": "stop", 
+    "progress": 0, 
+    "id": "5274563602327515415", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/operations/operation-1531056120110-5707cc82b9bb0-8668efbc-9df3e2a8", 
+    "user": "kapilt@gmail.com"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "691", 
+    "x-xss-protection": "1; mode=block", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "pragma": "no-cache", 
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate", 
+    "date": "Sun, 08 Jul 2018 13:22:00 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
