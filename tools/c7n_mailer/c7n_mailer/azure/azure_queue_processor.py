@@ -21,7 +21,7 @@ import json
 import traceback
 import zlib
 
-from .sendgrid_delivery import SendGridDelivery
+from c7n_mailer.azure.sendgrid_delivery import SendGridDelivery
 
 try:
     from c7n_azure.storage_utils import StorageUtilities
@@ -32,7 +32,7 @@ except ImportError:
 
 class MailerAzureQueueProcessor(object):
 
-    def __init__(self, config, logger, max_num_processes=16):
+    def __init__(self, config, logger, session=None, max_num_processes=16):
         if StorageUtilities is None:
             raise Exception("Using Azure queue requires package c7n_azure to be installed.")
 
@@ -42,13 +42,14 @@ class MailerAzureQueueProcessor(object):
         self.receive_queue = self.config['queue_url']
         self.batch_size = 16
         self.max_message_retry = 3
+        self.session = session
 
     def run(self, parallel=False):
         if parallel:
             self.logger.info("Parallel processing with Azure Queue is not yet implemented.")
 
         self.logger.info("Downloading messages from the Azure Storage queue.")
-        queue_settings = StorageUtilities.get_queue_client_by_uri(self.receive_queue)
+        queue_settings = StorageUtilities.get_queue_client_by_uri(self.receive_queue, self.session)
         queue_messages = StorageUtilities.get_queue_messages(
             *queue_settings, num_messages=self.batch_size)
 
