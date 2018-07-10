@@ -14,14 +14,19 @@ provide the necessary permissions.
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
+    - Model: `RoleAssignment <https://docs.microsoft.com/en-us/python/api/azure.mgmt.authorization.models.roleassignment?view=azure-python>`_
+    - Model: `RoleDefinition <https://docs.microsoft.com/en-us/python/api/azure.mgmt.authorization.models.roledefinition?view=azure-python>`_
+- ARM Resource Filters (see :ref:`azure_genericarmfilter`)
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
-``role``
+- ``role``
   Filters Role Assignments based on name of Role Definition
 
   .. c7n-schema:: RoleFilter
       :module: c7n_azure.resources.access_control
 
-``resource-access``
+- ``resource-access``
   Filter Role Assignments based on access to an azure resource
 
   .. c7n-schema:: ResourceAccessFilter
@@ -30,8 +35,8 @@ Filters
 
 Actions
 -------
-
-``delete``
+- ARM Resource Actions (see :ref:`azure_genericarmaction`)
+- ``delete``
   Deletes role assignment
 
 Example Policies

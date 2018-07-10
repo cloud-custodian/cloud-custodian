@@ -3,6 +3,9 @@
 Generic Actions
 ================
 
+These actions can be applied to a specific resource type, such as ``azure.vm``, or they can be
+applied to all Azure resources by using ``azure.armresource`` as the resource type.
+
 Tags
 -----
 
@@ -85,7 +88,8 @@ Tags
                     - downtime
                     - custodian_status
 
-
+Others
+-------
 
 ``DeleteAction``
       Perform delete operation on any ARM resource. Can be used with 
