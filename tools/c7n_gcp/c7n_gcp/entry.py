@@ -1,4 +1,4 @@
-# Copyright 2017-2018 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
 
 import logging
 
-import c7n_gcp.resources.resourcemanager
 import c7n_gcp.resources.compute
+import c7n_gcp.resources.function
+import c7n_gcp.resources.resourcemanager
 import c7n_gcp.resources.storage  # noqa: F401
 
 logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)

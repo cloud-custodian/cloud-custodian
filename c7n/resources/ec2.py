@@ -1259,7 +1259,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 @actions.register('set-instance-profile')
 class SetInstanceProfile(BaseAction, StateTransitionFilter):
-    """Sets (or removes) the instance profile for a running EC2 instance.
+    """Sets (add, modify, remove) the instance profile for a running EC2 instance.
 
     :Example:
 
@@ -1287,38 +1287,48 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
-        profile_name = self.data.get('name', '')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name')
+        profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
+
+        associations = {
+            a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+            for a in client.describe_iam_instance_profile_associations(
+                Filters=[
+                    {'Name': 'instance-id',
+                     'Values': [i['InstanceId'] for i in profile_instances]},
+                    {'Name': 'state', 'Values': ['associating', 'associated']}]
+            ).get('IamInstanceProfileAssociations', ())}
 
         for i in instances:
-            if profile_name:
+            if profile_name and i['InstanceId'] not in associations:
                 client.associate_iam_instance_profile(
-                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    IamInstanceProfile={'Name': profile_name},
                     InstanceId=i['InstanceId'])
+                continue
+            # Removing profile and no profile on instance.
+            elif profile_name is None and i['InstanceId'] not in associations:
+                continue
+
+            p_assoc_id, p_arn = associations[i['InstanceId']]
+
+            # Already associated to target profile, skip
+            if profile_name and p_arn.endswith('/%s' % profile_name):
+                continue
+
+            if profile_name is None:
+                client.disassociate_iam_instance_profile(
+                    AssociationId=p_assoc_id)
             else:
-                response = client.describe_iam_instance_profile_associations(
-                    Filters=[
-                        {
-                            'Name': 'instance-id',
-                            'Values': [i['InstanceId']],
-                        },
-                        {
-                            'Name': 'state',
-                            'Values': ['associating', 'associated']
-                        }
-                    ]
-                )
-                for a in response['IamInstanceProfileAssociations']:
-                    client.disassociate_iam_instance_profile(
-                        AssociationId=a['AssociationId']
-                    )
+                client.replace_iam_instance_profile_association(
+                    IamInstanceProfile={'Name': profile_name},
+                    AssociationId=p_assoc_id)
 
         return instances
 

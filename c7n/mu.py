@@ -69,7 +69,7 @@ class PythonPackageArchive(object):
             self._temp_archive_file, mode='w',
             compression=zipfile.ZIP_DEFLATED)
         self._closed = False
-        self.add_modules(*modules)
+        self.add_modules(None, *modules)
 
     @property
     def path(self):
@@ -81,7 +81,7 @@ class PythonPackageArchive(object):
             raise ValueError("Archive not closed, size not accurate")
         return os.stat(self._temp_archive_file.name).st_size
 
-    def add_modules(self, *modules):
+    def add_modules(self, ignore, *modules):
         """Add the named Python modules to the archive. For consistency's sake
         we only add ``*.py`` files, not ``*.pyc``. We also don't add other
         files, including compiled modules. You'll have to add such files
@@ -93,8 +93,8 @@ class PythonPackageArchive(object):
             if hasattr(module, '__path__'):
                 # https://docs.python.org/3/reference/import.html#module-path
                 for directory in module.__path__:
-                    self.add_directory(directory)
-                if not hasattr(module, '__file__'):
+                    self.add_directory(directory, ignore)
+                if getattr(module, '__file__', None) is None:
 
                     # Likely a namespace package. Try to add *.pth files so
                     # submodules are importable under Python 2.7.
@@ -123,16 +123,22 @@ class PythonPackageArchive(object):
 
                 self.add_file(path)
 
-    def add_directory(self, path):
+    def add_directory(self, path, ignore=None):
         """Add ``*.py`` files under the directory ``path`` to the archive.
         """
         for root, dirs, files in os.walk(path):
             arc_prefix = os.path.relpath(root, os.path.dirname(path))
             for f in files:
+                dest_path = os.path.join(arc_prefix, f)
+
+                # ignore specific files
+                if ignore and ignore(dest_path):
+                    continue
+
                 if f.endswith('.pyc') or f.endswith('.c'):
                     continue
                 f_path = os.path.join(root, f)
-                dest_path = os.path.join(arc_prefix, f)
+
                 self.add_file(f_path, dest_path)
 
     def add_file(self, src, dest=None):
@@ -196,11 +202,11 @@ class PythonPackageArchive(object):
         if self._temp_archive_file:
             self._temp_archive_file = None
 
-    def get_checksum(self):
+    def get_checksum(self, encoder=base64.b64encode, hasher=hashlib.sha256):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
         with open(self._temp_archive_file.name, 'rb') as fh:
-            return base64.b64encode(checksum(fh, hashlib.sha256()))
+            return encoder(checksum(fh, hasher()))
 
     def get_bytes(self):
         """Return the entire zip file as a byte string. """
@@ -1177,6 +1183,64 @@ class CloudWatchLogSubscription(object):
                     raise
 
 
+class SQSSubscription(object):
+    """ Subscribe a lambda to one or more SQS queues.
+    """
+
+    def __init__(self, session_factory, queue_arns, batch_size=10):
+        self.queue_arns = queue_arns
+        self.session_factory = session_factory
+        self.batch_size = batch_size
+
+    def add(self, func):
+        client = local_session(self.session_factory).client('lambda')
+        event_mappings = {
+            m['EventSourceArn']: m for m in client.list_event_source_mappings(
+                FunctionName=func.name).get('EventSourceMappings', ())}
+
+        modified = False
+        for queue_arn in self.queue_arns:
+            mapping = None
+            if queue_arn in event_mappings:
+                mapping = event_mappings[queue_arn]
+                if (mapping['State'] == 'Enabled' or
+                        mapping['BatchSize'] != self.batch_size):
+                    continue
+                modified = True
+            else:
+                modified = True
+
+            if not modified:
+                return modified
+
+            if mapping is not None:
+                log.info(
+                    "Updating subscription %s on %s", func.name, queue_arn)
+                client.update_event_source_mapping(
+                    UUID=mapping['UUID'],
+                    Enabled=True,
+                    BatchSize=self.batch_size)
+            else:
+                log.info("Subscribing %s to %s", func.name, queue_arn)
+                client.create_event_source_mapping(
+                    FunctionName=func.name,
+                    EventSourceArn=queue_arn,
+                    BatchSize=self.batch_size)
+            return modified
+
+    def remove(self, func):
+        client = local_session(self.session_factory).client('lambda')
+        event_mappings = {
+            m['EventSourceArn']: m for m in client.list_event_source_mappings(
+                FunctionName=func.name).get('EventSourceMappings', ())}
+
+        for queue_arn in self.queue_arns:
+            if queue_arn not in event_mappings:
+                continue
+            client.delete_event_source_mapping(
+                UUID=event_mappings[queue_arn]['UUID'])
+
+
 class SNSSubscription(object):
     """ Subscribe a lambda to one or more SNS topics.
     """
@@ -1186,8 +1250,6 @@ class SNSSubscription(object):
     def __init__(self, session_factory, topic_arns):
         self.topic_arns = topic_arns
         self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('sns')
 
     @staticmethod
     def _parse_arn(arn):
@@ -1197,7 +1259,8 @@ class SNSSubscription(object):
         return region, topic_name, statement_id
 
     def add(self, func):
-        lambda_client = self.session.client('lambda')
+        session = local_session(self.session_factory)
+        lambda_client = session.client('lambda')
         for arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(arn)
 
@@ -1218,12 +1281,16 @@ class SNSSubscription(object):
                 if e.response['Error']['Code'] != 'ResourceConflictException':
                     raise
 
-            # Subscribe the lambda to the topic.
-            topic = self.session.resource('sns').Topic(arn)
-            topic.subscribe(Protocol='lambda', Endpoint=func.arn)  # idempotent
+            # Subscribe the lambda to the topic, idempotent
+            sns_client = session.client('sns')
+            sns_client.subscribe(
+                TopicArn=arn, Protocol='lambda', Endpoint=func.arn)
 
     def remove(self, func):
-        lambda_client = self.session.client('lambda')
+        session = local_session(self.session_factory)
+        lambda_client = session.client('lambda')
+        sns_client = session.client('sns')
+
         for topic_arn in self.topic_arns:
             region, topic_name, statement_id = self._parse_arn(topic_arn)
 
@@ -1236,7 +1303,7 @@ class SNSSubscription(object):
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
                     raise
 
-            paginator = self.client.get_paginator('list_subscriptions_by_topic')
+            paginator = sns_client.get_paginator('list_subscriptions_by_topic')
 
             class Done(Exception):
                 pass
@@ -1246,7 +1313,7 @@ class SNSSubscription(object):
                         if subscription['Endpoint'] != func.arn:
                             continue
                         try:
-                            response = self.client.unsubscribe(
+                            response = sns_client.unsubscribe(
                                 SubscriptionArn=subscription['SubscriptionArn'])
                             log.debug("Unsubscribed %s from %s" %
                                 (func.name, topic_name))

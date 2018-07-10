@@ -17,13 +17,15 @@ the 'azure://' prefix
 
 """
 import datetime
-import tempfile
+import logging
 import os
 import shutil
-import logging
+import tempfile
 
-from c7n.output import FSOutput, blob_outputs
 from c7n_azure.storage_utils import StorageUtilities
+
+from c7n.utils import local_session
+from c7n.output import FSOutput, blob_outputs
 
 
 @blob_outputs.register('azure')
@@ -44,7 +46,7 @@ class AzureStorageOutput(FSOutput):
         self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
         self.root_dir = tempfile.mkdtemp()
         self.blob_service, self.container, self.file_prefix = \
-            self.get_blob_client_wrapper(self.ctx.output_path)
+            self.get_blob_client_wrapper(self.ctx.output_path, ctx)
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if exc_type is not None:
@@ -73,6 +75,7 @@ class AzureStorageOutput(FSOutput):
                 self.log.debug("%s uploaded" % blob_name)
 
     @staticmethod
-    def get_blob_client_wrapper(output_path):
+    def get_blob_client_wrapper(output_path, ctx):
         # provides easier test isolation
-        return StorageUtilities.get_blob_client_by_uri(output_path)
+        s = local_session(ctx.session_factory)
+        return StorageUtilities.get_blob_client_by_uri(output_path, s)

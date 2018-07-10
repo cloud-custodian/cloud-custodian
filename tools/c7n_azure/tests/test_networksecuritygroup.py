@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
-from c7n.filters.core import PolicyValidationError
 from c7n_azure.resources.network_security_group \
     import FROM_PORT, TO_PORT, PORTS, EXCEPT_PORTS, IP_PROTOCOL
 from mock import patch
+
+from c7n.filters.core import PolicyValidationError
 
 
 class NetworkSecurityGroupTest(BaseTest):

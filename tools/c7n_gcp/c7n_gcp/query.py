@@ -42,7 +42,15 @@ class ResourceQuery(object):
 
         # depends on resource scope
         if m.scope in ('project', 'zone'):
-            params['project'] = session.get_default_project()
+            project = session.get_default_project()
+            scope_t = getattr(m, 'scope_template', None)
+            if scope_t:
+                project = scope_t.format(project)
+
+            if getattr(m, 'scope_key', None):
+                params[m.scope_key] = project
+            else:
+                params['project'] = project
 
         if m.scope == 'zone':
             if session.get_default_zone():
@@ -111,6 +119,15 @@ class QueryResourceManager(ResourceManager):
 
     def get_source(self, source_type):
         return sources.get(source_type)(self)
+
+    def get_client(self):
+        return local_session(self.session_factory).client(
+            self.resource_type.service,
+            self.resource_type.version,
+            self.resource_type.component)
+
+    def get_model(self):
+        return self.resource_type
 
     def get_cache_key(self, query):
         return {'source_type': self.source_type, 'query': query}
