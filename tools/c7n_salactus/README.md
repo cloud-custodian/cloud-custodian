@@ -78,7 +78,8 @@ To get this running you will need to create a role, e.g. salactus-role,
 that can be assumed which has read permissions to CloudWatch, S3, and
 write access to the bucket created or chosen for the reports, e.g.
 salactus-bucket.
- 
+
+``` 
 accounts:
   - account-id: "123456789012"
     role: "arn:aws:iam::123456789012:role/salactus-role"
@@ -92,3 +93,4 @@ visitors:
 object-reporting:
   bucket: "salactus-bucket"
   prefix: "object-reports"
+```
