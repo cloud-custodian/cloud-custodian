@@ -54,6 +54,9 @@ class FlightRecorder(Http):
                 # if we already have discovery metadata, don't re-record it.
                 if record and is_discovery:
                     return None
+                # on replay always return the same discovery file
+                if is_discovery:
+                    return fn
                 self._index[base_name] += 1
                 if not record:
                     next_file = fn
