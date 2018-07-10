@@ -20,7 +20,7 @@ class VMSSTest(BaseTest):
     def setUp(self):
         super(VMSSTest, self).setUp()
 
-    @arm_template('vmscaleset.json')
+    @arm_template('vmss.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-vm-scale-set',

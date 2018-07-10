@@ -32,7 +32,7 @@ and then perform the delete operation on those ready for deletion.
             op: in
             value_type: normalize
             value: test
-         actions:
+        actions:
           - type: mark-for-op
             op: delete
             days: 7
