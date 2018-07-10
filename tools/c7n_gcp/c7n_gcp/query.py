@@ -120,6 +120,15 @@ class QueryResourceManager(ResourceManager):
     def get_source(self, source_type):
         return sources.get(source_type)(self)
 
+    def get_client(self):
+        return local_session(self.session_factory).client(
+            self.resource_type.service,
+            self.resource_type.version,
+            self.resource_type.component)
+
+    def get_model(self):
+        return self.resource_type
+
     def get_cache_key(self, query):
         return {'source_type': self.source_type, 'query': query}
 
