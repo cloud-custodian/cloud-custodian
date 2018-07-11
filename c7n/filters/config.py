@@ -21,7 +21,8 @@ from .core import Filter
 
 
 class ConfigCompliance(Filter):
-
+    """Filter resources by their compliance with one or more AWS config rules.
+    """
     permissions = ('config:DescribeComplianceByConfigRule',)
     schema = type_schema(
         'config-compliance',
@@ -47,7 +48,7 @@ class ConfigCompliance(Filter):
             pager = client.get_paginator('get_compliance_details_by_config_rule')
             for page in pager.paginate(
                     ConfigRuleName=rid, ComplianceTypes=states):
-                evaluations = page.get('Evaluations', ())
+                evaluations = page.get('EvaluationResults', ())
 
                 for e in evaluations:
                     rident = e['EvaluationResultIdentifier'][
@@ -55,7 +56,7 @@ class ConfigCompliance(Filter):
                     # for multi resource type rules, only look at
                     # results for the resource type currently being
                     # processed.
-                    if rident != resource_model.config_type:
+                    if rident['ResourceType'] != resource_model.config_type:
                         continue
 
                     if not filters:
@@ -99,7 +100,6 @@ class ConfigCompliance(Filter):
         if config_type is None:
             return
         resource_class.filter_registry.register('config-compliance', klass)
-
 
 
 resources.subscribe(resources.EVENT_REGISTER, ConfigCompliance.register_resources)

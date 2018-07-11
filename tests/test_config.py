@@ -19,7 +19,7 @@ from .common import BaseTest
 class ConfigComplianceTest(BaseTest):
 
     def test_compliance(self):
-        factory = self.record_flight_data('test_config_compliance')
+        factory = self.replay_flight_data('test_config_compliance')
         p = self.load_policy({
             'name': 'compliance',
             'resource': 'ebs',
@@ -31,7 +31,9 @@ class ConfigComplianceTest(BaseTest):
             ]}, session_factory=factory, config={'region': 'us-east-2'})
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['VolumeId'], '')
+        self.assertEqual(resources[0]['VolumeId'], 'vol-0c6efd2a9f5677a03')
+        self.assertEqual(resources[0]['c7n:config-compliance'][0]['Annotation'],
+                         'Resource is not compliant with policy:good-vol')
 
 
 class ConfigRuleTest(BaseTest):
