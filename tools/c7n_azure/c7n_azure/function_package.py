@@ -17,6 +17,7 @@ import json
 import logging
 import os
 import sys
+import time
 
 import requests
 from c7n_azure.session import Session
@@ -27,23 +28,29 @@ from c7n.utils import local_session
 
 class FunctionPackage(object):
 
-    def __init__(self, policy):
+    def __init__(self, name, function_path=None):
         self.log = logging.getLogger('custodian.azure.function_package')
-        self.basedir = os.path.dirname(os.path.realpath(__file__))
         self.pkg = PythonPackageArchive()
-        self.policy = policy
+        self.name = name
+        self.function_path = function_path or os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), 'function.py')
 
-    def _add_functions_required_files(self):
-        policy_name = self.policy['name']
+    def _add_functions_required_files(self, policy):
+        self.pkg.add_file(self.function_path,
+                          dest=self.name + '/function.py')
 
-        self.pkg.add_file(os.path.join(self.basedir, 'function.py'),
-                          dest=policy_name + '/function.py')
-
-        self.pkg.add_contents(dest=policy_name + '/__init__.py', contents='')
+        self.pkg.add_contents(dest=self.name + '/__init__.py', contents='')
 
         self._add_host_config()
-        self._add_function_config()
-        self._add_policy()
+
+        if policy:
+            config_contents = self.get_function_config(policy)
+            policy_contents = self._get_policy(policy)
+            self.pkg.add_contents(dest=self.name + '/function.json',
+                                  contents=config_contents)
+
+            self.pkg.add_contents(dest=self.name + '/config.json',
+                                  contents=policy_contents)
 
     def _add_host_config(self):
         config = \
@@ -81,7 +88,7 @@ class FunctionPackage(object):
             }
         self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
 
-    def _add_function_config(self):
+    def get_function_config(self, policy):
         config = \
             {
                 "scriptFile": "function.py",
@@ -90,13 +97,13 @@ class FunctionPackage(object):
                 }]
             }
 
-        mode_type = self.policy['mode']['type']
+        mode_type = policy['mode']['type']
         binding = config['bindings'][0]
 
         if mode_type == 'azure-periodic':
             binding['type'] = 'timerTrigger'
             binding['name'] = 'input'
-            binding['schedule'] = self.policy['mode']['schedule']
+            binding['schedule'] = policy['mode']['schedule']
 
         elif mode_type == 'azure-stream':
             binding['type'] = 'httpTrigger'
@@ -112,12 +119,10 @@ class FunctionPackage(object):
             self.log.error("Mode not yet supported for Azure functions (%s)"
                            % mode_type)
 
-        self.pkg.add_contents(dest=self.policy['name'] + '/function.json',
-                              contents=json.dumps(config))
+        return json.dumps(config, indent=2)
 
-    def _add_policy(self):
-        self.pkg.add_contents(dest=self.policy['name'] + '/config.json',
-                              contents=json.dumps({'policies': [self.policy]}, indent=2))
+    def _get_policy(self, policy):
+        return json.dumps({'policies': [policy]}, indent=2)
 
     def _add_cffi_module(self):
         """CFFI native bits aren't discovered automatically
@@ -149,13 +154,18 @@ class FunctionPackage(object):
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
 
-    def build(self):
+    def build(self, policy, entry_point=None, extra_modules=None):
         # Get dependencies for azure entry point
-        modules, so_files = FunctionPackage._get_dependencies('entry.py')
+        entry_point = entry_point or \
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), 'entry.py')
+        modules, so_files = FunctionPackage._get_dependencies(entry_point)
 
         # add all loaded modules
-        modules.remove('azure')
+        modules.discard('azure')
         modules = modules.union({'c7n', 'c7n_azure', 'pkg_resources'})
+        if extra_modules:
+            modules = modules.union(extra_modules)
+
         self.pkg.add_modules(None, *modules)
 
         # adding azure manually
@@ -163,20 +173,24 @@ class FunctionPackage(object):
         # https://www.python.org/dev/peps/pep-0420/
         self.pkg.add_modules(lambda f: f == 'azure/__init__.py', 'azure')
 
-        # add Functions HttpTrigger
-        self._add_functions_required_files()
+        # add config and policy
+        self._add_functions_required_files(policy)
 
         # generate and add auth
         s = local_session(Session)
-        self.pkg.add_contents(dest=self.policy['name'] + '/auth.json', contents=s.get_auth_string())
+        self.pkg.add_contents(dest=self.name + '/auth.json', contents=s.get_auth_string())
 
         # cffi module needs special handling
         self._add_cffi_module()
 
-        self.pkg.close()
-
-        # update perms of the package
-        self._update_perms_package()
+    def wait_for_status(self, app_name, retries=5, delay=15):
+        for r in range(retries):
+            if self.status(app_name):
+                return True
+            else:
+                self.log.info('Will retry Function App status check in %s seconds...' % delay)
+                time.sleep(delay)
+        return False
 
     def status(self, app_name):
         s = local_session(Session)
@@ -199,6 +213,11 @@ class FunctionPackage(object):
         return True
 
     def publish(self, app_name):
+        self.close()
+
+        # update perms of the package
+        self._update_perms_package()
+
         s = local_session(Session)
         zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
         headers = {
@@ -252,7 +271,7 @@ class FunctionPackage(object):
         # Dynamically find all imported modules
         from modulefinder import ModuleFinder
         finder = ModuleFinder()
-        finder.run_script(os.path.join(os.path.dirname(os.path.realpath(__file__)), entry_point))
+        finder.run_script(entry_point)
         imports = list(set([v.__file__.split('site-packages/', 1)[-1].split('/')[0]
                             for (k, v) in finder.modules.items()
                             if v.__file__ is not None and "site-packages" in v.__file__]))
