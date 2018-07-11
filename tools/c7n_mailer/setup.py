@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from setuptools import setup, find_packages
-import os
+from os import path
 
 # *Any* updates here should also go into c7n_mailer/deploy.py for lambda packaging.
 requires = [
@@ -34,15 +34,17 @@ except ImportError:
     # https://github.com/agronholm/pythonfutures/issues/41
     requires += ['futures']
 
-description = ""
-if os.path.exists('README.md'):
-    description = open('README.md').read()
+# read the contents of your README file
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name="c7n_mailer",
     version='0.3.1',
     description="Cloud Custodian - Reference Mailer",
-    long_description=description,
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
