@@ -16,10 +16,15 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('sqlserver')
-class SqlServer(ArmResourceManager):
+@resources.register('vmss')
+class VMScaleSet(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
-        service = 'azure.mgmt.sql'
-        client = 'SqlManagementClient'
-        enum_spec = ('servers', 'list', None)
+        service = 'azure.mgmt.compute'
+        client = 'ComputeManagementClient'
+        enum_spec = ('virtual_machine_scale_sets', 'list_all', None)
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup'
+        )
