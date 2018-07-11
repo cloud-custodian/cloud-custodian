@@ -17,7 +17,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('sqlserver')
-class Vnet(ArmResourceManager):
+class SqlServer(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'

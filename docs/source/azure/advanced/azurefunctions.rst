@@ -88,4 +88,37 @@ An example on how to set size and location as well:
             value: "PowerState/running"
 
 
+Execution Options
+#################
 
+Execution options are not required, but allow you to override defaults that would normally
+be provided on the command line in non-serverless scenarios.
+
+Common properties are:
+
+- output_dir
+- cache_period
+- dryrun
+
+Output directory defaults to `/tmp/<random_uuid>` but you can point it to a Azure Blob Storage container instead
+
+.. code-block:: yaml
+
+    policies:
+      - name: stopped-vm
+        mode:
+            type: azure-periodic
+            schedule: '0 0 * * * *'
+            provision-options:
+              servicePlanName: functionshost
+            execution-options:
+              output_dir: azure://yourstorageaccount.blob.core.windows.net/custodian
+         resource: azure.vm
+         filters:
+          - type: instance-view
+            key: statuses[].code
+            op: not-in
+            value_type: swap
+            value: "PowerState/running"
+
+More details on Blob Storage output are at :ref:`azure_bloboutput`

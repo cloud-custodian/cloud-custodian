@@ -37,7 +37,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'sku': 'string',
                 'workerSize': 'number',
                 'skuCode': 'string'
-            }
+            },
+            'execution-options': {'type': 'object'}
         }
     }
 
@@ -45,7 +46,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def __init__(self, policy):
         self.policy = policy
-        self.template_util = TemplateUtilities()
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
 
     def run(self, event=None, lambda_context=None):
@@ -54,17 +54,19 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def provision(self):
         """Provision any resources needed for the policy."""
-        parameters = self.get_parameters()
+        template_util = TemplateUtilities()
+
+        parameters = self._get_parameters(template_util)
         group_name = parameters['servicePlanName']['value']
         webapp_name = parameters['name']['value']
 
-        existing_webapp = self.template_util.resource_exist(group_name, webapp_name)
+        existing_webapp = template_util.resource_exist(group_name, webapp_name)
 
         if not existing_webapp:
-            self.template_util.create_resource_group(
+            template_util.create_resource_group(
                 group_name, {'location': parameters['location']['value']})
 
-            self.template_util.deploy_resource_template(
+            template_util.deploy_resource_template(
                 group_name, 'dedicated_functionapp.json', parameters).wait()
         else:
             self.log.info("Found existing App %s (%s) in group %s" %
@@ -80,8 +82,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
-    def get_parameters(self):
-        parameters = self.template_util.get_default_parameters(
+    def _get_parameters(self, template_util):
+        parameters = template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
 
         data = self.policy.data
@@ -98,7 +100,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             if 'provision-options' in data['mode']:
                 updated_parameters.update(data['mode']['provision-options'])
 
-        parameters = self.template_util.update_parameters(parameters, updated_parameters)
+        parameters = template_util.update_parameters(parameters, updated_parameters)
 
         return parameters
 

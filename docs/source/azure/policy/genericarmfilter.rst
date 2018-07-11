@@ -3,12 +3,34 @@
 Generic Filters
 ================
 
+These filters can be applied to a specific resource type, such as ``azure.vm``, or they can be
+applied to all Azure resources by using ``azure.armresource`` as the resource type.
+
+Metric Filter
+-------------
 
 ``MetricFilter``
 Filters Azure resources based on live metrics from the Azure monitor.
 
 .. c7n-schema:: MetricFilter
     :module: c7n_azure.filters
+
+Metrics for Custodian-supported Azure resources:
+
+- `Cognitive Services <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcognitiveservicesaccounts/>`_
+- `Cosmos DB <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftdocumentdbdatabaseaccounts/>`_
+- `Data Factory <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftdatafactoryfactories/>`_
+- `IoT Hub <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftdevicesiothubs/>`_
+- `Key Vault <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftkeyvaultvaults/>`_
+- `Load Balancer <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftnetworkloadbalancers/>`_
+- `Public IP Address <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftnetworkpublicipaddresses/>`_
+- `SQL Server <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftsqlservers/>`_
+- `Storage Accounts <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftstoragestorageaccounts/>`_
+- `Virtual Machine <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcomputevirtualmachines/>`_
+- `Web Apps (excluding functions) <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftwebsites-excluding-functions/>`_
+
+Click `here <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics/>`_
+for a full list of metrics supported by Azure resources.
 
 
 Example Policies
@@ -60,8 +82,56 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
             timeframe: 24
 
 
+Tag Filter
+----------
+
+The "tag filter" is implicitly just the ValueFilter (see :ref:`filters`).
+It can be used to filter resources on the presence, absence or value of a tag.
+
+.. c7n-schema:: ValueFilter
+    :module: c7n.filters.core
+
+
+Example Policies
+----------------
+
+This policy will delete all ARM resources with the tag 'Tag1' present
+
+.. code-block:: yaml
+
+    policies
+      - name: delete-resources-with-Tag1
+        resource: azure.armresource
+        filters:
+          - tag:Tag1: present
+        actions:
+          - type: delete
+
+This policy will find all VMs with the tag 'Tag1' absent
+
+.. code-block:: yaml
+
+    policies
+      - name: find-vms-without-Tag1
+        resource: azure.vm
+        filters:
+          - tag:Tag1: absent
+
+This policy will find all CosmosDBs with the tag 'Tag1' and value 'Value1'
+
+.. code-block:: yaml
+
+    policies
+      - name: find-cosmosdb-tag-value
+        resource: azure.cosmosdb
+        filters:
+          - tag:Tag1: Value1
+
+Marked-For-Op Filter
+--------------------
+
 ``TagActionFilter``
-Filters Azure resources based on previously scheduled operations via tags
+Filters Azure resources based on previously scheduled operations via tags.
 
 .. c7n-schema:: TagActionFilter
     :module: c7n_azure.filters
@@ -83,7 +153,7 @@ Find VMs that have been marked for stopping and stop them
         actions:
           - type: stop
 
-Find VMs that have been marked for stopping tomorrow and notify email address
+Find VMs that have been marked for stopping tomorrow and notify user@domain.com
 
 .. code-block:: yaml
 
@@ -92,13 +162,15 @@ Find VMs that have been marked for stopping tomorrow and notify email address
         resource: azure.vm
         filters:
           - type: marked-for-op
+            # 'Fast-forward' 1 day into future. skew_hours is used for hour increments
             skew: 1
             op: stop
         actions:
           - type: notify
             template: default
             subject: VMs Scheduled To Stop
-            to: user@domain.com
+            to:
+              - user@domain.com
             transport:
               - type: asq
                 queue: https://accountname.queue.core.windows.net/test
