@@ -14,10 +14,15 @@
 
 import logging
 
+import c7n_gcp.resources.build
 import c7n_gcp.resources.compute
 import c7n_gcp.resources.function
+import c7n_gcp.resources.gke
 import c7n_gcp.resources.resourcemanager
-import c7n_gcp.resources.storage  # noqa: F401
+import c7n_gcp.resources.source
+import c7n_gcp.resources.storage
+import c7n_gcp.resources.sql  # noqa: F401
+
 
 logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
 
