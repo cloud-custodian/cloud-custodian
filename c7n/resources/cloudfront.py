@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
+import re
 
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
@@ -179,8 +180,8 @@ class IsWafEnabled(Filter):
         return results
 
 
-@Distribution.filter_registry.register('mismatch-s3-owner')
-class MismatchS3Owner(Filter):
+@Distribution.filter_registry.register('mismatch-s3-origin')
+class MismatchS3Origin(Filter):
     """Check for existence of S3 bucket referenced by Cloudfront,
        and verify whether owner is different from Cloudfront account owner.
 
@@ -189,23 +190,24 @@ class MismatchS3Owner(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: mismatch-s3-owner
+              - name: mismatch-s3-origin
                 resource: distribution
                 filters:
-                  - type: mismatch-s3-owner
+                  - type: mismatch-s3-origin
    """
 
     schema = type_schema(
-        'mismatch-s3-owner')
+        'mismatch-s3-origin')
 
     permissions = ('s3:ListBuckets',)
     retry = staticmethod(get_retry(('Throttling',)))
 
     def is_s3_domain(self, domain_name):
-        if domain_name.endswith('.s3.amazonaws.com'):
-            return domain_name[:-len('.s3.amazonaws.com')]
+        match = re.match(".*s3.*?amazonaws.com", domain_name, flags=0)
+        if match:
+            return match.group()
 
-        return False
+        return None
 
     def process(self, resources, event=None):
         results = []
@@ -222,10 +224,10 @@ class MismatchS3Owner(Filter):
                 elif 'CustomOriginConfig' in x and self.is_s3_domain(x['DomainName']):
                     target_bucket = self.is_s3_domain(x['DomainName'])
 
-                if 'target_bucket' in locals() and target_bucket not in buckets:
+                if target_bucket is not None and target_bucket not in buckets:
                     self.log.debug("Bucket %s not found in distribution %s hosting account."
                                    % (target_bucket, r['Id']))
-                    r['c7n:mismatch-s3-origin'] = True
+                    r['c7n:mismatched-s3-origin'] = target_bucket
                     results.append(r)
 
         return results

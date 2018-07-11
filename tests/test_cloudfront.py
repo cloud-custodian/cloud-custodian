@@ -199,16 +199,16 @@ class CloudFront(BaseTest):
         resp = client.list_distributions()
         self.assertEqual(resp["DistributionList"]["Items"][0]["Enabled"], False)
 
-    def test_distribution_check_s3_owner_missing_bucket(self):
-        factory = self.replay_flight_data("test_distribution_check_s3_owner_missing_bucket")
+    def test_distribution_check_s3_origin_missing_bucket(self):
+        factory = self.replay_flight_data("test_distribution_check_s3_origin_missing_bucket")
 
         p = self.load_policy(
             {
-                "name": "test_distribution_check_s3_owner_missing_bucket",
+                "name": "test_distribution_check_s3_origin_missing_bucket",
                 "resource": "distribution",
                 "filters": [
                     {
-                        "type": "mismatch-s3-owner",
+                        "type": "mismatch-s3-origin",
                     }
                 ]
             },
@@ -217,7 +217,7 @@ class CloudFront(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:mismatch-s3-origin'])
+        self.assertEqual(resources[0]['c7n:mismatched-s3-origin'], 'c7n-idontexist')
 
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
