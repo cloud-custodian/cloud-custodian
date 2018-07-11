@@ -226,6 +226,17 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
 
+#### Standard Azure Functions Config
+
+| Required? | Key                            | Type             |
+|:---------:|:-------------------------------|:-----------------|
+|           | `function_name`                | string           |
+| &#x2705;  | `function_servicePlanName`     | string           |
+|           | `function_location`            | string           |
+|           | `function_appInsightsLocation` | string           |
+
+
+
 
 #### Mailer Infrastructure Config
 
@@ -394,6 +405,22 @@ sendgrid_api_key: SENDGRID_API_KEY
 The mailer will transmit all messages found on the queue on each execution, and will retry
 sending 3 times in the event of a failure calling SendGrid.  After the retries the queue
 message will be discarded.
+
+#### Deploying Azure Functions
+
+The `--update-lambda` CLI option will also deploy Azure Functions if you have an Azure
+mailer configuration.
+
+`c7n-mailer --config mailer.yml --update-lambda`
+
+where `mailer.yml` may look like:
+
+```yml
+queue_url: asq://storage.queue.core.windows.net/custodian
+from_address: foo@mail.com
+sendgrid_api_key: <key>
+function_servicePlanName: mycustodianfunctions
+```
 
 ## Writing an email template
 

@@ -59,6 +59,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         parameters = self._get_parameters(template_util)
         group_name = parameters['servicePlanName']['value']
         webapp_name = parameters['name']['value']
+        policy_name = self.policy.data['name'].replace(' ', '-').lower()
 
         existing_webapp = template_util.resource_exist(group_name, webapp_name)
 
@@ -74,10 +75,11 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         self.log.info("Building function package for %s" % webapp_name)
 
-        archive = FunctionPackage(self.policy.data)
-        archive.build()
+        archive = FunctionPackage(policy_name)
+        archive.build(self.policy.data)
+        archive.close()
 
-        if archive.status(webapp_name):
+        if archive.wait_for_status(webapp_name):
             archive.publish(webapp_name)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
