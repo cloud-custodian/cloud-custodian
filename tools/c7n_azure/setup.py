@@ -17,8 +17,11 @@ from os import path
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'readme.md'), encoding='utf-8') as f:
-    long_description = f.read()
+readme = path.join(this_directory, 'readme.md')
+long_description = ''
+if path.exists(readme):
+    with open(readme, encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(
     name="c7n_azure",
