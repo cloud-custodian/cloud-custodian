@@ -22,10 +22,7 @@ from .core import Filter
 
 class ConfigCompliance(Filter):
 
-    permissions = (
-        'config:DescribeComplianceByConfigRule',
-        'config:DescribeComplianceByResource')
-
+    permissions = ('config:DescribeComplianceByConfigRule',)
     schema = type_schema(
         'config-compliance',
         required=('rules',),
@@ -40,14 +37,14 @@ class ConfigCompliance(Filter):
 
     def get_resource_map(self, filters, resource_model, resources):
         rule_ids = self.data.get('rules')
-        states = self.gdata.get('states', ['NON_COMPLIANT'])
+        states = self.data.get('states', ['NON_COMPLIANT'])
         op = self.data.get('op', 'or') == 'or' and any or all
 
-        client = local_session(self.manager.session_factory)
+        client = local_session(self.manager.session_factory).client('config')
         resource_map = {}
 
         for rid in rule_ids:
-            pager = client.get_paginator('describe_compliance_by_rule')
+            pager = client.get_paginator('get_compliance_details_by_config_rule')
             for page in pager.paginate(
                     ConfigRuleName=rid, ComplianceTypes=states):
                 evaluations = page.get('Evaluations', ())
@@ -72,7 +69,7 @@ class ConfigCompliance(Filter):
 
         return resource_map
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         filters = []
         for f in self.data.get('eval_filters', ()):
             vf = ValueFilter(f)
@@ -102,6 +99,7 @@ class ConfigCompliance(Filter):
         if config_type is None:
             return
         resource_class.filter_registry.register('config-compliance', klass)
+
 
 
 resources.subscribe(resources.EVENT_REGISTER, ConfigCompliance.register_resources)

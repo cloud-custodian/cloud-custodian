@@ -16,6 +16,24 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from .common import BaseTest
 
 
+class ConfigComplianceTest(BaseTest):
+
+    def test_compliance(self):
+        factory = self.record_flight_data('test_config_compliance')
+        p = self.load_policy({
+            'name': 'compliance',
+            'resource': 'ebs',
+            'filters': [
+                {'type': 'config-compliance',
+                 'eval_filters': [{
+                     'EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType': 'AWS::EC2::Volume'}],
+                 'rules': ['custodian-good-vol']}
+            ]}, session_factory=factory, config={'region': 'us-east-2'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VolumeId'], '')
+
+
 class ConfigRuleTest(BaseTest):
 
     def test_status(self):
