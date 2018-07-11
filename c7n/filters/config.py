@@ -28,7 +28,10 @@ class ConfigCompliance(Filter):
         'config-compliance',
         required=('rules',),
         op={'enum': ['or', 'and']},
-        eval_filters={'type': 'array', '$ref': '#/definitions/filters/value'},
+        eval_filters={'type': 'array', 'items': {
+            'oneOf': [
+                {'$ref': '#/definitions/filters/valuekv'},
+                {'$ref': '#/definitions/filters/value'}]}},
         states={'type': 'array', 'items': {'enum': [
             'COMPLIANT', 'NON_COMPLIANT',
             'NOT_APPLICABLE', 'INSUFFICIENT_DATA']}},
