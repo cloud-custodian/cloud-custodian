@@ -80,7 +80,7 @@ class ConfigCompliance(Filter):
             filters.append(vf)
 
         resource_model = self.manager.get_model()
-        resource_map = self.get_resource_map(filters, resources)
+        resource_map = self.get_resource_map(filters, resource_model, resources)
 
         results = []
         for r in resources:
