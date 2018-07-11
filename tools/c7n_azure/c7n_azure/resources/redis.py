@@ -17,7 +17,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('redis')
-class CdnProfile(ArmResourceManager):
+class Redis(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.redis'
