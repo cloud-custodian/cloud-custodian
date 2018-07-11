@@ -13,11 +13,19 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+from os import path
+
+# read the contents of your README file
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'readme.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name="c7n_azure",
     version='0.1',
     description="Cloud Custodian - Azure Support",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     include_package_data=True,
     classifiers=[
         "Topic :: System :: Systems Administration",
