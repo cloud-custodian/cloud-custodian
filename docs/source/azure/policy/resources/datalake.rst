@@ -19,32 +19,6 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all Datalake Stores for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
-
-.. code-block:: yaml
-
-    policies:
-      - name: mark-test-datalake-for-deletion
-        resource: azure.datalake
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-datalake
-        resource: azure.datalake
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
-
 This policy will find all Datalake Stores with one million or more write requests in the last 72 hours
 
 .. code-block:: yaml

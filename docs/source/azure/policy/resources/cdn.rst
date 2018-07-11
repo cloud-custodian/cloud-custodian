@@ -18,28 +18,16 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all CDNs for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+Returns all CDNs with Standard_Verizon sku
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-cdn-for-deletion
+      - name: standard-verizon
         resource: azure.cdn
         filters:
           - type: value
-            key: name
+            key: sku
             op: in
             value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-cdn
-        resource: azure.cdn
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
+            value: Standard_Verizon

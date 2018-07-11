@@ -18,28 +18,16 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all container services for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+Returns all container services that did not provision successfully
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-containerservices-for-deletion
+      - name: broken-containerservices
         resource: azure.containerservices
         filters:
           - type: value
-            key: name
-            op: in
+            key: properties.provisioningState
+            op: not-equal
             value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-cdn
-        resource: azure.containerservice
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
+            value: succeeded
