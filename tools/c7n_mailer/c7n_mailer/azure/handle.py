@@ -17,7 +17,6 @@ Lambda entry point
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n_azure.session import Session
-
 from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
 
 

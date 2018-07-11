@@ -40,6 +40,7 @@ CONFIG_SCHEMA = {
         'function_servicePlanName': {'type': 'string'},
         'function_location': {'type': 'string'},
         'function_appInsightsLocation': {'type': 'string'},
+        'function_schedule': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},

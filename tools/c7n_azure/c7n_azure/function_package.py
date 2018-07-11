@@ -119,7 +119,7 @@ class FunctionPackage(object):
             self.log.error("Mode not yet supported for Azure functions (%s)"
                            % mode_type)
 
-        return json.dumps(config)
+        return json.dumps(config, indent=2)
 
     def _get_policy(self, policy):
         return json.dumps({'policies': [policy]}, indent=2)
@@ -183,12 +183,12 @@ class FunctionPackage(object):
         # cffi module needs special handling
         self._add_cffi_module()
 
-    def wait_for_status(self, app_name, retries=3, delay=30):
+    def wait_for_status(self, app_name, retries=5, delay=15):
         for r in range(retries):
             if self.status(app_name):
                 return True
             else:
-                self.log.info('Will retry Function App status check in %s seconds...')
+                self.log.info('Will retry Function App status check in %s seconds...' % delay)
                 time.sleep(delay)
         return False
 

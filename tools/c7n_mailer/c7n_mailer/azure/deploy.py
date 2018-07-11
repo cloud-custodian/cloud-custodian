@@ -34,7 +34,8 @@ def provision(config):
         name=function_name,
         servicePlanName=config.get('function_servicePlanName', 'cloudcustodian'),
         location=config.get('function_location'),
-        appInsightsLocation=config.get('function_appInsightsLocation'))
+        appInsightsLocation=config.get('function_appInsightsLocation'),
+        schedule=config.get('function_schedule', '0 */10 * * * *'))
 
     template_util = TemplateUtilities()
 
@@ -75,7 +76,7 @@ def provision(config):
         function_name + '/function.json',
         contents=packager.get_function_config({'mode':
                                               {'type': 'azure-periodic',
-                                               'schedule': '0 30 * * * *'}}))
+                                               'schedule': func_config['schedule']}}))
 
     packager.close()
 
