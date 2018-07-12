@@ -232,7 +232,7 @@ class FunctionPackage(object):
         try:
             r = requests.post(zip_api_url, headers=headers, data=zip_file, timeout=300)
         except requests.exceptions.ReadTimeout:
-            self.log.error("Your Function App deployment timed out after 5 minutes.  Please try again.")
+            self.log.error("Your Function App deployment timed out after 5 minutes. Try again.")
 
         r.raise_for_status()
 
