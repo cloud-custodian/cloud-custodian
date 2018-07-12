@@ -74,6 +74,7 @@ class TemplateUtilities(object):
     @staticmethod
     def update_parameters(parameters, updated_parameters):
         for key, value in list(updated_parameters.items()):
-            parameters[key]['value'] = value
+            if value and key in parameters:
+                parameters[key]['value'] = value
 
         return parameters

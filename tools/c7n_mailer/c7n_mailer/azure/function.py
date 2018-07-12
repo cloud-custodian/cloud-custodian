@@ -13,19 +13,20 @@
 # limitations under the License.
 
 import logging
+import sys
+import json
+from os.path import dirname, join
 
-import c7n_gcp.resources.build
-import c7n_gcp.resources.compute
-import c7n_gcp.resources.function
-import c7n_gcp.resources.gke
-import c7n_gcp.resources.resourcemanager
-import c7n_gcp.resources.source
-import c7n_gcp.resources.storage
-import c7n_gcp.resources.sql  # noqa: F401
+# The working path for the Azure Function doesn't include this file's folder
+sys.path.append(dirname(dirname(__file__)))
 
+from c7n_mailer.azure import handle
 
-logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
+def main(input):
+    logger = logging.getLogger('custodian.mailer')
+    config_file = join(dirname(__file__), 'config.json')
+    with open(config_file) as fh:
+        config = json.load(fh)
+    return handle.start_c7n_mailer(logger, config, join(dirname(__file__), 'auth.json'))
 
-
-def initialize_gcp():
-    pass
+# flake8: noqa
