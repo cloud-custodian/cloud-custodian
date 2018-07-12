@@ -46,7 +46,7 @@ environment variables as documented in [Authentication](http://capitalone.github
 If successful, you should see output similar to the following on the command line
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: azure.vm
-    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:ec2 has count:1 time:1.38
+    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:azure.vm has count:1 time:1.38
     2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67
 
 
