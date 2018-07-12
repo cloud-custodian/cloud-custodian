@@ -13,8 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from setuptools import setup, find_packages
+from io import open
 from os import path
+from setuptools import setup, find_packages
 
 # *Any* updates here should also go into c7n_mailer/deploy.py for lambda packaging.
 requires = [
