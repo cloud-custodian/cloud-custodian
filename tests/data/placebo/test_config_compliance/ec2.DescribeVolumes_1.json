@@ -1,0 +1,154 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bc6465e3-3ca9-444e-b92e-7fa19755882a", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Wed, 11 Jul 2018 23:02:43 GMT"
+            }
+        }, 
+        "Volumes": [
+            {
+                "AvailabilityZone": "us-east-2c", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 16, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 10, 
+                            "microsecond": 0, 
+                            "year": 2018, 
+                            "day": 22, 
+                            "minute": 9
+                        }, 
+                        "InstanceId": "i-0340f8e495ec140b7", 
+                        "VolumeId": "vol-007bb55074a82aafb", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/xvda"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "OK", 
+                        "Key": "Status"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-007bb55074a82aafb", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "snap-097cfa8524eee2bac", 
+                "CreateTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 10, 
+                    "microsecond": 387000, 
+                    "year": 2018, 
+                    "day": 22, 
+                    "minute": 9
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-east-2b", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 16, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 59, 
+                            "microsecond": 0, 
+                            "year": 2018, 
+                            "day": 29, 
+                            "minute": 41
+                        }, 
+                        "InstanceId": "i-09cc2926e06cfe715", 
+                        "VolumeId": "vol-09058b8a10974beac", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/sda1"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "Good", 
+                        "Key": "Status"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-09058b8a10974beac", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "snap-0ea806abc1ef3a6cd", 
+                "CreateTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 59, 
+                    "microsecond": 350000, 
+                    "year": 2018, 
+                    "day": 29, 
+                    "minute": 41
+                }, 
+                "Size": 8
+            }, 
+            {
+                "AvailabilityZone": "us-east-2a", 
+                "Attachments": [
+                    {
+                        "AttachTime": {
+                            "hour": 1, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 3, 
+                            "microsecond": 0, 
+                            "year": 2018, 
+                            "day": 23, 
+                            "minute": 4
+                        }, 
+                        "InstanceId": "i-094207d64930768dc", 
+                        "VolumeId": "vol-0c6efd2a9f5677a03", 
+                        "State": "attached", 
+                        "DeleteOnTermination": true, 
+                        "Device": "/dev/sda1"
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "Bad", 
+                        "Key": "Status"
+                    }
+                ], 
+                "Encrypted": false, 
+                "VolumeType": "gp2", 
+                "VolumeId": "vol-0c6efd2a9f5677a03", 
+                "State": "in-use", 
+                "Iops": 100, 
+                "SnapshotId": "snap-012ae2d1db927295f", 
+                "CreateTime": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 3, 
+                    "microsecond": 553000, 
+                    "year": 2018, 
+                    "day": 23, 
+                    "minute": 4
+                }, 
+                "Size": 8
+            }
+        ]
+    }
+}
