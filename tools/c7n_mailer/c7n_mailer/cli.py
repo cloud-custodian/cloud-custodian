@@ -41,6 +41,8 @@ CONFIG_SCHEMA = {
         'function_location': {'type': 'string'},
         'function_appInsightsLocation': {'type': 'string'},
         'function_schedule': {'type': 'string'},
+        'function_skuCode': {'type': 'string'},
+        'function_sku': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
