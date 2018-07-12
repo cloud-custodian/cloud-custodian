@@ -19,7 +19,7 @@ class TestGuardDuty(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_list_invitations_nomatch(self):
         factory = self.replay_flight_data("test_guardduty")
         p = self.load_policy(
@@ -34,7 +34,7 @@ class TestGuardDuty(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
-        
+
     def test_accept_invitation(self):
         factory = self.replay_flight_data("test_guardduty")
         p = self.load_policy(
@@ -50,7 +50,7 @@ class TestGuardDuty(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_list_detectors(self):
         factory = self.replay_flight_data("test_guardduty")
         p = self.load_policy(
