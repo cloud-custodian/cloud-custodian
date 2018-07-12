@@ -669,6 +669,9 @@ class UserData(ValueFilter):
     def validate(self):
         return self
 
+    def get_permissions(self):
+        return ('ec2:DescribeInstanceAttribute',)
+
     def process(self, resources, event=None):
         self.data['key'] = '"c7n:user-data"'
         client = utils.local_session(self.manager.session_factory).client('ec2')
