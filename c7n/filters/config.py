@@ -22,6 +22,32 @@ from .core import Filter
 
 class ConfigCompliance(Filter):
     """Filter resources by their compliance with one or more AWS config rules.
+
+    An example of using the filter to find all ec2 instances that have
+    been registered as non compliant in the last 30 days against two
+    custom AWS Config rules.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: non-compliant-ec2
+           resource: ec2
+           filters:
+            - type: config-compliance
+              eval_filters:
+               - type: value
+                 key: ResultRecordedTime
+                 type: age
+                 value: 30
+                 op: less-thanx
+              rules:
+               - custodian-ec2-encryption-required
+               - custodian-ec2-tags-required
+
+    Also note, custodian has direct support for deploying policies as config
+    rules see https://bit.ly/2mblVpq
     """
     permissions = ('config:DescribeComplianceByConfigRule',)
     schema = type_schema(

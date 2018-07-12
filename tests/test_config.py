@@ -26,7 +26,7 @@ class ConfigComplianceTest(BaseTest):
             'filters': [
                 {'type': 'config-compliance',
                  'eval_filters': [{
-                     'EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType': 'AWS::EC2::Volume'}],
+                     'EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType': 'AWS::EC2::Volume'}], # noqa
                  'rules': ['custodian-good-vol']}
             ]}, session_factory=factory, config={'region': 'us-east-2'})
         resources = p.run()
