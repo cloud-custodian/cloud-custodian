@@ -307,6 +307,7 @@ class Time(Filter):
         'sgt': 'Asia/Singapore',
         'aet': 'Australia/Sydney',
         'brt': 'America/Sao_Paulo',
+        'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
 
