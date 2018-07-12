@@ -52,7 +52,7 @@ If successful, you should see output similar to the following on the command lin
 
 You should also find a new ``my-first-policy`` directory with a log and other
 files (subsequent runs will append to the log by default rather than
-overwriting it).
+overwriting it). 
 
 ## Links
 - [Getting Started](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html)
