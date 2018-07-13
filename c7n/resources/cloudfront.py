@@ -218,6 +218,7 @@ class MismatchS3Origin(Filter):
         buckets = {b['Name'] for b in s3_client.list_buckets()['Buckets']}
 
         for r in resources:
+            r['c7n:mismatched-s3-origin'] = []
             for x in r['Origins']['Items']:
                 if 'S3OriginConfig' in x:
                     target_bucket = x['DomainName'].split('.', 1)[0]
@@ -227,7 +228,7 @@ class MismatchS3Origin(Filter):
                 if target_bucket is not None and target_bucket not in buckets:
                     self.log.debug("Bucket %s not found in distribution %s hosting account."
                                    % (target_bucket, r['Id']))
-                    r['c7n:mismatched-s3-origin'] = target_bucket
+                    r['c7n:mismatched-s3-origin'].append(target_bucket)
                     results.append(r)
 
         return results
