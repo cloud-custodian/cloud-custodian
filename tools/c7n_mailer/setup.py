@@ -49,7 +49,7 @@ setup(
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
-    packages=find_packages('c7n_mailer'),
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
             'c7n-mailer = c7n_mailer.cli:main',

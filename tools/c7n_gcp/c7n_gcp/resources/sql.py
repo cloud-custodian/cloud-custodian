@@ -1,4 +1,4 @@
-# Copyright 2017-2018 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,24 @@
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
+"""
+sql instances represent roots in a logical hierarchy
 
-@resources.register('function')
-class CloudFunction(QueryResourceManager):
+ - sql instance
+  - logical databases
+  - users list
+
+"""
+
+
+@resources.register('sql-instance')
+class SQLInstance(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'cloudfunctions'
-        version = 'v1'
-        component = 'projects.locations.functions'
-        enum_spec = ('list', 'functions[]', None)
+        service = 'sql'
+        version = 'v1beta4'
+        component = 'projects.locations.clusters'
+        enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        scope_key = 'parent'
-        scope_template = "projects/{}/locations/-"
+        # scope_key = 'project'
+        scope_template = "projects/{}/instances"

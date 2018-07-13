@@ -7,7 +7,8 @@ import logging
 import boto3
 import jsonschema
 from c7n_mailer import deploy, utils
-from c7n_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure import deploy as azure_deploy
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from ruamel import yaml
 
@@ -33,6 +34,13 @@ CONFIG_SCHEMA = {
         'lambda_description': {'type': 'string'},
         'lambda_tags': {'type': 'object'},
         'lambda_schedule': {'type': 'string'},
+
+        # Azure Function Config
+        'function_name': {'type': 'string'},
+        'function_servicePlanName': {'type': 'string'},
+        'function_location': {'type': 'string'},
+        'function_appInsightsLocation': {'type': 'string'},
+        'function_schedule': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
@@ -136,9 +144,6 @@ def main():
     logger = get_logger(debug=args_dict.get('debug', False))
 
     if args_dict.get('update_lambda'):
-        if is_azure_cloud(mailer_config):
-            print('\n** Lambda support not available for Azure queues **\n')
-            return
         if args_dict.get('debug'):
             print('\n** --debug is only supported with --run, not --update-lambda **\n')
             return
@@ -146,7 +151,11 @@ def main():
             print('\n** --max-num-processes is only supported '
                   'with --run, not --update-lambda **\n')
             return
-        deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
+
+        if is_azure_cloud(mailer_config):
+            azure_deploy.provision(mailer_config)
+        else:
+            deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
 
     if args_dict.get('run'):
         max_num_processes = args_dict.get('max_num_processes')
