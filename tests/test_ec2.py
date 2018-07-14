@@ -15,7 +15,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 import unittest
+import os
 import time
+import yaml
 
 from datetime import datetime
 from dateutil import tz, zoneinfo
@@ -1378,3 +1380,18 @@ class TestFilter(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestUserData(BaseTest):
+
+    def get_cfg(self):
+        with open(os.path.join(os.path.dirname(__file__), "data", "bad-userdata.yml")) as f:
+            return dict(yaml.load(f))
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_userdata")
+        policy = self.load_policy(self.get_cfg(), session_factory=session_factory)
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0)
