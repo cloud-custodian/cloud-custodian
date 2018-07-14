@@ -1,4 +1,4 @@
-# Copyright 2017-2018 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-@resources.register('function')
-class CloudFunction(QueryResourceManager):
+@resources.register('gke')
+class KubernetesCluster(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'cloudfunctions'
-        version = 'v1'
-        component = 'projects.locations.functions'
-        enum_spec = ('list', 'functions[]', None)
+        service = 'container'
+        version = 'v1beta1'
+        component = 'projects.locations.clusters'
+        enum_spec = ('list', 'clusters[]', None)
         scope = 'project'
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
