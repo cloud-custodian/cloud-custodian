@@ -457,7 +457,10 @@ class Time(Filter):
 
     @classmethod
     def get_tz(cls, tz):
-        return zoneinfo.gettz(cls.TZ_ALIASES.get(tz, tz))
+        found = cls.TZ_ALIASES.get(tz)
+        if found:
+            tz = found
+        return zoneinfo.gettz(tz.title())
 
     def get_default_schedule(self):
         raise NotImplementedError("use subclass")
