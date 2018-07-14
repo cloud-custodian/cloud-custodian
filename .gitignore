@@ -28,3 +28,4 @@ results.xml
 .idea/
 .vscode/
 !.vscode/*.sample
+tests/data/placebo/test_ec2_userdata/*
