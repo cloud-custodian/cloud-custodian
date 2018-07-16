@@ -131,9 +131,6 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 	if err != nil {
 		return err
 	}
-	if err != nil {
-		return err
-	}
 
 	dec := json.NewDecoder(result.Body)
 	for {
