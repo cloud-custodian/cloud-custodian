@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -86,12 +85,10 @@ func createIndex(ctx context.Context, client *elastic.Client) error {
 		return errors.New("Missing mapping bucket or key, unable to create new ES index")
 	}
 
-	input := &s3.GetObjectInput{
+	result, err := s3Svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(mappingBucket),
 		Key:    aws.String(mappingKey),
-	}
-
-	result, err := s3Svc.GetObject(input)
+	})
 	if err != nil {
 		return err
 	}
@@ -114,7 +111,7 @@ func createIndex(ctx context.Context, client *elastic.Client) error {
 func newElasticClient(url string) (*elastic.Client, error) {
 	creds := credentials.NewEnvCredentials()
 	signer := v4.NewSigner(creds)
-	awsClient, err := aws_signing_client.New(signer, nil, "es", "us-east-1")
+	awsClient, err := aws_signing_client.New(signer, nil, "es", os.Getenv("AWS_REGION"))
 	if err != nil {
 		return nil, err
 	}
@@ -126,33 +123,19 @@ func newElasticClient(url string) (*elastic.Client, error) {
 	)
 }
 
-func getObjFromS3(record events.S3EventRecord) (*s3.GetObjectOutput, error) {
-	s3Record := record.S3
-	input := &s3.GetObjectInput{
-		Bucket: aws.String(s3Record.Bucket.Name),
-		Key:    aws.String(s3Record.Object.Key),
-	}
-
-	result, err := s3Svc.GetObject(input)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
 func processEventRecord(ctx context.Context, record events.S3EventRecord, client *elastic.Client) error {
-	result, err := getObjFromS3(record)
+	result, err := s3Svc.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(record.S3.Bucket.Name),
+		Key:    aws.String(record.S3.Object.Key),
+	})
+	if err != nil {
+		return err
+	}
 	if err != nil {
 		return err
 	}
 
-	body, err := ioutil.ReadAll(result.Body)
-	if err != nil {
-		return err
-	}
-
-	dec := json.NewDecoder(bytes.NewReader(body))
+	dec := json.NewDecoder(result.Body)
 	for {
 		var m map[string]interface{}
 		if err := dec.Decode(&m); err == io.EOF {
@@ -169,5 +152,6 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 			return err
 		}
 	}
+	defer result.Body.Close()
 	return nil
 }
