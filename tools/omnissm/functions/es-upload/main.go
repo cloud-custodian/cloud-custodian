@@ -133,6 +133,7 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 	}
 
 	dec := json.NewDecoder(result.Body)
+	defer result.Body.Close()
 	for {
 		var m map[string]interface{}
 		if err := dec.Decode(&m); err == io.EOF {
@@ -149,6 +150,6 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 			return err
 		}
 	}
-	defer result.Body.Close()
+
 	return nil
 }
