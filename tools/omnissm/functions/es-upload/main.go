@@ -18,108 +18,156 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 
+	"github.com/aws/aws-xray-sdk-go/xray"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/olivere/elastic"
 	"github.com/sha1sum/aws_signing_client"
 )
 
-var xRayTracingEnabled = os.Getenv("_X_AMZN_TRACE_ID")
+var (
+	xRayTracingEnabled = os.Getenv("_X_AMZN_TRACE_ID")
+	esClient           = os.Getenv("OMNISSM_ELASTIC_SEARCH_HTTP")
+	indexName          = os.Getenv("OMNISSM_INDEX_NAME")
+	typeName           = os.Getenv("OMNISSM_TYPE_NAME")
+	mappingBucket      = os.Getenv("OMNISSM_MAPPING_BUCKET")
+	mappingKey         = os.Getenv("OMNISSM_MAPPING_KEY")
+	s3Svc              = s3.New(session.New())
+)
 
 func main() {
 	lambda.Start(func(ctx context.Context, event events.S3Event) {
-		fmt.Println("lambda start")
-
-		client, err := newElasticClient("https://vpc-cof-omnissm-2t62qkcyjh6vbjadenyifuqfki.us-east-1.es.amazonaws.com")
-		fmt.Println("got client")
-		if err != nil {
-			fmt.Println("error block 1")
-			fmt.Println(err.Error())
+		if xRayTracingEnabled != "" {
+			xray.AWS(s3Svc.Client)
 		}
-		exists, err := client.IndexExists("twitter").Do(context.Background())
+		if esClient == "" || indexName == "" || typeName == "" {
+			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
+		}
+		fmt.Printf("%s %s %s %s %s\n", esClient, indexName, typeName, mappingBucket, mappingKey)
+		client, err := newElasticClient(esClient)
 		if err != nil {
-			fmt.Println("error block 2")
-			fmt.Println(err.Error())
+			log.Fatal(err)
+		}
+		exists, err := client.IndexExists(indexName).Do(context.Background())
+		if err != nil {
+			log.Fatal(err)
 		}
 		if !exists {
-			fmt.Println("no index exists")
-		}
-		fmt.Println("finished")
-		svc := s3.New(session.New())
-		if xRayTracingEnabled != "" {
-			xray.AWS(svc.Client)
-		}
-		for _, record := range event.Records {
-			s3Record := record.S3
-			input := &s3.GetObjectInput{
-				Bucket: aws.String(s3Record.Bucket.Name),
-				Key:    aws.String(s3Record.Object.Key),
-			}
-
-			result, err := svc.GetObject(input)
+			err := createIndex(ctx, client)
 			if err != nil {
-				if aerr, ok := err.(awserr.Error); ok {
-					switch aerr.Code() {
-					case s3.ErrCodeNoSuchKey:
-						fmt.Println(s3.ErrCodeNoSuchKey, aerr.Error())
-					default:
-						fmt.Println(aerr.Error())
-					}
-				} else {
-					fmt.Println(err.Error())
-				}
-				return
+				log.Fatal(err)
 			}
+		}
 
-			fmt.Println(result)
-			body, err := ioutil.ReadAll(result.Body)
-			dec := json.NewDecoder(bytes.NewReader(body))
-			for {
-				var m map[string]interface{}
-				if err := dec.Decode(&m); err == io.EOF {
-					break
-				} else if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Println(m["cmdline"])
+		for _, record := range event.Records {
+			err = processEventRecord(ctx, record, client)
+			if err != nil {
+				log.Fatal(err)
 			}
-			fmt.Printf("[%s - %s] Bucket = %s, Key = %s \n", record.EventSource, record.EventTime, s3Record.Bucket.Name, s3Record.Object.Key)
-			fmt.Println(s3Record)
 		}
 	})
+}
+
+func createIndex(ctx context.Context, client *elastic.Client) error {
+	if mappingBucket == "" || mappingKey == "" {
+		return errors.New("Missing mapping bucket or key, unable to create new ES index")
+	}
+
+	input := &s3.GetObjectInput{
+		Bucket: aws.String(mappingBucket),
+		Key:    aws.String(mappingKey),
+	}
+
+	result, err := s3Svc.GetObject(input)
+	if err != nil {
+		return err
+	}
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(result.Body)
+	mapping := buf.String()
+
+	createIndex, err := client.CreateIndex(indexName).BodyString(mapping).Do(ctx)
+	if err != nil {
+		return errors.New(err.Error())
+	}
+
+	if !createIndex.Acknowledged {
+		return errors.New("Create Index not Acknowledged")
+	}
+	return nil
 }
 
 //get elastic client
 func newElasticClient(url string) (*elastic.Client, error) {
 	creds := credentials.NewEnvCredentials()
-	fmt.Println("creds")
-	fmt.Println(creds)
 	signer := v4.NewSigner(creds)
-	fmt.Println("signer")
-	fmt.Println(signer)
 	awsClient, err := aws_signing_client.New(signer, nil, "es", "us-east-1")
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("awsClient")
-	fmt.Println(awsClient)
 	return elastic.NewClient(
 		elastic.SetURL(url),
 		elastic.SetScheme("https"),
 		elastic.SetHttpClient(awsClient),
-		elastic.SetSniff(false), // See note below
+		elastic.SetSniff(false),
 	)
+}
+
+func getObjFromS3(record events.S3EventRecord) (*s3.GetObjectOutput, error) {
+	s3Record := record.S3
+	input := &s3.GetObjectInput{
+		Bucket: aws.String(s3Record.Bucket.Name),
+		Key:    aws.String(s3Record.Object.Key),
+	}
+
+	result, err := s3Svc.GetObject(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func processEventRecord(ctx context.Context, record events.S3EventRecord, client *elastic.Client) error {
+	result, err := getObjFromS3(record)
+	if err != nil {
+		return err
+	}
+
+	body, err := ioutil.ReadAll(result.Body)
+	if err != nil {
+		return err
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(body))
+	for {
+		var m map[string]interface{}
+		if err := dec.Decode(&m); err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+		_, err := client.Index().
+			Index(indexName).
+			Type(typeName).
+			BodyJson(m).
+			Do(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
