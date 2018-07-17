@@ -194,18 +194,34 @@ class MismatchS3Origin(Filter):
                 resource: distribution
                 filters:
                   - type: mismatch-s3-origin
+                    check_custom_origins: true
    """
 
+    s3_prefix = re.compile('.*(?=\.s3(-.*)?\.amazonaws.com)')
+    s3_suffix = re.compile('^([^.]+\.)?s3(-.*)?\.amazonaws.com')
+
     schema = type_schema(
-        'mismatch-s3-origin')
+        'mismatch-s3-origin',
+        check_custom_origins={'type': 'boolean'})
 
     permissions = ('s3:ListBuckets',)
     retry = staticmethod(get_retry(('Throttling',)))
 
-    def is_s3_domain(self, domain_name):
-        match = re.match(".*s3.*?amazonaws.com", domain_name, flags=0)
-        if match:
-            return match.group()
+    def is_s3_domain(self, x):
+        bucket_match = self.s3_prefix.match(x['DomainName'])
+
+        if bucket_match:
+            return bucket_match.group()
+
+        domain_match = self.s3_suffix.match(x['DomainName'])
+
+        if domain_match:
+            value = x['OriginPath']
+
+            if value.startswith('/'):
+                value = value.replace("/", "", 1)
+
+            return value
 
         return None
 
@@ -221,9 +237,11 @@ class MismatchS3Origin(Filter):
             r['c7n:mismatched-s3-origin'] = []
             for x in r['Origins']['Items']:
                 if 'S3OriginConfig' in x:
-                    target_bucket = x['DomainName'].split('.', 1)[0]
-                elif 'CustomOriginConfig' in x and self.is_s3_domain(x['DomainName']):
-                    target_bucket = self.is_s3_domain(x['DomainName'])
+                    bucket_match = self.s3_prefix.match(x['DomainName'])
+                    if bucket_match:
+                        target_bucket = self.s3_prefix.match(x['DomainName']).group()
+                elif 'CustomOriginConfig' in x and self.data.get('check_custom_origins'):
+                    target_bucket = self.is_s3_domain(x)
 
                 if target_bucket is not None and target_bucket not in buckets:
                     self.log.debug("Bucket %s not found in distribution %s hosting account."
