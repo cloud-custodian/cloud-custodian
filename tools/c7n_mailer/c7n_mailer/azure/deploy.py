@@ -61,7 +61,7 @@ def provision(config):
 
     log.info("Building function package for %s" % webapp_name)
 
-    # Build package
+    # Build package 
     packager = FunctionPackage(
         function_name,
         os.path.join(os.path.dirname(__file__), 'function.py'))
