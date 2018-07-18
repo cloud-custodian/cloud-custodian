@@ -1,49 +1,64 @@
-Service Principal Authentication
---------------------------------
 
-To authenticate via environment variables, you can create a service principal with Azure CLI
+# Cloud Custodian - Azure Support
 
-```
-# select correct subscription
-az account set -s "my subscription name"
+This a plugin to Cloud Custodian that adds Azure support.
 
-# create service principal
-az ad sp create-for-rbac --name <name> --password <password>
-```
-This will yield something like:
+## Install Cloud Custodian and Azure Plugin
 
-```
-{
-  "appId": appid,
-  "displayName": name,
-  "name": name,
-  "password": password,
-  "tenant": guid
-}
-```
-You will need to map it to environment variables like this:
+The Azure provider must be installed as a separate package in addition to c7n. 
 
-AZURE_TENANT_ID=tenant
-AZURE_SUBSCRIPTION_ID=subscription id
-AZURE_CLIENT_ID=appId
-AZURE_CLIENT_SECRET=password
+    $ virtualenv custodian
+    $ source custodian/bin/activate
+    (custodian) $ pip install c7n
+    (custodian) $ pip install c7n_azure
 
 
+## Write your first policy
 
-Azure CLI Authentication
-------------------------
+A policy specifies the following items:
 
-Set environment variable `AZURE_CLI_AUTH` to any value, and session will pull credentials from cached AZ Login and
-default subscription.
+- The type of resource to run the policy against
+- Filters to narrow down the set of resources
+- Actions to take on the filtered set of resources
+
+For this tutorial we will add a tag to all virtual machines with the name "Hello" and the value "World".
+
+Create a file named ``custodian.yml`` with this content:
+
+    policies:
+        - name: my-first-policy
+          description: |
+            Adds a tag to all virtual machines
+          resource: azure.vm
+          actions:
+            - type: tag
+              tag: Hello
+              value: World
+
+## Run your policy
+
+First, choose one of the supported authentication mechanisms and either log in to Azure CLI or set
+environment variables as documented in [Authentication](http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html#azure-authentication).
+
+    custodian run --output-dir=. custodian.yml
+
+
+If successful, you should see output similar to the following on the command line
+
+    2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: azure.vm
+    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:azure.vm has count:1 time:1.38
+    2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67
+
+
+You should also find a new ``my-first-policy`` directory with a log and other
+files (subsequent runs will append to the log by default rather than
+overwriting it). 
+
+## Links
+- [Getting Started](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html)
+- [Example Scenarios](http://capitalone.github.io/cloud-custodian/docs/azure/examples/index.html)
+- [Example Policies](http://capitalone.github.io/cloud-custodian/docs/azure/policy/index.html)
 
 
 
-Fake Authentication
--------------------
 
-Fake authentication for tests should be configured as seen in tox.ini, basically:
-
-```
-AZURE_ACCESS_TOKEN=fake_token
-AZURE_SUBSCRIPTION_ID=ea42f556-5106-4743-99b0-c129bfa71a47
-```
