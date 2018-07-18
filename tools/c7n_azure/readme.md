@@ -5,7 +5,7 @@ This a plugin to Cloud Custodian that adds Azure support.
 
 ## Install Cloud Custodian and Azure Plugin
 
-The Azure provider must be installed as a separate package in addition to c7n.
+The Azure provider must be installed as a separate package in addition to c7n. 
 
     $ virtualenv custodian
     $ source custodian/bin/activate
