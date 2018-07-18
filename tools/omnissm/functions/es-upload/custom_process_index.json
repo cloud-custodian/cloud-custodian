@@ -52,6 +52,12 @@
         },
         "schemaVersion": {
           "type": "text"
+        },
+        "region": {
+          "type": "text"
+        },
+        "accountId": {
+          "type": "text"
         }
       }
     }

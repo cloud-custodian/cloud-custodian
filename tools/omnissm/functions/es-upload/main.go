@@ -19,9 +19,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-xray-sdk-go/xray"
 
@@ -54,6 +57,7 @@ func main() {
 		if esClient == "" || indexName == "" || typeName == "" {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
 		}
+		fmt.Printf("%s, %s, %s, %s, %s", esClient, indexName, typeName, mappingBucket, mappingKey)
 		client, err := newElasticClient(esClient)
 		if err != nil {
 			log.Fatal(err)
@@ -83,7 +87,7 @@ func createIndex(ctx context.Context, client *elastic.Client) error {
 		return errors.New("Missing mapping bucket or key, unable to create new ES index")
 	}
 
-	result, err := s3Svc.GetObject(&s3.GetObjectInput{
+	result, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(mappingBucket),
 		Key:    aws.String(mappingKey),
 	})
@@ -122,14 +126,31 @@ func newElasticClient(url string) (*elastic.Client, error) {
 }
 
 func processEventRecord(ctx context.Context, record events.S3EventRecord, client *elastic.Client) error {
-	result, err := s3Svc.GetObject(&s3.GetObjectInput{
+	//url encoded in response so we need to parse it
+	key, err := url.QueryUnescape(record.S3.Object.Key)
+	if err != nil {
+		return err
+	}
+	result, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(record.S3.Bucket.Name),
-		Key:    aws.String(record.S3.Object.Key),
+		Key:    aws.String(key),
 	})
 	if err != nil {
 		return err
 	}
 
+	keyParams := strings.Split(key, "/")
+	var region string
+	var account string
+	//pull region and/or accountid from key path. there may be a better way to do this
+	for _, element := range keyParams {
+		if strings.Contains(element, "region") {
+			region = strings.Split(element, "=")[1]
+		}
+		if strings.Contains(element, "accountid") {
+			account = strings.Split(element, "=")[1]
+		}
+	}
 	dec := json.NewDecoder(result.Body)
 	defer result.Body.Close()
 	for {
@@ -139,6 +160,9 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 		} else if err != nil {
 			return err
 		}
+		m["region"] = region
+		m["accountId"] = account
+		fmt.Println(m)
 		_, err := client.Index().
 			Index(indexName).
 			Type(typeName).
