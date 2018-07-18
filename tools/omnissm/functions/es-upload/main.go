@@ -19,7 +19,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -55,7 +54,6 @@ func main() {
 		if esClient == "" || indexName == "" || typeName == "" {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
 		}
-		fmt.Printf("%s %s %s %s %s\n", esClient, indexName, typeName, mappingBucket, mappingKey)
 		client, err := newElasticClient(esClient)
 		if err != nil {
 			log.Fatal(err)
