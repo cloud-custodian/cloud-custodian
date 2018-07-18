@@ -22,15 +22,18 @@ from datetime import datetime, timedelta
 from dateutil import zoneinfo
 from dateutil.parser import parse
 
+import base64
 import logging
 import itertools
 import time
+import zlib
 
 from c7n.actions import Action, ActionRegistry
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, ValueFilter, AgeFilter, Filter,
     OPERATORS)
+from c7n import utils
 from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
@@ -115,7 +118,6 @@ class LaunchConfigFilterBase(object):
         self.configs = {
             cfg['LaunchConfigurationName']: cfg for cfg in configs
             if cfg['LaunchConfigurationName'] in config_names}
-
 
 @filters.register('security-group')
 class SecurityGroupFilter(
@@ -1630,10 +1632,9 @@ class LaunchConfig(query.QueryResourceManager):
 class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
-        for r in resources:
-            r.pop('UserData', None)
+        # for r in resources:
+        #     r.pop('UserData', None)
         return resources
-
 
 @LaunchConfig.filter_registry.register('age')
 class LaunchConfigAge(AgeFilter):
@@ -1688,6 +1689,62 @@ class UnusedLaunchConfig(Filter):
 
     def __call__(self, config):
         return config['LaunchConfigurationName'] not in self.used
+
+
+@LaunchConfig.filter_registry.register('user-data')
+class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+
+    def validate(self):
+        return self
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
+
+    def process(self, launch_configs_maybe, event=None):
+        self.data['key'] = '"c7n:user-data"'
+        client = utils.local_session(self.manager.session_factory).client('autoscaling')
+        results = []
+
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for instance_set in utils.chunks(launch_configs_maybe, self.batch_size):
+                futures[w.submit(
+                    self.process_instance_set,
+                    client, instance_set)] = instance_set
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error processing userdata on instance set %s", f.exception())
+                results.extend(f.result())
+        return results
+
+    def process_instance_set(self, client, launch_configs):
+        results = []
+        for lc in launch_configs:
+            if self.annotation not in lc:
+                try:
+                    lc_tmp = client.describe_launch_configurations(LaunchConfigurationNames=[lc["LaunchConfigurationName"]])
+                    result = lc_tmp['LaunchConfigurations'][0]
+                except ClientError as e:
+                    print(e)
+                    continue
+                if not result['UserData']:
+                    lc[self.annotation] = None
+                else:
+                    data = base64.b64decode(result['UserData'])
+                    try:
+                        lc[self.annotation] = data.decode('utf8')
+                    except:
+                        lc[self.annotation] = zlib.decompress(
+                            data, 16).decode('utf8')
+            if self.match(lc):
+                results.append(lc)
+        return results
 
 
 @LaunchConfig.action_registry.register('delete')
