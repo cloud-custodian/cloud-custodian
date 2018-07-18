@@ -29,7 +29,7 @@ def main(output):
     Generate a c7n-org subscriptions config file
     """
 
-    client = SubscriptionClient(Session().credentials)
+    client = SubscriptionClient(Session().get_credentials())
     subs = [sub.serialize(True) for sub in client.subscriptions.list()]
     results = []
     for sub in subs:
