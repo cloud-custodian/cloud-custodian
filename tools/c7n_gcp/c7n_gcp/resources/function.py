@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.provider import resources
+from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
 @resources.register('function')
-class Instance(QueryResourceManager):
+class CloudFunction(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'cloudfunctions'

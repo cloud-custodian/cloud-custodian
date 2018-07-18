@@ -7,20 +7,22 @@ Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
 - Arm Filters (see :ref:`azure_genericarmfilter`)
-
-``instance-view``
+    - Metric Filter - Filter on metrics from Azure Monitor - (see `Virtual Machine Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftcomputevirtualmachines/>`_)
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- ``instance-view``
   Filter based on VM attributes in instance view, such as power state.
 
   .. c7n-schema:: InstanceViewFilter
        :module: c7n_azure.resources.vm
 
-``metric``
+- ``metric``
   Filter based on metrics from Azure Monitor, such as CPU usage.
 
   .. c7n-schema:: MetricFilter
        :module: c7n_azure.filters
 
-``network-interface``
+- ``network-interface``
   Filter based on properties of the network interfaces associated with the virtual machine.
 
   .. c7n-schema:: NetworkInterfaceFilter
@@ -28,20 +30,19 @@ Filters
 
 Actions
 -------
-
-``start``
+- ``start``
   Start the VMs
 
   .. c7n-schema:: VmStartAction
-       :module: c7n_azure.resources.vm 
+       :module: c7n_azure.resources.vm
 
-``stop``
+- ``stop``
   Stop the VMs
 
   .. c7n-schema:: VmStopAction
-        :module: c7n_azure.resources.vm 
+        :module: c7n_azure.resources.vm
 
-``restart``
+- ``restart``
   Restart the VMs
 
   .. c7n-schema:: VmRestartAction
@@ -113,3 +114,56 @@ Find all VMs with a Public IP address
           - type: network-interface
             key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
             value: not-null
+
+This policy will find all VMs that have Percentage CPU usage >= 75% over the last 72 hours and notify user@domain.com
+
+.. code-block:: yaml
+
+    policies:
+      - name: notify-busy-vms
+        resource: azure.vm
+        filters:
+          - type: metric
+            metric: Percentage CPU
+            op: ge
+            aggregation: average
+            threshold: 75
+            timeframe: 72
+         actions:
+          - type: notify
+            template: default
+            priority_header: 2
+            subject: Busy VMs
+            to:
+              - user@domain.com
+            transport:
+              - type: asq
+                queue: https://accountname.queue.core.windows.net/queuename
+
+This policy will find all VMs that have Percentage CPU usage <= 1% over the last 72 hours, mark for deletion in 7 days and notify user@domain.com
+
+.. code-block:: yaml
+
+    policies:
+      - name: notify-busy-vms
+        resource: azure.vm
+        filters:
+          - type: metric
+            metric: Percentage CPU
+            op: le
+            aggregation: average
+            threshold: 1
+            timeframe: 72
+         actions:
+          - type: mark-for-op
+            op: delete
+            days: 7
+          - type: notify
+            template: default
+            priority_header: 2
+            subject: VMs to be Deleted in 7 Days
+            to:
+              - user@domain.com
+            transport:
+              - type: asq
+                queue: https://accountname.queue.core.windows.net/queuename

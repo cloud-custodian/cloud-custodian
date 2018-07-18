@@ -15,8 +15,8 @@
 Generic ARM template resource utilities
 """
 import json
-import os.path
 import logging
+import os.path
 
 from azure.mgmt.resource.resources.models import DeploymentMode
 from c7n_azure.session import Session
@@ -56,7 +56,7 @@ class TemplateUtilities(object):
         r_filter = ("name eq '%s'" % resource_name)
 
         for resource in self.client.resources.list_by_resource_group(group_name, filter=r_filter):
-            return True
+            return resource
         return False
 
     def get_default_parameters(self, file_name):
@@ -74,6 +74,7 @@ class TemplateUtilities(object):
     @staticmethod
     def update_parameters(parameters, updated_parameters):
         for key, value in list(updated_parameters.items()):
-            parameters[key]['value'] = value
+            if value and key in parameters:
+                parameters[key]['value'] = value
 
         return parameters

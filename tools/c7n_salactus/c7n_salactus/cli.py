@@ -249,7 +249,7 @@ def save(dbpath):
 @cli.command()
 # todo check redis version if >=4 support this
 # @click.option('--async/--sync', default=False)
-def reset(async=None):
+def reset(c7n_async=None):
     """Delete all persistent cluster state.
     """
     click.echo('Delete db? Are you Sure? [yn] ', nl=False)

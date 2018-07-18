@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.template_utils import TemplateUtilities
+import logging
+import json
+
 from c7n_azure.function_package import FunctionPackage
+from c7n_azure.template_utils import TemplateUtilities
 
 from c7n import utils
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
@@ -34,7 +37,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'sku': 'string',
                 'workerSize': 'number',
                 'skuCode': 'string'
-            }
+            },
+            'execution-options': {'type': 'object'}
         }
     }
 
@@ -42,7 +46,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def __init__(self, policy):
         self.policy = policy
-        self.template_util = TemplateUtilities()
+        self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -50,22 +54,38 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def provision(self):
         """Provision any resources needed for the policy."""
-        parameters = self.get_parameters()
-        group_name = parameters['servicePlanName']['value']
+        template_util = TemplateUtilities()
 
-        if not self.template_util.resource_exist(group_name, parameters['name']['value']):
-            self.template_util.create_resource_group(
+        parameters = self._get_parameters(template_util)
+        group_name = parameters['servicePlanName']['value']
+        webapp_name = parameters['name']['value']
+        policy_name = self.policy.data['name'].replace(' ', '-').lower()
+
+        existing_webapp = template_util.resource_exist(group_name, webapp_name)
+
+        if not existing_webapp:
+            template_util.create_resource_group(
                 group_name, {'location': parameters['location']['value']})
 
-            self.template_util.deploy_resource_template(
+            template_util.deploy_resource_template(
                 group_name, 'dedicated_functionapp.json', parameters).wait()
+        else:
+            self.log.info("Found existing App %s (%s) in group %s" %
+                          (webapp_name, existing_webapp.location, group_name))
 
-        archive = FunctionPackage(self.policy.data)
-        archive.build()
-        archive.publish(parameters['name']['value'])
+        self.log.info("Building function package for %s" % webapp_name)
 
-    def get_parameters(self):
-        parameters = self.template_util.get_default_parameters(
+        archive = FunctionPackage(policy_name)
+        archive.build(self.policy.data)
+        archive.close()
+
+        if archive.wait_for_status(webapp_name):
+            archive.publish(webapp_name)
+        else:
+            self.log.error("Aborted deployment, ensure Application Service is healthy.")
+
+    def _get_parameters(self, template_util):
+        parameters = template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
 
         data = self.policy.data
@@ -82,7 +102,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             if 'provision-options' in data['mode']:
                 updated_parameters.update(data['mode']['provision-options'])
 
-        parameters = self.template_util.update_parameters(parameters, updated_parameters)
+        parameters = template_util.update_parameters(parameters, updated_parameters)
 
         return parameters
 
@@ -120,6 +140,7 @@ class AzureStreamMode(AzureFunctionMode):
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
+        self.log.info(json.dumps(lambda_context))
         raise NotImplementedError("error - not implemented")
 
     def get_logs(self, start, end):

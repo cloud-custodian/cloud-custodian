@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Redis_cctestredis_name": {
+            "defaultValue": "cctestredis",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/tabarlow/providers/Microsoft.Cache/Redis/cctestredis'.",
+            "type": "Microsoft.Cache/Redis",
+            "name": "[parameters('Redis_cctestredis_name')]",
+            "apiVersion": "2017-10-01",
+            "location": "Central US",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "sku": {
+                    "name": "Basic",
+                    "family": "C",
+                    "capacity": 0
+                },
+                "enableNonSslPort": false,
+                "redisConfiguration": {
+                    "maxclients": "256",
+                    "maxmemory-reserved": "2",
+                    "maxfragmentationmemory-reserved": "12",
+                    "maxmemory-delta": "2"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}

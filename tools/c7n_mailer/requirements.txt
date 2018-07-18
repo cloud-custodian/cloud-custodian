@@ -10,7 +10,7 @@ Markup
 MarkupSafe==1.0
 python-dateutil>=2.5.2
 ldap3
-ruamel.yaml<0.15 # rq.filter: <0.15
+ruamel.yaml==0.15.42
 six==1.11.0
 redis
 datadog
