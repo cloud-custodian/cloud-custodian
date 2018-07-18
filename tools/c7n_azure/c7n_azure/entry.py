@@ -34,7 +34,11 @@ import c7n_azure.resources.disk
 import c7n_azure.resources.cognitive_service
 import c7n_azure.resources.data_factory
 import c7n_azure.resources.iot_hub
-import c7n_azure.resources.vm_scale_set
+import c7n_azure.resources.cdn
+import c7n_azure.resources.container_service
+import c7n_azure.resources.datalake_store
+import c7n_azure.resources.redis
+import c7n_azure.resources.vmss
 import c7n_azure.resources.batch
 import c7n_azure.resources.appserviceplan  # noqa: F401
 
