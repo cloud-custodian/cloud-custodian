@@ -20,7 +20,6 @@ from .common import BaseTest
 from botocore.exceptions import ClientError
 from c7n.resources.asg import NotEncryptedFilter
 
-
 class LaunchConfigTest(BaseTest):
 
     def test_config_unused(self):
@@ -51,6 +50,36 @@ class LaunchConfigTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["LaunchConfigurationName"], "CloudClusterCopy")
+
+
+class TestUserData(BaseTest):
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_lc_userdata")
+        policy = self.load_policy(
+            {
+                "name": "lc_userdata",
+                "resource": "launch-config",
+                'filters': [{'or': [{'type': 'user-data', 'op': 'regex', 'value': '(?smi).*(ch)?passw(or)?d(?! --)'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*GIT_TOKEN=.*'},
+                                    {'type': 'user-data', 'op': 'regex',
+                                     'value': '(?smi).*Set\\-ADAccountPassword.*(\\-Credential |\\-OldPassword |\\-NewPassword |\\-AsPlainText )'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*BEGIN RSA PRIVATE KEY'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*access_token='},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*client_secret='},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).* ldap\\.password='},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*usermod -p '}]}],
+            },
+            session_factory=session_factory
+        )
+
+        resources = policy.run()
+
+        for r in resources:
+            print(r['LaunchConfigurationName'])
+
+        self.assertGreater(len(resources), 0)
 
 
 class AutoScalingTest(BaseTest):

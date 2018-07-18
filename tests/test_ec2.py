@@ -15,9 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 import unittest
-import os
 import time
-import yaml
 
 from datetime import datetime
 from dateutil import tz, zoneinfo
@@ -1384,14 +1382,25 @@ class TestFilter(BaseTest):
 
 class TestUserData(BaseTest):
 
-    def get_cfg(self):
-        with open(os.path.join(os.path.dirname(__file__), "data", "bad-userdata.yml")) as f:
-            return dict(yaml.load(f))
-
     def test_regex_filter(self):
         session_factory = self.replay_flight_data("test_ec2_userdata")
-        policy = self.load_policy(self.get_cfg(), session_factory=session_factory)
-
+        policy = self.load_policy(
+            {
+                "name": "ec2_userdata",
+                "resource": "ec2",
+                'filters': [{'or': [{'type': 'user-data', 'op': 'regex', 'value': '(?smi).*(ch)?passw(or)?d(?! --)'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*GIT_TOKEN=.*'},
+                                    {'type': 'user-data', 'op': 'regex',
+                                     'value': '(?smi).*Set\\-ADAccountPassword.*(\\-Credential |\\-OldPassword |\\-NewPassword |\\-AsPlainText )'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*BEGIN RSA PRIVATE KEY'},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*access_token='},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*client_secret='},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).* ldap\\.password='},
+                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*usermod -p '}]}],
+            },
+            session_factory=session_factory,
+        )
         resources = policy.run()
 
         self.assertGreater(len(resources), 0)
