@@ -1704,14 +1704,14 @@ class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
     def get_permissions(self):
         return self.manager.get_resource_manager('asg').get_permissions()
 
-    def process(self, launch_configs_maybe, event=None):
+    def process(self, launch_configs, event=None):
         self.data['key'] = '"c7n:user-data"'
         client = utils.local_session(self.manager.session_factory).client('autoscaling')
         results = []
 
         with self.executor_factory(max_workers=3) as w:
             futures = {}
-            for instance_set in utils.chunks(launch_configs_maybe, self.batch_size):
+            for instance_set in utils.chunks(launch_configs, self.batch_size):
                 futures[w.submit(
                     self.process_instance_set,
                     client, instance_set)] = instance_set
@@ -1727,16 +1727,13 @@ class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
         results = []
         for lc in launch_configs:
             if self.annotation not in lc:
-                try:
-                    lc_tmp = client.describe_launch_configurations(LaunchConfigurationNames=[lc["LaunchConfigurationName"]])
-                    result = lc_tmp['LaunchConfigurations'][0]
-                except ClientError as e:
-                    print(e)
-                    continue
-                if not result['UserData']:
+                lc_tmp = (client.describe_launch_configurations(
+                    LaunchConfigurationNames=[lc["LaunchConfigurationName"]]
+                )).get('LaunchConfigurations')[0]
+                if not lc_tmp['UserData']:
                     lc[self.annotation] = None
                 else:
-                    data = base64.b64decode(result['UserData'])
+                    data = base64.b64decode(lc_tmp['UserData'])
                     try:
                         lc[self.annotation] = data.decode('utf8')
                     except:
