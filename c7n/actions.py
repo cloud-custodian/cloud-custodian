@@ -392,7 +392,7 @@ class FunctionInvoke(EventAction):
     Example::
 
      - type: invoke-function
-       function: my-function
+       class: actions.action_class
     """
 
     schema = {
@@ -400,16 +400,11 @@ class FunctionInvoke(EventAction):
         'required': ['type', 'function'],
         'properties': {
             'type': {'enum': ['invoke-lambda']},
-            'function': {'type': 'string'},
+            'class': {'type': 'string'},
             'qualifier': {'type': 'string'},
             'batch_size': {'type': 'integer'}
         }
     }
-
-    def get_permissions(self):
-        return ('lambda:Invoke',)
-
-    permissions = ('lambda:InvokeFunction',)
 
     def process(self, resources, event=None):
         kwargs = dict(FunctionName=self.data['function'])
@@ -426,8 +421,9 @@ class FunctionInvoke(EventAction):
         for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
             payload['resources'] = resource_set
             kwargs['Payload'] = utils.dumps(payload)
-            function = getattr(self.data['function'])
-            result = function(kwargs)
+            function = getattr(self.data['class'])
+            f = function()
+            f.process(kwargs)
             results.append(result)
         return results
 
