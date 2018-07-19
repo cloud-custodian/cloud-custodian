@@ -17,10 +17,9 @@ import logging
 import unittest
 import time
 
-from botocore.exceptions import ClientError
 from datetime import datetime
 from dateutil import tz, zoneinfo
-from mock import mock, MagicMock
+from mock import mock
 from jsonschema.exceptions import ValidationError
 
 from c7n.exceptions import PolicyValidationError
@@ -1389,16 +1388,20 @@ class TestUserData(BaseTest):
             {
                 "name": "ec2_userdata",
                 "resource": "ec2",
-                'filters': [{'or': [{'type': 'user-data', 'op': 'regex', 'value': '(?smi).*(ch)?passw(or)?d(?! --)'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*GIT_TOKEN=.*'},
-                                    {'type': 'user-data', 'op': 'regex',
-                                     'value': '(?smi).*Set\\-ADAccountPassword.*(\\-Credential |\\-OldPassword |\\-NewPassword |\\-AsPlainText )'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*BEGIN RSA PRIVATE KEY'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*access_token='},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*client_secret='},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).* ldap\\.password='},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*usermod -p '}]}],
+                'filters': [{'or': [
+                    {'type': 'user-data', 'op': 'regex',
+                     'value': '(?smi).*(ch)?passw(or)?d(?! --)'},
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'},
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*GIT_TOKEN=.*'},
+                    {'type': 'user-data', 'op': 'regex',
+                        'value': '(?smi).*Set\\-ADAccountPassword.*'
+                                 '(\\-Credential |\\-OldPassword '
+                                 '|\\-NewPassword |\\-AsPlainText )'},
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*BEGIN RSA PRIVATE KEY'},
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*access_token='},
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*client_secret='},
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).* ldap\\.password='},
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*usermod -p '}]}],
             },
             session_factory=session_factory,
         )
@@ -1407,8 +1410,8 @@ class TestUserData(BaseTest):
 
     def test_validate(self):
 
-        dataz = {u'type': u'user-data', u'key': u'"c7n:user-data"', u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
-                 u'op': u'regex'}
-        ud = ec2.UserData(dataz).validate()
+        data = {u'type': u'user-data', u'key': u'"c7n:user-data"',
+                u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
+             u'op': u'regex'}
+        ud = ec2.UserData(data).validate()
         self.assertEqual(type(ud), ec2.UserData)
-

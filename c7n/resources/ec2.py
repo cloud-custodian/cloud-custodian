@@ -708,7 +708,7 @@ class UserData(ValueFilter):
                     # try raw and compressed
                     try:
                         r[self.annotation] = data.decode('utf8')
-                    except:
+                    except UnicodeDecodeError:
                         r[self.annotation] = zlib.decompress(
                             data, 16).decode('utf8')
             if self.match(r):

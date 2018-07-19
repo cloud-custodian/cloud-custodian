@@ -21,6 +21,7 @@ from botocore.exceptions import ClientError
 from c7n.resources.asg import NotEncryptedFilter
 import c7n.resources.asg
 
+
 class LaunchConfigTest(BaseTest):
 
     def test_config_unused(self):
@@ -61,29 +62,37 @@ class TestUserData(BaseTest):
             {
                 "name": "lc_userdata",
                 "resource": "launch-config",
-                'filters': [{'or': [{'type': 'user-data', 'op': 'regex', 'value': '(?smi).*(ch)?passw(or)?d(?! --)'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*GIT_TOKEN=.*'},
-                                    {'type': 'user-data', 'op': 'regex',
-                                     'value': '(?smi).*Set\\-ADAccountPassword.*(\\-Credential |\\-OldPassword |\\-NewPassword |\\-AsPlainText )'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*BEGIN RSA PRIVATE KEY'},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*access_token='},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*client_secret='},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).* ldap\\.password='},
-                                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*usermod -p '}]}],
+                'filters': [
+                    {
+                        'or': [
+                            {'type': 'user-data', 'op': 'regex',
+                                'value': '(?smi).*(ch)?passw(or)?d(?! --)'},
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'},
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*GIT_TOKEN=.*'},
+                            {'type': 'user-data', 'op': 'regex',
+                                'value': '(?smi).*Set\\-ADAccountPassword.*(\\-Credential '
+                                '|\\-OldPassword |\\-NewPassword |\\-AsPlainText )'},
+                            {'type': 'user-data', 'op': 'regex',
+                                'value': '(?smi).*BEGIN RSA PRIVATE KEY'},
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*access_token='},
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*client_secret='},
+                            {'type': 'user-data', 'op': 'regex',
+                                'value': '(?smi).* ldap\\.password='},
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*usermod -p '}
+                        ]
+                    }
+                ],
             },
             session_factory=session_factory
         )
-        # cp from policy.py
-        # policy.run() calls <mode>.run, and mode is pull by default and is pull here. So:
-        # pullmode.run()
-            # resources = self.policy.resource_manager.resources()
+
         resources = policy.run()
 
         self.assertGreater(len(resources), 0)
 
     def test_validate(self):
-        dataz = {u'type': u'user-data', u'key': u'"c7n:user-data"', u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
+        dataz = {u'type': u'user-data', u'key': u'"c7n:user-data"',
+                 u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
                  u'op': u'regex'}
         ud = c7n.resources.asg.UserDataFilter(dataz).validate()
         self.assertEqual(type(ud), c7n.resources.asg.UserDataFilter)
