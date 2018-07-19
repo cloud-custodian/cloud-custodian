@@ -378,6 +378,8 @@ class LambdaInvoke(EventAction):
             params['Payload'] = utils.dumps(payload)
             result = client.invoke(**params)
             result['Payload'] = result['Payload'].read()
+            if isinstance(result['Payload'], bytes):
+                result['Payload'] = result['Payload'].decode()
             results.append(result)
         return results
 
