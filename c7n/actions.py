@@ -397,9 +397,9 @@ class FunctionInvoke(EventAction):
 
     schema = {
         'type': 'object',
-        'required': ['type', 'function'],
         'properties': {
-            'type': {'enum': ['invoke-lambda']},
+            'type': {'enum': ['invoke-function']},
+            'module': {'type': 'string'},
             'class': {'type': 'string'},
             'qualifier': {'type': 'string'},
             'batch_size': {'type': 'integer'}
@@ -407,7 +407,7 @@ class FunctionInvoke(EventAction):
     }
 
     def process(self, resources, event=None):
-        kwargs = dict(FunctionName=self.data['function'])
+        kwargs = dict(FunctionName=self.data['class'])
         if self.data.get('qualifier'):
             kwargs['Qualifier'] = self.data['Qualifier']
 
@@ -419,11 +419,11 @@ class FunctionInvoke(EventAction):
 
         results = []
         for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
-            payload['resources'] = resource_set
-            kwargs['Payload'] = utils.dumps(payload)
-            function = getattr(self.data['class'])
-            f = function()
-            f.process(kwargs)
+            payload['resources'] = utils.dumps(resource_set)
+            module = __import__(self.data['module'])
+            a_class = getattr(module, self.data['class'])
+            f = a_class()
+            result = getattr(f, self.data['function'])(payload)
             results.append(result)
         return results
 
