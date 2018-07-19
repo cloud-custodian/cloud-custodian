@@ -19,6 +19,7 @@ from dateutil import zoneinfo
 from .common import BaseTest
 from botocore.exceptions import ClientError
 from c7n.resources.asg import NotEncryptedFilter
+import c7n.resources.asg
 
 class LaunchConfigTest(BaseTest):
 
@@ -73,13 +74,19 @@ class TestUserData(BaseTest):
             },
             session_factory=session_factory
         )
-
+        # cp from policy.py
+        # policy.run() calls <mode>.run, and mode is pull by default and is pull here. So:
+        # pullmode.run()
+            # resources = self.policy.resource_manager.resources()
         resources = policy.run()
 
-        for r in resources:
-            print(r['LaunchConfigurationName'])
-
         self.assertGreater(len(resources), 0)
+
+    def test_validate(self):
+        dataz = {u'type': u'user-data', u'key': u'"c7n:user-data"', u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
+                 u'op': u'regex'}
+        ud = c7n.resources.asg.UserDataFilter(dataz).validate()
+        self.assertEqual(type(ud), c7n.resources.asg.UserDataFilter)
 
 
 class AutoScalingTest(BaseTest):
