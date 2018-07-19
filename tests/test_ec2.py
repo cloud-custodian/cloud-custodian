@@ -17,9 +17,10 @@ import logging
 import unittest
 import time
 
+from botocore.exceptions import ClientError
 from datetime import datetime
 from dateutil import tz, zoneinfo
-from mock import mock
+from mock import mock, MagicMock
 from jsonschema.exceptions import ValidationError
 
 from c7n.exceptions import PolicyValidationError
@@ -1402,5 +1403,12 @@ class TestUserData(BaseTest):
             session_factory=session_factory,
         )
         resources = policy.run()
-
         self.assertGreater(len(resources), 0)
+
+    def test_validate(self):
+
+        dataz = {u'type': u'user-data', u'key': u'"c7n:user-data"', u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
+                 u'op': u'regex'}
+        ud = ec2.UserData(dataz).validate()
+        self.assertEqual(type(ud), ec2.UserData)
+
