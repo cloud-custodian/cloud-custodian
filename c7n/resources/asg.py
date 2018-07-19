@@ -119,6 +119,7 @@ class LaunchConfigFilterBase(object):
             cfg['LaunchConfigurationName']: cfg for cfg in configs
             if cfg['LaunchConfigurationName'] in config_names}
 
+
 @filters.register('security-group')
 class SecurityGroupFilter(
         net_filters.SecurityGroupFilter, LaunchConfigFilterBase):
@@ -1636,6 +1637,7 @@ class DescribeLaunchConfig(query.DescribeSource):
         #     r.pop('UserData', None)
         return resources
 
+
 @LaunchConfig.filter_registry.register('age')
 class LaunchConfigAge(AgeFilter):
     """Filter ASG launch configuration by age (in days)
@@ -1736,7 +1738,7 @@ class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
                     data = base64.b64decode(lc_tmp['UserData'])
                     try:
                         lc[self.annotation] = data.decode('utf8')
-                    except:
+                    except UnicodeDecodeError:
                         lc[self.annotation] = zlib.decompress(
                             data, 16).decode('utf8')
             if self.match(lc):
