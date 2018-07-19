@@ -91,6 +91,7 @@ class ActionRegistry(PluginRegistry):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
         self.register('invoke-lambda', LambdaInvoke)
+        self.register('invoke-function', FunctionInvoke)
         self.register('put-metric', PutMetric)
 
     def parse(self, data, manager):
@@ -348,13 +349,6 @@ class LambdaInvoke(EventAction):
         }
     }
 
-    def get_permissions(self):
-        if self.data.get('async', True):
-            return ('lambda:InvokeAsync',)
-        return ('lambda:Invoke',)
-
-    permissions = ('lambda:InvokeFunction',)
-
     def process(self, resources, event=None):
         client = utils.local_session(
             self.manager.session_factory).client('lambda')
@@ -380,6 +374,60 @@ class LambdaInvoke(EventAction):
             result['Payload'] = result['Payload'].read()
             if isinstance(result['Payload'], bytes):
                 result['Payload'] = result['Payload'].decode()
+            results.append(result)
+        return results
+
+
+class FunctionInvoke(EventAction):
+    """ Invoke an arbitrary function
+
+    serialized invocation parameters
+
+     - resources / collection of resources
+     - policy / policy that is invoke the lambda
+     - action / action that is invoking the lambda
+     - event / cloud trail event if any
+     - version / version of custodian invoking the lambda
+
+    Example::
+
+     - type: invoke-function
+       function: my-function
+    """
+
+    schema = {
+        'type': 'object',
+        'required': ['type', 'function'],
+        'properties': {
+            'type': {'enum': ['invoke-lambda']},
+            'function': {'type': 'string'},
+            'qualifier': {'type': 'string'},
+            'batch_size': {'type': 'integer'}
+        }
+    }
+
+    def get_permissions(self):
+        return ('lambda:Invoke',)
+
+    permissions = ('lambda:InvokeFunction',)
+
+    def process(self, resources, event=None):
+        kwargs = dict(FunctionName=self.data['function'])
+        if self.data.get('qualifier'):
+            kwargs['Qualifier'] = self.data['Qualifier']
+
+        payload = {
+            'version': VERSION,
+            'event': event,
+            'action': self.data,
+            'policy': self.manager.data}
+
+        results = []
+        for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
+            payload['resources'] = resource_set
+            kwargs['Payload'] = utils.dumps(payload)
+            function = getattr(self.data['function'])
+            result = function(kwargs)
             results.append(result)
         return results
 
