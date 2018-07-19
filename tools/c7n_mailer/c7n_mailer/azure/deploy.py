@@ -35,7 +35,9 @@ def provision(config):
         servicePlanName=config.get('function_servicePlanName', 'cloudcustodian'),
         location=config.get('function_location'),
         appInsightsLocation=config.get('function_appInsightsLocation'),
-        schedule=config.get('function_schedule', '0 */10 * * * *'))
+        schedule=config.get('function_schedule', '0 */10 * * * *'),
+        skuCode=config.get('function_skuCode'),
+        sku=config.get('function_sku'))
 
     template_util = TemplateUtilities()
 
@@ -77,6 +79,13 @@ def provision(config):
         contents=packager.get_function_config({'mode':
                                               {'type': 'azure-periodic',
                                                'schedule': func_config['schedule']}}))
+    # Add mail templates
+    template_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '../..', 'msg-templates'))
+
+    for t in os.listdir(template_dir):
+        with open(os.path.join(template_dir, t)) as fh:
+            packager.pkg.add_contents('msg-templates/%s' % t, fh.read())
 
     packager.close()
 
