@@ -15,17 +15,13 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"log"
 	"net/url"
 	"os"
 	"strings"
-
-	"github.com/aws/aws-xray-sdk-go/xray"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -34,6 +30,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/olivere/elastic"
 	"github.com/sha1sum/aws_signing_client"
 )
@@ -60,16 +57,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		exists, err := client.IndexExists(indexName).Do(context.Background())
-		if err != nil {
-			log.Fatal(err)
-		}
-		if !exists {
-			err := createIndex(ctx, client)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
 
 		for _, record := range event.Records {
 			err = processEventRecord(ctx, record, client)
@@ -78,33 +65,6 @@ func main() {
 			}
 		}
 	})
-}
-
-func createIndex(ctx context.Context, client *elastic.Client) error {
-	if mappingBucket == "" || mappingKey == "" {
-		return errors.New("Missing mapping bucket or key, unable to create new ES index")
-	}
-
-	result, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(mappingBucket),
-		Key:    aws.String(mappingKey),
-	})
-	if err != nil {
-		return err
-	}
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(result.Body)
-	mapping := buf.String()
-
-	createIndex, err := client.CreateIndex(indexName).BodyString(mapping).Do(ctx)
-	if err != nil {
-		return errors.New(err.Error())
-	}
-
-	if !createIndex.Acknowledged {
-		return errors.New("Create Index not Acknowledged")
-	}
-	return nil
 }
 
 //get elastic client
