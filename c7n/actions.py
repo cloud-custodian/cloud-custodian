@@ -22,6 +22,7 @@ from datetime import datetime
 import jmespath
 import logging
 import zlib
+import sys
 
 import six
 from botocore.exceptions import ClientError
@@ -420,10 +421,9 @@ class FunctionInvoke(EventAction):
         results = []
         for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
             payload['resources'] = utils.dumps(resource_set)
-            module = __import__(self.data['module'])
-            a_class = getattr(module, self.data['class'])
+            a_class = getattr(sys.modules[self.data['module']], self.data['class'])
             f = a_class()
-            result = getattr(f, self.data['function'])(payload)
+            result = getattr(f, self.data['method'])(payload)
             results.append(result)
         return results
 
