@@ -250,7 +250,6 @@ def generate(resource_types=()):
 
 def process_resource(type_name, resource_type, resource_defs, alias_name=None):
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
-
     seen_actions = set()  # Aliases get processed once
     action_refs = []
     for action_name, a in resource_type.action_registry.items():
