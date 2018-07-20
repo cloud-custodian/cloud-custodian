@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -35,6 +36,13 @@ class Folder(QueryResourceManager):
         scope = 'global'
 
 
+@Folder.action_registry.register('delete')
+class FolderDelete(MethodAction):
+
+    def get_resource_params(self, model, resource):
+        return {'name': 'folder/{}'.format(resource['name'])}
+
+
 @resources.register('project')
 class Project(QueryResourceManager):
 
@@ -44,3 +52,10 @@ class Project(QueryResourceManager):
         component = 'projects'
         scope = 'global'
         enum_spec = ('list', 'projects', None)
+
+
+@Project.action_registry.register('delete')
+class ProjectDelete(MethodAction):
+
+    def get_resource_params(self, model, resource):
+        return {'projectId': resource['projectId']}
