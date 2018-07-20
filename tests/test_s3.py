@@ -1886,7 +1886,7 @@ class S3Test(BaseTest):
         )
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.RemovePolicyStatement, "executor_factory", MainThreadExecutor)
-        self.patch(MainThreadExecutor, "async", False)
+        self.patch(MainThreadExecutor, "c7n_async", False)
 
         bname = "custodian-policy-test"
         statement = {

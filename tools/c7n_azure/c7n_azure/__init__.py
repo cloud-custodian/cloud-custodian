@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import adal
 import logging
+
+import adal
 
 # Quiet logging from dependencies
 adal.set_logging_options({'level': 'WARNING'})

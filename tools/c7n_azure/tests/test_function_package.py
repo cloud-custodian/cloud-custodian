@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
-import mock
 
 from azure_common import BaseTest
 from c7n_azure.function_package import FunctionPackage
@@ -33,18 +32,17 @@ class FunctionPackageTest(BaseTest):
                  'schedule': '0 1 0 0 0'}
         })
 
-        packer = FunctionPackage(p.data)
-        packer.pkg = mock.MagicMock()
+        packer = FunctionPackage(p.data['name'])
 
-        packer._add_function_config()
+        config = packer.get_function_config(p.data)
 
-        binding = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
+        binding = json.loads(config)
 
         self.assertEqual(binding['bindings'][0]['type'], 'timerTrigger')
-        self.assertEqual(binding['bindings'][0]['name'], 'timer')
+        self.assertEqual(binding['bindings'][0]['name'], 'input')
         self.assertEqual(binding['bindings'][0]['schedule'], '0 1 0 0 0')
 
-    def test_add_function_config_eventhub(self):
+    def test_add_function_config_events(self):
         p = self.load_policy({
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
@@ -52,14 +50,13 @@ class FunctionPackageTest(BaseTest):
                 {'type': 'azure-stream'}
         })
 
-        packer = FunctionPackage(p.data)
-        packer.pkg = mock.MagicMock()
+        packer = FunctionPackage(p.data['name'])
 
-        packer._add_function_config()
+        config = packer.get_function_config(p.data)
 
-        binding = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
+        binding = json.loads(config)
 
-        self.assertEqual(binding['bindings'][0]['type'], 'eventHubTrigger')
+        self.assertEqual(binding['bindings'][0]['type'], 'httpTrigger')
 
     def test_add_policy(self):
         p = self.load_policy({
@@ -69,14 +66,11 @@ class FunctionPackageTest(BaseTest):
                 {'type': 'azure-stream'}
         })
 
-        packer = FunctionPackage(p.data)
-        packer.pkg = mock.MagicMock()
+        packer = FunctionPackage(p.data['name'])
 
-        packer._add_policy()
+        policy = json.loads(packer._get_policy(p.data))
 
-        policy = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
-
-        self.assertEqual(policy,
+        self.assertEqual(policy['policies'][0],
                          {u'resource': u'azure.publicip',
                           u'name': u'test-azure-public-ip',
                           u'mode': {u'type': u'azure-stream'}})

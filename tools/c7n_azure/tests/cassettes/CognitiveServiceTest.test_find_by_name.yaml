@@ -1,0 +1,44 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.4 (Windows-10-10.0.17134-SP0) requests/2.19.1 msrest/0.5.1
+          msrest_azure/0.4.33 cognitiveservicesmanagementclient/2.0.0 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2017-04-18
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXM3yx4ePHywP9m+P9vLtvdnDw+2swcH2fa9g73zew92
+        7892HuR367yp1vU0/7yu1qvmbptNsrqsru6u6uqymOV1c/eLYlpXTXXejk+qi2XRFpf567y+LKY5
+        dTGdVutl29ydTtu8aben1cV2Q19+NPpomS0ItY/6X7TXK3xxG7DUOm+zC2r9+360k+3Q/z6dbu/Q
+        4/1zf3Ive5BPHtLvO7/vR/RGWU0zEIDeuiirSVbSZ83b9UePfrHB6dnOR79k9NHbYgmiPSmWF+PX
+        qzyfzqkhDXuV122RN2ifL2erqli21Gzetqvm0d272aoY02AE4fHCDmJaLe42RIjL3fEOwaGX8nqZ
+        lWfoYjK5N9u/93B39pB+Zud5Npnc388eTnay+9ne5FO0n2VtflLn9C9e2NvZPdjeebC9s/dm9+Gj
+        e58+2rs/3n+w++D+zt5PUWNC8rJoaIiE+uuW3qFXXq+n0zyf0eu/5Jd8/5f8P8fU9iYbAgAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 02 Jul 2018 20:03:09 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-IIS/10.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-AspNet-Version: [4.0.30319]
+      X-Content-Type-Options: [nosniff]
+      X-Powered-By: [ASP.NET]
+      x-ms-correlation-request-id: [131a2662-73c7-4b8e-8d51-0f50f9bce91c]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [08e9bd1a-c377-4828-b891-4c7ebba4010f]
+      x-ms-routing-request-id: ['NORTHCENTRALUS:20180702T200309Z:131a2662-73c7-4b8e-8d51-0f50f9bce91c']
+    status: {code: 200, message: OK}
+version: 1

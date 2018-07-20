@@ -667,7 +667,7 @@ def load_resources(bucket, prefix, region, account_config, accounts,
     executor = ProcessPoolExecutor
     if debug:
         from c7n.executor import MainThreadExecutor
-        MainThreadExecutor.async = False
+        MainThreadExecutor.c7n_async = False
         executor = MainThreadExecutor
 
     stats = Counter()

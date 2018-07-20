@@ -32,7 +32,7 @@ class FlightRecorder(Http):
 
     def get_next_file_path(self, uri, method, record=True):
         base_name = "%s%s" % (
-            method.lower(), urlparse(uri).path.replace('/', '-'))
+            method.lower(), urlparse(uri).path.replace('/', '-').replace(':', '-'))
         data_dir = self._data_path
 
         is_discovery = False
@@ -54,6 +54,9 @@ class FlightRecorder(Http):
                 # if we already have discovery metadata, don't re-record it.
                 if record and is_discovery:
                     return None
+                # on replay always return the same discovery file
+                if is_discovery:
+                    return fn
                 self._index[base_name] += 1
                 if not record:
                     next_file = fn
