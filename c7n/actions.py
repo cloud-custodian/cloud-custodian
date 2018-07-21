@@ -407,6 +407,9 @@ class FunctionInvoke(EventAction):
         }
     }
 
+    def get_permissions(self):
+        return ()
+
     def process(self, resources, event=None):
         kwargs = dict(FunctionName=self.data['class'])
         if self.data.get('qualifier'):
