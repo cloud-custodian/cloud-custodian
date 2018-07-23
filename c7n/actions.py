@@ -92,7 +92,7 @@ class ActionRegistry(PluginRegistry):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
         self.register('invoke-lambda', LambdaInvoke)
-        self.register('invoke-function', FunctionInvoke)
+        self.register('invoke-method', MethodInvoke)
         self.register('put-metric', PutMetric)
 
     def parse(self, data, manager):
@@ -124,6 +124,7 @@ class Action(object):
 
     permissions = ()
     metrics = ()
+    _requires_permissions = True
 
     log = logging.getLogger("custodian.actions")
 
@@ -141,6 +142,14 @@ class Action(object):
 
     def validate(self):
         return self
+
+    @property
+    def requires_permissions(self):
+        return self._requires_permissions
+
+    @requires_permissions.setter
+    def requires_permissions(self, value):
+        self._requires_permissions = value
 
     @property
     def name(self):
@@ -350,6 +359,13 @@ class LambdaInvoke(EventAction):
         }
     }
 
+    def get_permissions(self):
+        if self.data.get('async', True):
+            return ('lambda:InvokeAsync',)
+        return ('lambda:Invoke',)
+
+    permissions = ('lambda:InvokeFunction',)
+
     def process(self, resources, event=None):
         client = utils.local_session(
             self.manager.session_factory).client('lambda')
@@ -379,33 +395,39 @@ class LambdaInvoke(EventAction):
         return results
 
 
-class FunctionInvoke(EventAction):
-    """ Invoke an arbitrary function
+class MethodInvoke(EventAction):
+    """ Invoke an arbitrary method
 
     serialized invocation parameters
 
      - resources / collection of resources
-     - policy / policy that is invoke the lambda
-     - action / action that is invoking the lambda
-     - event / cloud trail event if any
+     - policy / policy that is invoke the function
+     - action / action that is invoking the function
      - version / version of custodian invoking the lambda
 
     Example::
 
-     - type: invoke-function
+     - type: invoke-method
+       module: my_module
        class: actions.action_class
+       method: my_method
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'type': {'enum': ['invoke-function']},
+            'type': {'enum': ['invoke-method']},
             'module': {'type': 'string'},
             'class': {'type': 'string'},
+            'method': {'type': 'string'},
             'qualifier': {'type': 'string'},
             'batch_size': {'type': 'integer'}
         }
     }
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(MethodInvoke, self).__init__(data, manager, log_dir)
+        self.requires_permissions = False
 
     def get_permissions(self):
         return ()

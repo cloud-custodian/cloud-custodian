@@ -58,7 +58,7 @@ class DynamodbTest(BaseTest):
             {
                 "name": "tables",
                 "resource": "dynamodb-table",
-                "actions": [{"type": "invoke-function", "module": "c7n.invocable",
+                "actions": [{"type": "invoke-method", "module": "c7n.invocable",
                     "class": "InvocableFunction", "method": "process"}],
             },
             session_factory=session_factory,
