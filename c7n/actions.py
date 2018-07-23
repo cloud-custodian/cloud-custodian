@@ -22,6 +22,8 @@ from datetime import datetime
 import jmespath
 import logging
 import zlib
+import sys
+import importlib
 
 import six
 from botocore.exceptions import ClientError
@@ -91,6 +93,7 @@ class ActionRegistry(PluginRegistry):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
         self.register('invoke-lambda', LambdaInvoke)
+        self.register('invoke-method', MethodInvoke)
         self.register('put-metric', PutMetric)
 
     def parse(self, data, manager):
@@ -122,6 +125,7 @@ class Action(object):
 
     permissions = ()
     metrics = ()
+    _requires_permissions = True
 
     log = logging.getLogger("custodian.actions")
 
@@ -139,6 +143,14 @@ class Action(object):
 
     def validate(self):
         return self
+
+    @property
+    def requires_permissions(self):
+        return self._requires_permissions
+
+    @requires_permissions.setter
+    def requires_permissions(self, value):
+        self._requires_permissions = value
 
     @property
     def name(self):
@@ -378,6 +390,67 @@ class LambdaInvoke(EventAction):
             params['Payload'] = utils.dumps(payload)
             result = client.invoke(**params)
             result['Payload'] = result['Payload'].read()
+            if isinstance(result['Payload'], bytes):
+                result['Payload'] = result['Payload'].decode()
+            results.append(result)
+        return results
+
+
+class MethodInvoke(EventAction):
+    """ Invoke an arbitrary method
+
+    serialized invocation parameters
+
+     - resources / collection of resources
+     - policy / policy that is invoke the function
+     - action / action that is invoking the function
+     - version / version of custodian invoking the lambda
+
+    Example::
+
+     - type: invoke-method
+       module: my_module
+       class: actions.action_class
+       method: my_method
+    """
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'type': {'enum': ['invoke-method']},
+            'module': {'type': 'string'},
+            'class': {'type': 'string'},
+            'method': {'type': 'string'},
+            'qualifier': {'type': 'string'},
+            'batch_size': {'type': 'integer'}
+        }
+    }
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(MethodInvoke, self).__init__(data, manager, log_dir)
+        self.requires_permissions = False
+
+    def get_permissions(self):
+        return ()
+
+    def process(self, resources, event=None):
+        importlib.import_module(self.data['module'])
+        kwargs = dict(FunctionName=self.data['class'])
+        if self.data.get('qualifier'):
+            kwargs['Qualifier'] = self.data['Qualifier']
+
+        payload = {
+            'version': VERSION,
+            'event': event,
+            'action': self.data,
+            'policy': self.manager.data}
+
+        results = []
+        for resource_set in utils.chunks(resources, self.data.get('batch_size', 250)):
+            payload['resources'] = utils.dumps(resource_set)
+            a_class = getattr(sys.modules[self.data['module']], self.data['class'])
+            f = a_class()
+            result = getattr(f, self.data['method'])(payload)
             results.append(result)
         return results
 

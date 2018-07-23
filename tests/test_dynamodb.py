@@ -47,6 +47,20 @@ class DynamodbTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_invoke_method(self):
+        session_factory = self.replay_flight_data("test_dynamodb_invoke_action")
+        p = self.load_policy(
+            {
+                "name": "tables",
+                "resource": "dynamodb-table",
+                "actions": [{"type": "invoke-method", "module": "c7n.invocable",
+                    "class": "InvocableFunction", "method": "process"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_delete_tables(self):
         session_factory = self.replay_flight_data("test_dynamodb_delete_table")
         self.patch(DeleteTable, "executor_factory", MainThreadExecutor)
