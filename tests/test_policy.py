@@ -179,6 +179,8 @@ class PolicyPermissions(BaseTest):
 
             for n, a in v.action_registry.items():
                 p["actions"] = [n]
+                if not a({}, mgr).requires_permissions:
+                    continue
                 perms = a({}, mgr).get_permissions()
                 found = bool(perms)
                 if not isinstance(perms, (list, tuple, set)):
