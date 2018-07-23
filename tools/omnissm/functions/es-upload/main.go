@@ -40,8 +40,6 @@ var (
 	esClient           = os.Getenv("OMNISSM_ELASTIC_SEARCH_HTTP")
 	indexName          = os.Getenv("OMNISSM_INDEX_NAME")
 	typeName           = os.Getenv("OMNISSM_TYPE_NAME")
-	mappingBucket      = os.Getenv("OMNISSM_MAPPING_BUCKET")
-	mappingKey         = os.Getenv("OMNISSM_MAPPING_KEY")
 	s3Svc              = s3.New(session.New())
 )
 
