@@ -410,7 +410,7 @@ class BaseNotify(EventAction):
         dumped = utils.dumps(message)
         compressed = zlib.compress(dumped.encode('utf8'))
         b64encoded = base64.b64encode(compressed)
-        return b64encoded.decode('ascii')
+        return utils.dumps(message)
 
 
 class Notify(BaseNotify):
