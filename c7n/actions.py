@@ -23,6 +23,7 @@ import jmespath
 import logging
 import zlib
 import sys
+import importlib
 
 import six
 from botocore.exceptions import ClientError
@@ -433,6 +434,7 @@ class MethodInvoke(EventAction):
         return ()
 
     def process(self, resources, event=None):
+        importlib.import_module(self.data['module'])
         kwargs = dict(FunctionName=self.data['class'])
         if self.data.get('qualifier'):
             kwargs['Qualifier'] = self.data['Qualifier']

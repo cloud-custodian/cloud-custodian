@@ -19,7 +19,6 @@ from dateutil import zoneinfo
 
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
-from c7n.invocable import InvocableFunction
 
 
 class DynamodbTest(BaseTest):
@@ -48,12 +47,8 @@ class DynamodbTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_invoke_function(self):
+    def test_invoke_method(self):
         session_factory = self.replay_flight_data("test_dynamodb_invoke_action")
-        import sys
-        assert 'c7n.invocable' in sys.modules.keys()
-        i = InvocableFunction()
-        assert i.is_imported()
         p = self.load_policy(
             {
                 "name": "tables",
