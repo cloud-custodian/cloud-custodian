@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/url"
@@ -29,9 +30,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
 	"github.com/sha1sum/aws_signing_client"
 )
 
@@ -39,14 +43,17 @@ var (
 	xRayTracingEnabled = os.Getenv("_X_AMZN_TRACE_ID")
 	esClient           = os.Getenv("OMNISSM_ELASTIC_SEARCH_HTTP")
 	indexName          = os.Getenv("OMNISSM_INDEX_NAME")
+	tableName          = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 	typeName           = os.Getenv("OMNISSM_TYPE_NAME")
 	s3Svc              = s3.New(session.New())
+	dynamoSvc          = dynamodb.New(session.New())
 )
 
 func main() {
 	lambda.Start(func(ctx context.Context, event events.S3Event) {
 		if xRayTracingEnabled != "" {
 			xray.AWS(s3Svc.Client)
+			xray.AWS(dynamoSvc.Client)
 		}
 		if esClient == "" || indexName == "" || typeName == "" {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
@@ -94,19 +101,44 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 	if err != nil {
 		return err
 	}
-
 	keyParams := strings.Split(key, "/")
-	var region string
-	var account string
-	//pull region and/or accountid from key path. there may be a better way to do this
-	for _, element := range keyParams {
-		if strings.Contains(element, "region") {
-			region = strings.Split(element, "=")[1]
-		}
-		if strings.Contains(element, "accountid") {
-			account = strings.Split(element, "=")[1]
-		}
+	//get m-id from key in filename
+	id := strings.Split(keyParams[len(keyParams)-1], ".")[0]
+	fmt.Println(id)
+	fmt.Println("initializing session")
+	fmt.Println("about to get item")
+	fmt.Printf("tablename: %s\n", tableName)
+	resp, err := dynamoSvc.GetItemWithContext(ctx, &dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"ManagedId": {
+				S: aws.String(id),
+			},
+		},
+	})
+
+	fmt.Println(resp)
+	fmt.Println(err)
+	if err != nil {
+		return err
 	}
+
+	if resp.Item == nil {
+		return errors.New("Item not found with id: " + id)
+	}
+
+	fmt.Println("attempting to unmarshal")
+	var entry map[string]interface{}
+	if err := dynamodbattribute.UnmarshalMap(resp.Item, &entry); err != nil {
+		return err
+	}
+	fmt.Println(entry)
+	account := entry["AccountId"]
+	region := entry["Region"]
+
+	fmt.Println(account)
+	fmt.Println(region)
+
 	dec := json.NewDecoder(result.Body)
 	defer result.Body.Close()
 	for {
@@ -118,6 +150,7 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 		}
 		m["region"] = region
 		m["accountId"] = account
+		fmt.Println(m)
 		_, err := client.Index().
 			Index(indexName).
 			Type(typeName).
