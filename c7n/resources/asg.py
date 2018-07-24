@@ -130,7 +130,7 @@ class SecurityGroupFilter(
     def get_related_ids(self, asgs):
         group_ids = set()
         for asg in asgs:
-            cfg = self.configs.get(asg['LaunchConfigurationName'])
+            cfg = self.configs.get(asg['LaunchConfigurationName'], {})
             group_ids.update(cfg.get('SecurityGroups', ()))
         return group_ids
 
