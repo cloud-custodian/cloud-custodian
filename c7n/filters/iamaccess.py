@@ -91,6 +91,10 @@ class PolicyChecker(object):
     def allowed_vpc(self):
         return self.checker_config.get('allowed_vpc', ())
 
+    @property
+    def allowed_orgid(self):
+        return self.checker_config.get('allowed_orgid', ())
+
     # Policy statement handling
     def check(self, policy_text):
         if isinstance(policy_text, six.string_types):
@@ -244,6 +248,11 @@ class PolicyChecker(object):
             return False
         return bool(set(map(_account, c['values'])).difference(self.allowed_vpc))
 
+    def handle_aws_principalorgid(self, s, c):
+        if not self.allowed_orgid:
+            return False
+        return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.
@@ -260,6 +269,8 @@ class CrossAccountAccessFilter(Filter):
         # white list accounts
         whitelist_from=ValuesFrom.schema,
         whitelist={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_orgids_from=ValuesFrom.schema,
+        whitelist_orgids={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpce_from=ValuesFrom.schema,
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
         whitelist_vpc_from=ValuesFrom.schema,
@@ -279,11 +290,13 @@ class CrossAccountAccessFilter(Filter):
         self.accounts = self.get_accounts()
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
+        self.orgid = self.get_orgids()
         self.checker_config = getattr(self, 'checker_config', None) or {}
         self.checker_config.update(
             {'allowed_accounts': self.accounts,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
+             'allowed_orgid': self.orgid,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions})
@@ -312,6 +325,13 @@ class CrossAccountAccessFilter(Filter):
             values = ValuesFrom(self.data['whitelist_vpce_from'], self.manager)
             vpce = vpce.union(values.get_values())
         return vpce
+
+    def get_orgids(self):
+        org_ids = set(self.data.get('whitelist_orgids', ()))
+        if 'whitelist_orgids_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_orgids_from'], self.manager)
+            org_ids = org_ids.union(values.get_values())
+        return org_ids
 
     def get_resource_policy(self, r):
         return r.get(self.policy_attribute, None)
