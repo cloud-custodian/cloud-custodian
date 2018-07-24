@@ -1,0 +1,65 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "mapping": {
+      "total_fields": {
+        "limit": "10000"
+      }
+    }
+  },
+  "mappings": {
+    "process_info": {
+      "properties": {
+        "create_time": {
+          "type": "date"
+        },
+        "cmdline": {
+          "type": "text"
+        },
+        "rss": {
+          "type": "text"
+        },
+        "write_bytes": {
+          "type": "text"
+        },
+        "name": {
+          "type": "text"
+        },
+        "pid": {
+          "type": "text"
+        },
+        "thread_count": {
+          "type": "text"
+        },
+        "num_fds": {
+          "type": "text"
+        },
+        "read_bytes": {
+          "type": "text"
+        },
+        "user": {
+          "type": "text"
+        },
+        "vms": {
+          "type": "text"
+        },
+        "resourceId": {
+          "type": "text"
+        },
+        "captureTime": {
+          "type": "date"
+        },
+        "schemaVersion": {
+          "type": "text"
+        },
+        "region": {
+          "type": "text"
+        },
+        "accountId": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}
