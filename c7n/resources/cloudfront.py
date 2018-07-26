@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
+import re
 
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
@@ -27,7 +28,6 @@ from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 @resources.register('distribution')
 class Distribution(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudfront'
         type = 'distribution'
@@ -72,7 +72,6 @@ class DescribeDistribution(DescribeSource):
 
 @resources.register('streaming-distribution')
 class StreamingDistribution(QueryResourceManager):
-
     class resource_type(object):
         service = 'cloudfront'
         type = 'streaming-distribution'
@@ -181,9 +180,80 @@ class IsWafEnabled(Filter):
         return results
 
 
+@Distribution.filter_registry.register('mismatch-s3-origin')
+class MismatchS3Origin(Filter):
+    """Check for existence of S3 bucket referenced by Cloudfront,
+       and verify whether owner is different from Cloudfront account owner.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: mismatch-s3-origin
+                resource: distribution
+                filters:
+                  - type: mismatch-s3-origin
+                    check_custom_origins: true
+   """
+
+    s3_prefix = re.compile('.*(?=\.s3(-.*)?\.amazonaws.com)')
+    s3_suffix = re.compile('^([^.]+\.)?s3(-.*)?\.amazonaws.com')
+
+    schema = type_schema(
+        'mismatch-s3-origin',
+        check_custom_origins={'type': 'boolean'})
+
+    permissions = ('s3:ListBuckets',)
+    retry = staticmethod(get_retry(('Throttling',)))
+
+    def is_s3_domain(self, x):
+        bucket_match = self.s3_prefix.match(x['DomainName'])
+
+        if bucket_match:
+            return bucket_match.group()
+
+        domain_match = self.s3_suffix.match(x['DomainName'])
+
+        if domain_match:
+            value = x['OriginPath']
+
+            if value.startswith('/'):
+                value = value.replace("/", "", 1)
+
+            return value
+
+        return None
+
+    def process(self, resources, event=None):
+        results = []
+
+        s3_client = local_session(self.manager.session_factory).client(
+            's3', region_name=self.manager.config.region)
+
+        buckets = {b['Name'] for b in s3_client.list_buckets()['Buckets']}
+
+        for r in resources:
+            r['c7n:mismatched-s3-origin'] = []
+            for x in r['Origins']['Items']:
+                if 'S3OriginConfig' in x:
+                    bucket_match = self.s3_prefix.match(x['DomainName'])
+                    if bucket_match:
+                        target_bucket = self.s3_prefix.match(x['DomainName']).group()
+                elif 'CustomOriginConfig' in x and self.data.get('check_custom_origins'):
+                    target_bucket = self.is_s3_domain(x)
+
+                if target_bucket is not None and target_bucket not in buckets:
+                    self.log.debug("Bucket %s not found in distribution %s hosting account."
+                                   % (target_bucket, r['Id']))
+                    r['c7n:mismatched-s3-origin'].append(target_bucket)
+                    results.append(r)
+
+        return results
+
+
 @Distribution.action_registry.register('set-waf')
 class SetWaf(BaseAction):
-
     permissions = ('cloudfront:UpdateDistribution', 'waf:ListWebACLs')
     schema = type_schema(
         'set-waf', required=['web-acl'], **{
