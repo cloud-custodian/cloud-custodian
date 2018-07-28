@@ -179,8 +179,9 @@ class TypeInfo(object):
 
     service = None
     version = None
+    component = None
     scope = 'project'
-    enum_spec = ('list', 'items', None)
+    enum_spec = ('list', 'items[]', None)
 
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')

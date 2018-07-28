@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # import base64
+from collections import namedtuple
 import logging
 import hashlib
 
@@ -20,21 +21,18 @@ from c7n_gcp.client import errors
 from c7n.mu import custodian_archive as base_archive
 from c7n.utils import local_session
 
+from googleapiclient.errors import HttpError
+
 log = logging.getLogger('c7n_gcp.mu')
 
 
-handler = """\
-exports.handler = (req, res) => {
-  res.send('Hello World!');
-};
-"""
-
-
 def custodian_archive(packages=None):
-    archive = base_archive(['c7n_gcp'])
-    archive.add_contents('index.js', handler)
+    if not packages:
+        packages = []
+    packages.append('c7n_gcp')
+    archive = base_archive(packages)
 
-    # requirements are fetched server-side, which helps for binary extensions
+    # Requirements are fetched server-side, which helps for binary extensions
     # but for pure python packages, if we have a local install and its
     # relatively small, it might be faster to just upload.
     #
@@ -44,6 +42,7 @@ def custodian_archive(packages=None):
     requirements.add('google-auth>=1.4.1')
     requirements.add('google-auth-httplib2>=0.0.3')
     requirements.add('google-api-python-client>=1.7.3')
+    # TODO: replace these deps
     # both of these bring in grpc :-( which in turn brings in a whole
     # pile of random threads and protobufs.
     requirements.add('google-cloud-monitoring>=0.3.0')
@@ -111,12 +110,16 @@ class CloudFunctionManager(object):
         else:
             delta = self.delta_function(func_info, config)
             if not delta:
-                return
-            response = self.client.execute_command(
-                'patch', {
-                    'name': func_name,
-                    'body': config,
-                    'updateMask': ','.join(delta)})
+                response = None
+            else:
+                response = self.client.execute_command(
+                    'patch', {
+                        'name': func_name,
+                        'body': config,
+                        'updateMask': ','.join(delta)})
+        # converge event source creation
+        for e in func.events:
+            e.add(func)
         return response
 
     @staticmethod
@@ -206,12 +209,23 @@ class CloudFunction(object):
 
     @property
     def runtime(self):
-        # see google-cloud-sdk lib/googlecloudsdk/command_lib/functions/flags.py AddRuntimeFlag
-        return self.func_data.get('runtime', 'nodejs6')
+        return self.func_data.get('runtime', 'python37')
 
     @property
     def labels(self):
         return dict(self.func_data.get('labels', {}))
+
+    @property
+    def environment(self):
+        return self.func_data.get('environment', {})
+
+    @property
+    def network(self):
+        return self.func_data.get('network')
+
+    @property
+    def max_instances(self):
+        return self.func_data.get('max-instances')
 
     @property
     def events(self):
@@ -231,13 +245,37 @@ class CloudFunction(object):
             'labels': labels,
             'availableMemoryMb': self.memory_size}
 
+        if self.environment:
+            conf['environmentVariables'] = self.environment
+
+        if self.network:
+            conf['network'] = self.network
+
+        if self.max_instances:
+            conf['maxInstances'] = self.max_instances
+
         for e in self.events:
             conf.update(e.get_config(self))
         return conf
 
 
+
+PolicyHandlerTemplate = """\
+from c7n_gcp.handler import handler
+
+def run(event, context=None):
+    return handler.run(event, context)
+"""
+
+
 class PolicyFunction(CloudFunction):
-    pass
+
+    def get_archive(self):
+        self.archive.add_file('main.py', PolicyHandlerTemplate)
+
+    def get_config(self):
+        config = super(CloudFunction, self).get_config()
+        config['entryPoint'] = 'run'
 
 
 class EventSource(object):
@@ -296,10 +334,135 @@ class PubSubSubscriber(EventSource):
                 'eventType': self.trigger,
                 'resource': self.data['topic']}}
 
+    def get_topic_param(self, topic=None, project=None):
+        return {'topic': 'projects/{}/topics/{}'.format(
+            project or self.session.get_default_project(),
+            topic or self.data['topic'])}
+
+    def ensure_topic(self):
+        client = self.session.client('pubsub', 'v1', 'project.topics')
+        topic = self.get_topic_param()
+        try:
+            client.execute_command('get', topic)
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+        else:
+            return topic
+
+        client.execute_command('create', topic)
+        return topic
+
+    def add(self):
+        self.ensure_topic()
+
+    def remove(self):
+        if not self.data.get('topic').startswith('custodian-auto'):
+            return
+        client = self.session.client('topic', 'v1', 'project.topics')
+        client.execute_command('delete', self.get_topic_param())
+
+
+LogInfo = namedtuple('LogInfo', 'name scope_type scope_id id')
+
 
 class LogSubscriber(EventSource):
-    """Composite as a log sink"""
+    """Composite as a log sink
 
+    subscriber = LogSubscriber(dict(
+        log='projects/custodian-1291/logs/cloudaudit.googleapis.com%2Factivity'))
+
+    function = CloudFunction(dict(name='log-sub', events=[subscriber])
+    """
+
+    def get_log(self):
+        scope_type, scope_id, _, log_id = self.data['log'].split('/', 3)
+        return LogInfo(scope_type=scope_type, scope_id=scope_id,
+                       id=log_id, name=self.data['log'])
+
+    def get_log_filter(self):
+        return self.data.get('filter')
+
+    def get_parent(self, log_info):
+        if self.data.get('scope', 'log') == 'log':
+            if log_info != 'project':
+                raise ValueError("Invalid log subscriber scope")
+            parent = "%s/%s" % (log_info['scope_type'], log_info['scope_id'])
+        if self.data['scope'] == 'project':
+            parent = 'projects/{}'.format(
+                self.data.get('scope_id', self.session.get_default_project()))
+        elif self.data['scope'] == 'organization':
+            parent = 'organizations/{}'.format(self.data['scope_id'])
+        elif self.data['scope'] == 'folder':
+            parent = 'folders/{}'.format(self.data['scope_id'])
+        elif self.data['scope'] == 'billing':
+            parent = 'billingAccounts/{}'.format(self.data['scope_id'])
+        else:
+            raise ValueError(
+                'invalid log subscriber scope %s' % (self.data))
+        return parent
+
+    def get_sink(self, func):
+        log_info = self.get_log()
+        parent = self.get_parent(log_info)
+        log_filter = self.get_log_filter()
+        topic_info = self.ensure_topic()
+
+        sink = {
+            'parent': parent,
+            'uniqueWriterIdentity': False,  # Todo
+            # Sink body
+            'name': self.data['name'],
+            'destination': topic_info['topic']
+        }
+
+        if log_filter is not None:
+            sink['filter'] = log_filter
+        return sink
+
+    def ensure_log(self):
+        pass
+
+    def add(self, func):
+        pass
+
+    def remove(self, func):
+        pass
+
+
+class ApiSubscriber(EventSource):
+    """
+
+{
+  "name": string,
+  "destination": string,
+  "filter": string,
+  "outputVersionFormat": enum(VersionFormat),
+  "writerIdentity": string,
+  "includeChildren": boolean,
+  "startTime": string,
+  "endTime": string
+}
+    """
+    # https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog
+
+    def add(self, func):
+
+        log_client = self.session.client(
+            'logging', 'v2', self.get_log_component())
+        topic_client = self.session.client(
+            'topic', 'v1', 'project.topics')
+
+        sink_info = self.get_sink()
+
+        # Ensure pub/sub topic exists
+        topic_data = topic_client.execute_command(
+            'get', 'projects/{}/topics/{}'.format(self.data))
+        topic = 'pubsub.googleapis.com/projects/{project_id}/topics/{topic_id}'
+
+        # Ensure api log exists
+
+        # Ensure log sink exists
 
 class ScheduledEvent(EventSource):
     """External scheduled clock event."""
