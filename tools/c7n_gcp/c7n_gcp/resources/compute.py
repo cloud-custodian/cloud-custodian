@@ -31,6 +31,13 @@ class Instance(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.instances[]', None)
         scope = 'project'
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project_id': resource_info['project_id'],
+                        'zone': resource_info['zone'],
+                        'resourceId': resource_info['instance_id']})
+
 
 class InstanceAction(MethodAction):
 
@@ -67,6 +74,12 @@ class Image(QueryResourceManager):
         version = 'v1'
         component = 'images'
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project_id': resource_info['project_id'],
+                        'resourceId': resource_info['image_id']})
+
 
 @resources.register('disk')
 class Disk(QueryResourceManager):
@@ -77,3 +90,10 @@ class Disk(QueryResourceManager):
         component = 'disks'
         scope = 'zone'
         enum_spec = ('aggregatedList', 'items.*.disks[]', None)
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project_id': resource_info['project_id'],
+                        'zone': resource_info['zone'],
+                        'resourceId': resource_info['disk_id']})

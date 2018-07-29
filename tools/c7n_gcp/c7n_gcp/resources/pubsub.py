@@ -11,20 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n_gcp.provider import resources
+from c7n_gcp.query import QueryResourceManager, TypeInfo
 
-import logging
-
-import c7n_gcp.resources.compute
-import c7n_gcp.resources.function
-import c7n_gcp.resources.gke
-import c7n_gcp.resources.logging
-import c7n_gcp.resources.network
-import c7n_gcp.resources.pubsub
-import c7n_gcp.resources.resourcemanager
-import c7n_gcp.resources.storage  # noqa: F401
-
-logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
+"""
+todo, needs detail_spec
+"""
 
 
-def initialize_gcp():
-    pass
+@resources.register('pubsub-topic')
+class PubSubTopic(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'pubsub'
+        version = 'v1'
+        component = 'projects.topics'
+        enum_spec = ('list', 'topics[]', None)
+        # need batch spec
+        scope = 'project'
+        scope_key = 'project'
+        scope_template = "projects/{}"

@@ -473,9 +473,6 @@ class LambdaMode(ServerlessExecutionMode):
         return p
 
     def provision(self):
-        # Avoiding runtime lambda dep, premature optimization?
-        from c7n.mu import PolicyLambda, LambdaManager
-
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
@@ -485,14 +482,14 @@ class LambdaMode(ServerlessExecutionMode):
             }
             self.policy.data = self.expand_variables(variables)
             try:
-                manager = LambdaManager(self.policy.session_factory)
+                manager = mu.LambdaManager(self.policy.session_factory)
             except ClientError:
                 # For cli usage by normal users, don't assume the role just use
                 # it for the lambda
-                manager = LambdaManager(
+                manager = mu.LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                PolicyLambda(self.policy), 'current',
+                mu.PolicyLambda(self.policy), 'current',
                 role=self.policy.options.assume_role)
 
     def get_logs(self, start, end):

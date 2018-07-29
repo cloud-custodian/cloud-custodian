@@ -132,6 +132,9 @@ class QueryResourceManager(ResourceManager):
     def get_cache_key(self, query):
         return {'source_type': self.source_type, 'query': query}
 
+    def get_resource(self, resource_info):
+        return self.resource_type.get(self.get_client(), resource_info)
+
     @property
     def source_type(self):
         return self.data.get('source', 'describe-gcp')

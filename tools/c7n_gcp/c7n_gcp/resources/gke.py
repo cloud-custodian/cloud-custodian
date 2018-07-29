@@ -11,20 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import logging
-
-import c7n_gcp.resources.compute
-import c7n_gcp.resources.function
-import c7n_gcp.resources.gke
-import c7n_gcp.resources.logging
-import c7n_gcp.resources.network
-import c7n_gcp.resources.pubsub
-import c7n_gcp.resources.resourcemanager
-import c7n_gcp.resources.storage  # noqa: F401
-
-logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
+from c7n_gcp.provider import resources
+from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-def initialize_gcp():
-    pass
+@resources.register('gke')
+class KubernetesCluster(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'container'
+        version = 'v1beta1'
+        component = 'projects.locations.clusters'
+        enum_spec = ('list', 'clusters[]', None)
+        scope = 'project'
+        scope_key = 'parent'
+        scope_template = "projects/{}/locations/-"

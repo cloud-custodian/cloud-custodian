@@ -1,4 +1,4 @@
-# Copyright 2017-2018 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -323,10 +323,12 @@ class BucketEvent(EventSource):
                 'resource': self.data['bucket']}}
 
 
-class PubSubSubscriber(EventSource):
+class PubSubSource(EventSource):
 
     trigger = 'google.pubsub.topic.publish'
     collection_id = 'pubsub.projects.topics'
+
+    # data -> topic
 
     def get_config(self, func):
         return {
@@ -375,10 +377,20 @@ class LogSubscriber(EventSource):
     function = CloudFunction(dict(name='log-sub', events=[subscriber])
     """
 
+    # filter, log, topic, name
+    # optional scope, scope_id (if scope != default)
+    # + pub sub
+
+    def __init__(self, data, session):
+        self.data = data
+        self.session = session
+        self.pubsub = PubSubSource(data, session)
+
     def get_log(self):
         scope_type, scope_id, _, log_id = self.data['log'].split('/', 3)
-        return LogInfo(scope_type=scope_type, scope_id=scope_id,
-                       id=log_id, name=self.data['log'])
+        return LogInfo(
+            scope_type=scope_type, scope_id=scope_id,
+            id=log_id, name=self.data['log'])
 
     def get_log_filter(self):
         return self.data.get('filter')
@@ -402,67 +414,99 @@ class LogSubscriber(EventSource):
                 'invalid log subscriber scope %s' % (self.data))
         return parent
 
-    def get_sink(self, func):
+    def get_sink(self, topic_info):
         log_info = self.get_log()
         parent = self.get_parent(log_info)
         log_filter = self.get_log_filter()
-        topic_info = self.ensure_topic()
+        scope = parent.split('/', 1)[0]
 
         sink = {
             'parent': parent,
-            'uniqueWriterIdentity': False,  # Todo
+            'uniqueWriterIdentity': False,
             # Sink body
-            'name': self.data['name'],
-            'destination': topic_info['topic']
+            'body': {
+                'name': self.data['name'],
+                'destination': topic_info['topic']
+            }
         }
 
         if log_filter is not None:
-            sink['filter'] = log_filter
-        return sink
+            sink['body']['filter'] = log_filter
+        if scope != 'project':
+            sink['body']['includeChildren'] = True
+            sink['uniqueWriterIdentity'] = True
+        return scope, sink
 
-    def ensure_log(self):
-        pass
+    def ensure_sink(self):
+        topic_info = self.pubsub.ensure_topic()
+        scope, sink_info = self.get_sink(topic_info)
+
+        client = self.session.client('logging', 'v1', '%s.sinks' % scope)
+
+        sink_path = '%s/sinks/%s' % (sink_info['parent'], sink_info['body']['name'])
+        try:
+            # todo, delta sink update on attribute change
+            client.execute_command('get', {'sinkName': sink_path})
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+        else:
+            return sink_path
+
+        client.execute_command('create', sink_info)
+        return sink_path
 
     def add(self, func):
-        pass
+        return self.ensure_sink()
 
     def remove(self, func):
-        pass
+        if not self.data['name'].startswith('custodian-auto'):
+            return
+        parent = self.get_parent(self.get_log())
+        client = self.session.client(
+            'logging', 'v1', '%s.sinks' % (parent.split('/', 1)[0]))
+        try:
+            client.execute_command(
+                'delete', {'sinkName': ''})
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+
+    def get_config(self):
+        return self.pubsub.get_config()
 
 
 class ApiSubscriber(EventSource):
-    """
-
-{
-  "name": string,
-  "destination": string,
-  "filter": string,
-  "outputVersionFormat": enum(VersionFormat),
-  "writerIdentity": string,
-  "includeChildren": boolean,
-  "startTime": string,
-  "endTime": string
-}
+    """Subscribe to individual api calls
     """
     # https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog
 
+    # scope - project
+    # api calls
+
+    def __init__(self, data, session):
+        self.data = data
+        self.session = session
+
+    def get_subscription(self, func):
+        log_name = "%s/%s/logs/cloudaudit.googleapis.com%2Factivity" % (
+            self.data.get('scope', 'project'),
+            self.session.get_default_project())
+        log_filter = 'logName = "%s"' % log_name
+        log_filter += " AND protoPayload.methodName = (%s)" % (
+            ' or '.join(['"%s"' % m for m in self.data['methods']]))
+        return {
+            'topic': 'custodian-auto-audit-%s' % func.name,
+            'name': 'custodian-auto-audit-%s' % func.name,
+            'log': log_name,
+            'filter': log_filter}
+
     def add(self, func):
+        return LogSubscriber(self.get_subscription(), self.session).add(func)
 
-        log_client = self.session.client(
-            'logging', 'v2', self.get_log_component())
-        topic_client = self.session.client(
-            'topic', 'v1', 'project.topics')
+    def remove(self, func):
+        return LogSubscriber(self.get_subscription(), self.session).remove(func)
 
-        sink_info = self.get_sink()
+    def get_config(self, func):
+        return LogSubscriber(self.get_subscription(), self.session).get_config(func)
 
-        # Ensure pub/sub topic exists
-        topic_data = topic_client.execute_command(
-            'get', 'projects/{}/topics/{}'.format(self.data))
-        topic = 'pubsub.googleapis.com/projects/{project_id}/topics/{topic_id}'
-
-        # Ensure api log exists
-
-        # Ensure log sink exists
-
-class ScheduledEvent(EventSource):
-    """External scheduled clock event."""
