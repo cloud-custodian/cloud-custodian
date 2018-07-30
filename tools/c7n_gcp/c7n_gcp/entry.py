@@ -14,6 +14,7 @@
 
 import logging
 
+import c7n_gcp.policy
 import c7n_gcp.resources.compute
 import c7n_gcp.resources.function
 import c7n_gcp.resources.gke
@@ -22,6 +23,7 @@ import c7n_gcp.resources.network
 import c7n_gcp.resources.pubsub
 import c7n_gcp.resources.resourcemanager
 import c7n_gcp.resources.storage  # noqa: F401
+
 
 logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
 

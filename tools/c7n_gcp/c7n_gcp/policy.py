@@ -13,13 +13,14 @@
 # limitations under the License.
 import logging
 
-from c7n.policy import execution
-from c7n.utils import type_schema
+from c7n.exceptions import PolicyValidationError
+from c7n.policy import execution, ServerlessExecutionMode
+from c7n.utils import local_session, type_schema
 
-from c7n_gcp.mu import CloudFunctionManager, PolicyFunction
+from c7n_gcp import mu
 
 
-class FunctionMode(object):
+class FunctionMode(ServerlessExecutionMode):
 
     schema = type_schema(
         'gcp-audit',
@@ -34,11 +35,6 @@ class FunctionMode(object):
     def __init__(self, policy):
         self.policy = policy
         self.log = logging.getLogger('custodian.gcp.funcexec')
-
-    def provision(self):
-        self.log.info("Provisioning policy function %s", self.policy.name)
-        manager = CloudFunctionManager(self.policy.session_factory)
-        return manager.publish(PolicyFunction(self.policy))
 
     def run(self):
         raise NotImplementedError("subclass responsibility")
@@ -66,6 +62,19 @@ class ApiAuditMode(FunctionMode):
             return
         resource = self.policy.resource_manager.get_resource(resource_info['labels'])
         return [resource]
+
+    def provision(self):
+        self.log.info("Provisioning policy function %s", self.policy.name)
+        manager = mu.CloudFunctionManager(self.policy.session_factory)
+        events = [mu.ApiSubscriber(
+            local_session(self.policy.session_factory),
+            {'methods': self.policy.data['mode']['methods']})]
+        return manager.publish(mu.PolicyFunction(self.policy, events=events))
+
+    def validate(self):
+        if not self.policy.data.get('mode', {}).get('methods', []):
+            raise PolicyValidationError(
+                "No api methods specified policy:%s" % self.policy.name)
 
     def run(self, event, context):
         """Execute a gcp serverless model"""

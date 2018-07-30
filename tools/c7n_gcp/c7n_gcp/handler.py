@@ -19,15 +19,16 @@ import uuid
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
-from c7n.resources import load_resources
+
+# Load resource plugins
+from c7n_gcp.entry import initialize_gcp
+
+initialize_gcp()
 
 log = logging.getLogger('custodian.gcp.functions')
 
-# Load resource plugins
-load_resources()
 
-
-def run(event, context):
+def run(event, context=None):
     # policies file should always be valid in functions so do loading naively
     with open('config.json') as f:
         policy_config = json.load(f)

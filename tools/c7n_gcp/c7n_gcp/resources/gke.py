@@ -15,7 +15,7 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-@resources.register('gke')
+@resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
 
     class resource_type(TypeInfo):

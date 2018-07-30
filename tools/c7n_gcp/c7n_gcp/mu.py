@@ -14,6 +14,7 @@
 
 # import base64
 from collections import namedtuple
+import json
 import logging
 import hashlib
 
@@ -36,7 +37,9 @@ def custodian_archive(packages=None):
     # but for pure python packages, if we have a local install and its
     # relatively small, it might be faster to just upload.
     #
-    requirements = packages and set(packages) or set()
+    requirements = set()
+    requirements.add('boto3')
+    requirements.add('botocore')
     requirements.add('retrying')
     requirements.add('ratelimiter>=1.2.0.post0')
     requirements.add('google-auth>=1.4.1')
@@ -51,7 +54,6 @@ def custodian_archive(packages=None):
     archive.add_contents(
         'requirements.txt',
         '\n'.join(sorted(requirements)))
-    archive.close()
 
     return archive
 
@@ -76,6 +78,10 @@ class CloudFunctionManager(object):
 
     def remove(self, func):
         project = self.session.get_default_project()
+
+        # delete event sources
+        for e in func.events:
+            e.remove(func)
         func_name = "projects/{}/locations/{}/functions/{}".format(
             project, self.region, func.name)
         try:
@@ -101,7 +107,16 @@ class CloudFunctionManager(object):
         if source_url:
             config['sourceUploadUrl'] = source_url
 
+        # todo - we'll really need before() and after() for pre-provisioning of
+        # resources (ie topic for function stream on create) and post provisioning (schedule
+        # invocation of extant function).
+        #
+        # convergent event source creation
+        for e in func.events:
+            e.add(func)
+
         if func_info is None:
+            log.info("creating function")
             response = self.client.execute_command(
                 'create', {
                     'location': "projects/{}/locations/{}".format(
@@ -112,14 +127,12 @@ class CloudFunctionManager(object):
             if not delta:
                 response = None
             else:
+                log.info("updating function config")
                 response = self.client.execute_command(
                     'patch', {
                         'name': func_name,
                         'body': config,
                         'updateMask': ','.join(delta)})
-        # converge event source creation
-        for e in func.events:
-            e.add(func)
         return response
 
     @staticmethod
@@ -173,7 +186,7 @@ class CloudFunctionManager(object):
             {'parent': 'projects/{}/locations/{}'.format(
                 self.session.get_default_project(),
                 region)}).get('uploadUrl')
-        log.info("function upload url %s", url)
+        log.info("function uploading %s", url)
         http = self._get_http_client(self.client)
         headers, response = http.request(
             url, method='PUT',
@@ -191,7 +204,7 @@ class CloudFunctionManager(object):
 
 class CloudFunction(object):
 
-    def __init__(self, func_data, archive):
+    def __init__(self, func_data, archive=None):
         self.func_data = func_data
         self.archive = archive
 
@@ -205,7 +218,7 @@ class CloudFunction(object):
 
     @property
     def memory_size(self):
-        return self.func_data.get('memory-size', 256)
+        return self.func_data.get('memory-size', 512)
 
     @property
     def runtime(self):
@@ -259,23 +272,54 @@ class CloudFunction(object):
         return conf
 
 
-
 PolicyHandlerTemplate = """\
-from c7n_gcp.handler import handler
+
+import traceback
+import os
 
 def run(event, context=None):
-    return handler.run(event, context)
+    paths = filter(None, os.environ.get('PYTHONPATH', '').split(':'))
+    for p in paths:
+        print("path: %s" % p)
+        print("packages: {}".format(' '.join(os.listdir(p))))
+
+    try:
+        from c7n_gcp.handler import run
+        return run(event, context)
+    except Exception as e:
+        traceback.print_exc()
+        raise
 """
 
 
 class PolicyFunction(CloudFunction):
 
+    def __init__(self, policy, archive=None, events=()):
+        self.policy = policy
+        self.func_data = self.policy.data['mode']
+        self.archive = archive or custodian_archive()
+        self._events = events
+
+    @property
+    def name(self):
+        return self.policy.name
+
+    @property
+    def events(self):
+        return self._events
+
     def get_archive(self):
-        self.archive.add_file('main.py', PolicyHandlerTemplate)
+        self.archive.add_contents('main.py', PolicyHandlerTemplate)
+        self.archive.add_contents(
+            'config.json', json.dumps(
+                {'policies': [self.policy.data]}, indent=2))
+        self.archive.close()
+        return self.archive
 
     def get_config(self):
-        config = super(CloudFunction, self).get_config()
+        config = super(PolicyFunction, self).get_config()
         config['entryPoint'] = 'run'
+        return config
 
 
 class EventSource(object):
@@ -325,7 +369,7 @@ class BucketEvent(EventSource):
 
 class PubSubSource(EventSource):
 
-    trigger = 'google.pubsub.topic.publish'
+    trigger = 'providers/cloud.pubsub/eventTypes/topic.publish'
     collection_id = 'pubsub.projects.topics'
 
     # data -> topic
@@ -334,25 +378,27 @@ class PubSubSource(EventSource):
         return {
             'eventTrigger': {
                 'eventType': self.trigger,
-                'resource': self.data['topic']}}
+                'resource': self.get_topic_param()}}
 
     def get_topic_param(self, topic=None, project=None):
-        return {'topic': 'projects/{}/topics/{}'.format(
+        return 'projects/{}/topics/{}'.format(
             project or self.session.get_default_project(),
-            topic or self.data['topic'])}
+            topic or self.data['topic'])
 
     def ensure_topic(self):
-        client = self.session.client('pubsub', 'v1', 'project.topics')
+        client = self.session.client('pubsub', 'v1', 'projects.topics')
         topic = self.get_topic_param()
         try:
-            client.execute_command('get', topic)
+            client.execute_command('get', {'topic': topic})
         except HttpError as e:
             if e.resp.status != 404:
                 raise
         else:
             return topic
 
-        client.execute_command('create', topic)
+        # bug in discovery doc.. apis say body must be empty but its required in the
+        # discovery api for create.
+        client.execute_command('create', {'name': topic, 'body': {}})
         return topic
 
     def add(self):
@@ -361,8 +407,8 @@ class PubSubSource(EventSource):
     def remove(self):
         if not self.data.get('topic').startswith('custodian-auto'):
             return
-        client = self.session.client('topic', 'v1', 'project.topics')
-        client.execute_command('delete', self.get_topic_param())
+        client = self.session.client('topic', 'v1', 'projects.topics')
+        client.execute_command('delete', {'topic': self.get_topic_param()})
 
 
 LogInfo = namedtuple('LogInfo', 'name scope_type scope_id id')
@@ -381,10 +427,10 @@ class LogSubscriber(EventSource):
     # optional scope, scope_id (if scope != default)
     # + pub sub
 
-    def __init__(self, data, session):
+    def __init__(self, session, data):
         self.data = data
         self.session = session
-        self.pubsub = PubSubSource(data, session)
+        self.pubsub = PubSubSource(session, data)
 
     def get_log(self):
         scope_type, scope_id, _, log_id = self.data['log'].split('/', 3)
@@ -397,10 +443,10 @@ class LogSubscriber(EventSource):
 
     def get_parent(self, log_info):
         if self.data.get('scope', 'log') == 'log':
-            if log_info != 'project':
+            if log_info.scope_type != 'projects':
                 raise ValueError("Invalid log subscriber scope")
-            parent = "%s/%s" % (log_info['scope_type'], log_info['scope_id'])
-        if self.data['scope'] == 'project':
+            parent = "%s/%s" % (log_info.scope_type, log_info.scope_id)
+        elif self.data['scope'] == 'project':
             parent = 'projects/{}'.format(
                 self.data.get('scope_id', self.session.get_default_project()))
         elif self.data['scope'] == 'organization':
@@ -426,13 +472,13 @@ class LogSubscriber(EventSource):
             # Sink body
             'body': {
                 'name': self.data['name'],
-                'destination': topic_info['topic']
+                'destination': "pubsub.googleapis.com/%s" % topic_info
             }
         }
 
         if log_filter is not None:
             sink['body']['filter'] = log_filter
-        if scope != 'project':
+        if scope != 'projects':
             sink['body']['includeChildren'] = True
             sink['uniqueWriterIdentity'] = True
         return scope, sink
@@ -441,8 +487,7 @@ class LogSubscriber(EventSource):
         topic_info = self.pubsub.ensure_topic()
         scope, sink_info = self.get_sink(topic_info)
 
-        client = self.session.client('logging', 'v1', '%s.sinks' % scope)
-
+        client = self.session.client('logging', 'v2', '%s.sinks' % scope)
         sink_path = '%s/sinks/%s' % (sink_info['parent'], sink_info['body']['name'])
         try:
             # todo, delta sink update on attribute change
@@ -464,7 +509,7 @@ class LogSubscriber(EventSource):
             return
         parent = self.get_parent(self.get_log())
         client = self.session.client(
-            'logging', 'v1', '%s.sinks' % (parent.split('/', 1)[0]))
+            'logging', 'v2', '%s.sinks' % (parent.split('/', 1)[0]))
         try:
             client.execute_command(
                 'delete', {'sinkName': ''})
@@ -472,8 +517,8 @@ class LogSubscriber(EventSource):
             if e.resp.status != 404:
                 raise
 
-    def get_config(self):
-        return self.pubsub.get_config()
+    def get_config(self, func):
+        return self.pubsub.get_config(func)
 
 
 class ApiSubscriber(EventSource):
@@ -484,17 +529,17 @@ class ApiSubscriber(EventSource):
     # scope - project
     # api calls
 
-    def __init__(self, data, session):
+    def __init__(self, session, data):
         self.data = data
         self.session = session
 
     def get_subscription(self, func):
-        log_name = "%s/%s/logs/cloudaudit.googleapis.com%2Factivity" % (
-            self.data.get('scope', 'project'),
+        log_name = "{}/{}/logs/cloudaudit.googleapis.com%2Factivity".format(
+            self.data.get('scope', 'projects'),
             self.session.get_default_project())
         log_filter = 'logName = "%s"' % log_name
         log_filter += " AND protoPayload.methodName = (%s)" % (
-            ' or '.join(['"%s"' % m for m in self.data['methods']]))
+            ' OR '.join(['"%s"' % m for m in self.data['methods']]))
         return {
             'topic': 'custodian-auto-audit-%s' % func.name,
             'name': 'custodian-auto-audit-%s' % func.name,
@@ -502,11 +547,10 @@ class ApiSubscriber(EventSource):
             'filter': log_filter}
 
     def add(self, func):
-        return LogSubscriber(self.get_subscription(), self.session).add(func)
+        return LogSubscriber(self.session, self.get_subscription(func)).add(func)
 
     def remove(self, func):
-        return LogSubscriber(self.get_subscription(), self.session).remove(func)
+        return LogSubscriber(self.session, self.get_subscription(func)).remove(func)
 
     def get_config(self, func):
-        return LogSubscriber(self.get_subscription(), self.session).get_config(func)
-
+        return LogSubscriber(self.session, self.get_subscription(func)).get_config(func)
