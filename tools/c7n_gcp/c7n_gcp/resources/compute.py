@@ -34,7 +34,7 @@ class Instance(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
-                'get', {'project_id': resource_info['project_id'],
+                'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
                         'resourceId': resource_info['instance_id']})
 
@@ -77,7 +77,7 @@ class Image(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
-                'get', {'project_id': resource_info['project_id'],
+                'get', {'project': resource_info['project_id'],
                         'resourceId': resource_info['image_id']})
 
 
@@ -94,6 +94,6 @@ class Disk(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
-                'get', {'project_id': resource_info['project_id'],
+                'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
                         'resourceId': resource_info['disk_id']})
