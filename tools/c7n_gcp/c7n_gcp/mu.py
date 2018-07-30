@@ -51,9 +51,10 @@ def custodian_archive(packages=None):
     requirements.add('google-cloud-monitoring>=0.3.0')
     requirements.add('google-cloud-logging>=1.6.0')
 
-    archive.add_contents(
-        'requirements.txt',
-        '\n'.join(sorted(requirements)))
+    requirements = []
+    #archive.add_contents(
+    #    'requirements.txt',
+    #    '\n'.join(sorted(requirements)))
 
     return archive
 
@@ -123,27 +124,18 @@ class CloudFunctionManager(object):
                         project, self.region),
                     'body': config})
         else:
-            delta = self.delta_function(func_info, config)
+            delta = delta_resource(func_info, config, ('httpsTrigger',))
             if not delta:
                 response = None
             else:
-                log.info("updating function config")
+                update_mask = ','.join(delta)
+                log.info("updating function config %s", update_mask)
                 response = self.client.execute_command(
                     'patch', {
                         'name': func_name,
                         'body': config,
-                        'updateMask': ','.join(delta)})
+                        'updateMask': update_mask})
         return response
-
-    @staticmethod
-    def delta_function(old_config, new_config):
-        found = []
-        for k in new_config:
-            if k in ('httpsTrigger',):
-                continue
-            if new_config[k] != old_config[k]:
-                found.append(k)
-        return found
 
     def metrics(self, funcs, start, end, period=5 * 60):
         """Get the metrics for a set of functions."""
@@ -175,6 +167,8 @@ class CloudFunctionManager(object):
         source_headers, _ = http.request(source_info['downloadUrl'], 'HEAD')
         # 'x-goog-hash': 'crc32c=tIfQ9A==, md5=DqrN06/NbVGsG+3CdrVK+Q=='
         deployed_checksum = source_headers['x-goog-hash'].split(',')[-1].split('=', 1)[-1]
+        log.info("archive checksum %r deployed checksum %r",
+                 checksum, deployed_checksum)
         return deployed_checksum != checksum
 
     def _upload(self, archive, region):
@@ -186,7 +180,7 @@ class CloudFunctionManager(object):
             {'parent': 'projects/{}/locations/{}'.format(
                 self.session.get_default_project(),
                 region)}).get('uploadUrl')
-        log.info("function uploading %s", url)
+        log.debug("uploading function code %s", url)
         http = self._get_http_client(self.client)
         headers, response = http.request(
             url, method='PUT',
@@ -197,9 +191,20 @@ class CloudFunctionManager(object):
             },
             body=open(archive.path)
         )
+        log.info("function code uploaded")
         if headers['status'] != '200':
             raise RuntimeError("%s\n%s" % (headers, response))
         return url
+
+
+def delta_resource(old_config, new_config, ignore=()):
+    found = []
+    for k in new_config:
+        if k in ignore:
+            continue
+        if new_config[k] != old_config[k]:
+            found.append(k)
+    return found
 
 
 class CloudFunction(object):
@@ -276,8 +281,17 @@ PolicyHandlerTemplate = """\
 
 import traceback
 import os
+import logging
+
+# Bug workaround on platform logging, else info shows as warning.
+info_handler = logging.StreamHandler(sys.stdout)
+info_handler.setLevel(logging.NOTSET)
+info_handler.addFilter(lambda record: record.levelno <= logging.INFO)
+logging.getLogger().addHandler(info_handler)
+
 
 def run(event, context=None):
+    logging.info("starting function execution")
     paths = filter(None, os.environ.get('PYTHONPATH', '').split(':'))
     for p in paths:
         print("path: %s" % p)
@@ -285,7 +299,9 @@ def run(event, context=None):
 
     try:
         from c7n_gcp.handler import run
-        return run(event, context)
+        result = run(event, context)
+        logging.info("function execution complete")
+        return result
     except Exception as e:
         traceback.print_exc()
         raise
@@ -378,6 +394,8 @@ class PubSubSource(EventSource):
         return {
             'eventTrigger': {
                 'eventType': self.trigger,
+                'failurePolicy': {},
+                'service': 'pubsub.googleapis.com',
                 'resource': self.get_topic_param()}}
 
     def get_topic_param(self, topic=None, project=None):
@@ -460,7 +478,7 @@ class LogSubscriber(EventSource):
                 'invalid log subscriber scope %s' % (self.data))
         return parent
 
-    def get_sink(self, topic_info):
+    def get_sink(self, topic_info=""):
         log_info = self.get_log()
         parent = self.get_parent(log_info)
         log_filter = self.get_log_filter()
@@ -481,21 +499,27 @@ class LogSubscriber(EventSource):
         if scope != 'projects':
             sink['body']['includeChildren'] = True
             sink['uniqueWriterIdentity'] = True
-        return scope, sink
+
+        sink_path = '%s/sinks/%s' % (sink['parent'], sink['body']['name'])
+
+        return scope, sink_path, sink
 
     def ensure_sink(self):
         topic_info = self.pubsub.ensure_topic()
-        scope, sink_info = self.get_sink(topic_info)
-
+        scope, sink_path, sink_info = self.get_sink(topic_info)
         client = self.session.client('logging', 'v2', '%s.sinks' % scope)
-        sink_path = '%s/sinks/%s' % (sink_info['parent'], sink_info['body']['name'])
         try:
-            # todo, delta sink update on attribute change
-            client.execute_command('get', {'sinkName': sink_path})
+            sink = client.execute_command('get', {'sinkName': sink_path})
         except HttpError as e:
             if e.resp.status != 404:
                 raise
         else:
+            delta = delta_resource(sink, sink_info['body'])
+            if delta:
+                sink_info['updateMask'] = ','.join(delta)
+                sink_info['sinkName'] = sink_path
+                sink_info.pop('parent')
+                client.execute_command('update', sink_info)
             return sink_path
 
         client.execute_command('create', sink_info)
@@ -508,11 +532,12 @@ class LogSubscriber(EventSource):
         if not self.data['name'].startswith('custodian-auto'):
             return
         parent = self.get_parent(self.get_log())
+        _, sink_path, _ = self.get_sink()
         client = self.session.client(
             'logging', 'v2', '%s.sinks' % (parent.split('/', 1)[0]))
         try:
             client.execute_command(
-                'delete', {'sinkName': ''})
+                'delete', {'sinkName': sink_path})
         except HttpError as e:
             if e.resp.status != 404:
                 raise

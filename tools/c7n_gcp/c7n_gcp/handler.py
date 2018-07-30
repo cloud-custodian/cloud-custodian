@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import uuid
+import sys
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
@@ -26,6 +27,8 @@ from c7n_gcp.entry import initialize_gcp
 initialize_gcp()
 
 log = logging.getLogger('custodian.gcp.functions')
+
+logging.getLogger().setLevel(logging.INFO)
 
 
 def run(event, context=None):

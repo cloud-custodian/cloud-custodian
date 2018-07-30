@@ -33,10 +33,13 @@ class Instance(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
+            # The api docs for compute instance get are wrong,
+            # they spell instance as resourceId
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
-                        'resourceId': resource_info['instance_id']})
+                        'instance': resource_info[
+                            'resourceName'].rsplit('/', 1)[-1]})
 
 
 class InstanceAction(MethodAction):

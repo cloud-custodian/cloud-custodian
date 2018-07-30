@@ -41,9 +41,9 @@ class FunctionMode(ServerlessExecutionMode):
 
     def validate(self):
         pass
-    
 
-@execution.register('gcp-audit')    
+
+@execution.register('gcp-audit')
 class ApiAuditMode(FunctionMode):
     """Custodian policy execution on gcp api audit logs
     """
@@ -51,8 +51,9 @@ class ApiAuditMode(FunctionMode):
     schema = type_schema(
         'gcp-audit',
         methods={'type': 'array', 'items': {'type': 'string'}},
+        required=['methods'],
         rinherit=FunctionMode.schema)
-    
+
     def resolve_resources(self, event):
         """Resolve a gcp resource from its audit trail metadata.
         """
@@ -60,6 +61,10 @@ class ApiAuditMode(FunctionMode):
         if resource_info is None or 'labels' not in resource_info:
             self.policy.log.warning("Could not find resource information in event")
             return
+        # copy resource name, the api doesn't like resource ids, just names.
+        if 'resourceName' in event['protoPayload']:
+            resource_info['labels']['resourceName'] = event['protoPayload']['resourceName']
+
         resource = self.policy.resource_manager.get_resource(resource_info['labels'])
         return [resource]
 
@@ -72,9 +77,10 @@ class ApiAuditMode(FunctionMode):
         return manager.publish(mu.PolicyFunction(self.policy, events=events))
 
     def validate(self):
-        if not self.policy.data.get('mode', {}).get('methods', []):
+        if not self.policy.resource_manager.resource_type.get:
             raise PolicyValidationError(
-                "No api methods specified policy:%s" % self.policy.name)
+                "Resource:%s does not implement retrieval method" % (
+                    self.policy.resource_type))
 
     def run(self, event, context):
         """Execute a gcp serverless model"""
@@ -90,11 +96,8 @@ class ApiAuditMode(FunctionMode):
 
         if not resources:
             return
-        
+
         for action in self.policy.resource_manager.actions:
-            results = action.process(resources)
+            action.process(resources)
 
         return resources
-
-        
-
