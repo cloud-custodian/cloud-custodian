@@ -51,11 +51,9 @@ def custodian_archive(packages=None):
     requirements.add('google-cloud-monitoring>=0.3.0')
     requirements.add('google-cloud-logging>=1.6.0')
 
-    requirements = []
-    #archive.add_contents(
-    #    'requirements.txt',
-    #    '\n'.join(sorted(requirements)))
-
+    archive.add_contents(
+        'requirements.txt',
+        '\n'.join(sorted(requirements)))
     return archive
 
 
