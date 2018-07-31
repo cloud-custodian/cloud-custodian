@@ -54,4 +54,4 @@ class FunctionAppUtilities(object):
         #: :type: azure.mgmt.applicationinsights.ApplicationInsightsManagementClient
         insights_client = self.local_session.client('azure.mgmt.applicationinsights.ApplicationInsightsManagementClient')
         app_insights = insights_client.components.get(resource_group_name, application_insights_name)
-        return app_insights.id
+        return app_insights.instrumentation_key
