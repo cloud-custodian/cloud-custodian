@@ -25,7 +25,7 @@ class FunctionAppUtilities(object):
         site_config.always_on = True
 
         con_string = self.get_storage_connection_string(group_name, storage_account_name)
-        app_insights_key = self.get_application_insights_key(group_name, storage_account_name)
+        app_insights_key = self.get_application_insights_key(group_name, app_name)
         site_config.app_settings.append(NameValuePair('AzureWebJobsStorage', con_string))
         site_config.app_settings.append(NameValuePair('AzureWebJobsDashboard', con_string))
         site_config.app_settings.append(NameValuePair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))

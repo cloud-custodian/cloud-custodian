@@ -108,7 +108,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                      '-' +
                      data['name']).replace(' ', '-').lower(),
 
-            'storageName': data['mode']['provision-options']['servicePlanName']
+            'storageName': (data['mode']['provision-options']['servicePlanName']).replace('-', '').lower()
         }
 
         if 'mode' in data:
