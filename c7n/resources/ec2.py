@@ -1183,6 +1183,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 if i.get('c7n:matched-security-groups'):
                     eni['c7n:matched-security-groups'] = i[
                         'c7n:matched-security-groups']
+                if i.get('c7n:NetworkLocation'):
+                    eni['c7n:NetworkLocation'] = i[
+                        'c7n:NetworkLocation']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
