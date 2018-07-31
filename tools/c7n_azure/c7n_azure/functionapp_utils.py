@@ -25,9 +25,10 @@ class FunctionAppUtilities(object):
         site_config.always_on = True
 
         con_string = self.get_storage_connection_string(group_name, storage_account_name)
-
+        app_insights_key = self.get_application_insights_key(group_name, storage_account_name)
         site_config.app_settings.append(NameValuePair('AzureWebJobsStorage', con_string))
         site_config.app_settings.append(NameValuePair('AzureWebJobsDashboard', con_string))
+        site_config.app_settings.append(NameValuePair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
         site_config.app_settings.append(NameValuePair('FUNCTIONS_EXTENSION_VERSION', 'beta'))
         site_config.app_settings.append(NameValuePair('FUNCTIONS_WORKER_RUNTIME', 'python'))
 
@@ -42,10 +43,15 @@ class FunctionAppUtilities(object):
         obj = storage_client.storage_accounts.list_keys(resource_group_name,
                                                         storage_account_name)
 
-        connection_string = 'DefaultEndpointsProtocol={};EndpointSuffix={};AccountName={};AccountKey={}'.format(
+        connection_string = 'DefaultEndpointsProtocol={};AccountName={};AccountKey={}'.format(
             'https',
-            '2015-05-01-preview',
             storage_account_name,
             obj.keys[0].value)
 
         return connection_string
+
+    def get_application_insights_key(self, resource_group_name, application_insights_name):
+        #: :type: azure.mgmt.applicationinsights.ApplicationInsightsManagementClient
+        insights_client = self.local_session.client('azure.mgmt.applicationinsights.ApplicationInsightsManagementClient')
+        app_insights = insights_client.components.get(resource_group_name, application_insights_name)
+        return app_insights.id
