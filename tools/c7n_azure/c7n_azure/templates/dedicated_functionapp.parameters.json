@@ -27,10 +27,10 @@
             "value": "B1"
         },
         "dockerVersion": {
-            "value": ""
+            "value": "DOCKER|microsoft/azure-functions-python3.6:v2.0.11933-alpha"
         },
         "functionsExtVersion": {
-            "value": ""
+            "value": "beta"
         }
     }
 }
