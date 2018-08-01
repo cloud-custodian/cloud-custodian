@@ -15,11 +15,10 @@
 import json
 import logging
 
-from azure.mgmt.web.models import (Site, SiteConfig, NameValuePair)
 from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.session import Session
 from c7n_azure.template_utils import TemplateUtilities
-from c7n_azure.functionapp_utils import FunctionAppUtilities
 
 from c7n import utils
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
@@ -67,7 +66,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
         webapp_name = parameters['name']['value']
         policy_name = self.policy.data['name'].replace(' ', '-').lower()
 
-        existing_service_plan = self.client.app_service_plans.get(group_name, parameters['servicePlanName']['value'])
+        existing_service_plan = self.client.app_service_plans.get(
+            group_name, parameters['servicePlanName']['value'])
 
         if not existing_service_plan:
             template_util.create_resource_group(
@@ -108,7 +108,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
                      '-' +
                      data['name']).replace(' ', '-').lower(),
 
-            'storageName': (data['mode']['provision-options']['servicePlanName']).replace('-', '').lower()
+            'storageName': (data['mode']['provision-options']['servicePlanName']
+                            ).replace('-', '').lower()
         }
 
         if 'mode' in data:
