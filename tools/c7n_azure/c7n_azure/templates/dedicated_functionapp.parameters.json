@@ -18,13 +18,13 @@
             "value": "cloud-custodian"
         },
         "sku": {
-            "value": "STANDARD"
+            "value": "Basic"
         },
         "workerSize": {
             "value": "0"
         },
         "skuCode": {
-            "value": "S1"
+            "value": "B1"
         },
         "dockerVersion": {
             "value": ""

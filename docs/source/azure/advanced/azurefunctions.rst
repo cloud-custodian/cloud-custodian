@@ -35,8 +35,8 @@ keys:
 - location (default: West US 2)
 - appInsightsLocation (default: West US 2)
 - servicePlanName (default: cloud-custodian)
-- sku (default: Standard)
-- skuCode (default: S1)
+- sku (default: Basic)
+- skuCode (default: B1)
 - workerSize (default: 0)
 
 The location allows you to choose the region to deploy the resource group and resources that will be
@@ -78,7 +78,7 @@ An example on how to set size and location as well:
               location: East US
               appInsightsLocation: East US
               sku: Standard
-              skuCode: S2
+              skuCode: S1
          resource: azure.vm
          filters:
           - type: instance-view
