@@ -19,6 +19,7 @@ from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.session import Session
 from c7n_azure.template_utils import TemplateUtilities
+from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
 
 from c7n import utils
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
@@ -109,7 +110,9 @@ class AzureFunctionMode(ServerlessExecutionMode):
                      data['name']).replace(' ', '-').lower(),
 
             'storageName': (data['mode']['provision-options']['servicePlanName']
-                            ).replace('-', '').lower()
+                            ).replace('-', '').lower(),
+            'dockerVersion': CONST_DOCKER_VERSION,
+            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION
         }
 
         if 'mode' in data:

@@ -25,6 +25,12 @@
         },
         "skuCode": {
             "value": "S1"
+        },
+        "dockerVersion": {
+            "value": ""
+        },
+        "functionsExtVersion": {
+            "value": ""
         }
     }
 }

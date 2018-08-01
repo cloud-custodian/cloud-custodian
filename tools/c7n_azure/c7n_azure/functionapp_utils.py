@@ -2,6 +2,7 @@ import logging
 
 from azure.mgmt.web.models import (Site, SiteConfig, NameValuePair)
 from c7n_azure.session import Session
+from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
 
 from c7n.utils import local_session
 
@@ -21,7 +22,7 @@ class FunctionAppUtilities(object):
         functionapp_def.kind = 'functionapp,linux'
         functionapp_def.server_farm_id = service_plan.id
 
-        site_config.linux_fx_version = 'DOCKER|microsoft/azure-functions-python3.6:latest'
+        site_config.linux_fx_version = CONST_DOCKER_VERSION
         site_config.always_on = True
 
         app_insights_key = self.get_application_insights_key(group_name,
@@ -34,7 +35,8 @@ class FunctionAppUtilities(object):
         con_string = self.get_storage_connection_string(group_name, storage_account_name)
         site_config.app_settings.append(NameValuePair('AzureWebJobsStorage', con_string))
         site_config.app_settings.append(NameValuePair('AzureWebJobsDashboard', con_string))
-        site_config.app_settings.append(NameValuePair('FUNCTIONS_EXTENSION_VERSION', 'beta'))
+        site_config.app_settings.append(NameValuePair('FUNCTIONS_EXTENSION_VERSION',
+                                                      CONST_FUNCTIONS_EXT_VERSION))
         site_config.app_settings.append(NameValuePair('FUNCTIONS_WORKER_RUNTIME', 'python'))
 
         #: :type: azure.mgmt.web.WebSiteManagementClient
