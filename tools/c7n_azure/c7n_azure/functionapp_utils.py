@@ -24,7 +24,8 @@ class FunctionAppUtilities(object):
         site_config.linux_fx_version = 'DOCKER|microsoft/azure-functions-python3.6:latest'
         site_config.always_on = True
 
-        app_insights_key = self.get_application_insights_key(group_name, app_name)
+        app_insights_key = self.get_application_insights_key(group_name,
+                                                             service_plan.app_service_plan_name)
 
         if app_insights_key:
             site_config.app_settings.append(
@@ -59,9 +60,10 @@ class FunctionAppUtilities(object):
         insights_client = self.local_session.client(
             'azure.mgmt.applicationinsights.ApplicationInsightsManagementClient')
 
-        app_insights = insights_client.components.get(resource_group_name,
+        try:
+            app_insights = insights_client.components.get(resource_group_name,
                                                       application_insights_name)
-        if app_insights:
             return app_insights.instrumentation_key
 
-        return False
+        except Exception:
+            return False
