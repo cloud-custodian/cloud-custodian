@@ -108,8 +108,6 @@ they are not returned in this filter.
 
     policies:
         - name: role-definition-permissions
-          description: |
-            Adds a tag to all virtual machines
           resource: azure.roledefinition
           filters:
             - type: value
