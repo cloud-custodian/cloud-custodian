@@ -32,27 +32,30 @@ from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
 
 
-def update_resource_tags(self, resource, tags):
+def update_resource_tags(tag_action, resource, tags):
+    # get session and client
+    session = utils.local_session(tag_action.manager.session_factory)
+    client = tag_action.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     # resource group type
-    if self.manager.type == 'resourcegroup':
+    if tag_action.manager.type == 'resourcegroup':
         params_patch = ResourceGroupPatchable(
             tags=tags
         )
-        self.client.resource_groups.update(
+        client.resource_groups.update(
             resource['name'],
             params_patch,
         )
     # other Azure resources
     else:
-        if self.manager.type == 'armresource':
+        if tag_action.manager.type == 'armresource':
             raise NotImplementedError('Cannot tag generic ARM resources.')
 
         az_resource = GenericResource.deserialize(resource)
-        api_version = self.session.resource_api_version(az_resource.id)
+        api_version = session.resource_api_version(az_resource.id)
         az_resource.tags = tags
 
-        self.client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+        client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
 
 
 class Tag(BaseAction):
@@ -82,8 +85,6 @@ class Tag(BaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Tag, self).__init__(data, manager, log_dir)
-        self.session = utils.local_session(self.manager.session_factory)
-        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     def validate(self):
         if not self.data.get('tags') and not (self.data.get('tag') and self.data.get('value')):
@@ -132,8 +133,6 @@ class RemoveTag(BaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(RemoveTag, self).__init__(data, manager, log_dir)
-        self.session = utils.local_session(self.manager.session_factory)
-        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     def validate(self):
         if not self.data.get('tags'):
@@ -188,9 +187,6 @@ class AutoTagUser(BaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
-        delta_days = self.data.get('days', self.max_query_days)
-        self.start_time = utcnow() - datetime.timedelta(days=delta_days)
-        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
         self.tag_action = self.manager.action_registry.get('tag')
 
     def validate(self):
@@ -217,11 +213,17 @@ class AutoTagUser(BaseAction):
 
         user = self.default_user
 
+        # Calculate start time
+        delta_days = self.data.get('days', self.max_query_days)
+        start_time = utcnow() - datetime.timedelta(days=delta_days)
+
+        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+
         # resource group type
         if self.manager.type == 'resourcegroup':
             resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
             query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % self.start_time,
+                "eventTimestamp ge '%s'" % start_time,
                 "resourceGroupName eq '%s'" % resource['name'],
                 "eventChannels eq 'Operation'"
             ])
@@ -229,13 +231,13 @@ class AutoTagUser(BaseAction):
         else:
             resource_type = resource['type']
             query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % self.start_time,
+                "eventTimestamp ge '%s'" % start_time,
                 "resourceUri eq '%s'" % resource['id'],
                 "eventChannels eq 'Operation'"
             ])
 
         # fetch activity logs
-        logs = self.client.activity_logs.list(
+        logs = client.activity_logs.list(
             filter=query_filter,
             select=self.query_select
         )
@@ -343,7 +345,7 @@ class TagTrim(BaseAction):
         if self.space:
             # Free up slots to fit
             remove = len(candidates) - (
-                self.max_tag_count - (self.space + len(tags_to_preserve)))
+                    self.max_tag_count - (self.space + len(tags_to_preserve)))
             candidates = list(sorted(candidates))[:remove]
 
         if not candidates:
@@ -355,7 +357,6 @@ class TagTrim(BaseAction):
 
 
 class Notify(BaseNotify):
-
     batch_size = 50
 
     schema = {
@@ -456,8 +457,6 @@ class TagDelayedAction(BaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(TagDelayedAction, self).__init__(data, manager, log_dir)
-        self.session = utils.local_session(self.manager.session_factory)
-        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     def validate(self):
         op = self.data.get('op')
@@ -521,7 +520,6 @@ class TagDelayedAction(BaseAction):
 
 
 class DeleteAction(BaseAction):
-
     schema = type_schema('delete')
 
     def process(self, resources):
@@ -530,4 +528,4 @@ class DeleteAction(BaseAction):
         client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
         for resource in resources:
             client.resources.delete_by_id(resource['id'],
-                session.resource_api_version(resource['id']))
+                                          session.resource_api_version(resource['id']))
