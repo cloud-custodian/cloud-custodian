@@ -16,7 +16,6 @@ import json
 import logging
 import os
 import uuid
-import sys
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
@@ -65,4 +64,3 @@ def get_tmp_output_dir():
         except OSError as error:
             log.warning("Unable to make output directory: {}".format(error))
     return output_dir
-    

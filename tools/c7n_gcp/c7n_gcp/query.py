@@ -183,7 +183,7 @@ class TypeInfo(object):
     version = None
     component = None
 
-    ## resource enumeration parameters
+    # resource enumeration parameters
 
     scope = 'project'
     enum_spec = ('list', 'items[]', None)
