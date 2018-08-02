@@ -33,7 +33,7 @@ class FunctionAppUtilsTest(BaseTest):
         parameters = template_util.get_default_parameters(
             'dedicated_functionapp.test.parameters.json')
         template_util.deploy_resource_template(CONST_GROUP_NAME, template_file,
-                                                    parameters).wait()
+                                               parameters).wait()
 
     @classmethod
     def tearDownClass(cls):
@@ -52,7 +52,8 @@ class FunctionAppUtilsTest(BaseTest):
             'dedicated_functionapp.test.parameters.json')
 
         storage_name = parameters['storageName']['value']
-        conn_string = self.functionapp_util.get_storage_connection_string(CONST_GROUP_NAME, storage_name)
+        conn_string = self.functionapp_util.get_storage_connection_string(
+            CONST_GROUP_NAME, storage_name)
 
         self.assertIn('AccountName=%s;' % storage_name, conn_string)
 
@@ -62,13 +63,15 @@ class FunctionAppUtilsTest(BaseTest):
             'dedicated_functionapp.test.parameters.json')
 
         app_insights_name = parameters['servicePlanName']['value']
-        key = self.functionapp_util.get_application_insights_key(CONST_GROUP_NAME, app_insights_name)
+        key = self.functionapp_util.get_application_insights_key(
+            CONST_GROUP_NAME, app_insights_name)
 
         self.assertIsNotNone(key)
 
     def test_get_application_insights_key_not_exists(self):
         app_insights_name = 'does-not-exist'
-        key = self.functionapp_util.get_application_insights_key(CONST_GROUP_NAME, app_insights_name)
+        key = self.functionapp_util.get_application_insights_key(
+            CONST_GROUP_NAME, app_insights_name)
 
         self.assertFalse(key)
 
