@@ -38,7 +38,8 @@ class TestFunctionAppUtils(BaseTest):
         template_file = 'dedicated_functionapp.json'
         parameters = self.template_util.get_default_parameters(
             'dedicated_functionapp.test.parameters.json')
-        self.template_util.deploy_resource_template(CONST_GROUP_NAME, template_file, parameters).wait()
+        self.template_util.deploy_resource_template(CONST_GROUP_NAME, template_file,
+                                                    parameters).wait()
 
         resources = client.resources.list_by_resource_group(CONST_GROUP_NAME)
         self.assertIsNotNone(resources)
@@ -49,7 +50,10 @@ class TestFunctionAppUtils(BaseTest):
 
         self.assertIsNotNone(service_plan)
         webapp_name = 'test-deploy-webapp'
-        self.functionapp_util.deploy_webapp(webapp_name, CONST_GROUP_NAME, service_plan, parameters['storageName']['value'])
+        self.functionapp_util.deploy_webapp(webapp_name,
+                                            CONST_GROUP_NAME,
+                                            service_plan,
+                                            parameters['storageName']['value'])
 
         wep_app = web_client.web_apps.get(CONST_GROUP_NAME, webapp_name)
 
