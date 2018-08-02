@@ -53,7 +53,7 @@ setup(
                       "c7n",
                       "requests",
                       "azure-cli-core<=2.0.40",
-                      "adal~=0.5.0",
+                      "adal~=1.0.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
 
