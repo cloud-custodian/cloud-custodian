@@ -17,7 +17,7 @@ from azure_common import BaseTest, arm_template
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.session import Session
 
-CONST_GROUP_NAME = 'cloud-custodian-test'
+CONST_GROUP_NAME = 'test_functionapp-reqs'
 
 
 class FunctionAppUtilsTest(BaseTest):

@@ -33,7 +33,7 @@
             "type": "microsoft.insights/components",
             "location": "westus2",
             "tags": {
-                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', cloud-custodian-test)]": "Resource"
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', 'cloud-custodian-test')]": "Resource"
             },
             "properties": {
                 "ApplicationId": "cloud-custodian-test",
