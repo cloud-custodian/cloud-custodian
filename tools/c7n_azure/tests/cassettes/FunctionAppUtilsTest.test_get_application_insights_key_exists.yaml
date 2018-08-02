@@ -1,0 +1,46 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.4 msrest_azure/0.4.34 azure-mgmt-applicationinsights/0.1.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR8Xs
+        o0cf3W3Wk2ZaF6u2qJbN3Sx7ePDwwf5k+/5sL9venz082M4eHGTb9w72zu892L0/23mQ363zplrX
+        0/zzulqvmrvTslrPtqfrpq1mRbbcbvOmvbuqq8tiltfN3UUxraumOm/HxbIpLuYtvVEtVtUyX+LX
+        yMsfjT5aZoucsBv4tr1e4duNkKlZWU0zDIuaXtGL62aPPmyzi+ajR7/4o3kxm+XL7bJYvn1092ed
+        CF9YVL+bT+42BX0dfYVQfaWAP/olo4/eFktM0lU+IcxzQp3++H0/2pnt7Nzf25lt79Dj/XN/8um9
+        /QezjH7f+X0/ojeo/1Vet0XOI/7JvKbXL0GE49WqLIQ4Z+ggigo346/PD3Yns4PJp9s7u5/ube/n
+        5w+3D+5Pz7cPJg/u7WazezsH9w6kuYH6+7+RKRLMn5XVlX6yXJfliMb4i9bUxe//Wkb66KOzSfGD
+        jEhDIE7ftTlNZ7U8qfOszen1s2XT1usFzSrD/r3ya3pjku2cn+c70+2Dgwf3t/enn+5sT2js23vn
+        B9n5zmR3cnD/Ib37YiMjcRcE8ik6evTR3s7uwfYO/W/vze7Bo537j3b3x/ce7N+jLj7Z2Xm0s0Ov
+        vMymb7OLHHSRsbzJl9myxd8f3YZxCMS3q+nb/JqGipcEiP3oTfU2J4aVT2n+LguQolhevKbBA8fX
+        6+k0z2f5jAC9zhZE8eXFy5yoSNS5oAby5glGuvgib+ti2ny5avPZ2dJNwC/5Jf8P+jIubv4DAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Thu, 02 Aug 2018 18:15:55 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-IIS/8.5]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Powered-By: [ASP.NET]
+      x-ms-correlation-request-id: [c54d8537-4203-4d42-91af-a8d075541d8a]
+      x-ms-ratelimit-remaining-subscription-reads: ['11999']
+      x-ms-request-id: [18bef8d4-9680-11e8-b413-8c8590ced288]
+      x-ms-routing-request-id: ['WESTUS2:20180802T181555Z:c54d8537-4203-4d42-91af-a8d075541d8a']
+    status: {code: 200, message: OK}
+version: 1

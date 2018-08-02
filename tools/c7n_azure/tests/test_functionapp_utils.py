@@ -20,34 +20,68 @@ from c7n_azure.template_utils import TemplateUtilities
 
 CONST_GROUP_NAME = 'cloud-custodian-test'
 
-class TestFunctionAppUtils(BaseTest):
+
+class FunctionAppUtilsTest(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        super(FunctionAppUtilsTest, cls).setUpClass()
+        template_util = TemplateUtilities()
+
+        template_util.create_resource_group(CONST_GROUP_NAME, {'location': 'West US 2'})
+
+        template_file = 'dedicated_functionapp.json'
+        parameters = template_util.get_default_parameters(
+            'dedicated_functionapp.test.parameters.json')
+        template_util.deploy_resource_template(CONST_GROUP_NAME, template_file,
+                                                    parameters).wait()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(FunctionAppUtilsTest, cls).tearDownClass()
+        s = Session()
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+        client.resource_groups.delete(CONST_GROUP_NAME)
+
     def setUp(self):
-        super(TestFunctionAppUtils, self).setUp()
-        self.template_util = TemplateUtilities()
+        super(FunctionAppUtilsTest, self).setUp()
         self.functionapp_util = FunctionAppUtilities()
+
+    def test_get_storage_connection_string(self):
+        template_util = TemplateUtilities()
+        parameters = template_util.get_default_parameters(
+            'dedicated_functionapp.test.parameters.json')
+
+        storage_name = parameters['storageName']['value']
+        conn_string = self.functionapp_util.get_storage_connection_string(CONST_GROUP_NAME, storage_name)
+
+        self.assertIn('AccountName=%s;' % storage_name, conn_string)
+
+    def test_get_application_insights_key_exists(self):
+        template_util = TemplateUtilities()
+        parameters = template_util.get_default_parameters(
+            'dedicated_functionapp.test.parameters.json')
+
+        app_insights_name = parameters['servicePlanName']['value']
+        key = self.functionapp_util.get_application_insights_key(CONST_GROUP_NAME, app_insights_name)
+
+        self.assertIsNotNone(key)
+
+    def test_get_application_insights_key_not_exists(self):
+        app_insights_name = 'does-not-exist'
+        key = self.functionapp_util.get_application_insights_key(CONST_GROUP_NAME, app_insights_name)
+
+        self.assertFalse(key)
 
     def test_deploy_webapp(self):
         s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-
-        self.template_util.create_resource_group(CONST_GROUP_NAME, {'location': 'West US 2'})
-        resource_group = client.resource_groups.get(CONST_GROUP_NAME)
-
-        self.assertIsNotNone(resource_group)
-
-        template_file = 'dedicated_functionapp.json'
-        parameters = self.template_util.get_default_parameters(
-            'dedicated_functionapp.test.parameters.json')
-        self.template_util.deploy_resource_template(CONST_GROUP_NAME, template_file,
-                                                    parameters).wait()
-
-        resources = client.resources.list_by_resource_group(CONST_GROUP_NAME)
-        self.assertIsNotNone(resources)
-
         web_client = s.client('azure.mgmt.web.WebSiteManagementClient')
+
+        template_util = TemplateUtilities()
+        parameters = template_util.get_default_parameters(
+            'dedicated_functionapp.test.parameters.json')
+
         service_plan = web_client.app_service_plans.get(
             CONST_GROUP_NAME, parameters['servicePlanName']['value'])
-
         self.assertIsNotNone(service_plan)
         webapp_name = 'test-deploy-webapp'
         self.functionapp_util.deploy_webapp(webapp_name,
@@ -56,6 +90,4 @@ class TestFunctionAppUtils(BaseTest):
                                             parameters['storageName']['value'])
 
         wep_app = web_client.web_apps.get(CONST_GROUP_NAME, webapp_name)
-
         self.assertIsNotNone(wep_app)
-        client.resource_groups.delete(CONST_GROUP_NAME)
