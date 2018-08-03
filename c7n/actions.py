@@ -168,8 +168,9 @@ class ModifyVpcSecurityGroupsAction(Action):
     """Common actions for modifying security groups on a resource
 
     Can target either physical groups as a list of group ids or
-    symbolic groups like 'matched' or 'all'. 'matched' uses
-    the annotations of the 'security-group' interface filter.
+    symbolic groups like 'matched', 'network-location' or 'all'. 'matched' uses
+    the annotations of the 'security-group' interface filter. 'network-location' uses
+    the annotations of the 'network-location' interface filter for `SecurityGroupMismatch`.
 
     Note an interface always gets at least one security group, so
     we mandate the specification of an isolation/quarantine group
@@ -177,7 +178,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
     type: modify-security-groups
         add: []
-        remove: [] | matched
+        remove: [] | matched | network-location
         isolation-group: sg-xyz
     """
     schema = {
@@ -194,7 +195,7 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}},
                 {'enum': [
-                    'matched', 'all',
+                    'matched', 'network-location', 'all',
                     {'type': 'string', 'pattern': '^sg-*'}]}]},
             'isolation-group': {'oneOf': [
                 {'type': 'string', 'pattern': '^sg-*'},
@@ -276,6 +277,10 @@ class ModifyVpcSecurityGroupsAction(Action):
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
                 remove_groups = r.get('c7n:matched-security-groups', ())
+            elif remove_target_group_ids == 'network-location':
+                for reason in r.get('c7n:NetworkLocation', ()):
+                    if reason['reason'] == 'SecurityGroupMismatch':
+                        remove_groups = list(reason['security-groups'])
             elif remove_target_group_ids == 'all':
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
