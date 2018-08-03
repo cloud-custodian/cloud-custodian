@@ -38,8 +38,11 @@ def custodian_archive(packages=None):
     # relatively small, it might be faster to just upload.
     #
     requirements = set()
+
+    # we need to drop these two as hard deps ~ 25mb of downloads
     requirements.add('boto3')
     requirements.add('botocore')
+
     requirements.add('retrying')
     requirements.add('ratelimiter>=1.2.0.post0')
     requirements.add('google-auth>=1.4.1')
@@ -402,6 +405,10 @@ class PubSubSource(EventSource):
             topic or self.data['topic'])
 
     def ensure_topic(self):
+        """Verify the pub/sub topic exists.
+
+        Returns the topic qualified name.
+        """
         client = self.session.client('pubsub', 'v1', 'projects.topics')
         topic = self.get_topic_param()
         try:
@@ -416,6 +423,28 @@ class PubSubSource(EventSource):
         # discovery api for create.
         client.execute_command('create', {'name': topic, 'body': {}})
         return topic
+
+    def ensure_iam(self, publisher=None):
+        """Ensure the given identities are in the iam role bindings for the topic.
+        """
+        topic = self.get_topic_param()
+        client = self.session.client('pubsub', 'v1', 'project.topics')
+        policy = client.execute_command('getIamPolicy', {'resource': topic})
+        found = False
+        for binding in policy.get('bindings', {}):
+            if binding['role'] != 'roles/pubsub.publisher':
+                continue
+            if publisher in binding['members']:
+                return
+            found = binding
+
+        if found is None:
+            policy.setdefault(
+                'bindings', {'members': [publisher], 'role': 'roles/pubsub.publisher'})
+        else:
+            found['members'].append(publisher)
+
+        client.execute_command('setIamPolicy', {'resource': topic, 'body': policy})
 
     def add(self):
         self.ensure_topic()
@@ -511,16 +540,17 @@ class LogSubscriber(EventSource):
         except HttpError as e:
             if e.resp.status != 404:
                 raise
+            sink = client.execute_command('create', sink_info)
         else:
             delta = delta_resource(sink, sink_info['body'])
             if delta:
                 sink_info['updateMask'] = ','.join(delta)
                 sink_info['sinkName'] = sink_path
                 sink_info.pop('parent')
-                client.execute_command('update', sink_info)
-            return sink_path
-
-        client.execute_command('create', sink_info)
+                sink = client.execute_command('update', sink_info)
+            else:
+                return sink_path
+        self.pubsub.ensure_iam(publisher=sink['writerIdentity'])
         return sink_path
 
     def add(self, func):
@@ -546,6 +576,8 @@ class LogSubscriber(EventSource):
 
 class ApiSubscriber(EventSource):
     """Subscribe to individual api calls
+
+    via audit log -> filtered sink -> pub/sub topic -> cloud function.
     """
     # https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog
 
