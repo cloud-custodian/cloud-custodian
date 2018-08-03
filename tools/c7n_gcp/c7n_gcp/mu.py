@@ -168,8 +168,7 @@ class CloudFunctionManager(object):
         source_headers, _ = http.request(source_info['downloadUrl'], 'HEAD')
         # 'x-goog-hash': 'crc32c=tIfQ9A==, md5=DqrN06/NbVGsG+3CdrVK+Q=='
         deployed_checksum = source_headers['x-goog-hash'].split(',')[-1].split('=', 1)[-1]
-        log.info("archive checksum %r deployed checksum %r",
-                 checksum, deployed_checksum)
+        log.debug("archive checksum %r deployed checksum %r", checksum, deployed_checksum)
         return deployed_checksum != checksum
 
     def _upload(self, archive, region):
@@ -280,24 +279,18 @@ class CloudFunction(object):
 
 PolicyHandlerTemplate = """\
 
+import base64
+import json
 import traceback
 import os
 import logging
-
-# Bug workaround on platform logging, else info shows as warning.
-info_handler = logging.StreamHandler(sys.stdout)
-info_handler.setLevel(logging.NOTSET)
-info_handler.addFilter(lambda record: record.levelno <= logging.INFO)
-logging.getLogger().addHandler(info_handler)
+import sys
 
 
 def run(event, context=None):
     logging.info("starting function execution")
-    paths = filter(None, os.environ.get('PYTHONPATH', '').split(':'))
-    for p in paths:
-        print("path: %s" % p)
-        print("packages: {}".format(' '.join(os.listdir(p))))
-
+    event = json.loads(base64.b64decode(event['data']).decode('utf-8'))
+    print("Event: %s" % (event,))
     try:
         from c7n_gcp.handler import run
         result = run(event, context)
@@ -428,8 +421,9 @@ class PubSubSource(EventSource):
         """Ensure the given identities are in the iam role bindings for the topic.
         """
         topic = self.get_topic_param()
-        client = self.session.client('pubsub', 'v1', 'project.topics')
+        client = self.session.client('pubsub', 'v1', 'projects.topics')
         policy = client.execute_command('getIamPolicy', {'resource': topic})
+        policy.pop('etag')
         found = False
         for binding in policy.get('bindings', {}):
             if binding['role'] != 'roles/pubsub.publisher':
@@ -438,13 +432,13 @@ class PubSubSource(EventSource):
                 return
             found = binding
 
-        if found is None:
+        if not found:
             policy.setdefault(
                 'bindings', {'members': [publisher], 'role': 'roles/pubsub.publisher'})
         else:
             found['members'].append(publisher)
 
-        client.execute_command('setIamPolicy', {'resource': topic, 'body': policy})
+        client.execute_command('setIamPolicy', {'resource': topic, 'body': {'policy': policy}})
 
     def add(self):
         self.ensure_topic()
@@ -550,6 +544,7 @@ class LogSubscriber(EventSource):
                 sink = client.execute_command('update', sink_info)
             else:
                 return sink_path
+
         self.pubsub.ensure_iam(publisher=sink['writerIdentity'])
         return sink_path
 

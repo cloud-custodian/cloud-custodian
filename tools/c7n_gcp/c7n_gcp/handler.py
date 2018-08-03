@@ -52,6 +52,7 @@ def run(event, context=None):
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:
+            log.info("running policy %s", p.name)
             p.push(event, context)
     return True
 

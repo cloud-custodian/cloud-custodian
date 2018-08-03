@@ -128,7 +128,10 @@ class QueryResourceManager(ResourceManager):
         return self.resource_type
 
     def get_cache_key(self, query):
-        return {'source_type': self.source_type, 'query': query}
+        return {'source_type': self.source_type, 'query': query,
+                'service': self.resource_type.service,
+                'version': self.resource_type.version,
+                'component': self.resource_type.component}
 
     def get_resource(self, resource_info):
         return self.resource_type.get(self.get_client(), resource_info)
@@ -145,7 +148,7 @@ class QueryResourceManager(ResourceManager):
         q = query or self.get_resource_query()
         key = self.get_cache_key(q)
         try:
-            resources = self.augment(self.source.get_resources(q))
+            resources = self.augment(self.source.get_resources(q)) or []
         except HttpError as e:
             error = extract_error(e)
             if error is None:

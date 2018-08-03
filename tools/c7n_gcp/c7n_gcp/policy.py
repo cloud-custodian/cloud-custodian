@@ -91,8 +91,7 @@ class ApiAuditMode(FunctionMode):
         resources = self.policy.resource_manager.filter_resources(
             resources, event)
 
-        if 'debug' in event:
-            self.policy.log.info("Filtered resources %d" % len(resources))
+        self.policy.log.info("Filtered resources %d" % len(resources))
 
         if not resources:
             return
