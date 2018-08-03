@@ -29,7 +29,8 @@ from c7n.filters import FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema
+from c7n.utils import type_schema
+
 
 class TagHelper:
 
@@ -158,6 +159,7 @@ class RemoveTag(BaseAction):
     def process_resource(self, resource):
         tags_to_delete = self.data.get('tags')
         TagHelper.remove_tags(self, resource, tags_to_delete)
+
 
 class AutoTagUser(BaseAction):
     """Attempts to tag a resource with the first user who created/modified it.
@@ -348,8 +350,7 @@ class TagTrim(BaseAction):
 
         if self.space:
             # Free up slots to fit
-            remove = len(candidates) - (
-                    self.max_tag_count - (self.space + len(tags_to_preserve)))
+            remove = len(candidates) - (self.max_tag_count - (self.space + len(tags_to_preserve)))
             candidates = list(sorted(candidates))[:remove]
 
         if not candidates:
