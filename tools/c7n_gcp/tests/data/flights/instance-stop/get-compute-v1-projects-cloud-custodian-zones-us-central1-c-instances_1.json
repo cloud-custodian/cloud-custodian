@@ -5,19 +5,17 @@
         "status": "STOPPING", 
         "cpuPlatform": "Intel Haswell", 
         "kind": "compute#instance", 
-        "labels": {
-          "env": "testing"
-        }, 
         "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/machineTypes/n1-standard-1", 
         "description": "", 
         "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c", 
         "tags": {
           "items": [
+            "http-server", 
             "https-server"
           ], 
-          "fingerprint": "nNZ0SA7CJyk="
+          "fingerprint": "6smc4R4d39I="
         }, 
-        "labelFingerprint": "E-Rp3_dLV_0=", 
+        "labelFingerprint": "42WmSpB8rSM=", 
         "disks": [
           {
             "index": 0, 
@@ -70,20 +68,21 @@
             "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
             "accessConfigs": [
               {
+                "networkTier": "PREMIUM", 
                 "kind": "compute#accessConfig", 
                 "type": "ONE_TO_ONE_NAT", 
                 "name": "External NAT", 
-                "natIP": "130.211.185.176"
+                "natIP": "35.202.43.203"
               }
             ], 
             "networkIP": "10.128.0.2", 
-            "fingerprint": "tbchcbNiLaE=", 
+            "fingerprint": "I9c-TFZkmcc=", 
             "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default", 
             "name": "nic0"
           }
         ], 
-        "creationTimestamp": "2018-07-08T02:45:53.681-07:00", 
-        "id": "2529875210063864767", 
+        "creationTimestamp": "2018-08-03T05:05:46.403-07:00", 
+        "id": "6624228363236670454", 
         "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/instance-1", 
         "name": "instance-1"
       }
@@ -94,20 +93,20 @@
   }, 
   "headers": {
     "status": "200", 
-    "content-length": "2934", 
+    "content-length": "2943", 
     "transfer-encoding": "chunked", 
-    "expires": "Sun, 08 Jul 2018 13:22:01 GMT", 
+    "expires": "Fri, 03 Aug 2018 12:20:23 GMT", 
     "vary": "Origin, X-Origin", 
     "-content-encoding": "gzip", 
-    "date": "Sun, 08 Jul 2018 13:22:01 GMT", 
+    "date": "Fri, 03 Aug 2018 12:20:23 GMT", 
     "x-xss-protection": "1; mode=block", 
     "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances?filter=name+%3D+instance-1&alt=json", 
     "x-content-type-options": "nosniff", 
     "server": "GSE", 
-    "etag": "\"9w5JxmatbpySthOht_cNgcJV9Q4=/nfWqgv0NhZVn-fo_Q0ZK-sPsQzs=\"", 
+    "etag": "\"-dqp_y3kUQOqc9f5kHIm5ocLQIk=/naJ2iC-_FhlmuDJSGJ9MyWSizJM=\"", 
     "cache-control": "private, max-age=0, must-revalidate, no-transform", 
     "x-frame-options": "SAMEORIGIN", 
-    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
     "content-type": "application/json; charset=UTF-8"
   }
 }
