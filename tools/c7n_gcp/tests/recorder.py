@@ -98,6 +98,9 @@ class HttpReplay(FlightRecorder):
     static_responses = {
         ('POST', 'https://accounts.google.com/o/oauth2/token'): json.dumps({
             'access_token': 'ya29', 'token_type': 'Bearer',
+            'expires_in': 3600}).encode('utf8'),
+        ('POST', 'https://oauth2.googleapis.com/token'): json.dumps({
+            'access_token': 'ya29', 'token_type': 'Bearer',
             'expires_in': 3600}).encode('utf8')}
 
     _cache = {}

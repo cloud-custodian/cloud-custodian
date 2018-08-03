@@ -22,7 +22,7 @@ class DataLakeStore(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.datalake.store'
         client = 'DataLakeStoreAccountManagementClient'
-        enum_spec = ('account', 'list', None)
+        enum_spec = ('accounts', 'list', None)
         default_report_fields = (
             'name',
             'location',

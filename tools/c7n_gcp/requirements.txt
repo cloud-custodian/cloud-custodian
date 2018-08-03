@@ -1,7 +1,7 @@
 retrying
 google-api-python-client==1.7.3
 ratelimiter==1.2.0.post0
-google-auth>=1.4.1
+google-auth>=1.5.0
 google-auth-httplib2>=0.0.3
 google-cloud-logging>=1.6.0
 google-cloud-monitoring>=0.3.0
