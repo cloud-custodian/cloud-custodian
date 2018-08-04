@@ -28,6 +28,7 @@ class FunctionTest(BaseTest):
             runtime='nodejs6',
             events=[HTTPEvent(factory)])
         archive = custodian_archive()
+        archive.close()
         func = CloudFunction(config, archive)
         manager = CloudFunctionManager(factory)
         manager.publish(func)
