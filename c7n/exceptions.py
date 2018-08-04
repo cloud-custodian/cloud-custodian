@@ -15,7 +15,8 @@
 try:
     from botocore.exceptions import ClientError
 except ImportError:
-    class ClientError(Exception): pass
+    class ClientError(Exception):
+        """dummy boto api error"""
 
 
 class CustodianError(Exception):

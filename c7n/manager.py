@@ -27,10 +27,6 @@ except ImportError:
 from c7n.utils import dumps
 
 
-# Compatibility import
-
-
-
 class ResourceManager(object):
 
     filter_registry = None
