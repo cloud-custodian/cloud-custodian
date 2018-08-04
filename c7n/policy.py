@@ -20,13 +20,13 @@ import logging
 import os
 import time
 
-from botocore.client import ClientError
 import jmespath
 import six
 
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
+from c7n.exceptions import ClientError
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry

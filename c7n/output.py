@@ -28,8 +28,6 @@ import tempfile
 
 import os
 
-from boto3.s3.transfer import S3Transfer
-
 from c7n.registry import PluginRegistry
 from c7n.log import CloudWatchLogHandler
 from c7n.utils import local_session, parse_s3, get_retry
@@ -261,6 +259,7 @@ class S3Output(FSOutput):
         return "/".join([s.strip('/') for s in parts])
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        from boto3.s3.transfer import S3Transfer
         if exc_type is not None:
             log.exception("Error while executing policy")
         log.debug("Uploading policy logs")

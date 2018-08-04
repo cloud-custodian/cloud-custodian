@@ -38,21 +38,12 @@ def custodian_archive(packages=None):
     # relatively small, it might be faster to just upload.
     #
     requirements = set()
-
-    # we need to drop these two as hard deps ~ 25mb of downloads
-    requirements.add('boto3')
-    requirements.add('botocore')
-
+    requirements.add('jmespath')
     requirements.add('retrying')
     requirements.add('ratelimiter>=1.2.0.post0')
     requirements.add('google-auth>=1.4.1')
     requirements.add('google-auth-httplib2>=0.0.3')
     requirements.add('google-api-python-client>=1.7.3')
-    # TODO: replace these deps
-    # both of these bring in grpc :-( which in turn brings in a whole
-    # pile of random threads and protobufs.
-    requirements.add('google-cloud-monitoring>=0.3.0')
-    requirements.add('google-cloud-logging>=1.6.0')
 
     archive.add_contents(
         'requirements.txt',
