@@ -226,6 +226,17 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
 
+#### Standard Azure Functions Config
+
+| Required? | Key                            | Type             |
+|:---------:|:-------------------------------|:-----------------|
+|           | `function_name`                | string           |
+| &#x2705;  | `function_servicePlanName`     | string           |
+|           | `function_location`            | string           |
+|           | `function_appInsightsLocation` | string           |
+
+
+
 
 #### Mailer Infrastructure Config
 
@@ -264,6 +275,13 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 | Required? | Key                       | Type             | Notes                               |
 |:---------:|:--------------------------|:-----------------|:------------------------------------|
 |           | `slack_token`             | string           | Slack API token |
+
+#### SendGrid Config
+
+| Required? | Key                       | Type             | Notes                               |
+|:---------:|:--------------------------|:-----------------|:------------------------------------|
+|           | `sendgrid_api_key`        | string           | SendGrid API token |
+SendGrid is only supported for Azure Cloud use with Azure Storage Queue currently.
 
 #### SDK Config
 
@@ -348,6 +366,61 @@ For reference purposes, the JSON Schema of the `notify` action:
 }
 ```
 
+## Using on Azure
+
+Requires `c7n_azure` package.  See [Installing Azure Plugin](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html#install-cloud-custodian)
+
+The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.  
+Configuration for this scenario requires only minor changes from AWS deployments.
+
+The notify action in your policy will reflect transport type `asq` with the URL
+to an Azure Storage Queue.  For example:
+
+```json
+policies:
+  - name: azure-notify
+    resource: azure.resourcegroup
+    description: example policy
+    actions:
+      - type: notify
+        template: default
+        priority_header: '2'
+        subject: Hello from C7N Mailer
+        to:
+          - you@youremail.com
+        transport:
+          type: asq
+          queue: https://storageaccount.queue.core.windows.net/queuename
+```
+
+In your mailer configuration, you'll need to provide your SendGrid API key as well as
+prefix your queue URL with `asq://` to let mailer know what type of queue it is:
+
+```yml
+queue_url: asq://storageaccount.queue.core.windows.net/queuename
+from_address: you@youremail.com
+sendgrid_api_key: SENDGRID_API_KEY
+```
+
+The mailer will transmit all messages found on the queue on each execution, and will retry
+sending 3 times in the event of a failure calling SendGrid.  After the retries the queue
+message will be discarded.
+
+#### Deploying Azure Functions
+
+The `--update-lambda` CLI option will also deploy Azure Functions if you have an Azure
+mailer configuration.
+
+`c7n-mailer --config mailer.yml --update-lambda`
+
+where `mailer.yml` may look like:
+
+```yml
+queue_url: asq://storage.queue.core.windows.net/custodian
+from_address: foo@mail.com
+sendgrid_api_key: <key>
+function_servicePlanName: mycustodianfunctions
+```
 
 ## Writing an email template
 

@@ -18,11 +18,14 @@ import io
 import jmespath
 import json
 import os.path
+import logging
 from six import text_type
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
 
 from c7n.utils import format_string_values
+
+log = logging.getLogger('custodian.resolver')
 
 
 class URIResolver(object):
@@ -52,7 +55,11 @@ class URIResolver(object):
         if parsed.query:
             params.update(dict(parse_qsl(parsed.query)))
         result = client.get_object(**params)
-        return result['Body'].read()
+        body = result['Body'].read()
+        if isinstance(body, str):
+            return body
+        else:
+            return body.decode('utf-8')
 
 
 class ValuesFrom(object):
@@ -134,7 +141,10 @@ class ValuesFrom(object):
         if format == 'json':
             data = json.loads(contents)
             if 'expr' in self.data:
-                return jmespath.search(self.data['expr'], data)
+                res = jmespath.search(self.data['expr'], data)
+                if res is None:
+                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
+                return res
         elif format == 'csv' or format == 'csv2dict':
             data = csv.reader(io.StringIO(contents))
             if format == 'csv2dict':
@@ -144,7 +154,10 @@ class ValuesFrom(object):
                     return [d[self.data['expr']] for d in data]
                 data = list(data)
             if 'expr' in self.data:
-                return jmespath.search(self.data['expr'], data)
+                res = jmespath.search(self.data['expr'], data)
+                if res is None:
+                    log.warning('ValueFrom filter: %s key returned None' % self.data['expr'])
+                return res
             return data
         elif format == 'txt':
             return [s.strip() for s in io.StringIO(contents).readlines()]

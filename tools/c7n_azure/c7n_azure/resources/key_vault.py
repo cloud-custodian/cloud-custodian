@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('keyvault')
@@ -22,4 +22,4 @@ class KeyVault(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
-        enum_spec = ('vaults', 'list')
+        enum_spec = ('vaults', 'list', None)

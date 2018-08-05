@@ -263,6 +263,11 @@ class NetworkLocationTest(BaseTest):
                 {
                     "reason": "SecurityGroupLocationAbsent",
                     "security-groups": {sg_id: None, web_sg_id: "web"},
+                },
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "security-groups": {sg_id: None},
+                    "resource": "web"
                 }
             ],
         )
@@ -406,7 +411,11 @@ class NetworkLocationTest(BaseTest):
                     "security-groups": {db_sg_id: "db", web_sg_id: "web"},
                     "subnets": {web_sub_id: "web"},
                 },
-            ],
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "resource": "web",
+                    "security-groups": {db_sg_id: "db"}
+                }]
         )
 
     @functional
@@ -458,7 +467,12 @@ class NetworkLocationTest(BaseTest):
         matched = resources.pop()
         self.assertEqual(
             matched["c7n:NetworkLocation"],
-            [{"reason": "ResourceLocationAbsent", "resource": None}],
+            [
+                {"reason": "ResourceLocationAbsent",
+                "resource": None},
+                {"security-groups": {web_sg_id: "web"},
+                "resource": None,
+                "reason": "SecurityGroupMismatch"}],
         )
 
     @functional
@@ -1561,6 +1575,7 @@ class SecurityGroupTest(BaseTest):
             }
         )
         manager = p.get_resource_manager()
+
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         resources = [
@@ -1662,6 +1677,56 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
+        manager = p.get_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    def test_egress_ipv6(self):
+        p = self.load_policy({
+            "name": "ipv6-test",
+            "resource": "security-group",
+            "filters": [{
+                "type": "egress", "CidrV6": {
+                    "value": "::/0"}}]
+        })
+
+        resources = [{
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "PrefixListIds": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "UserIdGroupPairs": [],
+                    "Ipv6Ranges": [
+                        {
+                            "CidrIpv6": "::/0"
+                        }
+                    ]
+                }
+            ],
+            "Description": "default VPC security group",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "-1",
+                    "PrefixListIds": [],
+                    "IpRanges": [],
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "644160558196",
+                            "GroupId": "sg-b744bafc"
+                        }
+                    ],
+                    "Ipv6Ranges": []
+                }
+            ],
+            "GroupName": "default",
+            "VpcId": "vpc-f8c6d983",
+            "OwnerId": "644160558196",
+            "GroupId": "sg-b744bafc"
+        }]
         manager = p.get_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 

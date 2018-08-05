@@ -307,6 +307,7 @@ class Time(Filter):
         'sgt': 'Asia/Singapore',
         'aet': 'Australia/Sydney',
         'brt': 'America/Sao_Paulo',
+        'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
 
@@ -456,7 +457,10 @@ class Time(Filter):
 
     @classmethod
     def get_tz(cls, tz):
-        return zoneinfo.gettz(cls.TZ_ALIASES.get(tz, tz))
+        found = cls.TZ_ALIASES.get(tz)
+        if found:
+            tz = found
+        return zoneinfo.gettz(tz.title())
 
     def get_default_schedule(self):
         raise NotImplementedError("use subclass")

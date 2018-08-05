@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "MD5OfMessageBody": "ca25a487df6e351a06f025728468e323",
+        "MessageId": "6ce9ed27-0968-4053-8e61-f490b84ed84a",
+        "ResponseMetadata": {
+            "RequestId": "9f79bbd2-3888-543e-8776-e862078c21ee",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Fri, 29 Jun 2018 14:05:56 GMT",
+                "content-type": "text/xml",
+                "content-length": "378",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "9f79bbd2-3888-543e-8776-e862078c21ee"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

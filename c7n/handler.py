@@ -35,8 +35,11 @@ logging.root.setLevel(logging.DEBUG)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
-
 account_id = None
+
+# On cold start load all resources, requires a pythonpath directory scan
+if 'AWS_EXECUTION_ENV' in os.environ:
+    load_resources()
 
 
 def dispatch_event(event, context):
@@ -82,7 +85,6 @@ def dispatch_event(event, context):
         options_overrides['output_dir'] = output_dir
     options = Config.empty(**options_overrides)
 
-    load_resources()
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:

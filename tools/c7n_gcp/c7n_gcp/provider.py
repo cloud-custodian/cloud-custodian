@@ -16,6 +16,7 @@ from c7n.registry import PluginRegistry
 from c7n.provider import Provider, clouds
 
 from .client import Session
+from functools import partial
 
 
 @clouds.register('gcp')
@@ -32,7 +33,7 @@ class GoogleCloud(Provider):
 
     def get_session_factory(self, options):
         """Get a credential/session factory for api usage."""
-        return Session
+        return partial(Session, project_id=options.account_id)
 
 
 resources = GoogleCloud.resources

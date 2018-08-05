@@ -13,70 +13,111 @@
 # limitations under the License.
 
 import importlib
-import os
+import jwt
+import json
 import logging
-from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
+import os
+
 from azure.cli.core._profile import Profile
+from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from c7n_azure.utils import ResourceIdParser
 
 
 class Session(object):
 
-    def __init__(self, subscription_id=None):
+    def __init__(self, subscription_id=None, authorization_file=None,
+                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id):
+        """
+        :param subscription_id: If provided overrides environment variables.
+
+        """
+
         self.log = logging.getLogger('custodian.azure.session')
         self._provider_cache = {}
+        self.subscription_id_override = subscription_id
+        self.credentials = None
+        self.subscription_id = None
+        self.tenant_id = None
+        self.resource_namespace = resource
+        self._is_token_auth = False
+        self._is_cli_auth = False
+        self.authorization_file = authorization_file
 
-        self.subscription_id = subscription_id
+    def _initialize_session(self):
+        """
+        Creates a session using available authentication type.
+
+        Auth priority:
+        1. Token Auth
+        2. Tenant Auth
+        3. Azure CLI Auth
+
+        """
+
+        # Only run once
+        if self.credentials is not None:
+            return
+
         tenant_auth_variables = [
             'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
             'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
         ]
         token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
 
-        # If the user has specified they want to auth with Azure CLI
-        # then load up the cached CLI credentials
-        if 'AZURE_CLI_AUTH' in os.environ:
-            (self.credentials,
-             subscription_id,
-             self.tenant_id) = Profile().get_login_credentials(
-                resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
-            if self.subscription_id is None:
-                self.subscription_id = subscription_id
-            return
+        if self.authorization_file:
+            self.credentials, self.subscription_id = self.load_auth_file(self.authorization_file)
+            self.log.info("Creating session with authorization file")
 
-        # Try to do token auth which supports unit tests or other integrations
-        # which want to pass an existing token
-        if all(k in os.environ for k in token_auth_variables):
+        elif all(k in os.environ for k in token_auth_variables):
+            # Token authentication
             self.credentials = BasicTokenAuthentication(
                 token={
                     'access_token': os.environ['AZURE_ACCESS_TOKEN']
                 })
-            if self.subscription_id is None:
-                self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
-            return
+            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            self.log.info("Creating session with Token Authentication")
+            self._is_token_auth = True
 
-        # Set credentials with environment variables if all
-        # required variables are present
-        if all(k in os.environ for k in tenant_auth_variables):
-
+        elif all(k in os.environ for k in tenant_auth_variables):
+            # Tenant (service principal) authentication
             self.credentials = ServicePrincipalCredentials(
                 client_id=os.environ['AZURE_CLIENT_ID'],
                 secret=os.environ['AZURE_CLIENT_SECRET'],
-                tenant=os.environ['AZURE_TENANT_ID']
-            )
-            if self.subscription_id is None:
-                self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+                tenant=os.environ['AZURE_TENANT_ID'],
+                resource=self.resource_namespace)
+            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
             self.tenant_id = os.environ['AZURE_TENANT_ID']
-            return
+            self.log.info("Creating session with Service Principal Authentication")
 
-        self.log.error('Unable to locate credentials for Azure session.')
+        else:
+            # Azure CLI authentication
+            self._is_cli_auth = True
+            (self.credentials,
+             self.subscription_id,
+             self.tenant_id) = Profile().get_login_credentials(
+                resource=self.resource_namespace)
+            self.log.info("Creating session with Azure CLI Authentication")
+
+        # Let provided id parameter override everything else
+        if self.subscription_id_override is not None:
+            self.subscription_id = self.subscription_id_override
+
+        self.log.info("Session using Subscription ID: %s" % self.subscription_id)
+
+        if self.credentials is None:
+            self.log.error('Unable to locate credentials for Azure session.')
 
     def client(self, client):
+        self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
         return klass(self.credentials, self.subscription_id)
+
+    def get_credentials(self):
+        self._initialize_session()
+        return self.credentials
 
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
@@ -97,3 +138,43 @@ class Session(object):
             api_version = versions[0] if versions else rt.api_versions[0]
             self._provider_cache[resource_type] = api_version
             return api_version
+
+    def get_tenant_id(self):
+        self._initialize_session()
+        if self._is_token_auth:
+            decoded = jwt.decode(self.credentials['token']['access_token'], verify=False)
+            return decoded['tid']
+
+        return self.tenant_id
+
+    def get_bearer_token(self):
+        self._initialize_session()
+        if self._is_cli_auth:
+            return self.credentials._token_retriever()[1]
+        return self.credentials.token['access_token']
+
+    def load_auth_file(self, path):
+        with open(path) as json_file:
+            data = json.load(json_file)
+            return (ServicePrincipalCredentials(
+                client_id=data['credentials']['client_id'],
+                secret=data['credentials']['secret'],
+                tenant=data['credentials']['tenant']
+            ), data['subscription'])
+
+    def get_auth_string(self):
+        if type(self.credentials) is not ServicePrincipalCredentials:
+            raise NotImplementedError(
+                "Writing auth file only supported for Service Principal credentials.")
+
+        auth = {
+            'credentials':
+                {
+                    'client_id': os.environ['AZURE_CLIENT_ID'],
+                    'secret': os.environ['AZURE_CLIENT_SECRET'],
+                    'tenant': os.environ['AZURE_TENANT_ID']
+                },
+            'subscription': self.subscription_id
+        }
+
+        return json.dumps(auth)

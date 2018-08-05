@@ -34,24 +34,24 @@ interactions:
         V8vt8/Vy+l56CS/Lu3iVsNLx9D7/enroilTlutmjD3+kgMA6NOWECb0wpDc41NnZeXT/00f7B+N7
         O3v3du6THNMIII7fACCC9LOjgMIO9/b2dx/eu6UCCpnt9oqn8x5/HX2xBX2GX+Svoy/K7A29h28j
         rzEFedCegnGS8PNSs8BFPHiI0EqHNfT1j/TMD0nP7N5/s3uPopZH9x+O9+493L+3T6ELjQDS9w0A
-        Ikg/W3rG73D3wacP7+1TjAdoLE+3VzTKdF9X35jXuVX0/RbkuvF9bhV9X+b0htfRKPI2k5cJ8jWU
-        0Pd/yf8D0eYEf6QWAAA=
+        Ikg/W3rG73D3wacP7+1+LT2jPPd11Y15nVtF329BrRvf51bR92VKb3gdjSJvM3WZIF9DB33/l/w/
+        kzllB6MWAAA=
     headers:
       cache-control: [no-cache]
       content-encoding: [gzip]
-      content-length: ['1211']
+      content-length: ['1205']
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 17 May 2018 19:50:11 GMT']
+      date: ['Mon, 21 May 2018 17:24:20 GMT']
       expires: ['-1']
       pragma: [no-cache]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [e82e6c74-6af3-4e9a-b7d9-1194f044a6e1]
-      x-ms-original-request-ids: [f4405daa-6a85-4207-a0c7-0513edde82e7, 6f4a5296-3ef2-4875-af15-37a563b90705]
-      x-ms-ratelimit-remaining-subscription-reads: ['14999']
-      x-ms-request-id: [e82e6c74-6af3-4e9a-b7d9-1194f044a6e1]
-      x-ms-routing-request-id: ['WESTUS2:20180517T195011Z:e82e6c74-6af3-4e9a-b7d9-1194f044a6e1']
+      x-ms-correlation-request-id: [99e100a3-b2dc-4670-9fb8-2c7e4dd4a45f]
+      x-ms-original-request-ids: [b69127ae-2cca-4bc5-82db-07606a9146ca, 14b2cd10-59ac-44f0-b92b-556b9e97a90a]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [99e100a3-b2dc-4670-9fb8-2c7e4dd4a45f]
+      x-ms-routing-request-id: ['WESTUS2:20180521T172420Z:99e100a3-b2dc-4670-9fb8-2c7e4dd4a45f']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -88,24 +88,24 @@ interactions:
         V8vt8/Vy+l56CS/Lu3iVsNLx9D7/enroilTlutmjD3+kgMA6NOWECb0wpDc41NnZeXT/00f7B+N7
         O3v3du6THNMIII7fACCC9LOjgMIO9/b2dx/eu6UCCpnt9oqn8x5/HX2xBX2GX+Svoy/K7A29h28j
         rzEFedCegnGS8PNSs8BFPHiI0EqHNfT1j/TMD0nP7N5/s3uPopZH9x+O9+493L+3T6ELjQDS9w0A
-        Ikg/W3rG73D3wacP7+1TjAdoLE+3VzTKdF9X35jXuVX0/RbkuvF9bhV9X+b0htfRKPI2k5cJ8jWU
-        0Pd/yf8D0eYEf6QWAAA=
+        Ikg/W3rG73D3wacP7+1+LT2jPPd11Y15nVtF329BrRvf51bR92VKb3gdjSJvM3WZIF9DB33/l/w/
+        kzllB6MWAAA=
     headers:
       cache-control: [no-cache]
       content-encoding: [gzip]
-      content-length: ['1211']
+      content-length: ['1205']
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 17 May 2018 19:50:11 GMT']
+      date: ['Mon, 21 May 2018 17:24:20 GMT']
       expires: ['-1']
       pragma: [no-cache]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [54b6db6c-dd95-4638-9c86-97663c2082b3]
-      x-ms-original-request-ids: [e4f0a3ad-c0d7-44a7-955b-bcbaf1471813, 53e48fe7-04f3-4335-9c21-64f8e8b80041]
+      x-ms-correlation-request-id: [1e4ba164-3ade-4c5b-b6fb-7be2c5067811]
+      x-ms-original-request-ids: [e77b3160-2909-426d-9a88-2083eb26e2fd, 27cc7d99-afe0-40d6-8fde-8cc4f583710c]
       x-ms-ratelimit-remaining-subscription-reads: ['14999']
-      x-ms-request-id: [54b6db6c-dd95-4638-9c86-97663c2082b3]
-      x-ms-routing-request-id: ['WESTUS2:20180517T195012Z:54b6db6c-dd95-4638-9c86-97663c2082b3']
+      x-ms-request-id: [1e4ba164-3ade-4c5b-b6fb-7be2c5067811]
+      x-ms-routing-request-id: ['WESTUS2:20180521T172421Z:1e4ba164-3ade-4c5b-b6fb-7be2c5067811']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -134,7 +134,7 @@ interactions:
       cache-control: [no-cache]
       content-encoding: [gzip]
       content-type: [application/json]
-      date: ['Thu, 17 May 2018 19:50:11 GMT']
+      date: ['Mon, 21 May 2018 17:24:21 GMT']
       expires: ['-1']
       pragma: [no-cache]
       server: ['Microsoft-Azure-Storage-Resource-Provider/1.0,Microsoft-HTTPAPI/2.0
@@ -142,10 +142,10 @@ interactions:
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [3259a10c-290b-413c-a379-f02f291c1b4e]
+      x-ms-correlation-request-id: [ae75a802-4e23-4653-b59e-3637b12dfdee]
       x-ms-ratelimit-remaining-subscription-writes: ['1199']
-      x-ms-request-id: [0a170811-9b8e-4b63-938e-9e0fc00a69c3]
-      x-ms-routing-request-id: ['WESTUS2:20180517T195012Z:3259a10c-290b-413c-a379-f02f291c1b4e']
+      x-ms-request-id: [d5ab601d-19f4-4df5-9f9e-b8285c70820f]
+      x-ms-routing-request-id: ['WESTUS2:20180521T172421Z:ae75a802-4e23-4653-b59e-3637b12dfdee']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -153,18 +153,20 @@ interactions:
       Connection: [keep-alive]
       Content-Length: ['0']
       User-Agent: [Azure-Storage/0.34.3 (Python CPython 2.7.13; Windows 10)]
-      x-ms-date: ['Thu, 17 May 2018 19:50:10 GMT']
+      x-ms-date: ['Mon, 21 May 2018 17:24:20 GMT']
       x-ms-version: ['2016-05-31']
     method: PUT
     uri: https://cctstoragey6akyqpagdt3o.blob.core.windows.net/testcontainer?restype=container
   response:
-    body: {string: !!python/unicode ''}
+    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><Error><Code>ContainerAlreadyExists</Code><Message>The\
+        \ specified container already exists.\nRequestId:13f76773-401e-0067-7828-f1eaa4000000\n\
+        Time:2018-05-21T17:24:22.1423887Z</Message></Error>"}
     headers:
-      date: ['Thu, 17 May 2018 19:50:12 GMT']
-      etag: ['"0x8D5BC2F676839EA"']
-      last-modified: ['Thu, 17 May 2018 19:50:12 GMT']
+      content-length: ['230']
+      content-type: [application/xml]
+      date: ['Mon, 21 May 2018 17:24:22 GMT']
       server: [Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [a6bb07ed-401e-0028-4f18-ee2ebc000000]
+      x-ms-request-id: [13f76773-401e-0067-7828-f1eaa4000000]
       x-ms-version: ['2016-05-31']
-    status: {code: 201, message: Created}
+    status: {code: 409, message: The specified container already exists.}
 version: 1

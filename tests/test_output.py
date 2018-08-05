@@ -125,7 +125,7 @@ class S3OutputTest(unittest.TestCase):
             fh.name,
             "cloud-custodian",
             "policies/xyz/%s/foo.txt" % output.date_path,
-            extra_args={"ServerSideEncryption": "AES256"},
+            extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
 
     def test_sans_prefix(self):
@@ -143,5 +143,5 @@ class S3OutputTest(unittest.TestCase):
             fh.name,
             "cloud-custodian",
             "policies/xyz/%s/foo.txt" % output.date_path,
-            extra_args={"ServerSideEncryption": "AES256"},
+            extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )

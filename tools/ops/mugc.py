@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import itertools
 import json
 import os
 import logging
+import sys
 
 from c7n.credentials import SessionFactory
 from c7n.policy import load as policy_load
@@ -105,9 +107,10 @@ def resources_gc_prefix(options, policy_collection):
 
 def setup_parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument("configs", nargs='*', help="Policy configuration file(s)")
     parser.add_argument(
-        '-c', '--config',
-        required=True, dest="config_files", action="append")
+        '-c', '--config', dest="config_files", nargs="*", action='append',
+        help="Policy configuration files(s)")
     parser.add_argument(
         '-r', '--region', default=os.environ.get(
             'AWS_DEFAULT_REGION', 'us-east-1'))
@@ -130,6 +133,7 @@ def setup_parser():
 def main():
     parser = setup_parser()
     options = parser.parse_args()
+
     options.policy_filter = None
     options.log_group = None
     options.external_id = None
@@ -143,6 +147,15 @@ def main():
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('c7n.cache').setLevel(logging.WARNING)
+
+    files = []
+    files.extend(itertools.chain(*options.config_files))
+    files.extend(options.configs)
+    options.config_files = files
+    if not files:
+        parser.print_help()
+        sys.exit(1)
+
     resources.load_resources()
 
     policies = load_policies(options)

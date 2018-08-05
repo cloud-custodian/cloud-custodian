@@ -1,0 +1,2 @@
+include c7n_azure/templates/dedicated_functionapp.json
+include c7n_azure/templates/dedicated_functionapp.parameters.json
