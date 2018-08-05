@@ -27,7 +27,9 @@ class PubSubTopic(QueryResourceManager):
         version = 'v1'
         component = 'projects.topics'
         enum_spec = ('list', 'topics[]', None)
-        # need batch spec
-        scope = 'project'
-        scope_key = 'project'
         scope_template = "projects/{}"
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'topic': resource_info['topic_id']})

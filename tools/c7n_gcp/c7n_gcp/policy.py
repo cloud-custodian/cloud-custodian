@@ -68,13 +68,20 @@ class ApiAuditMode(FunctionMode):
         resource = self.policy.resource_manager.get_resource(resource_info['labels'])
         return [resource]
 
-    def provision(self):
-        self.log.info("Provisioning policy function %s", self.policy.name)
-        manager = mu.CloudFunctionManager(self.policy.session_factory)
+    def _get_function(self):
         events = [mu.ApiSubscriber(
             local_session(self.policy.session_factory),
             {'methods': self.policy.data['mode']['methods']})]
-        return manager.publish(mu.PolicyFunction(self.policy, events=events))
+        return mu.PolicyFunction(self.policy, events=events)
+
+    def provision(self):
+        self.log.info("Provisioning policy function %s", self.policy.name)
+        manager = mu.CloudFunctionManager(self.policy.session_factory)
+        return manager.publish(self._get_function())
+
+    def deprovision(self):
+        manager = mu.CloudFunctionManager(self.policy.session_factory)
+        return manager.remove(self._get_function())
 
     def validate(self):
         if not self.policy.resource_manager.resource_type.get:
