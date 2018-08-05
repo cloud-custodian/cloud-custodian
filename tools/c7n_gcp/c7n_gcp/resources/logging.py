@@ -1,4 +1,4 @@
-# Copyright 2017-2018 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,18 +14,23 @@
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
+# TODO .. folder, billing account, org sink
+# how to map them given a project level root entity sans use of c7n-org
 
-@resources.register('bucket')
-class Bucket(QueryResourceManager):
+
+@resources.register('logsink')
+class LogSink(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'storage'
+        service = 'logging'
         version = 'v1'
-        component = 'buckets'
-        scope = 'project'
-        enum_spec = ('list', 'items[]', {'projection': 'full'})
+        component = 'projects.sinks'
+        enum_spec = ('list', 'sinks[]', None)
+        scope_key = 'parent'
+        scope_template = "projects/{}/sinks"
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command(
-                'get', {'bucket': resource_info['bucket_name']})
+            return client.get('get', {
+                'sinkName': 'projects/{project_id}/sinks/{name}'.format(
+                    **resource_info)})

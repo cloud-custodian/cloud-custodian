@@ -24,7 +24,7 @@ from c7n.schema import generate
 from c7n.resources import load_resources
 from c7n.config import Bag, Config
 
-from c7n.testing import TestUtils, TextTestIO # NOQA
+from c7n.testing import TestUtils, TextTestIO, functional # NOQA
 from .zpill import PillTest
 
 
@@ -189,11 +189,3 @@ class Client(object):
     def get_all_instances(self, filters=None):
         self.filters = filters
         return [Reservation({"instances": [i for i in self.instances]})]
-
-
-try:
-    import pytest
-
-    functional = pytest.mark.functional
-except ImportError:
-    functional = lambda func: func  # noqa E731

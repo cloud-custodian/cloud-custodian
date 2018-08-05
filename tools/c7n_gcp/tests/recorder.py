@@ -37,7 +37,9 @@ class FlightRecorder(Http):
 
         is_discovery = False
         # We don't record authentication
-        if base_name.startswith('post-oauth2-v4') or base_name.startswith('post-o-oauth2'):
+        if (base_name.startswith('post-oauth2-v4') or
+                base_name.startswith('post-o-oauth2') or
+                base_name.startswith('post-token')):
             return
         # Use a common directory for discovery metadata across tests.
         if base_name.startswith('get-discovery'):
