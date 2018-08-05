@@ -98,7 +98,7 @@ def _default_options(p, blacklist=""):
 
     if 'output-dir' not in blacklist:
         p.add_argument("-s", "--output-dir", required=True,
-                       help="Directory or S3 URL For policy output")
+                       help="[REQUIRED] Directory or S3 URL For policy output")
 
     if 'cache' not in blacklist:
         p.add_argument(
