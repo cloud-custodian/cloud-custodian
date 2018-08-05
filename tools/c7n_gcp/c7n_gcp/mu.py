@@ -472,6 +472,7 @@ class LogSubscriber(EventSource):
         return self.data.get('filter')
 
     def get_parent(self, log_info):
+        """Get the parent container for the log sink"""
         if self.data.get('scope', 'log') == 'log':
             if log_info.scope_type != 'projects':
                 raise ValueError("Invalid log subscriber scope")
@@ -517,6 +518,7 @@ class LogSubscriber(EventSource):
         return scope, sink_path, sink
 
     def ensure_sink(self):
+        """Ensure the log sink and its pub sub topic exist."""
         topic_info = self.pubsub.ensure_topic()
         scope, sink_path, sink_info = self.get_sink(topic_info)
         client = self.session.client('logging', 'v2', '%s.sinks' % scope)
@@ -540,9 +542,11 @@ class LogSubscriber(EventSource):
         return sink_path
 
     def add(self, func):
+        """Create any configured log sink if doesn't exist."""
         return self.ensure_sink()
 
     def remove(self, func):
+        """Remove any provisioned log sink if auto created"""
         if not self.data['name'].startswith('custodian-auto'):
             return
         parent = self.get_parent(self.get_log())

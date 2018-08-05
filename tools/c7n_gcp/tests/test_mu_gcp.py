@@ -111,5 +111,7 @@ class FunctionTest(BaseTest):
         # todo set this up as test cleanups, dependent on ordering at the moment, fifo atm
         # it appears, we want lifo.
         if self.recording:
-            time.sleep(15)
+            # we sleep to allow time for in progress operations on creation to complete
+            # function requirements building primarily.
+            time.sleep(42)
         p.get_execution_mode().deprovision()
