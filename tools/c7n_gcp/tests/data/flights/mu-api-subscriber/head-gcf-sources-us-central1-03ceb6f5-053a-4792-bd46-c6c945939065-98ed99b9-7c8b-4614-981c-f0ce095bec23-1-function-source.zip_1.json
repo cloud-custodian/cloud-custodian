@@ -1,0 +1,24 @@
+{
+  "body": {}, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1953443", 
+    "x-goog-stored-content-length": "1953443", 
+    "accept-ranges": "bytes", 
+    "expires": "Sat, 04 Aug 2018 23:20:14 GMT", 
+    "last-modified": "Sat, 04 Aug 2018 23:11:38 GMT", 
+    "x-goog-generation": "1533424298799369", 
+    "date": "Sat, 04 Aug 2018 23:20:14 GMT", 
+    "x-goog-hash": "crc32c=X4le0g==, md5=My48XFcN7laCx/PXRmc/8g==", 
+    "x-guploader-uploadid": "AEnB2UploTfPfn2X-3YRzQgcnt3mB9_7GZXxoj9_viY1LPPHEYACkJuhuhTtp5_ZkYYJ5tC2y9wBUJoPL-tw5OVoVluOj08wMg", 
+    "x-goog-storage-class": "STANDARD", 
+    "x-goog-metageneration": "1", 
+    "content-location": "https://storage.googleapis.com/gcf-sources-us-central1-03ceb6f5-053a-4792-bd46-c6c945939065/98ed99b9-7c8b-4614-981c-f0ce095bec23/1/function-source.zip?GoogleAccessId=service-628364689359@gcf-admin-robot.iam.gserviceaccount.com&Expires=1533426614&Signature=Pyq%2Faux2E%2BFK9F5q0DYQIzkTEcPKxRne8rBvZj6OoNDowXI9FvyU5lunsm4xaZgZ6byMIpe3fZByUw42S97j8vkuwvgNJa%2Ffib%2FGj9c05vPpy%2FfBNsYdNyGxTSS0a9Y1QADeU24h6NYcVGCSfl3Ev97GIX18m0X2uG%2BT96FmtH53gg1ihKD7U13KabZLUcO4sqwUWeTE%2BaOxBOuvh9e813Yh%2FG5qIqtguHHvakCR73KdiWU3x8bzPXhJtzcufGSPvEu64RrOaNd6GzAsv%2FJTLB3Spy%2B8G4iVnR%2F8qhAb%2BR5S1X4%2BxfFL5pl75ebMOISn6i%2FMqeOdTEW6ab5rPDlbWw%3D%3D", 
+    "server": "UploadServer", 
+    "x-goog-stored-content-encoding": "identity", 
+    "etag": "\"332e3c5c570dee5682c7f3d746673ff2\"", 
+    "cache-control": "private, max-age=0", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
+    "content-type": "application/zip"
+  }
+}
