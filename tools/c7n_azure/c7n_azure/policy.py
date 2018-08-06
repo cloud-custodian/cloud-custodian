@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import json
+import logging
 
 from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.session import Session
 from c7n_azure.template_utils import TemplateUtilities
+from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
 
 from c7n import utils
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
+from c7n.utils import local_session
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -47,6 +51,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def __init__(self, policy):
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
+        s = local_session(Session)
+        self.client = s.client('azure.mgmt.web.WebSiteManagementClient')
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -61,17 +67,25 @@ class AzureFunctionMode(ServerlessExecutionMode):
         webapp_name = parameters['name']['value']
         policy_name = self.policy.data['name'].replace(' ', '-').lower()
 
-        existing_webapp = template_util.resource_exist(group_name, webapp_name)
+        existing_service_plan = self.client.app_service_plans.get(
+            group_name, parameters['servicePlanName']['value'])
 
-        if not existing_webapp:
+        if not existing_service_plan:
             template_util.create_resource_group(
                 group_name, {'location': parameters['location']['value']})
 
             template_util.deploy_resource_template(
                 group_name, 'dedicated_functionapp.json', parameters).wait()
+
         else:
-            self.log.info("Found existing App %s (%s) in group %s" %
-                          (webapp_name, existing_webapp.location, group_name))
+            existing_webapp = self.client.web_apps.get(group_name, webapp_name)
+            if not existing_webapp:
+                functionapp_util = FunctionAppUtilities()
+                functionapp_util.deploy_webapp(webapp_name, group_name, existing_service_plan,
+                                               parameters['storageName']['value'])
+            else:
+                self.log.info("Found existing App %s (%s) in group %s" %
+                              (webapp_name, existing_webapp.location, group_name))
 
         self.log.info("Building function package for %s" % webapp_name)
 
@@ -95,7 +109,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
                      '-' +
                      data['name']).replace(' ', '-').lower(),
 
-            'storageName': data['mode']['provision-options']['servicePlanName']
+            'storageName': (data['mode']['provision-options']['servicePlanName']
+                            ).replace('-', '').lower(),
+            'dockerVersion': CONST_DOCKER_VERSION,
+            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION
         }
 
         if 'mode' in data:

@@ -1,0 +1,31 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.4 msrest_azure/0.4.34 azure-mgmt-applicationinsights/0.1.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/does-not-exist?api-version=2015-05-01
+  response:
+    body: {string: '{"error":{"code":"ResourceNotFound","message":"The Resource ''microsoft.insights/components/does-not-exist''
+        under resource group ''test_functionapp-reqs'' was not found."}}'}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['169']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Thu, 02 Aug 2018 19:21:50 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [68724ffc-8aec-4c4a-b807-99054b8d6472]
+      x-ms-failure-cause: [gateway]
+      x-ms-request-id: [68724ffc-8aec-4c4a-b807-99054b8d6472]
+      x-ms-routing-request-id: ['WESTUS2:20180802T192151Z:68724ffc-8aec-4c4a-b807-99054b8d6472']
+    status: {code: 404, message: Not Found}
+version: 1

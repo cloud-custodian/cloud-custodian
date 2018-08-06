@@ -20,8 +20,10 @@ import logging
 try:
     from c7n_azure.function_package import FunctionPackage
     from c7n_azure.template_utils import TemplateUtilities
+    from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
 except ImportError:
     FunctionPackage = TemplateUtilities = None
+    CONST_DOCKER_VERSION = CONST_FUNCTIONS_EXT_VERSION = None
     pass
 
 
@@ -102,7 +104,9 @@ def _get_parameters(template_util, func_config):
     func_config['name'] = (func_config['servicePlanName'] + '-' +
                            func_config['name']).replace(' ', '-').lower()
 
-    func_config['storageName'] = func_config['servicePlanName']
+    func_config['storageName'] = (func_config['servicePlanName']).replace('-', '')
+    func_config['dockerVersion'] = CONST_DOCKER_VERSION
+    func_config['functionsExtVersion'] = CONST_FUNCTIONS_EXT_VERSION
 
     parameters = template_util.update_parameters(parameters, func_config)
 

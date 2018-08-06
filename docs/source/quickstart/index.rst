@@ -190,7 +190,7 @@ You can generate metrics by specifying the boolean metrics flag::
 
 You can also upload Cloud Custodian logs to CloudWatch logs::
 
-  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> <policyfile>.yml
+  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
 
 And you can output logs and resource records to S3::
 

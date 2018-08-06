@@ -23,6 +23,12 @@
         },
         "workerSize": {
             "type": "string"
+        },
+        "dockerVersion": {
+            "type": "string"
+        },
+        "functionsExtVersion" : {
+            "type": "string"
         }
     },
     "resources": [
@@ -88,7 +94,7 @@
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "beta"
+                            "value": "[parameters('functionsExtVersion')]"
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -101,7 +107,7 @@
                     ],
                     "alwaysOn": true,
                     "appCommandLine": "",
-                    "linuxFxVersion": "DOCKER|microsoft/azure-functions-python3.6:latest"
+                    "linuxFxVersion": "[parameters('dockerVersion')]"
                 },
                 "name": "[parameters('name')]",
                 "clientAffinityEnabled": false,
