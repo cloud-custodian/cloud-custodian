@@ -5,17 +5,15 @@ Todo, provider policy execution initialization for outputs
 
 """
 import datetime
+import json
 import os
 import tempfile
-import time
 
 # TODO drop these grpc variants for the REST versions, and we can drop
 # protobuf/grpc deps, and also so we can record tests..
 # gcp has three different python sdks all independently maintained .. hmmm...
 # and random monkey shims on top of those :-(
 
-from google.cloud.monitoring_v3 import MetricServiceClient
-from google.cloud.monitoring_v3.types import TimeSeries
 from google.cloud.logging import Client as LogClient
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud.logging.resource import Resource
@@ -26,31 +24,45 @@ from c7n.utils import local_session
 
 class StackDriverMonitoring(MetricsOutput):
 
-    def put_metric(self, key, value, unit, buffer=False, **dimensions):
-        pass
+    # Custom metrics docs https://tinyurl.com/y8rrghwc
+
+    def __init__(self, ctx):
+        super(StackDriverMonitoring, self).__init__(ctx)
+        self.project_id = local_session(self.ctx.session_factory).get_default_project()
 
     def _format_metric(self, key, value, unit, buffer=False, **dimensions):
-        series = TimeSeries()
-
-        series.metrics.type = 'custom.googleapis.com/custodian/policy/%s' % key
-
-        # Google controlled vocabulary with artificial limitations on resource type
-        # there's not uch useful we can utilize.
-        series.resource.type = 'global'
-
-        # series.resource.labels['project_id'] =
-        point = series.points.add()
-        if unit == 'Count':
-            point.value.int64 = value
-        elif unit == 'Seconds':
-            point.value.double_value = value
-        now = time.time()
-        point.interval.end_time.seconds = ns = int(now)
-        point.interval.end_time.nanos = int((now - ns) * 10**9)
-        return series
+        # Resource is a Google controlled vocabulary with artificial
+        # limitations on resource type there's not much useful we can
+        # utilize.
+        now = self.get_timestamp()
+        metrics_series = {
+            'metric': {
+                'type': 'custom.googleapis.com/custodian/policy/%s' % key.lower(),
+                'labels': {
+                    'policy': self.ctx.policy.name,
+                    'resource': self.ctx.policy.resource_type,
+                },
+            },
+            'metricKind': 'GAUGE',
+            'valueType': 'INT64',
+            'resource': {
+                'type': 'global',
+                'labels': {
+                    'project_id': self.project_id}
+            },
+            'points': [{
+                'interval': {'endTime': now.isoformat() + 'Z'},
+                'value': {'int64Value': int(value)}}]
+        }
+        metrics_series['metric']['labels'].update(dimensions),
+        return metrics_series
 
     def _put_metrics(self, ns, metrics):
-        client = MetricServiceClient()
+        session = local_session(self.ctx.session_factory)
+        client = session.client('monitoring', 'v3', 'projects.timeSeries')
+        client.execute_command(
+            'create', {'name': "{}/timeSeries".format(self.project_id),
+                       'body': json.dumps({'timeSeries': metrics})})
         client.create_time_series(metrics)
 
 

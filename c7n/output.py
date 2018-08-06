@@ -37,9 +37,11 @@ DEFAULT_NAMESPACE = "CloudMaid"
 log = logging.getLogger('custodian.output')
 
 
+metrics_outputs = PluginRegistry('c7n.blob-outputs')
 blob_outputs = PluginRegistry('c7n.blob-outputs')
 
 
+@metrics_outputs.register('aws')
 class MetricsOutput(object):
     """Send metrics data to cloudwatch
     """
@@ -49,10 +51,13 @@ class MetricsOutput(object):
     retry = staticmethod(get_retry(('Throttling',)))
 
     @staticmethod
-    def select(metrics_enabled):
-        if metrics_enabled:
-            return MetricsOutput
-        return NullMetricsOutput
+    def select(metrics_selector):
+        if metrics_selector is None:
+            return NullMetricsOutput
+        for k in metrics_outputs.keys():
+            if k.startswith(metrics_selector):
+                return metrics_outputs[k]
+        raise ValueError("invalid metrics option %r" % metrics_selector)
 
     def __init__(self, ctx, namespace=DEFAULT_NAMESPACE):
         self.ctx = ctx
@@ -77,6 +82,16 @@ class MetricsOutput(object):
             self.buf = []
 
     def put_metric(self, key, value, unit, buffer=False, **dimensions):
+        point = self._format_metric(key, value, unit, dimensions)
+        if buffer:
+            self.buf.append(point)
+            # Max metrics in a single request
+            if len(self.buf) == 20:
+                self.flush()
+        else:
+            self._put_metrics(self.namespace, [point])
+
+    def _format_metric(self, key, value, unit, dimensions): 
         d = {
             "MetricName": key,
             "Timestamp": self.get_timestamp(),
@@ -87,14 +102,7 @@ class MetricsOutput(object):
             {"Name": "ResType", "Value": self.ctx.policy.resource_type}]
         for k, v in dimensions.items():
             d['Dimensions'].append({"Name": k, "Value": v})
-
-        if buffer:
-            self.buf.append(d)
-            # Max metrics in a single request
-            if len(self.buf) == 20:
-                self.flush()
-        else:
-            self._put_metrics(self.namespace, [d])
+        return d
 
     def _put_metrics(self, ns, metrics):
         watch = local_session(self.ctx.session_factory).client('cloudwatch')
