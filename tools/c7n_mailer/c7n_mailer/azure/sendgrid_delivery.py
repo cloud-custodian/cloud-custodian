@@ -114,7 +114,6 @@ class SendGridDelivery(object):
                     return False
         return True
 
-
     @staticmethod
     def is_email(target):
         if parseaddr(target)[1] and '@' in target and '.' in target:
