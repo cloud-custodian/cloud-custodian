@@ -1,4 +1,4 @@
-# Copyright 2017-2018 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
+"""
+todo, needs detail_spec
+"""
 
-@resources.register('bucket')
-class Bucket(QueryResourceManager):
+
+@resources.register('pubsub-topic')
+class PubSubTopic(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'storage'
+        service = 'pubsub'
         version = 'v1'
-        component = 'buckets'
-        scope = 'project'
-        enum_spec = ('list', 'items[]', {'projection': 'full'})
+        component = 'projects.topics'
+        enum_spec = ('list', 'topics[]', None)
+        scope_template = "projects/{}"
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
-                'get', {'bucket': resource_info['bucket_name']})
+                'get', {'topic': resource_info['topic_id']})

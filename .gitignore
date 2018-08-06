@@ -28,3 +28,4 @@ results.xml
 .idea/
 .vscode/
 !.vscode/*.sample
+.pytest_cache/

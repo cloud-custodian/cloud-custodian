@@ -43,11 +43,9 @@ class ResourceQuery(object):
         # depends on resource scope
         if m.scope in ('project', 'zone'):
             project = session.get_default_project()
-            scope_t = getattr(m, 'scope_template', None)
-            if scope_t:
-                project = scope_t.format(project)
-
-            if getattr(m, 'scope_key', None):
+            if m.scope_template:
+                project = m.scope_template.format(project)
+            if m.scope_key:
                 params[m.scope_key] = project
             else:
                 params['project'] = project
@@ -130,7 +128,13 @@ class QueryResourceManager(ResourceManager):
         return self.resource_type
 
     def get_cache_key(self, query):
-        return {'source_type': self.source_type, 'query': query}
+        return {'source_type': self.source_type, 'query': query,
+                'service': self.resource_type.service,
+                'version': self.resource_type.version,
+                'component': self.resource_type.component}
+
+    def get_resource(self, resource_info):
+        return self.resource_type.get(self.get_client(), resource_info)
 
     @property
     def source_type(self):
@@ -144,7 +148,7 @@ class QueryResourceManager(ResourceManager):
         q = query or self.get_resource_query()
         key = self.get_cache_key(q)
         try:
-            resources = self.augment(self.source.get_resources(q))
+            resources = self.augment(self.source.get_resources(q)) or []
         except HttpError as e:
             error = extract_error(e)
             if error is None:
@@ -177,10 +181,22 @@ class TypeMeta(type):
 @six.add_metaclass(TypeMeta)
 class TypeInfo(object):
 
+    # api client construction information
     service = None
     version = None
+    component = None
+
+    # resource enumeration parameters
+
     scope = 'project'
-    enum_spec = ('list', 'items', None)
+    enum_spec = ('list', 'items[]', None)
+    # ie. when project is passed instead as parent
+    scope_key = None
+    # custom formatting for scope key
+    scope_template = None
+
+    # individual resource retrieval method, for serverless policies.
+    get = None
 
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')

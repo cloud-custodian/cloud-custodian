@@ -24,9 +24,8 @@ import logging
 import zlib
 
 import six
-from botocore.exceptions import ClientError
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.manager import resources
 from c7n.registry import PluginRegistry
