@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+    from botocore.exceptions import ClientError
+except ImportError:
+    class ClientError(Exception):
+        """dummy boto api error"""
+
 
 class CustodianError(Exception):
     """Custodian Exception Base Class

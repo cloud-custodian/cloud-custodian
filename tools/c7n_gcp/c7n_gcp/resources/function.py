@@ -16,7 +16,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
 @resources.register('function')
-class CloudFunction(QueryResourceManager):
+class Function(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'cloudfunctions'
@@ -26,3 +26,11 @@ class CloudFunction(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'name': (
+                    'projects/{project_id}/locations/'
+                    '{location_id}/functions/{function_name}').format(
+                        **resource_info)})

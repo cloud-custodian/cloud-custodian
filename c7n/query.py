@@ -25,10 +25,11 @@ from concurrent.futures import as_completed
 
 import jmespath
 import six
-from botocore.client import ClientError
+
 from botocore.paginate import set_value_from_jmespath
 
 from c7n.actions import ActionRegistry
+from c7n.exceptions import ClientError
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
