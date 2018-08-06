@@ -415,7 +415,7 @@ class VolumeDetach(BaseAction):
          policies:
            - name: instance-ebs-volumes
              resource: ebs
-             filters: 
+             filters:
                VolumeId :  volumeid
              actions:
                - detach
@@ -430,9 +430,11 @@ class VolumeDetach(BaseAction):
         client = local_session(self.manager.session_factory).client('ec2')
 
         for vol in volumes:
-            for attachment in vol.get('Attachments',[]):
-                client.detach_volume(InstanceId=attachment['InstanceId'], 
-                                    VolumeId=attachment['VolumeId'], Force=self.data.get('force', False))
+            for attachment in vol.get('Attachments', []):
+                client.detach_volume(InstanceId=attachment['InstanceId'],
+                                VolumeId=attachment['VolumeId'],
+                                Force=self.data.get('force', False))
+
 
 @filters.register('instance')
 class AttachedInstanceFilter(ValueFilter):
