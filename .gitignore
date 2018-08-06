@@ -30,5 +30,4 @@ results.xml
 !.vscode/*.sample
 tests/data/placebo/test_ec2_userdata/*
 tests/data/placebo/test_lc_userdata/*
-tests/data/placebo/test_lc_userdata/*
 .pytest_cache/
