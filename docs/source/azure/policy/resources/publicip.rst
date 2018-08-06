@@ -69,3 +69,17 @@ This policy will find all public IP addresses under DDoS attack over the last 72
             transport:
               - type: asq
                 queue: https://accountname.queue.core.windows.net/queuename
+
+This policy will find all unused public IP addresses and delete them
+
+.. code-block:: yaml
+
+    policies:
+      - name: find-and-delete-unused-public-ips
+        resource: azure.publicip
+        filters:
+          - type: value
+            key: 'properties.ipConfiguration'
+            value: null
+        actions:
+          - type: delete
