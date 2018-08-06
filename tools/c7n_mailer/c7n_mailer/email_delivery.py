@@ -175,6 +175,7 @@ class EmailDelivery(object):
         # or it's an email from an aws event username from an ldap_lookup
         email_to_addrs_to_resources_map = {}
         targets = sqs_message['action']['to']
+
         no_owner_targets = self.get_valid_emails_from_list(
             sqs_message['action'].get('owner_absent_contact', [])
         )
@@ -268,6 +269,8 @@ class EmailDelivery(object):
         message = MIMEText(body, email_format)
         message['From'] = from_addr
         message['To'] = ', '.join(to_addrs)
+        if sqs_message['action'].get('cc'):
+            message['Cc'] = ', '.join(sqs_message['action']['cc'])
         message['Subject'] = subject
         priority_header = sqs_message['action'].get('priority_header', None)
         if priority_header and self.priority_header_is_valid(
@@ -279,6 +282,11 @@ class EmailDelivery(object):
         return message
 
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):
+
+        # append cc addresses to outgoing list
+        if sqs_message['action'].get('cc'):
+            email_to_addrs += sqs_message['action']['cc']
+
         try:
             # if smtp_server is set in mailer.yml, send through smtp
             smtp_server = self.config.get('smtp_server')
