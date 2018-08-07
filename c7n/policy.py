@@ -19,6 +19,8 @@ import itertools
 import logging
 import os
 import time
+from dateutil import tz, parser
+from datetime import datetime
 
 import jmespath
 import six
@@ -224,12 +226,7 @@ class PullMode(PolicyExecutionMode):
     schema = utils.type_schema('pull')
 
     def run(self, *args, **kw):
-        if self.policy.region and (
-                self.policy.region != self.policy.options.region):
-            self.policy.log.info(
-                "Skipping policy %s target-region: %s current-region: %s",
-                self.policy.name, self.policy.region,
-                self.policy.options.region)
+        if not self.is_runnable():
             return
 
         with self.policy.ctx:
@@ -320,6 +317,27 @@ class PullMode(PolicyExecutionMode):
             start,
             end,
         )
+
+    def is_runnable(self):
+        now = datetime.now(self.policy.tz)
+        if self.policy.start and self.policy.start > now:
+            self.policy.log.info(
+                "Skipping policy %s start-date: %s is after current date: %s",
+                self.policy.name, self.policy.start, now)
+            return False
+        if self.policy.end and self.policy.end < now:
+            self.policy.log.info(
+                "Skipping policy %s end-date: %s is before current date: %s",
+                self.policy.name, self.policy.end, now)
+            return False
+        if self.policy.region and (
+                self.policy.region != self.policy.options.region):
+            self.policy.log.info(
+                "Skipping policy %s target-region: %s current-region: %s",
+                self.policy.name, self.policy.region,
+                self.policy.options.region)
+            return False
+        return True
 
 
 class LambdaMode(ServerlessExecutionMode):
@@ -711,6 +729,22 @@ class Policy(object):
         return self.data.get('region')
 
     @property
+    def tz(self):
+        return tz.gettz(self.data.get('tz', 'UTC'))
+
+    @property
+    def start(self):
+        if self.data.get('start'):
+            return parser.parse(self.data.get('start'), ignoretz=True).replace(tzinfo=self.tz)
+        return None
+
+    @property
+    def end(self):
+        if self.data.get('end'):
+            return parser.parse(self.data.get('end'), ignoretz=True).replace(tzinfo=self.tz)
+        return None
+
+    @property
     def max_resources(self):
         return self.data.get('max-resources')
 
@@ -731,6 +765,7 @@ class Policy(object):
     def validate(self):
         m = self.get_execution_mode()
         m.validate()
+        self.validate_policy_start_stop()
         for f in self.resource_manager.filters:
             f.validate()
         for a in self.resource_manager.actions:
@@ -801,3 +836,27 @@ class Policy(object):
             raise ValueError(
                 "Invalid resource type: %s" % resource_type)
         return factory(self.ctx, self.data)
+
+    def validate_policy_start_stop(self):
+        policy_name = self.data.get('name')
+        policy_tz = self.data.get('tz')
+        policy_start = self.data.get('start')
+        policy_end = self.data.get('end')
+
+        if policy_tz:
+            try:
+                p_tz = tz.gettz(policy_tz)
+            except Exception as e:
+                raise ValueError(
+                    "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
+            if not isinstance(p_tz, tz.tzfile):
+                raise ValueError(
+                    "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
+
+        for i in [policy_start, policy_end]:
+            if i:
+                try:
+                    parser.parse(i)
+                except Exception as e:
+                    raise ValueError(
+                        "Policy: %s Date/Time not parsable: %s, %s" % (policy_name, i, e))
