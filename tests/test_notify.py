@@ -21,6 +21,8 @@ import time
 import tempfile
 import zlib
 
+from c7n.exceptions import PolicyValidationError
+
 
 class NotifyTest(BaseTest):
 
@@ -115,6 +117,55 @@ class NotifyTest(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+    def test_sns_notify_with_msg_attr(self):
+        session_factory = self.replay_flight_data("test_sns_notify_action_with_msg_attr")
+
+        sqs = session_factory().client('sqs')
+        sns = session_factory().client('sns')
+
+        topic = 'arn:aws:sns:us-east-1:644160558196:test'
+
+        policy = {
+            "name": "notify-sns-with-attr",
+            "resource": "sns",
+            "actions": [
+                {
+                    "type": "notify",
+                    "to": ["noone@example.com"],
+                    "transport": {
+                        "type": "sns",
+                        "topic": topic,
+                        "attributes": {"mtype": "test"}
+                    },
+                }
+            ],
+        }
+
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
+        policy['actions'][0]['transport']['attributes'] = {'good-attr': 'value'}
+
+        self.assertTrue(self.load_policy(policy, validate=True))
+
+        messages = sqs.receive_message(
+            QueueUrl='https://sqs.us-east-1.amazonaws.com/644160558196/test-queue'
+        ).get('Messages')
+        self.assertFalse(messages)
+
+        subscription = sns.list_subscriptions_by_topic(
+            TopicArn=topic)['Subscriptions'][0]['Endpoint']
+        self.assertEqual(subscription, 'arn:aws:sqs:us-east-1:644160558196:test-queue')
+
+        self.load_policy(policy, session_factory=session_factory).run()
+        if self.recording:
+            time.sleep(20)
+
+        message_body = json.loads(sqs.receive_message(
+            QueueUrl='https://sqs.us-east-1.amazonaws.com/644160558196/test-queue'
+        ).get('Messages')[0]['Body'])
+        self.assertTrue('mtype' in message_body['MessageAttributes'])
+        self.assertTrue('good-attr' in message_body['MessageAttributes'])
 
     def test_notify(self):
         session_factory = self.replay_flight_data("test_notify_action", zdata=True)
