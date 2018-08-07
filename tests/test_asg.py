@@ -57,10 +57,10 @@ class LaunchConfigTest(BaseTest):
 class TestUserData(BaseTest):
 
     def test_regex_filter(self):
-        session_factory = self.replay_flight_data("test_lc_userdata")
+        session_factory = self.replay_flight_data("test_launch_config_userdata")
         policy = self.load_policy(
             {
-                "name": "lc_userdata",
+                "name": "launch_config_userdata",
                 "resource": "launch-config",
                 'filters': [
                     {
