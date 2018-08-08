@@ -616,12 +616,11 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
 
         return [alb for alb in resources
                 if alb['Type'] == 'application' and (
-                not alb['Attributes']['access_logs.s3.enabled'] or
-                (bucket_name and bucket_name != alb['Attributes'].get(
-                    'access_logs.s3.bucket', None)) or
-                (bucket_prefix and bucket_prefix != alb['Attributes'].get(
-                    'access_logs.s3.prefix', None)) )
-                ]
+                    not alb['Attributes']['access_logs.s3.enabled'] or (
+                        bucket_name and bucket_name != alb['Attributes'].get(
+                            'access_logs.s3.bucket', None)) or (
+                        bucket_prefix and bucket_prefix != alb['Attributes'].get(
+                            'access_logs.s3.prefix', None)))]
 
 
 class AppELBTargetGroupFilterBase(object):
