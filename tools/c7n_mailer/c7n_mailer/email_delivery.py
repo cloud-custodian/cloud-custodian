@@ -143,9 +143,11 @@ class EmailDelivery(object):
 
         # resolve the contact info from ldap
         non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
-        ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
-                                              (uid) for uid in non_email_ids]))
-
+        if self.config.get('ldap_uri'):
+            ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
+                                                (uid) for uid in non_email_ids]))
+        else:
+            ldap_emails = []
         return list(chain(explicit_emails, ldap_emails))
 
     def get_account_emails(self, sqs_message):
