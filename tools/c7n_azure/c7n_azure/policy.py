@@ -17,7 +17,6 @@ import logging
 
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.session import Session
 from c7n_azure.template_utils import TemplateUtilities
 from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
 
@@ -51,7 +50,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def __init__(self, policy):
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
-        s = local_session(Session)
+        s = local_session(self.policy.session_factory)
         self.client = s.client('azure.mgmt.web.WebSiteManagementClient')
 
     def run(self, event=None, lambda_context=None):
