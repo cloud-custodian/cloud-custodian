@@ -52,28 +52,60 @@ class TagHelper:
             if tag_action.manager.type == 'armresource':
                 raise NotImplementedError('Cannot tag generic ARM resources.')
 
+            # build a GenericResource object from the resource string returned by the Azure API
             az_resource = GenericResource.deserialize(resource)
             api_version = tag_action.session.resource_api_version(az_resource.id)
+
+            # set the tags for the VM
             az_resource.tags = tags
 
-            client.resources.create_or_update_by_id(resource['id'], api_version, az_resource)
+            # if the vm is a marketplace image, the plan will be set.
+            # the plan cannot be updated via the PATCH Microsoft.Compute/virtualMachines update api
+            # so set the plan to None, which will preserve any existing plan
+            az_resource.plan = None
+
+            client.resources.update_by_id(resource['id'], api_version, az_resource)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):
         # get existing tags
         tags = resource.get('tags', {})
-        # delete tags
-        resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
-        TagHelper.update_resource_tags(tag_action, resource, resource_tags)
+
+        # only determine if any tags_to_delete exist on the VM
+        tags_exist = False
+        for tag in tags_to_delete:
+            if tag in tags:
+                tags_exist = True
+                break
+
+        # only call the resource update if there are tags to delete tags
+        if tags_exist:
+            resource_tags = {key: tags[key] for key in tags if key not in tags_to_delete}
+            TagHelper.update_resource_tags(tag_action, resource, resource_tags)
 
     @staticmethod
-    def add_tags(tag_action, resource, new_tags):
+    def add_tags(tag_action, resource, tags_to_add):
+        new__or_updated_tags = False
+
         # get existing tags
         tags = resource.get('tags', {})
+
         # add or update tags
-        for key in new_tags:
-            tags[key] = new_tags[key]
-        TagHelper.update_resource_tags(tag_action, resource, tags)
+        for key in tags_to_add:
+
+            # nothing to do if the tag and value already exists on the vm
+            if key in tags:
+                if tags[key] != tags_to_add[key]:
+                    new__or_updated_tags = True
+            else:
+                # the tag doesn't exist or the value was updated
+                new__or_updated_tags = True
+
+            tags[key] = tags_to_add[key]
+
+        # call the arm resource update method if there are new or updated tags
+        if new__or_updated_tags:
+            TagHelper.update_resource_tags(tag_action, resource, tags)
 
 
 class Tag(BaseAction):
