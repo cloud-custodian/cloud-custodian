@@ -56,15 +56,10 @@ class TagHelper:
             az_resource = GenericResource.deserialize(resource)
             api_version = tag_action.session.resource_api_version(az_resource.id)
 
-            # set the tags for the resource
-            az_resource.tags = tags
+            # set the resource tags
+            generic_resource = GenericResource(tags=tags)
 
-            # if the resource is based on a marketplace image, the plan will be set.
-            # the plan cannot be updated via the PATCH Microsoft.Compute/virtualMachines update api
-            # so set the plan to None, which will preserve any existing plan
-            az_resource.plan = None
-
-            client.resources.update_by_id(resource['id'], api_version, az_resource)
+            client.resources.update_by_id(resource['id'], api_version, generic_resource)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):
@@ -85,7 +80,7 @@ class TagHelper:
 
     @staticmethod
     def add_tags(tag_action, resource, tags_to_add):
-        new__or_updated_tags = False
+        new_or_updated_tags = False
 
         # get existing tags
         tags = resource.get('tags', {})
@@ -96,15 +91,15 @@ class TagHelper:
             # nothing to do if the tag and value already exists on the resource
             if key in tags:
                 if tags[key] != tags_to_add[key]:
-                    new__or_updated_tags = True
+                    new_or_updated_tags = True
             else:
                 # the tag doesn't exist or the value was updated
-                new__or_updated_tags = True
+                new_or_updated_tags = True
 
             tags[key] = tags_to_add[key]
 
         # call the arm resource update method if there are new or updated tags
-        if new__or_updated_tags:
+        if new_or_updated_tags:
             TagHelper.update_resource_tags(tag_action, resource, tags)
 
 
