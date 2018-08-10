@@ -410,15 +410,15 @@ class VolumeDetach(BaseAction):
 
      :example:
 
-         .. code-block:: yaml
+     .. code-block:: yaml
 
-         policies:
-           - name: instance-ebs-volumes
-             resource: ebs
-             filters:
-               VolumeId :  volumeid
-             actions:
-               - detach
+             policies:
+               - name: instance-ebs-volumes
+                 resource: ebs
+                 filters:
+                   VolumeId :  volumeid
+                 actions:
+                   - detach
 
 
     """
