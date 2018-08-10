@@ -83,15 +83,17 @@ class MetricsOutput(object):
 
     def put_metric(self, key, value, unit, buffer=False, **dimensions):
         point = self._format_metric(key, value, unit, dimensions)
+        self.buf.append(point)
+
         if buffer:
-            self.buf.append(point)
             # Max metrics in a single request
             if len(self.buf) == 20:
                 self.flush()
         else:
-            self._put_metrics(self.namespace, [point])
+            self.buf.append(point)
+            self.flush()
 
-    def _format_metric(self, key, value, unit, dimensions): 
+    def _format_metric(self, key, value, unit, dimensions):
         d = {
             "MetricName": key,
             "Timestamp": self.get_timestamp(),
