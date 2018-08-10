@@ -59,5 +59,5 @@ class DeleteResourceGroup(BaseAction):
 
     def process(self, groups):
         for group in groups:
-            self.manager.log.info('Removing empty resource group ' + group['name'])
+            self.manager.log.info('Removing resource group ' + group['name'])
             self.manager.get_client().resource_groups.delete(group['name'])
