@@ -229,8 +229,8 @@ class ResourceAccessFilter(RelatedResourceFilter):
             )
 
 
-@RoleAssignment.filter_registry.register('scope-is-subscription')
-class ScopeIsSubscriptionFilter(Filter):
+@RoleAssignment.filter_registry.register('scope')
+class ScopeFilter(Filter):
     """Filters role assignments that have subscription level scope access
 
     :example:
@@ -241,34 +241,17 @@ class ScopeIsSubscriptionFilter(Filter):
               - name: assignments-with-subscription-scope
                 resource: azure.roleassignment
                 filters:
-                  - type: scope-is-subscription
+                  - type: scope
+                    value: subscription
     """
 
-    schema = type_schema('scope-is-subscription')
+    schema = type_schema(
+        'scope',
+        value={'type': 'string', 'enum': ['subscription', 'resource-group']})
 
     def process(self, data, event=None):
-        return [d for d in data if is_scope(d["properties"]["scope"], "subscription")]
-
-
-@RoleAssignment.filter_registry.register('scope-is-resource-group')
-class ScopeIsResourceGroupFilter(Filter):
-    """Filters role assignments that have resource group level scope access
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: assignments-with-resource-group-scope
-                resource: azure.roleassignment
-                filters:
-                  - type: scope-is-resource-group
-    """
-
-    schema = type_schema('scope-is-resource-group')
-
-    def process(self, data, event=None):
-        return [d for d in data if is_scope(d["properties"]["scope"], "resource-group")]
+        scope_value = self.data.get('value', '')
+        return [d for d in data if is_scope(d["properties"]["scope"], scope_value)]
 
 
 @RoleAssignment.action_registry.register('delete')
