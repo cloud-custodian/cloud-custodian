@@ -1,0 +1,173 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "ec2-52-87-15-194.compute-1.amazonaws.com", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 18, 
+                            "__class__": "datetime", 
+                            "month": 8, 
+                            "second": 29, 
+                            "microsecond": 0, 
+                            "year": 2018, 
+                            "day": 10, 
+                            "minute": 55
+                        }, 
+                        "PublicIpAddress": "52.87.15.194", 
+                        "PrivateIpAddress": "172.31.12.112", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-d2d616b5", 
+                        "CpuOptions": {
+                            "CoreCount": 1, 
+                            "ThreadsPerCore": 1
+                        }, 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-022f784aa6cd0a555", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-b70554c8", 
+                        "PrivateDnsName": "ip-172-31-12-112.ec2.internal", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-3", 
+                                "GroupId": "sg-061991ee1705fdd1d"
+                            }
+                        ], 
+                        "ClientToken": "", 
+                        "SubnetId": "subnet-914763e7", 
+                        "InstanceType": "t2.micro", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "0a:7a:87:d7:86:7a", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-d2d616b5", 
+                                "Description": "", 
+                                "NetworkInterfaceId": "eni-00d65767db0d75a12", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-12-112.ec2.internal", 
+                                        "PrivateIpAddress": "172.31.12.112", 
+                                        "Primary": true, 
+                                        "Association": {
+                                            "PublicIp": "52.87.15.194", 
+                                            "PublicDnsName": "ec2-52-87-15-194.compute-1.amazonaws.com", 
+                                            "IpOwnerId": "amazon"
+                                        }
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-12-112.ec2.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-0ecf9b8f21124e527", 
+                                    "AttachTime": {
+                                        "hour": 18, 
+                                        "__class__": "datetime", 
+                                        "month": 8, 
+                                        "second": 29, 
+                                        "microsecond": 0, 
+                                        "year": 2018, 
+                                        "day": 10, 
+                                        "minute": 55
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-3", 
+                                        "GroupId": "sg-061991ee1705fdd1d"
+                                    }
+                                ], 
+                                "Ipv6Addresses": [], 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.12.112", 
+                                "SubnetId": "subnet-914763e7", 
+                                "Association": {
+                                    "PublicIp": "52.87.15.194", 
+                                    "PublicDnsName": "ec2-52-87-15-194.compute-1.amazonaws.com", 
+                                    "IpOwnerId": "amazon"
+                                }
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-east-1a"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda", 
+                                "Ebs": {
+                                    "Status": "attached", 
+                                    "DeleteOnTermination": true, 
+                                    "VolumeId": "vol-0857298980a9e1d09", 
+                                    "AttachTime": {
+                                        "hour": 18, 
+                                        "__class__": "datetime", 
+                                        "month": 8, 
+                                        "second": 30, 
+                                        "microsecond": 0, 
+                                        "year": 2018, 
+                                        "day": 10, 
+                                        "minute": 55
+                                    }
+                                }
+                            }
+                        ], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "ebs", 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "DO NOT DELETE", 
+                                "Key": "Name"
+                            }, 
+                            {
+                                "Value": "lindsay.hefton@capitalone.com", 
+                                "Key": "Contact"
+                            }, 
+                            {
+                                "Value": "lindsay.hefton@capitalone.com", 
+                                "Key": "CreatorName"
+                            }, 
+                            {
+                                "Value": "DO NOT DELETE", 
+                                "Key": "IMPORTANT"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ], 
+                "ReservationId": "r-0301fc8dd85fd6a72", 
+                "Groups": [], 
+                "OwnerId": "644160558196"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "788a7a99-29c9-43e9-80a1-e5598a5f327d", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 10 Aug 2018 19:12:19 GMT"
+            }
+        }
+    }
+}

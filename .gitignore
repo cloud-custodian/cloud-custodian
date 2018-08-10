@@ -28,6 +28,4 @@ results.xml
 .idea/
 .vscode/
 !.vscode/*.sample
-tests/data/placebo/test_ec2_userdata/*
-tests/data/placebo/test_launch_config_userdata/*
 .pytest_cache/

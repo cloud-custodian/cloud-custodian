@@ -67,18 +67,7 @@ class TestUserData(BaseTest):
                         'or': [
                             {'type': 'user-data', 'op': 'regex',
                                 'value': '(?smi).*(ch)?passw(or)?d(?! --)'},
-                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'},
-                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*GIT_TOKEN=.*'},
-                            {'type': 'user-data', 'op': 'regex',
-                                'value': '(?smi).*Set\\-ADAccountPassword.*(\\-Credential '
-                                '|\\-OldPassword |\\-NewPassword |\\-AsPlainText )'},
-                            {'type': 'user-data', 'op': 'regex',
-                                'value': '(?smi).*BEGIN RSA PRIVATE KEY'},
-                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*access_token='},
-                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*client_secret='},
-                            {'type': 'user-data', 'op': 'regex',
-                                'value': '(?smi).* ldap\\.password='},
-                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*usermod -p '}
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'}
                         ]
                     }
                 ],

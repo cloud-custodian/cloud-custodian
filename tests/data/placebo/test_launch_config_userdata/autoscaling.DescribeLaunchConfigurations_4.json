@@ -1,0 +1,59 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "IyEvYmluL2Jhc2gKZWNobyBFQ1NfQ0xVU1RFUj10ZXN0Y2x1c3RlciA+PiAvZXRjL2Vjcy9lY3MuY29uZmlnO2VjaG8gRUNTX0JBQ0tFTkRfSE9TVD0gPj4gL2V0Yy9lY3MvZWNzLmNvbmZpZzs=", 
+                "IamInstanceProfile": "ecsInstanceRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:92da2630-9654-4eef-82e6-04b1a6b280c3:launchConfigurationName/EC2ContainerService-testcluster-EcsInstanceLc-10INUWP9CG539Copy", 
+                "InstanceMonitoring": {
+                    "Enabled": true
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 31, 
+                    "microsecond": 833000, 
+                    "year": 2018, 
+                    "day": 3, 
+                    "minute": 51
+                }, 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvdcz", 
+                        "Ebs": {
+                            "DeleteOnTermination": true, 
+                            "Encrypted": false, 
+                            "VolumeSize": 22, 
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ], 
+                "KeyName": "kylet", 
+                "SecurityGroups": [
+                    "sg-90d8c1d9"
+                ], 
+                "LaunchConfigurationName": "EC2ContainerService-testcluster-EcsInstanceLc-10INUWP9CG539Copy", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-aff65ad2", 
+                "InstanceType": "t2.micro", 
+                "AssociatePublicIpAddress": true
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9159961a-9cd3-11e8-9588-45b8705c0d8a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9159961a-9cd3-11e8-9588-45b8705c0d8a", 
+                "date": "Fri, 10 Aug 2018 19:28:32 GMT", 
+                "content-length": "1946", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

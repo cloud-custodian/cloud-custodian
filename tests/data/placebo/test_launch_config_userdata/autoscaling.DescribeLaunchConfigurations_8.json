@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "UserData": "Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PUJPVU5EQVJZPT0iIApNSU1FLVZlcnNpb246IDEuMCAKIAotLT09Qk9VTkRBUlk9PSAKTUlNRS1WZXJzaW9uOiAxLjAgCkNvbnRlbnQtVHlwZTogdGV4dC94LXNoZWxsc2NyaXB0OyBjaGFyc2V0PSJ1cy1hc2NpaSIgCiMhL2Jpbi9iYXNoIAplY2hvIEVDU19DTFVTVEVSPWZpcnN0LXJ1bi1jb21wdXRlLWVudmlyb25tZW50X0JhdGNoXzIxZWM0MWQ0LWQ4MDUtM2RlYS1hOWUyLTc4MzU0ZTUwNTBkNT4+L2V0Yy9lY3MvZWNzLmNvbmZpZyAKZWNobyBFQ1NfRElTQUJMRV9JTUFHRV9DTEVBTlVQPWZhbHNlPj4vZXRjL2Vjcy9lY3MuY29uZmlnIAplY2hvIEVDU19FTkdJTkVfVEFTS19DTEVBTlVQX1dBSVRfRFVSQVRJT049Mm0+Pi9ldGMvZWNzL2Vjcy5jb25maWcgCmVjaG8gRUNTX0lNQUdFX0NMRUFOVVBfSU5URVJWQUw9MTBtPj4vZXRjL2Vjcy9lY3MuY29uZmlnIAplY2hvIEVDU19JTUFHRV9NSU5JTVVNX0NMRUFOVVBfQUdFPTEwbT4+L2V0Yy9lY3MvZWNzLmNvbmZpZyAKZWNobyBFQ1NfTlVNX0lNQUdFU19ERUxFVEVfUEVSX0NZQ0xFPTU+Pi9ldGMvZWNzL2Vjcy5jb25maWcKZWNobyBFQ1NfUkVTRVJWRURfTUVNT1JZPTMyPj4vZXRjL2Vjcy9lY3MuY29uZmlnCi0tPT1CT1VOREFSWT09Cg==", 
+                "IamInstanceProfile": "arn:aws:iam::644160558196:instance-profile/ecsInstanceRole", 
+                "EbsOptimized": false, 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:af7383d5-7e0b-4e7a-ab8a-88638522b051:launchConfigurationName/first-run-compute-environment-lc-bdf27d68-d2e1-3e00-a1a2-3fc95afb871c", 
+                "InstanceMonitoring": {
+                    "Enabled": true
+                }, 
+                "ClassicLinkVPCSecurityGroups": [], 
+                "CreatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 58, 
+                    "microsecond": 520000, 
+                    "year": 2018, 
+                    "day": 14, 
+                    "minute": 55
+                }, 
+                "BlockDeviceMappings": [], 
+                "KeyName": "", 
+                "SecurityGroups": [
+                    "sg-6c7fa917"
+                ], 
+                "LaunchConfigurationName": "first-run-compute-environment-lc-bdf27d68-d2e1-3e00-a1a2-3fc95afb871c", 
+                "KernelId": "", 
+                "RamdiskId": "", 
+                "ImageId": "ami-28456852", 
+                "InstanceType": "m4.large"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "919da405-9cd3-11e8-9588-45b8705c0d8a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "919da405-9cd3-11e8-9588-45b8705c0d8a", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2313", 
+                "content-type": "text/xml", 
+                "date": "Fri, 10 Aug 2018 19:28:32 GMT"
+            }
+        }
+    }
+}
