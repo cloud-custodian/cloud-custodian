@@ -72,10 +72,11 @@ class RoleAssignment(QueryResourceManager):
             principal_dics = {aad_object.object_id: aad_object for aad_object in aad_objects}
 
             for resource in resources:
-                graph_resource = principal_dics[resource['properties']['principalId']]
-                resource['principalName'] = self.get_principal_name(graph_resource)
-                resource['displayName'] = graph_resource.display_name
-                resource['aadType'] = graph_resource.object_type
+                if resource['properties']['principalId'] in principal_dics.keys():
+                    graph_resource = principal_dics[resource['properties']['principalId']]
+                    resource['principalName'] = self.get_principal_name(graph_resource)
+                    resource['displayName'] = graph_resource.display_name
+                    resource['aadType'] = graph_resource.object_type
 
         except CloudError:
             log.warning('Credentials not authorized for access to read from Microsoft Graph. \n '
