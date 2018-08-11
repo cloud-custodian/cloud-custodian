@@ -488,6 +488,9 @@ class LambdaMode(ServerlessExecutionMode):
                 if 'output_dir' in p['mode']['execution-options']:
                     p['mode']['execution-options']['output_dir'] = utils.format_string_values(
                         p['mode']['execution-options']['output_dir'], **variables)
+            if 'dead_letter_config' in p['mode']:
+                p['mode']['dead_letter_config'] = utils.format_string_values(
+                    p['mode']['dead_letter_config'], **variables)
         return p
 
     def provision(self):
