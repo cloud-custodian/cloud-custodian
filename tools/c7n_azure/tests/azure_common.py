@@ -75,6 +75,10 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
                 DEFAULT_SUBSCRIPTION_ID,
                 request.url)
+        if request.body:
+            request.body = b'mock_body'
+        if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
+            return None
         if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
             return None
         return request

@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
       User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.4 msrest_azure/0.4.34 azure-mgmt-applicationinsights/0.1.1 Azure-SDK-For-Python]
+          msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-applicationinsights/0.1.1 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01
@@ -20,18 +20,18 @@ interactions:
         0/zzulqvmrtt3rS///l6OQWIbLXarvNf1Nxd1dVlMcvr5u6imNZVU52342LZFBfztrk7rRarapkv
         8WtZrWfb03XTVrMiW24D2kejj5bZIif0Br5tr1f4diNkalZW0wxIUdMrenHd7NGHbXbRfPToF380
         L2azfLldFsu3j+7+7FPhC4vrd/PJ3aag9vGxP/rolUL+6JeMPnpbLDFNV/mEUM8Jd/rj9/1oZ7az
-        82CS7W/v0OP9c3/y6b37Dz99QL/v/L4f0RvU/yqv2yLnIf9kXtPrl6DC8WpVFkKdM3QQRYWb8deT
-        B5PdT/N8n4gx3d3e33mwtz25N723PdufPTjf2d3dm947kOYG6u//RuZIMH9WVlf6yXJdliMa4y9a
-        Uxe//2sZ6aOPzibFDzIiDYE4fdfmNJ/V8qTOszan18+WTVuvFzStDPv3yq/pjQeT6acHO7sYOv2z
-        f/+AcMr397anB9NpvvNgdn/6AF2/2MhJ3AWBfIqOHn20t7N7sL1D/9t7s/vw0d7Oo50H43v7u5/e
-        +/T+Jzv01w698jKbvs0uctBFxvImX2bLFn9/dBvOIRDfrqZv82saKl4SIPajN9XbnDhWPqX5uyxA
-        imJ58ZoGDxxfr2l8+SyfEaDX2YIovrx4mRMViToX1EDePMFIF1/kbV1Mmy9XbT47W7oJ+CW/5P8B
-        MYlnnwAEAAA=
+        82D/3oPtHXq8f+5PPj3f35mc0+87v+9H9Ab1v8rrtsh5yD+Z1/T6JahwvFqVhVDnDB1EUeFm/PVs
+        uv/g4CDb3Z7lD/a398/3Z9sPdyb59sPJzk4+mzyY3Z/sSnMD9fd/I3MkmD8rqyv9ZLkuyxGN8Ret
+        qYvf/7WM9NFHZ5PiBxmRhkCcvmtzms9qeVLnWZvT62fLpq3XC5pWhv175df0xvn+pw8e5kSEg/sP
+        H9Is7e5vT7KH0+37Dz7NP907yO/v3HtI777YyEncBYF8io4efbS3s3uwvXOwvbv7Zm/n0c7eo50H
+        4/s7Dw/2Pt3/ZIc+2KFXXmbTt9lFDrrIWN7ky2zZ4u+PbsM5BOLb1fRtfk1DxUsCxH70pnqbE8fK
+        pzR/lwVIUSwvXtPggePr9XSa57N8RoBeZwui+PLiZU5UJOpcUAN58wQjXXyRt3Uxbb5ctfnsbOkm
+        4Jf8kv8HN6FLeQAEAAA=
     headers:
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Thu, 02 Aug 2018 19:21:50 GMT']
+      Date: ['Sat, 11 Aug 2018 20:34:48 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
       Server: [Microsoft-IIS/8.5]
@@ -39,9 +39,9 @@ interactions:
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Powered-By: [ASP.NET]
-      x-ms-correlation-request-id: [253145d6-7274-41de-9f05-c2335d646d17]
-      x-ms-ratelimit-remaining-subscription-reads: ['11998']
-      x-ms-request-id: [4e880650-9689-11e8-a630-8c8590ced288]
-      x-ms-routing-request-id: ['WESTUS2:20180802T192150Z:253145d6-7274-41de-9f05-c2335d646d17']
+      x-ms-correlation-request-id: [fb695158-288d-4d18-bb7f-7440c5deea4c]
+      x-ms-ratelimit-remaining-subscription-reads: ['11999']
+      x-ms-request-id: [fd60c252-9da5-11e8-8b43-8c8590ced288]
+      x-ms-routing-request-id: ['WESTUS2:20180811T203448Z:fb695158-288d-4d18-bb7f-7440c5deea4c']
     status: {code: 200, message: OK}
 version: 1
