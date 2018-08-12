@@ -52,7 +52,7 @@ class MetricsOutput(object):
 
     @staticmethod
     def select(metrics_selector):
-        if metrics_selector is None:
+        if not metrics_selector:
             return NullMetricsOutput
         for k in metrics_outputs.keys():
             if k.startswith(metrics_selector):
@@ -90,7 +90,6 @@ class MetricsOutput(object):
             if len(self.buf) == 20:
                 self.flush()
         else:
-            self.buf.append(point)
             self.flush()
 
     def _format_metric(self, key, value, unit, dimensions):

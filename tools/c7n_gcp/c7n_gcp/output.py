@@ -1,13 +1,15 @@
 """
 
-Todo, provider policy execution initialization for outputs
+TODO: provider policy execution initialization for outputs
 
 
 """
 import datetime
 import json
+import logging
 import os
 import tempfile
+import time
 
 # TODO drop these grpc variants for the REST versions, and we can drop
 # protobuf/grpc deps, and also so we can record tests..
@@ -18,19 +20,79 @@ from google.cloud.logging import Client as LogClient
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud.logging.resource import Resource
 
-from c7n.output import MetricsOutput, LogOutput, FSOutput, blob_outputs
+from c7n.output import MetricsOutput, LogOutput, FSOutput, blob_outputs, metrics_outputs
 from c7n.utils import local_session
 
 
-class StackDriverMonitoring(MetricsOutput):
+@metrics_outputs.register('gcp')
+class StackDriverMetrics(MetricsOutput):
 
+    METRICS_PREFIX = 'custom.googleapis.com/custodian/policy'
+
+    DESCRIPTOR_COMMON = {
+        'metricsKind': 'GAUGE',
+        'labels': [{
+            'key': 'policy',
+            'valueType': 'STRING',
+            'description': 'Custodian Policy'}],
+    }
+
+    METRICS_DESCRIPTORS = {
+        'resourcecount': {
+            'type': '%s/%'.format(METRICS_PREFIX, 'resourcecount'),
+            'valueType': 'INT64',
+            'units': 'items',
+            'description': 'Number of resources that matched the given policy',
+            'displayName': 'Resources',
+        },
+        'resourcetime': {
+            'type': '%s/%s'.format(METRICS_PREFIX, 'resourcetime'),
+            'valueType': 'DOUBLE',
+            'units': 's',
+            'description': 'Time to query the resources for a given policy',
+            'displayName': 'Query Time',
+        },
+        'actiontime': {
+            'type': '%s/%s'.format(METRICS_PREFIX, 'actiontime'),
+            'valueType': 'DOUBLE',
+            'units': 's',
+            'description': 'Time to perform actions for a given policy',
+            'displayName': 'Action Time',
+        },
+    }
     # Custom metrics docs https://tinyurl.com/y8rrghwc
 
+    log = logging.getLogger('c7n_gcp.metrics')
+
     def __init__(self, ctx):
-        super(StackDriverMonitoring, self).__init__(ctx)
+        super(StackDriverMetrics, self).__init__(ctx)
         self.project_id = local_session(self.ctx.session_factory).get_default_project()
 
-    def _format_metric(self, key, value, unit, buffer=False, **dimensions):
+    def initialize(self):
+        """One time initialization of metrics descriptors.
+        """
+        client = local_session(self.ctx.session_factory).client(
+            'monitoring', 'v3', 'projects.metricDescriptors')
+        descriptor_map = {
+            n['type'].rsplit('/', 1)[-1]: n for n in client.execute_command('list', {
+                'name': 'projects/%s' % self.project_id,
+                'filter': 'metric.type=startswith("{}")'.format(self.METRICS_PREFIX)}).get(
+                    'metricsDescriptors', [])}
+        created = False
+        for name in self.METRICS_DESCRIPTORS:
+            if name in descriptor_map:
+                continue
+            created = True
+            md = self.METRICS_DESCRIPTORS[name]
+            md.update(self.DESCRIPTOR_COMMON)
+            client.execute_command(
+                'create', {'name': 'projects/%s' % self.project_id, 'body': md})
+
+        if created:
+            self.log.info("Initializing StackDriver Metrics Descriptors")
+            time.sleep(5)
+
+    def _format_metric(self, key, value, unit, dimensions):
         # Resource is a Google controlled vocabulary with artificial
         # limitations on resource type there's not much useful we can
         # utilize.
@@ -40,30 +102,32 @@ class StackDriverMonitoring(MetricsOutput):
                 'type': 'custom.googleapis.com/custodian/policy/%s' % key.lower(),
                 'labels': {
                     'policy': self.ctx.policy.name,
-                    'resource': self.ctx.policy.resource_type,
+                    'project_id': self.project_id
                 },
             },
-            'metricKind': 'GAUGE',
             'valueType': 'INT64',
             'resource': {
                 'type': 'global',
-                'labels': {
-                    'project_id': self.project_id}
             },
             'points': [{
-                'interval': {'endTime': now.isoformat() + 'Z'},
+                'interval': {
+                    'endTime': now.isoformat('T') + 'Z',
+                    'startTime': now.isoformat('T') + 'Z',
+                },
                 'value': {'int64Value': int(value)}}]
         }
-        metrics_series['metric']['labels'].update(dimensions),
+
+        # metrics_series['metric']['labels'].update(dimensions),
+
         return metrics_series
 
     def _put_metrics(self, ns, metrics):
         session = local_session(self.ctx.session_factory)
         client = session.client('monitoring', 'v3', 'projects.timeSeries')
-        client.execute_command(
-            'create', {'name': "{}/timeSeries".format(self.project_id),
-                       'body': json.dumps({'timeSeries': metrics})})
-        client.create_time_series(metrics)
+        params = {'name': "projects/{}".format(self.project_id),
+                  'body': json.dumps({'timeSeries': metrics}, indent=2)}
+        self.log.debug("Create Series Payload: \n%s", params['body'])
+        client.execute_command('create', params)
 
 
 class StackDriverLogging(LogOutput):
