@@ -1,0 +1,18 @@
+{
+  "body": {}, 
+  "headers": {
+    "status": "200", 
+    "content-length": "3", 
+    "x-xss-protection": "1; mode=block", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Sun, 12 Aug 2018 22:30:56 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

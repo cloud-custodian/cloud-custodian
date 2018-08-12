@@ -5,22 +5,17 @@ TODO: provider policy execution initialization for outputs
 
 """
 import datetime
-import json
 import logging
 import os
 import tempfile
 import time
 
-# TODO drop these grpc variants for the REST versions, and we can drop
-# protobuf/grpc deps, and also so we can record tests..
-# gcp has three different python sdks all independently maintained .. hmmm...
-# and random monkey shims on top of those :-(
-
-from google.cloud.logging import Client as LogClient
-from google.cloud.logging.handlers import CloudLoggingHandler
-from google.cloud.logging.resource import Resource
-
-from c7n.output import MetricsOutput, LogOutput, FSOutput, blob_outputs, metrics_outputs
+from c7n.output import (
+    blob_outputs,
+    FSOutput,
+    metrics_outputs,
+    MetricsOutput,
+    LogOutput)
 from c7n.utils import local_session
 
 
@@ -70,6 +65,8 @@ class StackDriverMetrics(MetricsOutput):
 
     def initialize(self):
         """One time initialization of metrics descriptors.
+
+        # tbd - unclear if this adding significant value.
         """
         client = local_session(self.ctx.session_factory).client(
             'monitoring', 'v3', 'projects.metricDescriptors')
@@ -105,6 +102,7 @@ class StackDriverMetrics(MetricsOutput):
                     'project_id': self.project_id
                 },
             },
+            'metricKind': 'GAUGE',
             'valueType': 'INT64',
             'resource': {
                 'type': 'global',
@@ -112,21 +110,16 @@ class StackDriverMetrics(MetricsOutput):
             'points': [{
                 'interval': {
                     'endTime': now.isoformat('T') + 'Z',
-                    'startTime': now.isoformat('T') + 'Z',
-                },
+                    'startTime': now.isoformat('T') + 'Z'},
                 'value': {'int64Value': int(value)}}]
         }
-
-        # metrics_series['metric']['labels'].update(dimensions),
-
         return metrics_series
 
     def _put_metrics(self, ns, metrics):
         session = local_session(self.ctx.session_factory)
         client = session.client('monitoring', 'v3', 'projects.timeSeries')
         params = {'name': "projects/{}".format(self.project_id),
-                  'body': json.dumps({'timeSeries': metrics}, indent=2)}
-        self.log.debug("Create Series Payload: \n%s", params['body'])
+                  'body': {'timeSeries': metrics}}
         client.execute_command('create', params)
 
 
@@ -136,6 +129,15 @@ class StackDriverLogging(LogOutput):
         # gcp has three independent implementation of api bindings for python.
         # The one used by logging is not yet supported by our test recording.
 
+        # TODO drop these grpc variants for the REST versions, and we can drop
+        # protobuf/grpc deps, and also so we can record tests..
+        # gcp has three different python sdks all independently maintained .. hmmm...
+        # and random monkey shims on top of those :-(
+
+        from google.cloud.logging import Client as LogClient
+        from google.cloud.logging.handlers import CloudLoggingHandler
+        from google.cloud.logging.resource import Resource
+        
         log_group = self.ctx.options.log_group
         if log_group.endswith('*'):
             log_group = "%s%s" % (log_group[:-1], self.ctx.policy.name)
