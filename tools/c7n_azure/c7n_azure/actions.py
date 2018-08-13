@@ -49,15 +49,23 @@ class TagHelper:
             )
         # other Azure resources
         else:
+            # generic armresource tagging isn't supported yet Github issue #2637
             if tag_action.manager.type == 'armresource':
                 raise NotImplementedError('Cannot tag generic ARM resources.')
 
-            # build a GenericResource object from the resource string returned by the Azure API
-            az_resource = GenericResource.deserialize(resource)
-            api_version = tag_action.session.resource_api_version(az_resource.id)
+            api_version = tag_action.session.resource_api_version(resource['id'])
 
-            # set the resource tags
-            generic_resource = GenericResource(tags=tags)
+            # deserialize the original object
+            az_resource = GenericResource.deserialize(resource)
+
+            # create a GenericResource object with the required parameters
+            generic_resource = GenericResource(location=az_resource.location,
+                                               tags=tags,
+                                               properties=az_resource.properties,
+                                               kind=az_resource.kind,
+                                               managed_by=az_resource.managed_by,
+                                               sku=az_resource.sku,
+                                               identity=az_resource.identity)
 
             client.resources.update_by_id(resource['id'], api_version, generic_resource)
 
