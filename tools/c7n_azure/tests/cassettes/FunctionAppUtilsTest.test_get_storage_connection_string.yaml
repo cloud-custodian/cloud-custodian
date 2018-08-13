@@ -8,25 +8,25 @@ interactions:
       Content-Length: ['0']
       Content-Type: [application/json; charset=utf-8]
       User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.4 msrest_azure/0.4.34 azure-mgmt-storage/1.5.0 Azure-SDK-For-Python]
+          msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-storage/2.0.0 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: POST
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest/listKeys?api-version=2017-10-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest/listKeys?api-version=2018-02-01
   response:
     body:
       string: !!binary |
         H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
         VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR2/z
-        6+ajR9/jX15ki/yjR/ht96PRR5dZucafb5p3ew9fP391//T5g/3nL5+vrve+uv+d37s4/+mHpz99
-        8fDTiy+Kn149/Pbn+9/+4tO7XzVPfvrq0/u7k1frXzS5+1PLp9dfzubf+fRZPmmuX1wftJ9+sX/v
-        Fz2oyp/47DPqYpXXi6JpimpJOHz07Kvnzz/6JaMOKnvUzqCy9/r09Pj6u/n9X/T7PDyfnx0sPrl8
-        9lPt3btfvrj36Sf1xd4v+u6DT7Pfu7r37S9mP3j7/Pr3vtpbr7Nqli/rX/Rs/u3zZ9nbcud+ljUP
-        i+nL5nw/W7z69qfvLgZR+f4v+X8AFhi0syABAAA=
+        6+ajR9/jX15ki/yjR/ht96PRR5dZucafxfT+d69+uqh/kP9e7eyTy+sHV9dte/nVTx0091/9xOXu
+        d3/Ry093n/7g5On57/32er6XPbu7WH138np28LRud74sPvlF+19MHtzdO7t/svv7PH/9e38x2z24
+        fvH04rPPqItVXi+KpimqJeHw0bOvnj//6JeMOqjsUTuDyiff3bn+9DuLZzvTL549++7vtTr9zvHe
+        7/X7fH738+9+/lN7by+/evEsn7759G159vny98l/7/LhydOTV4tysfpq996b7OSnL15/evB7PZ2c
+        vr58+MmrJy+/89On93+v/ep4EJXv/5L/B6PPSDMgAQAA
     headers:
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json]
-      Date: ['Thu, 02 Aug 2018 19:21:50 GMT']
+      Date: ['Sat, 11 Aug 2018 20:34:49 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
       Server: ['Microsoft-Azure-Storage-Resource-Provider/1.0,Microsoft-HTTPAPI/2.0
@@ -34,9 +34,9 @@ interactions:
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [b333a769-09ea-481b-9d80-790226233658]
+      x-ms-correlation-request-id: [602e6681-e418-42f1-a52f-ceeaaae39283]
       x-ms-ratelimit-remaining-subscription-writes: ['1199']
-      x-ms-request-id: [8d2bf533-df63-48bc-9b6e-34db89fdf0cb]
-      x-ms-routing-request-id: ['WESTUS2:20180802T192151Z:b333a769-09ea-481b-9d80-790226233658']
+      x-ms-request-id: [8bf19d2c-5cc3-4922-8d88-60d19a92a14f]
+      x-ms-routing-request-id: ['WESTUS2:20180811T203450Z:602e6681-e418-42f1-a52f-ceeaaae39283']
     status: {code: 200, message: OK}
 version: 1
