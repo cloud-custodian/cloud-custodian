@@ -27,7 +27,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, OPERATORS)
+    ANNOTATION_KEY, FilterValidationError, OPERATORS, FilterKmsInvalid)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
@@ -485,6 +485,86 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
+
+
+@Snapshot.filter_registry.register('invalid-kms')
+class KmsKeyActiveSnapshot(FilterKmsInvalid):
+    """
+    Filter to ignore snapshots that have an active KMS Key.
+
+    This filter is 'true' by default.
+
+    :example:
+
+    implicit with no parameters, 'true' by default
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-snapshots-with-missing-keys
+                resource: ebs-snapshot
+                filters:
+                  - invalid-kms
+
+    :example:
+
+    explicit with parameter
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-snapshots
+                resource: ebs-snapshot
+                filters:
+                  - type: invalid-kms
+                    value: false
+
+    """
+
+    schema = type_schema('invalid-kms', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ec2').get_permissions()
+
+
+@filters.register('invalid-kms')
+class KmsKeyActive(FilterKmsInvalid):
+    """
+    Filter to ignore volumes that have an active KMS Key.
+
+    This filter is 'true' by default.
+
+    :example:
+
+    implicit with no parameters, 'true' by default
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-volumes-with-missing-keys
+                resource: ebs
+                filters:
+                  - invalid-kms
+
+    :example:
+
+    explicit with parameter
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-volumes
+                resource: ebs
+                filters:
+                  - type: invalid-kms
+                    value: false
+
+    """
+
+    schema = type_schema('invalid-kms', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('ec2').get_permissions()
 
 
 @filters.register('fault-tolerant')

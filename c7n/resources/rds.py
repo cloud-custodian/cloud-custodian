@@ -60,7 +60,7 @@ from c7n.actions import (
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
-    OPERATORS)
+    OPERATORS, FilterValidationError, FilterKmsInvalid)
 
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.filters.health import HealthEventFilter
@@ -1163,6 +1163,46 @@ class RestoreInstance(BaseAction):
         params.update(self.data.get('restore_options', {}))
         post_modify.update(self.data.get('modify_options', {}))
         return params, post_modify
+
+
+@RDSSnapshot.filter_registry.register('invalid-kms')
+class KmsKeyActive(FilterKmsInvalid):
+    """
+    Filter to ignore snapshots that have an active KMS Key.
+
+    This filter is 'true' by default.
+
+    :example:
+
+    implicit with no parameters, 'true' by default
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-snapshots-with-missing-keys
+                resource: rds-snapshot
+                filters:
+                  - invalid-kms
+
+    :example:
+
+    explicit with parameter
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-snapshots
+                resource: rds-snapshot
+                filters:
+                  - type: invalid-kms
+                    value: false
+
+    """
+
+    schema = type_schema('invalid-kms', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('rds').get_permissions()
 
 
 @RDSSnapshot.filter_registry.register('cross-account')
