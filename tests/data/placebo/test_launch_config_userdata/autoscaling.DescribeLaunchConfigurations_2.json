@@ -3,56 +3,55 @@
     "data": {
         "LaunchConfigurations": [
             {
-                "UserData": "IyEvYmluL2Jhc2gKZWNobyBFQ1NfQ0xVU1RFUj1vbW5pc3NtLXRlc3QtY2x1c3RlciA+PiAvZXRjL2Vjcy9lY3MuY29uZmlnO2VjaG8gRUNTX0JBQ0tFTkRfSE9TVD0gPj4gL2V0Yy9lY3MvZWNzLmNvbmZpZzs=", 
-                "IamInstanceProfile": "ecsInstanceRole", 
+                "UserData": "IyAtRGphdmF4Lm5ldC5zc2wudHJ1c3RTdG9yZVBhc3N3b3JkPXBAc3N3b3JkCiMgLS1wcnhfdXNlcm5hbWUgIC0tcHJ4X3Bhc3N3b3JkICAtLXByeF9zZXJ2ZXIgYXdzLXByb3h5LXByb2QuY2xvdWQuY2FwaXRhbG9uZS5jb20KIyBkZXZlbG9wL29wcy91c2VyZGF0YS5zaCB8IC9iaW4vYmFzaCAtcyAtLSBteXNlY3JldHBhc3N3b3JkIG15c2VjcmV0cGFzc3dvcmQgZW50ZXJwcmlzZWFwaS1SS0NrZnVSWmdnCiMgZGJQYXNzd29yZD0nVGhlMzFnMTMxMnJhODhzc0lzNzEzRzJyMjJlZW4zck9uMThUaGUxODIzOE90aDIxJwojIEFXU0FjY2Vzc0tleUlkPUFLSUFBU0RGR0hKS0xQT0lVWVRSJkV4cGlyZXM9MTUzMDExMjY2NSZTaWduYXR1cmU9c2N1YQojIHJ1bmVsZiAtLXBhc3N3b3JkIG15cGFzc3dvcmQgLS11c2VybmFtZSBib2IKIyBzb21ld2luZG93cyBwb3dlcnNoZWxsIHsgcGFzc3dvcmQgPSdteXBhc3N3b3JkJyB9CiMgaHR0cDovL2VpZDphc2RmYXNkZkBwcm94eS5rZGMuY2FwaXRhbG9uZS5jb206ODA5OTsgZXhwb3J0IGh0dHBfcHJveHk9JHByb3h5OwojIGh0dHA6Ly9laWQ6YXNkZmFzZGZAZW50cHJveHkua2RjLmNhcGl0YWxvbmUuY29tOjgwOTkKIyBodHRwOi8vZWlkOmFzZGZhc2RmQGdpdGh1Yi5rZGMuY2FwaXRhbG9uZS5jb20KIyBjbGllbnRfc2VjcmV0PTEyMzI0ZWFzZGZnaDEyMzQ1Njd4Y3ZiCiMgbGRhcC51c2VybmFtZT1TT01FUkVBTExZTE9OR0hBU0c4Mjg5ODJJSktpamRoOTNoaEpLREhoM2xramkzajlxcAojIGxkYXAucGFzc3dvcmQ9U0gzbmQ5MmtzaTE5NDMKIyBlY2hvIGFzZGZhc2RmIHwgY2hwYXNzd2QgdXNlcm5hbWUKIyBBZGQtTG9jYWxHcm91cE1lbWJlciAtR3JvdXAgIkFkbWluaXN0cmF0b3JzIiAtTWVtYmVyIEJvYgojIEJFR0lOIFJTQSBQUklWQVRFIEtFWQojIGFjY2Vzc190b2tlbj1hc2RmZzEyMzQ1ZmdoMzQ1NmdoamsKIyBsZGFwc2VhcmNoIC1MIC1IIGxkYXA6Ly9jb2YuZHMuY2FwaXRhbG9uZS5jb20gLWIgREM9Y29mLERDPWRzLERDPWNhcGl0YWxvbmUsREM9Y29tIGNuPTx1c2VybmFtZT4gbWFuYWdlciAtdyBteXBhc3N3b3JkCiMgQXV0aG9yaXphdGlvbjogQmFzaWMgYXNkZmFzZGZhc2RmCiMgU2V0LUFEQWNjb3VudFBhc3N3b3JkIC1DcmVkZW50aWFsIG15Y3JlZHMgLU9sZFBhc3N3b3JkIGFzZGZhc2RmIC1OZXdQYXNzd29yZCBteWNyZWRzIC1Bc1BsYWluVGV4dCBcInBAc3N3MHJkXCIKIyB1c2VybW9kIC1wIHNvbWVwYXNzd29yZAojIEdJVF9UT0tFTj1aT01HQUdJVFRPS0VOQVNERkFTREYKIyBwYXNzd2Q9J3Bhc3N3b3JycnJyZDEyMyc=", 
                 "EbsOptimized": false, 
-                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:d47e08f9-3656-405e-8b22-acc3efd52d9e:launchConfigurationName/EC2ContainerService-omnissm-test-cluster-EcsInstanceLc-1IDARAWHLMZ4ECopy", 
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:e42efcf8-357d-41be-a07d-0406bf784bbd:launchConfigurationName/TestCC", 
                 "InstanceMonitoring": {
-                    "Enabled": true
+                    "Enabled": false
                 }, 
                 "ClassicLinkVPCSecurityGroups": [], 
                 "CreatedTime": {
-                    "hour": 21, 
+                    "hour": 19, 
                     "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 36, 
-                    "microsecond": 99000, 
+                    "month": 8, 
+                    "second": 14, 
+                    "microsecond": 550000, 
                     "year": 2018, 
-                    "day": 1, 
-                    "minute": 51
+                    "day": 10, 
+                    "minute": 28
                 }, 
                 "BlockDeviceMappings": [
                     {
-                        "DeviceName": "/dev/xvdcz", 
+                        "DeviceName": "/dev/xvda", 
                         "Ebs": {
                             "DeleteOnTermination": true, 
-                            "Encrypted": false, 
-                            "VolumeSize": 22, 
+                            "SnapshotId": "snap-00d1996891a5d2fbc", 
+                            "VolumeSize": 8, 
                             "VolumeType": "gp2"
                         }
                     }
                 ], 
-                "KeyName": "kylet", 
+                "KeyName": "", 
                 "SecurityGroups": [
-                    "sg-3839ec4b"
+                    "sg-0a93da236b46a0565"
                 ], 
-                "LaunchConfigurationName": "EC2ContainerService-omnissm-test-cluster-EcsInstanceLc-1IDARAWHLMZ4ECopy", 
+                "LaunchConfigurationName": "TestCC", 
                 "KernelId": "", 
                 "RamdiskId": "", 
-                "ImageId": "ami-aff65ad2", 
-                "InstanceType": "t2.medium", 
-                "AssociatePublicIpAddress": true
+                "ImageId": "ami-b70554c8", 
+                "InstanceType": "t2.micro"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "913badd8-9cd3-11e8-9588-45b8705c0d8a", 
+            "RequestId": "57fc2684-9d05-11e8-9fd6-710ec875fc8e", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "913badd8-9cd3-11e8-9588-45b8705c0d8a", 
-                "date": "Fri, 10 Aug 2018 19:28:32 GMT", 
-                "content-length": "1977", 
-                "content-type": "text/xml"
+                "x-amzn-requestid": "57fc2684-9d05-11e8-9fd6-710ec875fc8e", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3298", 
+                "content-type": "text/xml", 
+                "date": "Sat, 11 Aug 2018 01:24:50 GMT"
             }
         }
     }
