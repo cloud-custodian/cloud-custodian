@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InstanceId": "i-022f784aa6cd0a555", 
+        "UserData": {
+            "Value": "CiMgLURqYXZheC5uZXQuc3NsLnRydXN0U3RvcmVQYXNzd29yZD1wQHNzd29yZAojIC0tcHJ4X3VzZXJuYW1lICAtLXByeF9wYXNzd29yZCAgLS1wcnhfc2VydmVyIGF3cy1wcm94eS1wcm9kLmNsb3VkLmNhcGl0YWxvbmUuY29tCiMgZGV2ZWxvcC9vcHMvdXNlcmRhdGEuc2ggfCAvYmluL2Jhc2ggLXMgLS0gbXlzZWNyZXRwYXNzd29yZCBteXNlY3JldHBhc3N3b3JkIGVudGVycHJpc2VhcGktUktDa2Z1UlpnZwojIGRiUGFzc3dvcmQ9J1RoZTMxZzEzMTJyYTg4c3NJczcxM0cycjIyZWVuM3JPbjE4VGhlMTgyMzhPdGgyMScKIyBBV1NBY2Nlc3NLZXlJZD1BS0lBQVNERkdISktMUE9JVVlUUiZFeHBpcmVzPTE1MzAxMTI2NjUmU2lnbmF0dXJlPXNjdWEKIyBydW5lbGYgLS1wYXNzd29yZCBteXBhc3N3b3JkIC0tdXNlcm5hbWUgYm9iCiMgc29tZXdpbmRvd3MgcG93ZXJzaGVsbCB7IHBhc3N3b3JkID0nbXlwYXNzd29yZCcgfQojIGh0dHA6Ly9laWQ6YXNkZmFzZGZAcHJveHkua2RjLmNhcGl0YWxvbmUuY29tOjgwOTk7IGV4cG9ydCBodHRwX3Byb3h5PSRwcm94eTsKIyBodHRwOi8vZWlkOmFzZGZhc2RmQGVudHByb3h5LmtkYy5jYXBpdGFsb25lLmNvbTo4MDk5CiMgaHR0cDovL2VpZDphc2RmYXNkZkBnaXRodWIua2RjLmNhcGl0YWxvbmUuY29tCiMgY2xpZW50X3NlY3JldD0xMjMyNGVhc2RmZ2gxMjM0NTY3eGN2YgojIGxkYXAudXNlcm5hbWU9U09NRVJFQUxMWUxPTkdIQVNHODI4OTgySUpLaWpkaDkzaGhKS0RIaDNsa2ppM2o5cXAKIyBsZGFwLnBhc3N3b3JkPVNIM25kOTJrc2kxOTQzCiMgZWNobyBhc2RmYXNkZiB8IGNocGFzc3dkIHVzZXJuYW1lCiMgQWRkLUxvY2FsR3JvdXBNZW1iZXIgLUdyb3VwICJBZG1pbmlzdHJhdG9ycyIgLU1lbWJlciBCb2IKIyBCRUdJTiBSU0EgUFJJVkFURSBLRVkKIyBhY2Nlc3NfdG9rZW49YXNkZmcxMjM0NWZnaDM0NTZnaGprCiMgbGRhcHNlYXJjaCAtTCAtSCBsZGFwOi8vY29mLmRzLmNhcGl0YWxvbmUuY29tIC1iIERDPWNvZixEQz1kcyxEQz1jYXBpdGFsb25lLERDPWNvbSBjbj08dXNlcm5hbWU+IG1hbmFnZXIgLXcgbXlwYXNzd29yZAojIEF1dGhvcml6YXRpb246IEJhc2ljIGFzZGZhc2RmYXNkZgojIFNldC1BREFjY291bnRQYXNzd29yZCAtQ3JlZGVudGlhbCBteWNyZWRzIC1PbGRQYXNzd29yZCBhc2RmYXNkZiAtTmV3UGFzc3dvcmQgbXljcmVkcyAtQXNQbGFpblRleHQgXCJwQHNzdzByZFwiCiMgdXNlcm1vZCAtcCBzb21lcGFzc3dvcmQKIyBHSVRfVE9LRU49Wk9NR0FHSVRUT0tFTkFTREZBU0RGCiMgcGFzc3dkPSdwYXNzd29ycnJycmQxMjMn"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0a3effb0-8586-446d-8e86-c145fd0a4d3e", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 10 Aug 2018 19:12:19 GMT"
+            }
+        }
+    }
+}

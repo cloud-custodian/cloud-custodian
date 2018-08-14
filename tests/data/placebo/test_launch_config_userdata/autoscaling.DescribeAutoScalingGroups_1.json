@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:5892b5a2-d131-4755-bfb3-b26df2f889b5:autoScalingGroupName/TestCCAsg", 
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling", 
+                "TargetGroupARNs": [], 
+                "SuspendedProcesses": [], 
+                "DesiredCapacity": 1, 
+                "Tags": [], 
+                "EnabledMetrics": [], 
+                "LoadBalancerNames": [], 
+                "AutoScalingGroupName": "TestCCAsg", 
+                "DefaultCooldown": 300, 
+                "MinSize": 1, 
+                "Instances": [
+                    {
+                        "ProtectedFromScaleIn": false, 
+                        "AvailabilityZone": "us-east-1a", 
+                        "InstanceId": "i-0b69801e780d8bd31", 
+                        "HealthStatus": "Healthy", 
+                        "LifecycleState": "InService", 
+                        "LaunchConfigurationName": "TestCC"
+                    }
+                ], 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-914763e7", 
+                "HealthCheckGracePeriod": 300, 
+                "TerminationPolicies": [
+                    "Default"
+                ], 
+                "LaunchConfigurationName": "TestCC", 
+                "CreatedTime": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 10, 
+                    "microsecond": 32000, 
+                    "year": 2018, 
+                    "day": 10, 
+                    "minute": 28
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1a"
+                ], 
+                "HealthCheckType": "EC2", 
+                "NewInstancesProtectedFromScaleIn": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "579db232-9d05-11e8-8789-651b41722a91", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "579db232-9d05-11e8-8789-651b41722a91", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2071", 
+                "content-type": "text/xml", 
+                "date": "Sat, 11 Aug 2018 01:24:50 GMT"
+            }
+        }
+    }
+}
