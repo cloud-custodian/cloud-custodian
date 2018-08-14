@@ -137,7 +137,7 @@ class StackDriverLogging(LogOutput):
         from google.cloud.logging import Client as LogClient
         from google.cloud.logging.handlers import CloudLoggingHandler
         from google.cloud.logging.resource import Resource
-        
+
         log_group = self.ctx.options.log_group
         if log_group.endswith('*'):
             log_group = "%s%s" % (log_group[:-1], self.ctx.policy.name)
