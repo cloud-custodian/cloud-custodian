@@ -178,8 +178,14 @@ class PolicyChange(object):
 
 
 class CollectionDelta(object):
+    """Iterator over changes between two policy collections.
 
-    def __init__(self, prev, curr, commit, repo_uri):
+    With a given by url associated to a give commit.
+    """
+
+    change = PolicyChange
+
+    def __init__(self, prev, curr, commit=None, repo_uri=None):
         self.prev = prev
         self.curr = curr
         self.commit = commit
@@ -207,7 +213,7 @@ class CollectionDelta(object):
 
 
 class Policy(BasePolicy):
-    # revision policy derivate is inert
+    """Policy that tracks its file origin."""
     def __init__(self, data, options, file_path):
         self.file_path = file_path
         self.data = data
@@ -215,6 +221,7 @@ class Policy(BasePolicy):
 
 
 class PolicyCollection(BaseCollection):
+    """Policy collection supporting collection modifications."""
 
     policy_class = Policy
 
@@ -265,9 +272,7 @@ def policy_path_matcher(path):
 
 
 class PolicyRepo(object):
-    """
-    How to process removals
-
+    """Models a git repository containing policy files.
     """
     def __init__(self, repo_uri, repo, matcher=None):
         self.repo_uri = repo_uri
@@ -307,26 +312,17 @@ class PolicyRepo(object):
 
         # Added
         for f in set(target_files) - set(baseline_files):
-            target_policies += PolicyCollection.from_data(
-                yaml.safe_load(self.repo.get(target.tree[f].id).data),
-                Config.empty(), f)
-
+            target_policies += self._policy_file_rev(f, target)
         # Removed
         for f in set(baseline_files) - set(target_files):
-            baseline_policies += PolicyCollection.from_data(
-                yaml.safe_load(self.repo.get(baseline.tree[f].id).data),
-                Config.empty(), f)
+            baseline_policies += self._policy_file_rev(f, baseline)
 
         # Modified
         for f in set(baseline_files).intersection(target_files):
             if baseline_files[f].hex == target_files[f].hex:
                 continue
-            target_policies += PolicyCollection.from_data(
-                yaml.safe_load(self.repo.get(target.tree[f].id).data),
-                Config.empty(), f)
-            baseline_policies += PolicyCollection.from_data(
-                yaml.safe_load(self.repo.get(baseline.tree[f].id).data),
-                Config.empty(), f)
+            target_policies += self._policy_file_rev(f, target)
+            baseline_policies += self._policy_file_rev(f, baseline)
 
         return CollectionDelta(
             baseline_policies, target_policies, target, self.repo_uri).delta()
@@ -353,10 +349,15 @@ class PolicyRepo(object):
             commits.pop(-1)
 
         for commit in commits:
-            for policy_change in self.process_commit(commit):
+            for policy_change in self._process_stream_commit(commit):
                 yield policy_change
 
-    def process_commit(self, change):
+    def _policy_file_rev(self, f, commit):
+        return PolicyCollection.from_data(
+            yaml.safe_load(self.repo.get(commit.tree[f].id).data),
+            Config.empty(), f)
+
+    def _process_stream_commit(self, change):
         if not change.parents:
             change_diff = self.repo.diff(self.repo.get(EMPTY_TREE, change), change)
         else:
@@ -379,21 +380,15 @@ class PolicyRepo(object):
             if not self.matcher(f):
                 continue
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_ADDED']:
-                change_policies += PolicyCollection.from_data(
-                    yaml.safe_load(self.repo.get(change.tree[f].id).data),
-                    Config.empty(), f)
+                change_policies += self._policy_file_rev(f, change)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_MODIFIED']:
-                change_policies += PolicyCollection.from_data(
-                    yaml.safe_load(self.repo.get(change.tree[f].id).data),
-                    Config.empty(), f)
+                change_policies += self._policy_file_rev(f, change)
                 current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_DELETED']:
                 current_policies += self.policy_files[f]
                 removed.add(f)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_RENAMED']:
-                change_policies += PolicyCollection.from_data(
-                    yaml.safe_load(self.repo.get(change.tree[f].id).data),
-                    Config.empty(), f)
+                change_policies += self._policy_file_rev(f, change)
                 current_policies += self.policy_files[delta.old_file.path]
                 removed.add(delta.old_file.path)
             else:
@@ -402,8 +397,16 @@ class PolicyRepo(object):
                     GIT_DELTA[delta.status], delta.new_file.path, change.id)
                 continue
 
-        for pchange in CollectionDelta(
-                current_policies, change_policies, change, self.repo_uri).delta():
+        for change in self._process_stream_delta(CollectionDelta(
+                current_policies, change_policies, change, self.repo_uri).delta()):
+            yield change
+
+        for r in removed:
+            del self.policy_files[r]
+
+    def _process_stream_delta(self, delta_stream):
+        """Bookkeeping on internal data structures while iterating a stream."""
+        for pchange in delta_stream:
             if pchange.kind == ChangeType.ADD:
                 self.policy_files.setdefault(
                     pchange.file_path, PolicyCollection()).add(pchange.policy)
@@ -417,9 +420,6 @@ class PolicyRepo(object):
                 else:
                     self.policy_files[pchange.file_path][pchange.policy.name] = pchange.policy
             yield pchange
-
-        for r in removed:
-            del self.policy_files[r]
 
 
 def parse_arn(arn):
@@ -540,13 +540,13 @@ def cli():
     """Policy changes from git history"""
 
 
-@cli.command(name='diff-tree')
+@cli.command(name='diff')
 @click.option('-r', '--repo-uri')
-@click.option('--baseline', default='master')
-@click.option('--branch', default=None)
+@click.option('--source', default='master', help="source/baseline revision spec")
+@click.option('--target', default=None, help="target revisiion spec")
 @click.option('-o', '--output', type=click.File('wb'), default='-')
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def diff_tree(repo_uri, baseline, branch, output, verbose):
+def diff(repo_uri, source, target, output, verbose):
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -558,46 +558,16 @@ def diff_tree(repo_uri, baseline, branch, output, verbose):
     repo = pygit2.Repository(repo_uri)
     load_resources()
 
-    if branch is None:
-        branch = repo.head.shorthand
+    if target is None:
+        target = repo.head.shorthand
 
     policy_repo = PolicyRepo(repo_uri, repo)
     changes = list(policy_repo.delta_commits(
-        repo.revparse_single(baseline),
-        repo.revparse_single(branch)))
+        repo.revparse_single(source),
+        repo.revparse_single(target)))
     output.write(
         yaml.safe_dump({
             'policies': [c.policy.data for c in changes]}))
-
-
-@cli.command()
-@click.option('-r', '--repo_uri')
-@click.option('-o', '--output', type=click.File('wb'), default='-')
-@click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def diff(repo_uri, output, verbose):
-    """Generate a policy file with only the changed policies from a repository.
-    """
-    logging.basicConfig(
-        format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
-        level=(verbose and logging.DEBUG or logging.INFO))
-    logging.getLogger('botocore').setLevel(logging.WARNING)
-
-    if repo_uri is None:
-        repo_uri = pygit2.discovery_repository(os.getcwd())
-
-    repo = pygit2.Repository(repo_uri)
-    load_resources()
-    policy_repo = PolicyRepo(repo_uri, repo)
-    policies = []
-    policy_names = set()
-
-    for c in list(policy_repo.delta_stream(limit=1, sort=pygit2.GIT_SORT_TIME)):
-        if c.policy.name in policy_names:
-            continue
-        policies.append(c.policy.data)
-        policy_names.add(c.policy.name)
-
-    output.write(yaml.safe_dump({'policies': policies}, default_flow_style=False))
 
 
 @cli.command()
