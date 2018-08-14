@@ -57,7 +57,7 @@ def regex_match(value, regex):
         return False
     # Note python 2.5+ internally cache regex
     # would be nice to use re2
-    return bool(re.match(regex, value, flags=re.IGNORECASE & re.DOTALL))
+    return bool(re.match(regex, value, flags=re.IGNORECASE))
 
 
 def operator_in(x, y):
