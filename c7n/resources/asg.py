@@ -15,15 +15,18 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.client import ClientError
 
+import base64
+import contextlib
 from collections import Counter
 from concurrent.futures import as_completed
-
 from datetime import datetime, timedelta
 from dateutil import zoneinfo
 from dateutil.parser import parse
+from gzip import GzipFile
 
 import logging
 import itertools
+from six import BytesIO
 import time
 
 from c7n.actions import Action, ActionRegistry
@@ -183,6 +186,40 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
         # Active launch configs can be deleted..
         cfg = self.configs.get(asg['LaunchConfigurationName'])
         return self.match(cfg)
+
+
+@filters.register('user-data')
+class UserData(LaunchConfigFilter):
+
+    schema = type_schema(
+        'user-data', rinherit=ValueFilter.schema)
+    permissions = ("autoscaling:DescribeLaunchConfigurations",)
+
+    def validate(self):
+        return self
+
+    def process(self, asgs, event=None):
+        self.initialize(asgs)
+        return super(LaunchConfigFilter, self).process(asgs, event)
+
+    def __call__(self, asg):
+        cfg = self.configs.get(asg['LaunchConfigurationName'])
+        if not cfg:
+            return
+        ud = cfg.get('UserData')
+        if not ud:
+            return
+
+        ud = base64.b64decode(ud)
+        try:
+            ud = ud.decode('utf8')
+        except UnicodeDecodeError:
+            with contextlib.closing(
+                    GzipFile(None, "rb", 1, BytesIO(ud))) as fh:
+                ud = fh.read().decode('utf8')
+
+        self.data['key'] = 'Value'
+        return self.match({'Value': ud})
 
 
 class ConfigValidFilter(Filter, LaunchConfigFilterBase):
@@ -1628,11 +1665,8 @@ class LaunchConfig(query.QueryResourceManager):
 
 
 class DescribeLaunchConfig(query.DescribeSource):
-
-    def augment(self, resources):
-        for r in resources:
-            r.pop('UserData', None)
-        return resources
+    """Query for launch configs from asg api
+    """
 
 
 @LaunchConfig.filter_registry.register('age')

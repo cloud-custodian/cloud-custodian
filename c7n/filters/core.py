@@ -16,6 +16,7 @@ Resource Filtering Logic
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import copy
 import datetime
 from datetime import timedelta
@@ -56,7 +57,7 @@ def regex_match(value, regex):
         return False
     # Note python 2.5+ internally cache regex
     # would be nice to use re2
-    return bool(re.match(regex, value, flags=re.IGNORECASE))
+    return bool(re.match(regex, value, flags=re.IGNORECASE & re.DOTALL))
 
 
 def operator_in(x, y):
@@ -311,8 +312,9 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr', 'unique_size']},
+                'age', 'integer', 'expiration', 'normalize', 'size', 'base64',
+                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
+                'unique_size']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -475,6 +477,10 @@ class ValueFilter(Filter):
     def process_value_type(self, sentinel, value, resource):
         if self.vtype == 'normalize' and isinstance(value, six.string_types):
             return sentinel, value.strip().lower()
+
+        elif self.vtype == 'base64':
+            return sentinel, (
+                value and base64.b64decode(value).decode('utf8') or value)
 
         elif self.vtype == 'expr':
             return sentinel, self.get_resource_value(value, resource)
