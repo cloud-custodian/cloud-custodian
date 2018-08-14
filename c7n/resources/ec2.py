@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import itertools
 import operator
 import random
@@ -1565,15 +1566,64 @@ class InstanceAttribute(ValueFilter):
     def get_instance_attribute(self, resources, attribute):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource_set in utils.chunks(resources):
+                futures.append(
+                    w.submit(
+                        self.process_resource_set,
+                        client, attribute, resource_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error retrieving instance-attribute %s err: %s",
+                        attribute, f.exception())
 
+    def process_resource_set(self, client, attribute, resources):
+        annotation_key = 'c7n:attribute-%s' % attribute
         for resource in resources:
+            if annotation_key in resource:
+                continue
             instance_id = resource['InstanceId']
-            fetched_attribute = self.manager.retry(
-                client.describe_instance_attribute,
-                Attribute=attribute,
-                InstanceId=instance_id)
+            try:
+                fetched_attribute = self.manager.retry(
+                    client.describe_instance_attribute,
+                    Attribute=attribute,
+                    InstanceId=instance_id)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidInstanceID.NotFound':
+                    resource[annotation_key] = None
+                    continue
+                raise
             keys = list(fetched_attribute.keys())
             keys.remove('ResponseMetadata')
             keys.remove('InstanceId')
-            resource['c7n:attribute-%s' % attribute] = fetched_attribute[
-                keys[0]]
+
+            resource[annotation_key] = self.process_resource_value(
+                fetched_attribute[keys[0]])
+
+    def process_resource_value(self, value):
+        return value
+
+
+@filters.register('user-data')
+class UserData(InstanceAttribute):
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+
+    def validate(self):
+        return self
+
+    def process(self, resources, event=None):
+        attribute = 'userData'
+        annotation_key = 'c7n:attribute-%s' % attribute
+        self.get_instance_attribute(resources, attribute)
+        self.data['key'] = 'Value'
+        return [resource for resource in resources
+                if self.match(resource[annotation_key])]
+
+    def process_resource_value(self, value):
+        if not value:
+            return value
+        value['Value'] = base64.b64decode(value['Value']).decode('utf8')
+        return value
