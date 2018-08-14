@@ -61,7 +61,7 @@ class TestUserData(BaseTest):
         policy = self.load_policy(
             {
                 "name": "launch_config_userdata",
-                "resource": "launch-config",
+                "resource": "asg",
                 'filters': [
                     {
                         'or': [
@@ -74,9 +74,7 @@ class TestUserData(BaseTest):
             },
             session_factory=session_factory
         )
-
         resources = policy.run()
-
         self.assertGreater(len(resources), 0)
 
     def test_validate(self):
@@ -85,6 +83,13 @@ class TestUserData(BaseTest):
                  u'op': u'regex'}
         ud = c7n.resources.asg.UserDataFilter(dataz).validate()
         self.assertEqual(type(ud), c7n.resources.asg.UserDataFilter)
+
+    def test_attributes(self):
+        data = {u'type': u'user-data', u'key': u'"c7n:user-data"',
+                u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
+                u'op': u'regex'}
+        ud = c7n.resources.asg.UserDataFilter(data)
+        self.assertEqual(ud.data['key'], '"c7n:user-data"')
 
 
 class AutoScalingTest(BaseTest):
