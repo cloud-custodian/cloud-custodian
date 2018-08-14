@@ -265,7 +265,7 @@ class EmailDelivery(object):
                 'template', 'default').endswith('html') and 'html' or 'plain'
         subject = get_message_subject(sqs_message)
         from_addr = sqs_message['action'].get('from', self.config['from_address'])
-        message = MIMEText(body, email_format)
+        message = MIMEText(body, email_format, 'utf-8')
         message['From'] = from_addr
         message['To'] = ', '.join(to_addrs)
         message['Subject'] = subject
