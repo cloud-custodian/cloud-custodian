@@ -15,19 +15,18 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from botocore.client import ClientError
 
-import base64
-import contextlib
 from collections import Counter
 from concurrent.futures import as_completed
+
 from datetime import datetime, timedelta
 from dateutil import zoneinfo
 from dateutil.parser import parse
-from gzip import GzipFile
 
+import base64
 import logging
 import itertools
-from six import BytesIO
 import time
+import zlib
 
 from c7n.actions import Action, ActionRegistry
 from c7n.exceptions import PolicyValidationError
@@ -186,40 +185,6 @@ class LaunchConfigFilter(ValueFilter, LaunchConfigFilterBase):
         # Active launch configs can be deleted..
         cfg = self.configs.get(asg['LaunchConfigurationName'])
         return self.match(cfg)
-
-
-@filters.register('user-data')
-class UserData(LaunchConfigFilter):
-
-    schema = type_schema(
-        'user-data', rinherit=ValueFilter.schema)
-    permissions = ("autoscaling:DescribeLaunchConfigurations",)
-
-    def validate(self):
-        return self
-
-    def process(self, asgs, event=None):
-        self.initialize(asgs)
-        return super(LaunchConfigFilter, self).process(asgs, event)
-
-    def __call__(self, asg):
-        cfg = self.configs.get(asg['LaunchConfigurationName'])
-        if not cfg:
-            return
-        ud = cfg.get('UserData')
-        if not ud:
-            return
-
-        ud = base64.b64decode(ud)
-        try:
-            ud = ud.decode('utf8')
-        except UnicodeDecodeError:
-            with contextlib.closing(
-                    GzipFile(None, "rb", 1, BytesIO(ud))) as fh:
-                ud = fh.read().decode('utf8')
-
-        self.data['key'] = 'Value'
-        return self.match({'Value': ud})
 
 
 class ConfigValidFilter(Filter, LaunchConfigFilterBase):
@@ -855,6 +820,49 @@ class CapacityDelta(Filter):
         return [a for a in asgs
                 if len(a['Instances']) < a['DesiredCapacity'] or
                 len(a['Instances']) < a['MinSize']]
+
+
+@filters.register('user-data')
+class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+
+    def validate(self):
+        return self
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
+
+    def process(self, asgs, event=None):
+        '''
+        Get list of autoscaling groups whose launch configs match the user-data filter.
+        Note: Since this is an autoscaling filter, this won't match unused launch configs.
+        :param launch_configs: List of launch configurations
+        :param event: Event
+        :return: List of ASG's with matching launch configs
+        '''
+
+        self.data['key'] = '"c7n:user-data"'
+        results = []
+        super(UserDataFilter, self).initialize(asgs)
+
+        for asg in asgs:
+            launch_config = self.configs.get(asg['LaunchConfigurationName'])
+            if self.annotation not in launch_config:
+                if not launch_config['UserData']:
+                    launch_config[self.annotation] = None
+                else:
+                    data = base64.b64decode(launch_config['UserData'])
+                    try:
+                        asg[self.annotation] = data.decode('utf8')
+                    except UnicodeDecodeError:
+                        asg[self.annotation] = zlib.decompress(
+                            data, 16).decode('utf8')
+            if self.match(asg):
+                results.append(asg)
+            return results
 
 
 @actions.register('resize')
@@ -1665,8 +1673,9 @@ class LaunchConfig(query.QueryResourceManager):
 
 
 class DescribeLaunchConfig(query.DescribeSource):
-    """Query for launch configs from asg api
-    """
+
+    def augment(self, resources):
+        return resources
 
 
 @LaunchConfig.filter_registry.register('age')
