@@ -268,7 +268,7 @@ def commit_date(commit):
 
 
 def policy_path_matcher(path):
-    if path.endswith('.yaml') or path.endswith('.yml'):
+    if (path.endswith('.yaml') or path.endswith('.yml')) and not path.startswith('.'):
         return True
 
 
