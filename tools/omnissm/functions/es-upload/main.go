@@ -17,8 +17,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -30,30 +30,70 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/olivere/elastic"
-	"github.com/pkg/errors"
 	"github.com/sha1sum/aws_signing_client"
 )
+
+type tagObj struct {
+	Key   string `json:"Key"`
+	Value string `json:"Value"`
+}
+
+type requiredTags struct {
+	ASV             string
+	CMDBEnvironment string
+	OwnerContact    string
+}
+
+type processObj struct {
+	Cmdline       string `json:"cmdline"`
+	Rss           string `json:"rss"`
+	CreateTime    string `json:"create_time"`
+	WriteBytes    string `json:"write_bytes"`
+	Name          string `json:"name"`
+	Pid           string `json:"pid"`
+	ThreadCount   string `json:"thread_count"`
+	NumFds        string `json:"num_fds"`
+	ReadBytes     string `json:"read_bytes"`
+	User          string `json:"user"`
+	Vms           string `json:"vms"`
+	ResourceId    string `json:"resourceId"`
+	captureTime   string `json:"captureTime"`
+	schemaVersion string `json:"schemaVersion"`
+}
+
+type resourceObj struct {
+	KeyName       string `json:"KeyName"`
+	AccountId     string `json:"AccountId"`
+	Platform      string `json:"Platform"`
+	InstanceId    string `json:"InstanceId"`
+	VPCId         string `json:"VPCId"`
+	State         string `json:"State"`
+	ImageId       string `json:"ImageId"`
+	InstanceRole  string `json:"InstanceRole"`
+	Region        string `json:"Region"`
+	SubnetId      string `json:"SubnetId"`
+	InstanceType  string `json:"InstanceType"`
+	Created       string `json:"Created"`
+	ResourceId    string `json:"resourceId"`
+	CaptureTime   string `json:"captureTime"`
+	SchemaVersion string `json:"schemaVersion"`
+}
 
 var (
 	xRayTracingEnabled = os.Getenv("_X_AMZN_TRACE_ID")
 	esClient           = os.Getenv("OMNISSM_ELASTIC_SEARCH_HTTP")
 	indexName          = os.Getenv("OMNISSM_INDEX_NAME")
-	tableName          = os.Getenv("OMNISSM_REGISTRATIONS_TABLE")
 	typeName           = os.Getenv("OMNISSM_TYPE_NAME")
 	s3Svc              = s3.New(session.New())
-	dynamoSvc          = dynamodb.New(session.New())
 )
 
 func main() {
 	lambda.Start(func(ctx context.Context, event events.S3Event) {
 		if xRayTracingEnabled != "" {
 			xray.AWS(s3Svc.Client)
-			xray.AWS(dynamoSvc.Client)
 		}
 		if esClient == "" || indexName == "" || typeName == "" {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
@@ -89,68 +129,67 @@ func newElasticClient(url string) (*elastic.Client, error) {
 }
 
 func processEventRecord(ctx context.Context, record events.S3EventRecord, client *elastic.Client) error {
+	var bucketName = record.S3.Bucket.Name
 	//url encoded in response so we need to parse it
-	key, err := url.QueryUnescape(record.S3.Object.Key)
-	if err != nil {
-		return err
-	}
-	result, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(record.S3.Bucket.Name),
-		Key:    aws.String(key),
-	})
-	if err != nil {
-		return err
-	}
-	keyParams := strings.Split(key, "/")
-	//get m-id from key in filename
-	id := strings.Split(keyParams[len(keyParams)-1], ".")[0]
-	fmt.Println(id)
-	fmt.Println("initializing session")
-	fmt.Println("about to get item")
-	fmt.Printf("tablename: %s\n", tableName)
-	resp, err := dynamoSvc.GetItemWithContext(ctx, &dynamodb.GetItemInput{
-		TableName: aws.String(tableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			"ManagedId": {
-				S: aws.String(id),
-			},
-		},
-	})
-
-	fmt.Println(resp)
-	fmt.Println(err)
+	bucketKey, err := url.QueryUnescape(record.S3.Object.Key)
 	if err != nil {
 		return err
 	}
 
-	if resp.Item == nil {
-		return errors.New("Item not found with id: " + id)
-	}
-
-	fmt.Println("attempting to unmarshal")
-	var entry map[string]interface{}
-	if err := dynamodbattribute.UnmarshalMap(resp.Item, &entry); err != nil {
+	dec, err := getProcessDecoder(ctx, bucketName, bucketKey)
+	if err != nil {
 		return err
 	}
-	fmt.Println(entry)
-	account := entry["AccountId"]
-	region := entry["Region"]
 
-	fmt.Println(account)
-	fmt.Println(region)
+	tags, err := getTags(ctx, bucketName, bucketKey)
+	if err != nil {
+		return err
+	}
 
-	dec := json.NewDecoder(result.Body)
-	defer result.Body.Close()
+	resource, err := getResourceInfo(ctx, bucketName, bucketKey)
+	if err != nil {
+		return err
+	}
+
 	for {
-		var m map[string]interface{}
-		if err := dec.Decode(&m); err == io.EOF {
+		var process processObj
+		if err := dec.Decode(&process); err == io.EOF {
 			break
 		} else if err != nil {
 			return err
 		}
-		m["region"] = region
-		m["accountId"] = account
-		fmt.Println(m)
+		var m map[string]interface{}
+
+		m["ASV"] = tags.ASV
+		m["CMDBEnvironment"] = tags.CMDBEnvironment
+		m["OwnerContact"] = tags.OwnerContact
+		m["Cmdline"] = process.Cmdline
+		m["Rss"] = process.Rss
+		m["CreateTime"] = process.CreateTime
+		m["WriteBytes"] = process.WriteBytes
+		m["Name"] = process.Name
+		m["Pid"] = process.Pid
+		m["ThreadCount"] = process.ThreadCount
+		m["NumFds"] = process.NumFds
+		m["ReadBytes"] = process.ReadBytes
+		m["User"] = process.User
+		m["Vms"] = process.Vms
+		m["ResourceId"] = process.ResourceId
+		m["captureTime"] = process.captureTime
+		m["schemaVersion"] = process.schemaVersion
+		m["KeyName"] = resource.KeyName
+		m["AccountId"] = resource.AccountId
+		m["Platform"] = resource.Platform
+		m["InstanceId"] = resource.InstanceId
+		m["VPCId"] = resource.VPCId
+		m["State"] = resource.State
+		m["ImageId"] = resource.ImageId
+		m["InstanceRole"] = resource.InstanceRole
+		m["Region"] = resource.Region
+		m["SubnetId"] = resource.SubnetId
+		m["InstanceType"] = resource.InstanceType
+		m["Created"] = resource.Created
+
 		_, err := client.Index().
 			Index(indexName).
 			Type(typeName).
@@ -162,4 +201,78 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 	}
 
 	return nil
+}
+
+func getTags(ctx context.Context, bucketName string, bucketKey string) (requiredTags, error) {
+	var tags requiredTags
+	tagsRes, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(strings.Replace(bucketKey, "Custom:ProcessInfo", "AWS:Tag", 1)),
+	})
+	if err != nil {
+		return tags, err
+	}
+
+	dec := json.NewDecoder(tagsRes.Body)
+	if err != nil {
+		return tags, err
+	}
+
+	for {
+		var aTagObj tagObj
+		if err := dec.Decode(&aTagObj); err == io.EOF {
+			break
+		} else if err != nil {
+			return tags, err
+		}
+		switch aTagObj.Key {
+		case "ASV":
+			tags.ASV = aTagObj.Value
+		case "CMDBEnvironment":
+			tags.CMDBEnvironment = aTagObj.Value
+		case "OwnerContact":
+			tags.OwnerContact = aTagObj.Value
+
+		}
+	}
+	return tags, nil
+}
+
+func getResourceInfo(ctx context.Context, bucketName string, bucketKey string) (resourceObj, error) {
+
+	var resource resourceObj
+	//get resource file
+	resourceFile, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(strings.Replace(bucketKey, "Custom:ProcessInfo", "Custom:CloudInfo", 1)),
+	})
+
+	if err != nil {
+		return resource, err
+	}
+
+	resourceByteArray, err := ioutil.ReadAll(resourceFile.Body)
+	if err != nil {
+		return resource, err
+	}
+	defer resourceFile.Body.Close()
+
+	json.Unmarshal(resourceByteArray, resource)
+
+	return resource, nil
+}
+
+func getProcessDecoder(ctx context.Context, bucketName string, bucketKey string) (*json.Decoder, error) {
+	//get process file
+	processFile, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(bucketKey),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dec := json.NewDecoder(processFile.Body)
+	defer processFile.Body.Close()
+	return dec, nil
 }
