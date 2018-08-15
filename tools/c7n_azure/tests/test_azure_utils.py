@@ -16,6 +16,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest
 from c7n_azure.utils import Math
 from c7n_azure.utils import ResourceIdParser
+from c7n_azure.utils import provider_resource_type_comparator
+
 
 RESOURCE_ID = (
     "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
@@ -33,10 +35,14 @@ class UtilsTest(BaseTest):
         self.assertEqual(ResourceIdParser.get_resource_group(RESOURCE_ID), "rgtest")
 
     def test_get_resource_type(self):
-        self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualMachines")
+        self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualmachines")
 
     def test_resource_name(self):
         self.assertEqual(ResourceIdParser.get_resource_name(RESOURCE_ID), "nametest")
+
+    def test_provider_resource_type_comparator(self):
+        self.assertEqual(provider_resource_type_comparator("test", "test"), True)
+        self.assertEqual(provider_resource_type_comparator("Test", "test"), False)
 
     def test_math_mean(self):
         self.assertEqual(Math.mean([4, 5, None, 3]), 4)
