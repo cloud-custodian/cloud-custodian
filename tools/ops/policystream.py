@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Policy Changes from Git.
 ---------------------------
 
@@ -353,9 +354,16 @@ class PolicyRepo(object):
                 yield policy_change
 
     def _policy_file_rev(self, f, commit):
-        return PolicyCollection.from_data(
-            yaml.safe_load(self.repo.get(commit.tree[f].id).data),
-            Config.empty(), f)
+        try:
+            return PolicyCollection.from_data(
+                yaml.safe_load(self.repo.get(commit.tree[f].id).data),
+                Config.empty(), f)
+        except Exception as e:
+            log.warning(
+                "invalid policy file %s @ %s %s %s",
+                f, str(commit.id)[:6], commit_date(commit).isoformat(),
+                commit.author.name)
+            return PolicyCollection()
 
     def _process_stream_commit(self, change):
         if not change.parents:
@@ -383,10 +391,12 @@ class PolicyRepo(object):
                 change_policies += self._policy_file_rev(f, change)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_MODIFIED']:
                 change_policies += self._policy_file_rev(f, change)
-                current_policies += self.policy_files[f]
+                if f in self.policy_files:
+                    current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_DELETED']:
-                current_policies += self.policy_files[f]
-                removed.add(f)
+                if f in self.policy_files:
+                    current_policies += self.policy_files[f]
+                    removed.add(f)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_RENAMED']:
                 change_policies += self._policy_file_rev(f, change)
                 current_policies += self.policy_files[delta.old_file.path]
@@ -553,7 +563,7 @@ def diff(repo_uri, source, target, output, verbose):
     logging.getLogger('botocore').setLevel(logging.WARNING)
 
     if repo_uri is None:
-        repo_uri = pygit2.discovery_repository(os.getcwd())
+        repo_uri = pygit2.discover_repository(os.getcwd())
 
     repo = pygit2.Repository(repo_uri)
     load_resources()
@@ -567,7 +577,8 @@ def diff(repo_uri, source, target, output, verbose):
         repo.revparse_single(target)))
     output.write(
         yaml.safe_dump({
-            'policies': [c.policy.data for c in changes]}))
+            'policies': [c.policy.data for c in changes
+                         if c.kind != ChangeType.REMOVE]}).encode('utf8'))
 
 
 @cli.command()
