@@ -389,6 +389,8 @@ class PolicyRepo(object):
                 continue
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_ADDED']:
                 change_policies += self._policy_file_rev(f, change)
+                if f in self.policy_files:
+                    current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_MODIFIED']:
                 change_policies += self._policy_file_rev(f, change)
                 if f in self.policy_files:
