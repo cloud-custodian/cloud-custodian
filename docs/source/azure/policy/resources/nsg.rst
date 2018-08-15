@@ -54,6 +54,7 @@ This policy will deny access to all security rules with Inbound SSH ports in the
           - type: ingress
             fromPort: 8080
             toPort: 8090
+            access: Allow
          actions:
           - type: close
 
@@ -67,6 +68,7 @@ This policy will deny access to all security rules with any Inbound SSH ports th
          filters:
           - type: ingress
             exceptPorts: [22,23,24]
+            access: Allow
          actions:
           - type: close
 
@@ -80,5 +82,6 @@ This policy will deny access to all security rules with any Outbound SSH ports w
          filters:
           - type: egress
             ipProtocol: TCP
+            access: Allow
          actions:
           - type: close
