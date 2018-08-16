@@ -26,7 +26,7 @@ class ResourceIdParser(object):
 
     @staticmethod
     def get_resource_type(resource_id):
-        return resource_id.split('/')[7].lower()
+        return resource_id.split('/')[7]
 
     @staticmethod
     def get_resource_name(resource_id):
@@ -36,7 +36,7 @@ class ResourceIdParser(object):
 def provider_resource_type_comparator(provider_resource_type, resource_id_resource_type):
     """Compares a provider's resource type and a resource ids resource type
     """
-    return provider_resource_type == resource_id_resource_type.split('/')[-1]
+    return provider_resource_type.lower() == resource_id_resource_type.split('/')[-1].lower()
 
 
 def utcnow():

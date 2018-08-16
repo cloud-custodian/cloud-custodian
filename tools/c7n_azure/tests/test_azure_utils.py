@@ -35,14 +35,17 @@ class UtilsTest(BaseTest):
         self.assertEqual(ResourceIdParser.get_resource_group(RESOURCE_ID), "rgtest")
 
     def test_get_resource_type(self):
-        self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualmachines")
+        self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualMachines")
 
     def test_resource_name(self):
         self.assertEqual(ResourceIdParser.get_resource_name(RESOURCE_ID), "nametest")
 
     def test_provider_resource_type_comparator(self):
         self.assertEqual(provider_resource_type_comparator("test", "test"), True)
-        self.assertEqual(provider_resource_type_comparator("Test", "test"), False)
+        self.assertEqual(provider_resource_type_comparator("Test", "test"), True)
+        self.assertEqual(provider_resource_type_comparator("test", "Test"), True)
+        self.assertEqual(provider_resource_type_comparator("Test", "Test"), True)
+        self.assertEqual(provider_resource_type_comparator("test", "fail"), False)
 
     def test_math_mean(self):
         self.assertEqual(Math.mean([4, 5, None, 3]), 4)

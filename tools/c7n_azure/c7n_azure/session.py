@@ -132,7 +132,7 @@ class Session(object):
         provider = resource_client.providers.get(namespace)
 
         rt = next((t for t in provider.resource_types
-           if provider_resource_type_comparator(t.resource_type.lower(), resource_type)), None)
+           if provider_resource_type_comparator(t.resource_type, resource_type)), None)
 
         if rt and rt.api_versions:
             versions = [v for v in rt.api_versions if 'preview' not in v.lower()]
