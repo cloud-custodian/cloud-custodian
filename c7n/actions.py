@@ -551,6 +551,42 @@ class Notify(BaseNotify):
                 receipt, self.manager.data['name'],
                 self.data.get('template', 'default'), len(batch)))
 
+    def prepare_resources(self, resources):
+        """Resources preparation for transport.
+
+        If we have sensitive or overly large resource metadata we want to
+        remove or additional serialization we need to perform, this
+        provides a mechanism.
+
+        TODO: consider alternative implementations, at min look at adding
+        provider as additional discriminator to resource type. One alternative
+        would be dynamically adjusting buffer size based on underlying
+        transport.
+        """
+        handler = getattr(self, "prepare_%s" % (
+            self.manager.type.replace('-', '_')),
+            None)
+        if handler is None:
+            return resources
+        return handler(resources)
+
+    def prepare_launch_config(self, resources):
+        for r in resources:
+            r.pop('UserData', None)
+        return resources
+
+    def prepare_asg(self, resources):
+        for r in resources:
+            if 'c7n:user-data' in r:
+                r.pop('c7n:user-data', None)
+        return resources
+
+    def prepare_ec2(self, resources):
+        for r in resources:
+            if 'c7n:user-data' in r:
+                r.pop('c7n:user-data')
+        return resources
+
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
             return self.send_sqs(message)
