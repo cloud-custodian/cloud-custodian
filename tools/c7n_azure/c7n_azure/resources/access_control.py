@@ -17,12 +17,11 @@ import re
 import six
 
 from azure.graphrbac import GraphRbacManagementClient
-from azure.graphrbac.models import GetObjectsParameters
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
 from c7n_azure.session import Session
-from msrestazure.azure_exceptions import CloudError
+from c7n_azure.utils import GraphHelper
 
 from c7n.actions import BaseAction
 from c7n.config import Config
@@ -65,36 +64,16 @@ class RoleAssignment(QueryResourceManager):
             resource['properties']['principalId'] for resource in resources
             if resource['properties']['principalId']))
 
-        object_params = GetObjectsParameters(
-            include_directory_object_references=True,
-            object_ids=object_ids)
+        principal_dics = GraphHelper.get_principal_dictionary(graph_client, object_ids)
 
-        aad_objects = graph_client.objects.get_objects_by_object_ids(object_params)
-
-        try:
-            principal_dics = {aad_object.object_id: aad_object for aad_object in aad_objects}
-
-            for resource in resources:
-                if resource['properties']['principalId'] in principal_dics.keys():
-                    graph_resource = principal_dics[resource['properties']['principalId']]
-                    resource['principalName'] = self.get_principal_name(graph_resource)
-                    resource['displayName'] = graph_resource.display_name
-                    resource['aadType'] = graph_resource.object_type
-
-        except CloudError:
-            log.warning('Credentials not authorized for access to read from Microsoft Graph. \n '
-                        'Can not query on principalName, displayName, or aadType. \n'
-                        )
+        for resource in resources:
+            if resource['properties']['principalId'] in principal_dics.keys():
+                graph_resource = principal_dics[resource['properties']['principalId']]
+                resource['principalName'] = GraphHelper.get_principal_name(graph_resource)
+                resource['displayName'] = graph_resource.display_name
+                resource['aadType'] = graph_resource.object_type
 
         return resources
-
-    @staticmethod
-    def get_principal_name(graph_object):
-        if graph_object.user_principal_name:
-            return graph_object.user_principal_name
-        elif graph_object.service_principal_names:
-            return graph_object.service_principal_names[0]
-        return graph_object.display_name or ''
 
 
 @resources.register('roledefinition')
