@@ -291,8 +291,8 @@ def setup_parser():
         help="Skips validation of policies (assumes you've run the validate command seperately).")
     run.add_argument(
         "-m", "--metrics-enabled",
-        default=False, action="store_true",
-        help="Emit metrics to CloudWatch Metrics")
+        default=None, nargs="?", const="aws",
+        help="Emit metrics to provider metrics")
 
     return parser
 
