@@ -38,15 +38,13 @@ def main(input):
     }
 
     if type(input) is HttpRequest:
-        context['event'] = input.get_json()
-        context['event'] = input.get_json()
+        req_body = input.get_json()
+        context['event'] = req_body[0]
         logging.info(context['event'])
-        code = context['event'][0]['data']['validationCode']
-        response = {
-            "validationResponse": code
-        }
-
-        return func.HttpResponse(body=json.dump(response), status_code=200)
+        if 'validationCode' in context['event']['data'].keys():
+            code = context['event'][0]['data']['validationCode']
+            response = {"validationResponse": code}
+            return func.HttpResponse(body=json.dumps(response, indent=2), status_code=200)
 
     handler.run(None, context)
 
