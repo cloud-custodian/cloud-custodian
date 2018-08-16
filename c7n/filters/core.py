@@ -16,7 +16,6 @@ Resource Filtering Logic
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import base64
 import copy
 import datetime
 from datetime import timedelta
@@ -312,7 +311,7 @@ class ValueFilter(Filter):
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
             'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size', 'base64',
+                'age', 'integer', 'expiration', 'normalize', 'size',
                 'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
                 'unique_size']},
             'default': {'type': 'object'},
@@ -477,10 +476,6 @@ class ValueFilter(Filter):
     def process_value_type(self, sentinel, value, resource):
         if self.vtype == 'normalize' and isinstance(value, six.string_types):
             return sentinel, value.strip().lower()
-
-        elif self.vtype == 'base64':
-            return sentinel, (
-                value and base64.b64decode(value).decode('utf8') or value)
 
         elif self.vtype == 'expr':
             return sentinel, self.get_resource_value(value, resource)

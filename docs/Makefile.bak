@@ -2,16 +2,10 @@
 #
 
 # You can set these variables from the command line.
-VIRTUALENV	  = $(shell echo $$VIRTUAL_ENV | awk -F "/" '{print $$NF}')
-
-ifndef VIRTUALENV
-VIRTUALENV = py36
-endif
-
-SPHINXBINS    = .tox/$(VIRTUALENV)/bin
+SPHINXBINS    = .tox/docs/bin
 SRCDIR        = docs/source
 SPHINXOPTS    = -W
-SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
+SPHINXBUILD   = $(SPHINXBINS)/sphinx-build
 PAPER         =
 BUILDDIR      = $(SRCDIR)/../build
 

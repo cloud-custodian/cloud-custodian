@@ -666,6 +666,9 @@ class UserData(ValueFilter):
     batch_size = 50
     annotation = 'c7n:user-data'
 
+    def validate(self):
+        return self
+
     def get_permissions(self):
         return ('ec2:DescribeInstanceAttribute',)
 
