@@ -22,11 +22,9 @@ from datetime import datetime, timedelta
 from dateutil import zoneinfo
 from dateutil.parser import parse
 
-import base64
 import logging
 import itertools
 import time
-import zlib
 
 from c7n.actions import Action, ActionRegistry
 from c7n.exceptions import PolicyValidationError
@@ -41,6 +39,9 @@ from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
+
+
+from .ec2 import deserialize_user_data
 
 log = logging.getLogger('custodian.asg')
 
@@ -852,14 +853,10 @@ class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
             launch_config = self.configs.get(asg['LaunchConfigurationName'])
             if self.annotation not in launch_config:
                 if not launch_config['UserData']:
-                    launch_config[self.annotation] = None
+                    asg[self.annotation] = None
                 else:
-                    data = base64.b64decode(launch_config['UserData'])
-                    try:
-                        asg[self.annotation] = data.decode('utf8')
-                    except UnicodeDecodeError:
-                        asg[self.annotation] = zlib.decompress(
-                            data, 16).decode('utf8')
+                    asg[self.annotation] = deserialize_user_data(
+                        launch_config['UserData'])
             if self.match(asg):
                 results.append(asg)
             return results

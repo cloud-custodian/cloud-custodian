@@ -659,18 +659,22 @@ class DefaultVpc(DefaultVpcBase):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 
 
+def deserialize_user_data(user_data):
+    data = base64.b64decode(user_data)
+    # try raw and compressed
+    try:
+        return data.decode('utf8')
+    except UnicodeDecodeError:
+        return zlib.decompress(data, 16).decode('utf8')
+
+
 @filters.register('user-data')
 class UserData(ValueFilter):
 
     schema = type_schema('user-data', rinherit=ValueFilter.schema)
     batch_size = 50
     annotation = 'c7n:user-data'
-
-    def validate(self):
-        return self
-
-    def get_permissions(self):
-        return ('ec2:DescribeInstanceAttribute',)
+    permissions = ('ec2:DescribeInstanceAttribute',)
 
     def process(self, resources, event=None):
         self.data['key'] = '"c7n:user-data"'
@@ -704,13 +708,8 @@ class UserData(ValueFilter):
                 if 'Value' not in result['UserData']:
                     r[self.annotation] = None
                 else:
-                    data = base64.b64decode(result['UserData']['Value'])
-                    # try raw and compressed
-                    try:
-                        r[self.annotation] = data.decode('utf8')
-                    except UnicodeDecodeError:
-                        r[self.annotation] = zlib.decompress(
-                            data, 16).decode('utf8')
+                    r[self.annotation] = deserialize_user_data(
+                        result['UserData']['Value'])
             if self.match(r):
                 results.append(r)
         return results
