@@ -33,6 +33,12 @@ class ResourceIdParser(object):
         return resource_id.split('/')[8]
 
 
+def provider_resource_type_comparator(provider_resource_type, resource_id_resource_type):
+    """Compares a provider's resource type and a resource ids resource type
+    """
+    return provider_resource_type.lower() == resource_id_resource_type.split('/')[-1].lower()
+
+
 def utcnow():
     """The datetime object for the current time in UTC
     """
