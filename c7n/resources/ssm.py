@@ -38,25 +38,3 @@ class SSMParameter(QueryResourceManager):
     permissions = ('ssm:GetParameters',
                    'ssm:DescribeParameters')
     filter_registry = filters
-
-
-@filters.register('is-not-secure-string')
-class IsNotSecureString(Filter):
-    """ Matches Parameters that are not of type SecureString
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-                - name: parameters-are-not-secure-string
-                  resource: ssm-parameter
-                  filters:
-                    - type: is-not-secure-string
-    """
-    permissions = ("ssm:Describe",)
-    schema = type_schema('is-not-secure-string')
-
-    def process(self, resources, event=None):
-        return [param for param in resources
-                if not param['Type'] == 'SecureString']

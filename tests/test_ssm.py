@@ -37,9 +37,13 @@ class TestSsm(BaseTest):
             {
                 "name": "ssm-parameter-not-secure",
                 "resource": "ssm-parameter",
-                "filters": ["is-not-secure-string"]
+                "filters": [{"type": "value",
+                             "op": "ne",
+                             "key": "Type",
+                             "value": "SecureString"}]
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.addCleanup(client.delete_parameters, Names=['test-name', 'secure-test-name'])
