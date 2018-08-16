@@ -21,6 +21,7 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.filters.core import PolicyValidationError
 from c7n.utils import type_schema
+from c7n_azure.utils import StringUtils
 
 
 @resources.register('networksecuritygroup')
@@ -43,6 +44,7 @@ TO_PORT = 'toPort'
 PORTS = 'ports'
 EXCEPT_PORTS = 'exceptPorts'
 IP_PROTOCOL = 'ipProtocol'
+ACCESS = 'access'
 
 
 class SecurityRuleFilter(Filter):
@@ -53,7 +55,7 @@ class SecurityRuleFilter(Filter):
     perm_attrs = set((
         IP_PROTOCOL, FROM_PORT, TO_PORT))
 
-    filter_attrs = set(('Cidr', PORTS, EXCEPT_PORTS))
+    filter_attrs = set(('Cidr', PORTS, EXCEPT_PORTS, ACCESS))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
@@ -79,6 +81,7 @@ class SecurityRuleFilter(Filter):
         self.to_port = self.data.get(TO_PORT)
         self.ports = self.data.get(PORTS)
         self.except_ports = self.data.get(EXCEPT_PORTS)
+        self.access = self.data.get(ACCESS)
         self.match_op = self.data.get('match-operator', 'and') == 'and' and all or any
 
         """
@@ -171,15 +174,22 @@ class SecurityRuleFilter(Filter):
         {} - Lower bound of port range (inclusive)
         {} - Upper bound of port range (inclusive)
         {} - TCP/UDP protocol
-    """.format(PORTS, EXCEPT_PORTS, FROM_PORT, TO_PORT, IP_PROTOCOL)
+        {} - Allow/Deny access
+    """.format(PORTS, EXCEPT_PORTS, FROM_PORT, TO_PORT, IP_PROTOCOL, ACCESS)
 
     def is_match(self, security_rule):
-        if self.direction_key != security_rule['properties']['direction']:
+        if not StringUtils.equal(self.direction_key, security_rule['properties']['direction']):
             return False
         ranges_match = self.is_ranges_match(security_rule)
         protocol_match = (self.ip_protocol is None) or \
-                         (self.ip_protocol == security_rule['properties']['protocol'])
-        return self.match_op([ranges_match, protocol_match])
+                         (StringUtils.equal(self.ip_protocol,
+                                            security_rule['properties']['protocol']))
+
+        if self.access is not None:
+            access_match = StringUtils.equal(self.access, security_rule['properties']['access'])
+            return self.match_op([ranges_match, protocol_match, access_match])
+        else:
+            return self.match_op([ranges_match, protocol_match])
 
 
 @NetworkSecurityGroup.filter_registry.register('ingress')
@@ -195,7 +205,8 @@ class IngressFilter(SecurityRuleFilter):
             EXCEPT_PORTS: {'type': 'array', 'items': {'type': 'integer'}},
             FROM_PORT: {'type': 'integer'},
             TO_PORT: {'type': 'integer'},
-            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP']}
+            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP']},
+            ACCESS: {'type': 'string', 'enum': ['Allow', 'Deny']}
         },
         'required': ['type']
     }
@@ -215,7 +226,8 @@ class EgressFilter(SecurityRuleFilter):
             EXCEPT_PORTS: {'type': 'array', 'items': {'type': 'integer'}},
             FROM_PORT: {'type': 'integer'},
             TO_PORT: {'type': 'integer'},
-            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP']}
+            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP']},
+            ACCESS: {'type': 'string', 'enum': ['Allow', 'Deny']}
             # 'SelfReference': {'type': 'boolean'}
         },
         'required': ['type']}

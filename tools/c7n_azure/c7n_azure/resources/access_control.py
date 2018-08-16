@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import logging
+import re
+import six
 
 from azure.graphrbac import GraphRbacManagementClient
 from azure.graphrbac.models import GetObjectsParameters
@@ -25,6 +27,7 @@ from msrestazure.azure_exceptions import CloudError
 from c7n.actions import BaseAction
 from c7n.config import Config
 from c7n.ctx import ExecutionContext
+from c7n.filters import Filter
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
@@ -129,6 +132,21 @@ class DescribeSource(DescribeSource):
         return [r.serialize(True) for r in resources]
 
 
+def is_scope(scope, scope_type):
+    if not isinstance(scope, six.string_types):
+        return False
+
+    regex = ""
+    if scope_type == "subscription":
+        regex = "^\/subscriptions\/[^\/]+$"
+    elif scope_type == "resource-group":
+        regex = "^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
+    else:
+        return False
+
+    return bool(re.match(regex, scope, flags=re.IGNORECASE))
+
+
 @RoleAssignment.filter_registry.register('role')
 class RoleFilter(RelatedResourceFilter):
     """Filters role assignments based on role definitions
@@ -209,6 +227,31 @@ class ResourceAccessFilter(RelatedResourceFilter):
             raise FilterValidationError(
                 "The related resource can not be role assignments or role definitions"
             )
+
+
+@RoleAssignment.filter_registry.register('scope')
+class ScopeFilter(Filter):
+    """Filters role assignments that have subscription level scope access
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: assignments-with-subscription-scope
+                resource: azure.roleassignment
+                filters:
+                  - type: scope
+                    value: subscription
+    """
+
+    schema = type_schema(
+        'scope',
+        value={'type': 'string', 'enum': ['subscription', 'resource-group']})
+
+    def process(self, data, event=None):
+        scope_value = self.data.get('value', '')
+        return [d for d in data if is_scope(d["properties"]["scope"], scope_value)]
 
 
 @RoleAssignment.action_registry.register('delete')
