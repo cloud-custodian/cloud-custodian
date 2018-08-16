@@ -360,9 +360,9 @@ class PolicyRepo(object):
                 Config.empty(), f)
         except Exception as e:
             log.warning(
-                "invalid policy file %s @ %s %s %s",
+                "invalid policy file %s @ %s %s %s \n error:%s",
                 f, str(commit.id)[:6], commit_date(commit).isoformat(),
-                commit.author.name)
+                commit.author.name, e)
             return PolicyCollection()
 
     def _process_stream_commit(self, change):
@@ -525,12 +525,17 @@ class SQSTransport(Transport):
 class OutputTransport(Transport):
 
     def send(self, change):
-        print(change)
+        if self.info.get('format', '') == 'json':
+            print(json.dumps(change.data(), indent=2))
+        else:
+            print(change)
 
 
 def transport(stream_uri, assume):
     if stream_uri == 'stdout':
-        return OutputTransport(None, None)
+        return OutputTransport(None, {})
+    elif stream_uri == 'json':
+        return OutputTransport(None, {'format': 'json'})
     if not stream_uri.startswith('arn'):
         raise ValueError("invalid transport")
     info = parse_arn(stream_uri)
@@ -575,8 +580,7 @@ def diff(repo_uri, source, target, output, verbose):
 
     policy_repo = PolicyRepo(repo_uri, repo)
     changes = list(policy_repo.delta_commits(
-        repo.revparse_single(source),
-        repo.revparse_single(target)))
+        repo.revparse_single(source), repo.revparse_single(target)))
     output.write(
         yaml.safe_dump({
             'policies': [c.policy.data for c in changes
@@ -584,7 +588,7 @@ def diff(repo_uri, source, target, output, verbose):
 
 
 @cli.command()
-@click.option('-r', '--repo-uri', required=True)
+@click.option('-r', '--repo-uri')
 @click.option('-s', '--stream-uri', default="stdout")
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('--assume')
@@ -596,8 +600,14 @@ def stream(repo_uri, stream_uri, verbose, assume):
     logging.getLogger('botocore').setLevel(logging.WARNING)
 
     with contextlib.closing(TempDir().open()) as temp_dir:
-        log.info("Cloning repository: %s", repo_uri)
-        repo = pygit2.clone_repository(repo_uri, temp_dir.path)
+        if repo_uri is None:
+            repo_uri = pygit2.discover_repository(os.getcwd())
+            log.debug("Using repository %s", repo_uri)
+        if repo_uri.startswith('http') or repo_uri.startswith('git@'):
+            log.info("Cloning repository: %s", repo_uri)
+            repo = pygit2.clone_repository(repo_uri, temp_dir.path)
+        else:
+            repo = pygit2.Repository(repo_uri)
         load_resources()
         policy_repo = PolicyRepo(repo_uri, repo)
         change_count = 0
