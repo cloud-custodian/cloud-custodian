@@ -25,7 +25,7 @@ and then perform the delete operation on those ready for deletion.
 
     policies:
       - name: mark-test-appservice-for-deletion
-        resource: azure.appservice
+        resource: azure.appserviceplan
         filters:
           - type: value
             key: name
@@ -37,7 +37,7 @@ and then perform the delete operation on those ready for deletion.
             op: delete
             days: 7
       - name: delete-test-appservice
-        resource: azure.appservice
+        resource: azure.appserviceplan
         filters:
           - type: marked-for-op
             op: delete

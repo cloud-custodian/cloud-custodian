@@ -94,10 +94,10 @@ class PolicyCollection(object):
         policies = [Policy(p, options,
                            session_factory=cls.session_factory())
                     for p in data.get('policies', ())]
-        return PolicyCollection(policies, options)
+        return cls(policies, options)
 
     def __add__(self, other):
-        return PolicyCollection(self.policies + other.policies, self.options)
+        return self.__class__(self.policies + other.policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
         results = []
