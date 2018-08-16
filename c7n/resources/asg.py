@@ -830,9 +830,6 @@ class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
     batch_size = 50
     annotation = 'c7n:user-data'
 
-    def validate(self):
-        return self
-
     def get_permissions(self):
         return self.manager.get_resource_manager('asg').get_permissions()
 

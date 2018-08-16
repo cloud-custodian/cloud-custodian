@@ -11,6 +11,18 @@ Filters
 Actions
 -------
 
+``tag-trim``
+  Trim the number of tags to avoid hitting tag limits.
+
+    .. c7n-schema:: TagTrim
+        :module: c7n.resources.asg
+
+``resize``
+  Resize the min/max/desired instances in an ASG.
+
+    .. c7n-schema:: Resize
+        :module: c7n.resources.asg
+
 ``remove-tag`` or ``untag`` or ``unmark``
   Removes tag from ASG.
 
@@ -61,14 +73,24 @@ Actions
 
 ``offhour`` or ``OffHour``
   Turn resources off based on a schedule.
-  :py:class:``c7n.offhours``
+  :py:class:`.c7n.offhours`
 
   .. c7n-schema:: OffHour
       :module: c7n.resources.asg
 
 ``onhour`` or ``onhour``
   Turn resources on based on a schedule.
-  :py:class:``c7n.offhours``
+  :py:class:`.c7n.offhours`
 
   .. c7n-schema:: OnHour
+      :module: c7n.resources.asg
+
+
+Launch Configs
+++++++++++++++
+
+``delete``
+  Delete a launch configuration.
+
+  .. c7n-schema:: Delete
       :module: c7n.resources.asg
