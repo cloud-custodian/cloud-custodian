@@ -46,6 +46,7 @@ class StringUtils(object):
 
         return False
 
+
 def utcnow():
     """The datetime object for the current time in UTC
     """

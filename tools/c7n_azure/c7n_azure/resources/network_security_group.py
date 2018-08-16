@@ -182,7 +182,8 @@ class SecurityRuleFilter(Filter):
             return False
         ranges_match = self.is_ranges_match(security_rule)
         protocol_match = (self.ip_protocol is None) or \
-                         (StringUtils.equal(self.ip_protocol, security_rule['properties']['protocol']))
+                         (StringUtils.equal(self.ip_protocol,
+                                            security_rule['properties']['protocol']))
 
         if self.access is not None:
             access_match = StringUtils.equal(self.access, security_rule['properties']['access'])

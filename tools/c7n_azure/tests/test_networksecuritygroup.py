@@ -406,8 +406,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  PORTS: [22],
-                 ACCESS: 'Allow'
-                }],
+                 ACCESS: 'Allow'}],
             'actions': [
                 {'type': 'close'}]})
         p.run()
