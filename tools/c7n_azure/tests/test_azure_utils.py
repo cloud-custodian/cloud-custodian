@@ -53,7 +53,7 @@ class UtilsTest(BaseTest):
         # Case insensitive matches
         self.assertTrue(StringUtils.equal("FOO", "foo"))
         self.assertTrue(StringUtils.equal("fOo", "FoO"))
-        self.assertTrue(StringUtils.equal("ABCDEFGH", "abcdefgh"))
+        self.assertTrue(StringUtils.equal("ABCDEFG", "abcdefg"))
         self.assertFalse(StringUtils.equal("Foo", "Bar"))
 
         # Case sensitive matches
