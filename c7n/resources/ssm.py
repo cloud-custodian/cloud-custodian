@@ -16,10 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import get_retry, type_schema
-from c7n.filters import Filter, FilterRegistry
-
-filters = FilterRegistry('ssmparameter.filters')
+from c7n.utils import get_retry
 
 
 @resources.register('ssm-parameter')
@@ -37,4 +34,3 @@ class SSMParameter(QueryResourceManager):
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',
                    'ssm:DescribeParameters')
-    filter_registry = filters
