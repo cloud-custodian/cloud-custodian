@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudfront::644160558196:distribution/E3U7J4TIDRMINY",
+                "Tags": [
+                    {
+                        "Key": "tag",
+                        "Value": "value"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7474b5e0-9ccb-11e8-b4df-27f7fb5e5118",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7474b5e0-9ccb-11e8-b4df-27f7fb5e5118",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "167",
+                "date": "Fri, 10 Aug 2018 18:30:27 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

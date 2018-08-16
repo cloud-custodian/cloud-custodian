@@ -24,9 +24,8 @@ import logging
 import zlib
 
 import six
-from botocore.exceptions import ClientError
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.manager import resources
 from c7n.registry import PluginRegistry
@@ -168,8 +167,9 @@ class ModifyVpcSecurityGroupsAction(Action):
     """Common actions for modifying security groups on a resource
 
     Can target either physical groups as a list of group ids or
-    symbolic groups like 'matched' or 'all'. 'matched' uses
-    the annotations of the 'security-group' interface filter.
+    symbolic groups like 'matched', 'network-location' or 'all'. 'matched' uses
+    the annotations of the 'security-group' interface filter. 'network-location' uses
+    the annotations of the 'network-location' interface filter for `SecurityGroupMismatch`.
 
     Note an interface always gets at least one security group, so
     we mandate the specification of an isolation/quarantine group
@@ -177,7 +177,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
     type: modify-security-groups
         add: []
-        remove: [] | matched
+        remove: [] | matched | network-location
         isolation-group: sg-xyz
     """
     schema = {
@@ -194,7 +194,7 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}},
                 {'enum': [
-                    'matched', 'all',
+                    'matched', 'network-location', 'all',
                     {'type': 'string', 'pattern': '^sg-*'}]}]},
             'isolation-group': {'oneOf': [
                 {'type': 'string', 'pattern': '^sg-*'},
@@ -249,7 +249,7 @@ class ModifyVpcSecurityGroupsAction(Action):
                 else:
                     rgroups = [g['GroupId'] for g in r['Groups']]
             elif r.get('SecurityGroups'):
-                # elb, ec2, elasticache, efs, vpc resource security groups
+                # elb, ec2, elasticache, efs, dax vpc resource security groups
                 if metadata_key and isinstance(r['SecurityGroups'][0], dict):
                     rgroups = [g[metadata_key] for g in r['SecurityGroups']]
                 else:
@@ -276,6 +276,10 @@ class ModifyVpcSecurityGroupsAction(Action):
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
                 remove_groups = r.get('c7n:matched-security-groups', ())
+            elif remove_target_group_ids == 'network-location':
+                for reason in r.get('c7n:NetworkLocation', ()):
+                    if reason['reason'] == 'SecurityGroupMismatch':
+                        remove_groups = list(reason['security-groups'])
             elif remove_target_group_ids == 'all':
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
@@ -336,13 +340,17 @@ class LambdaInvoke(EventAction):
        function: my-function
     """
 
-    schema = utils.type_schema(
-        'invoke-lambda',
-        function={'type': 'string'},
-        async={'type': 'boolean'},
-        qualifier={'type': 'string'},
-        batch_size={'type': 'integer'},
-        required=('function',))
+    schema = {
+        'type': 'object',
+        'required': ['type', 'function'],
+        'properties': {
+            'type': {'enum': ['invoke-lambda']},
+            'function': {'type': 'string'},
+            'async': {'type': 'boolean'},
+            'qualifier': {'type': 'string'},
+            'batch_size': {'type': 'integer'}
+        }
+    }
 
     def get_permissions(self):
         if self.data.get('async', True):
@@ -374,18 +382,54 @@ class LambdaInvoke(EventAction):
             params['Payload'] = utils.dumps(payload)
             result = client.invoke(**params)
             result['Payload'] = result['Payload'].read()
+            if isinstance(result['Payload'], bytes):
+                result['Payload'] = result['Payload'].decode('utf-8')
             results.append(result)
         return results
 
 
-class Notify(EventAction):
+class BaseNotify(EventAction):
+
+    batch_size = 250
+
+    def expand_variables(self, message):
+        """expand any variables in the action to_from/cc_from fields.
+        """
+        p = copy.deepcopy(self.data)
+        if 'to_from' in self.data:
+            to_from = self.data['to_from'].copy()
+            to_from['url'] = to_from['url'].format(**message)
+            if 'expr' in to_from:
+                to_from['expr'] = to_from['expr'].format(**message)
+            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
+        if 'cc_from' in self.data:
+            cc_from = self.data['cc_from'].copy()
+            cc_from['url'] = cc_from['url'].format(**message)
+            if 'expr' in cc_from:
+                cc_from['expr'] = cc_from['expr'].format(**message)
+            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
+        return p
+
+    def pack(self, message):
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
+
+class Notify(BaseNotify):
     """
     Flexible notifications require quite a bit of implementation support
     on pluggable transports, templates, address resolution, variable
     extraction, batch periods, etc.
 
     For expedience and flexibility then, we instead send the data to
-    an sqs queue, for processing. ie. actual communications is DIY atm.
+    an sqs queue, for processing. ie. actual communications can be enabled
+    with the c7n-mailer tool, found under tools/c7n_mailer.
+
+    Attaching additional string message attributes are supported on the SNS
+    transport, with the exception of the ``mtype`` attribute, which is a
+    reserved attribute used by Cloud Custodian.
 
     Example::
 
@@ -409,6 +453,28 @@ class Notify(EventAction):
                type: sqs
                region: us-east-1
                queue: xyz
+
+        - name: ec2-notify-with-attributes
+          resource: ec2
+          filters:
+           - Name: bad-instance
+          actions:
+           - type: notify
+             to:
+              - event-user
+              - resource-creator
+              - email@address
+             owner_absent_contact:
+              - other_email@address
+             # which template for the email should we use
+             template: policy-template
+             transport:
+               type: sns
+               region: us-east-1
+               topic: your-notify-topic
+               attributes:
+                 - attribute_key: attribute_value
+                 - attribute_key_2: attribute_value_2
     """
 
     C7N_DATA_MESSAGE = "maidmsg/1.0"
@@ -441,17 +507,24 @@ class Notify(EventAction):
                      'properties': {
                          'topic': {'type': 'string'},
                          'type': {'enum': ['sns']},
+                         'attributes': {'type': 'object'},
                      }}]
             },
             'assume_role': {'type': 'boolean'}
         }
     }
 
-    batch_size = 250
-
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Notify, self).__init__(data, manager, log_dir)
         self.assume_role = data.get('assume_role', True)
+
+    def validate(self):
+        if self.data.get('transport', {}).get('type') == 'sns' and \
+                self.data.get('transport').get('attributes') and \
+                'mtype' in self.data.get('transport').get('attributes').keys():
+                    raise PolicyValidationError(
+                        "attribute: mtype is a reserved attribute for sns transport")
+        return self
 
     def get_permissions(self):
         if self.data.get('transport', {}).get('type') == 'sns':
@@ -459,24 +532,6 @@ class Notify(EventAction):
         if self.data.get('transport', {'type': 'sqs'}).get('type') == 'sqs':
             return ('sqs:SendMessage',)
         return ()
-
-    def expand_variables(self, message):
-        """expand any variables in the action to_from/cc_from fields.
-        """
-        p = copy.deepcopy(self.data)
-        if 'to_from' in self.data:
-            to_from = self.data['to_from'].copy()
-            to_from['url'] = to_from['url'].format(**message)
-            if 'expr' in to_from:
-                to_from['expr'] = to_from['expr'].format(**message)
-            p.setdefault('to', []).extend(ValuesFrom(to_from, self.manager).get_values())
-        if 'cc_from' in self.data:
-            cc_from = self.data['cc_from'].copy()
-            cc_from['url'] = cc_from['url'].format(**message)
-            if 'expr' in cc_from:
-                cc_from['expr'] = cc_from['expr'].format(**message)
-            p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
-        return p
 
     def process(self, resources, event=None):
         alias = utils.get_account_alias_from_sts(
@@ -496,20 +551,51 @@ class Notify(EventAction):
                 receipt, self.manager.data['name'],
                 self.data.get('template', 'default'), len(batch)))
 
+    def prepare_resources(self, resources):
+        """Resources preparation for transport.
+
+        If we have sensitive or overly large resource metadata we want to
+        remove or additional serialization we need to perform, this
+        provides a mechanism.
+
+        TODO: consider alternative implementations, at min look at adding
+        provider as additional discriminator to resource type. One alternative
+        would be dynamically adjusting buffer size based on underlying
+        transport.
+        """
+        handler = getattr(self, "prepare_%s" % (
+            self.manager.type.replace('-', '_')),
+            None)
+        if handler is None:
+            return resources
+        return handler(resources)
+
+    def prepare_launch_config(self, resources):
+        for r in resources:
+            r.pop('UserData', None)
+        return resources
+
+    def prepare_asg(self, resources):
+        for r in resources:
+            if 'c7n:user-data' in r:
+                r.pop('c7n:user-data', None)
+        return resources
+
+    def prepare_ec2(self, resources):
+        for r in resources:
+            if 'c7n:user-data' in r:
+                r.pop('c7n:user-data')
+        return resources
+
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
             return self.send_sqs(message)
         elif self.data['transport']['type'] == 'sns':
             return self.send_sns(message)
 
-    def pack(self, message):
-        dumped = utils.dumps(message)
-        compressed = zlib.compress(dumped.encode('utf8'))
-        b64encoded = base64.b64encode(compressed)
-        return b64encoded.decode('ascii')
-
     def send_sns(self, message):
         topic = self.data['transport']['topic'].format(**message)
+        user_attributes = self.data['transport'].get('attributes')
         if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
@@ -525,6 +611,10 @@ class Notify(EventAction):
                 'StringValue': self.C7N_DATA_MESSAGE,
             },
         }
+        if user_attributes:
+            for k, v in user_attributes.items():
+                if k != 'mtype':
+                    attrs[k] = {'DataType': 'String', 'StringValue': v}
         client.publish(
             TopicArn=topic_arn,
             Message=self.pack(message),

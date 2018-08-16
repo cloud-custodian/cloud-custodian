@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest
 import datetime
+from dateutil import zoneinfo
 
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
@@ -86,11 +87,14 @@ class DynamodbTest(BaseTest):
             {
                 "name": "dynamodb-mark",
                 "resource": "dynamodb-table",
-                "filters": [{"TableName": "rolltop"}],
+                "filters": [
+                    {"TableName": "c7n-test"},
+                    {'tag:test_tag': 'absent'}
+                ],
                 "actions": [
                     {
                         "type": "mark-for-op",
-                        "days": 4,
+                        "days": 0,
                         "op": "delete",
                         "tag": "test_tag",
                     }
@@ -103,7 +107,16 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         tags = client.list_tags_of_resource(ResourceArn=arn)
         tag_map = {t["Key"]: t["Value"] for t in tags["Tags"]}
-        self.assertTrue("test_key" in tag_map)
+
+        localtz = zoneinfo.gettz("America/New_York")
+        dt = datetime.datetime.now(localtz)
+        dt = dt.replace(year=2018, month=6, day=8, hour=7, minute=00)
+        result = datetime.datetime.strptime(
+            tag_map["test_tag"].strip().split("@", 1)[-1], "%Y/%m/%d"
+        ).replace(
+            tzinfo=localtz
+        )
+        self.assertEqual(result.date(), dt.date())
 
     def test_dynamodb_tag(self):
         session_factory = self.replay_flight_data("test_dynamodb_tag")
@@ -348,6 +361,65 @@ class DynamoDbAccelerator(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        client = session_factory(region="us-east-1").client("dax")
-        clusters = client.describe_clusters()["Clusters"]
-        self.assertEqual(clusters[0]["Status"], "deleting")
+        client = session_factory(region='us-east-1').client('dax')
+        clusters = client.describe_clusters()['Clusters']
+        self.assertEqual(clusters[0]['Status'], 'deleting')
+
+    def test_update_cluster(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_update_cluster')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{
+                'ParameterGroup.ParameterGroupName': 'default.dax1.0'}],
+            'actions': [{
+                'type': 'update-cluster',
+                'ParameterGroupName': 'testparamgroup'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        clusters = client.describe_clusters()['Clusters']
+        self.assertEqual(clusters[0]['ParameterGroup']['ParameterGroupName'],
+                         'testparamgroup')
+
+    def test_modify_security_groups(self):
+        session_factory = self.replay_flight_data(
+            'test_dax_update_security_groups')
+        p = self.load_policy({
+            'name': 'dax-resources',
+            'resource': 'dax',
+            'filters': [{
+                'type': 'security-group',
+                'key': 'GroupName',
+                'value': 'default'}],
+            'actions': [{
+                'type': 'modify-security-groups',
+                'remove': 'matched',
+                'add': 'sg-72916c3b'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-dax')
+        client = session_factory(region='us-east-1').client('dax')
+        sgs = client.describe_clusters()['Clusters'][0]['SecurityGroups']
+        self.assertDictEqual(sgs[0], {"Status": "adding",
+                                      "SecurityGroupIdentifier": "sg-72916c3b"})
+        self.assertDictEqual(sgs[1], {"Status": "removing",
+                                      "SecurityGroupIdentifier": "sg-4b9ada34"})
+
+    def test_subnet_group_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_dax_subnet_group_filter")
+        p = self.load_policy({
+            "name": "dax-cluster",
+            "resource": "dax",
+            "filters": [{
+                "type": "subnet",
+                "key": "MapPublicIpOnLaunch",
+                "value": False}]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterName'], 'c7n-test')

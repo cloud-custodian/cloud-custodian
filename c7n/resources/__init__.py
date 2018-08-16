@@ -58,6 +58,7 @@ def load_resources():
     import c7n.resources.elasticbeanstalk
     import c7n.resources.elasticsearch
     import c7n.resources.elb
+    import c7n.resources.eks
     import c7n.resources.emr
     import c7n.resources.gamelift
     import c7n.resources.glacier
@@ -69,6 +70,7 @@ def load_resources():
     import c7n.resources.kinesis
     import c7n.resources.kms
     import c7n.resources.ml
+    import c7n.resources.mq
     import c7n.resources.opsworks
     import c7n.resources.rds
     import c7n.resources.rdsparamgroup
@@ -77,6 +79,7 @@ def load_resources():
     import c7n.resources.route53
     import c7n.resources.s3
     import c7n.resources.sagemaker
+    import c7n.resources.secretsmanager
     import c7n.resources.sfn
     import c7n.resources.shield
     import c7n.resources.simpledb

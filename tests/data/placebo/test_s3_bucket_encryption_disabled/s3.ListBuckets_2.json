@@ -1,0 +1,142 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 16, 
+                    "minute": 7
+                }, 
+                "Name": "aws-codestar-us-east-1-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 16, 
+                    "minute": 7
+                }, 
+                "Name": "aws-codestar-us-east-1-644160558196-c7n-test-pipe"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 17, 
+                    "minute": 54
+                }, 
+                "Name": "c7n-bucket-without-default-encryption"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 30, 
+                    "minute": 21
+                }, 
+                "Name": "c7n-ssm"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 20, 
+                    "minute": 47
+                }, 
+                "Name": "c7n-ssm-build"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 9
+                }, 
+                "Name": "cf-templates-9c4kee3xbart-us-east-1"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 26
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 41
+                }, 
+                "Name": "custodian-mark-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 26
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "sZVcRv9wwOh/59Bs526fDQQ6TULSxwYeuzHJxBcra+tyBWHsBy1xRtjJUHxwshNjdiOCbHROqWA=", 
+            "RequestId": "01BA6CCC820925C9", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "sZVcRv9wwOh/59Bs526fDQQ6TULSxwYeuzHJxBcra+tyBWHsBy1xRtjJUHxwshNjdiOCbHROqWA=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "01BA6CCC820925C9", 
+                "date": "Thu, 17 May 2018 13:54:37 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -14,8 +14,13 @@ Resource - :py:class:`c7n.manager.ResourceManager`
   and defines the vocabulary of filters and actions that can be used on those
   resources (e.g., ASG, S3, EC2, ELBs, etc).
 
+  With the addition of more cloud providers, resources should be prefixed with
+  the appropraite provider, except in the case of AWS resources which do not 
+  require a ``aws.`` prefix for backwards-compatibility (e.g. azure.vm, gcp.instance).
+
 Mode - :py:class:`c7n.policy` (yes, ``policy``)
-  Defines how the policy will execute (lambda, config rule, poll, etc).
+  Defines how the policy will execute (lambda, config rule, poll, etc). Policies
+  run in ``pull`` mode by default.
 
 .. code-block:: yaml
 

@@ -87,6 +87,8 @@ class HostedZone(Route53Base, QueryResourceManager):
         date = None
         dimension = None
         universal_taggable = True
+        # Denotes this resource type exists across regions
+        global_resource = True
 
     def get_arns(self, resource_set):
         arns = []

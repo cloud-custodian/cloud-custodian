@@ -17,13 +17,14 @@ import logging
 
 from c7n import cache
 from c7n.executor import ThreadPoolExecutor
-from c7n.resources.aws import AWS
+from c7n.registry import PluginRegistry
+try:
+    from c7n.resources.aws import AWS
+    resources = AWS.resources
+except ImportError:
+    resources = PluginRegistry('resources')
 
 from c7n.utils import dumps
-
-
-# Compatibility import
-resources = AWS.resources
 
 
 class ResourceManager(object):

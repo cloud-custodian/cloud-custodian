@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
-import re
 import logging
-from mock import patch
-from c7n_azure.session import Session
-from c7n.filters import FilterValidationError
+import re
+
 from azure_common import BaseTest, arm_template
+from c7n_azure.session import Session
+from mock import patch
+
+from c7n.filters import FilterValidationError
 
 
 class TagsTest(BaseTest):
@@ -111,7 +114,7 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify modified tags
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0] # NOQA
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]  # NOQA
         self.assertEqual(
             rg.tags,
             {'tag1': 'value1', 'pre-existing-1': 'modified', 'pre-existing-2': 'unmodified'})
@@ -278,7 +281,7 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify tags removed and pre-existing tags not removed
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0] # NOQA
+        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]  # NOQA
         end_tags = rg.tags
         self.assertTrue('pre-existing-1' in end_tags)
         self.assertTrue('pre-existing-2' in end_tags)
@@ -643,3 +646,116 @@ class TagsTest(BaseTest):
         )
 
         logger_mock.assert_called_with(expected_warning)
+
+    @arm_template('vm.json')
+    def test_tag_filter_present(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'present'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    def test_tag_filter_absent(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'absent'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    def test_tag_filter_value(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'tag:Pythontest': 'ItWorks'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    DAYS = 10
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.utils.now', return_value=TEST_DATE)
+    def test_mark_for_op(self, date_mock):
+        policy = {
+            'name': 'test-mark-for-op',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}],
+            'actions': [
+                {'type': 'mark-for-op',
+                 'op': 'stop',
+                 'days': self.DAYS}
+            ]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.utils.now', return_value=TEST_DATE)
+    def test_marked_for_op_empty(self, date_mock):
+        policy = {
+            'name': 'test-mark-for-op',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'marked-for-op',
+                 'op': 'stop'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.utils.now', return_value=TEST_DATE + datetime.timedelta(days=DAYS))
+    def test_marked_for_op(self, date_mock):
+        policy = {
+            'name': 'test-mark-for-op',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'marked-for-op',
+                 'op': 'stop'}]
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

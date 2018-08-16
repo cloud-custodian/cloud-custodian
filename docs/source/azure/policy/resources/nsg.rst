@@ -1,4 +1,4 @@
-.. _nsg:
+.. _azure_nsg:
 
 Network Security Groups
 =======================
@@ -6,14 +6,18 @@ Network Security Groups
 Filters
 -------
 - Standard Value Filter (see :ref:`filters`)
-
-``ingress``
+      - Model: `NetworkSecurityGroup <https://docs.microsoft.com/en-us/python/api/azure.mgmt.network.v2018_02_01.models.networksecuritygroup?view=azure-python>`_
+- ARM Resource Filters (see :ref:`azure_genericarmfilter`)
+    - Metric Filter - Filter on metrics from Azure Monitor
+    - Tag Filter - Filter on tag presence and/or values
+    - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- ``ingress``
   Filter based on Inbound Security Rules
 
   .. c7n-schema:: IngressFilter
       :module: c7n_azure.resources.network_security_group
 
-``egress``
+- ``egress``
   Filter based on Outbound Security Rules
 
   .. c7n-schema:: EgressFilter
@@ -22,12 +26,18 @@ Filters
 
 Actions
 -------
-
-``open``
+- ARM Resource Actions (see :ref:`azure_genericarmaction`)
+- ``open``
   Allow access to security rules
 
-``close``
+  .. c7n-schema:: CloseRules
+      :module: c7n_azure.resources.network_security_group
+
+- ``close``
   Deny access to security rules
+
+  .. c7n-schema:: OpenRules
+      :module: c7n_azure.resources.network_security_group
 
 
 Example Policies
@@ -42,8 +52,8 @@ This policy will deny access to all security rules with Inbound SSH ports in the
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            FromPort: 8080
-            ToPort: 8090
+            fromPort: 8080
+            toPort: 8090
          actions:
           - type: close
 
@@ -56,7 +66,7 @@ This policy will deny access to all security rules with any Inbound SSH ports th
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            OnlyPorts: [22,23,24]
+            exceptPorts: [22,23,24]
          actions:
           - type: close
 
@@ -69,6 +79,6 @@ This policy will deny access to all security rules with any Outbound SSH ports w
          resource: azure.networksecuritygroup
          filters:
           - type: egress
-            IpProtocol: TCP
+            ipProtocol: TCP
          actions:
           - type: close

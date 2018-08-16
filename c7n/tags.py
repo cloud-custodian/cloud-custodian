@@ -80,8 +80,12 @@ def universal_augment(self, resources):
     if not resources:
         return resources
 
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1
+    region = getattr(self.resource_type, 'global_resource', None) and 'us-east-1' or self.region
+
     client = utils.local_session(
-        self.session_factory).client('resourcegroupstaggingapi')
+        self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 
     paginator = client.get_paginator('get_resources')
     resource_type = getattr(self.get_model(), 'resource_type', None)
@@ -555,21 +559,21 @@ class TagDelayedAction(Action):
     The optional 'tz' parameter can be used to adjust the clock to align
     with a given timezone. The default value is 'utc'.
 
+    If neither 'days' nor 'hours' is specified, Cloud Custodian will default
+    to marking the resource for action 4 days in the future.
+
     .. code-block :: yaml
 
       - policies:
-        - name: ec2-stop-marked
+        - name: ec2-mark-for-stop-in-future
           resource: ec2
           filters:
-            - type: marked-for-op
-              # The default tag used is custodian_status
-              # but that is configurable
-              tag: custodian_status
-              op: stop
-              # Another optional tag is skew
-              tz: utc
+            - type: value
+              key: Name
+              value: instance-to-stop-in-four-days
           actions:
-            - stop
+            - type: mark-for-op
+              op: stop
     """
 
     schema = utils.type_schema(
@@ -605,7 +609,7 @@ class TagDelayedAction(Action):
 
     def generate_timestamp(self, days, hours):
         n = datetime.now(tz=self.tz)
-        if days == hours == 0:
+        if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
         action_date = (n + timedelta(days=days, hours=hours))

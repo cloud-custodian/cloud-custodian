@@ -34,11 +34,11 @@ tag policies, and cost management via garbage collection of unused resources
 and off-hours resource management.
 
 Custodian policies are written in simple YAML configuration files that
-enable users to specify policies on a resource type (ec2, asg, redshift, etc)
+enable users to specify policies on a resource type (EC2, ASG, Redshift, etc)
 and are constructed from a vocabulary of filters and actions.
 
-It integrates with lambda and cloudwatch events to provide for
-real time enforcement of policies with builtin provisioning of the lambdas, or
+It integrates with AWS Lambda and AWS Cloudwatch events to provide for
+real time enforcement of policies with builtin provisioning of the Lambdas, or
 as a simple cron job on a server to execute against large existing fleets.
 
 “`Engineering the Next Generation of Cloud Governance <https://cloudrumblings.io/cloud-adoption-engineering-the-next-generation-of-cloud-governance-21fb1a2eff60>`_” by @drewfirment
@@ -51,15 +51,15 @@ Features
   400+ actions and 300+ filters to build policies with.
 - Supports arbitrary filtering on resources with nested boolean conditions.
 - Dry run any policy to see what it would do.
-- Automatically provisions lambda functions, config rules, and cloud watch event targets for
+- Automatically provisions AWS Lambda functions, AWS Config rules, and Cloudwatch event targets for
   real-time policies.
-- Cloudwatch metrics outputs on resources that matched a policy
-- Structured outputs into s3 of which resources matched a policy.
+- AWS Cloudwatch metrics outputs on resources that matched a policy
+- Structured outputs into S3 of which resources matched a policy.
 - Intelligent cache usage to minimize api calls.
 - Battle-tested - in production on some very large AWS accounts.
 - Supports cross-account usage via STS role assumption.
-- Supports integration with custom/user supplied lambdas as actions.
-- Supports both Python 2.7 and Python 3.6 (beta) lambda runtimes
+- Supports integration with custom/user supplied Lambdas as actions.
+- Supports both Python 2.7 and Python 3.6 (beta) Lambda runtimes
 
 
 Links
@@ -129,7 +129,7 @@ First a policy file needs to be created in YAML format, as an example::
         days: 4
 
 
-Given that, you can run cloud-custodian with::
+Given that, you can run Cloud Custodian with::
 
   # Validate the configuration (note this happens by default on run)
   $ custodian validate policy.yml
@@ -143,8 +143,8 @@ Given that, you can run cloud-custodian with::
 
 
 Custodian supports a few other useful subcommands and options, including
-outputs to s3, cloud watch metrics, sts role assumption. Policies go together
-like lego bricks with actions and filters.
+outputs to S3, Cloudwatch metrics, STS role assumption. Policies go together
+like Lego bricks with actions and filters.
 
 Consult the documentation for additional information, or reach out on gitter.
 
@@ -166,7 +166,7 @@ Salactus
    Scale out s3 scanning.
 
 Mailer
-   A reference implementation of sending emails to users to notify them.
+   A reference implementation of sending messages to users to notify them.
 
 TrailDB
    Cloudtrail indexing and timeseries generation for dashboarding

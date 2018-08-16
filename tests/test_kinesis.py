@@ -54,6 +54,23 @@ class Kinesis(BaseTest):
         ]
         self.assertEqual(stream["StreamStatus"], "DELETING")
 
+    def test_stream_encrypt(self):
+        factory = self.replay_flight_data("test_kinesis_encrypt")
+        p = self.load_policy(
+            {
+                "name": "kstream",
+                "resource": "kinesis",
+                "filters": [{"StreamName": "sock-drawer"}],
+                "actions": [{"type": "encrypt", "key": "aws/kinesis"}],
+            },
+            session_factory=factory,
+        )
+        p.run()
+        stream = factory().client("kinesis").describe_stream(StreamName="sock-drawer")[
+            "StreamDescription"
+        ]
+        self.assertEqual(stream["EncryptionType"], "KMS")
+
     def test_hose_query(self):
         factory = self.replay_flight_data("test_kinesis_hose_query")
         p = self.load_policy(

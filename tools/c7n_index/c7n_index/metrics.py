@@ -38,7 +38,7 @@ from c7n.utils import chunks, dumps, get_retry, local_session
 # from c7n.executor import MainThreadExecutor
 # ThreadPoolExecutor = MainThreadExecutor
 # ProcessPoolExecutor = MainThreadExecutor
-# MainThreadExecutor.async = False
+# MainThreadExecutor.c7n_async = False
 
 MAX_POINTS = 1440.0
 NAMESPACE = 'CloudMaid'

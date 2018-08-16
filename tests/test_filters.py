@@ -145,6 +145,18 @@ class TestValueFilter(unittest.TestCase):
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (None, 4))
 
+    def test_value_match(self):
+        resource = {"a": 1, "Tags": [{"Key": "xtra", "Value": "hello"}]}
+        vf = filters.factory({"type": "value", "value": None, "key": "tag:xtra"})
+        self.assertFalse(hasattr(vf, "content_initialized"))
+        self.assertEqual(vf.v, None)
+
+        res = vf.match(resource)
+
+        self.assertTrue(vf.content_initialized)
+        self.assertEqual(vf.v, None)
+        self.assertFalse(res)
+
 
 class TestAgeFilter(unittest.TestCase):
 

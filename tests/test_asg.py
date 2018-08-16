@@ -19,6 +19,7 @@ from dateutil import zoneinfo
 from .common import BaseTest
 from botocore.exceptions import ClientError
 from c7n.resources.asg import NotEncryptedFilter
+import c7n.resources.asg
 
 
 class LaunchConfigTest(BaseTest):
@@ -51,6 +52,37 @@ class LaunchConfigTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["LaunchConfigurationName"], "CloudClusterCopy")
+
+
+class TestUserData(BaseTest):
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_launch_config_userdata")
+        policy = self.load_policy(
+            {
+                "name": "launch_config_userdata",
+                "resource": "asg",
+                'filters': [
+                    {
+                        'or': [
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'}
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+
+        resources = policy.run()
+
+        self.assertGreater(len(resources), 0)
+
+    def test_validate(self):
+        dataz = {u'type': u'user-data', u'key': u'"c7n:user-data"',
+                 u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
+                 u'op': u'regex'}
+        ud = c7n.resources.asg.UserDataFilter(dataz).validate()
+        self.assertEqual(type(ud), c7n.resources.asg.UserDataFilter)
 
 
 class AutoScalingTest(BaseTest):
