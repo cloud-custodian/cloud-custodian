@@ -670,6 +670,24 @@ def deserialize_user_data(user_data):
 
 @filters.register('user-data')
 class UserData(ValueFilter):
+    """Filter on EC2 instances which have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ec2_userdata_stop
+                resource: ec2
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - stop
+    """
 
     schema = type_schema('user-data', rinherit=ValueFilter.schema)
     batch_size = 50

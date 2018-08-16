@@ -20,6 +20,7 @@ from .common import BaseTest
 from botocore.exceptions import ClientError
 from c7n.resources.asg import NotEncryptedFilter
 
+
 class LaunchConfigTest(BaseTest):
 
     def test_config_unused(self):

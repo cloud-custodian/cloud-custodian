@@ -8,6 +8,80 @@ Filters
 
 - Standard Value Filter (see :ref:`filters`)
 
+``security-group``
+  Filter for ASG's that have a certain security group.
+
+  .. c7n-schema:: SecurityGroupFilter
+      :module: c7n.resources.asg
+
+``subnet``
+  Filter on ASG's
+
+  .. c7n-schema:: SubnetFilter
+      :module: c7n.resources.asg
+
+
+``launch-config``
+  Filter ASG by launch config attributes.
+
+  .. c7n-schema:: LaunchConfigFilter
+      :module: c7n.resources.asg
+
+``valid``
+  Filters ASG's to find those that are structurally valid.
+
+  .. c7n-schema:: ValidConfigFilter
+      :module: c7n.resources.asg
+
+``invalid``
+  Filters ASG's to find those that are structurally invalid.
+
+  .. c7n-schema:: InvalidConfigFilter
+      :module: c7n.resources.asg
+
+``not-encrypted``
+  Check if an ASG is configured to have unencrypted volumes.
+
+  .. c7n-schema:: NotEncryptedFilter
+      :module: c7n.resources.asg
+
+``image-age``
+  Filter ASG by image age (in days).
+
+  .. c7n-schema:: ImageAgeFilter
+      :module: c7n.resources.asg
+
+``image``
+  Filter by ASG image
+
+  .. c7n-schema:: ImageFilter
+      :module: c7n.resources.asg
+
+``vpc-id``
+  Filters ASG based on the VpcId
+
+  .. c7n-schema:: VpcIdFilter
+      :module: c7n.resources.asg
+
+``progagated-tags``
+  Filter ASG based on propagated tags
+
+  .. c7n-schema:: PropagatedTagFilter
+      :module: c7n.resources.asg
+
+``capacity-delta``
+  Filter returns ASG that have less instances than desired or required
+
+  .. c7n-schema:: CapacityDelta
+      :module: c7n.resources.asg
+
+``user-data``
+  Filter for ASG's with launch configs containing user data matching the value given.
+
+  .. c7n-schema:: UserDataFilter
+      :module: c7n.resources.asg
+
+
 Actions
 -------
 
