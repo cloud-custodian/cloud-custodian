@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
 from mock import patch
+from c7n_azure.resources.access_control import is_scope
 
 
 class AccessControlTest(BaseTest):
@@ -65,3 +66,23 @@ class AccessControlTest(BaseTest):
         })
         definitions = p.run()
         self.assertEqual(len(definitions), 1)
+
+    def test_is_scope(self):
+        sub_scope = "/subscriptions/111-111-1111"
+        resource_group_scope = sub_scope + "/resourceGroups/foo"
+
+        # Subscription scope tests
+        self.assertTrue(is_scope(sub_scope, "subscription"))
+        self.assertFalse(is_scope(resource_group_scope, "subscription"))
+        self.assertFalse(is_scope("subscriptions", "subscription"))
+        self.assertFalse(is_scope("/subscription", "subscription"))
+        self.assertFalse(is_scope("/foo/bar", "subscription"))
+
+        # Resource group scope test
+        self.assertTrue(is_scope(resource_group_scope, "resource-group"))
+        self.assertFalse(is_scope(sub_scope, "resource-group"))
+        self.assertFalse(is_scope("/subscriptions/resourceGroups", "resource-group"))
+        self.assertFalse(is_scope("/subscriptions/resourceGroups/", "resource-group"))
+        self.assertFalse(is_scope("/subscriptions/resourceGroup/", "resource-group"))
+        self.assertFalse(is_scope("/subscription/resourceGroups/foo", "resource-group"))
+        self.assertFalse(is_scope("/foo/bar/xyz", "resource-group"))

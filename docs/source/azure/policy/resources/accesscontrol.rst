@@ -29,6 +29,12 @@ Filters
   .. c7n-schema:: ResourceAccessFilter
       :module: c7n_azure.resources.access_control
 
+- ``scope``
+  Filter Role Assignments by scope access
+
+  .. c7n-schema:: ScopeFilter
+      :module: c7n_azure.resources.access_control
+
 
 Actions
 -------
@@ -131,3 +137,56 @@ is Owner.
               value: custodian@example.com
          actions:
             - type: delete
+
+Return all role assignments with the Subscription level scope access.
+
+.. code-block:: yaml
+
+    policies:
+       - name: assignments-subscription-scope
+         resource: azure.roleassignment
+         filters:
+            - type: scope
+              value: subscription
+
+Return all role assignments with the Resource Group level scope access.
+
+.. code-block:: yaml
+
+    policies:
+       - name: assignments-resource-group-scope
+         resource: azure.roleassignment
+         filters:
+            - type: scope
+              value: resource-group
+
+Return all role assignments with scope level access other than Subscription or Resource Group.
+
+.. code-block:: yaml
+
+    policies:
+       - name: assignments-other-level-scope
+         resource: azure.roleassignment
+         filters:
+            - not: 
+              - type: scope
+                value: subscription
+            - not:
+              - type: scope
+                value: resource-group
+
+Return all service principal role assignments with the Subscription level scope access.
+
+.. code-block:: yaml
+
+    policies:
+       - name: service-principal-assignments-subscription-scope
+         resource: azure.roleassignment
+         filters:
+            - type: value
+              key: aadType
+              op: eq
+              value: ServicePrincipal
+            - type: scope
+              value: subscription
+            

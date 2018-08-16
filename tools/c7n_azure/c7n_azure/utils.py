@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import datetime
+import six
 
 
 class ResourceIdParser(object):
@@ -31,6 +32,19 @@ class ResourceIdParser(object):
     @staticmethod
     def get_resource_name(resource_id):
         return resource_id.split('/')[8]
+
+
+class StringUtils(object):
+
+    @staticmethod
+    def equal(a, b, case_insensitive=True):
+        if isinstance(a, six.string_types) and isinstance(b, six.string_types):
+            if case_insensitive:
+                return a.strip().lower() == b.strip().lower()
+            else:
+                return a.strip() == b.strip()
+
+        return False
 
 
 def utcnow():
