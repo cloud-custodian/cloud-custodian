@@ -1,6 +1,6 @@
 
 install:
-	python -m virtualenv --python python3.6 .
+	python3.6 -m virtualenv --python python3.6 .
 	. bin/activate && pip install -r requirements-dev.txt
 	. bin/activate && pip install -e .
 	. bin/activate && pip install -r tools/c7n_mailer/requirements.txt

@@ -40,6 +40,9 @@ from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
 
+
+from .ec2 import deserialize_user_data
+
 log = logging.getLogger('custodian.asg')
 
 filters = FilterRegistry('asg.filters')
@@ -818,6 +821,45 @@ class CapacityDelta(Filter):
         return [a for a in asgs
                 if len(a['Instances']) < a['DesiredCapacity'] or
                 len(a['Instances']) < a['MinSize']]
+
+
+@filters.register('user-data')
+class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+
+    def validate(self):
+        return self
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
+
+    def process(self, asgs, event=None):
+        '''
+        Get list of autoscaling groups whose launch configs match the user-data filter.
+        Note: Since this is an autoscaling filter, this won't match unused launch configs.
+        :param launch_configs: List of launch configurations
+        :param event: Event
+        :return: List of ASG's with matching launch configs
+        '''
+
+        self.data['key'] = '"c7n:user-data"'
+        results = []
+        super(UserDataFilter, self).initialize(asgs)
+
+        for asg in asgs:
+            launch_config = self.configs.get(asg['LaunchConfigurationName'])
+            if self.annotation not in launch_config:
+                if not launch_config['UserData']:
+                    asg[self.annotation] = None
+                else:
+                    asg[self.annotation] = deserialize_user_data(
+                        launch_config['UserData'])
+            if self.match(asg):
+                results.append(asg)
+            return results
 
 
 @actions.register('resize')
@@ -1630,8 +1672,6 @@ class LaunchConfig(query.QueryResourceManager):
 class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
-        for r in resources:
-            r.pop('UserData', None)
         return resources
 
 

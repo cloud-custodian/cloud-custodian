@@ -249,13 +249,11 @@ class TestSqsAction(BaseTest):
             },
             session_factory=factory,
         )
-
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = factory().client("sqs")
-        d2 = client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["All"])[
-            "Attributes"
-        ]
+        d2 = client.get_queue_attributes(
+            QueueUrl=queue_url, AttributeNames=["All"])["Attributes"]
         self.assertNotIn("Policy", d2)
 
     @functional
