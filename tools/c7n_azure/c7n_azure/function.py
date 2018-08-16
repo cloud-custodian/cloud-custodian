@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import json
 import sys
 from os.path import dirname, join
 
@@ -38,6 +39,14 @@ def main(input):
 
     if type(input) is HttpRequest:
         context['event'] = input.get_json()
+        context['event'] = input.get_json()
+        logging.info(context['event'])
+        code = context['event'][0]['data']['validationCode']
+        response = {
+            "validationResponse": code
+        }
+
+        return func.HttpResponse(body=json.dump(response), status_code=200)
 
     handler.run(None, context)
 
