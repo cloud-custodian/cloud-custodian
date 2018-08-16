@@ -14,14 +14,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime
+from dateutil import tz, parser
 import json
 import fnmatch
 import itertools
 import logging
 import os
 import time
-from dateutil import tz, parser
-from datetime import datetime
+
 
 import jmespath
 import six
