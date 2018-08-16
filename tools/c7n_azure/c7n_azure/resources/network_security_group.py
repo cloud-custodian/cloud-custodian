@@ -21,6 +21,7 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.filters.core import PolicyValidationError
 from c7n.utils import type_schema
+from c7n_azure.utils import StringUtils
 
 
 @resources.register('networksecuritygroup')
@@ -177,14 +178,14 @@ class SecurityRuleFilter(Filter):
     """.format(PORTS, EXCEPT_PORTS, FROM_PORT, TO_PORT, IP_PROTOCOL, ACCESS)
 
     def is_match(self, security_rule):
-        if self.direction_key != security_rule['properties']['direction']:
+        if not StringUtils.equal(self.direction_key, security_rule['properties']['direction']):
             return False
         ranges_match = self.is_ranges_match(security_rule)
         protocol_match = (self.ip_protocol is None) or \
-                         (self.ip_protocol == security_rule['properties']['protocol'])
+                         (StringUtils.equal(self.ip_protocol, security_rule['properties']['protocol']))
 
         if self.access is not None:
-            access_match = self.access == security_rule['properties']['access']
+            access_match = StringUtils.equal(self.access, security_rule['properties']['access'])
             return self.match_op([ranges_match, protocol_match, access_match])
         else:
             return self.match_op([ranges_match, protocol_match])
