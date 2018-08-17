@@ -18,10 +18,23 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
+from botocore.exceptions import ClientError as BotoClientError
 
 
 @resources.register('guardduty-invitations')
 class GuardDutyInvitations(QueryResourceManager):
+    """Filter GuardDuty invitation from trusted Master account id.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: accept-trusted-guardduty-invitation
+                resource: guardduty-invitations
+                filters:
+                  - AccountId: '000000000000'
+    """
 
     class resource_type(object):
         service = 'guardduty'
@@ -42,40 +55,6 @@ class GuardDutyDetectors(QueryResourceManager):
         dimension = None
 
 
-@GuardDutyInvitations.filter_registry.register('list-invitations')
-class ListInvitations(ValueFilter):
-    """Filter GuardDuty invitation from trusted Master account id.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: accept-trusted-guardduty-invitation
-                resource: guardduty-invitations
-                filters:
-                  - type: list-invitations
-                    key: AccountId
-                    value: '000000000000'
-    """
-    schema = type_schema('list-invitations', rinherit=ValueFilter.schema)
-    permissions = ('guardduty:ListInvitations',)
-
-    def process(self, resources, event=None):
-        return [r for r in resources if self.match(r)]
-
-
-@GuardDutyDetectors.filter_registry.register('list-detectors')
-class ListDetectors(Filter):
-    schema = type_schema('list-detectors', rinherit=ValueFilter.schema)
-    permissions = ('guardduty:ListDetectors',)
-
-    # Only 1 detector per region is allowed.
-    # So if GuardDuty is enabled then a list containing one element will be returned
-    def process(self, resources, event=None):
-        return resources
-
-
 @GuardDutyInvitations.action_registry.register('accept-invitation')
 class AcceptInvitation(BaseAction):
     """Filter GuardDuty invitation from trusted Master account id and accept it.
@@ -88,9 +67,7 @@ class AcceptInvitation(BaseAction):
               - name: accept-trusted-guardduty-invitation
                 resource: guardduty-invitations
                 filters:
-                  - type: list-invitations
-                    key: AccountId
-                    value: '000000000000'
+                  - AccountId: '000000000000'
                 actions:
                   - type: accept-invitation
     """
@@ -113,5 +90,6 @@ class AcceptInvitation(BaseAction):
             try:
                 client.accept_invitation(DetectorId=detectorid,
                     InvitationId=invitationid, MasterId=masterid)
-            except Exception as E:
-                raise E
+            except BotoClientError as e:
+                self.log.exception('Exception: guardduty accept-invitation: %s',
+                    e.response['Error']['Message'])
