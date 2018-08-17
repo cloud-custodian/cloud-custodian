@@ -1396,11 +1396,3 @@ class TestUserData(BaseTest):
         )
         resources = policy.run()
         self.assertGreater(len(resources), 0)
-
-    def test_validate(self):
-
-        data = {u'type': u'user-data', u'key': u'"c7n:user-data"',
-                u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
-             u'op': u'regex'}
-        ud = ec2.UserData(data).validate()
-        self.assertEqual(type(ud), ec2.UserData)

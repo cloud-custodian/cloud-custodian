@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import datetime
+import logging
 import six
+
+from azure.graphrbac.models import GetObjectsParameters, AADObject
+from msrestazure.azure_exceptions import CloudError
 
 
 class ResourceIdParser(object):
@@ -70,3 +74,34 @@ class Math(object):
     def sum(numbers):
         clean_numbers = [e for e in numbers if e is not None]
         return float(sum(clean_numbers))
+
+
+class GraphHelper(object):
+    log = logging.getLogger('custodian.azure.utils.GraphHelper')
+
+    @staticmethod
+    def get_principal_dictionary(graph_client, object_ids):
+        object_params = GetObjectsParameters(
+            include_directory_object_references=True,
+            object_ids=object_ids)
+
+        principal_dics = {object_id: AADObject() for object_id in object_ids}
+
+        aad_objects = graph_client.objects.get_objects_by_object_ids(object_params)
+        try:
+            for aad_object in aad_objects:
+                principal_dics[aad_object.object_id] = aad_object
+        except CloudError:
+            GraphHelper.log.warning(
+                'Credentials not authorized for access to read from Microsoft Graph. \n '
+                'Can not query on principalName, displayName, or aadType. \n')
+
+        return principal_dics
+
+    @staticmethod
+    def get_principal_name(graph_object):
+        if graph_object.user_principal_name:
+            return graph_object.user_principal_name
+        elif graph_object.service_principal_names:
+            return graph_object.service_principal_names[0]
+        return graph_object.display_name or ''
