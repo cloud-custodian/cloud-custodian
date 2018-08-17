@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest
 from c7n_azure.utils import Math
 from c7n_azure.utils import ResourceIdParser
+from c7n_azure.utils import StringUtils
 
 RESOURCE_ID = (
     "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
@@ -47,3 +48,27 @@ class UtilsTest(BaseTest):
         self.assertEqual(Math.sum([4, 5, None, 3]), 12)
         self.assertEqual(Math.sum([None]), 0)
         self.assertEqual(Math.sum([3.5, 4]), 7.5)
+
+    def test_string_utils_equal(self):
+        # Case insensitive matches
+        self.assertTrue(StringUtils.equal("FOO", "foo"))
+        self.assertTrue(StringUtils.equal("fOo", "FoO"))
+        self.assertTrue(StringUtils.equal("ABCDEFGH", "abcdefgh"))
+        self.assertFalse(StringUtils.equal("Foo", "Bar"))
+
+        # Case sensitive matches
+        self.assertFalse(StringUtils.equal("Foo", "foo", False))
+        self.assertTrue(StringUtils.equal("foo", "foo", False))
+        self.assertTrue(StringUtils.equal("fOo", "fOo", False))
+        self.assertFalse(StringUtils.equal("Foo", "Bar"))
+
+        # Strip whitespace matches
+        self.assertTrue(StringUtils.equal(" Foo ", "foo"))
+        self.assertTrue(StringUtils.equal("Foo", " foo "))
+        self.assertTrue(StringUtils.equal(" Foo ", "Foo", False))
+        self.assertTrue(StringUtils.equal("Foo", " Foo ", False))
+
+        # Returns false for non string types
+        self.assertFalse(StringUtils.equal(1, "foo"))
+        self.assertFalse(StringUtils.equal("foo", 1))
+        self.assertFalse(StringUtils.equal(True, False))

@@ -228,7 +228,11 @@ class FunctionPackage(object):
         self.log.info("Publishing package at: %s" % self.pkg.path)
 
         zip_file = open(self.pkg.path, 'rb').read()
-        r = requests.post(zip_api_url, headers=headers, data=zip_file)
+
+        try:
+            r = requests.post(zip_api_url, headers=headers, data=zip_file, timeout=300)
+        except requests.exceptions.ReadTimeout:
+            self.log.error("Your Function App deployment timed out after 5 minutes. Try again.")
 
         r.raise_for_status()
 

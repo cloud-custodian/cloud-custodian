@@ -28,6 +28,19 @@ from c7n import utils
 log = logging.getLogger('custodian.aws')
 
 
+_profile_session = None
+
+
+def get_profile_session(options):
+    global _profile_session
+    if _profile_session:
+        return _profile_session
+
+    profile = getattr(options, 'profile', None)
+    _profile_session = boto3.Session(profile_name=profile)
+    return _profile_session
+
+
 def _default_region(options):
     marker = object()
     value = getattr(options, 'regions', marker)
@@ -38,7 +51,7 @@ def _default_region(options):
         return
 
     try:
-        options.regions = [utils.get_profile_session(options).region_name]
+        options.regions = [get_profile_session(options).region_name]
     except Exception:
         log.warning('Could not determine default region')
         options.regions = [None]
@@ -59,7 +72,7 @@ def _default_account_id(options):
         except IndexError:
             pass
     try:
-        session = utils.get_profile_session(options)
+        session = get_profile_session(options)
         options.account_id = utils.get_account_id_from_sts(session)
     except Exception:
         options.account_id = None

@@ -12,12 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from io import open
+from os import path
 from setuptools import setup, find_packages
+
+# read the contents of your README file
+this_directory = path.abspath(path.dirname(__file__))
+readme = path.join(this_directory, 'readme.md')
+long_description = ''
+if path.exists(readme):
+    with open(readme, encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(
     name="c7n_azure",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Azure Support",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     include_package_data=True,
     classifiers=[
         "Topic :: System :: Systems Administration",
@@ -41,7 +53,7 @@ setup(
                       "c7n",
                       "requests",
                       "azure-cli-core<=2.0.40",
-                      "adal~=0.5.0",
+                      "adal~=1.0.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
 

@@ -87,6 +87,7 @@ def load_resources():
     import c7n.resources.sns
     import c7n.resources.storagegw
     import c7n.resources.sqs
+    import c7n.resources.ssm
     import c7n.resources.support
     import c7n.resources.vpc
     import c7n.resources.waf

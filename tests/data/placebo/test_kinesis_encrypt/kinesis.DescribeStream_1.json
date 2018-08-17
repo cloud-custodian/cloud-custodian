@@ -1,0 +1,52 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "da712176-7c8c-9817-8878-2c27b42cfde5", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "da712176-7c8c-9817-8878-2c27b42cfde5", 
+                "content-length": "557", 
+                "x-amz-id-2": "06AHhU8LB0t7Fe5/FEpjt53U3dpYCqMT4zUYxxfz6SCR3EoNrRd6HVjAgFaIdWltUhBQHpNa5jZIs+lA7+JdYi9ocBVKnOVm", 
+                "server": "Apache-Coyote/1.1", 
+                "date": "Sat, 12 Aug 2017 14:05:04 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "StreamDescription": {
+            "HasMoreShards": false, 
+            "RetentionPeriodHours": 24, 
+            "StreamName": "sock-drawer", 
+            "Shards": [
+                {
+                    "ShardId": "shardId-000000000000", 
+                    "HashKeyRange": {
+                        "EndingHashKey": "340282366920938463463374607431768211455", 
+                        "StartingHashKey": "0"
+                    }, 
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49575983792626831963983842622784465898296159642543194114"
+                    }
+                }
+            ], 
+            "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/sock-drawer", 
+            "EnhancedMonitoring": [
+                {
+                    "ShardLevelMetrics": []
+                }
+            ], 
+            "StreamCreationTimestamp": {
+                "hour": 10, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 43, 
+                "microsecond": 0, 
+                "year": 2017, 
+                "day": 12, 
+                "minute": 0
+            }, 
+            "StreamStatus": "ACTIVE"
+        }
+    }
+}

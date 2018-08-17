@@ -1,4 +1,4 @@
-# Copyright 2017-2018 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
 
-class PolicyFilter(object):
-    pass
+
+@resources.register('datalake')
+class DataLakeStore(ArmResourceManager):
+
+    class resource_type(ArmResourceManager.resource_type):
+        service = 'azure.mgmt.datalake.store'
+        client = 'DataLakeStoreAccountManagementClient'
+        enum_spec = ('accounts', 'list', None)
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup'
+        )

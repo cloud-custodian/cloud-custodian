@@ -37,6 +37,14 @@ skip_if_not_validating = unittest.skipIf(
 )
 
 
+try:
+    import pytest
+
+    functional = pytest.mark.functional
+except ImportError:
+    functional = lambda func: func  # noqa E731
+
+
 class TestUtils(unittest.TestCase):
 
     custodian_schema = None

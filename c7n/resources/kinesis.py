@@ -44,6 +44,31 @@ class KinesisStream(QueryResourceManager):
             self, super(KinesisStream, self).augment(resources))
 
 
+@KinesisStream.action_registry.register('encrypt')
+class Encrypt(Action):
+
+    schema = type_schema('encrypt',
+                         key={'type': 'string'},
+                         required=('key',))
+
+    permissions = ("kinesis:UpdateStream",)
+
+    def process(self, resources):
+        # get KeyId
+        key = "alias/" + self.data.get('key')
+        self.key_id = local_session(self.manager.session_factory).client(
+            'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
+        client = local_session(self.manager.session_factory).client('kinesis')
+        for r in resources:
+            if not r['StreamStatus'] == 'ACTIVE':
+                continue
+            client.start_stream_encryption(
+                StreamName=r['StreamName'],
+                EncryptionType='KMS',
+                KeyId=self.key_id
+            )
+
+
 @KinesisStream.action_registry.register('delete')
 class Delete(Action):
 

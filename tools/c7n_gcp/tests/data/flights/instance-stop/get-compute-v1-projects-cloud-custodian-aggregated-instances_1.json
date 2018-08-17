@@ -73,6 +73,18 @@
           ]
         }
       }, 
+      "zones/us-west2-b": {
+        "warning": {
+          "message": "There are no results for scope 'zones/us-west2-b' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "zones/us-west2-b", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
       "zones/europe-west1-d": {
         "warning": {
           "message": "There are no results for scope 'zones/europe-west1-d' on this page.", 
@@ -164,6 +176,18 @@
           "data": [
             {
               "value": "zones/europe-west1-c", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "zones/us-west2-a": {
+        "warning": {
+          "message": "There are no results for scope 'zones/us-west2-a' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "zones/us-west2-a", 
               "key": "scope"
             }
           ]
@@ -379,19 +403,17 @@
             "status": "RUNNING", 
             "cpuPlatform": "Intel Haswell", 
             "kind": "compute#instance", 
-            "labels": {
-              "env": "testing"
-            }, 
             "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/machineTypes/n1-standard-1", 
             "description": "", 
             "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c", 
             "tags": {
               "items": [
+                "http-server", 
                 "https-server"
               ], 
-              "fingerprint": "nNZ0SA7CJyk="
+              "fingerprint": "6smc4R4d39I="
             }, 
-            "labelFingerprint": "E-Rp3_dLV_0=", 
+            "labelFingerprint": "42WmSpB8rSM=", 
             "disks": [
               {
                 "index": 0, 
@@ -444,20 +466,21 @@
                 "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
                 "accessConfigs": [
                   {
+                    "networkTier": "PREMIUM", 
                     "kind": "compute#accessConfig", 
                     "type": "ONE_TO_ONE_NAT", 
                     "name": "External NAT", 
-                    "natIP": "130.211.185.176"
+                    "natIP": "35.202.43.203"
                   }
                 ], 
                 "networkIP": "10.128.0.2", 
-                "fingerprint": "tbchcbNiLaE=", 
+                "fingerprint": "I9c-TFZkmcc=", 
                 "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default", 
                 "name": "nic0"
               }
             ], 
-            "creationTimestamp": "2018-07-08T02:45:53.681-07:00", 
-            "id": "2529875210063864767", 
+            "creationTimestamp": "2018-08-03T05:05:46.403-07:00", 
+            "id": "6624228363236670454", 
             "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/instance-1", 
             "name": "instance-1"
           }
@@ -607,6 +630,18 @@
           ]
         }
       }, 
+      "zones/us-west2-c": {
+        "warning": {
+          "message": "There are no results for scope 'zones/us-west2-c' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "zones/us-west2-c", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
       "zones/northamerica-northeast1-c": {
         "warning": {
           "message": "There are no results for scope 'zones/northamerica-northeast1-c' on this page.", 
@@ -674,20 +709,20 @@
   }, 
   "headers": {
     "status": "200", 
-    "content-length": "16159", 
+    "content-length": "16934", 
     "transfer-encoding": "chunked", 
-    "expires": "Sun, 08 Jul 2018 13:21:59 GMT", 
+    "expires": "Fri, 03 Aug 2018 12:20:21 GMT", 
     "vary": "Origin, X-Origin", 
     "-content-encoding": "gzip", 
-    "date": "Sun, 08 Jul 2018 13:21:59 GMT", 
+    "date": "Fri, 03 Aug 2018 12:20:21 GMT", 
     "x-xss-protection": "1; mode=block", 
     "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances?alt=json", 
     "x-content-type-options": "nosniff", 
     "server": "GSE", 
-    "etag": "\"_OAUT0Siv8_jfIsjP9p3RAfx2Zo=/9bwVZByCu1Hb5J3RQLjNpVNiIOM=\"", 
+    "etag": "\"jRzdCaVPuslVt0zk0wwbAmLcXpA=/RT1AE9A6P2wD9bR83OamMmOj2oQ=\"", 
     "cache-control": "private, max-age=0, must-revalidate, no-transform", 
     "x-frame-options": "SAMEORIGIN", 
-    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
     "content-type": "application/json; charset=UTF-8"
   }
 }

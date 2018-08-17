@@ -20,11 +20,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import six
 
-from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzlocal, tzutc
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema

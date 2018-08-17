@@ -860,5 +860,5 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
                     'S3BucketName', None)) or
                 (bucket_prefix and bucket_prefix != elb['Attributes'][
                     'AccessLog'].get(
-                    'S3AccessPrefix', None))
+                    'S3BucketPrefix', None))
                 ]

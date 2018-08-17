@@ -399,6 +399,43 @@ class EBS(QueryResourceManager):
     action_registry = actions
 
 
+@EBS.action_registry.register('detach')
+class VolumeDetach(BaseAction):
+
+    """
+    Detach an EBS volume from an Instance.
+
+    If 'Force' Param is True, then we'll do a forceful detach
+    of the Volume. The default value for 'Force' is False.
+
+     :example:
+
+     .. code-block:: yaml
+
+             policies:
+               - name: instance-ebs-volumes
+                 resource: ebs
+                 filters:
+                   VolumeId :  volumeid
+                 actions:
+                   - detach
+
+
+    """
+
+    schema = type_schema('detach', force={'type': 'boolean'})
+    permissions = ('ec2:DetachVolume',)
+
+    def process(self, volumes, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vol in volumes:
+            for attachment in vol.get('Attachments', []):
+                client.detach_volume(InstanceId=attachment['InstanceId'],
+                                VolumeId=attachment['VolumeId'],
+                                Force=self.data.get('force', False))
+
+
 @filters.register('instance')
 class AttachedInstanceFilter(ValueFilter):
     """Filter volumes based on filtering on their attached instance

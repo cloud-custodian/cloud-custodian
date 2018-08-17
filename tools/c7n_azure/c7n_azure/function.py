@@ -23,7 +23,7 @@ from c7n_azure import handler, entry
 
 try:
     import azure.functions as func
-    from azure.worker.bindings.http import HttpRequest
+    from azure.functions_worker.bindings.http import HttpRequest
 except ImportError:
     pass
 

@@ -11,6 +11,9 @@ Filters
     - Metric Filter - Filter on metrics from Azure Monitor - (see `Key Vault Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftkeyvaultvaults/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- Whitelist filter - Filter on whitelist of Service Principals allowed to have a KeyVault access
+    - You can use object_id, `display_name`, `principal_name` for the key
+    - Note: if you use `display_name` or `principal_name`, you need to use azure cli authentication
 
 Actions
 -------
@@ -69,3 +72,20 @@ This policy will find all KeyVaults with 10 or less API Hits over the last 72 ho
             transport:
               - type: asq
                 queue: https://accountname.queue.core.windows.net/queuename
+
+This policy will find all KeyVaults with an access of Service Principals not in the white list
+
+.. code-block:: yaml
+
+    policies:
+        - name: policy
+          description:
+            Adds a tag to all virtual machines
+          resource: azure.keyvault
+          filters:
+            - type: whitelist
+              key: accessPolicies[].principalName
+              op: difference
+              value:
+                - account1@sample.com
+                - account2@sample.com

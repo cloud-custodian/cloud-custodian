@@ -263,6 +263,11 @@ class NetworkLocationTest(BaseTest):
                 {
                     "reason": "SecurityGroupLocationAbsent",
                     "security-groups": {sg_id: None, web_sg_id: "web"},
+                },
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "security-groups": {sg_id: None},
+                    "resource": "web"
                 }
             ],
         )
@@ -406,7 +411,11 @@ class NetworkLocationTest(BaseTest):
                     "security-groups": {db_sg_id: "db", web_sg_id: "web"},
                     "subnets": {web_sub_id: "web"},
                 },
-            ],
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "resource": "web",
+                    "security-groups": {db_sg_id: "db"}
+                }]
         )
 
     @functional
@@ -458,7 +467,12 @@ class NetworkLocationTest(BaseTest):
         matched = resources.pop()
         self.assertEqual(
             matched["c7n:NetworkLocation"],
-            [{"reason": "ResourceLocationAbsent", "resource": None}],
+            [
+                {"reason": "ResourceLocationAbsent",
+                "resource": None},
+                {"security-groups": {web_sg_id: "web"},
+                "resource": None,
+                "reason": "SecurityGroupMismatch"}],
         )
 
     @functional
