@@ -312,7 +312,6 @@ class TestPolicy(BaseTest):
             "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
         self.assertEqual(p.data['mode']['role'], 'arn:iam::12312311/role/FooBar')
         self.assertEqual(p.data['mode']['member-role'], 'arn:iam:{account_id}/role/BarFoo')
-        
         self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
 
     def test_child_resource_trail_validation(self):
