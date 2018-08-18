@@ -300,6 +300,10 @@ class TestPolicy(BaseTest):
                 {'type': 'tag',
                  'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
                 {'type': 'notify',
+                 'transport': {
+                     'type': 'sns',
+                     'topic': 'arn:::::',
+                 },
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
