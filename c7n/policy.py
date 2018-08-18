@@ -787,7 +787,7 @@ class Policy(object):
             'bucket_region': '{bucket_region}',
             'bucket_name': '{bucket_name}',
             'source_bucket_name': '{source_bucket_name}',
-            'target_bucket_name': '{source_bucket_name}',
+            'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
         }
@@ -797,12 +797,17 @@ class Policy(object):
 
         Updates the policy data in-place.
         """
+        # format string values returns a copy
         updated = utils.format_string_values(self.data, **variables)
+
         # Several keys should only be expanded at runtime, perserve them.
         if 'member-role' in updated.get('mode', {}):
             updated['mode']['member-role'] = self.data['mode']['member-role']
+
+        # Update ourselves in place
         self.data = updated
-        # Reload filters/actions using updated data.
+        # Reload filters/actions using updated data, we keep a reference
+        # for some compatiblity preservation work.
         m = self.resource_manager
         self.resource_manager = self.load_resource_manager()
 

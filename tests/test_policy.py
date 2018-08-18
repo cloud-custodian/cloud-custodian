@@ -294,17 +294,25 @@ class TestPolicy(BaseTest):
             'resource': 'aws.ec2',
             'mode': {
                 'type': 'config-rule',
+                'member-role': 'arn:iam:{account_id}/role/BarFoo',
                 'role': 'arn:iam::{account_id}/role/FooBar'},
             'actions': [
                 {'type': 'tag',
-                 'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'}
+                 'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
+                {'type': 'notify',
+                 'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
         ivalue = 'bad monkey 12312311 zanzibar %s' % (
             (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d'))
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['actions'][0]['value'], ivalue)
+        self.assertEqual(
+            p.data['actions'][1]['subject'],
+            "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
         self.assertEqual(p.data['mode']['role'], 'arn:iam::12312311/role/FooBar')
+        self.assertEqual(p.data['mode']['member-role'], 'arn:iam:{account_id}/role/BarFoo')
+        
         self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
 
     def test_child_resource_trail_validation(self):
