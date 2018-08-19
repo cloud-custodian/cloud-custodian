@@ -300,6 +300,7 @@ class TestPolicy(BaseTest):
                 {'type': 'tag',
                  'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
                 {'type': 'notify',
+                 'to': ['me@example.com'],
                  'transport': {
                      'type': 'sns',
                      'topic': 'arn:::::',
