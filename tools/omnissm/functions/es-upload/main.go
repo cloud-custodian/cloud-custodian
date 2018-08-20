@@ -36,6 +36,11 @@ import (
 	"github.com/sha1sum/aws_signing_client"
 )
 
+type myOutput struct {
+	requiredTags
+	processObj
+	resourceObj
+}
 type tagObj struct {
 	Key   string `json:"Key"`
 	Value string `json:"Value"`
@@ -65,21 +70,18 @@ type processObj struct {
 }
 
 type resourceObj struct {
-	KeyName       string `json:"KeyName"`
-	AccountId     string `json:"AccountId"`
-	Platform      string `json:"Platform"`
-	InstanceId    string `json:"InstanceId"`
-	VPCId         string `json:"VPCId"`
-	State         string `json:"State"`
-	ImageId       string `json:"ImageId"`
-	InstanceRole  string `json:"InstanceRole"`
-	Region        string `json:"Region"`
-	SubnetId      string `json:"SubnetId"`
-	InstanceType  string `json:"InstanceType"`
-	Created       string `json:"Created"`
-	ResourceId    string `json:"resourceId"`
-	CaptureTime   string `json:"captureTime"`
-	SchemaVersion string `json:"schemaVersion"`
+	KeyName      string `json:"KeyName"`
+	AccountId    string `json:"AccountId"`
+	Platform     string `json:"Platform"`
+	InstanceId   string `json:"InstanceId"`
+	VPCId        string `json:"VPCId"`
+	State        string `json:"State"`
+	ImageId      string `json:"ImageId"`
+	InstanceRole string `json:"InstanceRole"`
+	Region       string `json:"Region"`
+	SubnetId     string `json:"SubnetId"`
+	InstanceType string `json:"InstanceType"`
+	Created      string `json:"Created"`
 }
 
 var (
@@ -136,11 +138,6 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 		return err
 	}
 
-	dec, err := getProcessDecoder(ctx, bucketName, bucketKey)
-	if err != nil {
-		return err
-	}
-
 	tags, err := getTags(ctx, bucketName, bucketKey)
 	if err != nil {
 		return err
@@ -151,6 +148,17 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 		return err
 	}
 
+	//get process file
+	processFile, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(bucketKey),
+	})
+	if err != nil {
+		return err
+	}
+	defer processFile.Body.Close()
+	dec := json.NewDecoder(processFile.Body)
+
 	for {
 		var process processObj
 		if err := dec.Decode(&process); err == io.EOF {
@@ -158,53 +166,29 @@ func processEventRecord(ctx context.Context, record events.S3EventRecord, client
 		} else if err != nil {
 			return err
 		}
-		var m map[string]interface{}
 
-		m["ASV"] = tags.ASV
-		m["CMDBEnvironment"] = tags.CMDBEnvironment
-		m["OwnerContact"] = tags.OwnerContact
-		m["Cmdline"] = process.Cmdline
-		m["Rss"] = process.Rss
-		m["CreateTime"] = process.CreateTime
-		m["WriteBytes"] = process.WriteBytes
-		m["Name"] = process.Name
-		m["Pid"] = process.Pid
-		m["ThreadCount"] = process.ThreadCount
-		m["NumFds"] = process.NumFds
-		m["ReadBytes"] = process.ReadBytes
-		m["User"] = process.User
-		m["Vms"] = process.Vms
-		m["ResourceId"] = process.ResourceId
-		m["captureTime"] = process.captureTime
-		m["schemaVersion"] = process.schemaVersion
-		m["KeyName"] = resource.KeyName
-		m["AccountId"] = resource.AccountId
-		m["Platform"] = resource.Platform
-		m["InstanceId"] = resource.InstanceId
-		m["VPCId"] = resource.VPCId
-		m["State"] = resource.State
-		m["ImageId"] = resource.ImageId
-		m["InstanceRole"] = resource.InstanceRole
-		m["Region"] = resource.Region
-		m["SubnetId"] = resource.SubnetId
-		m["InstanceType"] = resource.InstanceType
-		m["Created"] = resource.Created
-
-		_, err := client.Index().
+		output := myOutput{
+			requiredTags: tags,
+			resourceObj:  resource,
+			processObj:   process,
+		}
+		_, error := client.Index().
 			Index(indexName).
 			Type(typeName).
-			BodyJson(m).
+			BodyJson(output).
 			Do(ctx)
 		if err != nil {
-			return err
+			return error
 		}
 	}
 
 	return nil
 }
 
+//Attempt to pull file from s3 with the same manager id, iterate over returned tags
 func getTags(ctx context.Context, bucketName string, bucketKey string) (requiredTags, error) {
 	var tags requiredTags
+	//get tags file from s3
 	tagsRes, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(strings.Replace(bucketKey, "Custom:ProcessInfo", "AWS:Tag", 1)),
@@ -212,7 +196,8 @@ func getTags(ctx context.Context, bucketName string, bucketKey string) (required
 	if err != nil {
 		return tags, err
 	}
-
+	defer tagsRes.Body.Close()
+	//setup decoder to iterate over individual tag objects
 	dec := json.NewDecoder(tagsRes.Body)
 	if err != nil {
 		return tags, err
@@ -225,6 +210,7 @@ func getTags(ctx context.Context, bucketName string, bucketKey string) (required
 		} else if err != nil {
 			return tags, err
 		}
+		//search for specific tags
 		switch aTagObj.Key {
 		case "ASV":
 			tags.ASV = aTagObj.Value
@@ -232,14 +218,12 @@ func getTags(ctx context.Context, bucketName string, bucketKey string) (required
 			tags.CMDBEnvironment = aTagObj.Value
 		case "OwnerContact":
 			tags.OwnerContact = aTagObj.Value
-
 		}
 	}
 	return tags, nil
 }
 
 func getResourceInfo(ctx context.Context, bucketName string, bucketKey string) (resourceObj, error) {
-
 	var resource resourceObj
 	//get resource file
 	resourceFile, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
@@ -250,29 +234,17 @@ func getResourceInfo(ctx context.Context, bucketName string, bucketKey string) (
 	if err != nil {
 		return resource, err
 	}
+	defer resourceFile.Body.Close()
 
 	resourceByteArray, err := ioutil.ReadAll(resourceFile.Body)
 	if err != nil {
 		return resource, err
 	}
-	defer resourceFile.Body.Close()
 
-	json.Unmarshal(resourceByteArray, resource)
-
-	return resource, nil
-}
-
-func getProcessDecoder(ctx context.Context, bucketName string, bucketKey string) (*json.Decoder, error) {
-	//get process file
-	processFile, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(bucketKey),
-	})
+	err = json.Unmarshal(resourceByteArray, resource)
 	if err != nil {
-		return nil, err
+		return resource, err
 	}
 
-	dec := json.NewDecoder(processFile.Body)
-	defer processFile.Body.Close()
-	return dec, nil
+	return resource, nil
 }
