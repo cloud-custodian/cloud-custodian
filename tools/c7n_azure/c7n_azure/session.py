@@ -21,7 +21,7 @@ import os
 from azure.cli.core._profile import Profile
 from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
-from c7n_azure.utils import ResourceIdParser
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class Session(object):
@@ -132,7 +132,8 @@ class Session(object):
         provider = resource_client.providers.get(namespace)
 
         rt = next((t for t in provider.resource_types
-            if t.resource_type == str(resource_type).split('/')[-1]), None)
+            if StringUtils.equal(t.resource_type, resource_type.split('/')[-1])), None)
+
         if rt and rt.api_versions:
             versions = [v for v in rt.api_versions if 'preview' not in v.lower()]
             api_version = versions[0] if versions else rt.api_versions[0]

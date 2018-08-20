@@ -24,7 +24,7 @@ Returns all container services that did not provision successfully
 
     policies:
       - name: broken-containerservices
-        resource: azure.containerservices
+        resource: azure.containerservice
         filters:
           - type: value
             key: properties.provisioningState

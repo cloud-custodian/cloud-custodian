@@ -1401,7 +1401,7 @@ class ConfigRule(object):
         )
 
         if isinstance(func, PolicyLambda):
-            manager = func.policy.get_resource_manager()
+            manager = func.policy.load_resource_manager()
             if hasattr(manager.get_model(), 'config_type'):
                 config_type = manager.get_model().config_type
             else:

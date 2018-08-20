@@ -1421,7 +1421,7 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_multi_attribute_ingress(self):
@@ -1458,7 +1458,7 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_ports_ingress(self):
@@ -1493,7 +1493,7 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_self_reference_ingress_false_positives(self):
@@ -1538,7 +1538,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1555,7 +1555,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         p = self.load_policy(
@@ -1574,8 +1574,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
-
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         resources = [
@@ -1622,7 +1621,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1641,7 +1640,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         p = self.load_policy(
@@ -1659,7 +1658,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1677,7 +1676,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_egress_ipv6(self):
@@ -1727,7 +1726,7 @@ class SecurityGroupTest(BaseTest):
             "OwnerId": "644160558196",
             "GroupId": "sg-b744bafc"
         }]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_permission_expansion(self):

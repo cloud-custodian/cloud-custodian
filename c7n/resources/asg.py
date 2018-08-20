@@ -422,6 +422,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                   - type: not-encrypted
                     exclude_image: true
     """
+
     schema = type_schema('not-encrypted', exclude_image={'type': 'boolean'})
     permissions = (
         'ec2:DescribeImages',
@@ -825,13 +826,28 @@ class CapacityDelta(Filter):
 
 @filters.register('user-data')
 class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+    """Filter on ASG's whose launch configs have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: lc_userdata
+                resource: asg
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - delete
+    """
 
     schema = type_schema('user-data', rinherit=ValueFilter.schema)
     batch_size = 50
     annotation = 'c7n:user-data'
-
-    def validate(self):
-        return self
 
     def get_permissions(self):
         return self.manager.get_resource_manager('asg').get_permissions()
