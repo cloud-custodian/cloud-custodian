@@ -114,7 +114,7 @@ class ActionRegistry(PluginRegistry):
                 "Invalid action type %s, valid actions %s" % (
                     action_type, list(self.keys())))
         # Construct a ResourceManager
-        return action_class(data, manager).validate()
+        return action_class(data, manager)
 
 
 class Action(object):

@@ -58,14 +58,6 @@ Once the service principal is created, follow these steps:
 - Click `Save`
 
 
-Azure CLI
----------
-
-Set environment variable :code:`AZURE_CLI_AUTH` to any value, and session will pull credentials and the default
-subscription from Azure CLI.  Requires that you have run :code:`az login` in Azure CLI first.
-
-
-
 Access Token
 ------------
 

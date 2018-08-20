@@ -13,14 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from datetime import datetime
+from dateutil import tz, parser
 import json
 import fnmatch
 import itertools
 import logging
 import os
 import time
-from dateutil import tz, parser
-from datetime import datetime
+
 
 import jmespath
 import six
@@ -28,7 +29,7 @@ import six
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
-from c7n.exceptions import ClientError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
@@ -477,28 +478,10 @@ class LambdaMode(ServerlessExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
-    def expand_variables(self, variables):
-        """expand variables in the mode role and output_dir fields.
-        """
-        p = self.policy.data
-        if 'mode' in p:
-            if 'role' in p['mode']:
-                p['mode']['role'] = utils.format_string_values(p['mode']['role'], **variables)
-            if 'execution-options' in p['mode']:
-                if 'output_dir' in p['mode']['execution-options']:
-                    p['mode']['execution-options']['output_dir'] = utils.format_string_values(
-                        p['mode']['execution-options']['output_dir'], **variables)
-        return p
-
     def provision(self):
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
-            variables = {
-                'account_id': self.policy.options.account_id,
-                'region': self.policy.options.region
-            }
-            self.policy.data = self.expand_variables(variables)
             try:
                 manager = mu.LambdaManager(self.policy.session_factory)
             except ClientError:
@@ -702,7 +685,7 @@ class Policy(object):
             session_factory = clouds[self.provider_name]().get_session_factory(options)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
 
     def __repr__(self):
         return "<Policy resource: %s name: %s region: %s>" % (
@@ -754,7 +737,10 @@ class Policy(object):
 
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        return execution.get(exec_mode_type)(self)
+        exec_mode = execution[exec_mode_type]
+        if exec_mode is None:
+            return None
+        return exec_mode(self)
 
     @property
     def is_lambda(self):
@@ -764,12 +750,73 @@ class Policy(object):
 
     def validate(self):
         m = self.get_execution_mode()
+        if m is None:
+            raise PolicyValidationError(
+                "Invalid Execution mode in policy %s" % (self.data,))
         m.validate()
         self.validate_policy_start_stop()
         for f in self.resource_manager.filters:
             f.validate()
         for a in self.resource_manager.actions:
             a.validate()
+
+    def get_variables(self):
+        # Global policy variable expansion, we have to carry forward on
+        # various filter/action local vocabularies. Where possible defer
+        # by using a format string.
+        #
+        # See https://github.com/capitalone/cloud-custodian/issues/2330
+        return {
+            # standard runtime variables for interpolation
+            'account': '{account}',
+            'account_id': self.options.account_id,
+            'region': self.options.region,
+            # non-standard runtime variables from local filter/action vocabularies
+            #
+            # notify action
+            'policy': self.data,
+            'event': '{event}',
+            # mark for op action
+            'op': '{op}',
+            'action_date': '{action_date}',
+            # tag action pyformat-date handling
+            'now': utils.FormatDate(datetime.utcnow()),
+            # account increase limit action
+            'service': '{service}',
+            # s3 set logging action :-( see if we can revisit this one.
+            'bucket_region': '{bucket_region}',
+            'bucket_name': '{bucket_name}',
+            'source_bucket_name': '{source_bucket_name}',
+            'target_bucket_name': '{target_bucket_name}',
+            'target_prefix': '{target_prefix}',
+            'LoadBalancerName': '{LoadBalancerName}'
+        }
+
+    def expand_variables(self, variables):
+        """Expand variables in policy data.
+
+        Updates the policy data in-place.
+        """
+        # format string values returns a copy
+        updated = utils.format_string_values(self.data, **variables)
+
+        # Several keys should only be expanded at runtime, perserve them.
+        if 'member-role' in updated.get('mode', {}):
+            updated['mode']['member-role'] = self.data['mode']['member-role']
+
+        # Update ourselves in place
+        self.data = updated
+        # Reload filters/actions using updated data, we keep a reference
+        # for some compatiblity preservation work.
+        m = self.resource_manager
+        self.resource_manager = self.load_resource_manager()
+
+        # XXX: Compatiblity hack
+        # Preserve notify action subject lines which support
+        # embedded jinja2 as a passthrough to the mailer.
+        for old_a, new_a in zip(m.actions, self.resource_manager.actions):
+            if old_a.type == 'notify' and 'subject' in old_a.data:
+                new_a.data['subject'] = old_a.data['subject']
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()
@@ -813,7 +860,7 @@ class Policy(object):
         else:
             resources = mode.run()
         # clear out resource manager post run, to clear cache
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
         return resources
 
     run = __call__
@@ -822,7 +869,7 @@ class Policy(object):
         with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
-    def get_resource_manager(self):
+    def load_resource_manager(self):
         resource_type = self.data.get('resource')
 
         provider = clouds.get(self.provider_name)
