@@ -552,12 +552,16 @@ class CloudTrailMode(LambdaMode):
 
 @execution.register('ec2-instance-state')
 class EC2InstanceState(LambdaMode):
-    """a lambda policy that executes on ec2 instance state changes."""
+    """
+    A lambda policy that executes on ec2 instance state changes.
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
+    """
 
     schema = utils.type_schema(
         'ec2-instance-state', rinherit=LambdaMode.schema,
         events={'type': 'array', 'items': {
-            'enum': ['running', 'shutting-down',
+            'enum': ['pending', 'running', 'shutting-down',
                      'stopped', 'stopping', 'terminated']}})
 
 
