@@ -1,16 +1,16 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}",
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "3b8a3120-06cb-11e8-812f-47c9f53fd22c", 
+            "RequestId": "1b5e5a87-a582-11e8-a445-45a07f65ca23",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "3b8a3120-06cb-11e8-812f-47c9f53fd22c", 
-                "content-length": "522", 
-                "content-type": "application/x-amz-json-1.1"
-            }
+                "x-amzn-requestid": "1b5e5a87-a582-11e8-a445-45a07f65ca23",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "544"
+            },
+            "RetryAttempts": 0
         }
     }
 }

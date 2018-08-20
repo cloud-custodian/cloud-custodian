@@ -1,15 +1,15 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "13ea4c9b-06cb-11e8-ba91-93d7f3df746b", 
+            "RequestId": "f6035e35-a581-11e8-a5c1-c9d6ade79c97",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "13ea4c9b-06cb-11e8-ba91-93d7f3df746b", 
-                "content-length": "0", 
-                "content-type": "application/x-amz-json-1.1"
-            }
+                "x-amzn-requestid": "f6035e35-a581-11e8-a5c1-c9d6ade79c97",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "0"
+            },
+            "RetryAttempts": 0
         }
     }
 }

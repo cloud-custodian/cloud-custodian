@@ -1,19 +1,19 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Account": "644160558196", 
-        "UserId": "AIDAIF6CSPD4UCWCSYZZ6", 
+        "UserId": "AIDAIFSHVFT46NXYGWMEI",
+        "Account": "644160558196",
+        "Arn": "arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com",
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "138ac838-06cb-11e8-9a81-717e49e791ce", 
+            "RequestId": "f5cc4816-a581-11e8-ae07-0dc04e521f28",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "138ac838-06cb-11e8-9a81-717e49e791ce", 
-                "date": "Wed, 31 Jan 2018 21:09:51 GMT", 
-                "content-length": "413", 
-                "content-type": "text/xml"
-            }
-        }, 
-        "Arn": "arn:aws:iam::644160558196:user/AlfredMarcGamulo"
+                "x-amzn-requestid": "f5cc4816-a581-11e8-ae07-0dc04e521f28",
+                "content-type": "text/xml",
+                "content-length": "424",
+                "date": "Tue, 21 Aug 2018 20:37:02 GMT"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

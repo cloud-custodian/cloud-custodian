@@ -13,24 +13,11 @@
                 ]
             },
             {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/66cc02aa-d87b-46ee-92cc-845edb4257cf",
-                "Tags": []
-            },
-            {
                 "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
                 "Tags": [
                     {
                         "Key": "Name",
                         "Value": "c7n/sagemaker"
-                    }
-                ]
-            },
-            {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/825e5eb4-f85b-4953-81ea-905aa251af57",
-                "Tags": [
-                    {
-                        "Key": "RequisiteKey",
-                        "Value": "Required"
                     }
                 ]
             },
@@ -45,13 +32,13 @@
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "f738a92c-a581-11e8-96a0-21b3edd860c2",
+            "RequestId": "31ba387e-a57e-11e8-a0ff-bd1797e76058",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "f738a92c-a581-11e8-96a0-21b3edd860c2",
+                "x-amzn-requestid": "31ba387e-a57e-11e8-a0ff-bd1797e76058",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "719",
-                "date": "Tue, 21 Aug 2018 20:37:04 GMT"
+                "content-length": "470",
+                "date": "Tue, 21 Aug 2018 20:10:04 GMT"
             },
             "RetryAttempts": 0
         }

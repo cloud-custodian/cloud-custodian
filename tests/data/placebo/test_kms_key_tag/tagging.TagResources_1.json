@@ -1,17 +1,17 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
+        "FailedResourcesMap": {},
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "356e8290-06cc-11e8-b966-032838b313f4", 
+            "RequestId": "5eee9c2b-a581-11e8-ba9e-8d2f9ec6ef7d",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "356e8290-06cc-11e8-b966-032838b313f4", 
-                "date": "Wed, 31 Jan 2018 21:17:57 GMT", 
-                "content-length": "25", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
-        "FailedResourcesMap": {}
+                "x-amzn-requestid": "5eee9c2b-a581-11e8-ba9e-8d2f9ec6ef7d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "25",
+                "date": "Tue, 21 Aug 2018 20:32:48 GMT"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

@@ -1,22 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Keys": [ 
+        "Keys": [
             {
-                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/ffb1402c-040a-4b1f-b1e5-9918a0238aa7", 
-                "KeyId": "ffb1402c-040a-4b1f-b1e5-9918a0238aa7"
+                "KeyId": "f1f33a6b-91aa-4b0a-904c-f2a0378277f0",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0"
             }
-        ], 
+        ],
+        "Truncated": false,
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "230c3e71-06a7-11e8-b8da-c114a8625b7e", 
+            "RequestId": "64cc6bdb-a582-11e8-87d3-ef77a09d1ed7",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "230c3e71-06a7-11e8-b8da-c114a8625b7e", 
-                "content-length": "4666", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
-        "Truncated": false
+                "x-amzn-requestid": "64cc6bdb-a582-11e8-87d3-ef77a09d1ed7",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "3850"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

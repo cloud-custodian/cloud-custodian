@@ -1,36 +1,36 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "KeyMetadata": {
-            "Origin": "AWS_KMS", 
-            "KeyId": "7e9d3a66-b4f3-47ff-98f7-4a6087b45405", 
-            "Description": "test-cross-account-3", 
-            "KeyManager": "CUSTOMER", 
-            "Enabled": true, 
-            "KeyUsage": "ENCRYPT_DECRYPT", 
-            "KeyState": "Enabled", 
+            "AWSAccountId": "644160558196",
+            "KeyId": "772d5a38-b19c-4ee7-93c7-bcada3cb8cfb",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/772d5a38-b19c-4ee7-93c7-bcada3cb8cfb",
             "CreationDate": {
-                "hour": 16, 
-                "__class__": "datetime", 
-                "month": 1, 
-                "second": 38, 
-                "microsecond": 475000, 
-                "year": 2018, 
-                "day": 31, 
-                "minute": 36
-            }, 
-            "Arn": "arn:aws:kms:us-east-1:644160558196:key/7e9d3a66-b4f3-47ff-98f7-4a6087b45405", 
-            "AWSAccountId": "644160558196"
-        }, 
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 8,
+                "day": 22,
+                "hour": 9,
+                "minute": 37,
+                "second": 43,
+                "microsecond": 704000
+            },
+            "Enabled": true,
+            "Description": "test-cross-account-3",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER"
+        },
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d305c409-06ce-11e8-bfbd-832bafe7beb0", 
+            "RequestId": "8cd69251-a610-11e8-83cd-fd2cfca22180",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "d305c409-06ce-11e8-bfbd-832bafe7beb0", 
-                "content-length": "355", 
-                "content-type": "application/x-amz-json-1.1"
-            }
+                "x-amzn-requestid": "8cd69251-a610-11e8-83cd-fd2cfca22180",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "355"
+            },
+            "RetryAttempts": 0
         }
     }
 }

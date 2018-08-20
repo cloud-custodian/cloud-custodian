@@ -1,28 +1,64 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "PaginationToken": "", 
+        "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/27250239-ae3b-4038-83c7-97a8e8421d51", 
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/3f2ab3af-cc4e-427b-b96d-d4356f9764c4",
                 "Tags": [
                     {
-                        "Value": "Invalid", 
-                        "Key": "ExpiredTag"
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/66cc02aa-d87b-46ee-92cc-845edb4257cf",
+                "Tags": [
+                    {
+                        "Key": "ExpiredTag",
+                        "Value": "Invalid"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n/sagemaker"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/825e5eb4-f85b-4953-81ea-905aa251af57",
+                "Tags": [
+                    {
+                        "Key": "RequisiteKey",
+                        "Value": "Required"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CMK-Rotation-Test"
                     }
                 ]
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "a480ce83-06cc-11e8-b6f5-33ff73a0618a", 
+            "RequestId": "74b5417a-a581-11e8-ba9e-8d2f9ec6ef7d",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "a480ce83-06cc-11e8-b6f5-33ff73a0618a", 
-                "date": "Wed, 31 Jan 2018 21:21:03 GMT", 
-                "content-length": "744", 
-                "content-type": "application/x-amz-json-1.1"
-            }
+                "x-amzn-requestid": "74b5417a-a581-11e8-ba9e-8d2f9ec6ef7d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "757",
+                "date": "Tue, 21 Aug 2018 20:33:25 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }
