@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -53,7 +53,7 @@ setup(
                       "c7n",
                       "requests",
                       "azure-cli-core<=2.0.40",
-                      "adal~=0.5.0",
+                      "adal~=1.0.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
 

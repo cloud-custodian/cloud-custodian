@@ -177,4 +177,4 @@ class Session(object):
             'subscription': self.subscription_id
         }
 
-        return json.dumps(auth)
+        return json.dumps(auth, indent=2)

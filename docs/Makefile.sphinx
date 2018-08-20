@@ -1,13 +1,19 @@
 # Makefile for Sphinx documentation
 #
 
+VIRTUALENV	  = $(shell echo $$VIRTUAL_ENV | awk -F "/" '{print $$NF}')
+
+ifndef VIRTUALENV
+VIRTUALENV = py27
+endif
+
 # You can set these variables from the command line.
-SPHINXBINS    = .tox/docs/bin
-SRCDIR        = docs/source
-SPHINXOPTS    = -W
-SPHINXBUILD   = $(SPHINXBINS)/sphinx-build
-PAPER         =
-BUILDDIR      = $(SRCDIR)/../build
+SPHINXBINS    ?= .tox/$(VIRTUALENV)/bin
+SRCDIR        ?= docs/source
+SPHINXOPTS    ?= -W
+SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
+PAPER         ?=
+BUILDDIR      ?= $(SRCDIR)/../build
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)

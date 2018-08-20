@@ -311,6 +311,13 @@ class Time(Filter):
         'utc': 'Etc/UTC',
     }
 
+    z_names = list(zoneinfo.get_zonefile_instance().zones)
+    non_title_case_zones = (
+        lambda aliases=TZ_ALIASES.keys(), z_names=z_names:
+        {z.lower(): z for z in z_names
+            if z.title() != z and z.lower() not in aliases})()
+    TZ_ALIASES.update(non_title_case_zones)
+
     def __init__(self, data, manager=None):
         super(Time, self).__init__(data, manager)
         self.default_tz = self.data.get('default_tz', self.DEFAULT_TZ)
@@ -459,7 +466,7 @@ class Time(Filter):
     def get_tz(cls, tz):
         found = cls.TZ_ALIASES.get(tz)
         if found:
-            tz = found
+            return zoneinfo.gettz(found)
         return zoneinfo.gettz(tz.title())
 
     def get_default_schedule(self):

@@ -24,7 +24,7 @@ Returns all CDNs with Standard_Verizon sku
 
     policies:
       - name: standard-verizon
-        resource: azure.cdn
+        resource: azure.cdnprofile
         filters:
           - type: value
             key: sku

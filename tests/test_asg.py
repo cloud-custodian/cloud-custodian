@@ -53,6 +53,28 @@ class LaunchConfigTest(BaseTest):
         self.assertEqual(resources[0]["LaunchConfigurationName"], "CloudClusterCopy")
 
 
+class TestUserData(BaseTest):
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_launch_config_userdata")
+        policy = self.load_policy(
+            {
+                "name": "launch_config_userdata",
+                "resource": "asg",
+                'filters': [
+                    {
+                        'or': [
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'}
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertGreater(len(resources), 0)
+
+
 class AutoScalingTest(BaseTest):
 
     def get_ec2_tags(self, ec2, instance_id):

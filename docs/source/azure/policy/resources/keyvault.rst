@@ -11,6 +11,13 @@ Filters
     - Metric Filter - Filter on metrics from Azure Monitor - (see `Key Vault Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftkeyvaultvaults/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- Whitelist filter - Filter on whitelist of Service Principals allowed to have a KeyVault access or Service Principals with specified access permissions
+    - You can use `objectId`, `displayName`, `principalName` for the key
+    - You can specify allowed set of permissions for keys, secrets and certificates (case insensitive)
+    - Keys permissions: `Get`, `Create`, `Delete`, `List`, `Update`, `Import`, `Backup`, `Restore`, `Recover`, `Decrypt`, `UnwrapKey`, `Encrypt`, `WrapKey`, `Verify`, `Sign`, `Purge`
+    - Secret permissions: `Get`, `List`, `Set`, `Delete`, `Backup`, `Restore`, `Recover`, `Purge`
+    - Certificate permissions: `Get`, `List`, `Delete`, `Create`, `Import`, `Update`, `ManageContacts`, `GetIssuers`, `ListIssuers`, `SetIssuers`, `DeleteIssuers`, `ManageIssuers`, `Recover`, `Backup`, `Restore`, `Purge`
+    - Note: if you use `displayName` or `principalName`, you need to use azure cli authentication
 
 Actions
 -------
@@ -69,3 +76,27 @@ This policy will find all KeyVaults with 10 or less API Hits over the last 72 ho
             transport:
               - type: asq
                 queue: https://accountname.queue.core.windows.net/queuename
+
+This policy will find all KeyVaults with an access of Service Principals not in the white list that exceed read-only access
+
+.. code-block:: yaml
+
+    policies:
+        - name: policy
+          description:
+            Ensure only authorized people have an access
+          resource: azure.keyvault
+          filters:
+            - not:
+              - type: whitelist
+                key: principalName
+                users:
+                  - account1@sample.com
+                  - account2@sample.com
+                permissions:
+                  keys:
+                    - get
+                  secrets:
+                    - get
+                  certificates:
+                    - get

@@ -1378,3 +1378,21 @@ class TestFilter(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestUserData(BaseTest):
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_userdata")
+        policy = self.load_policy(
+            {
+                "name": "ec2_userdata",
+                "resource": "ec2",
+                'filters': [{'or': [
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'}
+                ]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertGreater(len(resources), 0)

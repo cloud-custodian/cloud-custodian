@@ -1,4 +1,4 @@
 vcrpy==1.11.0
 vcrpy_unittest
-adal~=0.5.0
+adal~=1.0.0
 backports.functools_lru_cache

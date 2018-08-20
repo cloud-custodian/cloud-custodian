@@ -1120,3 +1120,14 @@ class CrossAccountChecker(TestCase):
         for p, expected in zip(policies, [True, True, False, False, False, False]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
+
+    def test_s3_principal_org_id(self):
+        policies = load_data("iam/s3-orgid.json")
+        checker = PolicyChecker(
+            {
+                "allowed_orgid": set(["o-goodorg"])
+            }
+        )
+        for p, expected in zip(policies, [False, True]):
+            violations = checker.check(p)
+            self.assertEqual(bool(violations), expected)

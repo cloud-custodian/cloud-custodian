@@ -287,6 +287,38 @@ class TestPolicyCollection(BaseTest):
 
 class TestPolicy(BaseTest):
 
+    def test_policy_variable_interpolation(self):
+
+        p = self.load_policy({
+            'name': 'compute',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'member-role': 'arn:iam:{account_id}/role/BarFoo',
+                'role': 'arn:iam::{account_id}/role/FooBar'},
+            'actions': [
+                {'type': 'tag',
+                 'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
+                {'type': 'notify',
+                 'to': ['me@example.com'],
+                 'transport': {
+                     'type': 'sns',
+                     'topic': 'arn:::::',
+                 },
+                 'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
+            ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
+
+        ivalue = 'bad monkey 12312311 zanzibar %s' % (
+            (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d'))
+        p.expand_variables(p.get_variables())
+        self.assertEqual(p.data['actions'][0]['value'], ivalue)
+        self.assertEqual(
+            p.data['actions'][1]['subject'],
+            "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
+        self.assertEqual(p.data['mode']['role'], 'arn:iam::12312311/role/FooBar')
+        self.assertEqual(p.data['mode']['member-role'], 'arn:iam:{account_id}/role/BarFoo')
+        self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
+
     def test_child_resource_trail_validation(self):
         self.assertRaises(
             ValueError,
@@ -520,7 +552,7 @@ class TestPolicy(BaseTest):
             }
         )
         p = collection.policies[0]
-        self.assertTrue(isinstance(p.get_resource_manager(), EC2))
+        self.assertTrue(isinstance(p.load_resource_manager(), EC2))
 
     def test_get_logs_from_group(self):
         p_data = {
@@ -557,6 +589,58 @@ class TestPolicy(BaseTest):
         p = collection.policies[0]
         p()
         self.assertEqual(len(p.ctx.metrics.data), 3)
+
+    def test_validate_policy_start_stop(self):
+        data = {
+            'name': 'bad-str-parse',
+            'resource': 'ec2',
+            'start': 'asdf'
+        }
+        with self.assertRaises(ValueError):
+            self.load_policy(data)
+
+        data = {
+            'name': 'bad-non-str-parse',
+            'resource': 'ec2',
+            'start': 2
+        }
+        with self.assertRaises(Exception):
+            self.load_policy(data)
+
+        data = {
+            'name': 'bad-tz-parse',
+            'resource': 'ec2',
+            'tz': 'asdf'
+        }
+        with self.assertRaises(ValueError):
+            self.load_policy(data)
+
+        data = {
+            'name': 'bad-tz-int-parse',
+            'resource': 'ec2',
+            'tz': 2
+        }
+        with self.assertRaises(Exception):
+            self.load_policy(data)
+
+        data = {
+            'name': 'good-time-parse',
+            'resource': 'ec2',
+            'start': '4 AM'
+        }
+        p = self.load_policy(data)
+        result = p.validate_policy_start_stop()
+        self.assertEqual(result, None)
+
+        data = {
+            'name': 'good-tz-str-parse',
+            'resource': 'ec2',
+            'tz': 'UTC'
+        }
+
+        p = self.load_policy(data)
+        result = p.validate_policy_start_stop()
+        self.assertEqual(result, None)
 
 
 class PolicyExecutionModeTest(BaseTest):
@@ -596,6 +680,100 @@ class PullModeTest(BaseTest):
             ),
             lines,
         )
+
+    def test_is_runnable_mismatch_region(self):
+        p = self.load_policy(
+            {'name': 'region-mismatch',
+             'resource': 'ec2',
+             'region': 'us-east-1'},
+            config={'region': 'us-west-2', 'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), False)
+
+    def test_is_runnable_dates(self):
+        p = self.load_policy(
+            {'name': 'good-start-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': '2018-3-29'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), True)
+
+        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        p = self.load_policy(
+            {'name': 'bad-start-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': tomorrow_date},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), False)
+
+        p = self.load_policy(
+            {'name': 'good-end-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'end': tomorrow_date},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), True)
+
+        p = self.load_policy(
+            {'name': 'bad-end-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'end': '2018-3-29'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), False)
+
+        p = self.load_policy(
+            {'name': 'bad-start-end-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': '2018-3-28',
+             'end': '2018-3-29'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), False)
+
+    def test_is_runnable_parse_dates(self):
+        p = self.load_policy(
+            {'name': 'parse-date-policy',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': 'March 3 2018'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), True)
+
+        p = self.load_policy(
+            {'name': 'parse-date-policy',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': 'March 3rd 2018'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), True)
+
+        p = self.load_policy(
+            {'name': 'parse-date-policy',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': '28 March 2018'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEquals(pull_mode.is_runnable(), True)
 
 
 class GuardModeTest(BaseTest):

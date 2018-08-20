@@ -30,12 +30,10 @@ import time
 import tempfile
 import zipfile
 
-from boto3.s3.transfer import S3Transfer, TransferConfig
-from botocore.exceptions import ClientError
-
 from concurrent.futures import ThreadPoolExecutor
 
 # Static event mapping to help simplify cwe rules creation
+from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
@@ -457,6 +455,7 @@ class LambdaManager(object):
         return result, changed
 
     def _upload_func(self, s3_uri, func, archive):
+        from boto3.s3.transfer import S3Transfer, TransferConfig
         _, bucket, key_prefix = parse_s3(s3_uri)
         key = "%s/%s" % (key_prefix, func.name)
         transfer = S3Transfer(
@@ -1402,7 +1401,7 @@ class ConfigRule(object):
         )
 
         if isinstance(func, PolicyLambda):
-            manager = func.policy.get_resource_manager()
+            manager = func.policy.load_resource_manager()
             if hasattr(manager.get_model(), 'config_type'):
                 config_type = manager.get_model().config_type
             else:

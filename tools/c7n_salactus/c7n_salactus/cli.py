@@ -33,6 +33,7 @@ from rq.queue import Queue, FailedQueue
 from rq.worker import Worker
 import tabulate
 
+from c7n.config import Bag
 from c7n import utils
 from c7n_salactus import worker, db
 
@@ -574,7 +575,7 @@ def watch(limit):
         if limit:
             progress = progress[:limit]
 
-        progress.insert(0, utils.Bag(totals))
+        progress.insert(0, Bag(totals))
         format_plain(
             progress, None,
             explicit_only=True,

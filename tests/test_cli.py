@@ -18,7 +18,7 @@ import os
 import sys
 
 from argparse import ArgumentTypeError
-from c7n import cli, version, commands, utils
+from c7n import cli, version, commands
 from datetime import datetime, timedelta
 
 from c7n.resources import aws
@@ -624,5 +624,5 @@ class MiscTest(CliTest):
         policy = {"policies": [{"name": "will-never-run", "resource": "ec2"}]}
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file(policy)
-        self.patch(utils, "get_profile_session", lambda x: None)
+        self.patch(aws, "get_profile_session", lambda x: None)
         self.run_and_expect_failure(["custodian", "run", "-s", temp_dir, yaml_file], 1)
