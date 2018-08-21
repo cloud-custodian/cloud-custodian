@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "c7n:AliasMetadata": {
+            "AliasArn": "arn:aws:kms:us-east-1:076173845600:alias/cof/efs/encrypted",
+            "AliasName": "alias/cof/efs/encrypted",
+            "TargetKeyId": "196d029a-c321-4218-b758-ed0cf9a9a2ca"
+        } 
+    }
+}
