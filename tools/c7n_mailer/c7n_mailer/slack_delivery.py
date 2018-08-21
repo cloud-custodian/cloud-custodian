@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json
 import time
 
 from botocore.vendored import requests
@@ -66,6 +65,11 @@ class SlackDelivery(object):
                             self.logger, 'slack_template', 'slack_default')
                 self.logger.debug(
                     "Generating messages for recipient list produced by resource owner resolution.")
+            elif target.startswith('https://hooks.slack.com/'):
+                slack_messages[target] = get_rendered_jinja(
+                    target, sqs_message,
+                    resource_list,
+                    self.logger, 'slack_template', 'slack_default')
             elif target.startswith('slack://webhook/#') and self.config.get('slack_webhook'):
                 webhook_target = self.config.get('slack_webhook')
                 slack_messages[webhook_target] = get_rendered_jinja(
@@ -100,7 +104,7 @@ class SlackDelivery(object):
                 sqs_message['policy']['resource'],
                 str(len(sqs_message['resources'])),
                 sqs_message['action'].get('slack_template', 'slack_default'),
-                json.loads(payload, strict=False)["channel"])
+                key)
             )
 
             self.send_slack_msg(key, payload)

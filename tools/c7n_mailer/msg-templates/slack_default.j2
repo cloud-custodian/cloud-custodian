@@ -30,6 +30,8 @@
          ]
       }
    ],
+   {%- if not recipient.startswith('https://') %}
    "channel":"{{ recipient }}",
+   {%- endif -%}
    "username":"Custodian"
 }
