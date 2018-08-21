@@ -102,7 +102,6 @@ class InstanceDescribe(DescribeSource):
 
     def process_resource_set(self, client, resources):
         for arn, r in zip(self.manager.get_arns(resources), resources):
-            self.manager.log.info("arn %s" % arn)
             try:
                 tags = client.list_tags_for_resource(
                     ResourceArn=arn).get('TagList', ())
