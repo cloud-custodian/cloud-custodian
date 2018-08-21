@@ -80,7 +80,6 @@ class Key(QueryResourceManager):
                 key_id = r.get('KeyArn')
                 info = client.describe_key(KeyId=key_id)['KeyMetadata']
                 r.update(info)
-                
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(
