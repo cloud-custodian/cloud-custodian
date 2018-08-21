@@ -17,14 +17,14 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
-	"net/url"
 	"os"
 	"strings"
+	"time"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -35,6 +35,27 @@ import (
 	"github.com/olivere/elastic"
 	"github.com/sha1sum/aws_signing_client"
 )
+
+type cloudWatchEvent struct {
+	Version    string    `json:"version"`
+	ID         string    `json:"id"`
+	DetailType string    `json:"detail-type"`
+	Source     string    `json:"source"`
+	AccountId  string    `json:"account"`
+	Time       time.Time `json:"time"`
+	Region     string    `json:"region"`
+	Resources  []string  `json:"resources"`
+	Detail     detail    `json:"detail"`
+}
+
+type detail struct {
+	RequestParameters requestParameters
+}
+
+type requestParameters struct {
+	BucketName string
+	Key        string
+}
 
 type myOutput struct {
 	requiredTags
@@ -65,8 +86,8 @@ type processObj struct {
 	User          string `json:"user"`
 	Vms           string `json:"vms"`
 	ResourceId    string `json:"resourceId"`
-	captureTime   string `json:"captureTime"`
-	schemaVersion string `json:"schemaVersion"`
+	CaptureTime   string `json:"captureTime"`
+	SchemaVersion string `json:"schemaVersion"`
 }
 
 type resourceObj struct {
@@ -93,23 +114,41 @@ var (
 )
 
 func main() {
-	lambda.Start(func(ctx context.Context, event events.S3Event) {
+	lambda.Start(func(ctx context.Context, event cloudWatchEvent) {
+		if event.Source != "aws.s3" {
+			fmt.Println(event.Source)
+			return
+		}
 		if xRayTracingEnabled != "" {
 			xray.AWS(s3Svc.Client)
 		}
 		if esClient == "" || indexName == "" || typeName == "" {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
 		}
+
+		b, err := json.MarshalIndent(event, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(b))
 		client, err := newElasticClient(esClient)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		for _, record := range event.Records {
-			err = processEventRecord(ctx, record, client)
-			if err != nil {
-				log.Fatal(err)
-			}
+		var bucketName = event.Detail.RequestParameters.BucketName
+		var bucketKey = event.Detail.RequestParameters.Key
+
+		if bucketName == "" || bucketKey == "" {
+			log.Fatal("Cloudwatch event missing BucketName or Key")
+		}
+		if !strings.Contains(bucketKey, "Custom:ProcessInfo") {
+			return
+		}
+		err = processEventRecord(ctx, bucketName, bucketKey, client)
+		if err != nil {
+			log.Fatal(err)
 		}
 	})
 }
@@ -130,19 +169,14 @@ func newElasticClient(url string) (*elastic.Client, error) {
 	)
 }
 
-func processEventRecord(ctx context.Context, record events.S3EventRecord, client *elastic.Client) error {
-	var bucketName = record.S3.Bucket.Name
-	//url encoded in response so we need to parse it
-	bucketKey, err := url.QueryUnescape(record.S3.Object.Key)
-	if err != nil {
-		return err
-	}
-
+func processEventRecord(ctx context.Context, bucketName string, bucketKey string, client *elastic.Client) error {
+	//get filtered tags object
 	tags, err := getTags(ctx, bucketName, bucketKey)
 	if err != nil {
 		return err
 	}
 
+	//get resource object
 	resource, err := getResourceInfo(ctx, bucketName, bucketKey)
 	if err != nil {
 		return err
