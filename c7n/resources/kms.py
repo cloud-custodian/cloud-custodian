@@ -77,11 +77,10 @@ class Key(QueryResourceManager):
             if r['KeyId'] in alias_to_key:
                 r['c7n:AliasMetadata'] = alias_to_key[r['KeyId']]
             try:
-                key_id = r['KeyArn']
+                key_id = r.get('KeyArn')
                 info = client.describe_key(KeyId=key_id)['KeyMetadata']
                 r.update(info)
-            except KeyError as ke:
-                self.log.warning('Found key without an ARN for {0}'.format(r['KeyId']))
+                
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(
