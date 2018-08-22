@@ -57,7 +57,9 @@ class DescribeSource(object):
         self.query = ResourceQuery(manager.session_factory)
 
     def get_resources(self, query):
-        return self.query.filter(self.manager)
+        if query is None:
+            query = {}
+        return self.query.filter(self.manager, **query)
 
     def get_permissions(self):
         return ()
@@ -122,19 +124,9 @@ class QueryResourceManager(ResourceManager):
         return self.filter_resources(resources)
 
     def get_resources(self, resource_ids, **params):
-        resource_client = self.get_client()
-        m = self.resource_type
-        get_client, get_op, extra_args = m.get_spec
-
-        if extra_args:
-            params.update(extra_args)
-
-        op = getattr(getattr(resource_client, get_client), get_op)
-        data = [
-            op(rid, **params)
-            for rid in resource_ids
-        ]
-        return [r.serialize(True) for r in data]
+        resources = self.resources(params)
+        resource_ids = [r.lower() for r in resource_ids]
+        return [r for r in resources if r['id'].lower() in resource_ids]
 
     @staticmethod
     def register_actions_and_filters(registry, _):

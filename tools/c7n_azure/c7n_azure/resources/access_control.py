@@ -82,7 +82,6 @@ class RoleDefinition(QueryResourceManager):
     class resource_type(object):
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
-        get_spec = ('role_definitions', 'get_by_id', None)
         type = 'roleDefinition'
         id = 'id'
         default_report_fields = (
