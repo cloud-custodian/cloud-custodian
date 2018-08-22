@@ -91,6 +91,34 @@ class VMTest(BaseTest):
 
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmPowerOffAction.poweroff')
+    def test_poweroff(self, poweroff_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'poweroff'}
+            ]
+        })
+        p.run()
+        poweroff_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     @patch('c7n_azure.resources.vm.VmStartAction.start')
     def test_start(self, start_action_mock, filter_mock):
 

@@ -36,7 +36,7 @@ type registrationHandler struct {
 func (r *registrationHandler) RequestActivation(ctx context.Context, req *omnissm.RegistrationRequest) (*omnissm.RegistrationResponse, error) {
 	logger := log.With().Str("handler", "CreateRegistration").Logger()
 	logger.Info().Interface("identity", req.Identity()).Msg("new registration request")
-	entry, err, ok := r.OmniSSM.Registrations.Get(req.Identity().Hash())
+	entry, err, ok := r.OmniSSM.Registrations.Get(ctx, req.Identity().Hash())
 	if err != nil {
 		return nil, err
 	}
@@ -44,10 +44,10 @@ func (r *registrationHandler) RequestActivation(ctx context.Context, req *omniss
 		logger.Info().Interface("entry", entry).Msg("existing registration entry found")
 		return &omnissm.RegistrationResponse{RegistrationEntry: *entry, Region: req.Identity().Region}, nil
 	}
-	activation, err := r.SSM.CreateActivation(req.Identity().Name())
+	activation, err := r.SSM.CreateActivation(ctx, req.Identity().Name())
 	if err != nil {
 		if r.OmniSSM.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-			sqsErr := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
+			sqsErr := r.OmniSSM.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 				Type:  omnissm.CreateActivation,
 				Value: req.Identity(),
 			})
@@ -67,9 +67,9 @@ func (r *registrationHandler) RequestActivation(ctx context.Context, req *omniss
 		Activation: *activation,
 		ManagedId:  "-",
 	}
-	if err := r.OmniSSM.Registrations.Put(entry); err != nil {
+	if err := r.OmniSSM.Registrations.Put(ctx, entry); err != nil {
 		if r.OmniSSM.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-			sqsErr := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
+			sqsErr := r.OmniSSM.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 				Type:  omnissm.PutRegistrationEntry,
 				Value: entry,
 			})
@@ -88,7 +88,7 @@ func (r *registrationHandler) UpdateRegistration(ctx context.Context, req *omnis
 	logger := log.With().Str("handler", "UpdateRegistration").Logger()
 	logger.Info().Interface("identity", req.Identity()).Msg("update registration request")
 	id := req.Identity().Hash()
-	entry, err, ok := r.OmniSSM.Registrations.Get(id)
+	entry, err, ok := r.OmniSSM.Registrations.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -97,9 +97,9 @@ func (r *registrationHandler) UpdateRegistration(ctx context.Context, req *omnis
 		return nil, errors.Wrapf(err, "entry not found: %#v", id)
 	}
 	logger.Info().Interface("entry", entry).Msg("registration entry found")
-	if req.ManagedId != "" || req.ManagedId != "-" {
+	if req.ManagedId != "" && req.ManagedId != "-" {
 		entry.ManagedId = req.ManagedId
-		if err := r.OmniSSM.Registrations.Update(entry); err != nil {
+		if err := r.OmniSSM.Registrations.Update(ctx, entry); err != nil {
 			return nil, err
 		}
 		logger.Info().Interface("entry", entry).Msg("registration entry updated")

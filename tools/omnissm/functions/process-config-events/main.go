@@ -55,8 +55,8 @@ func init() {
 	}
 }
 
-func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail) error {
-	entry, err, ok := omni.Registrations.Get(detail.ConfigurationItem.Hash())
+func handleConfigurationItemChange(ctx context.Context, detail configservice.ConfigurationItemDetail) error {
+	entry, err, ok := omni.Registrations.Get(ctx, detail.ConfigurationItem.Hash())
 	if err != nil {
 		return err
 	}
@@ -80,10 +80,10 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 			ManagedId: entry.ManagedId,
 			Tags:      tags,
 		}
-		err := omni.SSM.AddTagsToResource(resourceTags)
+		err := omni.SSM.AddTagsToResource(ctx, resourceTags)
 		if err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 					Type:  omnissm.AddTagsToResource,
 					Value: resourceTags,
 				})
@@ -101,10 +101,10 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 			CaptureTime: detail.ConfigurationItem.ConfigurationItemCaptureTime,
 			Content:     configservice.ConfigurationItemContentMap(detail.ConfigurationItem),
 		}
-		err = omni.SSM.PutInventory(inv)
+		err = omni.SSM.PutInventory(ctx, inv)
 		if err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 					Type:  omnissm.PutInventory,
 					Value: inv,
 				})
@@ -117,9 +117,9 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 		}
 		log.Info().Msgf("PutInventory successful for %#v", entry.ManagedId)
 	case "ResourceDeleted":
-		if err := omni.SSM.DeregisterManagedInstance(entry.ManagedId); err != nil {
+		if err := omni.SSM.DeregisterManagedInstance(ctx, entry.ManagedId); err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 					Type:  omnissm.DeregisterManagedInstance,
 					Value: entry.ManagedId,
 				})
@@ -131,7 +131,7 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 			return err
 		}
 		log.Info().Msgf("Successfully deregistered instance: %#v", entry.ManagedId)
-		if err := omni.Registrations.Delete(entry.Id); err != nil {
+		if err := omni.Registrations.Delete(ctx, entry.Id); err != nil {
 			return err
 		}
 		log.Info().Msgf("Successfully deleted registration entry: %#v", entry.ManagedId)
@@ -145,7 +145,7 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 			if err != nil {
 				return errors.Wrap(err, "cannot marshal SNS message")
 			}
-			if err := omni.SNS.Publish(omni.Config.ResourceDeletedSNSTopic, data); err != nil {
+			if err := omni.SNS.Publish(ctx, omni.Config.ResourceDeletedSNSTopic, data); err != nil {
 				return err
 			}
 		}
@@ -178,7 +178,7 @@ func main() {
 			if _, ok := resourceStatusTypes[event.Detail.ConfigurationItem.ConfigurationItemStatus]; !ok {
 				return
 			}
-			return handleConfigurationItemChange(event.Detail.ConfigurationItemDetail)
+			return handleConfigurationItemChange(ctx, event.Detail.ConfigurationItemDetail)
 		case "OversizedConfigurationItemChangeNotification":
 			if _, ok := resourceTypes[event.Detail.ConfigurationItemSummary.ResourceType]; !ok {
 				return
@@ -186,7 +186,7 @@ func main() {
 			if _, ok := resourceStatusTypes[event.Detail.ConfigurationItemSummary.ConfigurationItemStatus]; !ok {
 				return
 			}
-			data, err := omni.S3.GetObject(event.Detail.S3DeliverySummary.S3BucketLocation)
+			data, err := omni.S3.GetObject(ctx, event.Detail.S3DeliverySummary.S3BucketLocation)
 			if err != nil {
 				return err
 			}
@@ -194,7 +194,7 @@ func main() {
 			if err := json.Unmarshal(data, &eventDetail); err != nil {
 				return err
 			}
-			return handleConfigurationItemChange(eventDetail)
+			return handleConfigurationItemChange(ctx, eventDetail)
 		default:
 			err = fmt.Errorf("unknown message type: %#v", event.Detail.MessageType)
 		}

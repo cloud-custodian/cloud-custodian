@@ -15,6 +15,7 @@
 package omnissm
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -30,6 +31,8 @@ const DefaultSSMServiceRole = "service-role/AmazonEC2RunCommandRoleForManagedIns
 
 type Config struct {
 	*aws.Config
+
+	Context context.Context
 
 	// A whitelist of accounts allowed to register with SSM
 	AccountWhitelist []string `yaml:"accountWhitelist"`

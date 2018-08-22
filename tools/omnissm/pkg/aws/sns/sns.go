@@ -52,8 +52,8 @@ func New(config *Config) *SNS {
 	return s
 }
 
-func (s *SNS) Publish(topicArn string, msg []byte) error {
-	_, err := s.SNSAPI.PublishWithContext(context.TODO(), &sns.PublishInput{
+func (s *SNS) Publish(ctx context.Context, topicArn string, msg []byte) error {
+	_, err := s.SNSAPI.PublishWithContext(ctx, &sns.PublishInput{
 		Message:  aws.String(string(msg)),
 		TopicArn: aws.String(topicArn),
 	})
