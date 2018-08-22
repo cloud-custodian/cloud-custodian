@@ -38,7 +38,7 @@ type Config struct {
 	AccountWhitelist []string `yaml:"accountWhitelist"`
 
 	// This or AssumeRoles must be specified.
-	AssumeRoleName string
+	AssumeRoleName string `yaml:"assumeRole"`
 
 	// A mapping of IAM roles to assume with the provided accounts
 	AssumeRoles map[string]string `yaml:"assumeRoles"`
