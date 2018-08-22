@@ -104,6 +104,15 @@ func (r *registrationHandler) UpdateRegistration(ctx context.Context, req *omnis
 		}
 		logger.Info().Interface("entry", entry).Msg("registration entry updated")
 	}
+	if t := r.OmniSSM.Config.ResourceRegisteredSNSTopic; t != "" {
+		if data, err := json.Marshal(entry); err == nil {
+			if err := r.OmniSSM.SNS.Publish(ctx, t, data); err != nil {
+				logger.Error().String("topic", t).Err(err).Msg("cannot send SNS message")
+			}
+		} else {
+			logger.Error().Err(err).Msg("cannot marshal SNS message")
+		}
+	}
 	return &omnissm.RegistrationResponse{RegistrationEntry: *entry}, nil
 }
 
