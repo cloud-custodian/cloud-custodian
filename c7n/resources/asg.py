@@ -713,6 +713,7 @@ class VpcIdFilter(ValueFilter):
 
 
 @filters.register('progagated-tags')
+@filters.register('propagated-tags')
 class PropagatedTagFilter(Filter):
     """Filter ASG based on propagated tags
 
@@ -736,6 +737,7 @@ class PropagatedTagFilter(Filter):
     """
     schema = type_schema(
         'progagated-tags',
+        aliases=('propagated-tags',),
         keys={'type': 'array', 'items': {'type': 'string'}},
         match={'type': 'boolean'},
         propagate={'type': 'boolean'})
