@@ -17,7 +17,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -116,7 +115,6 @@ var (
 func main() {
 	lambda.Start(func(ctx context.Context, event cloudWatchEvent) {
 		if event.Source != "aws.s3" {
-			fmt.Println(event.Source)
 			return
 		}
 		if xRayTracingEnabled != "" {
@@ -124,17 +122,6 @@ func main() {
 		}
 		if esClient == "" || indexName == "" || typeName == "" {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
-		}
-
-		b, err := json.MarshalIndent(event, "", "  ")
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println(string(b))
-		client, err := newElasticClient(esClient)
-		if err != nil {
-			log.Fatal(err)
 		}
 
 		var bucketName = event.Detail.RequestParameters.BucketName
@@ -146,6 +133,12 @@ func main() {
 		if !strings.Contains(bucketKey, "Custom:ProcessInfo") {
 			return
 		}
+
+		client, err := newElasticClient(esClient)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		err = processEventRecord(ctx, bucketName, bucketKey, client)
 		if err != nil {
 			log.Fatal(err)

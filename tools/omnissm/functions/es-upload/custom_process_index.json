@@ -11,14 +11,23 @@
   "mappings": {
     "process_info": {
       "properties": {
-        "create_time": {
-          "type": "date"
+        "ASV": {
+          "type": "text"
+        },
+        "CMDBEnvironment":{
+          "type": "text"
+        },
+        "OwnerContact":{
+          "type": "text"
         },
         "cmdline": {
           "type": "text"
         },
         "rss": {
           "type": "text"
+        },
+        "create_time": {
+          "type": "date"
         },
         "write_bytes": {
           "type": "text"
@@ -53,11 +62,41 @@
         "schemaVersion": {
           "type": "text"
         },
-        "region": {
+        "KeyName": {
           "type": "text"
         },
-        "accountId": {
+        "AccountId": {
           "type": "text"
+        },
+        "Platform": {
+          "type": "text"
+        },
+        "InstanceId": {
+          "type": "text"
+        },
+        "VPCId": {
+          "type": "text"
+        },
+        "State": {
+          "type": "text"
+        },
+        "ImageId": {
+          "type": "text"
+        },
+        "InstanceRole": {
+          "type": "text"
+        },
+        "Region": {
+          "type": "text"
+        },
+        "SubnetId": {
+          "type": "text"
+        },
+        "InstanceType": {
+          "type": "text"
+        },
+        "Created": {
+          "type": "date"
         }
       }
     }
