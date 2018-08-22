@@ -63,7 +63,7 @@ func NewRegistrations(config *RegistrationsConfig) *Registrations {
 	return r
 }
 
-func (r *Registrations) Scan() ([]*RegistrationEntry, error) {
+func (r *Registrations) Scan(ctx context.Context) ([]*RegistrationEntry, error) {
 	input := &dynamodb.ScanInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":v1": {BOOL: aws.Bool(false)},
@@ -74,7 +74,7 @@ func (r *Registrations) Scan() ([]*RegistrationEntry, error) {
 		TableName:        aws.String(r.config.TableName),
 	}
 	items := make([]map[string]*dynamodb.AttributeValue, 0)
-	err := r.DynamoDBAPI.ScanPagesWithContext(context.TODO(), input, func(page *dynamodb.ScanOutput, lastPage bool) bool {
+	err := r.DynamoDBAPI.ScanPagesWithContext(ctx, input, func(page *dynamodb.ScanOutput, lastPage bool) bool {
 		items = append(items, page.Items...)
 		return !lastPage
 	})
@@ -92,8 +92,8 @@ func (r *Registrations) Scan() ([]*RegistrationEntry, error) {
 	return entries, nil
 }
 
-func (r *Registrations) Get(id string) (*RegistrationEntry, error, bool) {
-	resp, err := r.DynamoDBAPI.GetItemWithContext(context.TODO(), &dynamodb.GetItemInput{
+func (r *Registrations) Get(ctx context.Context, id string) (*RegistrationEntry, error, bool) {
+	resp, err := r.DynamoDBAPI.GetItemWithContext(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(r.config.TableName),
 		//AttributesToGet: aws.StringSlice([]string{"id", "ActivationId", "ActivationCode", "ManagedId"}),
 		Key: map[string]*dynamodb.AttributeValue{"id": {S: aws.String(id)}},
@@ -116,8 +116,8 @@ func (r *Registrations) Get(id string) (*RegistrationEntry, error, bool) {
 	return &entry, nil, true
 }
 
-func (r *Registrations) GetByManagedId(managedId string) (*RegistrationEntry, error, bool) {
-	resp, err := r.DynamoDBAPI.QueryWithContext(context.TODO(), &dynamodb.QueryInput{
+func (r *Registrations) GetByManagedId(ctx context.Context, managedId string) (*RegistrationEntry, error, bool) {
+	resp, err := r.DynamoDBAPI.QueryWithContext(ctx, &dynamodb.QueryInput{
 		TableName: aws.String(r.config.TableName),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":v1": {S: aws.String(managedId)},
@@ -143,20 +143,20 @@ func (r *Registrations) GetByManagedId(managedId string) (*RegistrationEntry, er
 	return &entry, nil, true
 }
 
-func (r *Registrations) Put(entry *RegistrationEntry) error {
+func (r *Registrations) Put(ctx context.Context, entry *RegistrationEntry) error {
 	item, err := dynamodbattribute.MarshalMap(entry)
 	if err != nil {
 		return err
 	}
-	_, err = r.DynamoDBAPI.PutItemWithContext(context.TODO(), &dynamodb.PutItemInput{
+	_, err = r.DynamoDBAPI.PutItemWithContext(ctx, &dynamodb.PutItemInput{
 		TableName: aws.String(r.config.TableName),
 		Item:      item,
 	})
 	return err
 }
 
-func (r *Registrations) Update(entry *RegistrationEntry) error {
-	_, err := r.DynamoDBAPI.UpdateItemWithContext(context.TODO(), &dynamodb.UpdateItemInput{
+func (r *Registrations) Update(ctx context.Context, entry *RegistrationEntry) error {
+	_, err := r.DynamoDBAPI.UpdateItemWithContext(ctx, &dynamodb.UpdateItemInput{
 		TableName:        aws.String(r.config.TableName),
 		Key:              map[string]*dynamodb.AttributeValue{"id": {S: aws.String(entry.Id)}},
 		UpdateExpression: aws.String("SET ManagedId=:v1, IsTagged=:v2, IsInventoried=:v3"),
@@ -169,8 +169,8 @@ func (r *Registrations) Update(entry *RegistrationEntry) error {
 	return errors.Wrapf(err, "unable to update entry: %#v", entry.Id)
 }
 
-func (r *Registrations) Delete(id string) error {
-	_, err := r.DynamoDBAPI.DeleteItemWithContext(context.TODO(), &dynamodb.DeleteItemInput{
+func (r *Registrations) Delete(ctx context.Context, id string) error {
+	_, err := r.DynamoDBAPI.DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.config.TableName),
 		Key:       map[string]*dynamodb.AttributeValue{"id": {S: aws.String(id)}},
 	})

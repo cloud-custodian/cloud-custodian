@@ -57,9 +57,9 @@ func New(config *Config) *ConfigService {
 	return c
 }
 
-func (c *ConfigService) GetLatestResourceConfig(resourceType, resourceId string) (*ConfigurationItem, error) {
-	c.configServiceRate.Wait(context.TODO())
-	resp, err := c.ConfigServiceAPI.GetResourceConfigHistoryWithContext(context.TODO(), &configservice.GetResourceConfigHistoryInput{
+func (c *ConfigService) GetLatestResourceConfig(ctx context.Context, resourceType, resourceId string) (*ConfigurationItem, error) {
+	c.configServiceRate.Wait(ctx)
+	resp, err := c.ConfigServiceAPI.GetResourceConfigHistoryWithContext(ctx, &configservice.GetResourceConfigHistoryInput{
 		ResourceId:   aws.String(resourceId),
 		ResourceType: aws.String(resourceType),
 		Limit:        aws.Int64(1),
@@ -100,7 +100,7 @@ func min(a, b int) int {
 	return b
 }
 
-func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*ConfigurationItem, error) {
+func (c *ConfigService) BatchGetResourceConfig(ctx context.Context, resources map[string]string) ([]*ConfigurationItem, error) {
 	resourceKeys := make([]*configservice.ResourceKey, 0)
 	for k, v := range resources {
 		resourceKeys = append(resourceKeys, &configservice.ResourceKey{ResourceId: aws.String(k), ResourceType: aws.String(v)})
@@ -111,7 +111,7 @@ func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*
 	for i := 0; i < len(resourceKeys); i += 100 {
 		batchResourceKeys := resourceKeys[i:min(i+100, len(resourceKeys))]
 		g.Go(func() error {
-			configurationItems, err := c.batchGetResourceConfig(batchResourceKeys)
+			configurationItems, err := c.batchGetResourceConfig(ctx, batchResourceKeys)
 			if err != nil {
 				return err
 			}
@@ -127,9 +127,9 @@ func (c *ConfigService) BatchGetResourceConfig(resources map[string]string) ([]*
 	return items, nil
 }
 
-func (c *ConfigService) batchGetResourceConfig(resourceKeys []*configservice.ResourceKey) ([]*ConfigurationItem, error) {
-	c.configServiceRate.Wait(context.TODO())
-	resp, err := c.ConfigServiceAPI.BatchGetResourceConfigWithContext(context.TODO(), &configservice.BatchGetResourceConfigInput{
+func (c *ConfigService) batchGetResourceConfig(ctx context.Context, resourceKeys []*configservice.ResourceKey) ([]*ConfigurationItem, error) {
+	c.configServiceRate.Wait(ctx)
+	resp, err := c.ConfigServiceAPI.BatchGetResourceConfigWithContext(ctx, &configservice.BatchGetResourceConfigInput{
 		ResourceKeys: resourceKeys,
 	})
 	if err != nil {

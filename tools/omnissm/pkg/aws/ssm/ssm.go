@@ -56,9 +56,9 @@ type Activation struct {
 	ActivationCode string `json:"ActivationCode"`
 }
 
-func (s *SSM) CreateActivation(name string) (*Activation, error) {
+func (s *SSM) CreateActivation(ctx context.Context, name string) (*Activation, error) {
 	s.ssmRate.Wait(context.TODO())
-	resp, err := s.SSMAPI.CreateActivationWithContext(context.TODO(), &ssm.CreateActivationInput{
+	resp, err := s.SSMAPI.CreateActivationWithContext(ctx, &ssm.CreateActivationInput{
 		DefaultInstanceName: aws.String(name),
 		IamRole:             aws.String(s.config.InstanceRole),
 		Description:         aws.String(name),
@@ -74,13 +74,13 @@ type ResourceTags struct {
 	Tags      map[string]string `json:"Tags"`
 }
 
-func (s *SSM) AddTagsToResource(input *ResourceTags) error {
+func (s *SSM) AddTagsToResource(ctx context.Context, input *ResourceTags) error {
 	awsTags := make([]*ssm.Tag, 0)
 	for k, v := range input.Tags {
 		awsTags = append(awsTags, &ssm.Tag{Key: aws.String(k), Value: aws.String(v)})
 	}
-	s.ssmRate.Wait(context.TODO())
-	_, err := s.SSMAPI.AddTagsToResourceWithContext(context.TODO(), &ssm.AddTagsToResourceInput{
+	s.ssmRate.Wait(ctx)
+	_, err := s.SSMAPI.AddTagsToResourceWithContext(ctx, &ssm.AddTagsToResourceInput{
 		ResourceType: aws.String(ssm.ResourceTypeForTaggingManagedInstance),
 		ResourceId:   aws.String(input.ManagedId),
 		Tags:         awsTags,
@@ -100,9 +100,9 @@ func (c *CustomInventory) ContentHash() string {
 	return fmt.Sprintf("%x", md5.Sum(data))
 }
 
-func (s *SSM) PutInventory(inv *CustomInventory) error {
-	s.ssmRate.Wait(context.TODO())
-	_, err := s.SSMAPI.PutInventoryWithContext(context.TODO(), &ssm.PutInventoryInput{
+func (s *SSM) PutInventory(ctx context.Context, inv *CustomInventory) error {
+	s.ssmRate.Wait(ctx)
+	_, err := s.SSMAPI.PutInventoryWithContext(ctx, &ssm.PutInventoryInput{
 		InstanceId: aws.String(inv.ManagedId),
 		Items: []*ssm.InventoryItem{{
 			CaptureTime:   aws.String(inv.CaptureTime), // "2006-01-02T15:04:05Z"
@@ -115,9 +115,9 @@ func (s *SSM) PutInventory(inv *CustomInventory) error {
 	return errors.Wrapf(err, "ssm.PutInventory failed: %#v", inv.ManagedId)
 }
 
-func (s *SSM) DeregisterManagedInstance(managedId string) error {
+func (s *SSM) DeregisterManagedInstance(ctx context.Context, managedId string) error {
 	s.ssmRate.Wait(context.TODO())
-	_, err := s.SSMAPI.DeregisterManagedInstanceWithContext(context.TODO(), &ssm.DeregisterManagedInstanceInput{
+	_, err := s.SSMAPI.DeregisterManagedInstanceWithContext(ctx, &ssm.DeregisterManagedInstanceInput{
 		InstanceId: aws.String(managedId),
 	})
 	return errors.Wrapf(err, "ssm.DeregisterManagedInstance failed: %#v", managedId)
@@ -130,8 +130,8 @@ type ManagedInstance struct {
 	RegistrationDate time.Time
 }
 
-func (s *SSM) DescribeInstanceInformation(activationId string) (*ManagedInstance, error) {
-	resp, err := s.SSMAPI.DescribeInstanceInformationWithContext(context.TODO(), &ssm.DescribeInstanceInformationInput{
+func (s *SSM) DescribeInstanceInformation(ctx context.Context, activationId string) (*ManagedInstance, error) {
+	resp, err := s.SSMAPI.DescribeInstanceInformationWithContext(ctx, &ssm.DescribeInstanceInformationInput{
 		InstanceInformationFilterList: []*ssm.InstanceInformationFilter{
 			{
 				Key:      aws.String(ssm.InstanceInformationFilterKeyActivationIds),

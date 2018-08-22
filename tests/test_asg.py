@@ -665,6 +665,19 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n.asg.ec2.01")
 
+        policy = self.load_policy(
+            {
+                "name": "asg-propagated-tag-filter",
+                "resource": "asg",
+                "filters": [
+                    {"type": "propagated-tags", "keys": ["Tag01", "Tag02", "Tag03"]}
+                ],
+            },
+            session_factory=session,
+        )
+
+        policy.validate()
+
     def test_asg_propagate_tag_missing(self):
         session = self.replay_flight_data("test_asg_propagate_tag_missing")
         policy = self.load_policy(
