@@ -24,7 +24,7 @@ from c7n_azure.template_utils import TemplateUtilities
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
                                  CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
-                                 CONS_AZURE_FUNCTION_KEY_URL)
+                                 CONST_AZURE_FUNCTION_KEY_URL)
 
 from c7n import utils
 from c7n.actions import EventAction
@@ -219,7 +219,7 @@ class AzureEventGridMode(AzureFunctionMode):
                 self.session.subscription_id,
                 self.group_name,
                 self.webapp_name,
-                CONS_AZURE_FUNCTION_KEY_URL)
+                CONST_AZURE_FUNCTION_KEY_URL)
 
         retrieved_key = False
 
