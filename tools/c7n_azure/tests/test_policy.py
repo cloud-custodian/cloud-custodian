@@ -13,17 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
-
 from azure_common import BaseTest
-from c7n_azure.policy import AzureEventMode
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE
+from c7n_azure.policy import AzureEventMode
 
 
-class FunctionPackageTest(BaseTest):
+class AzurePolicyModeTest(BaseTest):
     def setUp(self):
-        super(FunctionPackageTest, self).setUp()
+        super(AzurePolicyModeTest, self).setUp()
 
     def test_event_mode_is_subscribed_to_event_true(self):
         p = self.load_policy({
@@ -61,4 +59,3 @@ class FunctionPackageTest(BaseTest):
         }
         event_mode = AzureEventMode(p)
         self.assertFalse(event_mode.is_subscribed_to_event(event, subscribed_events))
-
