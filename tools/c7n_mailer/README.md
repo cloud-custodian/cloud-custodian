@@ -137,6 +137,7 @@ policies:
           - slack://foo@bar.com
           - slack://#custodian-test
           - slack://webhook/#c7n-webhook-test
+          - https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
@@ -146,17 +147,15 @@ Slack messages support use of a unique template field specified by `slack_templa
 existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
 and if not specified, the mailer will use the default value `slack_default`.
 
-Slack integration for the mailer supports three flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used.
+Slack integration for the mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
 
-| Required? | Key                  | Type             | Notes                               |
+| Requires&nbsp;`slack_token` | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
-|           | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
-|           | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
-|           | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
-|           | `slack://webhook/#c7n-webhook-test` | string      | Send to a Slack webhook; appended with the target channel. |
-
-
-The `slack_token` field is required for any of the first three Slack notify forms. However, a token is not required for use of the webhook.
+| No        | `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX` | string | **(PREFERRED)** Send to an [incoming webhook](https://api.slack.com/incoming-webhooks) (the channel is defined in the webhook) |
+| Yes       | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
+| Yes       | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
+| Yes       | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
+| No        | `slack://webhook/#c7n-webhook-test` | string      | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
 
 ### Now run:
 

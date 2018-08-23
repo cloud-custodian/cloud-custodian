@@ -43,7 +43,7 @@ func init() {
 	}
 }
 
-func processDeferredActionMessage(msg *sqs.Message) error {
+func processDeferredActionMessage(ctx context.Context, msg *sqs.Message) error {
 	var dMsg struct {
 		Type  omnissm.DeferredActionType
 		Value json.RawMessage
@@ -57,11 +57,11 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &resourceTags); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		if err := omni.SSM.AddTagsToResource(&resourceTags); err != nil {
+		if err := omni.SSM.AddTagsToResource(ctx, &resourceTags); err != nil {
 			return err
 		}
 		log.Info().Msg("tags added to resource successfully")
-		entry, err, ok := omni.Registrations.GetByManagedId(resourceTags.ManagedId)
+		entry, err, ok := omni.Registrations.GetByManagedId(ctx, resourceTags.ManagedId)
 		if err != nil {
 			return err
 		}
@@ -69,7 +69,7 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 			return errors.Errorf("registration entry not found: %#v", resourceTags.ManagedId)
 		}
 		entry.IsTagged = true
-		if err := omni.Registrations.Update(entry); err != nil {
+		if err := omni.Registrations.Update(ctx, entry); err != nil {
 			return err
 		}
 	case omnissm.CreateActivation:
@@ -77,7 +77,7 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &doc); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		activation, err := omni.SSM.CreateActivation(doc.Name())
+		activation, err := omni.SSM.CreateActivation(ctx, doc.Name())
 		if err != nil {
 			return err
 		}
@@ -89,9 +89,9 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 			InstanceId: doc.InstanceId,
 			Activation: *activation,
 		}
-		if err := omni.Registrations.Put(entry); err != nil {
+		if err := omni.Registrations.Put(ctx, entry); err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 					Type:  omnissm.PutRegistrationEntry,
 					Value: entry,
 				})
@@ -108,7 +108,7 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &managedId); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		if err := omni.SSM.DeregisterManagedInstance(managedId); err != nil {
+		if err := omni.SSM.DeregisterManagedInstance(ctx, managedId); err != nil {
 			return err
 		}
 	case omnissm.PutInventory:
@@ -116,11 +116,11 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &inv); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		if err := omni.SSM.PutInventory(&inv); err != nil {
+		if err := omni.SSM.PutInventory(ctx, &inv); err != nil {
 			return err
 		}
 		log.Info().Msg("custom inventory successful")
-		entry, err, ok := omni.Registrations.GetByManagedId(inv.ManagedId)
+		entry, err, ok := omni.Registrations.GetByManagedId(ctx, inv.ManagedId)
 		if err != nil {
 			return err
 		}
@@ -128,7 +128,7 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 			return errors.Errorf("registration entry not found: %#v", inv.ManagedId)
 		}
 		entry.IsInventoried = true
-		if err := omni.Registrations.Update(entry); err != nil {
+		if err := omni.Registrations.Update(ctx, entry); err != nil {
 			return err
 		}
 	case omnissm.PutRegistrationEntry:
@@ -136,7 +136,7 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &entry); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		if err := omni.Registrations.Put(&entry); err != nil {
+		if err := omni.Registrations.Put(ctx, &entry); err != nil {
 			return err
 		}
 		log.Info().Interface("entry", entry).Msg("new registration entry created")
@@ -153,7 +153,7 @@ func main() {
 		go func() {
 			defer close(messages)
 			for {
-				resp, err := omni.SQS.Receive()
+				resp, err := omni.SQS.Receive(ctx)
 				if err != nil {
 					log.Info().Err(err).Msg("cannot receive from SQS queue")
 					continue
@@ -174,10 +174,10 @@ func main() {
 				if !ok {
 					return nil
 				}
-				if err := processDeferredActionMessage(m); err != nil {
+				if err := processDeferredActionMessage(ctx, m); err != nil {
 					log.Info().Err(err).Interface("message", m).Msg("processing DeferredActionMessage failed")
 				}
-				if err := omni.SQS.Delete(m.ReceiptHandle); err != nil {
+				if err := omni.SQS.Delete(ctx, m.ReceiptHandle); err != nil {
 					log.Info().Err(err).Interface("message", m).Msg("removing from SQS queue failed")
 				}
 			case <-ctx.Done():

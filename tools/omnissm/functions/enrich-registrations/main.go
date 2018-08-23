@@ -50,7 +50,7 @@ func groupEntriesByAccountIdAndRegion(entries []*omnissm.RegistrationEntry) map[
 
 func main() {
 	lambda.Start(func(ctx context.Context) error {
-		entries, err := omni.Registrations.Scan()
+		entries, err := omni.Registrations.Scan(ctx)
 		if err != nil {
 			return err
 		}
@@ -74,13 +74,13 @@ func main() {
 				})
 				var i, j int
 				for _, entry := range entries {
-					ci, err := cs.GetLatestResourceConfig("AWS::EC2::Instance", entry.InstanceId)
+					ci, err := cs.GetLatestResourceConfig(ctx, "AWS::EC2::Instance", entry.InstanceId)
 					if err != nil {
 						log.Info().Err(err).Msg("configservice.GetLatestResourceConfig failed")
 						continue
 					}
 					if !ssm.IsManagedInstance(entry.ManagedId) {
-						m, err := omni.SSM.DescribeInstanceInformation(entry.ActivationId)
+						m, err := omni.SSM.DescribeInstanceInformation(ctx, entry.ActivationId)
 						if err != nil {
 							log.Info().Err(err).Msg("")
 							continue
@@ -90,7 +90,7 @@ func main() {
 							continue
 						}
 						entry.ManagedId = m.ManagedId
-						if err := omni.Registrations.Put(entry); err != nil {
+						if err := omni.Registrations.Put(ctx, entry); err != nil {
 							log.Info().Err(err).Msg("")
 							continue
 						}
@@ -103,7 +103,7 @@ func main() {
 							}
 							tags[k] = v
 						}
-						if err := omni.SQS.Send(&omnissm.DeferredActionMessage{
+						if err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.AddTagsToResource,
 							Value: &ssm.ResourceTags{
 								ManagedId: entry.ManagedId,
@@ -115,7 +115,7 @@ func main() {
 						i++
 					}
 					if !entry.IsInventoried {
-						if err := omni.SQS.Send(&omnissm.DeferredActionMessage{
+						if err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.PutInventory,
 							Value: &ssm.CustomInventory{
 								TypeName:    "Custom:CloudInfo",
