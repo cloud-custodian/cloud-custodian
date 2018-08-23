@@ -38,14 +38,23 @@ class LoadBalancerTest(BaseTest):
     @arm_template('load-balancer.json')
     def test_find_by_frontend_ip(self):
         p = self.load_policy({
-            'name': 'test-loadbalancer-with-ipv6-frontend',
+            'name': 'test-loadbalancer-with-ipv4-frontend',
             'resource': 'azure.loadbalancer',
             'filters': [
-                {'type': 'frontend-public-ip',
-                 'key': 'properties.publicIPAddressVersion',
-                 'op': 'in',
-                 'value_type': 'normalize',
-                 'value': 'ipv4'}],
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value_type': 'normalize',
+                    'value': 'cctestloadbalancer'
+                },
+                {
+                    'type': 'frontend-public-ip',
+                    'key': 'properties.publicIPAddressVersion',
+                    'op': 'in',
+                    'value_type': 'normalize',
+                    'value': 'ipv4'
+                }],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

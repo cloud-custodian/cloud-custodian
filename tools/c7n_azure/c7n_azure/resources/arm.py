@@ -44,15 +44,6 @@ class ArmResourceManager(QueryResourceManager):
                 resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
         return resources
 
-    def get_resources(self, resource_ids):
-        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
-        session = local_session(self.session_factory)
-        data = [
-            resource_client.resources.get_by_id(rid, session.resource_api_version(rid))
-            for rid in resource_ids
-        ]
-        return [r.serialize(True) for r in data]
-
     @staticmethod
     def register_arm_specific(registry, _):
         for resource in registry.keys():

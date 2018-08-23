@@ -44,7 +44,6 @@ class RoleAssignment(QueryResourceManager):
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
         enum_spec = ('role_assignments', 'list', None)
-        get_spec = ('role_assignments', 'get_by_id', None)
         id = 'id'
         default_report_fields = (
             'principalName',
@@ -82,7 +81,6 @@ class RoleDefinition(QueryResourceManager):
     class resource_type(object):
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
-        get_spec = ('role_definitions', 'get_by_id', None)
         type = 'roleDefinition'
         id = 'id'
         default_report_fields = (
