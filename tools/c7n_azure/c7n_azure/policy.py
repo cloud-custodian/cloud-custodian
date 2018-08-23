@@ -160,7 +160,7 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
 
 
 @execution.register(CONST_AZURE_EVENT_TRIGGER_MODE)
-class AzureEventMode(AzureFunctionMode):
+class AzureEventGridMode(AzureFunctionMode):
     """A policy that runs/executes in azure functions from an
     azure event."""
 
@@ -178,8 +178,8 @@ class AzureEventMode(AzureFunctionMode):
                                rinherit=AzureFunctionMode.schema)
 
     def provision(self):
-        super(AzureEventMode, self).provision()
-        key = self.get_webhook_key()
+        super(AzureEventGridMode, self).provision()
+        key = self._get_webhook_key()
         webhook_url = 'https://%s.azurewebsites.net/api/%s?code=%s' % (self.webapp_name,
                                                                        self.policy_name, key)
         destination = WebHookEventSubscriptionDestination(
@@ -195,10 +195,10 @@ class AzureEventMode(AzureFunctionMode):
         status_success = False
         while not status_success:
             try:
-                event_susbcription = eventgrid_client.event_subscriptions.create_or_update(
+                event_subscription = eventgrid_client.event_subscriptions.create_or_update(
                     scope, self.webapp_name, event_info)
 
-                event_susbcription.result()
+                event_subscription.result()
                 self.log.info('Event subscription creation succeeded')
                 status_success = True
             except CloudError as e:
@@ -206,7 +206,7 @@ class AzureEventMode(AzureFunctionMode):
                 self.log.info('Retrying in 30 seconds')
                 time.sleep(30)
 
-    def get_webhook_key(self):
+    def _get_webhook_key(self):
         token_headers = {
             'Authorization': 'Bearer %s' % self.session.get_bearer_token()
         }
@@ -237,13 +237,13 @@ class AzureEventMode(AzureFunctionMode):
             self.policy.data['mode'].get('events'))
 
         resource_ids = list(set(
-            [x['subject'] for x in event if self.is_subscribed_to_event(x, subscribed_events)]))
+            [e['subject'] for e in event if self._is_subscribed_to_event(e, subscribed_events)]))
 
         resources = self.policy.resource_manager.get_resources(resource_ids)
 
         if not resources:
             self.policy.log.info(
-                "policy: %s resources: %s no resources matched" % (
+                "policy: %s resources: %s no resources found" % (
                     self.policy.name, self.policy.resource_type))
             return
 
@@ -272,8 +272,8 @@ class AzureEventMode(AzureFunctionMode):
         """Retrieve logs for the policy"""
         raise NotImplementedError("error - not implemented")
 
-    def is_subscribed_to_event(self, event, subscribed_events):
-        subscribed_events = [o.lower() for o in subscribed_events]
+    def _is_subscribed_to_event(self, event, subscribed_events):
+        subscribed_events = [e.lower() for e in subscribed_events]
         if not event['data']['operationName'].lower() in subscribed_events:
             self.policy.log.info(
                 "Event operation %s does not match subscribed events %s" % (

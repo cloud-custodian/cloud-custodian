@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE
-from c7n_azure.policy import AzureEventMode, AzureFunctionMode
+from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 
 
 class AzurePolicyModeTest(BaseTest):
@@ -74,8 +74,8 @@ class AzurePolicyModeTest(BaseTest):
             }
         }
 
-        event_mode = AzureEventMode(p)
-        self.assertTrue(event_mode.is_subscribed_to_event(event, subscribed_events))
+        event_mode = AzureEventGridMode(p)
+        self.assertTrue(event_mode._is_subscribed_to_event(event, subscribed_events))
 
     def test_event_mode_is_subscribed_to_event_false(self):
         p = self.load_policy({
@@ -92,5 +92,5 @@ class AzurePolicyModeTest(BaseTest):
                 'operationName': 'Microsoft.Compute/virtualMachineScaleSets/write'
             }
         }
-        event_mode = AzureEventMode(p)
-        self.assertFalse(event_mode.is_subscribed_to_event(event, subscribed_events))
+        event_mode = AzureEventGridMode(p)
+        self.assertFalse(event_mode._is_subscribed_to_event(event, subscribed_events))
