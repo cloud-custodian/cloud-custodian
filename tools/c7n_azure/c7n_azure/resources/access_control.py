@@ -44,7 +44,6 @@ class RoleAssignment(QueryResourceManager):
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
         enum_spec = ('role_assignments', 'list', None)
-        get_spec = ('role_assignments', 'get_by_id', None)
         id = 'id'
         default_report_fields = (
             'principalName',
