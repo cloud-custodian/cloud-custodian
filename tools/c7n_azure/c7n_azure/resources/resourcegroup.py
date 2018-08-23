@@ -32,7 +32,7 @@ class ResourceGroup(ArmResourceManager):
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
         data = [
-            resource_client.resource_group.get(ResourceIdParser.get_resource_group(rid))
+            resource_client.resource_groups.get(ResourceIdParser.get_resource_group(rid))
             for rid in resource_ids
         ]
         return [r.serialize(True) for r in data]
