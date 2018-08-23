@@ -44,16 +44,12 @@ type cloudWatchEvent struct {
 	Time       time.Time `json:"time"`
 	Region     string    `json:"region"`
 	Resources  []string  `json:"resources"`
-	Detail     detail    `json:"detail"`
-}
-
-type detail struct {
-	RequestParameters requestParameters
-}
-
-type requestParameters struct {
-	BucketName string
-	Key        string
+	Detail     struct {
+		RequestParameters struct {
+			BucketName string
+			Key        string
+		}
+	} `json:"detail"`
 }
 
 type myOutput struct {
@@ -199,13 +195,13 @@ func processEventRecord(ctx context.Context, bucketName string, bucketKey string
 			resourceObj:  resource,
 			processObj:   process,
 		}
-		_, error := client.Index().
+		_, err := client.Index().
 			Index(indexName).
 			Type(typeName).
 			BodyJson(output).
 			Do(ctx)
 		if err != nil {
-			return error
+			return err
 		}
 	}
 
