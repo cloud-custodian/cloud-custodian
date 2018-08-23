@@ -125,19 +125,21 @@ class Session(object):
         namespace = ResourceIdParser.get_namespace(resource_id)
         resource_type = ResourceIdParser.get_resource_type(resource_id)
 
-        if resource_type in self._provider_cache:
-            return self._provider_cache[resource_type]
+        cache_id = namespace + resource_type
+
+        if cache_id in self._provider_cache:
+            return self._provider_cache[cache_id]
 
         resource_client = self.client('azure.mgmt.resource.ResourceManagementClient')
         provider = resource_client.providers.get(namespace)
 
         rt = next((t for t in provider.resource_types
-            if StringUtils.equal(t.resource_type, resource_type.split('/')[-1])), None)
+            if StringUtils.equal(t.resource_type, resource_type)), None)
 
         if rt and rt.api_versions:
             versions = [v for v in rt.api_versions if 'preview' not in v.lower()]
             api_version = versions[0] if versions else rt.api_versions[0]
-            self._provider_cache[resource_type] = api_version
+            self._provider_cache[cache_id] = api_version
             return api_version
 
     def get_tenant_id(self):
