@@ -10,7 +10,8 @@ them to run inexpensively in your subscription.
 
 Python support in Azure Functions V2 is in preview and this feature is still immature.
 
-Currently periodic (CRON) functions are supported and consumption pricing is not yet supported.
+Currently periodic (CRON) and Event Grid functions are supported, but consumption pricing is not
+yet supported.
 
 
 Provision Options
@@ -122,3 +123,33 @@ Output directory defaults to `/tmp/<random_uuid>` but you can point it to a Azur
             value: "PowerState/running"
 
 More details on Blob Storage output are at :ref:`azure_bloboutput`
+
+
+Event Grid Functions
+####################
+
+Currently, support for event grid functions is at the subscription level and can listen to write and delete
+events. When deploying an event grid function, an Event Grid Subscription is created that triggers the Azure Function
+when any event is triggered in the subscription. Cloud custodian filters to the events you passed to your policy and
+ignores all other events.
+
+In order to subscribe on an event you need to provide the resource provider and the action, or provide the string
+of one of the `shortcuts <https://github.com/capitalone/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_.
+
+.. code-block:: yaml
+
+    policies:
+        - name: tag-key-vault-creator
+          resource: azure.keyvault
+          mode:
+            type: azure-event-grid
+            events: [{
+                resourceProvider: 'Microsoft.KeyVault/vaults',
+                event: 'write'
+              }]
+          filters:
+            - "tag:CreatorEmail": null
+          actions:
+            - type: auto-tag-user
+              tag: CreatorEmail
+              days: 10

@@ -20,6 +20,7 @@ import sys
 import time
 
 import requests
+from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
@@ -100,14 +101,14 @@ class FunctionPackage(object):
         mode_type = policy['mode']['type']
         binding = config['bindings'][0]
 
-        if mode_type == 'azure-periodic':
+        if mode_type == CONST_AZURE_TIME_TRIGGER_MODE:
             binding['type'] = 'timerTrigger'
             binding['name'] = 'input'
             binding['schedule'] = policy['mode']['schedule']
 
-        elif mode_type == 'azure-stream':
+        elif mode_type == CONST_AZURE_EVENT_TRIGGER_MODE:
             binding['type'] = 'httpTrigger'
-            binding['authLevel'] = 'anonymous'
+            binding['authLevel'] = 'function'
             binding['name'] = 'input'
             binding['methods'] = ['post']
             config['bindings'].append({

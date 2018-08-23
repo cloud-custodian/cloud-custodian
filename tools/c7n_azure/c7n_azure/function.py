@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import json
+import logging
 import sys
 from os.path import dirname, join
 
@@ -37,16 +37,21 @@ def main(input):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
 
+    event = None
+
     if type(input) is HttpRequest:
-        req_body = input.get_json()
-        context['event'] = req_body[0]
-        logging.info(context['event'])
-        if 'validationCode' in context['event']['data'].keys():
-            code = context['event'][0]['data']['validationCode']
-            response = {"validationResponse": code}
+        event = input.get_json()
+        logging.info(event)
+
+        # handshake with event grid subscription creation
+        if 'data' in event[0] and 'validationCode' in event[0]['data']:
+            code = event[0]['data']['validationCode']
+            response = {
+                "validationResponse": code
+            }
             return func.HttpResponse(body=json.dumps(response, indent=2), status_code=200)
 
-    handler.run(None, context)
+    handler.run(event, context)
 
     if type(input) is HttpRequest:
         return func.HttpResponse("OK")
