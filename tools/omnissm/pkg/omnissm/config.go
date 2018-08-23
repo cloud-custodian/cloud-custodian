@@ -38,7 +38,7 @@ type Config struct {
 	AccountWhitelist []string `yaml:"accountWhitelist"`
 
 	// This or AssumeRoles must be specified.
-	AssumeRoleName string
+	AssumeRoleName string `yaml:"assumeRole"`
 
 	// A mapping of IAM roles to assume with the provided accounts
 	AssumeRoles map[string]string `yaml:"assumeRoles"`
@@ -58,6 +58,9 @@ type Config struct {
 
 	// The DynamodDb table used for storing instance regisrations.
 	RegistrationsTable string `yaml:"registrationsTable"`
+
+	// The SNS topic published to when resources are registered (optional).
+	ResourceRegisteredSNSTopic string `yaml:"resourceRegisteredSNSTopic"`
 
 	// The SNS topic published to when resources are deleted (optional).
 	ResourceDeletedSNSTopic string `yaml:"resourceDeletedSNSTopic"`
@@ -121,16 +124,17 @@ func splitNonEmpty(s string, sep string) []string {
 func ReadConfigFromEnv() *Config {
 	maxRetries, _ := strconv.Atoi(os.Getenv("OMNISSM_MAX_RETRIES"))
 	c := &Config{
-		AccountWhitelist:        splitNonEmpty(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
-		InstanceRole:            os.Getenv("OMNISSM_INSTANCE_ROLE"),
-		MaxRetries:              maxRetries,
-		RegistrationsTable:      os.Getenv("OMNISSM_REGISTRATIONS_TABLE"),
-		QueueName:               os.Getenv("OMNISSM_SPILLOVER_QUEUE"),
-		ResourceDeletedSNSTopic: os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC"),
-		ResourceTags:            splitNonEmpty(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
-		S3DownloadRole:          os.Getenv("OMNISSM_S3_DOWNLOAD_ROLE"),
-		SNSPublishRole:          os.Getenv("OMNISSM_SNS_PUBLISH_ROLE"),
-		XRayTracingEnabled:      os.Getenv("_X_AMZN_TRACE_ID"),
+		AccountWhitelist:           splitNonEmpty(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
+		InstanceRole:               os.Getenv("OMNISSM_INSTANCE_ROLE"),
+		MaxRetries:                 maxRetries,
+		RegistrationsTable:         os.Getenv("OMNISSM_REGISTRATIONS_TABLE"),
+		QueueName:                  os.Getenv("OMNISSM_SPILLOVER_QUEUE"),
+		ResourceRegisteredSNSTopic: os.Getenv("OMNISSM_RESOURCE_REGISTERED_SNS_TOPIC"),
+		ResourceDeletedSNSTopic:    os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC"),
+		ResourceTags:               splitNonEmpty(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
+		S3DownloadRole:             os.Getenv("OMNISSM_S3_DOWNLOAD_ROLE"),
+		SNSPublishRole:             os.Getenv("OMNISSM_SNS_PUBLISH_ROLE"),
+		XRayTracingEnabled:         os.Getenv("_X_AMZN_TRACE_ID"),
 	}
 	return c
 }
@@ -151,6 +155,9 @@ func MergeConfig(config *Config, other *Config) {
 	}
 	if other.RegistrationsTable != "" {
 		config.RegistrationsTable = other.RegistrationsTable
+	}
+	if other.ResourceRegisteredSNSTopic != "" {
+		config.ResourceRegisteredSNSTopic = other.ResourceRegisteredSNSTopic
 	}
 	if other.ResourceDeletedSNSTopic != "" {
 		config.ResourceDeletedSNSTopic = other.ResourceDeletedSNSTopic
