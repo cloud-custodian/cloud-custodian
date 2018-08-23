@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import six
 
 
-class AzureStreamEvents(object):
+class AzureEvents(object):
     """A mapping of resource types to events."""
 
     azure_events = {
@@ -93,7 +93,7 @@ class AzureStreamEvents(object):
             'event': 'write'},
 
         'ResourceGroupWrite': {
-            'resource_provider': 'Microsoft.Resourcws/subscriptions/resourceGroups',
+            'resource_provider': 'Microsoft.Resources/subscriptions/resourceGroups',
             'event': 'write'},
 
         'SqlServerWrite': {

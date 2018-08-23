@@ -21,7 +21,7 @@ from c7n_azure.function_package import FunctionPackage
 from msrestazure.azure_exceptions import CloudError
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.template_utils import TemplateUtilities
-from c7n_azure.azure_events import AzureStreamEvents
+from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
                                  CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
 
@@ -233,7 +233,7 @@ class AzureEventMode(AzureFunctionMode):
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
-        subscribed_events = AzureStreamEvents.get_event_operations(
+        subscribed_events = AzureEvents.get_event_operations(
             self.policy.data['mode'].get('events'))
 
         resource_ids = list(set(
