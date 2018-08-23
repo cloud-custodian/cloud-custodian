@@ -23,7 +23,8 @@ from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.template_utils import TemplateUtilities
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
-                                 CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
+                                 CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
+                                 CONS_AZURE_FUNCTION_KEY_URL)
 
 from c7n import utils
 from c7n.actions import EventAction
@@ -214,11 +215,11 @@ class AzureEventGridMode(AzureFunctionMode):
         key_url = (
             'https://management.azure.com'
             '/subscriptions/{0}/resourceGroups/{1}/'
-            'providers/Microsoft.Web/sites/{2}/'
-            'hostruntime/admin/host/systemkeys/_master?api-version=2018-02-01').format(
+            'providers/Microsoft.Web/sites/{2}/{3}').format(
                 self.session.subscription_id,
                 self.group_name,
-                self.webapp_name)
+                self.webapp_name,
+                CONS_AZURE_FUNCTION_KEY_URL)
 
         retrieved_key = False
 
