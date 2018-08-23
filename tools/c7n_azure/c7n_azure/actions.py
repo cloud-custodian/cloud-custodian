@@ -16,6 +16,7 @@ Actions to perform on Azure resources
 """
 import datetime
 from datetime import timedelta
+import logging
 
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
 from c7n_azure.storage_utils import StorageUtilities
@@ -30,6 +31,8 @@ from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
+
+log = logging.getLogger('custodian.azure.actions')
 
 
 class TagHelper:
@@ -67,7 +70,13 @@ class TagHelper:
                                                sku=az_resource.sku,
                                                identity=az_resource.identity)
 
-            client.resources.update_by_id(resource['id'], api_version, generic_resource)
+            try:
+                client.resources.update_by_id(resource['id'], api_version, generic_resource)
+            except Exception as e:
+                log.error("Failed to update tags for the resource.\n"
+                          "Type: {0}.\n"
+                          "Name: {1}.\n"
+                          "Error: {2}".format(resource['type'], resource['name'], e))
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):
