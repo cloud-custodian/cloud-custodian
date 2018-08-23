@@ -17,6 +17,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 from c7n.actions import BaseAction
 from c7n.filters import Filter
+from c7n.utils import local_session
 from c7n.utils import type_schema
 
 
@@ -27,6 +28,16 @@ class ResourceGroup(ArmResourceManager):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resource_groups', 'list', None)
+
+
+    def get_resources(self, resource_ids):
+        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
+        session = local_session(self.session_factory)
+        data = [
+            resource_client.resource_group.get(rid, session.resource_api_version(rid))
+            for rid in resource_ids
+        ]
+        return [r.serialize(True) for r in data]
 
 
 @ResourceGroup.filter_registry.register('empty-group')
