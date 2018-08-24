@@ -1,0 +1,104 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "mapping": {
+      "total_fields": {
+        "limit": "10000"
+      }
+    }
+  },
+  "mappings": {
+    "process_info": {
+      "properties": {
+        "ASV": {
+          "type": "text"
+        },
+        "CMDBEnvironment":{
+          "type": "text"
+        },
+        "OwnerContact":{
+          "type": "text"
+        },
+        "cmdline": {
+          "type": "text"
+        },
+        "rss": {
+          "type": "text"
+        },
+        "create_time": {
+          "type": "date"
+        },
+        "write_bytes": {
+          "type": "text"
+        },
+        "name": {
+          "type": "text"
+        },
+        "pid": {
+          "type": "text"
+        },
+        "thread_count": {
+          "type": "text"
+        },
+        "num_fds": {
+          "type": "text"
+        },
+        "read_bytes": {
+          "type": "text"
+        },
+        "user": {
+          "type": "text"
+        },
+        "vms": {
+          "type": "text"
+        },
+        "resourceId": {
+          "type": "text"
+        },
+        "captureTime": {
+          "type": "date"
+        },
+        "schemaVersion": {
+          "type": "text"
+        },
+        "KeyName": {
+          "type": "text"
+        },
+        "AccountId": {
+          "type": "text"
+        },
+        "Platform": {
+          "type": "text"
+        },
+        "InstanceId": {
+          "type": "text"
+        },
+        "VPCId": {
+          "type": "text"
+        },
+        "State": {
+          "type": "text"
+        },
+        "ImageId": {
+          "type": "text"
+        },
+        "InstanceRole": {
+          "type": "text"
+        },
+        "Region": {
+          "type": "text"
+        },
+        "SubnetId": {
+          "type": "text"
+        },
+        "InstanceType": {
+          "type": "text"
+        },
+        "Created": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}
