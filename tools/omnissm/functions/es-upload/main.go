@@ -53,19 +53,13 @@ type cloudWatchEvent struct {
 }
 
 type myOutput struct {
-	requiredTags
+	tags map[string]interface{}
 	processObj
 	resourceObj
 }
 type tagObj struct {
 	Key   string `json:"Key"`
 	Value string `json:"Value"`
-}
-
-type requiredTags struct {
-	ASV             string
-	CMDBEnvironment string
-	OwnerContact    string
 }
 
 type processObj struct {
@@ -105,6 +99,7 @@ var (
 	esClient           = os.Getenv("OMNISSM_ELASTIC_SEARCH_HTTP")
 	indexName          = os.Getenv("OMNISSM_INDEX_NAME")
 	typeName           = os.Getenv("OMNISSM_TYPE_NAME")
+	requiredTags       = os.Getenv("OMNISSM_TAGS")
 	s3Svc              = s3.New(session.New())
 )
 
@@ -191,9 +186,9 @@ func processEventRecord(ctx context.Context, bucketName string, bucketKey string
 		}
 
 		output := myOutput{
-			requiredTags: tags,
-			resourceObj:  resource,
-			processObj:   process,
+			tags:        tags,
+			resourceObj: resource,
+			processObj:  process,
 		}
 		_, err := client.Index().
 			Index(indexName).
@@ -209,8 +204,9 @@ func processEventRecord(ctx context.Context, bucketName string, bucketKey string
 }
 
 //Attempt to pull file from s3 with the same manager id, iterate over returned tags
-func getTags(ctx context.Context, bucketName string, bucketKey string) (requiredTags, error) {
-	var tags requiredTags
+func getTags(ctx context.Context, bucketName string, bucketKey string) (map[string]interface{}, error) {
+	tagsToGet := strings.Split(requiredTags, ",")
+	var tags map[string]interface{}
 	//get tags file from s3
 	tagsRes, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucketName),
@@ -234,13 +230,11 @@ func getTags(ctx context.Context, bucketName string, bucketKey string) (required
 			return tags, err
 		}
 		//search for specific tags
-		switch aTagObj.Key {
-		case "ASV":
-			tags.ASV = aTagObj.Value
-		case "CMDBEnvironment":
-			tags.CMDBEnvironment = aTagObj.Value
-		case "OwnerContact":
-			tags.OwnerContact = aTagObj.Value
+		for _, tag := range tagsToGet {
+			if aTagObj.Key == tag {
+				tags[aTagObj.Value] = aTagObj.Value
+			}
+
 		}
 	}
 	return tags, nil
