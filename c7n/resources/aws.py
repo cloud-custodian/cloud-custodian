@@ -14,6 +14,7 @@
 
 from c7n.provider import clouds
 
+from collections import Counter
 import copy
 import itertools
 import logging
@@ -76,6 +77,13 @@ def _default_account_id(options):
         options.account_id = utils.get_account_id_from_sts(session)
     except Exception:
         options.account_id = None
+
+
+class ApiStats(object):
+
+    def __init__(self):
+        self.api_calls = Counter()
+        self.api_times = Counter()
 
 
 @clouds.register('aws')
