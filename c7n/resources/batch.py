@@ -45,7 +45,7 @@ class ComputeSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "computeResources.subnets"
 
-    
+
 @resources.register('batch-definition')
 class JobDefinition(QueryResourceManager):
 
