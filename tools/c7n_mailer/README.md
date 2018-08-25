@@ -4,6 +4,7 @@ A mailer implementation for Custodian. Outbound mail delivery is still somewhat
 organization-specific, so this at the moment serves primarily as an example
 implementation.
 
+> The Cloud Custodian Mailer can now be easily run in a Docker container. Click [here](https://hub.docker.com/r/troylar/c7n-mailer/) for details.
 
 ## Message Relay
 
