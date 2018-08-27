@@ -16,6 +16,7 @@ package omnissm
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -25,10 +26,11 @@ type DeferredActionType int
 const (
 	InvalidActionType DeferredActionType = iota
 	AddTagsToResource
-	CreateActivation
-	DeregisterManagedInstance
+	RequestActivation
+	DeregisterInstance
 	PutInventory
 	PutRegistrationEntry
+	DeleteRegistrationEntry
 )
 
 type DeferredActionMessage struct {
@@ -60,4 +62,17 @@ func (d *DeferredActionMessage) UnmarshalJSON(data []byte) error {
 	}
 	*d = DeferredActionMessage{msg.Type, msg.Value}
 	return nil
+}
+
+type DeferError struct {
+	cause error
+	queue string
+}
+
+func (e *DeferError) Error() string {
+	return fmt.Sprintf("deferred action to SQS queue (%s): %v", e.queue, e.cause)
+}
+
+func (e *DeferError) Cause() error {
+	return e.cause
 }
