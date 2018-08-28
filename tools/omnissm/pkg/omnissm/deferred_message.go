@@ -16,7 +16,6 @@ package omnissm
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -62,17 +61,4 @@ func (d *DeferredActionMessage) UnmarshalJSON(data []byte) error {
 	}
 	*d = DeferredActionMessage{msg.Type, msg.Value}
 	return nil
-}
-
-type DeferError struct {
-	cause error
-	queue string
-}
-
-func (e *DeferError) Error() string {
-	return fmt.Sprintf("deferred action to SQS queue (%s): %v", e.queue, e.cause)
-}
-
-func (e *DeferError) Cause() error {
-	return e.cause
 }

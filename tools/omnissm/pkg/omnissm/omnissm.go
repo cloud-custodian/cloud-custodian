@@ -143,7 +143,7 @@ func (o *OmniSSM) tryDefer(ctx context.Context, err error, t DeferredActionType,
 		if sqsErr != nil {
 			return errors.Wrapf(sqsErr, "could not defer message (original error: %v)", err)
 		}
-		return &DeferError{err, o.Config.QueueName}
+		return errors.Wrapf(err, "deferred action to SQS queue (%s)", o.Config.QueueName)
 	}
 	return err
 }
