@@ -18,7 +18,7 @@ Two example use cases:
 Install
 +++++++
 
-Pre-requisites. pygit2, click and custodian/c7n.
+Pre-requisites. pygit2, click, requests and custodian/c7n.
 
 Usage
 +++++
@@ -44,7 +44,7 @@ Diff use case, output policies changes in the last commit::
 
 Pull request use, output policies changes between two branches::
 
-  $ python tools/ops/policystream.py diff-tree -r foo
+  $ python tools/ops/policystream.py diff -r foo
   policies:
   - filters:
     - {type: cross-account}
@@ -61,8 +61,9 @@ import json
 import logging
 import shutil
 import os
-import tempfile
 import pygit2
+import requests
+import tempfile
 import yaml
 
 from c7n.config import Config
@@ -555,6 +556,35 @@ def transport(stream_uri, assume):
 @click.group()
 def cli():
     """Policy changes from git history"""
+
+
+query = """
+query($organization: String!) {
+  organization(login: $organization) {
+    repositories(first: 100, orderBy: {field: UPDATE_AT, direction: DESC}) {
+      name
+      updatedAt
+      url
+    }
+  }
+}
+"""
+
+@cli.command(name='org-stream')
+@click.option('--organization', envvar="GITHUB_ORG",
+              required=True, help="Github Organization")
+@click.option('--github-url', envvar="GITHUB_API_URL",
+              default='https://api.github.com/graphql')
+@click.option('--github-token', envvar='GITHUB_TOKEN',
+              help="Github credential token")
+def org_stream(organization, github_url, github_token):
+    headers = {"Authorization": "token {}".format(github_token)}
+
+    response = requests.post(
+        github_url, headers=headers,
+        json={'query': query, 'variables': {'organization': organization}})
+
+    result = response.json()
 
 
 @cli.command(name='diff')
