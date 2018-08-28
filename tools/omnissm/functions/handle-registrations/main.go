@@ -59,7 +59,7 @@ func (r *registrationHandler) UpdateRegistration(ctx context.Context, req *omnis
 	}
 	if !ok {
 		logger.Info().Str("instanceName", req.Identity().Name()).Str("id", id).Msg("registration entry not found")
-		return nil, lambda.NotFoundError{"entry not found: " + id}
+		return nil, lambda.NotFoundError{fmt.Sprintf("entry not found: %#v", id)}
 	}
 	logger.Info().Interface("entry", entry).Msg("registration entry found")
 	entry.ManagedId = req.ManagedId
@@ -102,7 +102,7 @@ func main() {
 				return nil, lambda.BadRequestError{}
 			}
 			if a := registerReq.Identity().AccountId; !config.IsAuthorized(a) {
-				return nil, lambda.UnauthorizedError{"account not authorized: " + a}
+				return nil, lambda.UnauthorizedError{fmt.Sprintf("account not authorized: %#v", a)}
 			}
 			switch req.HTTPMethod {
 			case "POST":
