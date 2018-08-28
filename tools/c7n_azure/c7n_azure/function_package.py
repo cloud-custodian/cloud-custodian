@@ -189,7 +189,8 @@ class FunctionPackage(object):
             if self.status(app_name):
                 return True
             else:
-                self.log.info('(%s/%s) Will retry Function App status check in %s seconds...' % (r + 1, retries, delay))
+                self.log.info('(%s/%s) Will retry Function App status check in %s seconds...'
+                              % (r + 1, retries, delay))
                 time.sleep(delay)
         return False
 
