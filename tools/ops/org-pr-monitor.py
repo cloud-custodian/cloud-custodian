@@ -8,20 +8,22 @@ cat requirements.txt
 click
 dateparser
 c7n
+requests
 """
 import click
 import dateparser
 from collections import Counter
+from datetime import datetime
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 import jmespath
 import logging
 import requests
-import pprint
 
 from c7n.config import Bag
 from c7n.credentials import SessionFactory
 from c7n.output import MetricsOutput
+from c7n.utils import dumps
 
 log = logging.getLogger('c7nops.cimetrics')
 
@@ -69,6 +71,7 @@ query($organization: String!) {
 
 class RepoMetrics(MetricsOutput):
 
+    BUF_SIZE = 1000
     dims = None
 
     def _default_dimensions(self):
@@ -184,8 +187,11 @@ def run(organization, hook_context, github_url, github_token,
             Hook=hook_context)
 
     if not metrics:
-        pprint.pprint(repo_metrics.buf)
+        print(dumps(repo_metrics.buf, indent=2))
         return
+    else:
+        repo_metrics.BUF_SIZE = 20
+        repo_metrics.flush()
 
 
 if __name__ == '__main__':
