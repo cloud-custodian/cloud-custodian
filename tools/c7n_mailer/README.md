@@ -4,6 +4,7 @@ A mailer implementation for Custodian. Outbound mail delivery is still somewhat
 organization-specific, so this at the moment serves primarily as an example
 implementation.
 
+> The Cloud Custodian Mailer can now be easily run in a Docker container. Click [here](https://hub.docker.com/r/troylar/c7n-mailer/) for details.
 
 ## Message Relay
 
@@ -17,7 +18,7 @@ should be cross-account enabled for sending between accounts.
 Our goal in starting out with the Custodian mailer is to install the mailer,
 and run a policy that triggers an email to your inbox.
 
-1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop.
+1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/troylar/c7n-mailer/))
 1. In your text editor, create a `mailer.yml` file to hold your mailer config.
 1. In the AWS console, create a new standard SQS queue (quick create is fine).
    Copy the queue URL to `queue_url` in `mailer.yml`.

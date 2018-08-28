@@ -22,7 +22,7 @@ from mock import patch
 
 class ArmResourceTest(BaseTest):
 
-    TEST_DATE = datetime(2018, 8, 2, 0, 0, 0)
+    TEST_DATE = datetime(2018, 8, 24, 0, 0, 0)
 
     def setUp(self):
         super(ArmResourceTest, self).setUp()

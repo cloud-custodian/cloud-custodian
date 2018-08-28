@@ -390,3 +390,8 @@ class UtilTest(unittest.TestCase):
         self.assertEqual(fmt["Key3"], "aa")
         self.assertEqual(fmt["Key4"][2], "aa")
         self.assertEqual(fmt["Key4"][1]["K"], "bb")
+
+        self.assertEqual(
+            utils.format_string_values(
+                {'k': '{1}'}),
+            {'k': '{1}'})
