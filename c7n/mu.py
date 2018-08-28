@@ -600,7 +600,7 @@ class AbstractLambdaFunction:
             'VpcConfig': LAMBDA_EMPTY_VALUES['VpcConfig'],
             'Tags': self.tags}
 
-        if self.environment:
+        if self.environment['Variables']:
             conf['Environment'] = self.environment
 
         if self.subnets and self.security_groups:
