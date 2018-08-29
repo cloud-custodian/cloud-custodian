@@ -10,9 +10,11 @@ them to run inexpensively in your subscription.
 
 Python support in Azure Functions V2 is in preview and this feature is still immature.
 
-Currently periodic (CRON) and Event Grid functions are supported, but consumption pricing is not
-yet supported.
+- Linux is currently the only supported operating system.
+- Only Service Principal authentication is currently supported.
 
+Currently periodic (CRON) and Event Grid functions are supported, however consumption pricing is not
+yet supported.
 
 Provision Options
 #################
