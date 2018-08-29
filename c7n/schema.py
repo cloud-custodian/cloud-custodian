@@ -190,7 +190,7 @@ def generate(resource_types=()):
                 'end': {'format': 'date-time'},
                 'resource': {'type': 'string'},
                 'max-resources': {'type': 'integer'},
-                'max-resources-percent': {'type': 'float'},
+                'max-resources-percent': {'type': 'number'},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
