@@ -47,3 +47,17 @@ class DeprecationError(PolicySyntaxError):
 class PolicyExecutionError(CustodianError):
     """Error running a Policy.
     """
+
+
+class ResourceLimitExceeded(PolicyExecutionError):
+    """The policy would have affected more resources than its limit.
+    """
+    def __init__(self, msg, limit, selection_count, population_count=None):
+        msg = msg.format(
+            limit=limit,
+            selection_count=selection_count,
+            population_count=population_count)
+        super(ResourceLimitExceeded, self).__init__(msg)
+        self.limit = limit
+        self.selection_count = selection_count
+        self.population_count = population_count
