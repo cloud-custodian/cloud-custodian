@@ -378,6 +378,7 @@ def collect_metrics(clients, tasks):
 @click.command('load-app-metrics')
 @click.option('--app', required=True)
 @click.option('--env')
+
 @click.option(
     '-r', '--resources', multiple=True,
     type=click.Choice(['Instance', 'LoadBalancer', 'Volume']))

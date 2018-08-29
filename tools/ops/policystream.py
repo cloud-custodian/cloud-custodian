@@ -54,11 +54,13 @@ Pull request use, output policies changes between two branches::
 """ # NOQA
 import click
 import contextlib
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset
 from functools import partial
 import json
 import logging
+import multiprocessing
 import shutil
 import os
 import pygit2
@@ -559,16 +561,54 @@ def cli():
 
 
 query = """
-query($organization: String!) {
+query($organization: String!, $cursor: String) {
   organization(login: $organization) {
-    repositories(first: 100, orderBy: {field: UPDATE_AT, direction: DESC}) {
-      name
-      updatedAt
-      url
+    repositories(first: 100, after: $cursor, orderBy: {field: UPDATED_AT, direction: DESC}){
+      edges {
+        node {
+          name
+          url
+          createdAt
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
     }
   }
 }
 """
+
+
+def github_repos(organization, github_url, github_token):
+    """Return all github repositories."""
+    # Get github repos
+    import jmespath
+    headers = {"Authorization": "token {}".format(github_token)}
+    next_cursor = None
+
+    while next_cursor is not False:
+        params = {'query': query, 'variables': {
+            'organization': organization, 'cursor': next_cursor}}
+        response = requests.post(github_url, headers=headers, json=params)
+        result = response.json()
+        if response.status_code != 200 or 'errors' in result:
+            raise ValueError("Github api error %s" % (
+                response.content.decode('utf8'),))
+
+        repos = jmespath.search(
+            'data.organization.repositories.edges[].node', result)
+        for r in repos:
+            yield r
+        page_info = jmespath.search(
+            'data.organization.repositories.pageInfo', result)
+        if page_info:
+            print("paginating %s" % (page_info['endCursor'],))
+            next_cursor = page_info['hasNextPage'] and page_info['endCursor'] or False
+        else:
+            next_cursor = False
+
 
 @cli.command(name='org-stream')
 @click.option('--organization', envvar="GITHUB_ORG",
@@ -577,14 +617,13 @@ query($organization: String!) {
               default='https://api.github.com/graphql')
 @click.option('--github-token', envvar='GITHUB_TOKEN',
               help="Github credential token")
-def org_stream(organization, github_url, github_token):
-    headers = {"Authorization": "token {}".format(github_token)}
+@click.option('--parallel', default=int(multiprocessing.cpu_count() / 2.0),
+              help="Github credential token")
+@click.option('--keep', is_flag=True)
+def org_stream(organization, github_url, github_token, parallel, keep):
 
-    response = requests.post(
-        github_url, headers=headers,
-        json={'query': query, 'variables': {'organization': organization}})
-
-    result = response.json()
+    for r in github_repos(organization, github_url, github_token):
+        print(r)
 
 
 @cli.command(name='diff')

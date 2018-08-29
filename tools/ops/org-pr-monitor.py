@@ -1,7 +1,7 @@
 """Generate metrics for a Github org's pull request status hooks.
 
-Monitoring CI tools, by tracking latency of comments on a pull request,
-and pending count.
+Monitoring CI tools, by tracking latency of status on a pull request,
+and pending counts.
 
 cat requirements.txt
 
@@ -142,7 +142,9 @@ def run(organization, hook_context, github_url, github_token,
     """scan org repo status hooks"""
     logging.basicConfig(level=logging.DEBUG)
 
-    since = dateparser.parse(since).replace(tzinfo=tzutc())
+    since = dateparser.parse(
+        since, settings={
+            'RETURN_AS_TIMEZONE_AWARE': True, 'TO_TIMEZONE': 'UTC'})
 
     headers = {"Authorization": "token {}".format(github_token)}
 
@@ -183,7 +185,7 @@ def run(organization, hook_context, github_url, github_token,
             'RepoHookPending', stats['missing'], 'Count',
             Hook=hook_context)
         repo_metrics.put_metric(
-            'RepoHookLatency', stats['missing_time'], 'Secondsx',
+            'RepoHookLatency', stats['missing_time'], 'Seconds',
             Hook=hook_context)
 
     if not metrics:
