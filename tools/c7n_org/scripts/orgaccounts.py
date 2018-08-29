@@ -29,7 +29,7 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
     help="Role template for accounts in the config, defaults to %s" % ROLE_TEMPLATE)
 @click.option('--ou', multiple=True, default=["/"],
               help="Only export the given subtrees of an organization")
-@click.option('-r', '--regions', multiple=False,
+@click.option('-r', '--regions', multiple=True,
               help="If specified, set regions per account in config")
 @click.option('--assume', help="Role to assume for Credentials")
 @click.option('--profile', help="AWS CLI Profile to use for Credentials")
