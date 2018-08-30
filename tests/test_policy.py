@@ -481,7 +481,7 @@ class TestPolicy(BaseTest):
         )
 
     def test_policy_resource_limits(self):
-        session_factory = self.record_flight_data(
+        session_factory = self.replay_flight_data(
             "test_policy_resource_limits")
         p = self.load_policy(
             {
