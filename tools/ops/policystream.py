@@ -57,6 +57,7 @@ import contextlib
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset
+from fnmatch import fnmatch
 from functools import partial
 import json
 import logging
@@ -605,7 +606,8 @@ def github_repos(organization, github_url, github_token):
             'data.organization.repositories.pageInfo', result)
         if page_info:
             print("paginating %s" % (page_info['endCursor'],))
-            next_cursor = page_info['hasNextPage'] and page_info['endCursor'] or False
+            next_cursor = (page_info['hasNextPage'] and
+                           page_info['endCursor'] or False)
         else:
             next_cursor = False
 
@@ -619,11 +621,33 @@ def github_repos(organization, github_url, github_token):
               help="Github credential token")
 @click.option('--parallel', default=int(multiprocessing.cpu_count() / 2.0),
               help="Github credential token")
+
 @click.option('--keep', is_flag=True)
-def org_stream(organization, github_url, github_token, parallel, keep):
+@click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
+@click.option('-d', '--clone-dir')
+@click.option('-f', '--filter', multiple=True)
+def org_stream(organization, github_url, github_token, parallel, keep, clone_dir, verbose, filter):
+    logging.basicConfig(
+        format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
+        level=(verbose and logging.DEBUG or logging.INFO))
+
+    callbacks = pygit2.RemoteCallbacks(
+        pygit2.UserPass(github_token, 'x-oauth-basic'))
 
     for r in github_repos(organization, github_url, github_token):
-        print(r)
+        if filter:
+            found = False
+            for f in filter:
+                if fnmatch(r['name'], f):
+                    found = True
+                    break
+            if not found:
+                continue
+        log.info("cloning repo: %s/%s" % (organization, r['name']))
+        repo_path = os.path.join(clone_dir, r['name'])
+        if not os.path.exists(repo_path):
+            repo = pygit2.clone_repository(
+                r['url'], repo_path, callbacks=callbacks)
 
 
 @cli.command(name='diff')
