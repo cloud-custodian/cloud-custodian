@@ -18,6 +18,8 @@ import time
 from c7n.output import FSOutput, MetricsOutput, CloudWatchLogOutput
 from c7n.utils import reset_session_cache
 
+from c7n.resources.aws import ApiStats
+
 
 class ExecutionContext(object):
     """Policy Execution Context."""
@@ -27,6 +29,7 @@ class ExecutionContext(object):
         self.options = options
         self.session_factory = session_factory
         self.cloudwatch_logs = None
+        self.api_stats = None
         self.start_time = None
 
         metrics_enabled = getattr(options, 'metrics_enabled', None)
@@ -44,6 +47,8 @@ class ExecutionContext(object):
         if options.log_group:
             self.cloudwatch_logs = CloudWatchLogOutput(self)
 
+        self.api_stats = ApiStats(self)
+
     @property
     def log_dir(self):
         if self.output:
@@ -54,10 +59,13 @@ class ExecutionContext(object):
             self.output.__enter__()
         if self.cloudwatch_logs:
             self.cloudwatch_logs.__enter__()
+        if self.api_stats:
+            self.api_stats.__enter__()
         self.start_time = time.time()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
         self.metrics.flush()
         # clear policy execution thread local session cache
         reset_session_cache()

@@ -81,9 +81,29 @@ def _default_account_id(options):
 
 class ApiStats(object):
 
-    def __init__(self):
+    def __init__(self, ctx):
+        self.ctx = ctx
         self.api_calls = Counter()
-        self.api_times = Counter()
+
+    def __enter__(self):
+        self.ctx.session_factory.set_subscribers((self,))
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        self.ctx.session_factory.set_subscribers(())
+        log.info("api calls \n %s", (dict(self.api_calls),))
+        self.ctx.metrics.put_metric(
+            "ApiCalls", sum(self.api_calls.values()), "Count", Scope="Policy")
+        self.ctx.output._write_file(
+            'api-stats.json', utils.dumps(dict(self.api_calls)))
+
+    def __call__(self, s):
+        s.events.register(
+            'after-call.*.*', self._record, unique_id='c7n-api-stats')
+
+    def _record(self, http_response, parsed, model, **kwargs):
+        self.api_calls["%s.%s" % (
+            model.service_model.endpoint_prefix,
+            model.name)] += 1
 
 
 @clouds.register('aws')

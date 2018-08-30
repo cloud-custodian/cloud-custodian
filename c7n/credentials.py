@@ -37,6 +37,7 @@ class SessionFactory(object):
         if 'C7N_SESSION_SUFFIX' in os.environ:
             self.session_name = "%s@%s" % (
                 self.session_name, os.environ['C7N_SESSION_SUFFIX'])
+        self._subscribers = []
 
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
@@ -50,7 +51,14 @@ class SessionFactory(object):
 
         session._session.user_agent_name = "CloudCustodian"
         session._session.user_agent_version = version
+
+        for s in self._subscribers:
+            s(session)
+
         return session
+
+    def set_subscribers(self, subscribers):
+        self._subscribers = subscribers
 
 
 def assumed_session(role_arn, session_name, session=None, region=None, external_id=None):
