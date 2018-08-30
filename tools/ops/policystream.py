@@ -54,14 +54,12 @@ Pull request use, output policies changes between two branches::
 """ # NOQA
 import click
 import contextlib
-from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset
 from fnmatch import fnmatch
 from functools import partial
 import json
 import logging
-import multiprocessing
 import shutil
 import os
 import pygit2

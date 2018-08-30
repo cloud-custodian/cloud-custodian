@@ -156,8 +156,8 @@ def run(organization, hook_context, github_url, github_token,
 
     if response.status_code != 200 or 'errors' in result:
         raise Exception(
-           "Query failed to run by returning code of {}. {}".format(
-              response.status_code, response.content))
+            "Query failed to run by returning code of {}. {}".format(
+                response.status_code, response.content))
 
     now = datetime.utcnow().replace(tzinfo=tzutc())
     stats = Counter()
