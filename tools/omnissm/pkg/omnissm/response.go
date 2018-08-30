@@ -21,10 +21,16 @@ import (
 type RegistrationResponse struct {
 	RegistrationEntry
 
-	Region string `json:"region,omitempty"`
+	Region   string `json:"region,omitempty"`
+	existing bool
 }
 
 func (r *RegistrationResponse) MarshalJSON() ([]byte, error) {
 	type alias RegistrationResponse
 	return json.Marshal((*alias)(r))
+}
+
+// Used for logging
+func (r *RegistrationResponse) Existing() bool {
+	return r.existing
 }

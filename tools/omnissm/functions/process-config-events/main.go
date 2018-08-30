@@ -61,11 +61,12 @@ func handleConfigurationItemChange(ctx context.Context, detail configservice.Con
 		return err
 	}
 	if !ok {
-		return errors.Errorf("registration entry not found: %#v", detail.ConfigurationItem.Name())
+		log.Info().Str("name", detail.ConfigurationItem.Name()).Msgf("registration entry not found")
+		return nil
 	}
 	log.Info().Interface("entry", entry).Msg("existing registration entry found")
 	if !ssm.IsManagedInstance(entry.ManagedId) {
-		return errors.Errorf("ManagedId %#v invalid for %s/%s", entry.AccountId, entry.InstanceId)
+		return errors.Errorf("ManagedId %#v invalid for %s/%s", entry.ManagedId, entry.AccountId, entry.InstanceId)
 	}
 	switch detail.ConfigurationItem.ConfigurationItemStatus {
 	case "ResourceDiscovered", "OK":
@@ -76,25 +77,27 @@ func handleConfigurationItemChange(ctx context.Context, detail configservice.Con
 			}
 			tags[k] = v
 		}
-		resourceTags := &ssm.ResourceTags{
-			ManagedId: entry.ManagedId,
-			Tags:      tags,
-		}
-		err := omni.SSM.AddTagsToResource(ctx, resourceTags)
-		if err != nil {
-			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
-					Type:  omnissm.AddTagsToResource,
-					Value: resourceTags,
-				})
-				if sqsErr != nil {
-					return sqsErr
-				}
-				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
+		if len(tags) > 0 {
+			resourceTags := &ssm.ResourceTags{
+				ManagedId: entry.ManagedId,
+				Tags:      tags,
 			}
-			return err
+			err := omni.SSM.AddTagsToResource(ctx, resourceTags)
+			if err != nil {
+				if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
+					sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
+						Type:  omnissm.AddTagsToResource,
+						Value: resourceTags,
+					})
+					if sqsErr != nil {
+						return sqsErr
+					}
+					return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
+				}
+				return err
+			}
+			log.Info().Msgf("AddTagsToResource successful for %#v", entry.ManagedId)
 		}
-		log.Info().Msgf("AddTagsToResource successful for %#v", entry.ManagedId)
 		inv := &ssm.CustomInventory{
 			TypeName:    "Custom:CloudInfo",
 			ManagedId:   entry.ManagedId,
@@ -117,38 +120,10 @@ func handleConfigurationItemChange(ctx context.Context, detail configservice.Con
 		}
 		log.Info().Msgf("PutInventory successful for %#v", entry.ManagedId)
 	case "ResourceDeleted":
-		if err := omni.SSM.DeregisterManagedInstance(ctx, entry.ManagedId); err != nil {
-			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
-					Type:  omnissm.DeregisterManagedInstance,
-					Value: entry.ManagedId,
-				})
-				if sqsErr != nil {
-					return sqsErr
-				}
-				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
-			}
+		if err := omni.DeregisterInstance(ctx, entry); err != nil {
 			return err
 		}
 		log.Info().Msgf("Successfully deregistered instance: %#v", entry.ManagedId)
-		if err := omni.Registrations.Delete(ctx, entry.Id); err != nil {
-			return err
-		}
-		log.Info().Msgf("Successfully deleted registration entry: %#v", entry.ManagedId)
-		if omni.Config.ResourceDeletedSNSTopic != "" {
-			data, err := json.Marshal(map[string]interface{}{
-				"ManagedId":    entry.ManagedId,
-				"ResourceId":   detail.ConfigurationItem.ResourceId,
-				"AWSAccountId": detail.ConfigurationItem.AWSAccountId,
-				"AWSRegion":    detail.ConfigurationItem.AWSRegion,
-			})
-			if err != nil {
-				return errors.Wrap(err, "cannot marshal SNS message")
-			}
-			if err := omni.SNS.Publish(ctx, omni.Config.ResourceDeletedSNSTopic, data); err != nil {
-				return err
-			}
-		}
 	}
 	return nil
 }

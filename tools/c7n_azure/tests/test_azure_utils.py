@@ -17,6 +17,8 @@ from azure_common import BaseTest
 from c7n_azure.utils import Math
 from c7n_azure.utils import ResourceIdParser
 from c7n_azure.utils import StringUtils
+from c7n_azure.tags import TagHelper
+
 
 RESOURCE_ID = (
     "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
@@ -72,3 +74,10 @@ class UtilsTest(BaseTest):
         self.assertFalse(StringUtils.equal(1, "foo"))
         self.assertFalse(StringUtils.equal("foo", 1))
         self.assertFalse(StringUtils.equal(True, False))
+
+    def test_get_tag_value(self):
+        resource = {'tags': {'tag1': 'value1', 'tAg2': 'VaLuE2', 'TAG3': 'VALUE3'}}
+
+        self.assertEqual(TagHelper.get_tag_value(resource, 'tag1', True), 'value1')
+        self.assertEqual(TagHelper.get_tag_value(resource, 'tag2', True), 'VaLuE2')
+        self.assertEqual(TagHelper.get_tag_value(resource, 'tag3', True), 'VALUE3')

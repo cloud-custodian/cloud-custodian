@@ -731,7 +731,6 @@ class PolicyLambdaProvision(BaseTest):
             {
                 "DeadLetterConfig": {},
                 "Description": "cloud-custodian lambda policy",
-                "Environment": {"Variables": {}},
                 "FunctionName": "custodian-hello",
                 "Handler": "custodian_policy.run",
                 "KMSKeyArn": "",

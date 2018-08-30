@@ -124,7 +124,7 @@ class MetricFilter(Filter):
             resource['id'],
             timespan=self.timespan,
             interval=self.interval,
-            metric=self.metric,
+            metricnames=self.metric,
             aggregation=self.aggregation
         )
         m = [getattr(item, self.aggregation) for item in metrics_data.value[0].timeseries[0].data]

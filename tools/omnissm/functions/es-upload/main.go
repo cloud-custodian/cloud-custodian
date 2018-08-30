@@ -53,10 +53,11 @@ type cloudWatchEvent struct {
 }
 
 type myOutput struct {
-	tags map[string]interface{}
+	Tags map[string]string `yaml:"tags" json:"-"`
 	processObj
 	resourceObj
 }
+
 type tagObj struct {
 	Key   string `json:"Key"`
 	Value string `json:"Value"`
@@ -186,14 +187,20 @@ func processEventRecord(ctx context.Context, bucketName string, bucketKey string
 		}
 
 		output := myOutput{
-			tags:        tags,
+			Tags:        tags,
 			resourceObj: resource,
 			processObj:  process,
 		}
-		_, err := client.Index().
+
+		b, err := json.MarshalIndent(output, "", "  ")
+		if err != nil {
+			return err
+		}
+
+		_, err = client.Index().
 			Index(indexName).
 			Type(typeName).
-			BodyJson(output).
+			BodyJson(string(b)).
 			Do(ctx)
 		if err != nil {
 			return err
@@ -203,10 +210,27 @@ func processEventRecord(ctx context.Context, bucketName string, bucketKey string
 	return nil
 }
 
+//used to flatten the struct sent to es
+func (o myOutput) MarshalJSON() ([]byte, error) {
+
+	type myOutput_ myOutput
+	b, _ := json.Marshal(myOutput_(o))
+
+	var m map[string]json.RawMessage
+	json.Unmarshal(b, &m)
+
+	for k, v := range o.Tags {
+		b, _ = json.Marshal(v)
+		m[k] = json.RawMessage(b)
+	}
+
+	return json.Marshal(m)
+}
+
 //Attempt to pull file from s3 with the same manager id, iterate over returned tags
-func getTags(ctx context.Context, bucketName string, bucketKey string) (map[string]interface{}, error) {
+func getTags(ctx context.Context, bucketName string, bucketKey string) (map[string]string, error) {
 	tagsToGet := strings.Split(requiredTags, ",")
-	var tags map[string]interface{}
+	tags := make(map[string]string)
 	//get tags file from s3
 	tagsRes, err := s3Svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucketName),
@@ -232,7 +256,7 @@ func getTags(ctx context.Context, bucketName string, bucketKey string) (map[stri
 		//search for specific tags
 		for _, tag := range tagsToGet {
 			if aTagObj.Key == tag {
-				tags[aTagObj.Value] = aTagObj.Value
+				tags[aTagObj.Key] = aTagObj.Value
 			}
 
 		}
@@ -258,7 +282,7 @@ func getResourceInfo(ctx context.Context, bucketName string, bucketKey string) (
 		return resource, err
 	}
 
-	err = json.Unmarshal(resourceByteArray, resource)
+	err = json.Unmarshal(resourceByteArray, &resource)
 	if err != nil {
 		return resource, err
 	}

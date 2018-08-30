@@ -15,6 +15,11 @@
 package omnissm
 
 import (
+	"context"
+	"encoding/json"
+	"time"
+
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/pkg/errors"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/s3"
@@ -70,4 +75,75 @@ func New(config *Config) (*OmniSSM, error) {
 	}
 
 	return o, nil
+}
+
+func (o *OmniSSM) RequestActivation(ctx context.Context, req *RegistrationRequest) (*RegistrationResponse, error) {
+	entry, err, ok := o.Registrations.Get(ctx, req.Identity().Hash())
+	if err != nil {
+		return nil, err
+	}
+	if ok && (ssm.IsManagedInstance(entry.ManagedId) || time.Now().Sub(entry.CreatedAt) < 12*time.Hour) {
+		// duplicate request
+		return &RegistrationResponse{RegistrationEntry: *entry, Region: req.Identity().Region, existing: true}, nil
+	}
+	activation, err := o.SSM.CreateActivation(ctx, req.Identity().Name())
+	if err != nil {
+		// if we fail here, defer starting over
+		return nil, o.tryDefer(ctx, err, RequestActivation, req)
+	}
+	entry = &RegistrationEntry{
+		Id:         req.Identity().Hash(),
+		CreatedAt:  time.Now().UTC(),
+		AccountId:  req.Identity().AccountId,
+		Region:     req.Identity().Region,
+		InstanceId: req.Identity().InstanceId,
+		Activation: *activation,
+		ManagedId:  "-",
+	}
+	if err := o.Registrations.Put(ctx, entry); err != nil {
+		// if we fail here, defer saving the created activation to alleviate
+		// pressure on SSM to create it again
+		return nil, o.tryDefer(ctx, err, PutRegistrationEntry, entry)
+	}
+	return &RegistrationResponse{RegistrationEntry: *entry, Region: req.Identity().Region}, nil
+}
+
+func (o *OmniSSM) DeregisterInstance(ctx context.Context, entry *RegistrationEntry) error {
+	if err := o.SSM.DeregisterManagedInstance(ctx, entry.ManagedId); err != nil {
+		// if we fail here, defer starting over
+		return o.tryDefer(ctx, err, DeregisterInstance, entry)
+	}
+	if err := o.Registrations.Delete(ctx, entry.Id); err != nil {
+		// if we fail here, defer starting over
+		return o.tryDefer(ctx, err, DeleteRegistrationEntry, entry.Id)
+	}
+	if o.Config.ResourceDeletedSNSTopic != "" {
+		data, err := json.Marshal(map[string]interface{}{
+			"ManagedId":    entry.ManagedId,
+			"ResourceId":   entry.InstanceId,
+			"AWSAccountId": entry.AccountId,
+			"AWSRegion":    entry.Region,
+		})
+		if err != nil {
+			return errors.Wrap(err, "cannot marshal SNS message")
+		}
+		if err := o.SNS.Publish(ctx, o.Config.ResourceDeletedSNSTopic, data); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (o *OmniSSM) tryDefer(ctx context.Context, err error, t DeferredActionType, value interface{}) error {
+	if o.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
+		sqsErr := o.SQS.Send(ctx, &DeferredActionMessage{
+			Type:  t,
+			Value: value,
+		})
+		if sqsErr != nil {
+			return errors.Wrapf(sqsErr, "could not defer message (original error: %v)", err)
+		}
+		return errors.Wrapf(err, "deferred action to SQS queue (%s)", o.Config.QueueName)
+	}
+	return err
 }
