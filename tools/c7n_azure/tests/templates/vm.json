@@ -95,7 +95,8 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('vmName')]",
       "tags": {
-        "testtag": "testvalue"
+        "testtag": "testvalue",
+        "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
       },
       "location": "[resourceGroup().location]",
       "dependsOn": [

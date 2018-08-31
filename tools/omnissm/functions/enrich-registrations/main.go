@@ -103,19 +103,21 @@ func main() {
 							}
 							tags[k] = v
 						}
-						if err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
+						err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.AddTagsToResource,
 							Value: &ssm.ResourceTags{
 								ManagedId: entry.ManagedId,
 								Tags:      tags,
 							},
-						}); err != nil {
+						})
+						if err == nil {
+							i++
+						} else {
 							log.Info().Err(err).Msg("unable to defer AddTagsToResource")
 						}
-						i++
 					}
 					if !entry.IsInventoried {
-						if err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
+						err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.PutInventory,
 							Value: &ssm.CustomInventory{
 								TypeName:    "Custom:CloudInfo",
@@ -123,16 +125,20 @@ func main() {
 								CaptureTime: ci.ConfigurationItemCaptureTime,
 								Content:     configservice.ConfigurationItemContentMap(*ci),
 							},
-						}); err != nil {
+						})
+						if err == nil {
+							j++
+						} else {
 							log.Info().Err(err).Msg("unable to defer PutInventory")
 						}
-						j++
 					}
 				}
-				log.Info().Str("accountId", accountId).
-					Int("AddTagsToResource", i).
-					Int("PutInventory", j).
-					Msg("enqueued deferred actions")
+				if i+j > 0 {
+					log.Info().Str("accountId", accountId).
+						Int("AddTagsToResource", i).
+						Int("PutInventory", j).
+						Msg("enqueued deferred actions")
+				}
 			}(omni.Config.Copy().WithRegion(region), accountId, entries)
 		}
 		wg.Wait()

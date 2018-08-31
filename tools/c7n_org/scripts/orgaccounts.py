@@ -16,6 +16,7 @@ from __future__ import print_function
 
 import click
 import yaml
+import os
 from c7n.credentials import assumed_session, SessionFactory
 
 ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
@@ -28,7 +29,7 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
     help="Role template for accounts in the config, defaults to %s" % ROLE_TEMPLATE)
 @click.option('--ou', multiple=True, default=["/"],
               help="Only export the given subtrees of an organization")
-@click.option('-r', '--region', multiple=True,
+@click.option('-r', '--regions', multiple=True,
               help="If specified, set regions per account in config")
 @click.option('--assume', help="Role to assume for Credentials")
 @click.option('--profile', help="AWS CLI Profile to use for Credentials")
@@ -36,14 +37,14 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
     '-f', '--output', type=click.File('w'),
     help="File to store the generated config (default stdout)")
 @click.option('-a', '--active', default=False, help="Get only active accounts", type=click.BOOL)
-def main(role, ou, assume, profile, output, region, active):
+def main(role, ou, assume, profile, output, regions, active):
     """Generate a c7n-org accounts config file using AWS Organizations
 
     With c7n-org you can then run policies or arbitrary scripts across
     accounts.
     """
 
-    session = get_session(assume, 'c7n-org', profile, region)
+    session = get_session(assume, 'c7n-org', profile)
     client = session.client('organizations')
     accounts = []
     for path in ou:
@@ -63,8 +64,8 @@ def main(role, ou, assume, profile, output, region, active):
             'name': a['Name'],
             'tags': tags,
             'role': role.format(**a)}
-        if region:
-            ainfo['regions'] = region
+        if regions:
+            ainfo['regions'] = regions
         results.append(ainfo)
 
     print(
@@ -74,7 +75,8 @@ def main(role, ou, assume, profile, output, region, active):
         file=output)
 
 
-def get_session(role, session_name, profile, region):
+def get_session(role, session_name, profile):
+    region = os.environ.get('AWS_DEFAULT_REGION', 'eu-west-1')
     if role:
         return assumed_session(role, session_name, region=region)
     else:

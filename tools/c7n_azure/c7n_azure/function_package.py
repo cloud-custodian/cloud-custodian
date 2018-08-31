@@ -184,12 +184,13 @@ class FunctionPackage(object):
         # cffi module needs special handling
         self._add_cffi_module()
 
-    def wait_for_status(self, app_name, retries=5, delay=15):
+    def wait_for_status(self, app_name, retries=10, delay=15):
         for r in range(retries):
             if self.status(app_name):
                 return True
             else:
-                self.log.info('Will retry Function App status check in %s seconds...' % delay)
+                self.log.info('(%s/%s) Will retry Function App status check in %s seconds...'
+                              % (r + 1, retries, delay))
                 time.sleep(delay)
         return False
 

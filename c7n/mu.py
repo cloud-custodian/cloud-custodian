@@ -595,11 +595,13 @@ class AbstractLambdaFunction:
             'Handler': self.handler,
             'Timeout': self.timeout,
             'TracingConfig': self.tracing_config,
-            'Environment': self.environment,
             'KMSKeyArn': self.kms_key_arn,
             'DeadLetterConfig': self.dead_letter_config,
             'VpcConfig': LAMBDA_EMPTY_VALUES['VpcConfig'],
             'Tags': self.tags}
+
+        if self.environment['Variables']:
+            conf['Environment'] = self.environment
 
         if self.subnets and self.security_groups:
             conf['VpcConfig'] = {
