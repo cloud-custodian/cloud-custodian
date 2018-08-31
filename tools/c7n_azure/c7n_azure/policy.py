@@ -102,6 +102,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
         archive.build(self.policy.data)
         archive.close()
 
+        self.log.info("Function package built")
+
         if archive.wait_for_status(self.webapp_name):
             archive.publish(self.webapp_name)
         else:
@@ -180,12 +182,19 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def provision(self):
         super(AzureEventGridMode, self).provision()
+
         key = self._get_webhook_key()
         webhook_url = 'https://%s.azurewebsites.net/api/%s?code=%s' % (self.webapp_name,
                                                                        self.policy_name, key)
         destination = WebHookEventSubscriptionDestination(
             endpoint_url=webhook_url
         )
+
+        self._provision_eventgrid_subscription(destination)
+
+
+    def _provision_eventgrid_subscription(self, destination):
+        self.log.info("Provisoning EventGrid ARM Subscription")
         event_filter = EventSubscriptionFilter()
         event_info = EventSubscription(destination=destination, filter=event_filter)
         scope = '/subscriptions/%s' % self.session.subscription_id
