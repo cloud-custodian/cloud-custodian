@@ -66,6 +66,8 @@ class ExecutionContext(object):
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
+        if exc_type is not None:
+            self.metrics.put_metric('PolicyException', 1, "Count")
         self.metrics.flush()
         # clear policy execution thread local session cache
         reset_session_cache()

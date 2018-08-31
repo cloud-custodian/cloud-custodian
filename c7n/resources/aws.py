@@ -28,7 +28,11 @@ from c7n import utils
 
 log = logging.getLogger('custodian.aws')
 
-
+try:
+    from aws_xray_sdk.core import xray_recorder
+    HAVE_XRAY = True
+except ImportError:
+    HAVE_XRAY = False
 _profile_session = None
 
 
@@ -79,6 +83,42 @@ def _default_account_id(options):
         options.account_id = None
 
 
+class XrayEmitter(object):
+
+    def __init__(self):
+        self.buf = []
+
+    def send_entity(self, entity):
+        self.buf.append(entity)
+
+    def flush(self, client):
+        pass
+
+
+class Xray(object):
+
+    emitter = XrayEmitter()
+
+    if HAVE_XRAY:
+        xray_recorder.configure(
+            emitter=emitter
+        )
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+        self.emitter = XrayEmitter()
+
+    def __enter__(self):
+        # TODO lambda
+        p = self.ctx.policy
+        self.segment = xray_recorder.begin_segment(p.name)
+        # TODO difference metadata/annotation
+        self.segment.put_annotation('resource', p.resource)
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        xray_recorder.end_segment()
+
+
 class ApiStats(object):
 
     def __init__(self, ctx):
@@ -92,7 +132,7 @@ class ApiStats(object):
         self.ctx.session_factory.set_subscribers(())
         log.info("api calls \n %s", (dict(self.api_calls),))
         self.ctx.metrics.put_metric(
-            "ApiCalls", sum(self.api_calls.values()), "Count", Scope="Policy")
+            "ApiCalls", sum(self.api_calls.values()), "Count")
         self.ctx.output._write_file(
             'api-stats.json', utils.dumps(dict(self.api_calls)))
 
