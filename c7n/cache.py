@@ -53,6 +53,9 @@ class NullCache(object):
     def save(self, key, data):
         pass
 
+    def size(self):
+        return 0
+
 
 class InMemoryCache(object):
     # Running in a temporary environment, so keep as a cache.
@@ -70,6 +73,9 @@ class InMemoryCache(object):
 
     def save(self, key, data):
         self.data[pickle.dumps(key)] = data
+
+    def size(self):
+        return sum(map(len, self.data.values()))
 
 
 class FileCacheManager(object):
@@ -118,3 +124,6 @@ class FileCacheManager(object):
                 except Exception as e:
                     log.warning("Could not create directory: %s err: %s" % (
                         directory, e))
+
+    def size(self):
+        pass

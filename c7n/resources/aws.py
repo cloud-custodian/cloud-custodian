@@ -29,11 +29,18 @@ from c7n import utils
 log = logging.getLogger('custodian.aws')
 
 try:
-    from aws_xray_sdk.core import xray_recorder
+    from aws_xray_sdk.core import xray_recorder, patch
     HAVE_XRAY = True
 except ImportError:
     HAVE_XRAY = False
 _profile_session = None
+
+
+try:
+    import psutil
+    HAVE_PSUTIL = True
+except ImportError:
+    HAVE_PSUTIL = False
 
 
 def get_profile_session(options):
@@ -92,31 +99,100 @@ class XrayEmitter(object):
         self.buf.append(entity)
 
     def flush(self, client):
-        pass
+        client.put_trace_segments(
+            TraceSegmentDocuments=[
+                s.serialize() for s in self.buf])
+        self.buf = []
 
 
-class Xray(object):
+class XrayTracer(object):
 
     emitter = XrayEmitter()
 
+    in_lambda = 'LAMBDA_TASK_ROOT' in os.environ
+    use_daemon = 'AWS_XRAY_DAEMON_ADDRESS' in os.environ
+
     if HAVE_XRAY:
         xray_recorder.configure(
-            emitter=emitter
+            emitter=use_daemon is False and emitter or None,
+            sampling=False
         )
+        patch(['boto3', 'requests'])
 
     def __init__(self, ctx):
         self.ctx = ctx
         self.emitter = XrayEmitter()
+        self.client = self.ctx.session_factory(
+            assume=False).client('xray')
+        self.metadata = {}
 
     def __enter__(self):
-        # TODO lambda
         p = self.ctx.policy
-        self.segment = xray_recorder.begin_segment(p.name)
-        # TODO difference metadata/annotation
-        self.segment.put_annotation('resource', p.resource)
+        if self.in_lambda:
+            self.segment = xray_recorder.begin_segment(p.name)
+        else:
+            self.segment = xray_recorder.begin_subsegment(p.name)
+        xray_recorder.put_annotation('policy', p.name)
+        xray_recorder.put_annotation('resource', p.resource)
+        xray_recorder.put_annotation('account', self.ctx.account_id)
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        if self.metadata:
+            xray_recorder.put_metadata('custodian', self.metadata)
+        if self.in_lambda:
+            xray_recorder.end_subsegment()
+            return
         xray_recorder.end_segment()
+        if not self.use_daemon:
+            self.emitter.flush(self.client)
+
+
+class SystemStats(object):
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+        self.snapshot = None
+        self.process = psutil.Process(os.getpid())
+
+    def __enter__(self):
+        self.snapshot = self.get_snapshot()
+
+    def __exit__(self):
+        delta = self.delta(self.snapshot, self.get_snapshot())
+        log.info("Process stats: %s", delta)
+
+    def delta(self, before, after):
+        delta = {}
+        for k in before:
+            delta[k] = after[k] - before[k]
+        return delta
+
+    def get_snapshot(self):
+        snapshot = {
+            'num_threads': self.process.num_threads(),
+            'num_fds': self.process.num_fds(),
+            'snapshot_time': time.time(),
+            }
+
+        with self.process.oneshot():
+            cpu_time = self.process.cpu_times()
+            snapshot['cpu_user'] = cpu_time.user
+            snapshot['cpu_system'] = cpu_times.system
+            (snapshot['num_ctx_switches_voluntary'],
+                snapshot['num_ctx_switches_involuntary']) = p.num_ctx_switches()
+            # io counters
+            io = self.process.io_counters()
+            for counter in (
+                    'read_count', 'write_count',
+                    'write_bytes', 'read_bytes',
+                    ):
+                snapshot[counter] = getattr(io, counter)
+            # memory counters
+            mem = self.process.memory_info()
+            for counter in (
+                    'rss', 'vms', 'shared', 'text', 'data', 'lib'):
+                snapshot[counter] = getattr(mem, counter)
+        return snapshot
 
 
 class ApiStats(object):
@@ -133,7 +209,7 @@ class ApiStats(object):
         log.info("api calls \n %s", (dict(self.api_calls),))
         self.ctx.metrics.put_metric(
             "ApiCalls", sum(self.api_calls.values()), "Count")
-        self.ctx.output._write_file(
+        self.ctx.policy._write_file(
             'api-stats.json', utils.dumps(dict(self.api_calls)))
 
     def __call__(self, s):

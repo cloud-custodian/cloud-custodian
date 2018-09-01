@@ -16,9 +16,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 
 from c7n.output import FSOutput, MetricsOutput, CloudWatchLogOutput
-from c7n.utils import reset_session_cache
+from c7n.utils import reset_session_cache, dumps
 
-from c7n.resources.aws import ApiStats
+from c7n.resources.aws import ApiStats, SystemStats, XrayTracer
 
 
 class ExecutionContext(object):
@@ -48,6 +48,9 @@ class ExecutionContext(object):
             self.cloudwatch_logs = CloudWatchLogOutput(self)
 
         self.api_stats = ApiStats(self)
+        self.tracer = XrayTracer(self)
+        self.sys_stats = SystemStats(self)
+        self.execution_id = None
 
     @property
     def log_dir(self):
@@ -55,16 +58,22 @@ class ExecutionContext(object):
             return self.output.root_dir
 
     def __enter__(self):
+        self.execution_id = str(uuid.uuid4())
+        if self.sys_stats:
+            self.sys_stats.__enter__()
         if self.output:
             self.output.__enter__()
         if self.cloudwatch_logs:
             self.cloudwatch_logs.__enter__()
         if self.api_stats:
             self.api_stats.__enter__()
+        if self.tracer:
+            self.tracer.__enter__()
         self.start_time = time.time()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        self.policy._write_file('metadata.json', dumps(self.get_metadata()))
         self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
         if exc_type is not None:
             self.metrics.put_metric('PolicyException', 1, "Count")
@@ -76,3 +85,18 @@ class ExecutionContext(object):
             self.cloudwatch_logs = None
         if self.output:
             self.output.__exit__(exc_type, exc_value, exc_traceback)
+
+    def get_metadata(self):
+        md = {
+            'policy': self.policy.data,
+            'execution-id': self.execution_id,
+            'config': dict(self.options)
+        }
+
+        if self.sys_stats:
+            md['sys-stats'] = self.sys_stats.get_metadata()
+        if self.api_stats:
+            md['api-stats'] = self.api_stats.get_metadata()
+        if self.metrics:
+            md['metrics'] = self.metrics.get_metadata()
+        return md

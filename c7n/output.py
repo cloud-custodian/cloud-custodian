@@ -76,6 +76,9 @@ class MetricsOutput(object):
         else:
             return datetime.datetime.now()
 
+    def get_metadata(self):
+        return list(self.buf)
+
     def flush(self):
         if self.buf:
             self._put_metrics(self.namespace, self.buf)
