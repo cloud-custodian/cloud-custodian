@@ -77,7 +77,12 @@ class MetricsOutput(object):
             return datetime.datetime.now()
 
     def get_metadata(self):
-        return list(self.buf)
+        res = []
+        for k in self.buf:
+            k = dict(k)
+            k.pop('Dimensions', None)
+            res.append(k)
+        return res
 
     def flush(self):
         if self.buf:

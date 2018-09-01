@@ -21,7 +21,6 @@ import itertools
 import logging
 import os
 import time
-import uuid
 
 import jmespath
 import six
@@ -270,7 +269,8 @@ class PullMode(PolicyExecutionMode):
             at = time.time()
             for a in self.policy.resource_manager.actions:
                 s = time.time()
-                results = a.process(resources)
+                with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+                    results = a.process(resources)
                 self.policy.log.info(
                     "policy: %s action: %s"
                     " resources: %d"

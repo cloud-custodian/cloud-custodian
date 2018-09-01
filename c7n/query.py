@@ -417,9 +417,13 @@ class QueryResourceManager(ResourceManager):
         if query is None:
             query = {}
 
-        resources = self.augment(self.source.resources(query))
+        with self.ctx.tracer.subsegment('resource-fetch'):
+            resources = self.source.resources(query)
+        with self.ctx.tracer.subsegment('resource-augment'):
+            resources = self.augment(resources)
         self._cache.save(key, resources)
-        return self.filter_resources(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            return self.filter_resources(resources)
 
     def _get_cached_resources(self, ids):
         key = self.get_cache_key(None)

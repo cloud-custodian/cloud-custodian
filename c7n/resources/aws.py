@@ -15,9 +15,13 @@
 from c7n.provider import clouds
 
 from collections import Counter
+import contextlib
 import copy
 import itertools
 import logging
+import os
+import time
+import traceback
 import sys
 
 import boto3
@@ -30,8 +34,11 @@ log = logging.getLogger('custodian.aws')
 
 try:
     from aws_xray_sdk.core import xray_recorder, patch
+    from aws_xray_sdk.core.context import Context
+    from aws_xray_sdk.core.sampling.local.sampler import LocalSampler
     HAVE_XRAY = True
 except ImportError:
+    raise
     HAVE_XRAY = False
 _profile_session = None
 
@@ -94,15 +101,50 @@ class XrayEmitter(object):
 
     def __init__(self):
         self.buf = []
+        self.client = None
 
     def send_entity(self, entity):
+        #print('send entity %s', entity.serialize())
         self.buf.append(entity)
+        if len(self.buf) > 49:
+            pass
 
     def flush(self, client):
-        client.put_trace_segments(
-            TraceSegmentDocuments=[
-                s.serialize() for s in self.buf])
+        buf = self.buf
         self.buf = []
+        #print('flush %d' % (len(buf,)))
+        for segment_set in utils.chunks(buf, 50):
+            client.put_trace_segments(
+                TraceSegmentDocuments=[
+                    s.serialize() for s in segment_set])
+
+
+class XrayContext(Context):
+
+    sampler = LocalSampler()
+
+    def put_subsegment(self, subsegment):
+        """Use sampling for aws api call subsegments.
+
+        We want to record every policy execution. However some policies
+        may have thousands of resources and api calls.
+
+        Exception traces should always propagate.
+        """
+        # print('put sub %s' % subsegment.serialize())
+        if subsegment.namespace == 'aws' and not subsegment.cause:
+            decision = self.sampler.should_trace({})
+            print('decision %s' % decision)
+            if not decision:
+                return
+        return super(XrayContext, self).put_subsegment(subsegment)
+
+    def handle_context_missing(self):
+        """Custodian has a few api calls out of band of policy execution.
+
+        - Resolving account alias.
+        - Cloudwatch Log group/stream discovery/creation (when using -l on cli)
+        """
 
 
 class XrayTracer(object):
@@ -115,30 +157,50 @@ class XrayTracer(object):
     if HAVE_XRAY:
         xray_recorder.configure(
             emitter=use_daemon is False and emitter or None,
-            sampling=False
+            context=XrayContext(),
+            sampling=True,
+            context_missing='LOG_ERROR'
         )
         patch(['boto3', 'requests'])
+        logging.getLogger('aws_xray_sdk.core').setLevel(logging.ERROR)
 
     def __init__(self, ctx):
         self.ctx = ctx
-        self.emitter = XrayEmitter()
-        self.client = self.ctx.session_factory(
-            assume=False).client('xray')
+        self.client = None
         self.metadata = {}
 
+    @contextlib.contextmanager
+    def subsegment(self, name):
+        segment = xray_recorder.begin_subsegment(name)
+        try:
+            yield segment
+        except Exception as e:
+            stack = traceback.extract_stack(limit=xray_recorder.max_trace_back)
+            segment.add_exception(e, stack)
+            raise
+        finally:
+            xray_recorder.end_subsegment(time.time())
+
     def __enter__(self):
+        if self.client is None:
+            self.client = self.ctx.session_factory(assume=False).client('xray')
+
+        self.emitter.client = self.client
         p = self.ctx.policy
+        service_name = 'custodian'
         if self.in_lambda:
-            self.segment = xray_recorder.begin_segment(p.name)
+            self.segment = xray_recorder.begin_subsegment(service_name)
         else:
-            self.segment = xray_recorder.begin_subsegment(p.name)
+            self.segment = xray_recorder.begin_segment(service_name, sampling=True)
         xray_recorder.put_annotation('policy', p.name)
-        xray_recorder.put_annotation('resource', p.resource)
-        xray_recorder.put_annotation('account', self.ctx.account_id)
+        xray_recorder.put_annotation('resource', p.resource_type)
+        if self.ctx.options.account_id:
+            xray_recorder.put_annotation('account', self.ctx.options.account_id)
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        if self.metadata:
-            xray_recorder.put_metadata('custodian', self.metadata)
+        metadata = self.ctx.get_metadata(('api-stats',))
+        metadata.update(self.metadata)
+        xray_recorder.put_metadata('custodian', metadata)
         if self.in_lambda:
             xray_recorder.end_subsegment()
             return
@@ -158,14 +220,16 @@ class SystemStats(object):
         self.snapshot = self.get_snapshot()
 
     def __exit__(self):
-        delta = self.delta(self.snapshot, self.get_snapshot())
-        log.info("Process stats: %s", delta)
+        self.snapshot = None
 
     def delta(self, before, after):
         delta = {}
         for k in before:
             delta[k] = after[k] - before[k]
         return delta
+
+    def get_metadata(self):
+        return self.delta(self.snapshot, self.get_snapshot())
 
     def get_snapshot(self):
         snapshot = {
@@ -177,21 +241,23 @@ class SystemStats(object):
         with self.process.oneshot():
             cpu_time = self.process.cpu_times()
             snapshot['cpu_user'] = cpu_time.user
-            snapshot['cpu_system'] = cpu_times.system
+            snapshot['cpu_system'] = cpu_time.system
             (snapshot['num_ctx_switches_voluntary'],
-                snapshot['num_ctx_switches_involuntary']) = p.num_ctx_switches()
-            # io counters
-            io = self.process.io_counters()
-            for counter in (
-                    'read_count', 'write_count',
-                    'write_bytes', 'read_bytes',
-                    ):
-                snapshot[counter] = getattr(io, counter)
+                snapshot['num_ctx_switches_involuntary']) = self.process.num_ctx_switches()
+            # io counters ( not available on osx)
+            if getattr(self.process, 'io_counters', None):
+                io = self.process.io_counters()
+                for counter in (
+                        'read_count', 'write_count',
+                        'write_bytes', 'read_bytes'):
+                    snapshot[counter] = getattr(io, counter)
             # memory counters
             mem = self.process.memory_info()
             for counter in (
-                    'rss', 'vms', 'shared', 'text', 'data', 'lib'):
-                snapshot[counter] = getattr(mem, counter)
+                    'rss', 'vms', 'shared', 'text', 'data', 'lib', 'pfaults', 'pageins'):
+                v = getattr(mem, counter, None)
+                if v is not None:
+                    snapshot[counter] = v
         return snapshot
 
 
@@ -200,6 +266,9 @@ class ApiStats(object):
     def __init__(self, ctx):
         self.ctx = ctx
         self.api_calls = Counter()
+
+    def get_metadata(self):
+        return dict(self.api_calls)
 
     def __enter__(self):
         self.ctx.session_factory.set_subscribers((self,))

@@ -88,7 +88,10 @@ class ResourceManager(object):
             if not resources:
                 break
             rcount = len(resources)
-            resources = f.process(resources, event)
+
+            with self.ctx.tracer.subsegment("filter:%s" % f.type):
+                resources = f.process(resources, event)
+
             if event and event.get('debug', False):
                 self.log.debug(
                     "applied filter %s %d->%d", f, rcount, len(resources))

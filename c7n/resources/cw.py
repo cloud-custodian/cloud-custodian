@@ -247,7 +247,6 @@ class LastWriteDays(Filter):
         return super(LastWriteDays, self).process(resources)
 
     def __call__(self, group):
-        self.log.debug("Processing group %s", group['logGroupName'])
         logs = local_session(self.manager.session_factory).client('logs')
         streams = logs.describe_log_streams(
             logGroupName=group['logGroupName'],
@@ -282,7 +281,7 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
         client = local_session(self.manager.session_factory).client('logs')
         accounts = self.get_accounts()
         results = []
-        with self.executor_factory(max_workers=2) as w:
+        with self.executor_factory(max_workers=1) as w:
             futures = []
             for rset in chunks(resources, 50):
                 futures.append(
