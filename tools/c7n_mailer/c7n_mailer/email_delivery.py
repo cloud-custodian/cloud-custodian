@@ -104,16 +104,22 @@ class EmailDelivery(object):
 
     def get_event_owner_email(self, targets, event):
         self.logger.debug('getting owner email')
-        if 'event-owner' in targets and self.config.get('ldap_uri', False):
-            self.logger.debug('ldap_uri is: %s.', self.config.get('ldap_uri', False))
+        if 'event-owner' in targets:
+            self.logger.debug('event owner field in targets')
             aws_username = self.get_aws_username_from_event(event)
             if aws_username:
-                return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
-        elif 'event-owner' in targets and self.config.get('org_domain', False):
-            self.logger.debug('org_domain is: %s.', self.config.get('org_domain', False))
-            aws_username = self.get_aws_username_from_event(event)
-            if aws_username:
-                ['aws_username'+ self.config.get('org_domain', False)]
+                if self.config.get('ldap_uri', False):
+                    self.logger.debug('ldap_uri is: %s.', self.config.get('ldap_uri', False))
+                    return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
+                elif self.config.get('org_domain', False):
+                    org_domain = self.config.get('org_domain', False)
+                    self.logger.debug('org_domain is: %s.', org_domain)
+                    self.logger.info('adding email %s to targets.', aws_username+'@'+org_domain)
+                    return [aws_username+'@'+org_domain]
+                else:
+                    self.logger.warning('unable to lookup owner email. Please configure LDAP or org_domain')
+            else:
+                self.logger.info('no aws username in event')
         return []
 
     def get_ldap_emails_from_resource(self, sqs_message, resource):
