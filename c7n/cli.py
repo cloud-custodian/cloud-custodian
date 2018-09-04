@@ -293,6 +293,11 @@ def setup_parser():
         "-m", "--metrics-enabled",
         default=None, nargs="?", const="aws",
         help="Emit metrics to provider metrics")
+    run.add_argument(
+        "--trace",
+        dest="tracer",
+        help=argparse.SUPPRESS,
+        default=None, nargs="?", const="default")
 
     return parser
 

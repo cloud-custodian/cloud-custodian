@@ -83,8 +83,8 @@ class TestUtils(unittest.TestCase):
             self.context_output_dir = self.get_temp_dir()
             config = Config.empty(output_dir=self.context_output_dir)
         ctx = ExecutionContext(
-            session_factory, policy or Bag({"name": "test-policy"}), config
-        )
+            session_factory, policy or Bag({
+                "name": "test-policy", "provider_name": "aws"}), config)
         return ctx
 
     def load_policy(

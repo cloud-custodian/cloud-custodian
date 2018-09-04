@@ -17,16 +17,38 @@ from c7n.provider import clouds
 from collections import Counter
 import contextlib
 import copy
+import datetime
 import itertools
 import logging
 import os
+import tempfile
 import time
 import traceback
+import shutil
 import sys
 
 import boto3
 
 from c7n.credentials import SessionFactory
+from c7n.log import CloudWatchLogHandler
+
+# Import output registries aws provider extends.
+from c7n.output import (
+    api_stats_outputs,
+    blob_outputs,
+    log_outputs,
+    metrics_outputs,
+    tracer_outputs
+)
+
+# Output base implementations we extend.
+from c7n.output import (
+    DefaultMetrics,
+    DeltaStats,
+    DirectoryOutput,
+    LogOutput,
+)
+
 from c7n.registry import PluginRegistry
 from c7n import utils
 
@@ -43,11 +65,7 @@ except ImportError:
 _profile_session = None
 
 
-try:
-    import psutil
-    HAVE_PSUTIL = True
-except ImportError:
-    HAVE_PSUTIL = False
+DEFAULT_NAMESPACE = "CloudMaid"
 
 
 def get_profile_session(options):
@@ -97,6 +115,68 @@ def _default_account_id(options):
         options.account_id = None
 
 
+@metrics_outputs.register('aws')
+class MetricsOutput(DefaultMetrics):
+    """Send metrics data to cloudwatch
+    """
+
+    permissions = ("cloudWatch:PutMetricData",)
+    retry = staticmethod(utils.get_retry(('Throttling',)))
+
+    def __init__(self, ctx, config=None):
+        super(MetricsOutput, self).__init__(self, ctx, config)
+        self.namespace = self.config.get('namespace', DEFAULT_NAMESPACE)
+
+    def get_timestamp(self):
+        """
+        Now, if C7N_METRICS_TZ is set to TRUE, UTC timestamp will be used.
+        For backwards compatibility, if it is not set, UTC will be the default.
+        To disable this and use the system's time zone, C7N_METRICS_TZ shoule be set to FALSE.
+        """
+
+        if os.getenv("C7N_METRICS_TZ", '').lower() in ('true', '1', 'yes'):
+            return datetime.datetime.now()
+        else:
+            return datetime.datetime.utcnow()
+
+    def _format_metric(self, key, value, unit, dimensions):
+        d = {
+            "MetricName": key,
+            "Timestamp": self.get_timestamp(),
+            "Value": value,
+            "Unit": unit}
+        d["Dimensions"] = [
+            {"Name": "Policy", "Value": self.ctx.policy.name},
+            {"Name": "ResType", "Value": self.ctx.policy.resource_type}]
+        for k, v in dimensions.items():
+            d['Dimensions'].append({"Name": k, "Value": v})
+        return d
+
+    def _put_metrics(self, ns, metrics):
+        watch = utils.local_session(self.ctx.session_factory).client('cloudwatch')
+        return self.retry(
+            watch.put_metric_data, Namespace=ns, MetricData=metrics)
+
+
+@log_outputs.register('aws')
+class CloudWatchLogOutput(LogOutput):
+
+    log_format = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+
+    def get_handler(self):
+        return CloudWatchLogHandler(
+            log_group=self.ctx.options.log_group,
+            log_stream=self.ctx.policy.name,
+            session_factory=lambda x=None: self.ctx.session_factory(
+                assume=False))
+
+    def __repr__(self):
+        return "<%s to group:%s stream:%s>" % (
+            self.__class__.__name__,
+            self.ctx.options.log_group,
+            self.ctx.policy.name)
+
+
 class XrayEmitter(object):
 
     def __init__(self):
@@ -104,15 +184,15 @@ class XrayEmitter(object):
         self.client = None
 
     def send_entity(self, entity):
-        #print('send entity %s', entity.serialize())
+        # print('send entity %s', entity.serialize())
         self.buf.append(entity)
         if len(self.buf) > 49:
-            pass
+            self.flush()
 
     def flush(self, client):
         buf = self.buf
         self.buf = []
-        #print('flush %d' % (len(buf,)))
+        # print('flush %d' % (len(buf,)))
         for segment_set in utils.chunks(buf, 50):
             client.put_trace_segments(
                 TraceSegmentDocuments=[
@@ -121,7 +201,9 @@ class XrayEmitter(object):
 
 class XrayContext(Context):
 
-    sampler = LocalSampler()
+    def __init__(self, *args, **kw):
+        super(XrayContext, self).__init__(*args, **kw)
+        self.sampler = LocalSampler()
 
     def put_subsegment(self, subsegment):
         """Use sampling for aws api call subsegments.
@@ -130,11 +212,11 @@ class XrayContext(Context):
         may have thousands of resources and api calls.
 
         Exception traces should always propagate.
+
+        Using default sampling rule, 1/s reservoir, 5% of remainder.
         """
-        # print('put sub %s' % subsegment.serialize())
         if subsegment.namespace == 'aws' and not subsegment.cause:
-            decision = self.sampler.should_trace({})
-            print('decision %s' % decision)
+            decision = self.sampler.should_trace(None)
             if not decision:
                 return
         return super(XrayContext, self).put_subsegment(subsegment)
@@ -147,12 +229,14 @@ class XrayContext(Context):
         """
 
 
+@tracer_outputs.register('xray', condition=HAVE_XRAY)
 class XrayTracer(object):
 
     emitter = XrayEmitter()
 
     in_lambda = 'LAMBDA_TASK_ROOT' in os.environ
     use_daemon = 'AWS_XRAY_DAEMON_ADDRESS' in os.environ
+    service_name = 'custodian'
 
     if HAVE_XRAY:
         xray_recorder.configure(
@@ -164,14 +248,16 @@ class XrayTracer(object):
         patch(['boto3', 'requests'])
         logging.getLogger('aws_xray_sdk.core').setLevel(logging.ERROR)
 
-    def __init__(self, ctx):
+    def __init__(self, ctx, config):
         self.ctx = ctx
+        self.config = config or {}
         self.client = None
         self.metadata = {}
 
     @contextlib.contextmanager
     def subsegment(self, name):
         segment = xray_recorder.begin_subsegment(name)
+        self.ctx.api_stats.push_snapshot()
         try:
             yield segment
         except Exception as e:
@@ -179,6 +265,7 @@ class XrayTracer(object):
             segment.add_exception(e, stack)
             raise
         finally:
+            segment.put_metadata('api-stats', self.ctx.api_stats.pop_snapshot())
             xray_recorder.end_subsegment(time.time())
 
     def __enter__(self):
@@ -186,12 +273,14 @@ class XrayTracer(object):
             self.client = self.ctx.session_factory(assume=False).client('xray')
 
         self.emitter.client = self.client
-        p = self.ctx.policy
-        service_name = 'custodian'
+
         if self.in_lambda:
-            self.segment = xray_recorder.begin_subsegment(service_name)
+            self.segment = xray_recorder.begin_subsegment(self.service_name)
         else:
-            self.segment = xray_recorder.begin_segment(service_name, sampling=True)
+            self.segment = xray_recorder.begin_segment(
+                self.service_name, sampling=True)
+
+        p = self.ctx.policy
         xray_recorder.put_annotation('policy', p.name)
         xray_recorder.put_annotation('resource', p.resource_type)
         if self.ctx.options.account_id:
@@ -209,66 +298,19 @@ class XrayTracer(object):
             self.emitter.flush(self.client)
 
 
-class SystemStats(object):
+@api_stats_outputs.register('aws')
+class ApiStats(DeltaStats):
 
-    def __init__(self, ctx):
+    def __init__(self, ctx, config=None):
         self.ctx = ctx
-        self.snapshot = None
-        self.process = psutil.Process(os.getpid())
-
-    def __enter__(self):
-        self.snapshot = self.get_snapshot()
-
-    def __exit__(self):
-        self.snapshot = None
-
-    def delta(self, before, after):
-        delta = {}
-        for k in before:
-            delta[k] = after[k] - before[k]
-        return delta
-
-    def get_metadata(self):
-        return self.delta(self.snapshot, self.get_snapshot())
-
-    def get_snapshot(self):
-        snapshot = {
-            'num_threads': self.process.num_threads(),
-            'num_fds': self.process.num_fds(),
-            'snapshot_time': time.time(),
-            }
-
-        with self.process.oneshot():
-            cpu_time = self.process.cpu_times()
-            snapshot['cpu_user'] = cpu_time.user
-            snapshot['cpu_system'] = cpu_time.system
-            (snapshot['num_ctx_switches_voluntary'],
-                snapshot['num_ctx_switches_involuntary']) = self.process.num_ctx_switches()
-            # io counters ( not available on osx)
-            if getattr(self.process, 'io_counters', None):
-                io = self.process.io_counters()
-                for counter in (
-                        'read_count', 'write_count',
-                        'write_bytes', 'read_bytes'):
-                    snapshot[counter] = getattr(io, counter)
-            # memory counters
-            mem = self.process.memory_info()
-            for counter in (
-                    'rss', 'vms', 'shared', 'text', 'data', 'lib', 'pfaults', 'pageins'):
-                v = getattr(mem, counter, None)
-                if v is not None:
-                    snapshot[counter] = v
-        return snapshot
-
-
-class ApiStats(object):
-
-    def __init__(self, ctx):
-        self.ctx = ctx
+        self.config = config or {}
         self.api_calls = Counter()
 
-    def get_metadata(self):
+    def get_snapshot(self):
         return dict(self.api_calls)
+
+    def get_metadata(self):
+        return self.get_snapshot()
 
     def __enter__(self):
         self.ctx.session_factory.set_subscribers((self,))
@@ -289,6 +331,68 @@ class ApiStats(object):
         self.api_calls["%s.%s" % (
             model.service_model.endpoint_prefix,
             model.name)] += 1
+
+
+@blob_outputs.register('s3')
+class S3Output(DirectoryOutput):
+    """
+    Usage:
+
+    .. code-block:: python
+
+       with S3Output(session_factory, 's3://bucket/prefix'):
+           log.info('xyz')  # -> log messages sent to custodian-run.log.gz
+
+    """
+
+    permissions = ('S3:PutObject',)
+
+    def __init__(self, ctx, config):
+        self.ctx = ctx
+        self.config = config
+        self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
+        self.s3_path, self.bucket, self.key_prefix = utils.parse_s3(
+            self.config['url'])
+        self.root_dir = tempfile.mkdtemp()
+        self.transfer = None
+
+    def __repr__(self):
+        return "<%s to bucket:%s prefix:%s>" % (
+            self.__class__.__name__,
+            self.bucket,
+            "%s/%s" % (self.key_prefix, self.date_path))
+
+    @staticmethod
+    def join(*parts):
+        return "/".join([s.strip('/') for s in parts])
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        from boto3.s3.transfer import S3Transfer
+        if exc_type is not None:
+            log.exception("Error while executing policy")
+        log.debug("Uploading policy logs")
+        self.leave_log()
+        self.compress()
+        self.transfer = S3Transfer(
+            self.ctx.session_factory(assume=False).client('s3'))
+        self.upload()
+        shutil.rmtree(self.root_dir)
+        log.debug("Policy Logs uploaded")
+
+    def upload(self):
+        for root, dirs, files in os.walk(self.root_dir):
+            for f in files:
+                key = "%s/%s%s" % (
+                    self.key_prefix,
+                    self.date_path,
+                    "%s/%s" % (
+                        root[len(self.root_dir):], f))
+                key = key.strip('/')
+                self.transfer.upload_file(
+                    os.path.join(root, f), self.bucket, key,
+                    extra_args={
+                        'ACL': 'bucket-owner-full-control',
+                        'ServerSideEncryption': 'AES256'})
 
 
 @clouds.register('aws')

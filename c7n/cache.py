@@ -126,4 +126,4 @@ class FileCacheManager(object):
                         directory, e))
 
     def size(self):
-        pass
+        return os.path.getsize(self.cache_path)

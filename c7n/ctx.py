@@ -16,11 +16,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 import uuid
 
-from c7n.output import FSOutput, MetricsOutput, CloudWatchLogOutput
+from c7n.output import (
+    api_stats_outputs,
+    blob_outputs,
+    log_outputs,
+    metrics_outputs,
+    sys_stats_outputs,
+    tracer_outputs)
+
 from c7n.utils import reset_session_cache, dumps
 from c7n.version import version
-
-from c7n.resources.aws import ApiStats, SystemStats, XrayTracer
 
 
 class ExecutionContext(object):
@@ -30,29 +35,23 @@ class ExecutionContext(object):
         self.policy = policy
         self.options = options
         self.session_factory = session_factory
-        self.cloudwatch_logs = None
-        self.api_stats = None
         self.start_time = None
-
-        metrics_enabled = getattr(options, 'metrics_enabled', None)
-        factory = MetricsOutput.select(metrics_enabled)
-        self.metrics = factory(self)
-
-        output_dir = getattr(options, 'output_dir', '')
-        if output_dir:
-            factory = FSOutput.select(output_dir)
-            self.output_path = factory.join(output_dir, policy.name)
-            self.output = factory(self)
-        else:
-            self.output_path = self.output = None
-
-        if options.log_group:
-            self.cloudwatch_logs = CloudWatchLogOutput(self)
-
-        self.api_stats = ApiStats(self)
-        self.tracer = XrayTracer(self)
-        self.sys_stats = SystemStats(self)
         self.execution_id = None
+
+        self.metrics = metrics_outputs.select(options.metrics_enabled, self)
+        self.output = blob_outputs.select(options.output_dir, self)
+        self.logs = log_outputs.select(options.log_group, self)
+        self.tracer = tracer_outputs.select(options.tracer, self)
+
+        # Look for customizations, but fallback to default
+        for api_stats_type in (self.policy.provider_name, 'default'):
+            if api_stats_type in api_stats_outputs:
+                self.api_stats = api_stats_outputs.select(api_stats_type, self)
+                break
+        for sys_stats_type in ('psutil', 'default'):
+            if sys_stats_type in sys_stats_outputs:
+                self.sys_stats = sys_stats_outputs.select(sys_stats_type, self)
+                break
 
     @property
     def log_dir(self):
@@ -60,35 +59,29 @@ class ExecutionContext(object):
             return self.output.root_dir
 
     def __enter__(self):
-        self.execution_id = str(uuid.uuid4())
-        if self.sys_stats:
-            self.sys_stats.__enter__()
-        if self.output:
-            self.output.__enter__()
-        if self.cloudwatch_logs:
-            self.cloudwatch_logs.__enter__()
-        if self.api_stats:
-            self.api_stats.__enter__()
-        if self.tracer:
-            self.tracer.__enter__()
         self.start_time = time.time()
+        self.execution_id = str(uuid.uuid4())
+        self.sys_stats.__enter__()
+        self.output.__enter__()
+        self.logs.__enter__()
+        self.api_stats.__enter__()
+        self.tracer.__enter__()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        self.policy._write_file('metadata.json', dumps(self.get_metadata(), indent=2))
-        self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
         if exc_type is not None:
             self.metrics.put_metric('PolicyException', 1, "Count")
+
+        self.policy._write_file('metadata.json', dumps(self.get_metadata(), indent=2))
+        self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
 
         # clear policy execution thread local session cache
         reset_session_cache()
 
         with self.tracer.subsegment('output'):
             self.metrics.flush()
-            if self.cloudwatch_logs:
-                self.cloudwatch_logs.__exit__(exc_type, exc_value, exc_traceback)
-                self.cloudwatch_logs = None
-
+            self.logs.__exit__(exc_type, exc_value, exc_traceback)
+            self.logs = None
             self.output.__exit__(exc_type, exc_value, exc_traceback)
 
         self.tracer.__exit__()

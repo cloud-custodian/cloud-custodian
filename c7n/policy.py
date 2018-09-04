@@ -739,6 +739,9 @@ class Policy(object):
     def tags(self):
         return self.data.get('tags', ())
 
+    def get_cache(self):
+        return self.resource_manager._cache
+
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
         exec_mode = execution[exec_mode_type]

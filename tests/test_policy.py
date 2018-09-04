@@ -135,7 +135,7 @@ class PolicyPermissions(BaseTest):
             if not getattr(v.resource_type, "config_type", None):
                 continue
 
-            p = Bag({"name": "permcheck", "resource": k})
+            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'default'})
             ctx = self.get_context(config=cfg, policy=p)
             mgr = v(ctx, p)
 
@@ -169,7 +169,7 @@ class PolicyPermissions(BaseTest):
         cfg = Config.empty()
         for k, v in manager.resources.items():
 
-            p = Bag({"name": "permcheck", "resource": k})
+            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'default'})
             ctx = self.get_context(config=cfg, policy=p)
 
             mgr = v(ctx, p)
