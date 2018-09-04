@@ -50,7 +50,7 @@ from c7n.output import (
 )
 
 from c7n.registry import PluginRegistry
-from c7n import utils
+from c7n import credentials, utils
 
 log = logging.getLogger('custodian.aws')
 
@@ -313,11 +313,12 @@ class ApiStats(DeltaStats):
         return self.get_snapshot()
 
     def __enter__(self):
-        self.ctx.session_factory.set_subscribers((self,))
+        if isinstance(self.ctx.session_factory, credentials.SessionFactory):
+            self.ctx.session_factory.set_subscribers((self,))
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        self.ctx.session_factory.set_subscribers(())
-        log.info("api calls \n %s", (dict(self.api_calls),))
+        if isinstance(self.ctx.session_factory, credentials.SessionFactory):
+            self.ctx.session_factory.set_subscribers(())
         self.ctx.metrics.put_metric(
             "ApiCalls", sum(self.api_calls.values()), "Count")
         self.ctx.policy._write_file(

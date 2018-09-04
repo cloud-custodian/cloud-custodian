@@ -42,9 +42,14 @@ log = logging.getLogger('custodian.output')
 
 class OutputRegistry(PluginRegistry):
 
+    default_protocol = None
+
     def select(self, selector, ctx):
         if not selector:
             return self['default'](ctx, {'url': selector})
+        if self.default_protocol and '://' not in selector:
+            selector = "{}://{}".format(
+                self.default_protocol, selector)
         for k in self.keys():
             if selector.startswith(k):
                 return self[k](ctx, {'url': selector})
@@ -54,19 +59,18 @@ class OutputRegistry(PluginRegistry):
 
 
 class BlobOutputRegistry(OutputRegistry):
-    # override for compatiblity with naked file paths
-    def select(self, selector, ctx):
-        try:
-            return super(BlobOutputRegistry, self).select(selector, ctx)
-        except InvalidOutputConfig:
-            if '://' not in selector:
-                return super(BlobOutputRegistry, self).select('file://{}'.format(selector), ctx)
-            raise
+
+    default_protocol = "file"
+
+
+class LogOutputRegistry(OutputRegistry):
+
+    default_protocol = "aws"
 
 
 api_stats_outputs = OutputRegistry('c7n.output.api_stats')
 blob_outputs = BlobOutputRegistry('c7n.output.blob')
-log_outputs = OutputRegistry('c7n.output.logs')
+log_outputs = LogOutputRegistry('c7n.output.logs')
 metrics_outputs = OutputRegistry('c7n.output.metrics')
 tracer_outputs = OutputRegistry('c7n.output.tracer')
 sys_stats_outputs = OutputRegistry('c7n.output.sys_stats')
