@@ -60,8 +60,9 @@ try:
     from aws_xray_sdk.core.sampling.local.sampler import LocalSampler
     HAVE_XRAY = True
 except ImportError:
-    raise
     HAVE_XRAY = False
+    class Context: pass  # NOQA
+
 _profile_session = None
 
 
@@ -124,25 +125,13 @@ class MetricsOutput(DefaultMetrics):
     retry = staticmethod(utils.get_retry(('Throttling',)))
 
     def __init__(self, ctx, config=None):
-        super(MetricsOutput, self).__init__(self, ctx, config)
+        super(MetricsOutput, self).__init__(ctx, config)
         self.namespace = self.config.get('namespace', DEFAULT_NAMESPACE)
-
-    def get_timestamp(self):
-        """
-        Now, if C7N_METRICS_TZ is set to TRUE, UTC timestamp will be used.
-        For backwards compatibility, if it is not set, UTC will be the default.
-        To disable this and use the system's time zone, C7N_METRICS_TZ shoule be set to FALSE.
-        """
-
-        if os.getenv("C7N_METRICS_TZ", '').lower() in ('true', '1', 'yes'):
-            return datetime.datetime.now()
-        else:
-            return datetime.datetime.utcnow()
 
     def _format_metric(self, key, value, unit, dimensions):
         d = {
             "MetricName": key,
-            "Timestamp": self.get_timestamp(),
+            "Timestamp": datetime.datetime.utcnow(),
             "Value": value,
             "Unit": unit}
         d["Dimensions"] = [
@@ -221,6 +210,23 @@ class XrayContext(Context):
                 return
         return super(XrayContext, self).put_subsegment(subsegment)
 
+    def end_subsegment(self, end_time=None):
+        """
+        End the current active segment. Return False if there is no
+        subsegment to end.
+
+        :param int end_time: epoch in seconds. If not specified the current
+            system time will be used.
+        """
+        subsegment = self.get_trace_entity()
+        if self._is_subsegment(subsegment):
+            subsegment.close(end_time)
+            self._local.entities.pop()
+            return True
+        else:
+            log.warning("No subsegment to end.")
+            return False
+
     def handle_context_missing(self):
         """Custodian has a few api calls out of band of policy execution.
 
@@ -258,6 +264,10 @@ class XrayTracer(object):
     def subsegment(self, name):
         segment = xray_recorder.begin_subsegment(name)
         self.ctx.api_stats.push_snapshot()
+        # print("begin subsegment %s stack_depth:%s" % (
+        #    get_path(segment),
+        #    len(self.ctx.api_stats.snapshot_stack)))
+
         try:
             yield segment
         except Exception as e:
@@ -265,7 +275,12 @@ class XrayTracer(object):
             segment.add_exception(e, stack)
             raise
         finally:
-            segment.put_metadata('api-stats', self.ctx.api_stats.pop_snapshot())
+            # TODO something is closing the segment.. before we can annotate
+            # segment.put_metadata('api-stats', self.ctx.api_stats.pop_snapshot())
+            self.ctx.api_stats.pop_snapshot()
+            # print("end subsegment %s %s stack_depth:%s" % (
+            #    get_path(segment), segment.in_progress,
+            #    len(self.ctx.api_stats.snapshot_stack)))
             xray_recorder.end_subsegment(time.time())
 
     def __enter__(self):
@@ -298,12 +313,23 @@ class XrayTracer(object):
             self.emitter.flush(self.client)
 
 
+def get_path(s):
+    p = []
+    step = s
+    while True:
+        p.append(str((step.name, step.in_progress)))
+        try:
+            step = step.parent_segment
+        except AttributeError:
+            break
+    return "/".join(reversed(p))
+
+
 @api_stats_outputs.register('aws')
 class ApiStats(DeltaStats):
 
     def __init__(self, ctx, config=None):
-        self.ctx = ctx
-        self.config = config or {}
+        super(ApiStats, self).__init__(ctx, config)
         self.api_calls = Counter()
 
     def get_snapshot(self):
@@ -315,6 +341,7 @@ class ApiStats(DeltaStats):
     def __enter__(self):
         if isinstance(self.ctx.session_factory, credentials.SessionFactory):
             self.ctx.session_factory.set_subscribers((self,))
+        self.push_snapshot()
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if isinstance(self.ctx.session_factory, credentials.SessionFactory):
@@ -323,6 +350,7 @@ class ApiStats(DeltaStats):
             "ApiCalls", sum(self.api_calls.values()), "Count")
         self.ctx.policy._write_file(
             'api-stats.json', utils.dumps(dict(self.api_calls)))
+        self.pop_snapshot()
 
     def __call__(self, s):
         s.events.register(

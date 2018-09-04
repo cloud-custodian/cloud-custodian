@@ -40,6 +40,10 @@ except ImportError:
 log = logging.getLogger('custodian.output')
 
 
+# TODO remove
+DEFAULT_NAMESPACE = "CloudMaid"
+
+
 class OutputRegistry(PluginRegistry):
 
     default_protocol = None
@@ -76,10 +80,6 @@ tracer_outputs = OutputRegistry('c7n.output.tracer')
 sys_stats_outputs = OutputRegistry('c7n.output.sys_stats')
 
 
-# TODO remove
-DEFAULT_NAMESPACE = "CloudMaid"
-
-
 @tracer_outputs.register('default')
 class DefaultTracer(object):
     """Tracing provides for detailed analytics of a policy execution.
@@ -103,6 +103,32 @@ class DefaultTracer(object):
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         """Exit main segment for policy execution.
         """
+
+
+class DeltaStats(object):
+
+    def __init__(self, ctx, config=None):
+        self.ctx = ctx
+        self.config = config or {}
+        self.snapshot_stack = []
+
+    def push_snapshot(self):
+        self.snapshot_stack.append(self.get_snapshot())
+
+    def pop_snapshot(self):
+        return self.delta(
+            self.snapshot_stack.pop(), self.get_snapshot())
+
+    def get_snapshot(self):
+        return {}
+
+    def delta(self, before, after):
+        delta = {}
+        for k in before:
+            val = after[k] - before[k]
+            if val:
+                delta[k] = val
+        return delta
 
 
 @sys_stats_outputs.register('default')
@@ -141,30 +167,6 @@ class DefaultStats(object):
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         """Pop a snapshot
         """
-
-
-class DeltaStats(object):
-
-    def __init__(self, ctx, config=None):
-        self.ctx = ctx
-        self.config = config or {}
-        self.snapshot_stack = []
-
-    def push_snapshot(self):
-        self.snapshot_stack.append(self.get_snapshot())
-
-    def pop_snapshot(self):
-        return self.delta(
-            self.snapshot_stack.pop(), self.get_snapshot())
-
-    def get_snapshot(self):
-        return {}
-
-    def delta(self, before, after):
-        delta = {}
-        for k in before:
-            delta[k] = after[k] - before[k]
-        return delta
 
 
 @sys_stats_outputs.register('psutil', condition=HAVE_PSUTIL)

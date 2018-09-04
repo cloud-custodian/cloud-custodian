@@ -23,7 +23,8 @@ class TestEC2Manager(BaseTest):
 
     def get_manager(self, data, config=None, session_factory=None):
         ctx = ExecutionContext(
-            session_factory, Bag({"name": "test-policy"}), config or Config.empty()
+            session_factory, Bag(
+                {"name": "test-policy", 'provider_name': 'aws'}), config or Config.empty()
         )
         return EC2(ctx, data)
 

@@ -17,6 +17,7 @@ import logging
 
 from c7n import cache
 from c7n.executor import ThreadPoolExecutor
+from c7n.provider import clouds
 from c7n.registry import PluginRegistry
 try:
     from c7n.resources.aws import AWS
@@ -70,7 +71,8 @@ class ResourceManager(object):
         raise NotImplementedError("")
 
     def get_resource_manager(self, resource_type, data=None):
-        klass = resources.get(resource_type)
+        provider_resources = resources
+        klass = provider_resources.get(resource_type)
         if klass is None:
             raise ValueError(resource_type)
         # if we're already querying via config carry it forward

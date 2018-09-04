@@ -21,7 +21,9 @@ import shutil
 import os
 
 from c7n.ctx import ExecutionContext
-from c7n.output import S3Output, DirectoryOutput
+from c7n.output import DirectoryOutput
+from c7n.resources.aws import S3Output
+
 
 from .common import Bag, BaseTest, TestConfig as Config
 

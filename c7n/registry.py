@@ -61,8 +61,8 @@ class PluginRegistry(object):
 
     def register(self, name, klass=None, condition=True,
                  condition_message="Missing dependency for {}"):
-        if not condition:
-            return
+        if not condition and klass:
+            return klass
         # invoked as function
         if klass:
             klass.type = name
@@ -72,6 +72,8 @@ class PluginRegistry(object):
 
         # invoked as class decorator
         def _register_class(klass):
+            if not condition:
+                return klass
             self._factories[name] = klass
             klass.type = name
             self.notify(self.EVENT_REGISTER, klass)

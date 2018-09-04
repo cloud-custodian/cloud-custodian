@@ -81,7 +81,6 @@ class ExecutionContext(object):
         with self.tracer.subsegment('output'):
             self.metrics.flush()
             self.logs.__exit__(exc_type, exc_value, exc_traceback)
-            self.logs = None
             self.output.__exit__(exc_type, exc_value, exc_traceback)
 
         self.tracer.__exit__()
