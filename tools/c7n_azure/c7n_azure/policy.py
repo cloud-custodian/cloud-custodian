@@ -182,7 +182,6 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def provision(self):
         super(AzureEventGridMode, self).provision()
-
         key = self._get_webhook_key()
         webhook_url = 'https://%s.azurewebsites.net/api/%s?code=%s' % (self.webapp_name,
                                                                        self.policy_name, key)
@@ -190,11 +189,7 @@ class AzureEventGridMode(AzureFunctionMode):
             endpoint_url=webhook_url
         )
 
-        self._provision_eventgrid_subscription(destination)
-
-
-    def _provision_eventgrid_subscription(self, destination):
-        self.log.info("Provisoning EventGrid ARM Subscription")
+        self.log.info("Creating Event Grid subscription")
         event_filter = EventSubscriptionFilter()
         event_info = EventSubscription(destination=destination, filter=event_filter)
         scope = '/subscriptions/%s' % self.session.subscription_id
@@ -209,7 +204,7 @@ class AzureEventGridMode(AzureFunctionMode):
                     scope, self.webapp_name, event_info)
 
                 event_subscription.result()
-                self.log.info('Event subscription creation succeeded')
+                self.log.info('Event Grid subscription creation succeeded')
                 status_success = True
             except CloudError as e:
                 self.log.info(e)
@@ -217,6 +212,7 @@ class AzureEventGridMode(AzureFunctionMode):
                 time.sleep(30)
 
     def _get_webhook_key(self):
+        self.log.info("Fetching Function's API keys")
         token_headers = {
             'Authorization': 'Bearer %s' % self.session.get_bearer_token()
         }

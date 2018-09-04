@@ -73,20 +73,6 @@ class FunctionPackage(object):
                         "routePrefix": "api",
                         "maxConcurrentRequests": 5,
                         "maxOutstandingRequests": 30
-                    },
-                    "queues": {
-                        "visibilityTimeout": "00:00:10",
-                        "maxDequeueCount": 3
-                    },
-                    "eventHubs": {
-                        "maxBatchSize": 256,
-                        "prefetchCount": 512
-                    },
-                    "serviceBus": {
-                        "prefetchCount": 100,
-                        "messageHandlerOptions": {
-                            "maxConcurrentCalls": 32
-                        }
                     }
                 }
             }
@@ -230,7 +216,7 @@ class FunctionPackage(object):
             'Authorization': 'Bearer %s' % (s.get_bearer_token())
         }
 
-        self.log.info("Publishing package at: %s" % self.pkg.path)
+        self.log.info("Publishing Function package from %s" % self.pkg.path)
 
         zip_file = open(self.pkg.path, 'rb').read()
 
