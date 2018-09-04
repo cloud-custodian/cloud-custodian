@@ -13,9 +13,11 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.actions import BaseAction
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.actions import BaseAction
+
 from c7n.utils import local_session, type_schema
 
 
@@ -30,6 +32,18 @@ class ComputeEnvironment(QueryResourceManager):
         id = name = "computeEnvironmentName"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
+
+
+@ComputeEnvironment.filter_registry.register('security-group')
+class ComputeSGFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "computeResources.securityGroupIds"
+
+
+@ComputeEnvironment.filter_registry.register('subnet')
+class ComputeSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "computeResources.subnets"
 
 
 @resources.register('batch-definition')

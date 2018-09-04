@@ -324,6 +324,7 @@ def _setup_logger(options):
         external_log_level = logging.INFO
 
     logging.getLogger('botocore').setLevel(external_log_level)
+    logging.getLogger('urllib3').setLevel(external_log_level)
     logging.getLogger('s3transfer').setLevel(external_log_level)
 
 

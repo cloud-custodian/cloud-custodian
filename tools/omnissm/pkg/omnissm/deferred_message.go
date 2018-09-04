@@ -25,10 +25,11 @@ type DeferredActionType int
 const (
 	InvalidActionType DeferredActionType = iota
 	AddTagsToResource
-	CreateActivation
-	DeregisterManagedInstance
+	RequestActivation
+	DeregisterInstance
 	PutInventory
 	PutRegistrationEntry
+	DeleteRegistrationEntry
 )
 
 type DeferredActionMessage struct {
