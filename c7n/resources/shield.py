@@ -20,7 +20,7 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('shield-protection')
@@ -103,6 +103,8 @@ class SetShieldProtection(BaseAction):
         'set-shield',
         state={'type': 'boolean'}, sync={'type': 'boolean'})
 
+    retry = staticmethod(get_retry(('ThrottlingException',)))
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
@@ -119,13 +121,14 @@ class SetShieldProtection(BaseAction):
             if state and arn in protected_resources:
                 continue
             if state is False and arn in protected_resources:
-                client.delete_protection(
+                self.retry(
+                    client.delete_protection,
                     ProtectionId=protected_resources[arn]['Id'])
                 continue
             try:
-                client.create_protection(
-                    Name=r[model.name],
-                    ResourceArn=arn)
+                self.retry(
+                    client.create_protection,
+                    Name=r[model.name], ResourceArn=arn)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
                     continue
@@ -133,7 +136,8 @@ class SetShieldProtection(BaseAction):
 
     def clear_stale(self, client, protections):
         # Get all resources unfiltered
-        resources = self.manager.get_resource_manager(self.manager.type).resources()
+        resources = self.manager.get_resource_manager(
+            self.manager.type).resources()
         resource_arns = set(map(self.manager.get_arn, resources))
 
         pmap = {}
@@ -148,5 +152,4 @@ class SetShieldProtection(BaseAction):
         stale = set(pmap).difference(resource_arns)
         self.log.info("clearing %d stale protections", len(stale))
         for s in stale:
-            client.delete_protection(
-                ProtectionId=pmap[s]['Id'])
+            self.retry(client.delete_protection, ProtectionId=pmap[s]['Id'])
