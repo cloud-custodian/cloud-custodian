@@ -59,7 +59,7 @@ class SlackDelivery(object):
                     if not resolved_addrs:
                         continue
 
-                    for address, slack_target in resolved_addrs.iteritems():
+                    for address, slack_target in resolved_addrs.items():
                         slack_messages[address] = get_rendered_jinja(
                             slack_target, sqs_message, resources,
                             self.logger, 'slack_template', 'slack_default')
@@ -81,7 +81,7 @@ class SlackDelivery(object):
             elif target.startswith('slack://') and self.email_handler.target_is_email(
                     target.split('slack://', 1)[1]):
                 resolved_addrs = self.retrieve_user_im([target.split('slack://', 1)[1]])
-                for address, slack_target in resolved_addrs.iteritems():
+                for address, slack_target in resolved_addrs.items():
                     slack_messages[address] = get_rendered_jinja(
                         slack_target, sqs_message, resource_list,
                         self.logger, 'slack_template', 'slack_default')
@@ -97,7 +97,7 @@ class SlackDelivery(object):
         return slack_messages
 
     def slack_handler(self, sqs_message, slack_messages):
-        for key, payload in slack_messages.iteritems():
+        for key, payload in slack_messages.items():
             self.logger.info("Sending account:%s policy:%s %s:%s slack:%s to %s" % (
                 sqs_message.get('account', ''),
                 sqs_message['policy']['name'],
