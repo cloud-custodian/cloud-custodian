@@ -18,7 +18,7 @@ Two example use cases:
 Install
 +++++++
 
-Pre-requisites. pygit2, click and custodian/c7n.
+Pre-requisites. pygit2, click, requests and custodian/c7n.
 
 Usage
 +++++
@@ -44,7 +44,7 @@ Diff use case, output policies changes in the last commit::
 
 Pull request use, output policies changes between two branches::
 
-  $ python tools/ops/policystream.py diff-tree -r foo
+  $ python tools/ops/policystream.py diff -r foo
   policies:
   - filters:
     - {type: cross-account}
@@ -56,13 +56,16 @@ import click
 import contextlib
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset
+from fnmatch import fnmatch
 from functools import partial
+import jmespath
 import json
 import logging
 import shutil
 import os
-import tempfile
 import pygit2
+import requests
+import tempfile
 import yaml
 
 from c7n.config import Config
@@ -555,6 +558,141 @@ def transport(stream_uri, assume):
 @click.group()
 def cli():
     """Policy changes from git history"""
+
+
+query = """
+query($organization: String!, $cursor: String) {
+  organization(login: $organization) {
+    repositories(first: 100, after: $cursor, orderBy: {field: UPDATED_AT, direction: DESC}){
+      edges {
+        node {
+          name
+          url
+          createdAt
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}
+"""
+
+
+def github_repos(organization, github_url, github_token):
+    """Return all github repositories in an organization."""
+    # Get github repos
+    headers = {"Authorization": "token {}".format(github_token)}
+    next_cursor = None
+
+    while next_cursor is not False:
+        params = {'query': query, 'variables': {
+            'organization': organization, 'cursor': next_cursor}}
+        response = requests.post(github_url, headers=headers, json=params)
+        result = response.json()
+        if response.status_code != 200 or 'errors' in result:
+            raise ValueError("Github api error %s" % (
+                response.content.decode('utf8'),))
+
+        repos = jmespath.search(
+            'data.organization.repositories.edges[].node', result)
+        for r in repos:
+            yield r
+        page_info = jmespath.search(
+            'data.organization.repositories.pageInfo', result)
+        if page_info:
+            next_cursor = (page_info['hasNextPage'] and
+                           page_info['endCursor'] or False)
+        else:
+            next_cursor = False
+
+
+@cli.command(name='org-checkout')
+@click.option('--organization', envvar="GITHUB_ORG",
+              required=True, help="Github Organization")
+@click.option('--github-url', envvar="GITHUB_API_URL",
+              default='https://api.github.com/graphql')
+@click.option('--github-token', envvar='GITHUB_TOKEN',
+              help="Github credential token")
+@click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
+@click.option('-d', '--clone-dir')
+@click.option('-f', '--filter', multiple=True)
+@click.option('-e', '--exclude', multiple=True)
+def org_checkout(organization, github_url, github_token, clone_dir,
+                 verbose, filter, exclude):
+    """Checkout repositories from an organization."""
+    logging.basicConfig(
+        format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
+        level=(verbose and logging.DEBUG or logging.INFO))
+
+    callbacks = pygit2.RemoteCallbacks(
+        pygit2.UserPass(github_token, 'x-oauth-basic'))
+
+    for r in github_repos(organization, github_url, github_token):
+        if filter:
+            found = False
+            for f in filter:
+                if fnmatch(r['name'], f):
+                    found = True
+                    break
+            if not found:
+                continue
+
+        if exclude:
+            found = False
+            for e in exclude:
+                if fnmatch(r['name'], e):
+                    found = True
+                    break
+            if found:
+                continue
+
+        repo_path = os.path.join(clone_dir, r['name'])
+        if not os.path.exists(repo_path):
+            log.info("cloning repo: %s/%s" % (organization, r['name']))
+            repo = pygit2.clone_repository(
+                r['url'], repo_path, callbacks=callbacks)
+        else:
+            repo = pygit2.Repository(repo_path)
+            if repo.status():
+                log.warning('repo %s not clean skipping update')
+                continue
+            log.info("syncing repo: %s/%s" % (organization, r['name']))
+            pull(repo, callbacks)
+
+
+def pull(repo, creds, remote_name='origin', branch='master'):
+    found = False
+    for remote in repo.remotes:
+        if remote.name != remote_name:
+            continue
+        found = True
+        break
+
+    if not found:
+        return
+
+    # from https://github.com/MichaelBoselowitz/pygit2-examples/blob/master/examples.py
+    # License MIT Copyright (c) 2015 Michael Boselowitz
+    remote.fetch(callbacks=creds)
+    remote_master_id = repo.lookup_reference('refs/remotes/origin/%s' % branch).target
+    merge_result, _ = repo.merge_analysis(remote_master_id)
+    # Up to date, do nothing
+    if merge_result & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE:
+        return
+    # We can just fastforward
+    elif merge_result & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD:
+        repo.checkout_tree(repo.get(remote_master_id))
+        try:
+            master_ref = repo.lookup_reference('refs/heads/%s' % (branch))
+            master_ref.set_target(remote_master_id)
+        except KeyError:
+            repo.create_branch(branch, repo.get(remote_master_id))
+        repo.head.set_target(remote_master_id)
+    elif merge_result & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
+        log.info("Local commits, repo %s must be manually synced", repo)
 
 
 @cli.command(name='diff')
