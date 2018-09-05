@@ -30,7 +30,7 @@ import os
 
 from c7n.registry import PluginRegistry
 from c7n.log import CloudWatchLogHandler
-from c7n.utils import local_session, parse_s3, get_retry
+from c7n.utils import chunks, local_session, parse_s3, get_retry
 
 DEFAULT_NAMESPACE = "CloudMaid"
 
@@ -49,6 +49,8 @@ class MetricsOutput(object):
     permissions = ("cloudWatch:PutMetricData",)
 
     retry = staticmethod(get_retry(('Throttling',)))
+
+    BUFFER_SIZE = 20
 
     @staticmethod
     def select(metrics_selector):
@@ -71,7 +73,7 @@ class MetricsOutput(object):
         To disable this and use the system's time zone, C7N_METRICS_TZ shoule be set to FALSE.
         """
 
-        if os.getenv("C7N_METRICS_TZ", '').upper() in ('TRUE', ''):
+        if os.getenv("C7N_METRICS_TZ", 'TRUE').upper() in ('TRUE', ''):
             return datetime.datetime.utcnow()
         else:
             return datetime.datetime.now()
@@ -106,8 +108,9 @@ class MetricsOutput(object):
 
     def _put_metrics(self, ns, metrics):
         watch = local_session(self.ctx.session_factory).client('cloudwatch')
-        return self.retry(
-            watch.put_metric_data, Namespace=ns, MetricData=metrics)
+        for metric_values in chunks(metrics, self.BUF_SIZE):
+            return self.retry(
+                watch.put_metric_data, Namespace=ns, MetricData=metrics)
 
 
 class NullMetricsOutput(MetricsOutput):
