@@ -241,12 +241,9 @@ class PullMode(PolicyExecutionMode):
             try:
                 resources = self.policy.resource_manager.resources()
             except ResourceLimitExceeded as e:
-                self.policy.log.error(
-                    "policy: %s resource:%s resource limit:%s exceeded %d",
-                    self.policy.name, self.policy.resource_type, e.limit,
-                    e.selection_count)
+                self.policy.log.error(str(e))
                 self.policy.ctx.metrics.put_metric(
-                    'ResourceLimitExceeded', e.selection_count, "Count", Scope="Policy")
+                    'ResourceLimitExceeded', e.selection_count, "Count")
                 raise
 
             rt = time.time() - s

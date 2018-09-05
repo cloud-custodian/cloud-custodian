@@ -437,15 +437,14 @@ class QueryResourceManager(ResourceManager):
             raise ResourceLimitExceeded(
                 ("policy: %s exceeding resource limit: {limit} "
                  "found: {selection_count}") % p.name,
-                p.max_resources, selection_count, population_count)
+                "max-resources", p.max_resources, selection_count, population_count)
         elif p.max_resources_percent:
             if (population_count * (
                     p.max_resources_percent / 100.0) < selection_count):
                 raise ResourceLimitExceeded(
-                    ("policy: %s exceeding resource percent "
-                     "limit: {limit} found: {selection_count} "
-                     "total: {population_count}") % p.name,
-                    p.max_resources_percent, selection_count, population_count)
+                    ("policy: %s exceeding resource limit: {limit}%% "
+                     "found: {selection_count} total: {population_count}") % p.name,
+                    "max-percent", p.max_resources_percent, selection_count, population_count)
         return True
 
     def _get_cached_resources(self, ids):

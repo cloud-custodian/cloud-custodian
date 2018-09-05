@@ -495,7 +495,7 @@ class TestPolicy(BaseTest):
         self.assertRaises(ResourceLimitExceeded, p.run)
         self.assertEqual(
             output.getvalue().strip(),
-            "policy: log-delete resource:log-group resource limit:2.5 exceeded 1")
+            "policy: log-delete exceeding resource limit: 2.5% found: 1 total: 1")
         self.assertEqual(
             p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
 
