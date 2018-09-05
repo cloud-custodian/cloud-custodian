@@ -58,6 +58,7 @@ from datetime import datetime, timedelta
 from dateutil.tz import tzoffset
 from fnmatch import fnmatch
 from functools import partial
+import jmespath
 import json
 import logging
 import shutil
@@ -581,9 +582,8 @@ query($organization: String!, $cursor: String) {
 
 
 def github_repos(organization, github_url, github_token):
-    """Return all github repositories."""
+    """Return all github repositories in an organization."""
     # Get github repos
-    import jmespath
     headers = {"Authorization": "token {}".format(github_token)}
     next_cursor = None
 
