@@ -18,7 +18,7 @@ import os
 from kubernetes import config, client
 from kubernetes.client import Configuration, ApiClient
 
-log = logging.getLogger('c7n_kube.client')
+log = logging.getLogger('custodian.k8s.client')
 
 
 class Session(object):

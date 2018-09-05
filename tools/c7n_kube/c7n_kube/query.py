@@ -21,7 +21,7 @@ from c7n.manager import ResourceManager
 from c7n.query import sources
 from c7n.utils import local_session
 
-log = logging.getLogger('c7n_kube.query')
+log = logging.getLogger('custodian.k8s.query')
 
 
 class ResourceQuery(object):

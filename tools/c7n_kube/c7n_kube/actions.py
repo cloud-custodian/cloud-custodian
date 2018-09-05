@@ -17,7 +17,7 @@ import logging
 from c7n.actions import Action as BaseAction
 from c7n.utils import local_session, chunks
 
-log = logging.getLogger('c7n_kube.actions')
+log = logging.getLogger('custodian.k8s.actions')
 
 
 class Action(BaseAction):

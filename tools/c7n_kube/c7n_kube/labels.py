@@ -17,7 +17,7 @@ import logging
 from c7n_kube.actions import MethodAction
 from c7n.utils import type_schema
 
-log = logging.getLogger('c7n_kube.labels')
+log = logging.getLogger('custodian.k8s.labels')
 
 
 class LabelResource(MethodAction):

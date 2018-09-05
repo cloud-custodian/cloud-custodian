@@ -17,7 +17,7 @@ import logging
 import c7n_kube.resources.namespace
 import c7n_kube.resources.service  # NOQA
 
-log = logging.getLogger('custodian.kube')
+log = logging.getLogger('custodian.k8s')
 
 
 def initialize_kube():

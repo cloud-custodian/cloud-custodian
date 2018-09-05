@@ -20,13 +20,13 @@ from functools import partial
 
 import logging
 
-log = logging.getLogger('custodian.kube')
+log = logging.getLogger('custodian.k8s')
 
 
-@clouds.register('kube')
+@clouds.register('k8s')
 class Kubernetes(Provider):
 
-    resource_prefix = 'kube'
+    resource_prefix = 'k8s'
     resources = PluginRegistry('%s.resources' % resource_prefix)
 
     def initialize(self, options):
