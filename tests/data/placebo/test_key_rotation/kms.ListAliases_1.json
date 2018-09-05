@@ -1,0 +1,146 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/BlockStorageKey",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/BlockStorageKey",
+                "TargetKeyId": "82645407-2faa-4d93-be71-7d6a8d59a5fc"
+            },
+            {
+                "AliasName": "alias/CMK-Rotation",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/CMK-Rotation",
+                "TargetKeyId": "a476e533-b970-4c74-a341-707420ecf59b"
+            },
+            {
+                "AliasName": "alias/aws/acm",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/acm",
+                "TargetKeyId": "7efe5f36-5599-4a81-97b9-4c4aa4b64f93"
+            },
+            {
+                "AliasName": "alias/aws/cloud9",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/cloud9",
+                "TargetKeyId": "0c34a807-a390-4128-ba02-463ccd3d8850"
+            },
+            {
+                "AliasName": "alias/aws/codecommit",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/codecommit",
+                "TargetKeyId": "aaac6583-1d5f-44a2-b535-0823b47ed00e"
+            },
+            {
+                "AliasName": "alias/aws/dms",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/dms",
+                "TargetKeyId": "f1f33a6b-91aa-4b0a-904c-f2a0378277f0"
+            },
+            {
+                "AliasName": "alias/aws/dynamodb",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/dynamodb",
+                "TargetKeyId": "8785aeb9-a616-4e2b-bbd3-df3cde76bcc5"
+            },
+            {
+                "AliasName": "alias/aws/ebs",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/ebs",
+                "TargetKeyId": "798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0"
+            },
+            {
+                "AliasName": "alias/aws/elasticfilesystem",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/elasticfilesystem",
+                "TargetKeyId": "d38e6df4-3a19-4516-9f4b-ab568e9bccc5"
+            },
+            {
+                "AliasName": "alias/aws/es",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/es",
+                "TargetKeyId": "6917a312-adce-4bbc-8202-958f2db490fa"
+            },
+            {
+                "AliasName": "alias/aws/glue",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/glue"
+            },
+            {
+                "AliasName": "alias/aws/kinesis",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/kinesis",
+                "TargetKeyId": "f0108d2e-e1df-4a94-b1b6-9144085093cb"
+            },
+            {
+                "AliasName": "alias/aws/kinesisvideo",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/kinesisvideo",
+                "TargetKeyId": "d551d66a-1396-4c94-a6b7-e2edf550510c"
+            },
+            {
+                "AliasName": "alias/aws/lambda",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/lambda",
+                "TargetKeyId": "f4441361-1c8d-4710-8d6d-0b6d7cd0be11"
+            },
+            {
+                "AliasName": "alias/aws/lex",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/lex",
+                "TargetKeyId": "9835c962-ea8a-41ba-ab9e-32547228571d"
+            },
+            {
+                "AliasName": "alias/aws/lightsail",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/lightsail",
+                "TargetKeyId": "7147f795-71ee-4b59-8dd1-2fa32a55423c"
+            },
+            {
+                "AliasName": "alias/aws/rds",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/rds",
+                "TargetKeyId": "b10f842a-feb7-4318-92d5-0640a75b7688"
+            },
+            {
+                "AliasName": "alias/aws/redshift",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/redshift",
+                "TargetKeyId": "e39ed135-2a46-4d5e-8c05-41b8d900d0c7"
+            },
+            {
+                "AliasName": "alias/aws/s3",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3",
+                "TargetKeyId": "d1305425-4cde-46ee-be31-e2043dd4df39"
+            },
+            {
+                "AliasName": "alias/aws/secretsmanager",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/secretsmanager",
+                "TargetKeyId": "19135ee1-cd2b-4553-a719-a960edf22ae4"
+            },
+            {
+                "AliasName": "alias/aws/ssm",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/ssm",
+                "TargetKeyId": "13121aca-ffd6-45af-b640-4eb89f6d8fbd"
+            },
+            {
+                "AliasName": "alias/aws/xray",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/xray"
+            },
+            {
+                "AliasName": "alias/s3-custom",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/s3-custom",
+                "TargetKeyId": "3f2ab3af-cc4e-427b-b96d-d4356f9764c4"
+            },
+            {
+                "AliasName": "alias/sagemaker",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/sagemaker",
+                "TargetKeyId": "75d1e7ba-f9c5-46b9-97bc-28e6c834aa49"
+            },
+            {
+                "AliasName": "alias/skunk-s3",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/skunk-s3",
+                "TargetKeyId": "845ab6f1-744c-4edc-b702-efae6836818a"
+            },
+            {
+                "AliasName": "alias/skunk/trails",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/skunk/trails",
+                "TargetKeyId": "36812ccf-daaf-49b1-a24b-0eef254ffe41"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "64e94241-a582-11e8-a258-5f951b0eb9ca",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "64e94241-a582-11e8-a258-5f951b0eb9ca",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "3891"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

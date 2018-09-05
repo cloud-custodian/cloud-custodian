@@ -98,6 +98,36 @@ class ReplInstance(BaseTest):
             [True, "dms.t2.medium", "mon:23:00-mon:23:59"],
         )
 
+    def test_replication_instance_kmskey(self):
+        session_factory = self.replay_flight_data("test_dms_kmskey")
+        p = self.load_policy(
+            {
+                "name": "dms-instance-kmskey",
+                "resource": 'dms-instance',
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": '"c7n:AliasMetadata".AliasName',
+                        "value": "alias/aws/dms",
+                        "op": "eq"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        client = session_factory().client("kms")
+        aliases = client.list_aliases()
+        target_key_id = None
+        for a in aliases['Aliases']:
+            if a.get('AliasName') == 'alias/aws/dms':
+                target_key_id = a.get('TargetKeyId')
+                target_key_arn = client.describe_key(KeyId=target_key_id)['KeyMetadata']['Arn']
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['KmsKeyId'], target_key_arn
+        )
+
 
 class ReplicationInstanceTagging(BaseTest):
 

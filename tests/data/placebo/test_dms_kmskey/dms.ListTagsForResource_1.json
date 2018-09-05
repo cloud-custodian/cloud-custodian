@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagList": [
+            {
+                "Key": "description",
+                "Value": "test-kms-key"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "313eedff-a57e-11e8-833e-1721bf6176c3",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "313eedff-a57e-11e8-833e-1721bf6176c3",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "58",
+                "date": "Tue, 21 Aug 2018 20:10:04 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,19 +1,59 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "PaginationToken": "", 
+        "PaginationToken": "",
         "ResourceTagMappingList": [
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d48a40c5-06ce-11e8-b593-5b5791d1fd61", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d48a40c5-06ce-11e8-b593-5b5791d1fd61", 
-                "date": "Wed, 31 Jan 2018 21:36:42 GMT", 
-                "content-length": "706", 
-                "content-type": "application/x-amz-json-1.1"
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/3f2ab3af-cc4e-427b-b96d-d4356f9764c4",
+                "Tags": [
+                    {
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/66cc02aa-d87b-46ee-92cc-845edb4257cf",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n/sagemaker"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/825e5eb4-f85b-4953-81ea-905aa251af57",
+                "Tags": [
+                    {
+                        "Key": "RequisiteKey",
+                        "Value": "Required"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CMK-Rotation-Test"
+                    }
+                ]
             }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8dcc6463-a610-11e8-b3fe-cf085f9ea189",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8dcc6463-a610-11e8-b3fe-cf085f9ea189",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "719",
+                "date": "Wed, 22 Aug 2018 13:37:45 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }

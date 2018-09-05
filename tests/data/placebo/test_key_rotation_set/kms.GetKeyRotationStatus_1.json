@@ -1,16 +1,16 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "KeyRotationEnabled": false, 
+        "KeyRotationEnabled": false,
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "60ea41fc-2880-11e8-9715-256832f26545", 
+            "RequestId": "93160c9d-a581-11e8-bf0d-77b75e2f1541",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "60ea41fc-2880-11e8-9715-256832f26545", 
-                "content-length": "28", 
-                "content-type": "application/x-amz-json-1.1"
-            }
+                "x-amzn-requestid": "93160c9d-a581-11e8-bf0d-77b75e2f1541",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "28"
+            },
+            "RetryAttempts": 0
         }
     }
 }

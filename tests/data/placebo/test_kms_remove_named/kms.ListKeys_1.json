@@ -1,22 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Keys": [
             {
-                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/056d7b49-e807-40d7-adc1-8cfdf47638b6", 
-                "KeyId": "056d7b49-e807-40d7-adc1-8cfdf47638b6"
+                "KeyId": "ffbb2417-9fbc-45b2-8fc7-0a2086138e14",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/ffbb2417-9fbc-45b2-8fc7-0a2086138e14"
             }
-        ], 
+        ],
+        "Truncated": false,
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "a9878a79-06cb-11e8-a45c-2795b7188202", 
+            "RequestId": "b54285d6-a581-11e8-b988-69292120c5ae",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "a9878a79-06cb-11e8-a45c-2795b7188202", 
-                "content-length": "5482", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
-        "Truncated": false
+                "x-amzn-requestid": "b54285d6-a581-11e8-b988-69292120c5ae",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "3714"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

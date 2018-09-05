@@ -1,22 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Truncated": false, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "35873b08-06cc-11e8-994f-799fd07bbc53", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "35873b08-06cc-11e8-994f-799fd07bbc53", 
-                "content-length": "76", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
         "Tags": [
             {
-                "TagKey": "RequisiteKey", 
+                "TagKey": "RequisiteKey",
                 "TagValue": "Required"
             }
-        ]
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "5efcf376-a581-11e8-aa45-efe3465cdd21",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5efcf376-a581-11e8-aa45-efe3465cdd21",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "76"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

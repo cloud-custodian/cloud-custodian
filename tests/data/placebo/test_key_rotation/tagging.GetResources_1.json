@@ -1,28 +1,59 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "PaginationToken": "", 
-        "ResourceTagMappingList": [ 
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/ffb1402c-040a-4b1f-b1e5-9918a0238aa7", 
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/3f2ab3af-cc4e-427b-b96d-d4356f9764c4",
                 "Tags": [
                     {
-                        "Value": "tagv", 
-                        "Key": "tagk"
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/66cc02aa-d87b-46ee-92cc-845edb4257cf",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n/sagemaker"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/825e5eb4-f85b-4953-81ea-905aa251af57",
+                "Tags": [
+                    {
+                        "Key": "RequisiteKey",
+                        "Value": "Required"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/a476e533-b970-4c74-a341-707420ecf59b",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CMK-Rotation-Test"
                     }
                 ]
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "25386cab-06a7-11e8-81a1-c598be1613de", 
+            "RequestId": "65fd98e0-a582-11e8-a13e-675684e5fd44",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "25386cab-06a7-11e8-81a1-c598be1613de", 
-                "date": "Wed, 31 Jan 2018 16:52:38 GMT", 
-                "content-length": "457", 
-                "content-type": "application/x-amz-json-1.1"
-            }
+                "x-amzn-requestid": "65fd98e0-a582-11e8-a13e-675684e5fd44",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "719",
+                "date": "Tue, 21 Aug 2018 20:40:10 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }

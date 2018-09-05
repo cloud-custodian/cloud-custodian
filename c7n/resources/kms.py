@@ -21,6 +21,7 @@ import logging
 
 from c7n.actions import RemovePolicyBase, BaseAction
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
+from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -61,13 +62,24 @@ class Key(QueryResourceManager):
     def augment(self, resources):
         client = local_session(
             self.session_factory).client('kms')
+        try:
+            aliases = client.list_aliases().get('Aliases')
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDeniedException':
+                self.log.warning("Access denied when attempting to list_aliases")
+            else:
+                raise
+        alias_to_key = {}
+        if aliases is not None:
+            alias_to_key = {a['TargetKeyId']: a for a in aliases if a.get('TargetKeyId')}
 
         for r in resources:
+            if r['KeyId'] in alias_to_key:
+                r['c7n:AliasMetadata'] = alias_to_key[r['KeyId']]
             try:
                 key_id = r.get('KeyArn')
                 info = client.describe_key(KeyId=key_id)['KeyMetadata']
                 r.update(info)
-
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDeniedException':
                     self.log.warning(
@@ -337,3 +349,14 @@ class KmsKeyRotation(BaseAction):
                     key = futures[f]
                     self.log.error('error setting key rotation on %s: %s' % (
                         key['Arn'], f.exception()))
+
+
+class KmsKeyRelatedFilter(RelatedResourceFilter):
+    """Filter a resource by its associated Kms Key."""
+    schema = type_schema(
+        'kms-key', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+
+    RelatedResource = "c7n.resources.kms.Key"
+    AnnotationKey = "matched-kms-keys"
