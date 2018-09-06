@@ -39,8 +39,8 @@ func TestRegistrationResponseMarshal(t *testing.T) {
 					AccountId:     "accountId",
 					Region:        "region",
 					InstanceId:    "instanceId",
-					IsTagged:      false,
-					IsInventoried: false,
+					IsTagged:      0,
+					IsInventoried: 0,
 					Activation: ssm.Activation{
 						ActivationId:   "aid",
 						ActivationCode: "code",
@@ -48,7 +48,7 @@ func TestRegistrationResponseMarshal(t *testing.T) {
 				},
 				Region: "us-east-2",
 			},
-			expected: []byte(`{"id":"id","CreatedAt":"0001-01-01T00:00:00Z","ManagedId":"managedId","AccountId":"accountId","Region":"region","InstanceId":"instanceId","IsTagged":false,"IsInventoried":false,"ActivationId":"aid","ActivationCode":"code","region":"us-east-2"}`),
+			expected: []byte(`{"id":"id","CreatedAt":"0001-01-01T00:00:00Z","ManagedId":"managedId","AccountId":"accountId","Region":"region","InstanceId":"instanceId","IsTagged":0,"IsInventoried":0,"ActivationId":"aid","ActivationCode":"code","region":"us-east-2"}`),
 		},
 	}
 

@@ -50,7 +50,10 @@ func groupEntriesByAccountIdAndRegion(entries []*omnissm.RegistrationEntry) map[
 
 func main() {
 	lambda.Start(func(ctx context.Context) error {
-		entries, err := omni.Registrations.Scan(ctx)
+		entries, err := omni.Registrations.QueryIndexes(ctx, []omnissm.QueryIndexInput{
+			{"IsTagged-index", "IsTagged", "0"},
+			{"IsInventoried-index", "IsInventoried", "0"},
+		}...)
 		if err != nil {
 			return err
 		}
@@ -95,7 +98,7 @@ func main() {
 							continue
 						}
 					}
-					if !entry.IsTagged {
+					if entry.IsTagged > 0 {
 						tags := make(map[string]string)
 						for k, v := range ci.Tags {
 							if !omni.HasResourceTag(k) {
@@ -116,7 +119,7 @@ func main() {
 							log.Info().Err(err).Msg("unable to defer AddTagsToResource")
 						}
 					}
-					if !entry.IsInventoried {
+					if entry.IsInventoried > 0 {
 						err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.PutInventory,
 							Value: &ssm.CustomInventory{

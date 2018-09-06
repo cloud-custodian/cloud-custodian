@@ -29,7 +29,7 @@ import six
 from botocore.paginate import set_value_from_jmespath
 
 from c7n.actions import ActionRegistry
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, ResourceLimitExceeded
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
@@ -418,8 +418,34 @@ class QueryResourceManager(ResourceManager):
             query = {}
 
         resources = self.augment(self.source.resources(query))
+        resource_count = len(resources)
         self._cache.save(key, resources)
-        return self.filter_resources(resources)
+        resources = self.filter_resources(resources)
+
+        # Check if we're out of a policies execution limits.
+        self.check_resource_limit(len(resources), resource_count)
+        return resources
+
+    def check_resource_limit(self, selection_count, population_count):
+        """Check if policy's execution affects more resources then its limit.
+
+        Ideally this would be at a higher level but we've hidden
+        filtering behind the resource manager facade for default usage.
+        """
+        p = self.ctx.policy
+        if p.max_resources and p.max_resources > selection_count:
+            raise ResourceLimitExceeded(
+                ("policy: %s exceeded resource limit: {limit} "
+                 "found: {selection_count}") % p.name,
+                "max-resources", p.max_resources, selection_count, population_count)
+        elif p.max_resources_percent:
+            if (population_count * (
+                    p.max_resources_percent / 100.0) < selection_count):
+                raise ResourceLimitExceeded(
+                    ("policy: %s exceeded resource limit: {limit}%% "
+                     "found: {selection_count} total: {population_count}") % p.name,
+                    "max-percent", p.max_resources_percent, selection_count, population_count)
+        return True
 
     def _get_cached_resources(self, ids):
         key = self.get_cache_key(None)
