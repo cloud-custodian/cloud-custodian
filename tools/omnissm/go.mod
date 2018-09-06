@@ -3,16 +3,21 @@ module github.com/capitalone/cloud-custodian/tools/omnissm
 require (
 	github.com/BurntSushi/toml v0.3.0 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.3.0 // indirect
+	github.com/StackExchange/wmi v0.0.0-20180725035823-b12b22c5341f // indirect
 	github.com/aws/aws-lambda-go v1.6.0
 	github.com/aws/aws-sdk-go v1.15.23
-	github.com/aws/aws-xray-sdk-go v0.9.4
+	github.com/aws/aws-xray-sdk-go v1.0.0-rc.5
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
+	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/golang/time v0.0.0-20180412165947-fbb02b2291d2
 	github.com/google/go-cmp v0.2.0
+	github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c // indirect
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/jtolds/gls v4.2.1+incompatible // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/magiconair/properties v1.8.0 // indirect
 	github.com/mitchellh/mapstructure v1.0.0 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
@@ -20,6 +25,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/zerolog v1.8.0
 	github.com/shirou/gopsutil v2.17.12+incompatible
+	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
+	github.com/smartystreets/assertions v0.0.0-20180820201707-7c9eb446e3cf // indirect
+	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
 	github.com/spf13/afero v1.1.1 // indirect
 	github.com/spf13/cast v1.2.0 // indirect
 	github.com/spf13/cobra v0.0.3

@@ -6,6 +6,7 @@ Advanced Usage
 * :ref:`run-multiple-regions`
 * :ref:`report-multiple-regions`
 * :ref:`report-custom-fields`
+* :ref:`policy_resource_limits`
 
 .. _run-multiple-regions:
 
@@ -120,6 +121,49 @@ If no ``tz`` attribute is specified, UTC is set by default.
       actions:
         - start
 
+.. _policy_resource_limits:
+
+Limiting how many resources custodian affects
+---------------------------------------------
+
+Custodian by default will operate on as many resources exist within an
+environment that match a policy's filters. Custodian also allows policy
+authors to stop policy execution if a policy affects more resources then
+expected, either as a number of resources or as a percentage of total extant
+resources.
+
+.. code-block:: yaml
+
+  policies:
+
+    - name: log-delete
+      description: |
+        This policy will delete all log groups
+	that haven't been written to in 5 days.
+
+	As a safety belt, it will stop execution
+	if the number of log groups that would
+	be affected is more than 5% of the total
+        log groups in the account's region.
+      resource: aws.log-group
+      max-resources-percent: 5
+      filters:
+        - type: last-write
+	  days: 5
+      actions:
+        - delete
+
+
+Max resources can also be specified as an absolute number using
+`max-resources` specified on a policy. When executing if the limit
+is exceeded, policy execution is stopped before taking any actions::
+
+  $ custodian run -s out policy.yml
+  custodian.commands:ERROR policy: log-delete exceeded resource limit: 2.5% found: 1 total: 1
+
+If metrics are being published ('-m/--metrics-enabled') then an additional
+metric named `ResourceLimitExceeded` will be published with the number
+of resources that matched the policy.
 
 .. _report-custom-fields:
 

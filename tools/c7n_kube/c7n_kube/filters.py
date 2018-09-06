@@ -1,4 +1,4 @@
-# Copyright 2018 Capital One Services, LLC
+# Copyright 2017-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +13,5 @@
 # limitations under the License.
 
 
-from .common import BaseTest
-
-from c7n.provider import clouds
-
-
-class ProviderTest(BaseTest):
-
-    def test_available_clouds(self):
-        # the other providers are currently distributed as separate
-        # installs (tools/c7n_azure and tools/c7n_gcp)
-        self.assertEqual(sorted(clouds.keys()), ["aws", "azure", "gcp", "k8s"])
+class PolicyFilter(object):
+    pass

@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 
-from .common import BaseTest
+import c7n_kube.resources.namespace
+import c7n_kube.resources.service  # NOQA
 
-from c7n.provider import clouds
+log = logging.getLogger('custodian.k8s')
 
 
-class ProviderTest(BaseTest):
-
-    def test_available_clouds(self):
-        # the other providers are currently distributed as separate
-        # installs (tools/c7n_azure and tools/c7n_gcp)
-        self.assertEqual(sorted(clouds.keys()), ["aws", "azure", "gcp", "k8s"])
+def initialize_kube():
+    log.info('initialize_kube')
