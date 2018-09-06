@@ -20,6 +20,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.utils import local_session, chunks, type_schema, get_retry
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import FilterRegistry
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
@@ -110,6 +111,12 @@ class InstanceDescribe(DescribeSource):
                     continue
                 raise
             r['Tags'] = tags
+
+
+@ReplicationInstance.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KmsKeyId'
 
 
 @ReplicationInstance.filter_registry.register('subnet')
