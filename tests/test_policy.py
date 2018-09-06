@@ -15,11 +15,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 import json
+import logging
 import mock
 import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.exceptions import ResourceLimitExceeded
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
@@ -477,6 +479,25 @@ class TestPolicy(BaseTest):
                 ],
             },
         )
+
+    def test_policy_resource_limits(self):
+        session_factory = self.replay_flight_data(
+            "test_policy_resource_limits")
+        p = self.load_policy(
+            {
+                "name": "log-delete",
+                "resource": "log-group",
+                "max-resources-percent": 2.5,
+            },
+            session_factory=session_factory)
+        p.ctx.metrics.flush = mock.MagicMock()
+        output = self.capture_logging('custodian.policy', level=logging.ERROR)
+        self.assertRaises(ResourceLimitExceeded, p.run)
+        self.assertEqual(
+            output.getvalue().strip(),
+            "policy: log-delete exceeded resource limit: 2.5% found: 1 total: 1")
+        self.assertEqual(
+            p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
 
     def test_policy_metrics(self):
         session_factory = self.replay_flight_data("test_policy_metrics")

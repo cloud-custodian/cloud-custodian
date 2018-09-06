@@ -28,7 +28,7 @@ import six
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
-from c7n.exceptions import PolicyValidationError, ClientError
+from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
@@ -237,7 +237,14 @@ class PullMode(PolicyExecutionMode):
                 version)
 
             s = time.time()
-            resources = self.policy.resource_manager.resources()
+            try:
+                resources = self.policy.resource_manager.resources()
+            except ResourceLimitExceeded as e:
+                self.policy.log.error(str(e))
+                self.policy.ctx.metrics.put_metric(
+                    'ResourceLimitExceeded', e.selection_count, "Count")
+                raise
+
             rt = time.time() - s
             self.policy.log.info(
                 "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
@@ -254,13 +261,6 @@ class PullMode(PolicyExecutionMode):
 
             if not resources:
                 return []
-            elif (self.policy.max_resources is not None and
-                  len(resources) > self.policy.max_resources):
-                msg = "policy %s matched %d resources max resources %s" % (
-                    self.policy.name, len(resources),
-                    self.policy.max_resources)
-                self.policy.log.warning(msg)
-                raise RuntimeError(msg)
 
             if self.policy.options.dryrun:
                 self.policy.log.debug("dryrun: skipping actions")
@@ -736,6 +736,10 @@ class Policy(object):
         return self.data.get('max-resources')
 
     @property
+    def max_resources_percent(self):
+        return self.data.get('max-resources-percent')
+
+    @property
     def tags(self):
         return self.data.get('tags', ())
 
@@ -860,6 +864,7 @@ class Policy(object):
     def __call__(self):
         """Run policy in default mode"""
         mode = self.get_execution_mode()
+        self.session_factory.policy_name = self.name
         if self.options.dryrun:
             resources = PullMode(self).run()
         elif isinstance(mode, ServerlessExecutionMode):

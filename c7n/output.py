@@ -264,8 +264,7 @@ class DefaultMetrics(object):
         point = self._format_metric(key, value, unit, dimensions)
         self.buf.append(point)
         if buffer:
-            # Max metrics in a single request
-            if len(self.buf) == 20:
+            if len(self.buf) > self.BUFFER_SIZE:
                 self.flush()
         else:
             self.flush()

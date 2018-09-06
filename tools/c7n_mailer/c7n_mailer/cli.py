@@ -20,6 +20,7 @@ CONFIG_SCHEMA = {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
+        'org_domain': {'type': 'string'},
 
         # Standard Lambda Function Config
         'region': {'type': 'string'},
