@@ -435,14 +435,14 @@ class QueryResourceManager(ResourceManager):
         p = self.ctx.policy
         if p.max_resources and p.max_resources > selection_count:
             raise ResourceLimitExceeded(
-                ("policy: %s exceeding resource limit: {limit} "
+                ("policy: %s exceeded resource limit: {limit} "
                  "found: {selection_count}") % p.name,
                 "max-resources", p.max_resources, selection_count, population_count)
         elif p.max_resources_percent:
             if (population_count * (
                     p.max_resources_percent / 100.0) < selection_count):
                 raise ResourceLimitExceeded(
-                    ("policy: %s exceeding resource limit: {limit}%% "
+                    ("policy: %s exceeded resource limit: {limit}%% "
                      "found: {selection_count} total: {population_count}") % p.name,
                     "max-percent", p.max_resources_percent, selection_count, population_count)
         return True
