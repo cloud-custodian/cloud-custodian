@@ -292,7 +292,7 @@ class KMSTagging(BaseTest):
         resource_kms_key = resources[0]['KmsKeyId']
         aliases = client.list_aliases(KeyId=resource_kms_key)
         target_key_arn = None
-        if aliases['Aliases'][0].get('AliasName') == 'alias/aws/dms':
+        if aliases['Aliases'][0]['AliasName'] == 'alias/aws/dms':
             target_key_id = aliases['Aliases'][0].get('TargetKeyId')
             target_key_arn = client.describe_key(
                 KeyId=target_key_id).get('KeyMetadata').get('Arn')
