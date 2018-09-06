@@ -43,7 +43,7 @@ from c7n.output import (
 
 # Output base implementations we extend.
 from c7n.output import (
-    DefaultMetrics,
+    Metrics,
     DeltaStats,
     DirectoryOutput,
     LogOutput,
@@ -117,7 +117,7 @@ def _default_account_id(options):
 
 
 @metrics_outputs.register('aws')
-class MetricsOutput(DefaultMetrics):
+class MetricsOutput(Metrics):
     """Send metrics data to cloudwatch
     """
 

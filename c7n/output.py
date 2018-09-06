@@ -106,7 +106,11 @@ class DefaultTracer(object):
 
 
 class DeltaStats(object):
+    """Capture stats (dictionary of string->integer) as a stack.
 
+    Popping the stack automatically creates a delta of the last
+    stack element to the current stats.
+    """
     def __init__(self, ctx, config=None):
         self.ctx = ctx
         self.config = config or {}
@@ -171,7 +175,8 @@ class DefaultStats(object):
 
 @sys_stats_outputs.register('psutil', condition=HAVE_PSUTIL)
 class SystemStats(DeltaStats):
-
+    """Collect process statistics via psutil
+    """
     def __init__(self, ctx, config=None):
         super(SystemStats, self).__init__(ctx, config)
         self.process = psutil.Process(os.getpid())
@@ -213,16 +218,17 @@ class SystemStats(DeltaStats):
             # memory counters
             mem = self.process.memory_info()
             for counter in (
-                    'rss', 'vms', 'shared', 'text', 'data', 'lib', 'pfaults', 'pageins'):
+                    'rss', 'vms', 'shared', 'text', 'data', 'lib',
+                    'pfaults', 'pageins'):
                 v = getattr(mem, counter, None)
                 if v is not None:
                     snapshot[counter] = v
         return snapshot
 
 
-@metrics_outputs.register('default')
-class DefaultMetrics(object):
+class Metrics(object):
 
+    BUFFER_SIZE = 20
     permissions = ()
     namespace = DEFAULT_NAMESPACE
 
@@ -231,11 +237,37 @@ class DefaultMetrics(object):
         self.config = config
         self.buf = []
 
+    def _format_metric(self, key, value, unit, dimensions):
+        raise NotImplementedError("subclass responsiblity")
+
+    def _put_metrics(self, ns, metrics):
+        raise NotImplementedError("subclass responsiblity")
+
     def flush(self):
         if self.buf:
             self._put_metrics(self.namespace, self.buf)
             self.buf = []
 
+    def put_metric(self, key, value, unit, buffer=True, **dimensions):
+        point = self._format_metric(key, value, unit, dimensions)
+        self.buf.append(point)
+        if buffer:
+            # Max metrics in a single request
+            if len(self.buf) >= self.BUFFER_SIZE:
+                self.flush()
+        else:
+            self.flush()
+
+    def get_metadata(self):
+        return list(self.buf)
+
+
+@metrics_outputs.register('default')
+class DefaultMetrics(Metrics):
+    """Default metrics collection.
+
+    logs metrics to standard out.
+    """
     def _put_metrics(self, ns, metrics):
         for m in metrics:
             if m['MetricName'] not in ('ActionTime', 'ResourceTime'):
@@ -259,16 +291,6 @@ class DefaultMetrics(object):
         for k, v in dimensions.items():
             d['Dimensions'].append({"Name": k, "Value": v})
         return d
-
-    def put_metric(self, key, value, unit, buffer=True, **dimensions):
-        point = self._format_metric(key, value, unit, dimensions)
-        self.buf.append(point)
-        if buffer:
-            # Max metrics in a single request
-            if len(self.buf) == 20:
-                self.flush()
-        else:
-            self.flush()
 
     def get_metadata(self):
         res = []
