@@ -108,7 +108,7 @@ class MetricsOutput(object):
 
     def _put_metrics(self, ns, metrics):
         watch = local_session(self.ctx.session_factory).client('cloudwatch')
-        for metric_values in chunks(metrics, self.BUF_SIZE):
+        for metric_values in chunks(metrics, self.BUFFER_SIZE):
             return self.retry(
                 watch.put_metric_data, Namespace=ns, MetricData=metrics)
 

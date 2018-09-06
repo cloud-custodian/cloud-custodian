@@ -65,7 +65,7 @@ func processDeferredActionMessage(ctx context.Context, msg *sqs.Message) error {
 		if !ok {
 			return errors.Errorf("registration entry not found: %#v", resourceTags.ManagedId)
 		}
-		entry.IsTagged = true
+		entry.IsTagged = 1
 		if err := omni.Registrations.Update(ctx, entry); err != nil {
 			return err
 		}
@@ -119,7 +119,7 @@ func processDeferredActionMessage(ctx context.Context, msg *sqs.Message) error {
 		if !ok {
 			return errors.Errorf("registration entry not found: %#v", inv.ManagedId)
 		}
-		entry.IsInventoried = true
+		entry.IsInventoried = 1
 		if err := omni.Registrations.Update(ctx, entry); err != nil {
 			return err
 		}
