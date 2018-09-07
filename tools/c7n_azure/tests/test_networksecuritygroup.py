@@ -14,11 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
-from c7n_azure.resources.network_security_group \
-    import FROM_PORT, TO_PORT, PORTS, EXCEPT_PORTS, IP_PROTOCOL, ACCESS
-from mock import patch
-
-from c7n.filters.core import PolicyValidationError
 
 
 class NetworkSecurityGroupTest(BaseTest):
@@ -35,500 +30,172 @@ class NetworkSecurityGroupTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'anzoloch-test-vm-nsg'}],
+                 'value': 'c7n-nsg'}],
         })
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    fake_nsgs = [{
-        'resourceGroup': 'test_resource_group',
-        'name': 'test_nsg',
-        'properties': {
-            'securityRules': [
-                {
-                    'name': 'test_1',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'TCP',
-                        'destinationPortRange': '8081-8083'
-                    }
-                },
-                {
-                    'name': 'test_2',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'TCP',
-                        'destinationPortRange': '22'
-                    }
-                },
-                {
-                    'name': 'test_3',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRange': '8081-8089'
-                    }
-                },
-                {
-                    'name': 'test_4',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Allow',
-                        'protocol': 'UDP',
-                        'destinationPortRanges': ['10-12', '14-15', '16-19']
-                    }
-                },
-                {
-                    'name': 'inbound_22_deny',
-                    'properties': {
-                        'direction': 'Inbound',
-                        'access': 'Deny',
-                        'protocol': 'TCP',
-                        'destinationPortRange': '22'
-                    }
-                },
-                {
-                    'name': 'outbound_22_allow',
-                    'properties': {
-                        'direction': 'Outbound',
-                        'access': 'Allow',
-                        'protocol': 'TCP',
-                        'destinationPortRange': '22'
-                    }
-                },
-                {
-                    'name': 'outbound_22_deny',
-                    'properties': {
-                        'direction': 'Outbound',
-                        'access': 'Deny',
-                        'protocol': 'TCP',
-                        'destinationPortRange': '22'
-                    }
-                },
-            ]
-        }
-    }]
-
-    empty_nsgs = []
-
     @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-        return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-        return_value='')
-    def test_port_range(self, rules_action_mock, filter_mock):
+    def test_allow_single_port(self):
         p = self.load_policy({
-            'name': 'test-azure-network-security-group',
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
                 {'type': 'ingress',
-                 FROM_PORT: 8080,
-                 TO_PORT: 8084}],
-            'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{'resourceGroup': 'test_resource_group',
-            'name': 'test_nsg',
-            'properties': {
-                'securityRules': [
-                    {
-                        'name': 'test_1',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'TCP',
-                            'destinationPortRange': '8081-8083'
-                        }
-                    }
-                ]
-            }}
-        ]
-        rules_action_mock.assert_called_with(expected)
+                 'ports': '80',
+                 'access': 'Allow'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-        return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-        return_value='')
-    def test_ports_filter_empty(self, rules_action_mock, filter_mock):
+    def test_allow_multiple_ports(self):
         p = self.load_policy({
-            'name': 'test-azure-network-security-group',
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
                 {'type': 'ingress',
-                 PORTS: [93]}],
-            'actions': [
-                {'type': 'close'}]})
+                 'ports': '80,8080-8084,88-90',
+                 'match': 'all',
+                 'access': 'Allow'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_allow_ports_range_any(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'ingress',
+                 'ports': '40-100',
+                 'match': 'any',
+                 'access': 'Allow'}]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_deny_port(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'ingress',
+                 'ports': '8086',
+                 'access': 'Deny'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_egress_policy_protocols(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'egress',
+                 'ports': '22',
+                 'ipProtocol': 'TCP',
+                 'access': 'Allow'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'egress',
+                 'ports': '22',
+                 'ipProtocol': 'UDP',
+                 'access': 'Allow'}],
+        })
+
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
     @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-        return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-        return_value='')
-    def test_except_ports_filter_nonempty(self, rules_action_mock, filter_mock):
+    def test_open_ports(self):
         p = self.load_policy({
-            'name': 'test-azure-network-security-group',
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
                 {'type': 'ingress',
-                 EXCEPT_PORTS: [22]}],
+                 'ports': '1000-1100',
+                 'match': 'any',
+                 'access': 'Deny'}],
             'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{
-            'resourceGroup': 'test_resource_group',
-            'name': 'test_nsg',
-            'properties': {
-                'securityRules': [
-                    {
-                        'name': 'test_1',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'TCP',
-                            'destinationPortRange': '8081-8083'
-                        }
-                    },
-                    {
-                        'name': 'test_3',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP',
-                            'destinationPortRange': '8081-8089'
-                        }
-                    },
-                    {
-                        'name': 'test_4',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP',
-                            'destinationPortRanges': ['10-12', '14-15', '16-19']
-                        }
-                    },
-                ]
-            }}]
-        rules_action_mock.assert_called_with(expected)
+                {
+                    'type': 'open',
+                    'ports': '1000-1100',
+                    'direction': 'Inbound'}
+            ]
+        })
 
-    @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-        return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-        return_value='')
-    def test_protocol_filter(self, rules_action_mock, filter_mock):
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
         p = self.load_policy({
-            'name': 'test-azure-network-security-group',
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
                 {'type': 'ingress',
-                 IP_PROTOCOL: 'UDP'}],
+                 'ports': '1000-1100',
+                 'match': 'any',
+                 'access': 'Deny'}],
             'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{
-            'resourceGroup': 'test_resource_group',
-            'name': 'test_nsg',
-            'properties': {
-                'securityRules': [
-                    {
-                        'name': 'test_3',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP',
-                            'destinationPortRange': '8081-8089'
-                        }
-                    },
-                    {
-                        'name': 'test_4',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP',
-                            'destinationPortRanges': ['10-12', '14-15', '16-19']
-                        }
-                    },
-                ]
-            }}]
-        rules_action_mock.assert_called_with(expected)
+                {'type': 'open',
+                 'ports': '1000-1100',
+                 'direction': 'Inbound'}]
+        })
 
-    @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-        return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-        return_value='')
-    def test_protocol_and_range_filter(self, rules_action_mock, filter_mock):
-        p = self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 IP_PROTOCOL: 'UDP',
-                 FROM_PORT: 8081,
-                 TO_PORT: 8089}],
-            'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{
-            'resourceGroup': 'test_resource_group',
-            'name': 'test_nsg',
-            'properties': {
-                'securityRules': [
-                    {
-                        'name': 'test_3',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP',
-                            'destinationPortRange': '8081-8089'
-                        }
-                    }
-                ]
-            }}]
-        rules_action_mock.assert_called_with(expected)
-
-    @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-        return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-        return_value='')
-    def test_protocol_or_range_filter(self, rules_action_mock, filter_mock):
-        p = self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 IP_PROTOCOL: 'UDP',
-                 'match-operator': 'or',
-                 PORTS: [22]}],
-            'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{
-            'resourceGroup': 'test_resource_group',
-            'name': 'test_nsg',
-            'properties': {
-                'securityRules': [
-                    {
-                        'name': 'test_2',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'TCP',
-                            'destinationPortRange': '22'
-                        }
-                    },
-                    {
-                        'name': 'test_3',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP',
-                            'destinationPortRange': '8081-8089'
-                        }
-                    },
-                    {
-                        'name': 'test_4',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Allow',
-                            'protocol': 'UDP',
-                            'destinationPortRanges': ['10-12', '14-15', '16-19']
-                        }
-                    },
-                    {
-                        'name': 'inbound_22_deny',
-                        'properties': {
-                            'direction': 'Inbound',
-                            'access': 'Deny',
-                            'protocol': 'TCP',
-                            'destinationPortRange': '22'
-                        }
-                    },
-                ]
-            }}]
-        rules_action_mock.assert_called_with(expected)
-
-    @arm_template('networksecuritygroup.json')
-    def test_invalid_policy_range(self):
-        self.assertRaises(PolicyValidationError, lambda: self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 FROM_PORT: 22,
-                 TO_PORT: 20}],
-            'actions': [
-                {'type': 'close'}]}))
-
-    @arm_template('networksecuritygroup.json')
-    def test_invalid_policy_params(self):
-        self.assertRaises(PolicyValidationError, lambda: self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 FROM_PORT: 22,
-                 TO_PORT: 20,
-                 EXCEPT_PORTS: [20, 30],
-                 PORTS: [8080]}],
-            'actions': [
-                {'type': 'close'}]}))
-
-    @arm_template('networksecuritygroup.json')
-    def test_invalid_policy_params_only_ports(self):
-        self.assertRaises(PolicyValidationError, lambda: self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 EXCEPT_PORTS: [20, 30],
-                 PORTS: [8080]}],
-            'actions': [
-                {'type': 'close'}]}))
-
-    @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-           return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-           return_value='')
-    def test_access_ingress_allow(self, rules_action_mock, filter_mock):
-        p = self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 PORTS: [22],
-                 ACCESS: 'Allow'}],
-            'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{'resourceGroup': 'test_resource_group',
-                     'name': 'test_nsg',
-                     'properties': {
-                         'securityRules': [
-                             {
-                                 'name': 'test_2',
-                                 'properties': {
-                                     'direction': 'Inbound',
-                                     'access': 'Allow',
-                                     'protocol': 'TCP',
-                                     'destinationPortRange': '22'
-                                 }
-                             }
-                         ]
-                     }}
-                    ]
-        rules_action_mock.assert_called_with(expected)
-
-    @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-           return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-           return_value='')
-    def test_access_ingress_deny(self, rules_action_mock, filter_mock):
-        p = self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 PORTS: [22],
-                 ACCESS: 'Deny'
-                 }],
-            'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{'resourceGroup': 'test_resource_group',
-                     'name': 'test_nsg',
-                     'properties': {
-                         'securityRules': [
-                             {
-                                 'name': 'inbound_22_deny',
-                                 'properties': {
-                                     'direction': 'Inbound',
-                                     'access': 'Deny',
-                                     'protocol': 'TCP',
-                                     'destinationPortRange': '22'
-                                 }
-                             }
-                         ]
-                     }}
-                    ]
-        rules_action_mock.assert_called_with(expected)
-
-    @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-           return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-           return_value='')
-    def test_access_egress_allow(self, rules_action_mock, filter_mock):
-        p = self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'egress',
-                 PORTS: [22],
-                 ACCESS: 'Allow'
-                 }],
-            'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{'resourceGroup': 'test_resource_group',
-                     'name': 'test_nsg',
-                     'properties': {
-                         'securityRules': [
-                             {
-                                 'name': 'outbound_22_allow',
-                                 'properties': {
-                                     'direction': 'Outbound',
-                                     'access': 'Allow',
-                                     'protocol': 'TCP',
-                                     'destinationPortRange': '22'
-                                 }
-                             }
-                         ]
-                     }}
-                    ]
-        rules_action_mock.assert_called_with(expected)
-
-    @arm_template('networksecuritygroup.json')
-    @patch('c7n_azure.query.ResourceQuery.filter',
-           return_value=fake_nsgs)
-    @patch('c7n_azure.resources.network_security_group.RulesAction.process',
-           return_value='')
-    def test_access_egress_deny(self, rules_action_mock, filter_mock):
-        p = self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'egress',
-                 PORTS: [22],
-                 ACCESS: 'Deny'
-                 }],
-            'actions': [
-                {'type': 'close'}]})
-        p.run()
-        expected = [{'resourceGroup': 'test_resource_group',
-                     'name': 'test_nsg',
-                     'properties': {
-                         'securityRules': [
-                             {
-                                 'name': 'outbound_22_deny',
-                                 'properties': {
-                                     'direction': 'Outbound',
-                                     'access': 'Deny',
-                                     'protocol': 'TCP',
-                                     'destinationPortRange': '22'
-                                 }
-                             }
-                         ]
-                     }}
-                    ]
-        rules_action_mock.assert_called_with(expected)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
