@@ -61,6 +61,9 @@ class ExecutionContext(object):
     def __enter__(self):
         self.start_time = time.time()
         self.execution_id = str(uuid.uuid4())
+
+        # User agent w/ policy name
+        self.session_factory.policy_name = self.policy.name
         self.sys_stats.__enter__()
         self.output.__enter__()
         self.logs.__enter__()
@@ -72,11 +75,9 @@ class ExecutionContext(object):
         if exc_type is not None:
             self.metrics.put_metric('PolicyException', 1, "Count")
 
-        self.policy._write_file('metadata.json', dumps(self.get_metadata(), indent=2))
+        self.policy._write_file(
+            'metadata.json', dumps(self.get_metadata(), indent=2))
         self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
-
-        # clear policy execution thread local session cache
-        reset_session_cache()
 
         with self.tracer.subsegment('output'):
             self.metrics.flush()
@@ -84,6 +85,10 @@ class ExecutionContext(object):
             self.output.__exit__(exc_type, exc_value, exc_traceback)
 
         self.tracer.__exit__()
+
+        # clear policy execution thread local session cache
+        reset_session_cache()
+        self.session_factory.policy_name = None
 
     def get_metadata(self, include=('sys-stats', 'api-stats', 'metrics')):
         t = time.time()

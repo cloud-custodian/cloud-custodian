@@ -864,7 +864,6 @@ class Policy(object):
     def __call__(self):
         """Run policy in default mode"""
         mode = self.get_execution_mode()
-        self.session_factory.policy_name = self.name
         if self.options.dryrun:
             resources = PullMode(self).run()
         elif isinstance(mode, ServerlessExecutionMode):
