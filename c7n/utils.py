@@ -481,7 +481,7 @@ def set_value_from_jmespath(source, expression, value, is_first=True):
     source[current_key] = value
 
 
-def format_string_values(obj, err_fallback=(IndexError,), *args, **kwargs):
+def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwargs):
     """
     Format all string values in an object.
     Return the updated object

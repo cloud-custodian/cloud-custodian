@@ -33,10 +33,16 @@ class SessionFactory(object):
         self.profile = profile
         self.assume_role = assume_role
         self.external_id = external_id
+        self.user_agent_name = "CloudCustodian"
         self.session_name = "CloudCustodian"
         if 'C7N_SESSION_SUFFIX' in os.environ:
             self.session_name = "%s@%s" % (
                 self.session_name, os.environ['C7N_SESSION_SUFFIX'])
+
+    def _set_policy_name(self, name):
+        self.user_agent_name = ("CloudCustodian(%s)" % name).strip()
+
+    policy_name = property(None, _set_policy_name)
 
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
@@ -48,7 +54,7 @@ class SessionFactory(object):
             session = Session(
                 region_name=region or self.region, profile_name=self.profile)
 
-        session._session.user_agent_name = "CloudCustodian"
+        session._session.user_agent_name = self.user_agent_name
         session._session.user_agent_version = version
         return session
 

@@ -18,6 +18,7 @@ from c7n_azure.utils import Math
 from c7n_azure.utils import ResourceIdParser
 from c7n_azure.utils import StringUtils
 from c7n_azure.tags import TagHelper
+from c7n_azure.utils import PortsRangeHelper
 
 
 RESOURCE_ID = (
@@ -81,3 +82,74 @@ class UtilsTest(BaseTest):
         self.assertEqual(TagHelper.get_tag_value(resource, 'tag1', True), 'value1')
         self.assertEqual(TagHelper.get_tag_value(resource, 'tag2', True), 'VaLuE2')
         self.assertEqual(TagHelper.get_tag_value(resource, 'tag3', True), 'VALUE3')
+
+    def test_get_ports(self):
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_string("5, 4-5, 9"), set([4, 5, 9]))
+        rule = {'properties': {'destinationPortRange': '10-12'}}
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12]))
+        rule = {'properties': {'destinationPortRanges': ['80', '10-12']}}
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12, 80]))
+
+    def test_validate_ports_string(self):
+        self.assertEqual(PortsRangeHelper.validate_ports_string('80'), True)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('22-26'), True)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('80,22'), True)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('80,22-26'), True)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('80,22-26,30-34'), True)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('65537'), False)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('-1'), False)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('10-8'), False)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('80,30,25-65538'), False)
+        self.assertEqual(PortsRangeHelper.validate_ports_string('65536-65537'), False)
+
+    def test_get_ports_strings_from_list(self):
+        self.assertEqual(PortsRangeHelper.get_ports_strings_from_list([]),
+                         [])
+        self.assertEqual(PortsRangeHelper.get_ports_strings_from_list([10, 11]),
+                         ['10-11'])
+        self.assertEqual(PortsRangeHelper.get_ports_strings_from_list([10, 12, 13, 14]),
+                         ['10', '12-14'])
+        self.assertEqual(PortsRangeHelper.get_ports_strings_from_list([10, 12, 13, 14, 20, 21, 22]),
+                         ['10', '12-14', '20-22'])
+
+    def test_build_ports_dict(self):
+        securityRules = [
+            {'properties': {'destinationPortRange': '80-84',
+                            'priority': 100,
+                            'direction': 'Outbound',
+                            'access': 'Allow',
+                            'protocol': 'TCP'}},
+            {'properties': {'destinationPortRange': '85-89',
+                            'priority': 110,
+                            'direction': 'Outbound',
+                            'access': 'Allow',
+                            'protocol': 'UDP'}},
+            {'properties': {'destinationPortRange': '80-84',
+                            'priority': 120,
+                            'direction': 'Inbound',
+                            'access': 'Deny',
+                            'protocol': 'TCP'}},
+            {'properties': {'destinationPortRange': '85-89',
+                            'priority': 130,
+                            'direction': 'Inbound',
+                            'access': 'Deny',
+                            'protocol': 'UDP'}},
+            {'properties': {'destinationPortRange': '80-89',
+                            'priority': 140,
+                            'direction': 'Inbound',
+                            'access': 'Allow',
+                            'protocol': '*'}}]
+        nsg = {'properties': {'securityRules': securityRules}}
+
+        self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Inbound', 'TCP'),
+                         {k: k > 84 for k in range(80, 90)})
+        self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Inbound', 'UDP'),
+                         {k: k < 85 for k in range(80, 90)})
+        self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Inbound', '*'),
+                         {k: False for k in range(80, 90)})
+        self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Outbound', 'TCP'),
+                         {k: True for k in range(80, 85)})
+        self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Outbound', 'UDP'),
+                         {k: True for k in range(85, 90)})
+        self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Outbound', '*'),
+                         {k: True for k in range(80, 90)})

@@ -395,3 +395,10 @@ class UtilTest(unittest.TestCase):
             utils.format_string_values(
                 {'k': '{1}'}),
             {'k': '{1}'})
+
+        self.assertEqual(
+            utils.format_string_values(
+                {'k': '{limit}',
+                 'b': '{account_id}'}, account_id=21),
+            {'k': '{limit}',
+             'b': '21'})
