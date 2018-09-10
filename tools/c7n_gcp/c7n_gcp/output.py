@@ -14,13 +14,13 @@ from c7n.output import (
     blob_outputs,
     metrics_outputs,
     DirectoryOutput,
-    DefaultMetrics,
+    Metrics,
     LogOutput)
 from c7n.utils import local_session
 
 
 @metrics_outputs.register('gcp')
-class StackDriverMetrics(DefaultMetrics):
+class StackDriverMetrics(Metrics):
 
     METRICS_PREFIX = 'custom.googleapis.com/custodian/policy'
 
@@ -59,9 +59,10 @@ class StackDriverMetrics(DefaultMetrics):
 
     log = logging.getLogger('c7n_gcp.metrics')
 
-    def __init__(self, ctx):
-        super(StackDriverMetrics, self).__init__(ctx)
-        self.project_id = local_session(self.ctx.session_factory).get_default_project()
+    def __init__(self, ctx, config=None):
+        super(StackDriverMetrics, self).__init__(ctx, config)
+        self.project_id = local_session(
+            self.ctx.session_factory).get_default_project()
 
     def initialize(self):
         """One time initialization of metrics descriptors.
