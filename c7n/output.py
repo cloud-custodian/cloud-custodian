@@ -225,6 +225,7 @@ class DefaultMetrics(object):
 
     permissions = ()
     namespace = DEFAULT_NAMESPACE
+    BUFFER_SIZE = 20
 
     def __init__(self, ctx, config=None):
         self.ctx = ctx
