@@ -19,6 +19,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import itertools
 import logging
+import six
 
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction
@@ -113,14 +114,14 @@ class ConfigAppElb(ConfigSource):
 
         # Config originally stored supplementaryconfig on elbv2 as json
         # strings. Support that format for historical queries.
-        if isinstance(item_tags, str):
+        if isinstance(item_tags, six.string_types):
             item_tags = json.loads(item_tags)
         resource['Tags'] = [
             {'Key': t['key'], 'Value': t['value']} for t in item_tags]
 
         item_attrs = item['supplementaryConfiguration'][
             'LoadBalancerAttributes']
-        if isinstance(item_attrs, str):
+        if isinstance(item_attrs, six.string_types):
             item_attrs = json.loads(item_attrs)
         # Matches annotation of AppELBAttributeFilterBase filter
         resource['Attributes'] = {
