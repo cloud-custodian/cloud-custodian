@@ -1,4 +1,4 @@
-# Copyright 2016-2017 Capital One Services, LLC
+# Copyright 2016-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,15 +50,13 @@ class AppELB(QueryResourceManager):
     """
 
     class resource_type(object):
-
         service = 'elbv2'
         type = 'loadbalancer/app'
-
         enum_spec = ('describe_load_balancers', 'LoadBalancers', None)
         name = 'LoadBalancerName'
         id = 'LoadBalancerArn'
-        filter_name = None
-        filter_type = None
+        filter_name = "Names"
+        filter_type = "list"
         dimension = "LoadBalancer"
         date = 'CreatedTime'
         config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
@@ -88,6 +86,15 @@ class AppELB(QueryResourceManager):
 
 class DescribeAppElb(DescribeSource):
 
+    def get_resources(self, ids, cache=True):
+        """Support server side filtering on arns or names
+        """
+        if ids[0].startswith('arn:'):
+            params = {'LoadBalancerArns': ids}
+        else:
+            params = {'Names': ids}
+        return self.query.filter(self.manager, **params)
+
     def augment(self, albs):
         _describe_appelb_tags(
             albs,
@@ -102,8 +109,23 @@ class ConfigAppElb(ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigAppElb, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in json.loads(item['supplementaryConfiguration']['Tags'])]
+        item_tags = item['supplementaryConfiguration']['Tags']
+
+        # Config originally stored supplementaryconfig on elbv2 as json
+        # strings. Support that format for historical queries.
+        if isinstance(item_tags, str):
+            item_tags = json.loads(item_tags)
+        resource['Tags'] = [
+            {'Key': t['key'], 'Value': t['value']} for t in item_tags]
+
+        item_attrs = item['supplementaryConfiguration'][
+            'LoadBalancerAttributes']
+        if isinstance(item_attrs, str):
+            item_attrs = json.loads(item_attrs)
+        # Matches annotation of AppELBAttributeFilterBase filter
+        resource['Attributes'] = {
+            attr['key']: parse_attribute_value(attr['value']) for
+            attr in item_attrs}
         return resource
 
 
@@ -508,6 +530,16 @@ class AppELBListenerFilterBase(object):
             list(w.map(_process_listeners, albs))
 
 
+def parse_attribute_value(v):
+    if v.isdigit():
+        v = int(v)
+    elif v == 'true':
+        v = True
+    elif v == 'false':
+        v = False
+    return v
+
+
 class AppELBAttributeFilterBase(object):
     """ Mixin base class for filters that query LB attributes.
     """
@@ -524,13 +556,7 @@ class AppELBAttributeFilterBase(object):
                 # flatten out the list of dicts and cast
                 for pair in results['Attributes']:
                     k = pair['Key']
-                    v = pair['Value']
-                    if v.isdigit():
-                        v = int(v)
-                    elif v == 'true':
-                        v = True
-                    elif v == 'false':
-                        v = False
+                    v = parse_attribute_value(pair['Value'])
                     alb['Attributes'][k] = v
 
         with self.manager.executor_factory(max_workers=2) as w:
