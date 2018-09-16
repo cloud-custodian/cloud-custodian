@@ -21,13 +21,13 @@ import io
 import logging
 import re
 import time
-from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from datetime import datetime
 from dateutil import parser
 from dateutil import tz
 from gzip import GzipFile
 
+from c7n.exceptions import ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session
 
