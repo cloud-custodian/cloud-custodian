@@ -71,10 +71,19 @@ class ResourceManager(object):
         raise NotImplementedError("")
 
     def get_resource_manager(self, resource_type, data=None):
-        provider_resources = resources
+        """get a resource manager or a given resource type.
+
+        assumes the query is for the same underlying cloud provider.
+        """
+        provider_name = self.ctx.policy.provider_name
+        if resource_type.startswith('%s.' % provider_name):
+            _, resource_type = resource_type.split('.', 1)
+
+        provider_resources = clouds[provider_name].resources
         klass = provider_resources.get(resource_type)
         if klass is None:
             raise ValueError(resource_type)
+
         # if we're already querying via config carry it forward
         if not data and self.source_type == 'config' and getattr(
                 klass.get_model(), 'config_type', None):

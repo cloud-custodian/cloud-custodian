@@ -33,7 +33,10 @@ class DirOutputTest(BaseTest):
     def get_dir_output(self, location):
         work_dir = self.change_cwd()
         return work_dir, DirectoryOutput(
-            ExecutionContext(None, Bag(name="xyz"), Config.empty(output_dir=location))
+            ExecutionContext(
+                None,
+                Bag(name="xyz", provider_name="ostack"),
+                Config.empty(output_dir=location))
         )
 
     def test_dir_output(self):
@@ -53,13 +56,14 @@ class S3OutputTest(unittest.TestCase):
         self.assertEqual(S3Output.join("s3://xyz/xyz/", "/bar/"), "s3://xyz/xyz/bar")
 
     def get_s3_output(self):
+        output_dir = "s3://cloud-custodian/policies"
         output = S3Output(
             ExecutionContext(
                 None,
-                Bag(name="xyz"),
-                Config.empty(output_dir="s3://cloud-custodian/policies"),
-            )
-        )
+                Bag(name="xyz", provider_name="ostack"),
+                Config.empty(output_dir=output_dir)),
+            {'url': output_dir})
+
         self.addCleanup(shutil.rmtree, output.root_dir)
 
         return output
@@ -113,7 +117,7 @@ class S3OutputTest(unittest.TestCase):
 
     def test_upload(self):
         output = self.get_s3_output()
-        self.assertEqual(output.key_prefix, "/policies/xyz")
+        self.assertEqual(output.get_key_path(), "/policies/xyz")
 
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
@@ -126,7 +130,7 @@ class S3OutputTest(unittest.TestCase):
         m.assert_called_with(
             fh.name,
             "cloud-custodian",
-            "policies/xyz/%s/foo.txt" % output.date_path,
+            "%s/foo.txt" % output.get_key_path(),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
 
@@ -144,6 +148,6 @@ class S3OutputTest(unittest.TestCase):
         m.assert_called_with(
             fh.name,
             "cloud-custodian",
-            "policies/xyz/%s/foo.txt" % output.date_path,
+            "%s/foo.txt" % output.get_key_path(),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
