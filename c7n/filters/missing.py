@@ -26,11 +26,11 @@ class Missing(Filter):
 
     This works as an effectively an embedded policy thats evaluated.
     """
-    schema = type_schema('missing', policy={'type': 'object'})
+    schema = type_schema(
+        'missing', policy={'type': 'object'}, required=['policy'])
 
     def __init__(self, data, manager):
         super(Missing, self).__init__(data, manager)
-        # copy our policy's name to the embedded policy name
         self.data['policy']['name'] = self.manager.ctx.policy.name
         self.embedded_policy = Policy(self.data['policy'], self.manager.config)
 

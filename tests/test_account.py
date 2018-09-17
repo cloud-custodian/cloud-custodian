@@ -44,8 +44,8 @@ class AccountTests(BaseTest):
                 }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(list(resources[0].keys()),
-                         ['account_id', 'account_name'])
+        self.assertEqual(sorted(list(resources[0].keys())),
+                         sorted(['account_id', 'account_name']))
 
     def test_root_mfa_enabled(self):
         session_factory = self.replay_flight_data("test_account_root_mfa")
