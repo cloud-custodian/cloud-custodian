@@ -40,7 +40,6 @@ class ResourceManager(object):
         self.session_factory = ctx.session_factory
         self.config = ctx.options
         self.data = data
-        self.log_dir = ctx.log_dir
         self._cache = cache.factory(self.ctx.options)
         self.log = logging.getLogger('custodian.resources.%s' % (
             self.__class__.__name__.lower()))
@@ -75,9 +74,10 @@ class ResourceManager(object):
 
         assumes the query is for the same underlying cloud provider.
         """
-        provider_name = self.ctx.policy.provider_name
-        if resource_type.startswith('%s.' % provider_name):
-            _, resource_type = resource_type.split('.', 1)
+        if '.' in resource_type:
+            provider_name, resource_type = resource_type.split('.', 1)
+        else:
+            provider_name = self.ctx.policy.provider_name
 
         provider_resources = clouds[provider_name].resources
         klass = provider_resources.get(resource_type)

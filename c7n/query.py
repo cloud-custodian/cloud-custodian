@@ -422,7 +422,7 @@ class QueryResourceManager(ResourceManager):
         with self.ctx.tracer.subsegment('resource-augment'):
             resources = self.augment(resources)
 
-        resource_count = len(resources)            
+        resource_count = len(resources)
         self._cache.save(key, resources)
 
         with self.ctx.tracer.subsegment('filter'):

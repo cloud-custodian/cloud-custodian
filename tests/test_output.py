@@ -13,17 +13,19 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import gzip
 import logging
 import mock
-import unittest
 import shutil
 import os
 
-from c7n.ctx import ExecutionContext
-from c7n.output import DirectoryOutput
-from c7n.resources.aws import S3Output
+from dateutil.parser import parse as date_parse
 
+from c7n.ctx import ExecutionContext
+from c7n.output import DirectoryOutput, LogFile
+from c7n.resources.aws import S3Output
+from c7n.testing import mock_datetime_now, TestUtils
 
 from .common import Bag, BaseTest, TestConfig as Config
 
@@ -36,7 +38,8 @@ class DirOutputTest(BaseTest):
             ExecutionContext(
                 None,
                 Bag(name="xyz", provider_name="ostack"),
-                Config.empty(output_dir=location))
+                Config.empty(output_dir=location)),
+            {'url': location},
         )
 
     def test_dir_output(self):
@@ -45,7 +48,7 @@ class DirOutputTest(BaseTest):
         self.assertTrue(os.path.isdir(os.path.join(work_dir, "myoutput")))
 
 
-class S3OutputTest(unittest.TestCase):
+class S3OutputTest(TestUtils):
 
     def test_path_join(self):
 
@@ -77,7 +80,8 @@ class S3OutputTest(unittest.TestCase):
         self.assertIn("bucket:cloud-custodian", name)
 
     def test_join_leave_log(self):
-        output = self.get_s3_output()
+        temp_dir = self.get_temp_dir()
+        output = LogFile(Bag(log_dir=temp_dir), {})
         output.join_log()
 
         l = logging.getLogger("custodian.s3") # NOQA
@@ -93,7 +97,7 @@ class S3OutputTest(unittest.TestCase):
         # Reset logging.manager back to nose configured value
         l.manager.disable = v
 
-        with open(os.path.join(output.root_dir, "custodian-run.log")) as fh:
+        with open(os.path.join(temp_dir, "custodian-run.log")) as fh:
             content = fh.read().strip()
             self.assertTrue(content.endswith("hello world"))
 
@@ -116,8 +120,10 @@ class S3OutputTest(unittest.TestCase):
                     self.assertEqual(fh.read(), b"abc")
 
     def test_upload(self):
-        output = self.get_s3_output()
-        self.assertEqual(output.get_key_path(), "/policies/xyz")
+
+        with mock_datetime_now(date_parse('2018/09/01 13:00'), datetime):
+            output = self.get_s3_output()
+            self.assertEqual(output.key_prefix, "/policies/xyz/2018/09/01/13")
 
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
@@ -130,7 +136,7 @@ class S3OutputTest(unittest.TestCase):
         m.assert_called_with(
             fh.name,
             "cloud-custodian",
-            "%s/foo.txt" % output.get_key_path(),
+            "%s/foo.txt" % output.key_prefix.lstrip('/'),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
 
@@ -148,6 +154,6 @@ class S3OutputTest(unittest.TestCase):
         m.assert_called_with(
             fh.name,
             "cloud-custodian",
-            "%s/foo.txt" % output.get_key_path(),
+            "%s/foo.txt" % output.key_prefix.lstrip('/'),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )

@@ -651,7 +651,7 @@ class BucketDelete(BaseTest):
         self.assertIn(bname, buckets)
 
         # Make sure file got written
-        denied_file = os.path.join(p.resource_manager.log_dir, "denied.json")
+        denied_file = os.path.join(p.ctx.log_dir, "denied.json")
         self.assertIn(bname, open(denied_file).read())
         #
         # Now delete it for real

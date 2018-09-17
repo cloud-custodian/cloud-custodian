@@ -19,47 +19,11 @@ import os
 
 from dateutil import zoneinfo
 
-from mock import mock
-
 from .common import BaseTest, instance
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
-
-
-# Per http://blog.xelnor.net/python-mocking-datetime/
-# naive implementation has issues with pypy
-
-real_datetime_class = datetime.datetime
-
-
-def mock_datetime_now(tgt, dt):
-
-    class DatetimeSubclassMeta(type):
-
-        @classmethod
-        def __instancecheck__(mcs, obj):
-            return isinstance(obj, real_datetime_class)
-
-    class BaseMockedDatetime(real_datetime_class):
-        target = tgt
-
-        @classmethod
-        def now(cls, tz=None):
-            return cls.target.replace(tzinfo=tz)
-
-        @classmethod
-        def utcnow(cls):
-            return cls.target
-
-        # Python2 & Python3 compatible metaclass
-
-    MockedDatetime = DatetimeSubclassMeta(
-        b"datetime" if str is bytes else "datetime",  # hack Python2/3 port
-        (BaseMockedDatetime,),
-        {},
-    )
-    return mock.patch.object(dt, "datetime", MockedDatetime)
+from c7n.testing import mock_datetime_now
 
 
 class OffHoursFilterTest(BaseTest):

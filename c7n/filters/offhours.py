@@ -351,16 +351,16 @@ class Time(Filter):
 
     def process(self, resources, event=None):
         resources = super(Time, self).process(resources)
-        if self.parse_errors and self.manager and self.manager.log_dir:
+        if self.parse_errors and self.manager and self.manager.ctx.log_dir:
             self.log.warning("parse errors %d", len(self.parse_errors))
             with open(join(
-                    self.manager.log_dir, 'parse_errors.json'), 'w') as fh:
+                    self.manager.ctx.log_dir, 'parse_errors.json'), 'w') as fh:
                 dumps(self.parse_errors, fh=fh)
             self.parse_errors = []
-        if self.opted_out and self.manager and self.manager.log_dir:
+        if self.opted_out and self.manager and self.manager.ctx.log_dir:
             self.log.debug("disabled count %d", len(self.opted_out))
             with open(join(
-                    self.manager.log_dir, 'opted_out.json'), 'w') as fh:
+                    self.manager.ctx.log_dir, 'opted_out.json'), 'w') as fh:
                 dumps(self.opted_out, fh=fh)
             self.opted_out = []
         return resources
