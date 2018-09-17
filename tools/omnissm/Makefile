@@ -2,7 +2,7 @@
 
 bucket=c7n-ssm-build
 GCFLAGS="-trimpath $(shell go env GOPATH)/src"
-LDFLAGS="-X main.Version=`git rev-parse HEAD`"
+LDFLAGS="-X main.Revision=`git rev-parse HEAD`"
 functions := $(wildcard functions/*/.)
 
 build:

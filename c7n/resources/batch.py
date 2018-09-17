@@ -154,8 +154,7 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
     valid_origin_states = ('DISABLED',)
     valid_origin_status = ('VALID', 'INVALID')
 
-    def delete_environment(self, r):
-        client = local_session(self.manager.session_factory).client('batch')
+    def delete_environment(self, client, r):
         client.delete_compute_environment(
             computeEnvironment=r['computeEnvironmentName'])
 
@@ -164,8 +163,9 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
             self.filter_resource_state(
                 resources, 'state', self.valid_origin_states),
             'status', self.valid_origin_status)
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.delete_environment, resources))
+        client = local_session(self.manager.session_factory).client('batch')
+        for e in resources:
+            self.delete_environment(client, e)
 
 
 @JobDefinition.action_registry.register('deregister')

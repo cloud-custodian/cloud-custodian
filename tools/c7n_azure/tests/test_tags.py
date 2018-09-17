@@ -17,7 +17,7 @@ import datetime
 import logging
 import re
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, TEST_DATE
 from c7n_azure.session import Session
 from mock import patch
 
@@ -26,23 +26,58 @@ from c7n.filters import FilterValidationError
 
 class TagsTest(BaseTest):
 
-    # latest VCR recording date that tag tests
-    # If tests need to be re-recorded, update to current date
-    TEST_DATE = datetime.datetime(2018, 5, 16, 0, 0, 0)
-
     # regex for identifying valid email addresses
     EMAIL_REGEX = "[^@]+@[^@]+\.[^@]+"
 
     logger = logging.getLogger()
 
+    vm_name = 'cctestvm'
+    rg_name = 'test_vm'
+
+    client = Session().client('azure.mgmt.compute.ComputeManagementClient')
+
     def setUp(self):
         super(TagsTest, self).setUp()
+        self.before_tags = self.get_tags(self.rg_name, self.vm_name)
+
+    def tearDown(self):
+        self.after_tags = self.get_tags(self.rg_name, self.vm_name)
+
+        if (self.after_tags != self.before_tags):
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value_type': 'normalize',
+                    'value': 'cctestvm'}
+                ],
+                'actions': [
+                    {'type': 'untag',
+                    'tags': [k for k in self.after_tags.keys() if k not in self.before_tags.keys()]}
+                ],
+            })
+            p.run()
+            self.after_tags = self.get_tags(self.rg_name, self.vm_name)
+
+        self.assertEqual(self.before_tags, self.after_tags)
+        super(TagsTest, self).tearDown()
+
+    def get_tags(self, rg_name, vm_name):
+        vm = self.client.virtual_machines.get(rg_name, vm_name)
+        return vm.tags
+
+    def dict_diff(self, a, b):
+        return set(a.items()) ^ set(b.items())
 
     @arm_template('vm.json')
     def test_add_or_update_single_tag(self):
         """Verifies we can add a new tag to a VM and not modify
         an existing tag on that resource
         """
+
         p = self.load_policy({
             'name': 'test-azure-tag',
             'resource': 'azure.vm',
@@ -61,11 +96,8 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        # verify that the a new tag is added without modifying existing tags
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, {'tag1': 'value1', 'testtag': 'testvalue'})
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(self.dict_diff(self.before_tags, after_tags), {('tag1', 'value1')})
 
     @arm_template('vm.json')
     def test_add_or_update_tags(self):
@@ -74,13 +106,13 @@ class TagsTest(BaseTest):
         """
         p = self.load_policy({
             'name': 'test-azure-tag',
-            'resource': 'azure.resourcegroup',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test_vm'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'tag',
@@ -90,21 +122,19 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify initial tag set
-        s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        self.assertEqual(rg.tags,
-                         {'pre-existing-1': 'unmodified', 'pre-existing-2': 'unmodified'})
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(self.dict_diff(self.before_tags, after_tags),
+                         {('pre-existing-1', 'unmodified'), ('pre-existing-2', 'unmodified')})
 
         p = self.load_policy({
             'name': 'test-azure-tag',
-            'resource': 'azure.resourcegroup',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test_vm'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'tag',
@@ -114,10 +144,11 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify modified tags
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]  # NOQA
-        self.assertEqual(
-            rg.tags,
-            {'tag1': 'value1', 'pre-existing-1': 'modified', 'pre-existing-2': 'unmodified'})
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(self.dict_diff(self.before_tags, after_tags),
+                         {('tag1', 'value1'),
+                          ('pre-existing-1', 'modified'),
+                          ('pre-existing-2', 'unmodified')})
 
     def test_cant_have_both_tag_and_tags(self):
         with self.assertRaises(FilterValidationError):
@@ -204,10 +235,8 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify the initial tag set
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, {'tag1': 'to-delete', 'testtag': 'testvalue'})
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertTrue(after_tags.get('tag1') == 'to-delete')
 
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -227,8 +256,8 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify that the a tag is deleted without modifying existing tags
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(self.before_tags, after_tags)
 
     @arm_template('vm.json')
     def test_remove_tags(self):
@@ -237,13 +266,13 @@ class TagsTest(BaseTest):
         """
         p = self.load_policy({
             'name': 'test-azure-tag',
-            'resource': 'azure.resourcegroup',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test_vm'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'tag',
@@ -254,24 +283,21 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify initial tag set
-        s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        start_tags = rg.tags
-        self.assertTrue('pre-existing-1' in start_tags)
-        self.assertTrue('pre-existing-2' in start_tags)
-        self.assertTrue('added-1' in start_tags)
-        self.assertTrue('added-2' in start_tags)
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertTrue('pre-existing-1' in after_tags)
+        self.assertTrue('pre-existing-2' in after_tags)
+        self.assertTrue('added-1' in after_tags)
+        self.assertTrue('added-2' in after_tags)
 
         p = self.load_policy({
             'name': 'test-azure-remove-tag',
-            'resource': 'azure.resourcegroup',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test_vm'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'untag',
@@ -281,18 +307,20 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify tags removed and pre-existing tags not removed
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]  # NOQA
-        end_tags = rg.tags
-        self.assertTrue('pre-existing-1' in end_tags)
-        self.assertTrue('pre-existing-2' in end_tags)
-        self.assertTrue('added-1' not in end_tags)
-        self.assertTrue('added-2' not in end_tags)
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertTrue('pre-existing-1' in after_tags)
+        self.assertTrue('pre-existing-2' in after_tags)
+        self.assertTrue('added-1' not in after_tags)
+        self.assertTrue('added-2' not in after_tags)
 
     @arm_template('vm.json')
     def test_removal_does_not_raise_on_nonexistent_tag(self):
         """Verifies attempting to delete a tag that is
         not on the resource does not throw an error
         """
+
+        self.assertTrue('tag-does-not-exist' not in self.before_tags)
+
         p = self.load_policy({
             'name': 'test-azure-tag',
             'resource': 'azure.vm',
@@ -309,13 +337,6 @@ class TagsTest(BaseTest):
             ],
         })
 
-        # verify initial tag set
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        start_tags = vm.tags
-        self.assertTrue('tag-does-not-exist' not in start_tags)
-
         raised = False
         try:
             p.run()
@@ -323,9 +344,9 @@ class TagsTest(BaseTest):
             raised = True
 
         # verify no exception raised and no changes to tags on resource
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
         self.assertFalse(raised)
-        self.assertEqual(vm.tags, start_tags)
+        self.assertEqual(self.before_tags, after_tags)
 
     def test_must_specify_tags_to_remove(self):
         with self.assertRaises(FilterValidationError):
@@ -340,48 +361,50 @@ class TagsTest(BaseTest):
 
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_auto_tag_add_creator_tag(self, utcnow_mock):
+    def test_auto_tag_add_creator_tag(self, utcnow):
         """Adds CreatorEmail to a resource group.
+           IMPORTANT: If this test is failing, you might need to update
+                      TEST_DATE and capture new cassette.
         """
         p = self.load_policy({
             'name': 'test-azure-tag',
-            'resource': 'azure.resourcegroup',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test_vm'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'auto-tag-user',
-                 'tag': 'CreatorEmail'},
+                 'tag': 'CreatorEmail',
+                 'days': 2},
             ],
         })
         p.run()
 
-        # verify CreatorEmail tag set
-        s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        self.assertTrue(re.match(self.EMAIL_REGEX, rg.tags['CreatorEmail']))
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertTrue(re.match(self.EMAIL_REGEX, after_tags.get('CreatorEmail')))
 
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     @arm_template('vm.json')
-    def test_auto_tag_update_false_noop_for_existing_tag(self, utcnow_mock):
+    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
+    def test_auto_tag_update_false_noop_for_existing_tag(self, utcnow):
         """Adds CreatorEmail to a resource group
+           IMPORTANT: If this test is failing, you might need to update
+                      TEST_DATE and capture new cassette.
         """
 
         # setup by adding an existing CreatorEmail tag
         p = self.load_policy({
             'name': 'test-azure-tag',
-            'resource': 'azure.resourcegroup',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test_vm'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'tag',
@@ -393,13 +416,13 @@ class TagsTest(BaseTest):
 
         p = self.load_policy({
             'name': 'test-azure-tag',
-            'resource': 'azure.resourcegroup',
+            'resource': 'azure.vm',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'test_vm'}
+                 'value': 'cctestvm'}
             ],
             'actions': [
                 {'type': 'auto-tag-user',
@@ -410,11 +433,8 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        # verify CreatorEmail tag was not modified
-        s = Session()
-        client = s.client('azure.mgmt.resource.ResourceManagementClient')
-        rg = [rg for rg in client.resource_groups.list() if rg.name == 'test_vm'][0]
-        self.assertEqual(rg.tags['CreatorEmail'], 'do-not-modify')
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(after_tags['CreatorEmail'], 'do-not-modify')
 
     def test_auto_tag_days_must_be_btwn_1_and_90(self):
         with self.assertRaises(FilterValidationError):
@@ -471,13 +491,8 @@ class TagsTest(BaseTest):
         the space value.
         """
 
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        start_tags = vm.tags
-
         # verify there is at least 1 space for a tag
-        self.assertLess(len(start_tags), 15)
+        self.assertLess(len(self.before_tags), 15)
 
         # trim for space for 1 tag
         p = self.load_policy({
@@ -498,8 +513,8 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify that tags are unchanged
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, start_tags)
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(self.before_tags, after_tags)
 
     @arm_template('vm.json')
     def test_tag_trim_removes_tags_for_space(self):
@@ -526,11 +541,8 @@ class TagsTest(BaseTest):
         })
         p.run()
 
-        # verify more than 1 tag on resource
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertTrue(len(vm.tags) > 1)
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertTrue(len(after_tags) > 1)
 
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -544,8 +556,8 @@ class TagsTest(BaseTest):
             ],
             'actions': [
                 {'type': 'tag-trim',
-                 'space': 14,
-                 'preserve': ['testtag']
+                 'space': 15 - len(self.before_tags),
+                 'preserve': [k for k in self.before_tags.keys()]
                  }
             ],
         })
@@ -553,8 +565,8 @@ class TagsTest(BaseTest):
 
         # verify that tags were trimmed to
         # have 14 spaces and 1 preserved
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(len(vm.tags), 1)
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(self.before_tags, after_tags)
 
     @arm_template('vm.json')
     def test_tag_trim_space_0_removes_all_tags_but_preserve(self):
@@ -582,13 +594,10 @@ class TagsTest(BaseTest):
         p.run()
 
         # verify initial tags contain more than testtag
-        s = Session()
-        client = s.client('azure.mgmt.compute.ComputeManagementClient')
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertTrue('tag-to-trim1' in vm.tags)
-        self.assertTrue('tag-to-trim2' in vm.tags)
-        self.assertTrue('tag-to-trim3' in vm.tags)
-        self.assertTrue('testtag' in vm.tags)
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertTrue('tag-to-trim1' in after_tags)
+        self.assertTrue('tag-to-trim2' in after_tags)
+        self.assertTrue('tag-to-trim3' in after_tags)
 
         p = self.load_policy({
             'name': 'test-azure-tag',
@@ -603,15 +612,15 @@ class TagsTest(BaseTest):
             'actions': [
                 {'type': 'tag-trim',
                  'space': 0,
-                 'preserve': ['testtag']
+                 'preserve': [k for k in self.before_tags.keys()]
                  }
             ],
         })
         p.run()
 
         # verify all tags trimmed but testtag
-        vm = client.virtual_machines.get('test_vm', 'cctestvm')
-        self.assertEqual(vm.tags, {'testtag': 'testvalue'})
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(self.before_tags, after_tags)
 
     @arm_template('vm.json')
     @patch('logging.Logger.warning')
@@ -633,22 +642,40 @@ class TagsTest(BaseTest):
             'actions': [
                 {'type': 'tag-trim',
                  'space': 0,
-                 'preserve': ['testtag']
+                 'preserve': [k for k in self.before_tags.keys()]
                  }
             ],
         })
         p.run()
 
-        expected_warning = (
+        expected_warning_regex = (
             "Could not find any candidates to trim "
-            "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/"
-            "providers/Microsoft.Compute/virtualMachines/cctestvm"
+            "/subscriptions/[^/]+/resourceGroups/[^/]+/"
+            "providers/Microsoft.Compute/virtualMachines/[^/]+"
         )
 
-        logger_mock.assert_called_with(expected_warning)
+        args, _ = logger_mock.call_args
+        self.assertTrue(re.match(expected_warning_regex, args[0]) is not None)
 
     @arm_template('vm.json')
-    def test_tag_filter_present(self):
+    def test_tag_filter(self):
+        policy = {
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}],
+            'actions': [
+                {'type': 'tag',
+                 'tag': 'Pythontest',
+                 'value': 'ItWorks'}],
+        }
+        p = self.load_policy(policy)
+        resources = p.run()
+
         policy = {
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
@@ -664,8 +691,6 @@ class TagsTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @arm_template('vm.json')
-    def test_tag_filter_absent(self):
         policy = {
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
@@ -681,8 +706,6 @@ class TagsTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-    @arm_template('vm.json')
-    def test_tag_filter_value(self):
         policy = {
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
@@ -703,59 +726,59 @@ class TagsTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.utils.now', return_value=TEST_DATE)
     def test_mark_for_op(self, date_mock):
-        policy = {
-            'name': 'test-mark-for-op',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'}],
-            'actions': [
-                {'type': 'mark-for-op',
-                 'op': 'stop',
-                 'days': self.DAYS}
-            ]
-        }
-        p = self.load_policy(policy)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        """IMPORTANT: If this test is failing, you might need to update
+                      TEST_DATE and capture new cassette.
+        """
+        with patch('c7n_azure.utils.now') as MockClass:
+            MockClass.return_value = TEST_DATE
+            policy = {
+                'name': 'test-mark-for-op',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value_type': 'normalize',
+                    'value': 'cctestvm'}],
+                'actions': [
+                    {'type': 'mark-for-op',
+                    'op': 'stop',
+                    'days': self.DAYS}
+                ]
+            }
+            p = self.load_policy(policy)
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
 
-    @arm_template('vm.json')
-    @patch('c7n_azure.utils.now', return_value=TEST_DATE)
-    def test_marked_for_op_empty(self, date_mock):
-        policy = {
-            'name': 'test-mark-for-op',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'},
-                {'type': 'marked-for-op',
-                 'op': 'stop'}]
-        }
-        p = self.load_policy(policy)
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
+            policy = {
+                'name': 'test-mark-for-op',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value_type': 'normalize',
+                    'value': 'cctestvm'},
+                    {'type': 'marked-for-op',
+                    'op': 'stop'}]
+            }
+            p = self.load_policy(policy)
+            resources = p.run()
+            self.assertEqual(len(resources), 0)
 
-    @arm_template('vm.json')
-    @patch('c7n_azure.utils.now', return_value=TEST_DATE + datetime.timedelta(days=DAYS))
-    def test_marked_for_op(self, date_mock):
-        policy = {
-            'name': 'test-mark-for-op',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'},
-                {'type': 'marked-for-op',
-                 'op': 'stop'}]
-        }
-        p = self.load_policy(policy)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+            MockClass.return_value = TEST_DATE + datetime.timedelta(days=self.DAYS)
+            policy = {
+                'name': 'test-mark-for-op',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value_type': 'normalize',
+                    'value': 'cctestvm'},
+                    {'type': 'marked-for-op',
+                    'op': 'stop'}]
+            }
+            p = self.load_policy(policy)
+            resources = p.run()
+            self.assertEqual(len(resources), 1)

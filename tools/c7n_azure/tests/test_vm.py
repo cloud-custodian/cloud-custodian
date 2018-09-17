@@ -61,7 +61,7 @@ class VMTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     fake_running_vms = [{
-        'resourceGroup': 'test_resource_group',
+        'resourceGroup': 'test_vm',
         'name': 'test_vm'
     }]
 

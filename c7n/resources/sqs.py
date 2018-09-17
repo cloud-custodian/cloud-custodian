@@ -311,16 +311,16 @@ class DeleteSqsQueue(BaseAction):
     permissions = ('sqs:DeleteQueue',)
 
     def process(self, queues):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_queue, queues))
-
-    def process_queue(self, queue):
         client = local_session(self.manager.session_factory).client('sqs')
+        for q in queues:
+            self.process_queue(client, q)
+
+    def process_queue(self, client, queue):
         try:
             client.delete_queue(QueueUrl=queue['QueueUrl'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting queue:\n %s" % e)
+        except (client.exceptions.QueueDoesNotExist,
+                client.exceptions.QueueDeletedRecently):
+            pass
 
 
 @SQS.action_registry.register('set-encryption')
@@ -349,19 +349,21 @@ class SetEncryption(BaseAction):
     def process(self, queues):
         # get KeyId
         key = "alias/" + self.data.get('key')
-        self.key_id = local_session(self.manager.session_factory).client(
+        session = local_session(self.manager.session_factory)
+        key_id = session.client(
             'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_queue, queues))
+        client = session.client('sqs')
 
-    def process_queue(self, queue):
-        client = local_session(self.manager.session_factory).client('sqs')
+        for q in queues:
+            self.process_queue(client, q, key_id)
+
+    def process_queue(self, client, queue, key_id):
         try:
             client.set_queue_attributes(
                 QueueUrl=queue['QueueUrl'],
-                Attributes={'KmsMasterKeyId': self.key_id}
+                Attributes={'KmsMasterKeyId': key_id}
             )
-        except ClientError as e:
+        except (client.exceptions.QueueDoesNotExist,) as e:
             self.log.exception(
                 "Exception modifying queue:\n %s" % e)
 
@@ -395,13 +397,11 @@ class SetRetentionPeriod(BaseAction):
 
     permissions = ('sqs:SetQueueAttributes',)
 
-    def process_queue(self, q):
-        client = local_session(self.manager.session_factory).client('sqs')
-        client.set_queue_attributes(
-            QueueUrl=q['QueueUrl'],
-            Attributes={'MessageRetentionPeriod': str(self.period)})
-
     def process(self, queues):
-        self.period = self.data.get('period', 345600)
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_queue, queues))
+        client = local_session(self.manager.session_factory).client('sqs')
+        period = str(self.data.get('period', 345600))
+        for q in queues:
+            client.set_queue_attributes(
+                QueueUrl=q['QueueUrl'],
+                Attributes={
+                    'MessageRetentionPeriod': period})

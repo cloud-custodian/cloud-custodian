@@ -75,10 +75,19 @@ class LogOutputRegistry(OutputRegistry):
     default_protocol = "aws"
 
 
+class MetricsRegistry(OutputRegistry):
+
+    def select(self, selector, ctx):
+        # Compatibility for boolean configuration
+        if isinstance(selector, bool) and selector:
+            selector = 'aws'
+        return super(MetricsRegistry, self).select(selector, ctx)
+
+
 api_stats_outputs = OutputRegistry('c7n.output.api_stats')
 blob_outputs = BlobOutputRegistry('c7n.output.blob')
 log_outputs = LogOutputRegistry('c7n.output.logs')
-metrics_outputs = OutputRegistry('c7n.output.metrics')
+metrics_outputs = MetricsRegistry('c7n.output.metrics')
 tracer_outputs = OutputRegistry('c7n.output.tracer')
 sys_stats_outputs = OutputRegistry('c7n.output.sys_stats')
 

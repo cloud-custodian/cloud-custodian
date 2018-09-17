@@ -23,11 +23,18 @@ import os
 from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
-from c7n.output import DirectoryOutput, LogFile
-from c7n.resources.aws import S3Output
+from c7n.output import DirectoryOutput, LogFile, metrics_outputs
+from c7n.resources.aws import S3Output, MetricsOutput
 from c7n.testing import mock_datetime_now, TestUtils
 
 from .common import Bag, BaseTest, TestConfig as Config
+
+
+class MetricsTest(BaseTest):
+
+    def test_boolean_config_compatibility(self):
+        self.assertTrue(
+            isinstance(metrics_outputs.select(True, {}), MetricsOutput))
 
 
 class DirOutputTest(BaseTest):

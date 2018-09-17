@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 import uuid
+import os
+
 
 from c7n.output import (
     api_stats_outputs,
@@ -89,15 +91,18 @@ class ExecutionContext(object):
             'metadata.json', dumps(self.get_metadata(), indent=2))
         self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
 
-        # clear policy execution thread local session cache
-        reset_session_cache()
-
         with self.tracer.subsegment('output'):
             self.metrics.flush()
             self.logs.__exit__(exc_type, exc_value, exc_traceback)
             self.output.__exit__(exc_type, exc_value, exc_traceback)
 
         self.tracer.__exit__()
+
+        # IMPORTANT: multi-account execution (c7n-org and others) need to manually reset this.
+        # Why: Not doing this means we get excessive memory usage from client
+        # reconstruction.
+        if os.environ.get('C7N_TEST_RUN'):
+            reset_session_cache()
 
     def get_metadata(self, include=('sys-stats', 'api-stats', 'metrics')):
         t = time.time()
