@@ -29,7 +29,7 @@ class DiskTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': 'cctestvm_OsDisk_1_59fb7f64c815464aa1b991263b10ac7a'}],
+                 'value': 'cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

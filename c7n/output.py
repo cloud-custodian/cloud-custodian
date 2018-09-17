@@ -22,11 +22,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import contextlib
 from datetime import datetime
+import json
 import gzip
 import logging
+import os
 import shutil
 import time
-import os
+import uuid
+
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
@@ -72,16 +75,25 @@ class LogOutputRegistry(OutputRegistry):
     default_protocol = "aws"
 
 
+class MetricsRegistry(OutputRegistry):
+
+    def select(self, selector, ctx):
+        # Compatibility for boolean configuration
+        if isinstance(selector, bool) and selector:
+            selector = 'aws'
+        return super(MetricsRegistry, self).select(selector, ctx)
+
+
 api_stats_outputs = OutputRegistry('c7n.output.api_stats')
 blob_outputs = BlobOutputRegistry('c7n.output.blob')
 log_outputs = LogOutputRegistry('c7n.output.logs')
-metrics_outputs = OutputRegistry('c7n.output.metrics')
+metrics_outputs = MetricsRegistry('c7n.output.metrics')
 tracer_outputs = OutputRegistry('c7n.output.tracer')
 sys_stats_outputs = OutputRegistry('c7n.output.sys_stats')
 
 
 @tracer_outputs.register('default')
-class DefaultTracer(object):
+class NullTracer(object):
     """Tracing provides for detailed analytics of a policy execution.
 
     Uses native cloud provider integration (xray, stack driver trace).
@@ -137,7 +149,7 @@ class DeltaStats(object):
 
 @sys_stats_outputs.register('default')
 @api_stats_outputs.register('default')
-class DefaultStats(object):
+class NullStats(object):
     """Execution statistics/metrics collection.
 
     Encompasses concrete implementations over system stats (memory, cpu, cache size)
@@ -175,7 +187,7 @@ class DefaultStats(object):
 
 @sys_stats_outputs.register('psutil', condition=HAVE_PSUTIL)
 class SystemStats(DeltaStats):
-    """Collect process statistics via psutil
+    """Collect process statistics via psutil as deltas over policy execution.
     """
     def __init__(self, ctx, config=None):
         super(SystemStats, self).__init__(ctx, config)
@@ -228,9 +240,9 @@ class SystemStats(DeltaStats):
 
 class Metrics(object):
 
-    BUFFER_SIZE = 20
     permissions = ()
     namespace = DEFAULT_NAMESPACE
+    BUFFER_SIZE = 20
 
     def __init__(self, ctx, config=None):
         self.ctx = ctx
@@ -263,10 +275,10 @@ class Metrics(object):
 
 
 @metrics_outputs.register('default')
-class DefaultMetrics(Metrics):
+class LogMetrics(Metrics):
     """Default metrics collection.
 
-    logs metrics to standard out.
+    logs metrics, default handler should send to stderr
     """
     def _put_metrics(self, ns, metrics):
         for m in metrics:
@@ -308,6 +320,7 @@ class LogOutput(object):
     def __init__(self, ctx, config=None):
         self.ctx = ctx
         self.config = config or {}
+        self.handler = None
 
     def get_handler(self):
         raise NotImplementedError()
@@ -342,11 +355,7 @@ class LogFile(LogOutput):
     def get_handler(self):
         return logging.FileHandler(
             os.path.join(
-                self.ctx.output.root_dir, 'custodian-run.log'))
-
-    @staticmethod
-    def join(*parts):
-        return os.path.join(*parts)
+                self.ctx.log_dir, 'custodian-run.log'))
 
 
 @blob_outputs.register('file')
@@ -355,13 +364,15 @@ class DirectoryOutput(object):
 
     permissions = ()
 
-    def __init__(self, ctx, config=None):
+    def __init__(self, ctx, config):
         self.ctx = ctx
-        self.config = config or {}
-        self.root_dir = self.config['url']
-        if self.root_dir.startswith('file://'):
-            self.root_dir = self.root_dir[len('file://'):]
+        self.config = config
 
+        output_path = self.get_output_path(config['url'])
+        if output_path.startswith('file://'):
+            output_path = output_path[len('file://'):]
+
+        self.root_dir = output_path
         if self.root_dir and not os.path.exists(self.root_dir):
             os.makedirs(self.root_dir)
 
@@ -384,3 +395,30 @@ class DirectoryOutput(object):
                     with open(fp, "rb") as sfh:
                         shutil.copyfileobj(sfh, zfh, length=2**15)
                     os.remove(fp)
+
+    def get_output_path(self, output_url):
+        if '{' not in output_url:
+            return os.path.join(output_url, self.ctx.policy.name)
+        return output_url.format(**self.get_output_vars())
+
+    def get_output_vars(self):
+        data = {
+            'account_id': self.ctx.options.account_id,
+            'policy': self.ctx.policy.name,
+            'now': datetime.utcnow(),
+            'uuid': str(uuid.uuid4())}
+        return data
+
+    def get_resource_set(self):
+        record_path = os.path.join(self.root_dir, 'resources.json')
+
+        if not os.path.exists(record_path):
+            return []
+
+        mdate = datetime.fromtimestamp(
+            os.stat(record_path).st_ctime)
+
+        with open(record_path) as fh:
+            records = json.load(fh)
+            [r.__setitem__('CustodianDate', mdate) for r in records]
+            return records

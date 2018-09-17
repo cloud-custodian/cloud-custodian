@@ -29,7 +29,7 @@ class OutputTest(BaseTest):
         super(OutputTest, self).setUp()
 
     def get_azure_output(self):
-        output_dir="azure://mystorage.blob.core.windows.net/logs"
+        output_dir = "azure://mystorage.blob.core.windows.net/logs"
         output = AzureStorageOutput(
             ExecutionContext(
                 None,

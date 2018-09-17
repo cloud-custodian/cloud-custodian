@@ -40,7 +40,6 @@ class ResourceManager(object):
         self.session_factory = ctx.session_factory
         self.config = ctx.options
         self.data = data
-        self.log_dir = ctx.log_dir
         self._cache = cache.factory(self.ctx.options)
         self.log = logging.getLogger('custodian.resources.%s' % (
             self.__class__.__name__.lower()))
@@ -71,10 +70,20 @@ class ResourceManager(object):
         raise NotImplementedError("")
 
     def get_resource_manager(self, resource_type, data=None):
-        provider_resources = resources
+        """get a resource manager or a given resource type.
+
+        assumes the query is for the same underlying cloud provider.
+        """
+        if '.' in resource_type:
+            provider_name, resource_type = resource_type.split('.', 1)
+        else:
+            provider_name = self.ctx.policy.provider_name
+
+        provider_resources = clouds[provider_name].resources
         klass = provider_resources.get(resource_type)
         if klass is None:
             raise ValueError(resource_type)
+
         # if we're already querying via config carry it forward
         if not data and self.source_type == 'config' and getattr(
                 klass.get_model(), 'config_type', None):

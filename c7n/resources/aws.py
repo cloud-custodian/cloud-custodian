@@ -21,11 +21,11 @@ import datetime
 import itertools
 import logging
 import os
+import shutil
+import sys
 import tempfile
 import time
 import traceback
-import shutil
-import sys
 
 import boto3
 
@@ -379,9 +379,9 @@ class S3Output(DirectoryOutput):
     def __init__(self, ctx, config):
         self.ctx = ctx
         self.config = config
-        self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
+        self.output_path = self.get_output_path(self.config['url'])
         self.s3_path, self.bucket, self.key_prefix = utils.parse_s3(
-            self.config['url'])
+            self.output_path)
         self.root_dir = tempfile.mkdtemp()
         self.transfer = None
 
@@ -389,7 +389,14 @@ class S3Output(DirectoryOutput):
         return "<%s to bucket:%s prefix:%s>" % (
             self.__class__.__name__,
             self.bucket,
-            "%s/%s" % (self.key_prefix, self.date_path))
+            self.key_prefix)
+
+    def get_output_path(self, output_url):
+        if '{' not in output_url:
+            date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
+            return self.join(
+                output_url, self.ctx.policy.name, date_path)
+        return output_url.format(**self.get_output_vars())
 
     @staticmethod
     def join(*parts):
@@ -411,9 +418,8 @@ class S3Output(DirectoryOutput):
     def upload(self):
         for root, dirs, files in os.walk(self.root_dir):
             for f in files:
-                key = "%s/%s%s" % (
+                key = "%s%s" % (
                     self.key_prefix,
-                    self.date_path,
                     "%s/%s" % (
                         root[len(self.root_dir):], f))
                 key = key.strip('/')

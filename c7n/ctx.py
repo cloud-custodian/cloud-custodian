@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 import uuid
+import os
+
 
 from c7n.output import (
     api_stats_outputs,
@@ -35,13 +37,25 @@ class ExecutionContext(object):
         self.policy = policy
         self.options = options
         self.session_factory = session_factory
+
+        # Runtime initialized during policy execution
+        # We treat policies as a fly weight pre-execution.
         self.start_time = None
         self.execution_id = None
+        self.output = None
+        self.api_stats = None
+        self.sys_stats = None
 
-        self.metrics = metrics_outputs.select(options.metrics_enabled, self)
-        self.output = blob_outputs.select(options.output_dir, self)
-        self.logs = log_outputs.select(options.log_group, self)
-        self.tracer = tracer_outputs.select(options.tracer, self)
+        # A few tests patch on metrics flush
+        self.metrics = metrics_outputs.select(self.options.metrics_enabled, self)
+
+        # Tracer is wired into core filtering code / which is getting
+        # invoked sans execution context entry in tests
+        self.tracer = tracer_outputs.select(self.options.tracer, self)
+
+    def initialize(self):
+        self.output = blob_outputs.select(self.options.output_dir, self)
+        self.logs = log_outputs.select(self.options.log_group, self)
 
         # Look for customizations, but fallback to default
         for api_stats_type in (self.policy.provider_name, 'default'):
@@ -53,16 +67,15 @@ class ExecutionContext(object):
                 self.sys_stats = sys_stats_outputs.select(sys_stats_type, self)
                 break
 
-    @property
-    def log_dir(self):
-        if self.output:
-            return self.output.root_dir
-
-    def __enter__(self):
         self.start_time = time.time()
         self.execution_id = str(uuid.uuid4())
 
-        # User agent w/ policy name
+    @property
+    def log_dir(self):
+        return self.output.root_dir
+
+    def __enter__(self):
+        self.initialize()
         self.session_factory.policy_name = self.policy.name
         self.sys_stats.__enter__()
         self.output.__enter__()
@@ -72,9 +85,8 @@ class ExecutionContext(object):
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        if exc_type is not None:
+        if exc_type is not None and self.metrics:
             self.metrics.put_metric('PolicyException', 1, "Count")
-
         self.policy._write_file(
             'metadata.json', dumps(self.get_metadata(), indent=2))
         self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
@@ -86,9 +98,13 @@ class ExecutionContext(object):
 
         self.tracer.__exit__()
 
-        # clear policy execution thread local session cache
-        reset_session_cache()
         self.session_factory.policy_name = None
+        # IMPORTANT: multi-account execution (c7n-org and others) need
+        # to manually reset this.  Why: Not doing this means we get
+        # excessive memory usage from client reconstruction for dynamic-gen
+        # sdks.
+        if os.environ.get('C7N_TEST_RUN'):
+            reset_session_cache()
 
     def get_metadata(self, include=('sys-stats', 'api-stats', 'metrics')):
         t = time.time()

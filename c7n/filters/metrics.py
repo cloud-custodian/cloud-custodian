@@ -49,7 +49,7 @@ class MetricsFilter(Filter):
     Note periods when a resource is not sending metrics are not part
     of calculated statistics as in the case of a stopped ec2 instance,
     nor for resources to new to have existed the entire
-    period. ie. being stopped for an ec2 intsance wouldn't lower the
+    period. ie. being stopped for an ec2 instance wouldn't lower the
     average cpu utilization, nor would
     """
 

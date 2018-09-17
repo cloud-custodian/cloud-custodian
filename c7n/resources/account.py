@@ -928,8 +928,7 @@ class ShieldEnabled(Filter):
 
     def process(self, resources, event=None):
         state = self.data.get('state', False)
-        client = self.manager.session_factory().client('shield')
-
+        client = local_session(self.manager.session_factory).client('shield')
         try:
             subscription = client.describe_subscription().get(
                 'Subscription', None)
@@ -958,7 +957,7 @@ class SetShieldAdvanced(BaseAction):
         state={'type': 'boolean'})
 
     def process(self, resources):
-        client = self.manager.session_factory().client('shield')
+        client = local_session(self.manager.session_factory).client('shield')
         state = self.data.get('state', True)
 
         if state:

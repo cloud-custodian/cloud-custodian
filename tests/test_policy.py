@@ -137,7 +137,7 @@ class PolicyPermissions(BaseTest):
             if not getattr(v.resource_type, "config_type", None):
                 continue
 
-            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'default'})
+            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
             mgr = v(ctx, p)
 
@@ -171,7 +171,7 @@ class PolicyPermissions(BaseTest):
         cfg = Config.empty()
         for k, v in manager.resources.items():
 
-            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'default'})
+            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
 
             mgr = v(ctx, p)
@@ -498,6 +498,31 @@ class TestPolicy(BaseTest):
             "policy: log-delete exceeded resource limit: 2.5% found: 1 total: 1")
         self.assertEqual(
             p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
+
+    def test_policy_resource_limits_count(self):
+        session_factory = self.replay_flight_data(
+            "test_policy_resource_count")
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-resource-count",
+                "resource": "ecs",
+                "max-resources": 1
+            },
+            session_factory=session_factory)
+        self.assertRaises(ResourceLimitExceeded, p.run)
+        policy = {
+            "name": "ecs-cluster-resource-count",
+            "resource": "ecs",
+            "max-resources": 0
+        }
+        config = Config.empty(validate=True)
+        self.assertRaises(
+            Exception,
+            self.load_policy,
+            policy,
+            config=config,
+            session_factory=session_factory
+        )
 
     def test_policy_metrics(self):
         session_factory = self.replay_flight_data("test_policy_metrics")

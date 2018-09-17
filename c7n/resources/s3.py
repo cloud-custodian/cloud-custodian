@@ -100,10 +100,6 @@ class S3(query.QueryResourceManager):
     filter_registry = filters
     action_registry = actions
 
-    def __init__(self, ctx, data):
-        super(S3, self).__init__(ctx, data)
-        self.log_dir = ctx.log_dir
-
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeS3(self)
@@ -513,9 +509,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
 
         new_tags = {t['Key']: t['Value'] for t in add_tags}
         for t in bucket.get('Tags', ()):
-            if (t['Key'] not in new_tags and
-                    not t['Key'].startswith('aws') and
-                    t['Key'] not in remove_tags):
+            if (t['Key'] not in new_tags and t['Key'] not in remove_tags):
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
 
@@ -666,7 +660,7 @@ class GlobalGrantsFilter(Filter):
         permissions={
             'type': 'array', 'items': {
                 'type': 'string', 'enum': [
-                    'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
+                    'READ', 'WRITE', 'WRITE_ACP', 'READ_ACP', 'FULL_CONTROL']}})
 
     GLOBAL_ALL = "http://acs.amazonaws.com/groups/global/AllUsers"
     AUTH_ALL = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
@@ -1603,10 +1597,10 @@ class ScanBucket(BucketActionBase):
         return results
 
     def write_denied_buckets_file(self):
-        if self.denied_buckets and self.manager.log_dir:
+        if self.denied_buckets and self.manager.ctx.log_dir:
             with open(
                     os.path.join(
-                        self.manager.log_dir, 'denied.json'), 'w') as fh:
+                        self.manager.ctx.log_dir, 'denied.json'), 'w') as fh:
                 json.dump(list(self.denied_buckets), fh, indent=2)
             self.denied_buckets = set()
 
@@ -1624,7 +1618,7 @@ class ScanBucket(BucketActionBase):
         p = s3.get_paginator(
             self.get_bucket_op(b, 'iterator')).paginate(Bucket=b['Name'])
 
-        with BucketScanLog(self.manager.log_dir, b['Name']) as key_log:
+        with BucketScanLog(self.manager.ctx.log_dir, b['Name']) as key_log:
             with self.executor_factory(max_workers=10) as w:
                 try:
                     return self._process_bucket(b, p, key_log, w)

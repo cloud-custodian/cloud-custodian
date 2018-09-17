@@ -28,8 +28,8 @@ If you prefer to install the latest from source control you can do so as follows
   $ git clone https://github.com/capitalone/cloud-custodian.git
   $ virtualenv custodian
   $ source custodian/bin/activate
-  (custodian) $ pip install cloud-custodian
-  (custodian) $ pip install cloud-custodian/tools/c7n_azure
+  (custodian) $ pip install ./cloud-custodian
+  (custodian) $ pip install ./cloud-custodian/tools/c7n_azure
 
 .. _azure_write-policy:
 

@@ -41,6 +41,11 @@ class LoadBalancerTest(BaseTest):
             'name': 'test-loadbalancer-with-ipv6-frontend',
             'resource': 'azure.loadbalancer',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestloadbalancer'},
                 {'type': 'frontend-public-ip',
                  'key': 'properties.publicIPAddressVersion',
                  'op': 'in',

@@ -102,6 +102,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
         archive.build(self.policy.data)
         archive.close()
 
+        self.log.info("Function package built")
+
         if archive.wait_for_status(self.webapp_name):
             archive.publish(self.webapp_name)
         else:
@@ -186,6 +188,8 @@ class AzureEventGridMode(AzureFunctionMode):
         destination = WebHookEventSubscriptionDestination(
             endpoint_url=webhook_url
         )
+
+        self.log.info("Creating Event Grid subscription")
         event_filter = EventSubscriptionFilter()
         event_info = EventSubscription(destination=destination, filter=event_filter)
         scope = '/subscriptions/%s' % self.session.subscription_id
@@ -200,7 +204,7 @@ class AzureEventGridMode(AzureFunctionMode):
                     scope, self.webapp_name, event_info)
 
                 event_subscription.result()
-                self.log.info('Event subscription creation succeeded')
+                self.log.info('Event Grid subscription creation succeeded')
                 status_success = True
             except CloudError as e:
                 self.log.info(e)
@@ -208,6 +212,7 @@ class AzureEventGridMode(AzureFunctionMode):
                 time.sleep(30)
 
     def _get_webhook_key(self):
+        self.log.info("Fetching Function's API keys")
         token_headers = {
             'Authorization': 'Bearer %s' % self.session.get_bearer_token()
         }
