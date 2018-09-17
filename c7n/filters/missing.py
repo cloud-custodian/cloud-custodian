@@ -30,7 +30,7 @@ class Missing(Filter):
 
     def __init__(self, data, manager):
         super(Missing, self).__init__(data, manager)
-        self.embedded_policy = None
+        self.embedded_policy = Policy(self.data['policy'], self.manager.config)
 
     def validate(self):
         if 'mode' in self.data['policy']:
@@ -44,7 +44,6 @@ class Missing(Filter):
 
         # copy our policies name to the embedded policy name
         self.data['policy']['name'] = self.manager.ctx.policy.name
-        self.embedded_policy = Policy(self.data['policy'], self.manager.config)
         self.embedded_policy.validate()
         return self
 
