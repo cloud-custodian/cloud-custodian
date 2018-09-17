@@ -39,7 +39,7 @@ from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
 
 
-log = logging.getLogger('custodian.lambda')
+log = logging.getLogger('custodian.serverless')
 
 
 class PythonPackageArchive(object):
@@ -190,7 +190,7 @@ class PythonPackageArchive(object):
         self._closed = True
         self._zip_file.close()
         log.debug(
-            "Created custodian lambda archive size: %0.2fmb",
+            "Created custodian serverless archive size: %0.2fmb",
             (os.path.getsize(self._temp_archive_file.name) / (
                 1024.0 * 1024.0)))
         return self
@@ -204,7 +204,7 @@ class PythonPackageArchive(object):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
         with open(self._temp_archive_file.name, 'rb') as fh:
-            return encoder(checksum(fh, hasher()))
+            return encoder(checksum(fh, hasher())).decode('ascii')
 
     def get_bytes(self):
         """Return the entire zip file as a byte string. """

@@ -26,7 +26,6 @@ from concurrent.futures import as_completed
 import jmespath
 import six
 
-from botocore.paginate import set_value_from_jmespath
 
 from c7n.actions import ActionRegistry
 from c7n.exceptions import ClientError, ResourceLimitExceeded
@@ -35,7 +34,8 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource)
+    local_session, generate_arn, get_retry, chunks, camelResource,
+    set_value_from_jmespath)
 
 
 class ResourceQuery(object):

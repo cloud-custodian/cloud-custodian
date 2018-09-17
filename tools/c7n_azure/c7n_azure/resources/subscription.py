@@ -1,0 +1,104 @@
+# Copyright 2016-2017 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import six
+
+from azure.mgmt.resource.policy.models import PolicyAssignment
+from azure.mgmt.subscription import SubscriptionClient
+
+from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
+from c7n.manager import ResourceManager
+from c7n.utils import local_session, type_schema
+
+from c7n_azure.provider import resources
+from c7n_azure.query import QueryMeta
+
+
+@resources.register('subscription')
+@six.add_metaclass(QueryMeta)
+class Subscription(ResourceManager):
+
+    class resource_type(object):
+        id = 'subscriptionId'
+        name = 'displayName'
+        filter_name = None
+
+    def get_model(self):
+        return self.resource_type
+
+    def resources(self):
+        return self.filter_resources([self._get_subscription(self.session_factory, self.config)])
+
+    def get_resources(self, resource_ids):
+        return [self._get_subscription(self.session_factory, self.config)]
+
+    def _get_subscription(self, session_factory, config):
+        session = local_session(session_factory)
+        client = SubscriptionClient(session.get_credentials())
+        details = client.subscriptions.get(subscription_id=session.subscription_id)
+        return details.serialize(True)
+
+
+@Subscription.action_registry.register('add-policy')
+class AddPolicy(BaseAction):
+
+    schema = type_schema('add-policy',
+        required=['name', 'display_name', 'definition_name'],
+        scope={'type': 'string'},
+        definition_name={'type': 'string'},
+        name={'type': 'string'},
+        display_name={'type': 'string'})
+
+    policyDefinitionPrefix = '/providers/Microsoft.Authorization/policyDefinitions/'
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(AddPolicy, self).__init__(data, manager, log_dir)
+        self.session = local_session(self.manager.session_factory)
+        self.policyClient = self.session.client("azure.mgmt.resource.policy.PolicyClient")
+
+        self.paName = self.data.get('name')
+        self.displayName = self.data.get('display_name')
+        self.scope = '/subscriptions/' + self.session.subscription_id + \
+                     '/' + self.data.get('scope', '')
+
+        self.policyDefinitionName = self.data['definition_name']
+        self.policyDefinition = self._get_definition_id(self.policyDefinitionName)
+
+    def validate(self):
+        if self.policyDefinition is None:
+            raise PolicyValidationError(
+                "Azure Policy Definition '%s' not found." % (
+                    self.policyDefinitionName))
+
+    def _get_definition_id(self, name):
+        return next((r for r in self.policyClient.policy_definitions.list()
+                     if name == r.display_name or name == r.id), None)
+
+    def _add_policy(self, subscription):
+        parameters = PolicyAssignment(
+            display_name=self.displayName,
+            policy_definition_id=self.policyDefinition.id)
+
+        self.policyClient.policy_assignments.create(
+            scope=self.scope,
+            policy_assignment_name=self.paName,
+            parameters=parameters
+        )
+
+    def process(self, subscriptions):
+        for s in subscriptions:
+            self._add_policy(s)

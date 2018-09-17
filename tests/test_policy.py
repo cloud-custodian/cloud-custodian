@@ -169,8 +169,8 @@ class PolicyPermissions(BaseTest):
         self.capture_logging("c7n.cache")
         missing = []
         cfg = Config.empty()
-        for k, v in manager.resources.items():
 
+        for k, v in manager.resources.items():
             p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
 
@@ -190,7 +190,7 @@ class PolicyPermissions(BaseTest):
                     missing.append("%s.actions.%s" % (k, n))
 
             for n, f in v.filter_registry.items():
-                if n in ("and", "or", "not"):
+                if n in ("and", "or", "not", "missing"):
                     continue
                 p["filters"] = [n]
                 perms = f({}, mgr).get_permissions()
