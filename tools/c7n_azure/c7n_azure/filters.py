@@ -19,7 +19,7 @@ from c7n_azure.utils import now
 from dateutil import zoneinfo
 from dateutil.parser import parse
 
-from c7n.filters import Filter
+from c7n.filters import Filter, ValueFilter
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
 from c7n.utils import type_schema
@@ -242,3 +242,23 @@ class TagActionFilter(Filter):
 
         return self.current_date >= (
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
+
+
+class DiagnosticSettingsFilter(ValueFilter):
+
+    schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        #: :type: azure.mgmt.monitor.MonitorManagementClient
+        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+
+        filtered_resources = []
+        for resource in resources:
+            settings = client.diagnostic_settings.list(resource['id'])
+            settings = [s.as_dict() for s in settings.value]
+            filtered_settings = super().process(settings, event=None)
+
+            if filtered_settings:
+                filtered_resources.append(resource)
+
+        return filtered_resources
