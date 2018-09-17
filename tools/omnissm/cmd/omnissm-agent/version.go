@@ -16,18 +16,21 @@ package main
 
 import (
 	"fmt"
-	
+
 	"github.com/spf13/cobra"
+
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/omnissm"
 )
 
 var (
-	Version = "unknown"
-	
+	// git revision
+	Revision = "unknown"
+
 	VersionCmd = &cobra.Command{
 		Use:   "version",
 		Short: "",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(Version)
+			fmt.Printf("%s %s\n", omnissm.ClientVersion, Revision)
 		},
 	}
 )

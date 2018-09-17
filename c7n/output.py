@@ -56,6 +56,9 @@ class MetricsOutput(object):
     def select(metrics_selector):
         if not metrics_selector:
             return NullMetricsOutput
+        # Compatibility for boolean configuration
+        if isinstance(metrics_selector, bool):
+            metrics_selector = 'aws'
         for k in metrics_outputs.keys():
             if k.startswith(metrics_selector):
                 return metrics_outputs[k]

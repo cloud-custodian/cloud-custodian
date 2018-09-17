@@ -98,7 +98,7 @@ func main() {
 							continue
 						}
 					}
-					if entry.IsTagged > 0 {
+					if entry.IsTagged == 0 {
 						tags := make(map[string]string)
 						for k, v := range ci.Tags {
 							if !omni.HasResourceTag(k) {
@@ -119,7 +119,7 @@ func main() {
 							log.Info().Err(err).Msg("unable to defer AddTagsToResource")
 						}
 					}
-					if entry.IsInventoried > 0 {
+					if entry.IsInventoried == 0 {
 						err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.PutInventory,
 							Value: &ssm.CustomInventory{

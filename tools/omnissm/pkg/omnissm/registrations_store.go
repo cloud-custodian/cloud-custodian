@@ -43,8 +43,8 @@ type RegistrationEntry struct {
 	// represented as integers to allow for a LSI to be created in DynamoDB, as
 	// DynamoDB disallows creating a LSI on a Bool type. The value is false
 	// when equal to 0 and true when greater than 0.
-	IsTagged      int `json:"IsTagged"`
-	IsInventoried int `json:"IsInventoried"`
+	IsTagged      int `json:"IsTagged,omitempty"`
+	IsInventoried int `json:"IsInventoried,omitempty"`
 
 	// ActivationId/ActivationCode for registering with SSM
 	ssm.Activation
@@ -73,7 +73,6 @@ func NewRegistrations(config *RegistrationsConfig) *Registrations {
 func (r *Registrations) queryIndex(ctx context.Context, indexName, attrName, value string) ([]*RegistrationEntry, error) {
 	input := &dynamodb.QueryInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{":v1": {N: aws.String(value)}},
-		ConsistentRead:            aws.Bool(true),
 		IndexName:                 aws.String(indexName),
 		KeyConditionExpression:    aws.String(fmt.Sprintf("%s = :v1", attrName)),
 		TableName:                 aws.String(r.config.TableName),
@@ -102,13 +101,20 @@ type QueryIndexInput struct {
 }
 
 func (r *Registrations) QueryIndexes(ctx context.Context, inputs ...QueryIndexInput) ([]*RegistrationEntry, error) {
+	m := make(map[string]bool)
 	entries := make([]*RegistrationEntry, 0)
 	for _, input := range inputs {
 		resp, err := r.queryIndex(ctx, input.IndexName, input.AttrName, input.Value)
 		if err != nil {
 			return nil, err
 		}
-		entries = append(entries, resp...)
+		// avoid duplicates
+		for _, entry := range resp {
+			if !m[entry.Id] {
+				entries = append(entries, entry)
+				m[entry.Id] = true
+			}
+		}
 	}
 	return entries, nil
 }

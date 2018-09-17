@@ -49,10 +49,12 @@ class MethodAction(Action):
         resources = [r for r in resources if r.get(attr_name) in valid_enum]
         if len(resources) != rcount:
             self.log.warning(
-                "%s implicity filtered %d resources to %d by values %s",
+                "policy:%s action:%s implicitly filtered %d resources to %d by attr:%s",
+                self.manager.ctx.policy.name,
+                self.type,
                 rcount,
                 len(resources),
-                ", ".join(map(str, valid_enum))
+                attr_name,
             )
         return resources
 

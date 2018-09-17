@@ -131,8 +131,9 @@ class ConfigAppElb(ConfigSource):
 
 
 def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
+    client = local_session(session_factory).client('elbv2')
+
     def _process_tags(alb_set):
-        client = local_session(session_factory).client('elbv2')
         alb_map = {alb['LoadBalancerArn']: alb for alb in alb_set}
 
         results = retry(client.describe_tags, ResourceArns=list(alb_map.keys()))
@@ -488,11 +489,11 @@ class AppELBDeleteAction(BaseAction):
         "elasticloadbalancing:ModifyLoadBalancerAttributes",)
 
     def process(self, load_balancers):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_alb, load_balancers))
-
-    def process_alb(self, alb):
         client = local_session(self.manager.session_factory).client('elbv2')
+        for lb in load_balancers:
+            self.process_alb(client, lb)
+
+    def process_alb(self, client, alb):
         try:
             if self.data.get('force'):
                 client.modify_load_balancer_attributes(
@@ -503,14 +504,12 @@ class AppELBDeleteAction(BaseAction):
                     }])
             self.manager.retry(
                 client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
-        except Exception as e:
-            if e.response['Error']['Code'] in ['OperationNotPermitted',
-                                               'LoadBalancerNotFound']:
-                self.log.warning(
-                    "Exception trying to delete ALB: %s error: %s",
-                    alb['LoadBalancerArn'], e)
-                return
-            raise
+        except client.exceptions.LoadBalancerNotFoundException:
+            pass
+        except client.exceptions.OperationNotPermittedException as e:
+            self.log.warning(
+                "Exception trying to delete ALB: %s error: %s",
+                alb['LoadBalancerArn'], e)
 
 
 class AppELBListenerFilterBase(object):
@@ -519,16 +518,12 @@ class AppELBListenerFilterBase(object):
     permissions = ("elasticloadbalancing:DescribeListeners",)
 
     def initialize(self, albs):
-        def _process_listeners(alb):
-            client = local_session(
-                self.manager.session_factory).client('elbv2')
+        client = local_session(self.manager.session_factory).client('elbv2')
+        self.listener_map = defaultdict(list)
+        for alb in albs:
             results = client.describe_listeners(
                 LoadBalancerArn=alb['LoadBalancerArn'])
             self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
-
-        self.listener_map = defaultdict(list)
-        with self.manager.executor_factory(max_workers=2) as w:
-            list(w.map(_process_listeners, albs))
 
 
 def parse_attribute_value(v):
@@ -546,12 +541,11 @@ class AppELBAttributeFilterBase(object):
     """
 
     def initialize(self, albs):
+        client = local_session(self.manager.session_factory).client('elbv2')
+
         def _process_attributes(alb):
             if 'Attributes' not in alb:
                 alb['Attributes'] = {}
-
-                client = local_session(
-                    self.manager.session_factory).client('elbv2')
                 results = client.describe_load_balancer_attributes(
                     LoadBalancerArn=alb['LoadBalancerArn'])
                 # flatten out the list of dicts and cast
@@ -892,8 +886,9 @@ class AppELBTargetGroup(QueryResourceManager):
                 "elasticloadbalancing:DescribeTags")
 
     def augment(self, target_groups):
+        client = local_session(self.session_factory).client('elbv2')
+
         def _describe_target_group_health(target_group):
-            client = local_session(self.session_factory).client('elbv2')
             result = client.describe_target_health(
                 TargetGroupArn=target_group['TargetGroupArn'])
             target_group['TargetHealthDescriptions'] = result[
@@ -1065,12 +1060,12 @@ class AppELBTargetGroupDeleteAction(BaseAction):
     schema = type_schema('delete')
     permissions = ('elasticloadbalancing:DeleteTargetGroup',)
 
-    def process(self, target_group):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_targetgroup, target_group))
-
-    def process_targetgroup(self, target_group):
+    def process(self, resources):
         client = local_session(self.manager.session_factory).client('elbv2')
+        for tg in resources:
+            self.process_target_group(client, tg)
+
+    def process_target_group(self, client, target_group):
         self.manager.retry(
             client.delete_target_group,
             TargetGroupArn=target_group['TargetGroupArn'])
