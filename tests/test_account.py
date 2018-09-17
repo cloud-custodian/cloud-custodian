@@ -41,7 +41,7 @@ class AccountTests(BaseTest):
                 'type': 'missing',
                 'policy': {
                     'resource': 'aws.ec2'}
-                }]}, session_factory=session_factory)
+            }]}, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(sorted(list(resources[0].keys())),

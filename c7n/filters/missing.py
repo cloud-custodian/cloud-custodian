@@ -55,4 +55,3 @@ class Missing(Filter):
         if not check_resources:
             return resources
         return []
-
