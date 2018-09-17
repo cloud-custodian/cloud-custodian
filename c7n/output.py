@@ -84,7 +84,7 @@ sys_stats_outputs = OutputRegistry('c7n.output.sys_stats')
 
 
 @tracer_outputs.register('default')
-class DefaultTracer(object):
+class NullTracer(object):
     """Tracing provides for detailed analytics of a policy execution.
 
     Uses native cloud provider integration (xray, stack driver trace).
@@ -140,7 +140,7 @@ class DeltaStats(object):
 
 @sys_stats_outputs.register('default')
 @api_stats_outputs.register('default')
-class DefaultStats(object):
+class NullStats(object):
     """Execution statistics/metrics collection.
 
     Encompasses concrete implementations over system stats (memory, cpu, cache size)
@@ -178,7 +178,7 @@ class DefaultStats(object):
 
 @sys_stats_outputs.register('psutil', condition=HAVE_PSUTIL)
 class SystemStats(DeltaStats):
-    """Collect process statistics via psutil
+    """Collect process statistics via psutil as deltas over policy execution.
     """
     def __init__(self, ctx, config=None):
         super(SystemStats, self).__init__(ctx, config)
@@ -231,7 +231,6 @@ class SystemStats(DeltaStats):
 
 class Metrics(object):
 
-    BUFFER_SIZE = 20
     permissions = ()
     namespace = DEFAULT_NAMESPACE
     BUFFER_SIZE = 20
@@ -267,10 +266,10 @@ class Metrics(object):
 
 
 @metrics_outputs.register('default')
-class DefaultMetrics(Metrics):
+class LogMetrics(Metrics):
     """Default metrics collection.
 
-    logs metrics to standard out.
+    logs metrics, default handler should send to stderr
     """
     def _put_metrics(self, ns, metrics):
         for m in metrics:
