@@ -46,6 +46,8 @@ type RegistrationEntry struct {
 	IsTagged      int `json:"IsTagged,omitempty"`
 	IsInventoried int `json:"IsInventoried,omitempty"`
 
+	ClientVersion string `json:"ClientVersion,omitempty"`
+
 	// ActivationId/ActivationCode for registering with SSM
 	ssm.Activation
 }

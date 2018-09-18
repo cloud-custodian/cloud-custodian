@@ -28,3 +28,10 @@ if [ $# -eq 0 ] || [[ "$@" =~ "containerservice" ]]; then
 else
   echo "Skipping $rgName"
 fi
+
+# Destroy Azure Policy Assignment
+if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
+  az policy assignment delete --name cctestpolicy
+else
+  echo "Skipping policyassignment"
+fi

@@ -25,6 +25,7 @@ from dateutil.tz import tzutc
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
 
@@ -33,6 +34,9 @@ from c7n.resources.iam import CredentialReport
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
+
+
+filters.register('missing', Missing)
 
 
 def get_account(session_factory, config):

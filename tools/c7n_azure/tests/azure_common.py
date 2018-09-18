@@ -70,6 +70,9 @@ class AzureVCRBaseTest(VCRTestCase):
             DEFAULT_SUBSCRIPTION_ID,
             r2.path)
 
+        r1_path = r1_path.replace('//', '/')
+        r2_path = r2_path.replace('//', '/')
+
         return r1_path == r2_path
 
     def request_callback(self, request):
