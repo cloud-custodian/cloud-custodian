@@ -42,9 +42,6 @@ func init() {
 
 func main() {
 	lambda.Start(func(ctx context.Context) (err error) {
-		if err != nil {
-			return err
-		}
 		output, err := omni.SSM.DescribeInstanceInformationWithContext(ctx, &ssm.DescribeInstanceInformationInput{
 			InstanceInformationFilterList: []*ssm.InstanceInformationFilter{
 				{
@@ -53,6 +50,9 @@ func main() {
 				},
 			},
 		})
+		if err != nil {
+			return err
+		}
 		for _, element := range output.InstanceInformationList {
 			if err != nil {
 				return err
@@ -60,12 +60,12 @@ func main() {
 			if (time.Since(element.LastPingDateTime.UTC()).Hours() / 24) > omni.Config.CleanupAfterDays {
 				entry, err, ok := omni.Registrations.GetByManagedId(ctx, *element.InstanceId)
 				if err != nil {
-					return err
+					log.Error().Err(err)
 				}
 				if ok {
 					//entry found do full cleanup
 					if err := omni.DeregisterInstance(ctx, entry); err != nil {
-						return err
+						log.Error().Err(err)
 					}
 					log.Info().Msgf("Successfully deregistered instance: %#v", entry.ManagedId)
 				} else {
@@ -73,8 +73,9 @@ func main() {
 					if err := omni.SSM.DeregisterManagedInstance(ctx, *element.InstanceId); err != nil {
 						// if we fail here, log and try again with next run
 						log.Error().Err(err)
+					} else {
+						log.Info().Msgf("Successfully removed manager instance: %#v", *element.InstanceId)
 					}
-					log.Info().Msgf("Successfully removed manager instance: %#v", *element.InstanceId)
 				}
 			}
 		}
