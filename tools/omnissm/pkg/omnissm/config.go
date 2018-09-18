@@ -79,6 +79,10 @@ type Config struct {
 	// This is optional and x-ray is currently only supported when using lambda.
 	XRayTracingEnabled string `yaml:"xrayTracingEnabled"`
 
+	// The number of days to wait to clean up registered ssm instances that have a
+	// PingStatus of ConnectionLost
+	CleanupAfterDays float64 `yaml:"cleanupAfterDays"`
+
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
 	roleMap              map[string]string
