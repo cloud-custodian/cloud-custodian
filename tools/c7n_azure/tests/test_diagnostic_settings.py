@@ -36,10 +36,10 @@ class DiagnosticSettingsFilterTest(BaseTest):
                 },
                 {
                     'type': 'diagnostic-settings',
-                     'key': "logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled",
-                     'op': 'in',
-                     'value_type': 'swap',
-                     'value': True
+                    'key': "logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled",
+                    'op': 'in',
+                    'value_type': 'swap',
+                    'value': True
                 }
             ]
         })

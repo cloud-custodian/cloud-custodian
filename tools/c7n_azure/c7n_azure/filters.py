@@ -256,7 +256,7 @@ class DiagnosticSettingsFilter(ValueFilter):
         for resource in resources:
             settings = client.diagnostic_settings.list(resource['id'])
             settings = [s.as_dict() for s in settings.value]
-            filtered_settings = super().process(settings, event=None)
+            filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
 
             if filtered_settings:
                 filtered_resources.append(resource)
