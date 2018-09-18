@@ -190,3 +190,51 @@ Cancel operation on resource marked for operation
         actions:
           - type: untag
             tags: ['custodian_status']
+
+Diagnostic Settings Filter
+--------------------------
+
+``DiagnosticSettingsFilter``
+The diagnostic settings filter is implicitly just the ValueFilter (see :ref:`filters`) on the diagnostic settings for
+an azure resource.
+
+.. c7n-schema:: DiagnosticSettingsFilter
+    :module: c7n_azure.filters
+
+
+Example Policies
+----------------
+
+Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus category and LoadBalancerAlertEvent category
+enabled.
+
+.. code-block:: yaml
+
+    policies
+      - name: find-load-balancers-with-logs-enabled
+        resource: azure.loadbalancer
+        filters:
+          - type: diagnostic-settings
+            key: logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled
+            value: True
+            op: in
+            value_type: swap
+          - type: diagnostic-settings
+            key: logs[?category == 'LoadBalancerAlertEvent'][].enabled
+            value: True
+            op: in
+            value_type: swap
+
+Find KeyVaults that have logs enabled for the AuditEvent category.
+
+.. code-block:: yaml
+
+    policies
+      - name: find-load-balancers-with-logs-enabled
+        resource: azure.keyvault
+        filters:
+          - type: diagnostic-settings
+            key: logs[?category == 'AuditEvent'][].enabled
+            value: True
+            op: in
+            value_type: swap
