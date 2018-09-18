@@ -57,11 +57,12 @@ class DiagnosticSettingsFilterTest(BaseTest):
                     'value': 'cctestdiagnostic_loadbalancer',
                     'op': 'equal'
                 },
-                {'type': 'diagnostic-settings',
-                 'key': "logs[?category == 'LoadBalancerAlertEvent'][].enabled",
-                 'op': 'in',
-                 'value_type': 'swap',
-                 'value': True
+                {
+                    'type': 'diagnostic-settings',
+                    'key': "logs[?category == 'LoadBalancerAlertEvent'][].enabled",
+                    'op': 'in',
+                    'value_type': 'swap',
+                    'value': True
                  }
             ]
         })
