@@ -249,16 +249,20 @@ class DiagnosticSettingsFilter(ValueFilter):
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
+        # Process each resource in a separate thread, returning all that pass filter
+        with self.executor_factory(max_workers=3) as w:
+            processed = list(w.map(self.process_resource, resources))
+            return [resource for resource in processed if resource is not None]
+
+    def process_resource(self, resource):
         #: :type: azure.mgmt.monitor.MonitorManagementClient
         client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        settings = client.diagnostic_settings.list(resource['id'])
+        settings = [s.as_dict() for s in settings.value]
 
-        filtered_resources = []
-        for resource in resources:
-            settings = client.diagnostic_settings.list(resource['id'])
-            settings = [s.as_dict() for s in settings.value]
-            filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
+        filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
 
-            if filtered_settings:
-                filtered_resources.append(resource)
+        if filtered_settings:
+            return resource
 
-        return filtered_resources
+        return None
