@@ -54,9 +54,6 @@ func main() {
 			return err
 		}
 		for _, element := range output.InstanceInformationList {
-			if err != nil {
-				return err
-			}
 			if (time.Since(element.LastPingDateTime.UTC()).Hours() / 24) > omni.Config.CleanupAfterDays {
 				entry, err, ok := omni.Registrations.GetByManagedId(ctx, *element.InstanceId)
 				if err != nil {
