@@ -32,6 +32,7 @@ class ArmResourceManager(QueryResourceManager):
         enum_spec = ('resources', 'list', None)
         id = 'id'
         name = 'name'
+        diagnostic_settings_enabled = True
         default_report_fields = (
             'name',
             'location',

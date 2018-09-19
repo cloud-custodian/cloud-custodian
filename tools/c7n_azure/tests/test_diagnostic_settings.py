@@ -15,11 +15,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest, arm_template
 
+from c7n.filters.core import FilterValidationError
+
 
 class DiagnosticSettingsFilterTest(BaseTest):
 
     @arm_template('diagnostic-settings.json')
-    def test_filter_diagnostic_settings(self):
+    def test_filter_diagnostic_settings_enabled(self):
         """Verifies we can filter by a diagnostic setting
         on an azure resource.
         """
@@ -63,9 +65,30 @@ class DiagnosticSettingsFilterTest(BaseTest):
                     'op': 'in',
                     'value_type': 'swap',
                     'value': True
-                 }
+                }
             ]
         })
 
         resources_logs_not_enabled = p2.run()
         self.assertEqual(len(resources_logs_not_enabled), 0)
+
+    @arm_template('vm.json')
+    def test_filter_diagnostic_settings_not_enabled(self):
+        """Verifies validation fails if the resource type
+            does not use diagnostic settings.
+        """
+        with self.assertRaises(FilterValidationError):
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'filters': [
+                    {
+                        'type': 'diagnostic-settings',
+                        'key': "logs[*][].enabled",
+                        'op': 'in',
+                        'value_type': 'swap',
+                        'value': True
+                    }
+                ]
+            })
+            p.run()

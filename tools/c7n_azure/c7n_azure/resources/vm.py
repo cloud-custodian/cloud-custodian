@@ -30,6 +30,7 @@ class VirtualMachine(ArmResourceManager):
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
         enum_spec = ('virtual_machines', 'list_all', None)
+        diagnostic_settings_enabled = False
         default_report_fields = (
             'name',
             'location',
