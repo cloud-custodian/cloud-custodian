@@ -58,6 +58,7 @@ func main() {
 				entry, err, ok := omni.Registrations.GetByManagedId(ctx, *element.InstanceId)
 				if err != nil {
 					log.Error().Err(err)
+					continue
 				}
 				if ok {
 					//entry found do full cleanup
