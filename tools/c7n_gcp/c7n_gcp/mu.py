@@ -40,6 +40,7 @@ def custodian_archive(packages=None):
     requirements = set()
     requirements.add('jmespath')
     requirements.add('retrying')
+    requirements.add('python-dateutil')
     requirements.add('ratelimiter>=1.2.0.post0')
     requirements.add('google-auth>=1.4.1')
     requirements.add('google-auth-httplib2>=0.0.3')
@@ -159,8 +160,10 @@ class CloudFunctionManager(object):
         source_headers, _ = http.request(source_info['downloadUrl'], 'HEAD')
         # 'x-goog-hash': 'crc32c=tIfQ9A==, md5=DqrN06/NbVGsG+3CdrVK+Q=='
         deployed_checksum = source_headers['x-goog-hash'].split(',')[-1].split('=', 1)[-1]
-        log.debug("archive checksum %r deployed checksum %r", checksum, deployed_checksum)
-        return deployed_checksum != checksum
+        modified = deployed_checksum != checksum
+        log.debug("archive modified:%s checksum %r deployed checksum %r",
+                  modified, checksum, deployed_checksum)
+        return modified
 
     def _upload(self, archive, region):
         """Upload function source and return source url
@@ -180,7 +183,7 @@ class CloudFunctionManager(object):
                 'Content-Length': '%d' % archive.size,
                 'x-goog-content-length-range': '0,104857600'
             },
-            body=open(archive.path)
+            body=open(archive.path, 'rb')
         )
         log.info("function code uploaded")
         if headers['status'] != '200':

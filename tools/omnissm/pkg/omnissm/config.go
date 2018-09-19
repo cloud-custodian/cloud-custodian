@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	version "github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
@@ -83,9 +84,16 @@ type Config struct {
 	// PingStatus of ConnectionLost
 	CleanupAfterDays float64 `yaml:"cleanupAfterDays"`
 
+	// Version constraints for allowable client requests during registration. If
+	// constraints are empty, all versions are allowed. Version string should
+	// conform with github.com/hashicorp/go-version format, i.e. comma-separated
+	// rules like ">= 1.1.0, < 2.0.0"
+	ClientVersionConstraints string `yaml:"clientVersionConstraints"`
+
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
 	roleMap              map[string]string
+	versionConstraint    version.Constraints
 }
 
 func NewConfig() *Config {
@@ -114,6 +122,7 @@ func ReadConfig(path string) (*Config, error) {
 		return nil, errors.Wrap(err, "cannot unmarshal")
 	}
 	MergeConfig(&c, ReadConfigFromEnv())
+	c.setDefaults()
 	return &c, nil
 }
 
@@ -176,6 +185,9 @@ func MergeConfig(config *Config, other *Config) {
 	if other.SNSPublishRole != "" {
 		config.SNSPublishRole = other.SNSPublishRole
 	}
+	if other.ClientVersionConstraints != "" {
+		config.ClientVersionConstraints = other.ClientVersionConstraints
+	}
 	config.setDefaults()
 }
 
@@ -188,6 +200,12 @@ func (c *Config) setDefaults() {
 	}
 	if len(c.ResourceTags) == 0 {
 		c.ResourceTags = []string{"App", "OwnerContact", "Name"}
+	}
+	if c.ClientVersionConstraints != "" {
+		cs, err := version.NewConstraint(c.ClientVersionConstraints)
+		if err == nil {
+			c.versionConstraint = cs
+		}
 	}
 	if c.roleMap == nil {
 		c.roleMap = make(map[string]string)
@@ -208,6 +226,19 @@ func (c *Config) setDefaults() {
 		c.resourceTags[t] = struct{}{}
 	}
 	c.Config = aws.NewConfig().WithMaxRetries(c.MaxRetries)
+}
+
+func (c *Config) RequestVersionValid(vs string) bool {
+	if c.versionConstraint == nil {
+		return true
+	} else if vs == "" {
+		return false
+	}
+	v, err := version.NewVersion(vs)
+	if err != nil {
+		return false
+	}
+	return c.versionConstraint.Check(v)
 }
 
 func (c *Config) HasAssumeRole(accountId string) (roleArn string, ok bool) {

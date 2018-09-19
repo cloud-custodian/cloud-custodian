@@ -29,7 +29,7 @@ class NetworkInterfaceTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': 'myVMNic'}],
+                 'value': 'cctestnic'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

@@ -21,9 +21,15 @@ import shutil
 import os
 
 from c7n.ctx import ExecutionContext
-from c7n.output import S3Output, DirectoryOutput
+from c7n.output import S3Output, DirectoryOutput, MetricsOutput
 
 from .common import Bag, BaseTest, TestConfig as Config
+
+
+class MetricsTest(BaseTest):
+
+    def test_boolean_config_compatibility(self):
+        self.assertEqual(MetricsOutput.select(True), MetricsOutput)
 
 
 class DirOutputTest(BaseTest):

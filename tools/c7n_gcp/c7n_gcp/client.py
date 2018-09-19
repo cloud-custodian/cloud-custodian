@@ -42,6 +42,7 @@ from retrying import retry
 from six.moves import http_client
 from six.moves.urllib.error import URLError
 
+HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
 
 CLOUD_SCOPES = frozenset(['https://www.googleapis.com/auth/cloud-platform'])
 
@@ -128,7 +129,9 @@ def _build_http(http=None):
     """Construct an http client suitable for googleapiclient usage w/ user agent.
     """
     if not http:
-        http = httplib2.Http(timeout=HTTP_REQUEST_TIMEOUT)
+        http = httplib2.Http(
+            timeout=HTTP_REQUEST_TIMEOUT, ca_certs=HTTPLIB_CA_BUNDLE)
+
     user_agent = 'Python-httplib2/{} (gzip), {}/{}'.format(
         httplib2.__version__,
         'custodian-gcp',

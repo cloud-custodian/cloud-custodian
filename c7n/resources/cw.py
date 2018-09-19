@@ -242,14 +242,13 @@ class LastWriteDays(Filter):
     permissions = ('logs:DescribeLogStreams',)
 
     def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
         self.date_threshold = datetime.utcnow() - timedelta(
             days=self.data['days'])
-        return super(LastWriteDays, self).process(resources)
+        return [r for r in resources if self.check_group(client, r)]
 
-    def __call__(self, group):
-        self.log.debug("Processing group %s", group['logGroupName'])
-        logs = local_session(self.manager.session_factory).client('logs')
-        streams = logs.describe_log_streams(
+    def check_group(self, client, group):
+        streams = client.describe_log_streams(
             logGroupName=group['logGroupName'],
             orderBy='LastEventTime',
             descending=True,

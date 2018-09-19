@@ -56,6 +56,9 @@ class MetricsOutput(object):
     def select(metrics_selector):
         if not metrics_selector:
             return NullMetricsOutput
+        # Compatibility for boolean configuration
+        if isinstance(metrics_selector, bool):
+            metrics_selector = 'aws'
         for k in metrics_outputs.keys():
             if k.startswith(metrics_selector):
                 return metrics_outputs[k]
@@ -270,14 +273,15 @@ class S3Output(FSOutput):
         return "/".join([s.strip('/') for s in parts])
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        from boto3.s3.transfer import S3Transfer
+        from boto3.s3.transfer import S3Transfer, TransferConfig
         if exc_type is not None:
             log.exception("Error while executing policy")
         log.debug("Uploading policy logs")
         self.leave_log()
         self.compress()
         self.transfer = S3Transfer(
-            self.ctx.session_factory(assume=False).client('s3'))
+            self.ctx.session_factory(assume=False).client('s3'),
+            config=TransferConfig(use_threads=False))
         self.upload()
         shutil.rmtree(self.root_dir)
         log.debug("Policy Logs uploaded")
