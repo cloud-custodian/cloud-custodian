@@ -50,3 +50,37 @@ func TestRegistrationRequestUnmarshal(t *testing.T) {
 		}
 	}
 }
+
+func TestRequestVersionValid(t *testing.T) {
+	testCases := []struct {
+		clientVersion string
+		constraint    string
+		expected      bool
+	}{
+		// positive
+		{"", "", true},
+		{"12345abcde", "", true},
+		{"1.0.0", "", true},
+		{"1.0.0", "1.0.0", true},
+		{"1.0.0", ">= 1.0.0", true},
+		{"1.0.1", ">= 1.0.0", true},
+		{"1.1.0", ">= 1.0.0", true},
+		{"2.0.0", ">= 1.0.0", true},
+
+		// negative
+		{"", "1.0.0", false},
+		{"12345abcde", "1.0.0", false},
+		{"12345abcde", ">= 1.0.0", false},
+		{"1.0.1", ">= 1.1.0", false},
+	}
+
+	for i, tc := range testCases {
+		c := &omnissm.Config{
+			ClientVersionConstraints: tc.constraint,
+		}
+		omnissm.MergeConfig(c, &omnissm.Config{})
+		if got := c.RequestVersionValid(tc.clientVersion); got != tc.expected {
+			t.Errorf("TestCase %d: version %#v constraint %#v (got %t, want %t)", i, tc.clientVersion, tc.constraint, got, tc.expected)
+		}
+	}
+}

@@ -1,4 +1,5 @@
 import os
+from c7n.utils import reset_session_cache
 from contextlib import contextmanager
 
 
@@ -18,8 +19,11 @@ def environ(**kw):
     current_env = dict(os.environ)
     for k, v in kw.items():
         os.environ[k] = v
-    yield os.environ
 
-    for k in kw.keys():
-        del os.environ[k]
-    os.environ.update(current_env)
+    try:
+        yield os.environ
+    finally:
+        for k in kw.keys():
+            del os.environ[k]
+        os.environ.update(current_env)
+        reset_session_cache()

@@ -56,28 +56,7 @@ class FunctionPackage(object):
     def _add_host_config(self):
         config = \
             {
-                "http": {
-                    "routePrefix": "api",
-                    "maxConcurrentRequests": 5,
-                    "maxOutstandingRequests": 30
-                },
-                "logger": {
-                    "defaultLevel": "Trace",
-                    "categoryLevels": {
-                        "Worker": "Trace"
-                    }
-                },
-                "queues": {
-                    "visibilityTimeout": "00:00:10"
-                },
-                "swagger": {
-                    "enabled": True
-                },
-                "eventHub": {
-                    "maxBatchSize": 1000,
-                    "prefetchCount": 1000,
-                    "batchCheckpointFrequency": 1
-                },
+                "version": "2.0",
                 "healthMonitor": {
                     "enabled": True,
                     "healthCheckInterval": "00:00:10",
@@ -85,7 +64,17 @@ class FunctionPackage(object):
                     "healthCheckThreshold": 6,
                     "counterThreshold": 0.80
                 },
-                "functionTimeout": "00:05:00"
+                "functionTimeout": "00:05:00",
+                "logging": {
+                    "fileLoggingMode": "debugOnly"
+                },
+                "extensions": {
+                    "http": {
+                        "routePrefix": "api",
+                        "maxConcurrentRequests": 5,
+                        "maxOutstandingRequests": 30
+                    }
+                }
             }
         self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
 
@@ -227,7 +216,7 @@ class FunctionPackage(object):
             'Authorization': 'Bearer %s' % (s.get_bearer_token())
         }
 
-        self.log.info("Publishing package at: %s" % self.pkg.path)
+        self.log.info("Publishing Function package from %s" % self.pkg.path)
 
         zip_file = open(self.pkg.path, 'rb').read()
 

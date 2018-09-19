@@ -437,15 +437,23 @@ def assemble_bucket(item):
                 methods.append((m, k, default, select))
                 continue
             else:
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    b.setdefault('c7n:DeniedMethods', []).append(m)
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
-                # We don't bail out, continue processing if we can.
+                # For auth failures, we don't bail out, continue processing if we can.
                 # Note this can lead to missing data, but in general is cleaner than
-                # failing hard.
-                continue
+                # failing hard, due to the common use of locked down s3 bucket policies
+                # that may cause issues fetching information across a fleet of buckets.
+
+                # This does mean s3 policies depending on augments should check denied
+                # methods annotation, generally though lacking get access to an augment means
+                # they won't have write access either.
+
+                # For other error types we raise and bail policy execution.
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    b.setdefault('c7n:DeniedMethods', []).append(m)
+                    continue
+                raise
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
@@ -505,9 +513,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
 
         new_tags = {t['Key']: t['Value'] for t in add_tags}
         for t in bucket.get('Tags', ()):
-            if (t['Key'] not in new_tags and
-                    not t['Key'].startswith('aws') and
-                    t['Key'] not in remove_tags):
+            if (t['Key'] not in new_tags and t['Key'] not in remove_tags):
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
 
@@ -658,7 +664,7 @@ class GlobalGrantsFilter(Filter):
         permissions={
             'type': 'array', 'items': {
                 'type': 'string', 'enum': [
-                    'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
+                    'READ', 'WRITE', 'WRITE_ACP', 'READ_ACP', 'FULL_CONTROL']}})
 
     GLOBAL_ALL = "http://acs.amazonaws.com/groups/global/AllUsers"
     AUTH_ALL = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"

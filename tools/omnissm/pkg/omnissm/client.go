@@ -30,6 +30,8 @@ import (
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/servicectl"
 )
 
+const ClientVersion = "1.0.0"
+
 type Client struct {
 	*http.Client
 
@@ -62,9 +64,10 @@ func NewClient(url string) (*Client, error) {
 // should an existing one not be found in the registrations table.
 func (c *Client) Register() error {
 	data, err := json.Marshal(RegistrationRequest{
-		Provider:  "aws",
-		Document:  c.document,
-		Signature: c.signature,
+		Provider:      "aws",
+		Document:      c.document,
+		Signature:     c.signature,
+		ClientVersion: ClientVersion,
 	})
 	if err != nil {
 		return errors.Wrap(err, "cannot marshal new registration request")
@@ -112,10 +115,11 @@ func (c *Client) Update() error {
 	}
 	c.ManagedId = info.InstanceId
 	data, err := json.Marshal(RegistrationRequest{
-		Provider:  "aws",
-		Document:  c.document,
-		Signature: c.signature,
-		ManagedId: info.InstanceId,
+		Provider:      "aws",
+		Document:      c.document,
+		Signature:     c.signature,
+		ManagedId:     info.InstanceId,
+		ClientVersion: ClientVersion,
 	})
 	if err != nil {
 		return errors.Wrap(err, "cannot marshal registration request")

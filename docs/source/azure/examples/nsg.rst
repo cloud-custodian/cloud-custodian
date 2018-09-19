@@ -1,17 +1,21 @@
 Deny access to Network Security Group.
 ======================================
 
-This policy will deny access to all security rules with any Inbound SSH ports that are NOT 22, 23 or 24.
+This policy will deny access to all ports that are NOT 22, 23 or 24 for all Network Security Groups
 For more examples see :ref:`azure_nsg`
 
 .. code-block:: yaml
 
       policies:
-       - name: close-ingress-except-22-24
+       - name: close-inbound-except-22-24
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            exceptPorts: [22,23,24]
+            exceptPorts: '22-24'
+            ports-op: 'any'
+            access: 'Allow'
          actions:
           - type: close
+            exceptPorts: '22-24'
+            direction: 'Inbound'
 

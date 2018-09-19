@@ -29,7 +29,7 @@ class VMSSTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': 'cctest'}],
+                 'value': 'cctestvmss'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

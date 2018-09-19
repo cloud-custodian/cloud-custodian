@@ -30,7 +30,7 @@ import os
 
 from c7n.registry import PluginRegistry
 from c7n.log import CloudWatchLogHandler
-from c7n.utils import local_session, parse_s3, get_retry
+from c7n.utils import chunks, local_session, parse_s3, get_retry
 
 DEFAULT_NAMESPACE = "CloudMaid"
 
@@ -50,10 +50,15 @@ class MetricsOutput(object):
 
     retry = staticmethod(get_retry(('Throttling',)))
 
+    BUFFER_SIZE = 20
+
     @staticmethod
     def select(metrics_selector):
         if not metrics_selector:
             return NullMetricsOutput
+        # Compatibility for boolean configuration
+        if isinstance(metrics_selector, bool):
+            metrics_selector = 'aws'
         for k in metrics_outputs.keys():
             if k.startswith(metrics_selector):
                 return metrics_outputs[k]
@@ -71,7 +76,7 @@ class MetricsOutput(object):
         To disable this and use the system's time zone, C7N_METRICS_TZ shoule be set to FALSE.
         """
 
-        if os.getenv("C7N_METRICS_TZ", '').upper() in ('TRUE', ''):
+        if os.getenv("C7N_METRICS_TZ", 'TRUE').upper() in ('TRUE', ''):
             return datetime.datetime.utcnow()
         else:
             return datetime.datetime.now()
@@ -106,8 +111,9 @@ class MetricsOutput(object):
 
     def _put_metrics(self, ns, metrics):
         watch = local_session(self.ctx.session_factory).client('cloudwatch')
-        return self.retry(
-            watch.put_metric_data, Namespace=ns, MetricData=metrics)
+        for metric_values in chunks(metrics, self.BUFFER_SIZE):
+            return self.retry(
+                watch.put_metric_data, Namespace=ns, MetricData=metrics)
 
 
 class NullMetricsOutput(MetricsOutput):
@@ -267,14 +273,15 @@ class S3Output(FSOutput):
         return "/".join([s.strip('/') for s in parts])
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        from boto3.s3.transfer import S3Transfer
+        from boto3.s3.transfer import S3Transfer, TransferConfig
         if exc_type is not None:
             log.exception("Error while executing policy")
         log.debug("Uploading policy logs")
         self.leave_log()
         self.compress()
         self.transfer = S3Transfer(
-            self.ctx.session_factory(assume=False).client('s3'))
+            self.ctx.session_factory(assume=False).client('s3'),
+            config=TransferConfig(use_threads=False))
         self.upload()
         shutil.rmtree(self.root_dir)
         log.debug("Policy Logs uploaded")
