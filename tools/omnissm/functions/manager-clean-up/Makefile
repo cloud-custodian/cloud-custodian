@@ -1,4 +1,4 @@
-function-name=manager-cleanup
+function-name=manager-clean-up
 config-file=../config.yaml
 
 build:
