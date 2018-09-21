@@ -69,8 +69,11 @@ class ArmResourceManager(QueryResourceManager):
                 klass.filter_registry.register('metric', MetricFilter)
                 klass.filter_registry.register('marked-for-op', TagActionFilter)
                 klass.action_registry.register('mark-for-op', TagDelayedAction)
-                klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
                 klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
+                if hasattr(klass.resource_type, 'diagnostic_settings_enabled') \
+                        and klass.resource_type.diagnostic_settings_enabled:
+                    klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
+
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

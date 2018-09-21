@@ -250,11 +250,6 @@ class DiagnosticSettingsFilter(ValueFilter):
 
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
 
-    def validate(self):
-        if not self.manager.resource_type.diagnostic_settings_enabled:
-            raise FilterValidationError("Resource type %s does not have diagnostic settings." % (
-                                        self.manager.type))
-
     def process(self, resources, event=None):
         # Process each resource in a separate thread, returning all that pass filter
         with self.executor_factory(max_workers=3) as w:
