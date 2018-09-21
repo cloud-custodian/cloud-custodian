@@ -23,7 +23,9 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import Filter, FilterRegistry, ValueFilter, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
 
@@ -32,6 +34,9 @@ from c7n.resources.iam import CredentialReport
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
+
+
+filters.register('missing', Missing)
 
 
 def get_account(session_factory, config):
@@ -131,7 +136,7 @@ class CloudTrailEnabled(Filter):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
         if self.data.get('current-region'):
             current_region = session.region_name
-            trails  = [t for t in trails if t.get(
+            trails = [t for t in trails if t.get(
                 'HomeRegion') == current_region or t.get('IsMultiRegionTrail')]
         if self.data.get('kms'):
             trails = [t for t in trails if t.get('KmsKeyId')]
@@ -417,7 +422,7 @@ class ServiceLimit(Filter):
         region = self.manager.data.get('region', '')
         if len(self.global_services.intersection(self.data.get('services', []))):
             if region != 'us-east-1':
-                raise FilterValidationError(
+                raise PolicyValidationError(
                     "Global services: %s must be targeted in us-east-1 on the policy"
                     % ', '.join(self.global_services))
         return self
@@ -496,6 +501,7 @@ class RequestLimitIncrease(BaseAction):
             'type': {'enum': ['request-limit-increase']},
             'percent-increase': {'type': 'number', 'minimum': 1},
             'amount-increase': {'type': 'number', 'minimum': 1},
+            'minimum-increase': {'type': 'number', 'minimum': 1},
             'subject': {'type': 'string'},
             'message': {'type': 'string'},
             'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']}
@@ -532,12 +538,13 @@ class RequestLimitIncrease(BaseAction):
         limit_exceeded = resources[0].get('c7n:ServiceLimitsExceeded', [])
         percent_increase = self.data.get('percent-increase')
         amount_increase = self.data.get('amount-increase')
+        minimum_increase = self.data.get('minimum-increase', 1)
 
         for s in limit_exceeded:
             current_limit = int(s['limit'])
             if percent_increase:
                 increase_by = current_limit * float(percent_increase) / 100
-                increase_by = max(increase_by, 1)
+                increase_by = max(increase_by, minimum_increase)
             else:
                 increase_by = amount_increase
             increase_by = round(increase_by)
@@ -815,8 +822,9 @@ class EnableDataEvents(BaseAction):
     def validate(self):
         if self.data['data-trail'].get('create'):
             if 's3-bucket' not in self.data['data-trail']:
-                raise FilterValidationError(
-                    "If creating data trails, an s3-bucket is required")
+                raise PolicyValidationError(
+                    "If creating data trails, an s3-bucket is required on %s" % (
+                        self.manager.data))
         return self
 
     def get_permissions(self):
@@ -924,8 +932,7 @@ class ShieldEnabled(Filter):
 
     def process(self, resources, event=None):
         state = self.data.get('state', False)
-        client = self.manager.session_factory().client('shield')
-
+        client = local_session(self.manager.session_factory).client('shield')
         try:
             subscription = client.describe_subscription().get(
                 'Subscription', None)
@@ -954,7 +961,7 @@ class SetShieldAdvanced(BaseAction):
         state={'type': 'boolean'})
 
     def process(self, resources):
-        client = self.manager.session_factory().client('shield')
+        client = local_session(self.manager.session_factory).client('shield')
         state = self.data.get('state', True)
 
         if state:

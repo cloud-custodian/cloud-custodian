@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
 
 
@@ -40,6 +41,11 @@ class LoadBalancerTest(BaseTest):
             'name': 'test-loadbalancer-with-ipv6-frontend',
             'resource': 'azure.loadbalancer',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestloadbalancer'},
                 {'type': 'frontend-public-ip',
                  'key': 'properties.publicIPAddressVersion',
                  'op': 'in',
@@ -48,4 +54,3 @@ class LoadBalancerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-

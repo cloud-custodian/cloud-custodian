@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('sqlserver')
-class Vnet(ArmResourceManager):
+class SqlServer(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'
-        enum_spec = ('servers', 'list')
+        enum_spec = ('servers', 'list', None)

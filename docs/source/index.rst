@@ -56,17 +56,20 @@ Navigate below and get started with Cloud Custodian!
    :maxdepth: 2
    :caption: Azure
 
-   azure/index
-   azure/contribute
+   azure/gettingstarted
    azure/authentication
-   azure/usecases/index
+   azure/examples/index
    azure/policy/index
+   azure/advanced/index
+   azure/contribute
 
 .. toctree::
    :maxdepth: 2
    :caption: API Reference
 
-   generated/modules
+   generated/aws/modules
+   generated/azure/modules
+   generated/gcp/modules
 
 
 Indices and tables

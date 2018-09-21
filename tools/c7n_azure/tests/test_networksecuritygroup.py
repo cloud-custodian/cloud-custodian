@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
 
 
@@ -20,87 +21,181 @@ class NetworkSecurityGroupTest(BaseTest):
         super(NetworkSecurityGroupTest, self).setUp()
 
     @arm_template('networksecuritygroup.json')
-    def test_close_ssh_ports_range(self):
+    def test_find_by_name(self):
         p = self.load_policy({
-            'name': 'test-azure-network-security-group',
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
-                {'type': 'ingress',
-                 'FromPort': 8080,
-                 'ToPort': 8084}],
-            'actions': [
-                {'type': 'close'}]})
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'}],
+        })
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'tabarlow-test-open-ssh')
-        self.assertEqual(len(resources[0]['properties']['securityRules']), 1)
 
     @arm_template('networksecuritygroup.json')
-    def test_ports_filter_empty(self):
+    def test_allow_single_port(self):
         p = self.load_policy({
-            'name': 'test-azure-network-security-group',
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
                 {'type': 'ingress',
-                 'Ports': [93]}],
-            'actions': [
-                {'type': 'close'}]})
+                 'ports': '80',
+                 'access': 'Allow'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_allow_multiple_ports(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'ingress',
+                 'ports': '80,8080-8084,88-90',
+                 'match': 'all',
+                 'access': 'Allow'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_allow_ports_range_any(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'ingress',
+                 'ports': '40-100',
+                 'match': 'any',
+                 'access': 'Allow'}]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_deny_port(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'ingress',
+                 'ports': '8086',
+                 'access': 'Deny'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_egress_policy_protocols(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'egress',
+                 'ports': '22',
+                 'ipProtocol': 'TCP',
+                 'access': 'Allow'}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'egress',
+                 'ports': '22',
+                 'ipProtocol': 'UDP',
+                 'access': 'Allow'}],
+        })
+
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
     @arm_template('networksecuritygroup.json')
-    def test_only_ports_filter_nonempty(self):
+    def test_open_ports(self):
         p = self.load_policy({
-            'name': 'test-azure-network-security-group',
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
                 {'type': 'ingress',
-                 'OnlyPorts': [22]}],
+                 'ports': '1000-1100',
+                 'match': 'any',
+                 'access': 'Deny'}],
             'actions': [
-                {'type': 'close'}]})
+                {
+                    'type': 'open',
+                    'ports': '1000-1100',
+                    'direction': 'Inbound'}
+            ]
+        })
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'tabarlow-test-open-ssh')
-        self.assertEqual(len(resources[0]['properties']['securityRules']), 1)
 
-
-    @arm_template('networksecuritygroup.json')
-    def test_invalid_policy_range(self):
-        self.assertRaises(ValueError, lambda: self.load_policy({
-            'name': 'test-azure-network-security-group',
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
             'resource': 'azure.networksecuritygroup',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
                 {'type': 'ingress',
-                 'FromPort': 22,
-                 'ToPort': 20}],
+                 'ports': '1000-1100',
+                 'match': 'any',
+                 'access': 'Deny'}],
             'actions': [
-                {'type': 'close'}]}))
+                {'type': 'open',
+                 'ports': '1000-1100',
+                 'direction': 'Inbound'}]
+        })
 
-
-    @arm_template('networksecuritygroup.json')
-    def test_invalid_policy_params(self):
-        self.assertRaises(ValueError, lambda: self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 'FromPort': 22,
-                 'ToPort': 20,
-                 'OnlyPorts': [20, 30],
-                 'Ports': [8080]}],
-            'actions': [
-                {'type': 'close'}]}))
-
-    @arm_template('networksecuritygroup.json')
-    def test_invalid_policy_params_only_ports(self):
-        self.assertRaises(ValueError, lambda: self.load_policy({
-            'name': 'test-azure-network-security-group',
-            'resource': 'azure.networksecuritygroup',
-            'filters': [
-                {'type': 'ingress',
-                 'OnlyPorts': [20, 30],
-                 'Ports': [8080]}],
-            'actions': [
-                {'type': 'close'}]}))
-
-
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

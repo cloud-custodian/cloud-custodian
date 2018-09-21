@@ -20,11 +20,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import six
 
-from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzlocal, tzutc
 
-from c7n.filters import Filter, FilterValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
+from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
 
@@ -65,13 +65,14 @@ class Diff(Filter):
     def validate(self):
         if 'selector' in self.data and self.data['selector'] == 'date':
             if 'selector_value' not in self.data:
-                raise FilterValidationError(
-                    "Date version selector requires specification of date")
+                raise PolicyValidationError(
+                    "Date version selector requires specification of date on %s" % (
+                        self.manager.data))
             try:
                 parse_date(self.data['selector_value'])
             except ValueError:
-                raise FilterValidationError(
-                    "Invalid date for selector_value")
+                raise PolicyValidationError(
+                    "Invalid date for selector_value on %s" % (self.manager.data))
 
         elif 'selector' in self.data and self.data['selector'] == 'locked':
             idx = self.manager.data['filters'].index(self.data)
@@ -82,8 +83,9 @@ class Diff(Filter):
                 if isinstance(n, six.string_types) and n == 'locked':
                     found = True
             if not found:
-                raise FilterValidationError(
-                    "locked selector needs previous use of is-locked filter")
+                raise PolicyValidationError(
+                    "locked selector needs previous use of is-locked filter on %s" % (
+                        self.manager.data))
         return self
 
     def process(self, resources, event=None):

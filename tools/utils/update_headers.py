@@ -33,7 +33,6 @@ CUR_YEAR = str(datetime.now().year)
 
 
 def main():
-    
     base_dir = os.path.join(os.path.split(__file__)[0], '..', '..')
 
     for path in PATHS:
@@ -68,7 +67,9 @@ def validate_header(path):
 
 def get_creation_year(path):
     # This command find the year a file was first created in git
-    cmd = ['git', 'log', '--diff-filter=A', '--follow', '--format=%ad', "--date=format:'%Y'", '-1', '--', path]
+    cmd = [
+        'git', 'log', '--diff-filter=A', '--follow', '--format=%ad',
+        "--date=format:'%Y'", '-1', '--', path]
     year = subprocess.check_output(cmd)
 
     # Sanity check
@@ -90,7 +91,7 @@ def form_copyright_line(year):
         copyright_year = year
     else:
         copyright_year = "{}-{}".format(year, CUR_YEAR)
-        
+
     return "# Copyright {} Capital One Services, LLC\n".format(copyright_year)
 
 

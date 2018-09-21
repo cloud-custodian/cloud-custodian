@@ -24,9 +24,10 @@ from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
 
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, FilterValidationError, OPERATORS)
+    ANNOTATION_KEY, OPERATORS)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
@@ -212,12 +213,6 @@ class SnapshotSkipAmiSnapshots(Filter):
     def get_permissions(self):
         return AMI(self.manager.ctx, {}).get_permissions()
 
-    def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
-
     def process(self, snapshots, event=None):
         resources = _filter_ami_snapshots(self, snapshots)
         return resources
@@ -325,8 +320,9 @@ class CopySnapshot(BaseAction):
         if self.data.get('encrypted', True):
             key = self.data.get('target_key')
             if not key:
-                raise FilterValidationError(
-                    "Encrypted snapshot copy requires kms key")
+                raise PolicyValidationError(
+                    "Encrypted snapshot copy requires kms key on %s" % (
+                        self.manager.data,))
         return self
 
     def process(self, resources):
@@ -401,6 +397,43 @@ class EBS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+
+
+@EBS.action_registry.register('detach')
+class VolumeDetach(BaseAction):
+
+    """
+    Detach an EBS volume from an Instance.
+
+    If 'Force' Param is True, then we'll do a forceful detach
+    of the Volume. The default value for 'Force' is False.
+
+     :example:
+
+     .. code-block:: yaml
+
+             policies:
+               - name: instance-ebs-volumes
+                 resource: ebs
+                 filters:
+                   VolumeId :  volumeid
+                 actions:
+                   - detach
+
+
+    """
+
+    schema = type_schema('detach', force={'type': 'boolean'})
+    permissions = ('ec2:DetachVolume',)
+
+    def process(self, volumes, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vol in volumes:
+            for attachment in vol.get('Attachments', []):
+                client.detach_volume(InstanceId=attachment['InstanceId'],
+                                VolumeId=attachment['VolumeId'],
+                                Force=self.data.get('force', False))
 
 
 @filters.register('instance')
@@ -1225,10 +1258,10 @@ class ModifyVolume(BaseAction):
 
     def validate(self):
         if 'modifyable' not in self.manager.data.get('filters', ()):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "modify action requires modifyable filter in policy")
         if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
-            raise FilterValidationError((
+            raise PolicyValidationError((
                 "shrinking volumes requires os/fs support "
                 "or data-loss may ensue, use `shrink: true` to override"))
         return self

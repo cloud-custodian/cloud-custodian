@@ -1,8 +1,12 @@
 
 install:
-	python -m virtualenv --python python2.7 .
+	python3.6 -m virtualenv --python python3.6 .
 	. bin/activate && pip install -r requirements-dev.txt
 	. bin/activate && pip install -e .
+	. bin/activate && pip install -r tools/c7n_mailer/requirements.txt
+	. bin/activate && pip install -r tools/c7n_azure/requirements.txt
+	. bin/activate && pip install -r tools/c7n_gcp/requirements.txt
+	. bin/activate && pip install -r tools/c7n_kube/requirements.txt
 
 coverage:
 	rm -Rf .coverage
@@ -16,6 +20,11 @@ test3:
 
 nose-tests:
 	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --processes=-1 --process-timeout=300 tests
+
+
+azure-tests:
+
+	C7N_VALIDATE=true AZURE_ACCESS_TOKEN=fake_token AZURE_SUBSCRIPTION_ID=ea42f556-5106-4743-99b0-c129bfa71a47 ./bin/py.test --tb=native tools/c7n_azure
 
 ttest:
 	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer --process-timeout=300 tests
@@ -45,7 +54,7 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 lint:
-	flake8 c7n tools/c7n_org tools/c7n_gcp tools/c7n_logexporter tools/c7n_mailer tools/c7n_sentry tools/c7n_sphinxext tools/zerodark tools/ops tools/c7n_azure
+	flake8 c7n tools tests
 
 clean:
 	rm -rf .tox .Python bin include lib pip-selfcheck.json

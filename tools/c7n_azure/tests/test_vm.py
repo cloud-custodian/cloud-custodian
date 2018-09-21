@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import datetime
+
 from azure_common import BaseTest, arm_template
+from mock import patch
+from tests.test_offhours import mock_datetime_now
+from dateutil import zoneinfo
 
 
 class VMTest(BaseTest):
@@ -54,4 +60,222 @@ class VMTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    fake_running_vms = [{
+        'resourceGroup': 'test_vm',
+        'name': 'test_vm'
+    }]
 
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmStopAction.stop')
+    def test_stop(self, stop_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'stop'}
+            ]
+        })
+        p.run()
+        stop_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmPowerOffAction.poweroff')
+    def test_poweroff(self, poweroff_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'poweroff'}
+            ]
+        })
+        p.run()
+        poweroff_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmStartAction.start')
+    def test_start(self, start_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'start'}
+            ]
+        })
+        p.run()
+        start_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.resources.vm.VmRestartAction.restart')
+    def test_restart(self, restart_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'restart'}
+            ]
+        })
+        p.run()
+        restart_action_mock.assert_called_with(
+            self.fake_running_vms[0]['resourceGroup'],
+            self.fake_running_vms[0]['name'])
+
+    @arm_template('vm.json')
+    @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
+    @patch('c7n_azure.actions.DeleteAction.process', return_value='')
+    def test_delete(self, delete_action_mock, filter_mock):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'instance-view',
+                 'key': 'statuses[].code',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'PowerState/running'}],
+            'actions': [
+                {'type': 'delete'}
+            ]
+        })
+        p.run()
+        delete_action_mock.assert_called_with(self.fake_running_vms)
+
+    @arm_template('vm.json')
+    def test_find_vm_with_public_ip(self):
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'network-interface',
+                 'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
+                 'op': 'eq',
+                 'value': 'not-null'}
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy({
+            'name': 'test-azure-vm',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'network-interface',
+                 'key': 'properties.ipConfigurations[].properties.publicIPAddress.id',
+                 'op': 'eq',
+                 'value': 'null'}
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('vm.json')
+    def test_on_off_hours(self):
+
+        t = datetime.datetime.now(zoneinfo.gettz("pt"))
+        t = t.replace(year=2018, month=8, day=24, hour=18, minute=30)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy({
+                'name': 'test-azure-vm',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'offhour',
+                     'default_tz': "pt",
+                     'offhour': 18,
+                     'tag': 'schedule'}
+                ],
+            })
+
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+        t = t.replace(year=2018, month=8, day=24, hour=8, minute=30)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy({
+                'name': 'test-azure-vm',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'onhour',
+                     'default_tz': "pt",
+                     'onhour': 8,
+                     'tag': 'schedule'}
+                ],
+            })
+
+            resources = p.run()
+            self.assertEqual(len(resources), 1)

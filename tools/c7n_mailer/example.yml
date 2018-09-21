@@ -43,3 +43,9 @@ ldap_bind_password: "base64_encoded_ciphertext_password"
 # For sending to sns topics we need to assume back into the target account
 cross_accounts:
   '991119991111': 'arn:aws:iam::991119991111:role/MyDeliveryRole'
+
+# if your usernames match email addresses
+# you can set an org domain here which is appended to the username
+# to send to
+org_domain: example.com
+

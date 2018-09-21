@@ -242,7 +242,8 @@ from os.path import join
 
 from dateutil import zoneinfo
 
-from c7n.filters import Filter, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter
 from c7n.utils import type_schema, dumps
 from c7n.resolver import ValuesFrom
 
@@ -306,8 +307,16 @@ class Time(Filter):
         'sgt': 'Asia/Singapore',
         'aet': 'Australia/Sydney',
         'brt': 'America/Sao_Paulo',
+        'nzst': 'Pacific/Auckland',
         'utc': 'Etc/UTC',
     }
+
+    z_names = list(zoneinfo.get_zonefile_instance().zones)
+    non_title_case_zones = (
+        lambda aliases=TZ_ALIASES.keys(), z_names=z_names:
+        {z.lower(): z for z in z_names
+            if z.title() != z and z.lower() not in aliases})()
+    TZ_ALIASES.update(non_title_case_zones)
 
     def __init__(self, data, manager=None):
         super(Time, self).__init__(data, manager)
@@ -327,14 +336,17 @@ class Time(Filter):
 
     def validate(self):
         if self.get_tz(self.default_tz) is None:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.default_tz)
+            raise PolicyValidationError(
+                "Invalid timezone specified %s" % (
+                    self.default_tz))
         hour = self.data.get("%shour" % self.time_type, self.DEFAULT_HR)
         if hour not in self.parser.VALID_HOURS:
-            raise FilterValidationError("Invalid hour specified %s" % hour)
+            raise PolicyValidationError(
+                "Invalid hour specified %s" % (hour,))
         if 'skip-days' in self.data and 'skip-days-from' in self.data:
-            raise FilterValidationError(
-                "Cannot specify two sets of skip days %s" % self.data)
+            raise PolicyValidationError(
+                "Cannot specify two sets of skip days %s" % (
+                    self.data,))
         return self
 
     def process(self, resources, event=None):
@@ -452,7 +464,10 @@ class Time(Filter):
 
     @classmethod
     def get_tz(cls, tz):
-        return zoneinfo.gettz(cls.TZ_ALIASES.get(tz, tz))
+        found = cls.TZ_ALIASES.get(tz)
+        if found:
+            return zoneinfo.gettz(found)
+        return zoneinfo.gettz(tz.title())
 
     def get_default_schedule(self):
         raise NotImplementedError("use subclass")

@@ -27,8 +27,9 @@ import itertools
 import time
 
 from c7n.actions import Action, ActionRegistry
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
+    FilterRegistry, ValueFilter, AgeFilter, Filter,
     OPERATORS)
 from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
@@ -38,6 +39,9 @@ from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
+
+
+from .ec2 import deserialize_user_data
 
 log = logging.getLogger('custodian.asg')
 
@@ -194,7 +198,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 
     def validate(self):
         if self.manager.data.get('mode'):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "invalid-config makes too many queries to be run in lambda")
         return self
 
@@ -418,6 +422,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                   - type: not-encrypted
                     exclude_image: true
     """
+
     schema = type_schema('not-encrypted', exclude_image={'type': 'boolean'})
     permissions = (
         'ec2:DescribeImages',
@@ -527,7 +532,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
 
     def get_snapshots(self, ec2, snap_ids):
         """get snapshots corresponding to id, but tolerant of invalid id's."""
-        while True:
+        while snap_ids:
             try:
                 result = ec2.describe_snapshots(SnapshotIds=snap_ids)
             except ClientError as e:
@@ -538,6 +543,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                 raise
             else:
                 return result.get('Snapshots', ())
+        return ()
 
     @staticmethod
     def get_bad_snapshot(e):
@@ -707,6 +713,7 @@ class VpcIdFilter(ValueFilter):
 
 
 @filters.register('progagated-tags')
+@filters.register('propagated-tags')
 class PropagatedTagFilter(Filter):
     """Filter ASG based on propagated tags
 
@@ -730,6 +737,7 @@ class PropagatedTagFilter(Filter):
     """
     schema = type_schema(
         'progagated-tags',
+        aliases=('propagated-tags',),
         keys={'type': 'array', 'items': {'type': 'string'}},
         match={'type': 'boolean'},
         propagate={'type': 'boolean'})
@@ -818,6 +826,60 @@ class CapacityDelta(Filter):
                 len(a['Instances']) < a['MinSize']]
 
 
+@filters.register('user-data')
+class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+    """Filter on ASG's whose launch configs have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: lc_userdata
+                resource: asg
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
+
+    def process(self, asgs, event=None):
+        '''
+        Get list of autoscaling groups whose launch configs match the user-data filter.
+        Note: Since this is an autoscaling filter, this won't match unused launch configs.
+        :param launch_configs: List of launch configurations
+        :param event: Event
+        :return: List of ASG's with matching launch configs
+        '''
+
+        self.data['key'] = '"c7n:user-data"'
+        results = []
+        super(UserDataFilter, self).initialize(asgs)
+
+        for asg in asgs:
+            launch_config = self.configs.get(asg['LaunchConfigurationName'])
+            if self.annotation not in launch_config:
+                if not launch_config['UserData']:
+                    asg[self.annotation] = None
+                else:
+                    asg[self.annotation] = deserialize_user_data(
+                        launch_config['UserData'])
+            if self.match(asg):
+                results.append(asg)
+            return results
+
+
 @actions.register('resize')
 class Resize(Action):
     """Action to resize the min/max/desired instances in an ASG
@@ -898,12 +960,6 @@ class Resize(Action):
         'autoscaling:UpdateAutoScalingGroup',
         'autoscaling:CreateOrUpdateTags'
     )
-
-    def validate(self):
-        # if self.data['desired_size'] != 'current':
-        #    raise FilterValidationError(
-        #        "only resizing desired/min to current capacity is supported")
-        return self
 
     def process(self, asgs):
         # ASG parameters to save to/restore from a tag
@@ -1357,8 +1413,8 @@ class MarkForOp(Tag):
         self.tz = zoneinfo.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.tz)
+            raise PolicyValidationError(
+                "Invalid timezone specified %s on %s" % (self.tz, self.manager.data))
         return self
 
     def process(self, asgs):
@@ -1634,8 +1690,6 @@ class LaunchConfig(query.QueryResourceManager):
 class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
-        for r in resources:
-            r.pop('UserData', None)
         return resources
 
 

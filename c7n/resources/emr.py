@@ -18,9 +18,10 @@ import time
 
 import six
 
-from c7n.manager import resources
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
     local_session, type_schema, get_retry)
@@ -46,9 +47,9 @@ class EMRCluster(QueryResourceManager):
         enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'
         id = 'Id'
-        dimension = 'ClusterId'
         date = "Status.Timeline.CreationDateTime"
         filter_name = None
+        dimension = None
 
     action_registry = actions
     filter_registry = filters
@@ -117,6 +118,14 @@ class EMRCluster(QueryResourceManager):
                 client.describe_cluster, ClusterId=r['Id'])['Cluster']
             result.append(cluster)
         return result
+
+
+@EMRCluster.filter_registry.register('metrics')
+class EMRMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        # Job flow id is legacy name for cluster id
+        return [{'Name': 'JobFlowId', 'Value': resource['Id']}]
 
 
 @actions.register('mark-for-op')
@@ -257,7 +266,7 @@ class QueryFilter(object):
         results = []
         for d in data:
             if not isinstance(d, dict):
-                raise ValueError(
+                raise PolicyValidationError(
                     "EMR Query Filter Invalid structure %s" % d)
             results.append(cls(d).validate())
         return results
@@ -269,18 +278,18 @@ class QueryFilter(object):
 
     def validate(self):
         if not len(list(self.data.keys())) == 1:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EMR Query Filter Invalid %s" % self.data)
         self.key = list(self.data.keys())[0]
         self.value = list(self.data.values())[0]
 
         if self.key not in EMR_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
-            raise ValueError(
+            raise PolicyValidationError(
                 "EMR Query Filter invalid filter name %s" % (self.data))
 
         if self.value is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EMR Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)

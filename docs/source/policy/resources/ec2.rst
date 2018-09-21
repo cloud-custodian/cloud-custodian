@@ -97,6 +97,13 @@ Filter by State Transition Filter
   .. c7n-schema:: DisableApiTermination
       :module: c7n.resources.ec2
 
+``user-data``
+  Filter for EC2's with user data matching the value given.
+
+  .. c7n-schema:: UserData
+      :module: c7n.resources.ec2
+
+
 Actions
 -------
 

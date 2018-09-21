@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import partial
+
 from c7n.provider import Provider, clouds
 from c7n.registry import PluginRegistry
-
 from .session import Session
 
 
@@ -31,7 +32,9 @@ class Azure(Provider):
         return policy_collection
 
     def get_session_factory(self, options):
-        return Session
+        return partial(Session,
+                       subscription_id=options.account_id,
+                       authorization_file=options.authorization_file)
 
 
 resources = Azure.resources

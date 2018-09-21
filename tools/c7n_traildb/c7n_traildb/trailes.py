@@ -19,6 +19,7 @@ import subprocess
 import thread
 
 import click
+from c7n.credentials import SessionFactory
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
 from elasticsearch import Elasticsearch, helpers, RequestsHttpConnection
@@ -27,7 +28,7 @@ import sqlite3
 
 import yaml
 
-from c7n.credentials import assumed_session, SessionFactory
+# from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session
 
@@ -103,7 +104,7 @@ def dict_factory(cursor, row):
 
 def fetch_events(cursor, config, account_name):
     """Generator that returns the events"""
-    query = config['indexer'].get('query', 
+    query = config['indexer'].get('query',
         'select * from events where user_agent glob \'*CloudCustodian*\'')
 
     for event in cursor.execute(query):
@@ -146,7 +147,7 @@ def index_account_trails(config, account, region, date, directory):
 
     bucket = account['bucket']
     key_prefix = "accounts/{}/{}/traildb".format(account['name'], region)
-    marker =  "{}/{}/trail.db.bz2".format(key_prefix, date)
+    marker = "{}/{}/trail.db.bz2".format(key_prefix, date)
 
     p = s3.get_paginator('list_objects_v2').paginate(
         Bucket=bucket,
@@ -179,7 +180,7 @@ def index_account_trails(config, account, region, date, directory):
 
                 try:
                     os.remove(local_db_file)
-                except:
+                except Exception:
                     log.warning("Failed to remove temporary file: {}".format(
                         local_db_file))
                     pass

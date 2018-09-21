@@ -13,10 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import itertools
 import operator
 import random
 import re
+import zlib
 
 import six
 from botocore.exceptions import ClientError
@@ -26,6 +28,7 @@ from concurrent.futures import as_completed
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
@@ -656,6 +659,80 @@ class DefaultVpc(DefaultVpcBase):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 
 
+def deserialize_user_data(user_data):
+    data = base64.b64decode(user_data)
+    # try raw and compressed
+    try:
+        return data.decode('utf8')
+    except UnicodeDecodeError:
+        return zlib.decompress(data, 16).decode('utf8')
+
+
+@filters.register('user-data')
+class UserData(ValueFilter):
+    """Filter on EC2 instances which have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ec2_userdata_stop
+                resource: ec2
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - stop
+    """
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources, event=None):
+        self.data['key'] = '"c7n:user-data"'
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        results = []
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for instance_set in utils.chunks(resources, self.batch_size):
+                futures[w.submit(
+                    self.process_instance_set,
+                    client, instance_set)] = instance_set
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error processing userdata on instance set %s", f.exception())
+                results.extend(f.result())
+        return results
+
+    def process_instance_set(self, client, resources):
+        results = []
+        for r in resources:
+            if self.annotation not in r:
+                try:
+                    result = client.describe_instance_attribute(
+                        Attribute='userData',
+                        InstanceId=r['InstanceId'])
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
+                        continue
+                if 'Value' not in result['UserData']:
+                    r[self.annotation] = None
+                else:
+                    r[self.annotation] = deserialize_user_data(
+                        result['UserData']['Value'])
+            if self.match(r):
+                results.append(r)
+        return results
+
+
 @filters.register('singleton')
 class SingletonFilter(Filter, StateTransitionFilter):
     """EC2 instances without autoscaling or a recover alarm
@@ -1182,6 +1259,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 if i.get('c7n:matched-security-groups'):
                     eni['c7n:matched-security-groups'] = i[
                         'c7n:matched-security-groups']
+                if i.get('c7n:NetworkLocation'):
+                    eni['c7n:NetworkLocation'] = i[
+                        'c7n:NetworkLocation']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
@@ -1258,7 +1338,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 @actions.register('set-instance-profile')
 class SetInstanceProfile(BaseAction, StateTransitionFilter):
-    """Sets (or removes) the instance profile for a running EC2 instance.
+    """Sets (add, modify, remove) the instance profile for a running EC2 instance.
 
     :Example:
 
@@ -1286,38 +1366,48 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
-        profile_name = self.data.get('name', '')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name')
+        profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
+
+        associations = {
+            a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+            for a in client.describe_iam_instance_profile_associations(
+                Filters=[
+                    {'Name': 'instance-id',
+                     'Values': [i['InstanceId'] for i in profile_instances]},
+                    {'Name': 'state', 'Values': ['associating', 'associated']}]
+            ).get('IamInstanceProfileAssociations', ())}
 
         for i in instances:
-            if profile_name:
+            if profile_name and i['InstanceId'] not in associations:
                 client.associate_iam_instance_profile(
-                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    IamInstanceProfile={'Name': profile_name},
                     InstanceId=i['InstanceId'])
+                continue
+            # Removing profile and no profile on instance.
+            elif profile_name is None and i['InstanceId'] not in associations:
+                continue
+
+            p_assoc_id, p_arn = associations[i['InstanceId']]
+
+            # Already associated to target profile, skip
+            if profile_name and p_arn.endswith('/%s' % profile_name):
+                continue
+
+            if profile_name is None:
+                client.disassociate_iam_instance_profile(
+                    AssociationId=p_assoc_id)
             else:
-                response = client.describe_iam_instance_profile_associations(
-                    Filters=[
-                        {
-                            'Name': 'instance-id',
-                            'Values': [i['InstanceId']],
-                        },
-                        {
-                            'Name': 'state',
-                            'Values': ['associating', 'associated']
-                        }
-                    ]
-                )
-                for a in response['IamInstanceProfileAssociations']:
-                    client.disassociate_iam_instance_profile(
-                        AssociationId=a['AssociationId']
-                    )
+                client.replace_iam_instance_profile_association(
+                    IamInstanceProfile={'Name': profile_name},
+                    AssociationId=p_assoc_id)
 
         return instances
 
@@ -1472,18 +1562,18 @@ class QueryFilter(object):
 
     def validate(self):
         if not len(list(self.data.keys())) == 1:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filter Invalid %s" % self.data)
         self.key = list(self.data.keys())[0]
         self.value = list(self.data.values())[0]
 
         if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filter invalid filter name %s" % (self.data))
 
         if self.value is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)

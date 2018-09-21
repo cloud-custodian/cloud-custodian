@@ -22,6 +22,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
+from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import type_schema, local_session, chunks, get_retry
 
 
@@ -154,6 +155,16 @@ class LogGroup(QueryResourceManager):
         dimension = 'LogGroupName'
         date = 'creationTime'
 
+    augment = universal_augment
+
+    def get_arns(self, resources):
+        # log group arn in resource describe has ':*' suffix, not all
+        # apis can use that form, so normalize to standard arn.
+        return [r['arn'][:-2] for r in resources]
+
+
+register_universal_tags(LogGroup.filter_registry, LogGroup.action_registry)
+
 
 @LogGroup.action_registry.register('retention')
 class Retention(BaseAction):
@@ -231,14 +242,13 @@ class LastWriteDays(Filter):
     permissions = ('logs:DescribeLogStreams',)
 
     def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
         self.date_threshold = datetime.utcnow() - timedelta(
             days=self.data['days'])
-        return super(LastWriteDays, self).process(resources)
+        return [r for r in resources if self.check_group(client, r)]
 
-    def __call__(self, group):
-        self.log.debug("Processing group %s", group['logGroupName'])
-        logs = local_session(self.manager.session_factory).client('logs')
-        streams = logs.describe_log_streams(
+    def check_group(self, client, group):
+        streams = client.describe_log_streams(
             logGroupName=group['logGroupName'],
             orderBy='LastEventTime',
             descending=True,

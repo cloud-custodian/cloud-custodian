@@ -30,6 +30,7 @@ import jmespath
 import six
 
 from c7n import ipaddress
+from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
@@ -129,21 +130,21 @@ class FilterRegistry(PluginRegistry):
                 return And(data, self, manager)
             elif op == 'not':
                 return Not(data, self, manager)
-            return ValueFilter(data, manager).validate()
+            return ValueFilter(data, manager)
         if isinstance(data, six.string_types):
             filter_type = data
             data = {'type': data}
         else:
             filter_type = data.get('type')
         if not filter_type:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "%s Invalid Filter %s" % (
                     self.plugin_type, data))
         filter_class = self.get(filter_type)
         if filter_class is not None:
             return filter_class(data, manager)
         else:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "%s Invalid filter type %s" % (
                     self.plugin_type, data))
 
@@ -311,7 +312,8 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr', 'unique_size']},
+                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
+                'unique_size']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [
@@ -339,17 +341,17 @@ class ValueFilter(Filter):
         """
         for field in ('op', 'value'):
             if field not in self.data:
-                raise FilterValidationError(
+                raise PolicyValidationError(
                     "Missing '%s' in value filter %s" % (field, self.data))
 
         if not (isinstance(self.data['value'], int) or
                 isinstance(self.data['value'], list)):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
         if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "Invalid operator in value filter %s" % self.data)
 
         return self
@@ -364,21 +366,21 @@ class ValueFilter(Filter):
             return self._validate_resource_count()
 
         if 'key' not in self.data:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "Missing 'key' in value filter %s" % self.data)
         if 'value' not in self.data and 'value_from' not in self.data:
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
             if not self.data['op'] in OPERATORS:
-                raise FilterValidationError(
+                raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
             if self.data['op'] == 'regex':
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['value'])
                 except re.error as e:
-                    raise FilterValidationError(
+                    raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
         return self
 
@@ -405,10 +407,14 @@ class ValueFilter(Filter):
         if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
             r = None
-            for t in i.get("Tags", []):
-                if t.get('Key') == tk:
-                    r = t.get('Value')
-                    break
+            if 'Tags' in i:
+                for t in i.get("Tags", []):
+                    if t.get('Key') == tk:
+                        r = t.get('Value')
+                        break
+            # Azure schema: 'tags': {'key': 'value'}
+            elif 'tags' in i:
+                r = i.get('tags', {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
@@ -421,7 +427,7 @@ class ValueFilter(Filter):
     def match(self, i):
         if self.v is None and len(self.data) == 1:
             [(self.k, self.v)] = self.data.items()
-        elif self.v is None:
+        elif self.v is None and not hasattr(self, 'content_initialized'):
             self.k = self.data.get('key')
             self.op = self.data.get('op')
             if 'value_from' in self.data:
@@ -429,6 +435,7 @@ class ValueFilter(Filter):
                 self.v = values.get_values()
             else:
                 self.v = self.data.get('value')
+            self.content_initialized = True
             self.vtype = self.data.get('value_type')
 
         if i is None:
@@ -493,11 +500,11 @@ class ValueFilter(Filter):
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
-            if isinstance(value, (int, float)):
+            if isinstance(value, (str, int, float)):
                 try:
-                    value = datetime.datetime.fromtimestamp(value).replace(tzinfo=tzutc())
+                    value = datetime.datetime.fromtimestamp(float(value)).replace(tzinfo=tzutc())
                 except ValueError:
-                    value = 0
+                    pass
             if not isinstance(value, datetime.datetime):
                 # EMR bug when testing ages in EMR. This is due to
                 # EMR not having more functionality.
@@ -589,8 +596,9 @@ class EventFilter(ValueFilter):
 
     def validate(self):
         if 'mode' not in self.manager.data:
-            raise FilterValidationError(
-                "Event filters can only be used with lambda policies")
+            raise PolicyValidationError(
+                "Event filters can only be used with lambda policies in %s" % (
+                    self.manager.data,))
         return self
 
     def process(self, resources, event=None):

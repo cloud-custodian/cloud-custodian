@@ -35,12 +35,12 @@ class MailerSqsQueueIterator(object):
     msg_attributes = ['sequence_id', 'op', 'ser']
 
     def __init__(self, aws_sqs, queue_url, logger, limit=0, timeout=10):
-        self.aws_sqs   = aws_sqs
+        self.aws_sqs = aws_sqs
         self.queue_url = queue_url
-        self.limit     = limit
-        self.logger    = logger
-        self.timeout   = timeout
-        self.messages  = []
+        self.limit = limit
+        self.logger = logger
+        self.timeout = timeout
+        self.messages = []
 
     # this and the next function make this object iterable with a for loop
     def __iter__(self):
@@ -74,11 +74,11 @@ class MailerSqsQueueIterator(object):
 class MailerSqsQueueProcessor(object):
 
     def __init__(self, config, session, logger, max_num_processes=16):
-        self.config                = config
-        self.logger                = logger
-        self.session               = session
-        self.max_num_processes     = max_num_processes
-        self.receive_queue         = self.config['queue_url']
+        self.config = config
+        self.logger = logger
+        self.session = session
+        self.max_num_processes = max_num_processes
+        self.receive_queue = self.config['queue_url']
         if self.config.get('debug', False):
             self.logger.debug('debug logging is turned on from mailer config file.')
             logger.setLevel(logging.DEBUG)
@@ -166,7 +166,8 @@ class MailerSqsQueueProcessor(object):
         sns_delivery.deliver_sns_messages(sns_message_packages, sqs_message)
 
         # this section sends a notification to the resource owner via Slack
-        if any(e.startswith('slack') for e in sqs_message.get('action', ()).get('to')):
+        if any(e.startswith('slack') or e.startswith('https')
+                for e in sqs_message.get('action', ()).get('to')):
             from .slack_delivery import SlackDelivery
             slack_delivery = SlackDelivery(self.config, self.session, self.logger)
             slack_messages = slack_delivery.get_to_addrs_slack_messages_map(sqs_message)

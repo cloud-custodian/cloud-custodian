@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6831babd-52c3-11e8-bcdc-0591db82b7f0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6831babd-52c3-11e8-bcdc-0591db82b7f0", 
+                "date": "Tue, 08 May 2018 13:26:25 GMT", 
+                "content-length": "97", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "Resource does not meet policy: delete@2018/05/15", 
+                "Key": "custodian_cleanup"
+            }
+        ]
+    }
+}

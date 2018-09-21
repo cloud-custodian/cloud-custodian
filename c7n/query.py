@@ -20,21 +20,22 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 import itertools
-import jmespath
 import json
-
-import six
-from botocore.client import ClientError
-from botocore.paginate import set_value_from_jmespath
 from concurrent.futures import as_completed
 
+import jmespath
+import six
+
+
 from c7n.actions import ActionRegistry
+from c7n.exceptions import ClientError, ResourceLimitExceeded
 from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.manager import ResourceManager
+from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource)
-from c7n.registry import PluginRegistry
-from c7n.manager import ResourceManager
+    local_session, generate_arn, get_retry, chunks, camelResource,
+    set_value_from_jmespath)
 
 
 class ResourceQuery(object):
@@ -72,7 +73,7 @@ class ResourceQuery(object):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)
         client = local_session(self.session_factory).client(
-            m.service)
+            m.service, resource_manager.config.region)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
             params.update(extra_args)
@@ -417,8 +418,35 @@ class QueryResourceManager(ResourceManager):
             query = {}
 
         resources = self.augment(self.source.resources(query))
+        resource_count = len(resources)
         self._cache.save(key, resources)
-        return self.filter_resources(resources)
+        resources = self.filter_resources(resources)
+
+        # Check if we're out of a policies execution limits.
+        if self.data == self.ctx.policy.data:
+            self.check_resource_limit(len(resources), resource_count)
+        return resources
+
+    def check_resource_limit(self, selection_count, population_count):
+        """Check if policy's execution affects more resources then its limit.
+
+        Ideally this would be at a higher level but we've hidden
+        filtering behind the resource manager facade for default usage.
+        """
+        p = self.ctx.policy
+        if isinstance(p.max_resources, int) and selection_count > p.max_resources:
+            raise ResourceLimitExceeded(
+                ("policy: %s exceeded resource limit: {limit} "
+                 "found: {selection_count}") % p.name,
+                "max-resources", p.max_resources, selection_count, population_count)
+        elif p.max_resources_percent:
+            if (population_count * (
+                    p.max_resources_percent / 100.0) < selection_count):
+                raise ResourceLimitExceeded(
+                    ("policy: %s exceeded resource limit: {limit}%% "
+                     "found: {selection_count} total: {population_count}") % p.name,
+                    "max-percent", p.max_resources_percent, selection_count, population_count)
+        return True
 
     def _get_cached_resources(self, ids):
         key = self.get_cache_key(None)
@@ -431,13 +459,15 @@ class QueryResourceManager(ResourceManager):
                 return [r for r in resources if r[m.id] in id_set]
         return None
 
-    def get_resources(self, ids, cache=True):
+    def get_resources(self, ids, cache=True, augment=True):
         if cache:
             resources = self._get_cached_resources(ids)
             if resources is not None:
                 return resources
         try:
-            resources = self.augment(self.source.get_resources(ids))
+            resources = self.source.get_resources(ids)
+            if augment:
+                resources = self.augment(resources)
             return resources
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
@@ -460,6 +490,12 @@ class QueryResourceManager(ResourceManager):
         IAM.
         """
         return self.config.account_id
+
+    @property
+    def region(self):
+        """ Return the current region.
+        """
+        return self.config.region
 
     def get_arns(self, resources):
         arns = []
@@ -503,7 +539,8 @@ class ChildResourceManager(QueryResourceManager):
 
 def _batch_augment(manager, model, detail_spec, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
-    client = local_session(manager.session_factory).client(model.service)
+    client = local_session(manager.session_factory).client(
+        model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)
@@ -517,7 +554,8 @@ def _batch_augment(manager, model, detail_spec, resource_set):
 
 def _scalar_augment(manager, model, detail_spec, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
-    client = local_session(manager.session_factory).client(model.service)
+    client = local_session(manager.session_factory).client(
+        model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)

@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AccessKeyMetadata": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3a4fb2b5-652f-11e8-ae43-51ef87f2196b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3a4fb2b5-652f-11e8-ae43-51ef87f2196b", 
+                "date": "Fri, 01 Jun 2018 00:03:34 GMT", 
+                "content-length": "321", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

@@ -25,66 +25,79 @@ class ElasticFileSystem(BaseTest):
 
     @functional
     def test_resource_manager(self):
-        factory = self.replay_flight_data('test_efs_query')
-        client = factory().client('efs')
+        factory = self.replay_flight_data("test_efs_query")
+        client = factory().client("efs")
         token = str(uuid.uuid4())
-        fs_id = client.create_file_system(
-            CreationToken=token).get('FileSystemId')
+        fs_id = client.create_file_system(CreationToken=token).get("FileSystemId")
         self.addCleanup(client.delete_file_system, FileSystemId=fs_id)
-        tags = [{'Key': 'Name', 'Value': 'Somewhere'}]
+        tags = [{"Key": "Name", "Value": "Somewhere"}]
         client.create_tags(FileSystemId=fs_id, Tags=tags)
         if self.recording:
             time.sleep(5)
 
-        p = self.load_policy({
-            'name': 'efs-query',
-            'resource': 'efs',
-            'filters': [{'FileSystemId': fs_id}, {'tag:Name': 'Somewhere'}],
-            }, config=Config.empty(), session_factory=factory)
+        p = self.load_policy(
+            {
+                "name": "efs-query",
+                "resource": "efs",
+                "filters": [{"FileSystemId": fs_id}, {"tag:Name": "Somewhere"}],
+            },
+            config=Config.empty(),
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Tags'], tags)
+        self.assertEqual(resources[0]["Tags"], tags)
 
     def test_mount_target_loading(self):
-        factory = self.replay_flight_data('test_efs_subresource')
-        p = self.load_policy({
-            'name': 'test-mount-targets',
-            'resource': 'efs-mount-target',
-            }, session_factory=factory)
+        factory = self.replay_flight_data("test_efs_subresource")
+        p = self.load_policy(
+            {"name": "test-mount-targets", "resource": "efs-mount-target"},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
     def test_mount_target_security_group(self):
-        factory = self.replay_flight_data('test_efs_mount_secgroup')
-        p = self.load_policy({
-            'name': 'test-mount-secgroup',
-            'resource': 'efs-mount-target',
-            'filters': [
-                {'type': 'security-group',
-                 'key': 'GroupId',
-                 'value': 'sg-ccf3a8a4'},
-                # Use the same filter twice to excercise cache code
-                {'type': 'security-group',
-                 'key': 'GroupId',
-                 'value': 'sg-ccf3a8a4'},
-            ]}, session_factory=factory)
+        factory = self.replay_flight_data("test_efs_mount_secgroup")
+        p = self.load_policy(
+            {
+                "name": "test-mount-secgroup",
+                "resource": "efs-mount-target",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "GroupId",
+                        "value": "sg-ccf3a8a4",
+                    },
+                    # Use the same filter twice to excercise cache code
+                    {
+                        "type": "security-group",
+                        "key": "GroupId",
+                        "value": "sg-ccf3a8a4",
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 3)
-        resources = sorted(resources, key=itemgetter('MountTargetId'))
-        self.assertEqual(resources[0]['MountTargetId'], 'fsmt-a47385dd')
+        resources = sorted(resources, key=itemgetter("MountTargetId"))
+        self.assertEqual(resources[0]["MountTargetId"], "fsmt-a47385dd")
 
     def test_delete(self):
-        factory = self.replay_flight_data('test_efs_delete')
-        p = self.load_policy({
-            'name': 'efs-query',
-            'resource': 'efs',
-            'filters': [{'Name': 'MyDocs'}],
-            'actions': ['delete']
-            }, session_factory=factory)
+        factory = self.replay_flight_data("test_efs_delete")
+        p = self.load_policy(
+            {
+                "name": "efs-query",
+                "resource": "efs",
+                "filters": [{"Name": "MyDocs"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Name'], 'MyDocs')
-        client = factory().client('efs')
-        state = client.describe_file_systems().get('FileSystems', [])
+        self.assertEqual(resources[0]["Name"], "MyDocs")
+        client = factory().client("efs")
+        state = client.describe_file_systems().get("FileSystems", [])
         self.assertEqual(state, [])
-

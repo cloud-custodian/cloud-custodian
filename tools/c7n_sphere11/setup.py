@@ -19,8 +19,8 @@ setup(
     version='0.1.1',
     description="Cloud Custodian - Sphere11 - Resource Locking",
     classifiers=[
-      "Topic :: System :: Systems Administration",
-      "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
@@ -31,5 +31,3 @@ setup(
             'c7n-sphere11 = c7n_sphere11.cli:cli']},
     install_requires=["click", "tabulate"],
 )
-
-

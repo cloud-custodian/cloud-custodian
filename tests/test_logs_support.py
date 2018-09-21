@@ -29,10 +29,10 @@ def log_lines():
     with open(
         os.path.join(
             os.path.dirname(__file__),
-            'data',
-            'logs',
-            'test-policy',
-            'custodian-run.log',
+            "data",
+            "logs",
+            "test-policy",
+            "custodian-run.log",
         )
     ) as fh:
         return fh.readlines()
@@ -49,29 +49,27 @@ class TestLogsSupport(TestCase):
         self.assertEqual(len(nrm_entries), 55)
         # entries look reasonable
         entry = nrm_entries[1]
-        self.assertIn('timestamp', entry)
-        self.assertIn('message', entry)
-        self.assertIsInstance(entry['timestamp'], six.integer_types)
-        self.assertIsInstance(entry['message'], six.text_type)
+        self.assertIn("timestamp", entry)
+        self.assertIn("message", entry)
+        self.assertIsInstance(entry["timestamp"], six.integer_types)
+        self.assertIsInstance(entry["message"], six.text_type)
 
     def test_entries_in_range(self):
         raw_entries = log_lines()
         log_gen = normalized_log_entries(raw_entries)
         nrm_entries = list(log_gen)
         range_gen = log_entries_in_range(
-            nrm_entries,
-            '2016-11-21 12:40:00',
-            '2016-11-21 12:45:00',
+            nrm_entries, "2016-11-21 12:40:00", "2016-11-21 12:45:00"
         )
         in_range = list(range_gen)
         # fewer entries than we started with
         self.assertLess(len(in_range), len(nrm_entries))
         # entries are within 5 minutes of each other
-        span = (in_range[-1]['timestamp'] - in_range[0]['timestamp']) / 1000
+        span = (in_range[-1]["timestamp"] - in_range[0]["timestamp"]) / 1000
         self.assertLess(span, 300)
 
     def test_timestamp_from_string(self):
         tfs = _timestamp_from_string
-        date_text = '2016-11-21 13:13:41'
+        date_text = "2016-11-21 13:13:41"
         self.assertIsInstance(tfs(date_text), six.integer_types)
-        self.assertEqual(tfs('not a date'), 0)
+        self.assertEqual(tfs("not a date"), 0)

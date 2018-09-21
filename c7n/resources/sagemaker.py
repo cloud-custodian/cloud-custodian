@@ -17,12 +17,14 @@ from botocore.exceptions import ClientError
 
 import six
 
-from c7n.manager import resources
+from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry
+from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
-from c7n.actions import BaseAction
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 
 
 @resources.register('sagemaker-notebook')
@@ -40,9 +42,8 @@ class NotebookInstance(QueryResourceManager):
         dimension = None
         filter_name = None
 
-    filters = FilterRegistry('sagemaker-notebook.filters')
-    filters.register('marked-for-op', TagActionFilter)
-    filter_registry = filters
+    filter_registry = FilterRegistry('sagemaker-notebook.filters')
+    filter_registry.register('marked-for-op', TagActionFilter)
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, resources):
@@ -117,7 +118,7 @@ class QueryFilter(object):
         names = set()
         for d in data:
             if not isinstance(d, dict):
-                raise ValueError(
+                raise PolicyValidationError(
                     "Training-Job Query Filter Invalid structure %s" % d)
             for k, v in d.items():
                 if isinstance(v, list):
@@ -144,18 +145,18 @@ class QueryFilter(object):
 
     def validate(self):
         if not len(list(self.data.keys())) == 1:
-            raise ValueError(
+            raise PolicyValidationError(
                 "Training-Job Query Filter Invalid %s" % self.data)
         self.key = list(self.data.keys())[0]
         self.value = list(self.data.values())[0]
 
         if self.key not in JOB_FILTERS and not self.key.startswith('tag:'):
-            raise ValueError(
+            raise PolicyValidationError(
                 "Training-Job Query Filter invalid filter name %s" % (
                     self.data))
 
         if self.value is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "Training-Job Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)
@@ -183,9 +184,8 @@ class SagemakerEndpoint(QueryResourceManager):
         dimension = None
         filter_name = None
 
-    filters = FilterRegistry('sagemaker-endpoint.filters')
-    filters.register('marked-for-op', TagActionFilter)
-    filter_registry = filters
+    filter_registry = FilterRegistry('sagemaker-endpoint.filters')
+    filter_registry.register('marked-for-op', TagActionFilter)
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, endpoints):
@@ -218,9 +218,8 @@ class SagemakerEndpointConfig(QueryResourceManager):
         dimension = None
         filter_name = None
 
-    filters = FilterRegistry('sagemaker-endpoint-config.filters')
-    filters.register('marked-for-op', TagActionFilter)
-    filter_registry = filters
+    filter_registry = FilterRegistry('sagemaker-endpoint-config.filters')
+    filter_registry.register('marked-for-op', TagActionFilter)
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, endpoints):
@@ -251,9 +250,8 @@ class Model(QueryResourceManager):
         dimension = None
         filter_name = None
 
-    filters = FilterRegistry('sagemaker-model.filters')
-    filters.register('marked-for-op', TagActionFilter)
-    filter_registry = filters
+    filter_registry = FilterRegistry('sagemaker-model.filters')
+    filter_registry.register('marked-for-op', TagActionFilter)
     permissions = ('sagemaker:ListTags',)
 
     def augment(self, resources):
@@ -566,6 +564,18 @@ class DeleteNotebookInstance(BaseAction, StateTransitionFilter):
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_instance, resources))
+
+
+@NotebookInstance.filter_registry.register('security-group')
+class NotebookSecurityGroupFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "SecurityGroups[]"
+
+
+@NotebookInstance.filter_registry.register('subnet')
+class NotebookSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "SubnetId"
 
 
 @Model.action_registry.register('delete')

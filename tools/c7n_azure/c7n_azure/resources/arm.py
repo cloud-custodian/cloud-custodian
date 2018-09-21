@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import six
-from c7n_azure.query import QueryResourceManager, QueryMeta
-from c7n_azure.actions import Tag, AutoTagUser, RemoveTag
-from c7n_azure.utils import ResourceIdParser
+from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction, DeleteAction
+from c7n_azure.filters import MetricFilter, TagActionFilter, PolicyCompliantFilter
 from c7n_azure.provider import resources
+from c7n_azure.query import QueryResourceManager, QueryMeta
+from c7n_azure.utils import ResourceIdParser
+
+from c7n.utils import local_session
 
 
 @resources.register('armresource')
@@ -26,7 +29,7 @@ class ArmResourceManager(QueryResourceManager):
     class resource_type(object):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
-        enum_spec = ('resources', 'list')
+        enum_spec = ('resources', 'list', None)
         id = 'id'
         name = 'name'
         default_report_fields = (
@@ -41,6 +44,15 @@ class ArmResourceManager(QueryResourceManager):
                 resource['resourceGroup'] = ResourceIdParser.get_resource_group(resource['id'])
         return resources
 
+    def get_resources(self, resource_ids):
+        resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
+        session = local_session(self.session_factory)
+        data = [
+            resource_client.resources.get_by_id(rid, session.resource_api_version(rid))
+            for rid in resource_ids
+        ]
+        return [r.serialize(True) for r in data]
+
     @staticmethod
     def register_arm_specific(registry, _):
         for resource in registry.keys():
@@ -49,6 +61,13 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('tag', Tag)
                 klass.action_registry.register('untag', RemoveTag)
                 klass.action_registry.register('auto-tag-user', AutoTagUser)
+                klass.action_registry.register('tag-trim', TagTrim)
+                if resource is not 'resourcegroup':
+                    klass.action_registry.register('delete', DeleteAction)
+                klass.filter_registry.register('metric', MetricFilter)
+                klass.filter_registry.register('marked-for-op', TagActionFilter)
+                klass.action_registry.register('mark-for-op', TagDelayedAction)
+                klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

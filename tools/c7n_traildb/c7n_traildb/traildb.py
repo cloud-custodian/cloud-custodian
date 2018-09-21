@@ -21,13 +21,11 @@ import json
 import logging
 import math
 from multiprocessing import cpu_count, Pool
-from c7n.credentials import assumed_session, SessionFactory
+from c7n.credentials import SessionFactory
 import os
 import tempfile
 import time
 import sqlite3
-
-import boto3
 
 from botocore.client import Config
 
@@ -35,6 +33,7 @@ from botocore.client import Config
 log = logging.getLogger('c7n_traildb')
 
 options = None
+
 
 def dump(o):
     return json.dumps(o)
@@ -269,7 +268,7 @@ def process_bucket(
                 os.remove(fpath)
             db.flush()
 
-        l = t
+        l = t # NOQA
         t = time.time()
 
         log.info("Stored page time:%0.2fs", t - st)

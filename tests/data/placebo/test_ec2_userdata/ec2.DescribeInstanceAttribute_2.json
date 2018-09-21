@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InstanceId": "i-03ed5439c62bbaea9", 
+        "UserData": {
+            "Value": "IyAtRGphdmF4Lm5ldC5zc2wudHJ1c3RTdG9yZVBhc3N3b3JkPXBAc3N3b3JkCiMgQVdTQWNjZXNzS2V5SWQ9QUtJQUFTREZHSEpLTFBPSVVZVFImRXhwaXJlcz0xNTMwMTEyNjY1JlNpZ25hdHVyZT1zY3VhCiMgcnVuZWxmIC0tcGFzc3dvcmQgbXlwYXNzd29yZCAtLXVzZXJuYW1lIGJvYgojIHNvbWV3aW5kb3dzIHBvd2Vyc2hlbGwgeyBwYXNzd29yZCA9J215cGFzc3dvcmQnIH0KIyBjbGllbnRfc2VjcmV0PTEyMzI0ZWFzZGZnaDEyMzQ1Njd4Y3ZiCiMgbGRhcC51c2VybmFtZT1TT01FUkVBTExZTE9OR0hBU0c4Mjg5ODJJSktpamRoOTNoaEpLREhoM2xramkzajlxcAojIGxkYXAucGFzc3dvcmQ9U0gzbmQ5MmtzaTE5NDMKIyBlY2hvIGFzZGZhc2RmIHwgY2hwYXNzd2QgdXNlcm5hbWUKIyBBZGQtTG9jYWxHcm91cE1lbWJlciAtR3JvdXAgIkFkbWluaXN0cmF0b3JzIiAtTWVtYmVyIEJvYgojIEJFR0lOIFJTQSBQUklWQVRFIEtFWQojIGFjY2Vzc190b2tlbj1hc2RmZzEyMzQ1ZmdoMzQ1NmdoamsKIyBBdXRob3JpemF0aW9uOiBCYXNpYyBhc2RmYXNkZmFzZGYKIyBTZXQtQURBY2NvdW50UGFzc3dvcmQgLUNyZWRlbnRpYWwgbXljcmVkcyAtT2xkUGFzc3dvcmQgYXNkZmFzZGYgLU5ld1Bhc3N3b3JkIG15Y3JlZHMgLUFzUGxhaW5UZXh0IFwicEBzc3cwcmRcIgojIHVzZXJtb2QgLXAgc29tZXBhc3N3b3JkCiMgcGFzc3dkPSdwYXNzd29ycnJycmQxMjMn"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5173d2ac-f162-48b8-97e9-ad001edc08cd", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 14 Aug 2018 17:11:15 GMT"
+            }
+        }
+    }
+}

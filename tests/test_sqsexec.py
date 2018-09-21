@@ -37,21 +37,24 @@ def int_processor(*args):
 class TestSQSExec(BaseTest):
 
     def test_sqsexec(self):
-        session_factory = self.replay_flight_data('test_sqs_exec')
-        client = session_factory().client('sqs')
+        session_factory = self.replay_flight_data("test_sqs_exec")
+        client = session_factory().client("sqs")
         map_queue = client.create_queue(
-            QueueName = "%s-map-%s" % (
-                TEST_SQS_PREFIX, "".join(
-                    random.sample(string.ascii_letters, 3))))['QueueUrl']
+            QueueName="%s-map-%s"
+            % (TEST_SQS_PREFIX, "".join(random.sample(string.ascii_letters, 3)))
+        )[
+            "QueueUrl"
+        ]
         self.addCleanup(client.delete_queue, QueueUrl=map_queue)
         reduce_queue = client.create_queue(
-            QueueName = "%s-map-%s" % (
-                TEST_SQS_PREFIX, "".join(
-                    random.sample(string.ascii_letters, 3))))['QueueUrl']
+            QueueName="%s-map-%s"
+            % (TEST_SQS_PREFIX, "".join(random.sample(string.ascii_letters, 3)))
+        )[
+            "QueueUrl"
+        ]
         self.addCleanup(client.delete_queue, QueueUrl=reduce_queue)
 
-        with SQSExecutor(
-                session_factory, map_queue, reduce_queue) as w:
+        with SQSExecutor(session_factory, map_queue, reduce_queue) as w:
             w.op_sequence_start = 699723
             w.op_sequence = 699723
             # Submit work
@@ -62,18 +65,18 @@ class TestSQSExec(BaseTest):
             # Manually process and send results
             messages = MessageIterator(client, map_queue, limit=10)
             for m in messages:
-                d = utils.loads(m['Body'])
+                d = utils.loads(m["Body"])
                 self.assertEqual(
-                    m['MessageAttributes']['op']['StringValue'],
-                    'tests.test_sqsexec:int_processor')
+                    m["MessageAttributes"]["op"]["StringValue"],
+                    "tests.test_sqsexec:int_processor",
+                )
                 client.send_message(
                     QueueUrl=reduce_queue,
-                    MessageBody=utils.dumps([
-                        d['args'], int_processor(*d['args'])]),
-                    MessageAttributes=m['MessageAttributes'])
+                    MessageBody=utils.dumps([d["args"], int_processor(*d["args"])]),
+                    MessageAttributes=m["MessageAttributes"],
+                )
             w.gather()
-            results = [json.loads(r.result()['Body'])
-                       for r in list(as_completed(futures))]
-            self.assertEqual(
-                list(sorted(results))[-1],
-                [[9], 18])
+            results = [
+                json.loads(r.result()["Body"]) for r in list(as_completed(futures))
+            ]
+            self.assertEqual(list(sorted(results))[-1], [[9], 18])

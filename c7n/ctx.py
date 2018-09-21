@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import time
+import os
 
 from c7n.output import FSOutput, MetricsOutput, CloudWatchLogOutput
 from c7n.utils import reset_session_cache
@@ -59,8 +60,12 @@ class ExecutionContext(object):
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         self.metrics.flush()
-        # clear policy execution thread local session cache
-        reset_session_cache()
+        # Clear policy execution thread local session cache if running in tests.
+        # IMPORTANT: multi-account execution (c7n-org and others) need to manually reset this.
+        # Why: Not doing this means we get excessive memory usage from client
+        # reconstruction.
+        if os.environ.get('C7N_TEST_RUN'):
+            reset_session_cache()
         if self.cloudwatch_logs:
             self.cloudwatch_logs.__exit__(exc_type, exc_value, exc_traceback)
             self.cloudwatch_logs = None

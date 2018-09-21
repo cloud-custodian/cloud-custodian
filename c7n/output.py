@@ -28,20 +28,20 @@ import tempfile
 
 import os
 
-from boto3.s3.transfer import S3Transfer
-
 from c7n.registry import PluginRegistry
 from c7n.log import CloudWatchLogHandler
-from c7n.utils import local_session, parse_s3, get_retry
+from c7n.utils import chunks, local_session, parse_s3, get_retry
 
 DEFAULT_NAMESPACE = "CloudMaid"
 
 log = logging.getLogger('custodian.output')
 
 
+metrics_outputs = PluginRegistry('c7n.blob-outputs')
 blob_outputs = PluginRegistry('c7n.blob-outputs')
 
 
+@metrics_outputs.register('aws')
 class MetricsOutput(object):
     """Send metrics data to cloudwatch
     """
@@ -50,26 +50,56 @@ class MetricsOutput(object):
 
     retry = staticmethod(get_retry(('Throttling',)))
 
+    BUFFER_SIZE = 20
+
     @staticmethod
-    def select(metrics_enabled):
-        if metrics_enabled:
-            return MetricsOutput
-        return NullMetricsOutput
+    def select(metrics_selector):
+        if not metrics_selector:
+            return NullMetricsOutput
+        # Compatibility for boolean configuration
+        if isinstance(metrics_selector, bool):
+            metrics_selector = 'aws'
+        for k in metrics_outputs.keys():
+            if k.startswith(metrics_selector):
+                return metrics_outputs[k]
+        raise ValueError("invalid metrics option %r" % metrics_selector)
 
     def __init__(self, ctx, namespace=DEFAULT_NAMESPACE):
         self.ctx = ctx
         self.namespace = namespace
         self.buf = []
 
+    def get_timestamp(self):
+        """
+        Now, if C7N_METRICS_TZ is set to TRUE, UTC timestamp will be used.
+        For backwards compatibility, if it is not set, UTC will be the default.
+        To disable this and use the system's time zone, C7N_METRICS_TZ shoule be set to FALSE.
+        """
+
+        if os.getenv("C7N_METRICS_TZ", 'TRUE').upper() in ('TRUE', ''):
+            return datetime.datetime.utcnow()
+        else:
+            return datetime.datetime.now()
+
     def flush(self):
         if self.buf:
             self._put_metrics(self.namespace, self.buf)
             self.buf = []
 
-    def put_metric(self, key, value, unit, buffer=False, **dimensions):
+    def put_metric(self, key, value, unit, buffer=True, **dimensions):
+        point = self._format_metric(key, value, unit, dimensions)
+        self.buf.append(point)
+        if buffer:
+            # Max metrics in a single request
+            if len(self.buf) == 20:
+                self.flush()
+        else:
+            self.flush()
+
+    def _format_metric(self, key, value, unit, dimensions):
         d = {
             "MetricName": key,
-            "Timestamp": datetime.datetime.now(),
+            "Timestamp": self.get_timestamp(),
             "Value": value,
             "Unit": unit}
         d["Dimensions"] = [
@@ -77,19 +107,13 @@ class MetricsOutput(object):
             {"Name": "ResType", "Value": self.ctx.policy.resource_type}]
         for k, v in dimensions.items():
             d['Dimensions'].append({"Name": k, "Value": v})
-
-        if buffer:
-            self.buf.append(d)
-            # Max metrics in a single request
-            if len(self.buf) == 20:
-                self.flush()
-        else:
-            self._put_metrics(self.namespace, [d])
+        return d
 
     def _put_metrics(self, ns, metrics):
         watch = local_session(self.ctx.session_factory).client('cloudwatch')
-        return self.retry(
-            watch.put_metric_data, Namespace=ns, MetricData=metrics)
+        for metric_values in chunks(metrics, self.BUFFER_SIZE):
+            return self.retry(
+                watch.put_metric_data, Namespace=ns, MetricData=metrics)
 
 
 class NullMetricsOutput(MetricsOutput):
@@ -249,13 +273,15 @@ class S3Output(FSOutput):
         return "/".join([s.strip('/') for s in parts])
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        from boto3.s3.transfer import S3Transfer, TransferConfig
         if exc_type is not None:
             log.exception("Error while executing policy")
         log.debug("Uploading policy logs")
         self.leave_log()
         self.compress()
         self.transfer = S3Transfer(
-            self.ctx.session_factory(assume=False).client('s3'))
+            self.ctx.session_factory(assume=False).client('s3'),
+            config=TransferConfig(use_threads=False))
         self.upload()
         shutil.rmtree(self.root_dir)
         log.debug("Policy Logs uploaded")
@@ -272,4 +298,5 @@ class S3Output(FSOutput):
                 self.transfer.upload_file(
                     os.path.join(root, f), self.bucket, key,
                     extra_args={
+                        'ACL': 'bucket-owner-full-control',
                         'ServerSideEncryption': 'AES256'})

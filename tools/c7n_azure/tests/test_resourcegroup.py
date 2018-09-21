@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
 
 
@@ -20,7 +21,7 @@ class ResourceGroupTest(BaseTest):
         super(ResourceGroupTest, self).setUp()
 
     @arm_template('emptyrg.json')
-    def test_delete_empty_group(self):
+    def test_empty_group(self):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
             'resource': 'azure.resourcegroup',
@@ -29,12 +30,7 @@ class ResourceGroupTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': 'test_emptyrg'}],
-            'actions': [
-                {'type': 'delete'}]})
+                 'value': 'test_emptyrg'}]})
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
-
-
-

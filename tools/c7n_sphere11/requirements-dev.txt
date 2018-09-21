@@ -12,7 +12,7 @@ ipaddress>=1.0.18
 jmespath>=0.9.0
 jsonschema>=2.5.1
 pyasn1>=0.1.9
-python-dateutil==2.6.1
+python-dateutil>=2.6.1
 PyYAML>=3.12
 requests>=2.12.5
 rsa>=3.4.2

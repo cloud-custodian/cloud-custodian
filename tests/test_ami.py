@@ -19,46 +19,52 @@ from .common import BaseTest
 class TestAMI(BaseTest):
 
     def test_query(self):
-        factory = self.replay_flight_data('test_ami')
-        p = self.load_policy({
-            'name': 'test-ami',
-            'resource': 'ami',
-            'filters': [
-                {'Name': 'LambdaCompiler'},
-                {'type': 'image-age', 'days': 0.2}],
-            'actions': ['deregister']
-        }, session_factory=factory)
+        factory = self.replay_flight_data("test_ami")
+        p = self.load_policy(
+            {
+                "name": "test-ami",
+                "resource": "ami",
+                "filters": [
+                    {"Name": "LambdaCompiler"}, {"type": "image-age", "days": 0.2}
+                ],
+                "actions": ["deregister"],
+            },
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
     def test_unused_ami_true(self):
-        factory = self.replay_flight_data('test_unused_ami_true')
-        p = self.load_policy({
-            'name': 'test-unused-ami',
-            'resource': 'ami',
-            'filters': ['unused']
-        }, session_factory=factory)
+        factory = self.replay_flight_data("test_unused_ami_true")
+        p = self.load_policy(
+            {"name": "test-unused-ami", "resource": "ami", "filters": ["unused"]},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
     def test_unused_ami_false(self):
-        factory = self.replay_flight_data('test_unused_ami_false')
-        p = self.load_policy({
-            'name': 'test-unused-ami',
-            'resource': 'ami',
-            'filters': [{
-                'type': 'unused','value': False}]
-        }, session_factory=factory)
+        factory = self.replay_flight_data("test_unused_ami_false")
+        p = self.load_policy(
+            {
+                "name": "test-unused-ami",
+                "resource": "ami",
+                "filters": [{"type": "unused", "value": False}],
+            },
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
     def test_ami_cross_accounts(self):
-        session_factory = self.replay_flight_data('test_ami_cross_accounts')
-        p = self.load_policy({
-            'name': 'cross-account-ami',
-            'resource': 'ami',
-            'filters': [{
-                'type': 'cross-account',
-            }]}, session_factory=session_factory)
+        session_factory = self.replay_flight_data("test_ami_cross_accounts")
+        p = self.load_policy(
+            {
+                "name": "cross-account-ami",
+                "resource": "ami",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)

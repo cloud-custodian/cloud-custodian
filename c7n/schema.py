@@ -44,9 +44,11 @@ def validate(data, schema=None):
     if schema is None:
         schema = generate()
         Validator.check_schema(schema)
+
     validator = Validator(schema)
 
     errors = list(validator.iter_errors(data))
+
     if not errors:
         counter = Counter([p['name'] for p in data.get('policies')])
         dupes = []
@@ -96,7 +98,7 @@ def specific_error(error):
     if r is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if r in v['$ref'].rsplit('/', 2)[1]:
+            if v['$ref'].rsplit('/', 2)[1].endswith(r):
                 found = idx
         if found is not None:
             # error context is a flat list of all validation
@@ -183,8 +185,12 @@ def generate(resource_types=()):
                     'type': 'string',
                     'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
                 'region': {'type': 'string'},
+                'tz': {'type': 'string'},
+                'start': {'format': 'date-time'},
+                'end': {'format': 'date-time'},
                 'resource': {'type': 'string'},
-                'max-resources': {'type': 'integer'},
+                'max-resources': {'type': 'integer', 'minimum': 1},
+                'max-resources-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},

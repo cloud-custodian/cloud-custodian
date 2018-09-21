@@ -1,5 +1,3 @@
-jsonschema
-pyyaml
 click
 c7n
 structlog

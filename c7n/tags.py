@@ -26,22 +26,17 @@ from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 from dateutil import zoneinfo
 from dateutil.parser import parse
-from dateutil.tz import tzutc
 
 import itertools
+import time
 
 from c7n.actions import BaseAction as Action, AutoTagUser
-from c7n.filters import Filter, OPERATORS, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
-
-universal_tag_retry = utils.get_retry((
-    'Throttled',
-    'RequestLimitExceeded',
-    'Client.RequestLimitExceeded'
-))
 
 
 def register_ec2_tags(filters, actions):
@@ -85,8 +80,12 @@ def universal_augment(self, resources):
     if not resources:
         return resources
 
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1
+    region = getattr(self.resource_type, 'global_resource', None) and 'us-east-1' or self.region
+
     client = utils.local_session(
-        self.session_factory).client('resourcegroupstaggingapi')
+        self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 
     paginator = client.get_paginator('get_resources')
     resource_type = getattr(self.get_model(), 'resource_type', None)
@@ -140,8 +139,8 @@ class TagTrim(Action):
       - policies:
          - name: ec2-tag-trim
            comment: |
-             Any instances with 8 or more tags get tags removed until
-             they match the target tag count, in this case 7 so we
+             Any instances with 48 or more tags get tags removed until
+             they match the target tag count, in this case 47 so we
              that we free up a tag slot for another usage.
            resource: ec2
            filters:
@@ -151,7 +150,7 @@ class TagTrim(Action):
                type: value
                key: "[length(Tags)][0]"
                op: ge
-               value: 8
+               value: 48
            actions:
              - type: tag-trim
                space: 3
@@ -270,12 +269,14 @@ class TagActionFilter(Filter):
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
-            raise FilterValidationError("Invalid marked-for-op op:%s" % op)
+            raise PolicyValidationError(
+                "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
         tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
-            raise FilterValidationError(
-                "Invalid timezone specified '%s'" % self.data.get('tz'))
+            raise PolicyValidationError(
+                "Invalid timezone specified '%s' in %s" % (
+                    self.data.get('tz'), self.manager.data))
         return self
 
     def __call__(self, i):
@@ -371,8 +372,9 @@ class Tag(Action):
 
     def validate(self):
         if self.data.get('key') and self.data.get('tag'):
-            raise FilterValidationError(
-                "Can't specify both key and tag, choose one")
+            raise PolicyValidationError(
+                "Can't specify both key and tag, choose one in %s" % (
+                    self.manager.data,))
         return self
 
     def process(self, resources):
@@ -557,21 +559,21 @@ class TagDelayedAction(Action):
     The optional 'tz' parameter can be used to adjust the clock to align
     with a given timezone. The default value is 'utc'.
 
+    If neither 'days' nor 'hours' is specified, Cloud Custodian will default
+    to marking the resource for action 4 days in the future.
+
     .. code-block :: yaml
 
       - policies:
-        - name: ec2-stop-marked
+        - name: ec2-mark-for-stop-in-future
           resource: ec2
           filters:
-            - type: marked-for-op
-              # The default tag used is custodian_status
-              # but that is configurable
-              tag: custodian_status
-              op: stop
-              # Another optional tag is skew
-              tz: utc
+            - type: value
+              key: Name
+              value: instance-to-stop-in-four-days
           actions:
-            - stop
+            - type: mark-for-op
+              op: stop
     """
 
     schema = utils.type_schema(
@@ -593,19 +595,21 @@ class TagDelayedAction(Action):
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
-            raise FilterValidationError(
-                "mark-for-op specifies invalid op:%s" % op)
+            raise PolicyValidationError(
+                "mark-for-op specifies invalid op:%s in %s" % (
+                    op, self.manager.data))
 
         self.tz = zoneinfo.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.tz)
+            raise PolicyValidationError(
+                "Invalid timezone specified %s in %s" % (
+                    self.tz, self.manager.data))
         return self
 
     def generate_timestamp(self, days, hours):
         n = datetime.now(tz=self.tz)
-        if days == hours == 0:
+        if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
         action_date = (n + timedelta(days=days, hours=hours))
@@ -819,19 +823,8 @@ class UniversalTag(Tag):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = universal_tag_retry(
-            client.tag_resources,
-            ResourceARNList=arns,
-            Tags=tags)
-
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+        return universal_retry(
+            client.tag_resources, ResourceARNList=arns, Tags=tags)
 
 
 class UniversalUntag(RemoveTag):
@@ -845,22 +838,9 @@ class UniversalUntag(RemoveTag):
     def process_resource_set(self, resource_set, tag_keys):
         client = utils.local_session(
             self.manager.session_factory).client('resourcegroupstaggingapi')
-
         arns = self.manager.get_arns(resource_set)
-
-        response = universal_tag_retry(
-            client.untag_resources,
-            ResourceARNList=arns,
-            TagKeys=tag_keys)
-
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+        return universal_retry(
+            client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
 
 
 class UniversalTagDelayedAction(TagDelayedAction):
@@ -889,6 +869,8 @@ class UniversalTagDelayedAction(TagDelayedAction):
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
+        self.tz = zoneinfo.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
@@ -899,15 +881,15 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        date = self.data.get('days', 4)
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
+        action_date = self.generate_timestamp(days, hours)
 
-        n = datetime.now(tz=tzutc())
-        action_date = n + timedelta(days=date)
         msg = msg_tmpl.format(
-            op=op, action_date=action_date.strftime('%Y/%m/%d'))
+            op=op, action_date=action_date)
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date.strftime('%Y/%m/%d')))
+            len(resources), op, action_date))
 
         tags = {tag: msg}
 
@@ -922,17 +904,45 @@ class UniversalTagDelayedAction(TagDelayedAction):
             self.manager.session_factory).client('resourcegroupstaggingapi')
 
         arns = self.manager.get_arns(resource_set)
+        return universal_retry(
+            client.tag_resources, ResourceARNList=arns, Tags=tags)
 
-        response = universal_tag_retry(
-            client.tag_resources,
-            ResourceARNList=arns,
-            Tags=tags)
 
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+def universal_retry(method, ResourceARNList, **kw):
+    """Retry support for resourcegroup tagging apis.
+
+    The resource group tagging api typically returns a 200 status code
+    with embedded resource specific errors. To enable resource specific
+    retry on throttles, we extract those, perform backoff w/ jitter and
+    continue. Other errors are immediately raised.
+
+    We do not aggregate unified resource responses across retries, only the
+    last successful response is returned for a subset of the resources if
+    a retry is performed.
+    """
+    max_attempts = 6
+
+    for idx, delay in enumerate(
+            utils.backoff_delays(1.5, 2 ** 8, jitter=True)):
+        response = method(ResourceARNList=ResourceARNList, **kw)
+        failures = response.get('FailedResourcesMap', {})
+        if not failures:
+            return response
+
+        errors = {}
+        throttles = set()
+
+        for f_arn in failures:
+            if failures[f_arn]['ErrorCode'] == 'ThrottlingException':
+                throttles.add(f_arn)
+            else:
+                errors[f_arn] = failures[f_arn]['ErrorCode']
+
+        if errors:
+            raise Exception("Resource Tag Errors %s" % (errors))
+
+        if idx == max_attempts - 1:
+            raise Exception("Resource Tag Throttled %s" % (", ".join(throttles)))
+
+        time.sleep(delay)
+        ResourceARNList = list(throttles)
