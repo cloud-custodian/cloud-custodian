@@ -415,7 +415,7 @@ def run_account(account, region, policies_config, output_path,
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",
                     p.name, account['name'], region, e)
-                continue
+                raise SystemExit(1)
             except Exception as e:
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",
@@ -425,7 +425,7 @@ def run_account(account, region, policies_config, output_path,
                 import traceback, pdb, sys
                 traceback.print_exc()
                 pdb.post_mortem(sys.exc_info()[-1])
-                raise
+                raise SystemExit(1)
 
     return policy_counts
 
