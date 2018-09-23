@@ -80,6 +80,10 @@ type Config struct {
 	// This is optional and x-ray is currently only supported when using lambda.
 	XRayTracingEnabled string `yaml:"xrayTracingEnabled"`
 
+	// The number of days to wait to clean up registered ssm instances that have a
+	// PingStatus of ConnectionLost
+	CleanupAfterDays float64 `yaml:"cleanupAfterDays"`
+
 	// Version constraints for allowable client requests during registration. If
 	// constraints are empty, all versions are allowed. Version string should
 	// conform with github.com/hashicorp/go-version format, i.e. comma-separated

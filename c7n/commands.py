@@ -123,9 +123,10 @@ def policy_command(f):
                     log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)
 
-        # Variable expansion
+        # Variable expansion and non schema validation (not optional)
         for p in policies:
             p.expand_variables(p.get_variables())
+            p.validate()
 
         return f(options, list(policies))
 

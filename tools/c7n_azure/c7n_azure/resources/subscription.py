@@ -21,6 +21,7 @@ from azure.mgmt.subscription import SubscriptionClient
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
+from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
@@ -51,6 +52,9 @@ class Subscription(ResourceManager):
         client = SubscriptionClient(session.get_credentials())
         details = client.subscriptions.get(subscription_id=session.subscription_id)
         return details.serialize(True)
+
+
+Subscription.filter_registry.register('missing', Missing)
 
 
 @Subscription.action_registry.register('add-policy')
@@ -92,7 +96,6 @@ class AddPolicy(BaseAction):
         parameters = PolicyAssignment(
             display_name=self.displayName,
             policy_definition_id=self.policyDefinition.id)
-
         self.policyClient.policy_assignments.create(
             scope=self.scope,
             policy_assignment_name=self.paName,
