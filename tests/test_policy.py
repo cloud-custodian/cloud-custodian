@@ -525,6 +525,24 @@ class TestPolicy(BaseTest):
             session_factory=session_factory
         )
 
+    def test_policy_resource_limits_with_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_policy_resource_count_with_filter")
+        p = self.load_policy(
+            {
+                "name": "asg-with-image-age-resource-count",
+                "resource": "asg",
+                "max-resources": 1,
+                "filters": [{
+                    "type": "image-age",
+                    "op": "ge",
+                    "days": 0
+                }]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(resources)
+
     def test_policy_metrics(self):
         session_factory = self.replay_flight_data("test_policy_metrics")
         p = self.load_policy(

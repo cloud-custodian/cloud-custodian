@@ -423,7 +423,8 @@ class QueryResourceManager(ResourceManager):
         resources = self.filter_resources(resources)
 
         # Check if we're out of a policies execution limits.
-        self.check_resource_limit(len(resources), resource_count)
+        if self.data == self.ctx.policy.data:
+            self.check_resource_limit(len(resources), resource_count)
         return resources
 
     def check_resource_limit(self, selection_count, population_count):

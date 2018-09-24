@@ -84,13 +84,13 @@ class HttpRecorder(FlightRecorder):
         fopen = open
         if fpath.endswith('.bz2'):
             fopen = bz2.BZ2File
-        with fopen(fpath, 'w') as fh:
+        with fopen(fpath, 'wb') as fh:
             recorded = {}
             recorded['headers'] = dict(response)
             if not content:
                 content = '{}'
             recorded['body'] = json.loads(content)
-            json.dump(recorded, fh, indent=2)
+            fh.write(json.dumps(recorded, indent=2).encode('utf8'))
 
         return response, content
 
@@ -122,7 +122,7 @@ class HttpReplay(FlightRecorder):
             if fpath in self._cache:
                 return self._cache[fpath]
             fopen = bz2.BZ2File
-        with fopen(fpath, 'r') as fh:
+        with fopen(fpath, 'rb') as fh:
             data = json.load(fh)
             response = Response(data['headers'])
             serialized = json.dumps(data['body']).encode('utf8')

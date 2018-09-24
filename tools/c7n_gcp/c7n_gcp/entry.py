@@ -23,6 +23,7 @@ import c7n_gcp.resources.logging
 import c7n_gcp.resources.network
 import c7n_gcp.resources.pubsub
 import c7n_gcp.resources.resourcemanager
+import c7n_gcp.resources.service
 import c7n_gcp.resources.source
 import c7n_gcp.resources.storage
 import c7n_gcp.resources.sql  # noqa: F401
