@@ -11,10 +11,13 @@ Being that S3 object permissions can be hard to track and restrict due to the hu
 amount of S3 objects usually present in accounts, this policy allows you to prevent
 the issue from occuring in the first place and helps maintain tighter S3 security
 to avoid accidentally setting sensitive S3 objects to public.  Note the S3 bucket
-policy has a NotPrincipal statement of "AWS": "arn:aws:iam::858827067514:root"
-which is actually an account owned by AWS and used for it's Log Delivery Service.
-If the "arn:aws:iam::858827067514:root" statement is not there the Log Delivery
-service won't be able to write logs to your logging buckets!
+policy has a NotPrincipal statement with several "AWS": arns.  These arns are owned
+by AWS and they are used for the AWS logging services for Log Delivery Group, ELB Logs,
+and Redshift Logs.  The ELB and Redshift arns are region specific so depending on the
+regions you are utilizing you might need to add or remove addtional arns found here:
+Redshift Log Accounts: https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html
+ELB Log Accounts: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html
+
 
 .. code-block:: yaml
 
@@ -34,7 +37,12 @@ service won't be able to write logs to your logging buckets!
                 Effect: "Deny"
                 Action: "s3:PutObjectAcl"
                 NotPrincipal:
-                   "AWS": "arn:aws:iam::858827067514:root"
+                  "AWS":
+                      - "arn:aws:iam::858827067514:root"
+                      - "arn:aws:iam::193672423079:user/logs"
+                      - "arn:aws:iam::210876761215:user/logs"
+                      - "arn:aws:iam::127311923021:root"
+                      - "arn:aws:iam::156460612806:root"
                 Resource:
                    - "arn:aws:s3:::{bucket_name}/*"
                    - "arn:aws:s3:::{bucket_name}"
@@ -69,7 +77,12 @@ service won't be able to write logs to your logging buckets!
                Effect: "Deny"
                Action: "s3:PutObjectAcl"
                NotPrincipal:
-                   "AWS": "arn:aws:iam::858827067514:root"
+                  "AWS":
+                      - "arn:aws:iam::858827067514:root"
+                      - "arn:aws:iam::193672423079:user/logs"
+                      - "arn:aws:iam::210876761215:user/logs"
+                      - "arn:aws:iam::127311923021:root"
+                      - "arn:aws:iam::156460612806:root"
                Resource:
                   - "arn:aws:s3:::{bucket_name}/*"
                   - "arn:aws:s3:::{bucket_name}"
