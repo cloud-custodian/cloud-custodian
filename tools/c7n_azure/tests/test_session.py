@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+import re
 
 from azure_common import BaseTest
 from c7n_azure.session import Session
@@ -26,4 +27,5 @@ class SessionTest(BaseTest):
         s = Session()
         client = s.client('azure.mgmt.resource.ResourceManagementClient')
         resource = next(client.resources.list())
-        self.assertEqual('2018-04-01', s.resource_api_version(resource.id))
+        self.assertTrue(re.match('\\d{4}-\\d{2}-\\d{2}',
+                                 s.resource_api_version(resource.id)) is not None)

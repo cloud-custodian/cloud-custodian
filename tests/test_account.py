@@ -31,6 +31,22 @@ TRAIL = "nosetest"
 
 class AccountTests(BaseTest):
 
+    def test_missing(self):
+        session_factory = self.replay_flight_data(
+            'test_account_missing_resource_ec2')
+        p = self.load_policy({
+            'name': 'missing-resource',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'missing',
+                'policy': {
+                    'resource': 'aws.ec2'}
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(sorted(list(resources[0].keys())),
+                         sorted(['account_id', 'account_name']))
+
     def test_root_mfa_enabled(self):
         session_factory = self.replay_flight_data("test_account_root_mfa")
         p = self.load_policy(

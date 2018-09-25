@@ -26,7 +26,6 @@ from concurrent.futures import as_completed
 import jmespath
 import six
 
-from botocore.paginate import set_value_from_jmespath
 
 from c7n.actions import ActionRegistry
 from c7n.exceptions import ClientError, ResourceLimitExceeded
@@ -35,7 +34,8 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource)
+    local_session, generate_arn, get_retry, chunks, camelResource,
+    set_value_from_jmespath)
 
 
 class ResourceQuery(object):
@@ -423,7 +423,8 @@ class QueryResourceManager(ResourceManager):
         resources = self.filter_resources(resources)
 
         # Check if we're out of a policies execution limits.
-        self.check_resource_limit(len(resources), resource_count)
+        if self.data == self.ctx.policy.data:
+            self.check_resource_limit(len(resources), resource_count)
         return resources
 
     def check_resource_limit(self, selection_count, population_count):
@@ -433,7 +434,7 @@ class QueryResourceManager(ResourceManager):
         filtering behind the resource manager facade for default usage.
         """
         p = self.ctx.policy
-        if p.max_resources and p.max_resources > selection_count:
+        if isinstance(p.max_resources, int) and selection_count > p.max_resources:
             raise ResourceLimitExceeded(
                 ("policy: %s exceeded resource limit: {limit} "
                  "found: {selection_count}") % p.name,

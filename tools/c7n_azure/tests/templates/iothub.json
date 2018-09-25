@@ -14,20 +14,6 @@
     "variables": {},
     "resources": [
         {
-            "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/tabarlow/providers/Microsoft.CognitiveServices/accounts/cctest-cog-serv'.",
-            "type": "Microsoft.CognitiveServices/accounts",
-            "sku": {
-                "name": "F0"
-            },
-            "kind": "Bing.Speech",
-            "name": "[parameters('accounts_cctest_cog_serv_name')]",
-            "apiVersion": "2016-02-01-preview",
-            "location": "global",
-            "scale": null,
-            "properties": {},
-            "dependsOn": []
-        },
-        {
             "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/tabarlow/providers/Microsoft.Devices/IotHubs/cctest-iothub'.",
             "type": "Microsoft.Devices/IotHubs",
             "sku": {

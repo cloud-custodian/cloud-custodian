@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
+
 import os
 import logging
 import pprint
@@ -30,11 +32,11 @@ load_resources()
 
 
 def debug(event, context):
-    print sys.executable
-    print sys.version
-    print sys.path
+    print(sys.executable)
+    print(sys.version)
+    print(sys.path)
     pprint.pprint(os.environ)
-    print format_event(event)
+    print(format_event(event))
 
 
 def lambda_handler(event, context=None):

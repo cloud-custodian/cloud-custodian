@@ -92,13 +92,14 @@ func (o *OmniSSM) RequestActivation(ctx context.Context, req *RegistrationReques
 		return nil, o.tryDefer(ctx, err, RequestActivation, req)
 	}
 	entry = &RegistrationEntry{
-		Id:         req.Identity().Hash(),
-		CreatedAt:  time.Now().UTC(),
-		AccountId:  req.Identity().AccountId,
-		Region:     req.Identity().Region,
-		InstanceId: req.Identity().InstanceId,
-		Activation: *activation,
-		ManagedId:  "-",
+		Id:            req.Identity().Hash(),
+		CreatedAt:     time.Now().UTC(),
+		AccountId:     req.Identity().AccountId,
+		Region:        req.Identity().Region,
+		InstanceId:    req.Identity().InstanceId,
+		ClientVersion: req.ClientVersion,
+		Activation:    *activation,
+		ManagedId:     "-",
 	}
 	if err := o.Registrations.Put(ctx, entry); err != nil {
 		// if we fail here, defer saving the created activation to alleviate

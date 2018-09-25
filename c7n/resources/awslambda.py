@@ -237,9 +237,10 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 
     def process(self, resources, event=None):
 
+        client = local_session(
+            self.manager.session_factory).client('lambda')
+
         def _augment(r):
-            client = local_session(
-                self.manager.session_factory).client('lambda')
             try:
                 r['c7n:Policy'] = client.get_policy(
                     FunctionName=r['FunctionName'])['Policy']

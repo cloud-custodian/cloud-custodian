@@ -13,14 +13,16 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest
 
 
 class ContainerServiceTest(BaseTest):
     def setUp(self):
         super(ContainerServiceTest, self).setUp()
 
-    @arm_template('containerservice.json')
+    # Container service arm template requires SP id/secret, so please use az cli to deploy it
+    # az acs create -n cctestacs -d cctestacsdns
+    #               -g $rgName --generate-ssh-keys --orchestrator-type kubernetes
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-containerservice',

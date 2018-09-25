@@ -23,6 +23,32 @@ from c7n.resources.appelb import AppELB, AppELBTargetGroup
 
 class AppELBTest(BaseTest):
 
+    def test_appelb_config_event(self):
+        session_factory = self.replay_flight_data('test_appelb_config_event')
+        p = self.load_policy({
+            'name': 'appelb-checker',
+            'resource': 'app-elb',
+            'mode': {
+                'type': 'config-rule'}},
+            session_factory=session_factory)
+        event = event_data("app-elb-config-event.json", "config")
+        result = p.push(event, {})[0]
+        self.assertEqual(
+            result['DNSName'],
+            'internal-test-288037075.us-east-1.elb.amazonaws.com')
+        self.assertEqual(
+            result['Tags'],
+            [{'Key': 'App', 'Value': 'DevTest'},
+             {'Key': 'Env', 'Value': 'Dev'}])
+        self.assertEqual(
+            result['Attributes'],
+            {'access_logs.s3.bucket': '',
+             'access_logs.s3.enabled': False,
+             'access_logs.s3.prefix': '',
+             'deletion_protection.enabled': False,
+             'idle_timeout.timeout_seconds': 60,
+             'routing.http2.enabled': True})
+
     def test_appelb_config_source(self):
         event = event_data("app-elb.json", "config")
         p = self.load_policy({"name": "appelbcfg", "resource": "app-elb"})

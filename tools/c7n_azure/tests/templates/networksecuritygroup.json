@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "networkSecurityGroups_c7n_nsg_destinationPortRange": {
-            "defaultValue": null,
+            "defaultValue": "",
             "type": "SecureString"
         },
         "networkSecurityGroups_c7n_nsg_name": {
@@ -61,8 +61,7 @@
                                 "8086"
                             ],
                             "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": [],
-                            "destinationPortRange": "[parameters('networkSecurityGroups_c7n_nsg_destinationPortRange')]"
+                            "destinationAddressPrefixes": []
                         }
                     },
                     {

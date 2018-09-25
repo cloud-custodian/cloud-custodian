@@ -104,6 +104,9 @@ func main() {
 			if a := registerReq.Identity().AccountId; !config.IsAuthorized(a) {
 				return nil, lambda.UnauthorizedError{fmt.Sprintf("account not authorized: %#v", a)}
 			}
+			if !omni.RequestVersionValid(registerReq.ClientVersion) {
+				return nil, lambda.BadRequestError{fmt.Sprintf("client version does not meet constraints %#v", omni.Config.ClientVersionConstraints)}
+			}
 			switch req.HTTPMethod {
 			case "POST":
 				return lambda.JSON(r.RequestActivation(ctx, &registerReq))
