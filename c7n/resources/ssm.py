@@ -22,19 +22,19 @@ from c7n.actions import Action
 @resources.register('ssm-parameter')
 class SSMParameter(QueryResourceManager):
     class resource_type(object):
-      service = 'ssm'
-      enum_spec = ('describe_parameters', 'Parameters', None)
-      name = "Name"
-      id = "Name"
-      filter_name = None
-      dimension = None
-      universal_taggable = True
+        service = 'ssm'
+        enum_spec = ('describe_parameters', 'Parameters', None)
+        name = "Name"
+        id = "Name"
+        filter_name = None
+        dimension = None
+        universal_taggable = True
 
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',
                    'ssm:DescribeParameters')
 
-@resources.register('ssm-managed-instances')
+@resources.register('ssm-managed-instance')
 class ManagedInstance(QueryResourceManager):
     class resource_type(object):
         service = 'ssm'
@@ -44,7 +44,7 @@ class ManagedInstance(QueryResourceManager):
         date = 'RegistrationDate'
         dimension = None
         filter_name = None
-    permissions = ('ssm:DescribeInstanceInformation')
+    permissions = ('ssm:DescribeInstanceInformation',)
 
 @resources.register('ssm-activation')
 class SSMActivation(QueryResourceManager):
@@ -53,9 +53,10 @@ class SSMActivation(QueryResourceManager):
         enum_spec = ('describe_activations', 'ActivationList', None)
         id = 'ActivationId'
         name = 'Description'
-        date = dimension = None
+        date = 'CreatedDate'
+        dimension = None
         filter_name = None
-    permissions = ('ssm:DescribeActivations')
+    permissions = ('ssm:DescribeActivations',)
 
 @SSMActivation.action_registry.register('delete')
 class DeleteSSMActivation(Action):
@@ -63,7 +64,7 @@ class DeleteSSMActivation(Action):
     permissions = ('ssm:DeleteActivation',)
     def process(self, resources):
         if not len(resources):
-          return
+            return
         client = local_session(self.manager.session_factory).client('ssm')
         for a in resources:
             client.delete_activation(ActivationId=a["ActivationId"])

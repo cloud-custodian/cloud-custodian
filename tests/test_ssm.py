@@ -48,7 +48,6 @@ class TestSsm(BaseTest):
         self.assertEqual(len(resources), 1)
         self.addCleanup(client.delete_parameters, Names=['test-name', 'secure-test-name'])
 
-    @functional
     def test_ssm_activation_expired(self):
         session_factory = self.replay_flight_data("test_ssm_activation_expired")
         client = session_factory().client("ssm")
@@ -66,41 +65,18 @@ class TestSsm(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
-
-    @functional
-    def test_ssm_activation_expired_no_registrations(self):
-        session_factory = self.replay_flight_data("test_ssm_activation_expired_no_registrations")
-        client = session_factory().client("ssm")
-        p = self.load_policy(
-            {
-                "name": "ssm-list-expired-activations-no-registrations",
-                "resource": "ssm-activation",
-                "filters": [{
-                  "type": "value",
-                  "key": "Expired",
-                  "value": True
-                }, {
-                  "type": "value",
-                  "key": "RegistrationsCount",
-                  "value": 0
-                }]
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
     
-    @functional
     def test_ssm_get_manager_instances(self):
         session_factory = self.replay_flight_data("test_ssm_get_managed_instances")
         client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "ssm-get-managed-instances",
-                "resource": "ssm-managed-instances"
+                "resource": "ssm-managed-instance"
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["InstanceId"], "mi-1111aa111aa11a111")
 
