@@ -68,7 +68,7 @@ class MetricsFilter(Filter):
            'attr-multiplier': {'type': 'number'},
            'percent-attr': {'type': 'string'},
            'required': ('value', 'name')})
-
+    schema_alias = True
     permissions = ("cloudwatch:GetMetricStatistics",)
 
     MAX_QUERY_POINTS = 50850

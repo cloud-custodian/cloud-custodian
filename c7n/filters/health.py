@@ -26,7 +26,6 @@ class HealthEventFilter(Filter):
 
     Health events are stored as annotation on a resource.
     """
-
     schema = type_schema(
         'health-event',
         types={'type': 'array', 'items': {'type': 'string'}},
@@ -34,7 +33,6 @@ class HealthEventFilter(Filter):
             'type': 'string',
             'enum': ['open', 'upcoming', 'closed']
         }})
-
     permissions = ('health:DescribeEvents', 'health:DescribeAffectedEntities',
                    'health:DescribeEventDetails')
 
