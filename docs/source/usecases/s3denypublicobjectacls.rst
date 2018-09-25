@@ -13,8 +13,9 @@ the issue from occuring in the first place and helps maintain tighter S3 securit
 to avoid accidentally setting sensitive S3 objects to public.  Note the S3 bucket
 policy has a NotPrincipal statement with several "AWS": arns.  These arns are owned
 by AWS and they are used for the AWS logging services for Log Delivery Group, ELB Logs,
-and Redshift Logs.  The ELB and Redshift arns are region specific so depending on the
-regions you are utilizing you might need to add or remove addtional arns found here:
+and Redshift Logs.  The ELB and Redshift arns are region specific
+(sample includesus-east-1 and eu-west-1) so depending on the regions you are utilizing
+you might need to add or remove addtional arns found here:
 Redshift Log Accounts: https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html
 ELB Log Accounts: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html
 
@@ -27,9 +28,9 @@ ELB Log Accounts: https://docs.aws.amazon.com/elasticloadbalancing/latest/classi
        resource: s3
        description: |
          Appends a bucket policy statement to all existing s3 buckets to
-         deny anyone except for the AWS Log Delivery Service (arn:aws:iam::858827067514:root)
-         from setting s3 objects in the bucket to public-read,
-         public-read-write, or any authenticated AWS user.
+         deny anyone except for the AWS Logging Services from setting s3
+         objects in the bucket to public-read, public-read-write, or any
+         authenticated AWS user.
        actions:
          - type: set-statements
            statements:
@@ -68,8 +69,9 @@ ELB Log Accounts: https://docs.aws.amazon.com/elasticloadbalancing/latest/classi
        description: |
          Appends a bucket policy statement to an s3 bucket when it detects
          a policy change to the bucket or a new bucket is created which
-         will deny anyone from setting s3 objects in the bucket to public-read,
-         public-read-write, or any authenticated AWS user.
+         will deny anyone except some AWS logging services from setting
+         s3 objects in the bucket to public-read, public-read-write, or
+         any authenticated AWS user.
        actions:
          - type: set-statements
            statements:
