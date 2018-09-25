@@ -40,8 +40,10 @@ import c7n_azure.resources.datalake_store
 import c7n_azure.resources.redis
 import c7n_azure.resources.vmss
 import c7n_azure.resources.batch
-import c7n_azure.resources.appserviceplan  # noqa: F401
+import c7n_azure.resources.subscription
+import c7n_azure.resources.policy_assignments
 import c7n_azure.resources.image
+import c7n_azure.resources.appserviceplan  # noqa: F401
 
 
 def initialize_azure():
