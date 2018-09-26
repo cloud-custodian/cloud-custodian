@@ -466,6 +466,11 @@ def run_account(account, region, policies_config, output_path,
     st = time.time()
     with environ(**account_tags(account)):
         for p in policies:
+
+            # Variable expansion and non schema validation (not optional)
+            p.expand_variables(p.get_variables())
+            p.validate()
+
             log.debug(
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)
