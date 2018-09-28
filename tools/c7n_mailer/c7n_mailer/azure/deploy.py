@@ -14,9 +14,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
-import logging
 import os
-from binascii import hexlify
+import logging
 
 try:
     from c7n_azure.function_package import FunctionPackage

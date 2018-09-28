@@ -12,30 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-from binascii import hexlify
-
-import requests
-import logging
 import json
+import logging
 import time
 
-from c7n_azure.function_package import FunctionPackage
-from msrestazure.azure_exceptions import CloudError
-from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.template_utils import TemplateUtilities
+import requests
+from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
+                                         WebHookEventSubscriptionDestination)
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
                                  CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
                                  CONST_AZURE_FUNCTION_KEY_URL)
+from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.template_utils import TemplateUtilities
+from msrestazure.azure_exceptions import CloudError
 
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
 from c7n.utils import local_session
-
-from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
-                                         WebHookEventSubscriptionDestination)
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -105,7 +101,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         archive.build(self.policy.data)
         archive.close()
 
-        self.log.info("Function package built: %dMB" % (archive.pkg.size / (1024 * 1024)))
+        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
 
         if archive.wait_for_status(self.webapp_name):
             archive.publish(self.webapp_name)
@@ -212,8 +208,8 @@ class AzureEventGridMode(AzureFunctionMode):
                 status_success = True
             except CloudError as e:
                 self.log.info(e)
-                self.log.info('Retrying in 15 seconds')
-                time.sleep(15)
+                self.log.info('Retrying in 30 seconds')
+                time.sleep(30)
 
     def _get_webhook_key(self):
         self.log.info("Fetching Function's API keys")
