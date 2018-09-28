@@ -107,9 +107,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.log.info("Function package built: %dMB" % (archive.pkg.size / (1024*1024)))
 
         if archive.wait_for_status(self.webapp_name):
-            web_client = self.session.client('azure.mgmt.web.WebSiteManagementClient')
-            pub_creds = web_client.web_apps.list_publishing_credentials(self.group_name, self.webapp_name).result(30)
-            archive.publish(self.webapp_name, pub_creds)
+            archive.publish(self.webapp_name)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
