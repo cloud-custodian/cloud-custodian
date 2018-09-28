@@ -120,7 +120,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         updated_parameters = {
             'dockerVersion': CONST_DOCKER_VERSION,
             'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION,
-            'machineDecryptionKey': b16encode(os.urandom(64)).decode('utf-8')
+            'machineDecryptionKey': b16encode(os.urandom(32)).decode('utf-8')
         }
 
         if 'mode' in data:

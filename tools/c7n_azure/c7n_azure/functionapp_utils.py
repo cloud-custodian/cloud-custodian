@@ -42,7 +42,7 @@ class FunctionAppUtilities(object):
                                                       CONST_FUNCTIONS_EXT_VERSION))
         site_config.app_settings.append(NameValuePair('FUNCTIONS_WORKER_RUNTIME', 'python'))
         site_config.app_settings.append(
-            NameValuePair('MACHINEKEY_DecryptionKey', b16encode(os.urandom(64)).decode('utf-8')))
+            NameValuePair('MACHINEKEY_DecryptionKey', b16encode(os.urandom(32)).decode('utf-8')))
 
         #: :type: azure.mgmt.web.WebSiteManagementClient
         web_client = self.local_session.client('azure.mgmt.web.WebSiteManagementClient')

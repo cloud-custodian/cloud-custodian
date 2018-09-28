@@ -108,7 +108,7 @@ def _get_parameters(template_util, func_config):
     func_config['storageName'] = (func_config['servicePlanName']).replace('-', '')
     func_config['dockerVersion'] = CONST_DOCKER_VERSION
     func_config['functionsExtVersion'] = CONST_FUNCTIONS_EXT_VERSION
-    func_config['machineDecryptionKey'] = b16encode(os.urandom(64)).decode('utf-8')
+    func_config['machineDecryptionKey'] = b16encode(os.urandom(32)).decode('utf-8')
 
     parameters = template_util.update_parameters(parameters, func_config)
 
