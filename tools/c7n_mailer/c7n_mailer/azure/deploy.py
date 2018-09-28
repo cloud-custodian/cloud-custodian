@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-from base64 import b16encode
 
 import json
-import os
 import logging
+import os
+from binascii import hexlify
 
 try:
     from c7n_azure.function_package import FunctionPackage
+    from c7n_azure.functionapp_utils import FunctionAppUtilities
     from c7n_azure.template_utils import TemplateUtilities
     from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
 except ImportError:
@@ -108,7 +109,7 @@ def _get_parameters(template_util, func_config):
     func_config['storageName'] = (func_config['servicePlanName']).replace('-', '')
     func_config['dockerVersion'] = CONST_DOCKER_VERSION
     func_config['functionsExtVersion'] = CONST_FUNCTIONS_EXT_VERSION
-    func_config['machineDecryptionKey'] = b16encode(os.urandom(32)).decode('utf-8')
+    func_config['machineDecryptionKey'] = FunctionAppUtilities.generate_machine_decryption_key()
 
     parameters = template_util.update_parameters(parameters, func_config)
 

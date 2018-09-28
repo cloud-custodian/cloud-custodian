@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from base64 import b16encode
 
 import os
+from binascii import hexlify
+
 import requests
 import logging
 import json
@@ -120,7 +121,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         updated_parameters = {
             'dockerVersion': CONST_DOCKER_VERSION,
             'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION,
-            'machineDecryptionKey': b16encode(os.urandom(32)).decode('utf-8')
+            'machineDecryptionKey': FunctionAppUtilities.generate_machine_decryption_key()
         }
 
         if 'mode' in data:
