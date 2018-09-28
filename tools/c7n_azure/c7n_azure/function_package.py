@@ -125,7 +125,7 @@ class FunctionPackage(object):
 
         # linux
         platform = sys.platform
-        if platform == "linux" or platform == "linux2":
+        if platform == "linux" or platform == "linux2" or platform == "darwin":
             for so_file in os.listdir(site_pkg):
                 if fnmatch.fnmatch(so_file, '*ffi*.so*'):
                     self.pkg.add_file(os.path.join(site_pkg, so_file))
@@ -203,18 +203,22 @@ class FunctionPackage(object):
 
         return True
 
-    def publish(self, app_name):
+    def publish(self, app_name, pub_creds):
         self.close()
 
         # update perms of the package
         self._update_perms_package()
 
         s = local_session(Session)
-        zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
+        # zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
         headers = {
             'Content-type': 'application/zip',
-            'Authorization': 'Bearer %s' % (s.get_bearer_token())
+            # 'Authorization': 'Bearer %s' % (s.get_bearer_token())
         }
+
+        zip_api_url = "https://%s:%s@%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true" % (
+            pub_creds.publishing_user_name, pub_creds.publishing_password, app_name)
+
 
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
@@ -227,7 +231,7 @@ class FunctionPackage(object):
 
         r.raise_for_status()
 
-        self.log.info("Function publish result: %s %s" % (r.status_code, r.text))
+        self.log.info("Function publish result: %s % s" % (r.status_code, r.text))
 
     def close(self):
         self.pkg.close()

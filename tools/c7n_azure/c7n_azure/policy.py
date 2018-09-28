@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from base64 import b16encode
+import os
 
 import requests
 import logging
@@ -102,10 +104,12 @@ class AzureFunctionMode(ServerlessExecutionMode):
         archive.build(self.policy.data)
         archive.close()
 
-        self.log.info("Function package built")
+        self.log.info("Function package built: %dMB" % (archive.pkg.size / (1024*1024)))
 
         if archive.wait_for_status(self.webapp_name):
-            archive.publish(self.webapp_name)
+            web_client = self.session.client('azure.mgmt.web.WebSiteManagementClient')
+            pub_creds = web_client.web_apps.list_publishing_credentials(self.group_name, self.webapp_name).result(30)
+            archive.publish(self.webapp_name, pub_creds)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
@@ -117,7 +121,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         updated_parameters = {
             'dockerVersion': CONST_DOCKER_VERSION,
-            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION
+            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION,
+            'machineDecryptionKey' : b16encode(os.urandom(64)).decode('utf-8')
         }
 
         if 'mode' in data:
@@ -208,8 +213,8 @@ class AzureEventGridMode(AzureFunctionMode):
                 status_success = True
             except CloudError as e:
                 self.log.info(e)
-                self.log.info('Retrying in 30 seconds')
-                time.sleep(30)
+                self.log.info('Retrying in 15 seconds')
+                time.sleep(15)
 
     def _get_webhook_key(self):
         self.log.info("Fetching Function's API keys")

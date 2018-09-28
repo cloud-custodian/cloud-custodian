@@ -1,3 +1,5 @@
+from base64 import b16encode
+import os
 import logging
 
 from azure.mgmt.web.models import (Site, SiteConfig, NameValuePair)
@@ -38,6 +40,7 @@ class FunctionAppUtilities(object):
         site_config.app_settings.append(NameValuePair('FUNCTIONS_EXTENSION_VERSION',
                                                       CONST_FUNCTIONS_EXT_VERSION))
         site_config.app_settings.append(NameValuePair('FUNCTIONS_WORKER_RUNTIME', 'python'))
+        site_config.app_settings.append(NameValuePair('MACHINEKEY_DecryptionKey', b16encode(os.urandom(64)).decode('utf-8')))
 
         #: :type: azure.mgmt.web.WebSiteManagementClient
         web_client = self.local_session.client('azure.mgmt.web.WebSiteManagementClient')
