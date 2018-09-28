@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from base64 import b16encode
-import os
 
+import os
 import requests
 import logging
 import json
@@ -104,7 +104,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         archive.build(self.policy.data)
         archive.close()
 
-        self.log.info("Function package built: %dMB" % (archive.pkg.size / (1024*1024)))
+        self.log.info("Function package built: %dMB" % (archive.pkg.size / (1024 * 1024)))
 
         if archive.wait_for_status(self.webapp_name):
             archive.publish(self.webapp_name)
@@ -120,7 +120,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         updated_parameters = {
             'dockerVersion': CONST_DOCKER_VERSION,
             'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION,
-            'machineDecryptionKey' : b16encode(os.urandom(64)).decode('utf-8')
+            'machineDecryptionKey': b16encode(os.urandom(64)).decode('utf-8')
         }
 
         if 'mode' in data:
@@ -224,10 +224,10 @@ class AzureEventGridMode(AzureFunctionMode):
             'https://management.azure.com'
             '/subscriptions/{0}/resourceGroups/{1}/'
             'providers/Microsoft.Web/sites/{2}/{3}').format(
-                self.session.subscription_id,
-                self.group_name,
-                self.webapp_name,
-                CONST_AZURE_FUNCTION_KEY_URL)
+            self.session.subscription_id,
+            self.group_name,
+            self.webapp_name,
+            CONST_AZURE_FUNCTION_KEY_URL)
 
         retrieved_key = False
 
