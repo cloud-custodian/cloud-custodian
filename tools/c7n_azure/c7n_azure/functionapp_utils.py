@@ -30,6 +30,7 @@ class FunctionAppUtilities(object):
 
     @staticmethod
     def generate_machine_decryption_key():
+        # randomly generated decryption key for Functions key
         return str(hexlify(os.urandom(32)).decode()).upper()
 
     def deploy_webapp(self, app_name, group_name, service_plan, storage_account_name):
