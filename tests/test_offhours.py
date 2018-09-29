@@ -17,7 +17,6 @@ import datetime
 import json
 import os
 
-from dateutil import zoneinfo
 from dateutil import tz as tzutil
 
 from .common import BaseTest, instance
