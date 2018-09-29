@@ -89,8 +89,6 @@ class ActionRegistry(PluginRegistry):
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
-        self.register('invoke-lambda', LambdaInvoke)
-        self.register('put-metric', PutMetric)
 
     def parse(self, data, manager):
         results = []
@@ -127,6 +125,7 @@ class Action(object):
     executor_factory = ThreadPoolExecutor
     permissions = ()
     schema = {'type': 'object'}
+    schema_alias = None
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
@@ -180,6 +179,7 @@ class ModifyVpcSecurityGroupsAction(Action):
         remove: [] | matched | network-location
         isolation-group: sg-xyz
     """
+    schema_alias = True
     schema = {
         'type': 'object',
         'additionalProperties': False,
@@ -339,7 +339,7 @@ class LambdaInvoke(EventAction):
      - type: invoke-lambda
        function: my-function
     """
-
+    schema_alias = True
     schema = {
         'type': 'object',
         'required': ['type', 'function'],
@@ -386,6 +386,15 @@ class LambdaInvoke(EventAction):
                 result['Payload'] = result['Payload'].decode('utf-8')
             results.append(result)
         return results
+
+
+def register_action_invoke_lambda(registry, _):
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        klass.action_registry.register('invoke-lambda', LambdaInvoke)
+
+
+resources.subscribe(resources.EVENT_FINAL, register_action_invoke_lambda)
 
 
 class BaseNotify(EventAction):
@@ -479,6 +488,7 @@ class Notify(BaseNotify):
 
     C7N_DATA_MESSAGE = "maidmsg/1.0"
 
+    schema_alias = True
     schema = {
         'type': 'object',
         'anyOf': [
@@ -698,6 +708,7 @@ class AutoTagUser(EventAction):
      - CloudTrail User - http://goo.gl/XQhIG6
     """
 
+    schema_alias = True
     schema = utils.type_schema(
         'auto-tag-user',
         required=['tag'],
@@ -783,14 +794,14 @@ class AutoTagUser(EventAction):
         return new_tags
 
 
-def add_auto_tag_user(registry, _):
+def register_action_tag_user(registry, _):
     for resource in registry.keys():
         klass = registry.get(resource)
         if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
             klass.action_registry.register('auto-tag-user', AutoTagUser)
 
 
-resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
+resources.subscribe(resources.EVENT_FINAL, register_action_tag_user)
 
 
 class PutMetric(BaseAction):
@@ -819,6 +830,7 @@ class PutMetric(BaseAction):
     """
     # permissions are typically lowercase servicename:TitleCaseActionName
     permissions = {'cloudwatch:PutMetricData', }
+    schema_alias = True
     schema = {
         'type': 'object',
         'required': ['type', 'key', 'namespace', 'metric_name'],
@@ -896,6 +908,16 @@ class PutMetric(BaseAction):
         return resources
 
 
+def register_action_put_metric(registry, _):
+    # apply put metric to each resource
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        klass.action_registry.register('put-metric', PutMetric)
+
+
+resources.subscribe(resources.EVENT_FINAL, register_action_put_metric)
+
+
 class RemovePolicyBase(BaseAction):
 
     schema = utils.type_schema(
@@ -934,6 +956,7 @@ def remove_statements(match_ids, statements, matched=()):
 
 class ModifyPolicyBase(BaseAction):
 
+    schema_alias = True
     schema = utils.type_schema(
         'modify-policy',
         **{

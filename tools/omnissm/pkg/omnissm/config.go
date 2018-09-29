@@ -90,6 +90,14 @@ type Config struct {
 	// rules like ">= 1.1.0, < 2.0.0"
 	ClientVersionConstraints string `yaml:"clientVersionConstraints"`
 
+	// The name of a JSON file containing an ImageWhitelist structure. If the
+	// value is not an empty string, the registration handler will attempt to
+	// read the named file on lambda startup and construct a whitelist of valid
+	// image IDs for each AccountId/RegionName pair. Instances presenting an
+	// identity document with an image ID not present in the whitelist will not
+	// be allowed to register.
+	AMIWhitelistFile string `yaml:"amiWhitelistFile"`
+
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
 	roleMap              map[string]string
@@ -100,6 +108,15 @@ func NewConfig() *Config {
 	c := &Config{}
 	MergeConfig(c, ReadConfigFromEnv())
 	return c
+}
+
+type ImageWhitelist struct {
+	Images []struct {
+		AccountId   string `json:"AccountId"`
+		RegionName  string `json:"RegionName"`
+		ImageId     string `json:"ImageId"`
+		ReleaseDate string `json:"ReleaseDate"`
+	} `json:"Images"`
 }
 
 // ReadConfig loads configuration values from a yaml file.

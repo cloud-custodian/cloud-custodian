@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 
 import datetime
 import logging
@@ -549,5 +550,5 @@ if __name__ == '__main__':
         cli()
     except Exception as e:
         import traceback, pdb, sys
-        print traceback.print_exc()
+        print(traceback.print_exc())
         pdb.post_mortem(sys.exc_info()[-1])
