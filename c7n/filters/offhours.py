@@ -240,7 +240,7 @@ import datetime
 import logging
 from os.path import join
 
-from dateutil import zoneinfo
+from dateutil import zoneinfo, tz as tzutil
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
@@ -466,8 +466,8 @@ class Time(Filter):
     def get_tz(cls, tz):
         found = cls.TZ_ALIASES.get(tz)
         if found:
-            return zoneinfo.gettz(found)
-        return zoneinfo.gettz(tz.title())
+            return tzutil.gettz(found)
+        return tzutil.gettz(tz.title())
 
     def get_default_schedule(self):
         raise NotImplementedError("use subclass")
