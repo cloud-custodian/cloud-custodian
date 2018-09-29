@@ -521,6 +521,7 @@ class TestPolicy(BaseTest):
             self.load_policy,
             policy,
             config=config,
+            validate=True,
             session_factory=session_factory
         )
 
