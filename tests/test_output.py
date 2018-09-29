@@ -80,7 +80,7 @@ class S3OutputTest(TestUtils):
 
     def test_s3_output(self):
         output = self.get_s3_output()
-        self.assertEquals(output.type, "s3")
+        self.assertEqual(output.type, "s3")
 
         # Make sure __repr__ is defined
         name = str(output)

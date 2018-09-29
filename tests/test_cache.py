@@ -68,8 +68,8 @@ class FileCacheManagerTest(TestCase):
         self.test_cache.data = pickle.loads(test_pickle)
 
         # assert
-        self.assertEquals(self.test_cache.get(self.test_key), self.test_value)
-        self.assertEquals(self.test_cache.get(self.bad_key), None)
+        self.assertEqual(self.test_cache.get(self.test_key), self.test_value)
+        self.assertEqual(self.test_cache.get(self.bad_key), None)
 
     def test_load(self):
         t = tempfile.NamedTemporaryFile(suffix=".cache")
@@ -98,9 +98,9 @@ class FileCacheManagerTest(TestCase):
         self.assertTrue(mock_dump.called)
 
         # mkdir should NOT be called, but pickles should
-        self.assertEquals(mock_mkdir.call_count, 0)
-        self.assertEquals(mock_dump.call_count, 1)
-        self.assertEquals(mock_dumps.call_count, 1)
+        self.assertEqual(mock_mkdir.call_count, 0)
+        self.assertEqual(mock_dump.call_count, 1)
+        self.assertEqual(mock_dumps.call_count, 1)
 
     @mock.patch.object(cache.os, "makedirs")
     @mock.patch.object(cache.os.path, "exists")
@@ -125,6 +125,6 @@ class FileCacheManagerTest(TestCase):
         self.assertTrue(mock_dump.called)
 
         # all 3 should be called once
-        self.assertEquals(mock_mkdir.call_count, 1)
-        self.assertEquals(mock_dump.call_count, 1)
-        self.assertEquals(mock_dumps.call_count, 1)
+        self.assertEqual(mock_mkdir.call_count, 1)
+        self.assertEqual(mock_dump.call_count, 1)
+        self.assertEqual(mock_dumps.call_count, 1)

@@ -753,7 +753,7 @@ class PullModeTest(BaseTest):
             config={'region': 'us-west-2', 'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), False)
+        self.assertEqual(pull_mode.is_runnable(), False)
 
     def test_is_runnable_dates(self):
         p = self.load_policy(
@@ -764,7 +764,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), True)
+        self.assertEqual(pull_mode.is_runnable(), True)
 
         tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
         p = self.load_policy(
@@ -775,7 +775,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), False)
+        self.assertEqual(pull_mode.is_runnable(), False)
 
         p = self.load_policy(
             {'name': 'good-end-date',
@@ -785,7 +785,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), True)
+        self.assertEqual(pull_mode.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'bad-end-date',
@@ -795,7 +795,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), False)
+        self.assertEqual(pull_mode.is_runnable(), False)
 
         p = self.load_policy(
             {'name': 'bad-start-end-date',
@@ -806,7 +806,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), False)
+        self.assertEqual(pull_mode.is_runnable(), False)
 
     def test_is_runnable_parse_dates(self):
         p = self.load_policy(
@@ -817,7 +817,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), True)
+        self.assertEqual(pull_mode.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'parse-date-policy',
@@ -827,7 +827,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), True)
+        self.assertEqual(pull_mode.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'parse-date-policy',
@@ -837,7 +837,7 @@ class PullModeTest(BaseTest):
             config={'validate': True},
             session_factory=None)
         pull_mode = policy.PullMode(p)
-        self.assertEquals(pull_mode.is_runnable(), True)
+        self.assertEqual(pull_mode.is_runnable(), True)
 
 
 class GuardModeTest(BaseTest):
