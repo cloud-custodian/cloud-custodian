@@ -30,6 +30,7 @@ import traceback
 import boto3
 
 from c7n.credentials import SessionFactory
+from c7n.config import Bag
 from c7n.log import CloudWatchLogHandler
 
 # Import output registries aws provider extends.
@@ -193,6 +194,9 @@ class XrayContext(Context):
     def __init__(self, *args, **kw):
         super(XrayContext, self).__init__(*args, **kw)
         self.sampler = LocalSampler()
+        # We want process global semantics as policy execution
+        # can span threads.
+        self._local = Bag()
 
     def put_segment(self, segment):
         print("put segment {}".format(segment))
