@@ -17,7 +17,7 @@ from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import Filter
+from c7n.filters import Filter, MetricsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
@@ -90,7 +90,14 @@ class EventRule(QueryResourceManager):
         id = "Name"
         filter_name = "NamePrefix"
         filer_type = "scalar"
-        dimension = "RuleName"
+        dimension = None
+
+
+@EventRule.filter_registry.register('metrics')
+class EventRuleMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'RuleName', 'Value': resource['Name']}]
 
 
 @resources.register('event-rule-target')
