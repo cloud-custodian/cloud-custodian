@@ -94,7 +94,7 @@ class EventRule(QueryResourceManager):
 
 
 @EventRule.filter_registry.register('metrics')
-class EventRuleMetrics(MetricsFo;ter):
+class EventRuleMetrics(MetricsFilter):
 
     def get_dimensions(self, resource):
         return [{'Name': 'RuleName', 'Value': resource['Name']}]
