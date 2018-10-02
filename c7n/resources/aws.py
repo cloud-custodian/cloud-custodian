@@ -57,8 +57,6 @@ log = logging.getLogger('custodian.aws')
 
 try:
     from aws_xray_sdk.core import xray_recorder, patch
-    from aws_xray_sdk.core.models.subsegment import Subsegment
-    from aws_xray_sdk.core.models.segment import Segment
     from aws_xray_sdk.core.context import Context
     from aws_xray_sdk.core.sampling.local.sampler import LocalSampler
     HAVE_XRAY = True
