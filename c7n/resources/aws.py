@@ -57,6 +57,8 @@ log = logging.getLogger('custodian.aws')
 
 try:
     from aws_xray_sdk.core import xray_recorder, patch
+    from aws_xray_sdk.core.models.subsegment import Subsegment
+    from aws_xray_sdk.core.models.segment import Segment
     from aws_xray_sdk.core.context import Context
     from aws_xray_sdk.core.sampling.local.sampler import LocalSampler
     HAVE_XRAY = True
@@ -174,7 +176,6 @@ class XrayEmitter(object):
         self.client = None
 
     def send_entity(self, entity):
-        # print('send entity %s', entity.serialize())
         self.buf.append(entity)
         if len(self.buf) > 49:
             self.flush()
@@ -182,7 +183,6 @@ class XrayEmitter(object):
     def flush(self):
         buf = self.buf
         self.buf = []
-        # print('flush %d' % (len(buf,)))
         for segment_set in utils.chunks(buf, 50):
             self.client.put_trace_segments(
                 TraceSegmentDocuments=[
@@ -197,14 +197,35 @@ class XrayContext(Context):
         # We want process global semantics as policy execution
         # can span threads.
         self._local = Bag()
+        self._current_subsegment = None
 
     def put_segment(self, segment):
-        print("put segment {}".format(segment))
+        print("put segment {}".format(segment.name))
         super(XrayContext, self).put_segment(segment)
 
     def end_segment(self, end_time=None):
         print("end segment {}".format(end_time))
         super(XrayContext, self).end_segment(end_time)
+
+    @staticmethod
+    def named(s):
+        n = []
+        while True:
+            n.append(s.name)
+            if isinstance(s, Subsegment):
+                s = s.parent_segment
+                continue
+            break
+        return ".".join(reversed(n))
+
+    @classmethod
+    def print_tree(cls, seg, indent=1):
+        print("{} {}".format(" " * indent, cls.named(seg)))
+        for s in seg.subsegments:
+            if s.subsegments:
+                cls.print_tree(s, indent + 1)
+            else:
+                print(cls.named(s))
 
     def put_subsegment(self, subsegment):
         """Use sampling for aws api call subsegments.
@@ -217,11 +238,33 @@ class XrayContext(Context):
         Using default sampling rule, 1/s reservoir, 5% of remainder.
         """
         n = len(self.get_trace_entity().subsegments)
-        print("put subsegment current {}".format(n))
-        if subsegment.namespace == 'aws' and not subsegment.cause:
-            decision = self.sampler.should_trace(None)
-            if not decision:
-                return
+        name = self.named(subsegment)
+
+        if 0:
+        #if subsegment.namespace == 'aws' and not subsegment.cause:
+        #    decision = self.sampler.should_trace(None)
+        #    if not decision:
+        #        segment = subsegment.parent_segment
+        #        subsegment.sampled = False
+        #        subsegment.trace_id = 'dummy'
+        #        subsegment.namespace = 'dummy'
+        #        #segment.decrement_ref_counter()
+        #        #segment.decrement_subsegments_size()
+        #        return
+        #    #else:
+        #    #    self.current_subsegment.add_subsegment(subsegment)
+
+        #    # if self.current_subsegment and isinstance(subsegment.parent_segment, Segment):
+        #    #    self.current_subsegment.add_subsegment(subsegment)
+            pass
+
+        print("put subsegment {} parent {} progress: {} open: {} size: {}".format(
+            self.named(subsegment),
+            subsegment.parent_segment.name,
+            subsegment.parent_segment.in_progress,
+            subsegment.parent_segment.ref_counter.get_current(),
+            subsegment.parent_segment.get_total_subsegments_size()
+        ))
         return super(XrayContext, self).put_subsegment(subsegment)
 
     def end_subsegment(self, end_time=None):
@@ -232,16 +275,30 @@ class XrayContext(Context):
         :param int end_time: epoch in seconds. If not specified the current
             system time will be used.
         """
-        n = len(self.get_trace_entity().subsegments)
-        print("end subsegment stack {}".format(n))
+        # n = len(self.get_trace_entity().subsegments)
         subsegment = self.get_trace_entity()
+        # name = self.named(subsegment)
+        # print("{} end subsegment stack {} {}".format(" " * name.count('.'), name, n))
 
+        #if subsegment.sampled:
+        #    log.info("skipping sampled")
+        #    return
         if self._is_subsegment(subsegment):
+            print("end subsegment {} parent {} progress: {} open: {} size: {}".format(
+                self.named(subsegment),
+                subsegment.parent_segment.name,
+                subsegment.parent_segment.in_progress,
+                subsegment.parent_segment.ref_counter.get_current(),
+                subsegment.parent_segment.get_total_subsegments_size()))
             subsegment.close(end_time)
-            self._local.entities.pop()
+            popped = self._local.entities.pop()
+            assert subsegment is popped
             return True
         else:
-            log.warning("No subsegment to end.")
+            #self.print_tree(subsegment)
+            #import traceback
+            #traceback.print_stack()
+            log.warning("No subsegment to end: name: %s", self.named(subsegment))
             return False
 
     def handle_context_missing(self):
@@ -250,6 +307,7 @@ class XrayContext(Context):
         - Resolving account alias.
         - Cloudwatch Log group/stream discovery/creation (when using -l on cli)
         """
+        print('context missing')
 
 
 @tracer_outputs.register('xray', condition=HAVE_XRAY)
@@ -261,10 +319,11 @@ class XrayTracer(object):
     use_daemon = 'AWS_XRAY_DAEMON_ADDRESS' in os.environ
     service_name = 'custodian'
 
+    context = XrayContext()
     if HAVE_XRAY:
         xray_recorder.configure(
             emitter=use_daemon is False and emitter or None,
-            context=XrayContext(),
+            context=context,
             sampling=True,
             context_missing='LOG_ERROR'
         )
@@ -287,21 +346,26 @@ class XrayTracer(object):
         segment = xray_recorder.begin_subsegment(name)
         self.ctx.api_stats.push_snapshot()
         # print("begin subsegment %s stack_depth:%s" % (
-        #    get_path(segment),
+        # get_path(segment),
         #    len(self.ctx.api_stats.snapshot_stack)))
+
+        self.context.current_subsegment = segment
 
         try:
             yield segment
         except Exception as e:
             stack = traceback.extract_stack(limit=xray_recorder.max_trace_back)
             segment.add_exception(e, stack)
+            import pdb, sys
+            pdb.post_mortem(sys.exc_info()[-1])
             raise
         finally:
             self.index -= 1
+            self.context.current_subsegment = None
             # TODO something is closing the segment.. before we can annotate
             # segment.put_metadata('api-stats', self.ctx.api_stats.pop_snapshot())
             self.ctx.api_stats.pop_snapshot()
-            # print("end subsegment %s %s stack_depth:%s" % (
+            #print("end subsegment %s %s stack_depth:%s" % (
             #    get_path(segment), segment.in_progress,
             #    len(self.ctx.api_stats.snapshot_stack)))
             xray_recorder.end_subsegment(time.time())
