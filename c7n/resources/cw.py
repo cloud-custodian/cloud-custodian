@@ -89,7 +89,7 @@ class EventRule(QueryResourceManager):
         name = "Name"
         id = "Name"
         filter_name = "NamePrefix"
-        filer_type = "scalar"
+        filter_type = "scalar"
         dimension = None
 
 
