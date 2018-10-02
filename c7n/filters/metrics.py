@@ -104,9 +104,6 @@ class MetricsFilter(Filter):
         'sns': 'AWS/SNS',
         'sqs': 'AWS/SQS',
     }
-    from c7n.executor import MainThreadExecutor
-    MainThreadExecutor.c7n_async = False
-    executor_factory = MainThreadExecutor
 
     def process(self, resources, event=None):
         days = self.data.get('days', 14)
