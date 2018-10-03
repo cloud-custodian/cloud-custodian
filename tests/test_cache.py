@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from unittest import TestCase
-from c7n import cache
+from c7n import cache, config
 from argparse import Namespace
 from six.moves import cPickle as pickle
 import tempfile
@@ -29,6 +29,25 @@ class TestCache(TestCase):
         self.assertIsInstance(cache.factory(test_config), cache.FileCacheManager)
         test_config.cache = None
         self.assertIsInstance(cache.factory(test_config), cache.NullCache)
+
+
+class MemCacheTest(TestCase):
+
+    def test_mem_factory(self):
+        self.assertEqual(
+            cache.factory(config.Bag(cache='memory', cache_period=5)).__class__,
+            cache.InMemoryCache)
+
+    def test_get_set(self):
+        mem_cache = cache.InMemoryCache()
+        mem_cache.save({'region': 'us-east-1'}, {'hello': 'world'})
+        self.assertEqual(mem_cache.size(), 1)
+        self.assertEqual(mem_cache.load(), True)
+
+        mem_cache = cache.InMemoryCache()
+        self.assertEqual(
+            mem_cache.get({'region': 'us-east-1'}),
+            {'hello': 'world'})
 
 
 class FileCacheManagerTest(TestCase):
