@@ -55,6 +55,16 @@ func init() {
 	}
 }
 
+func removeTimestampMilliseconds(s string) string {
+	t, err := time.Parse(time.RFC3339, s)
+	if err != nil {
+		// default to using the current time if we cannot parse the timestamp
+		t = time.Now()
+	}
+	t = t.UTC()
+	return t.Format("2006-01-02T15:04:05Z")
+}
+
 func handleConfigurationItemChange(ctx context.Context, detail configservice.ConfigurationItemDetail) error {
 	entry, err, ok := omni.Registrations.Get(ctx, detail.ConfigurationItem.Hash())
 	if err != nil {
@@ -98,10 +108,15 @@ func handleConfigurationItemChange(ctx context.Context, detail configservice.Con
 			}
 			log.Info().Msgf("AddTagsToResource successful for %#v", entry.ManagedId)
 		}
+		// NOTE: CanfigurationItemCaptureTime is sometimes sent by AWS as
+		// a timestamp with milliseconds, which are not accepted by SSM when
+		// calling PutInventory. Here we must attempt to remove milliseconds
+		// from the timestamp and return it in the proper format - otherwise the
+		// current time is used.
 		inv := &ssm.CustomInventory{
 			TypeName:    "Custom:CloudInfo",
 			ManagedId:   entry.ManagedId,
-			CaptureTime: detail.ConfigurationItem.ConfigurationItemCaptureTime,
+			CaptureTime: removeTimestampMilliseconds(detail.ConfigurationItem.ConfigurationItemCaptureTime),
 			Content:     configservice.ConfigurationItemContentMap(detail.ConfigurationItem),
 		}
 		err = omni.SSM.PutInventory(ctx, inv)

@@ -248,7 +248,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
 |           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
 |           | `ldap_bind_password`       | string           | ldap bind password     |
-|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
 |           | `ldap_email_attribute`     | string           |                                     |
 |           | `ldap_email_key`           | string           | eg 'mail'     |
 |           | `ldap_manager_attribute`   | string           | eg 'manager'    |
@@ -374,7 +374,7 @@ Requires:
 - SendGrid account. See [Using SendGrid with Azure](https://docs.microsoft.com/en-us/azure/sendgrid-dotnet-how-to-send-email)
 - [Azure Storage Queue](https://azure.microsoft.com/en-us/services/storage/queues/)
 
-The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.  
+The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.
 Configuration for this scenario requires only minor changes from AWS deployments.
 
 The notify action in your policy will reflect transport type `asq` with the URL

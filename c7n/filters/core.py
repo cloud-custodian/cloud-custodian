@@ -161,6 +161,7 @@ class Filter(object):
     metrics = ()
     permissions = ()
     schema = {'type': 'object'}
+    schema_alias = None
 
     def __init__(self, data, manager=None):
         self.data = data

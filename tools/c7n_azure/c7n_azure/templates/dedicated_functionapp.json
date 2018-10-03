@@ -29,6 +29,9 @@
         },
         "functionsExtVersion" : {
             "type": "string"
+        },
+        "machineDecryptionKey" : {
+            "type": "securestring"
         }
     },
     "resources": [
@@ -103,6 +106,10 @@
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components/', parameters('servicePlanName')), '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "MACHINEKEY_DecryptionKey",
+                            "value": "[parameters('machineDecryptionKey')]"
                         }
                     ],
                     "alwaysOn": true,

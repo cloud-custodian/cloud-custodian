@@ -167,6 +167,7 @@ class TagTrim(Action):
         'tag-trim',
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
+    schema_alias = True
 
     permissions = ('ec2:DeleteTags',)
 
@@ -263,6 +264,7 @@ class TagActionFilter(Filter):
         skew={'type': 'number', 'minimum': 0},
         skew_hours={'type': 'number', 'minimum': 0},
         op={'type': 'string'})
+    schema_alias = True
 
     current_date = None
 
@@ -342,6 +344,7 @@ class TagCountFilter(Filter):
         'tag-count',
         count={'type': 'integer', 'minimum': 0},
         op={'enum': list(OPERATORS.keys())})
+    schema_alias = True
 
     def __call__(self, i):
         count = self.data.get('count', 10)
@@ -367,7 +370,7 @@ class Tag(Action):
         value={'type': 'string'},
         tag={'type': 'string'},
     )
-
+    schema_alias = True
     permissions = ('ec2:CreateTags',)
 
     def validate(self):
@@ -469,6 +472,7 @@ class RenameTag(Action):
         'rename-tag',
         old_key={'type': 'string'},
         new_key={'type': 'string'})
+    schema_alias = True
 
     permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
 
@@ -584,6 +588,7 @@ class TagDelayedAction(Action):
         hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
         op={'type': 'string'})
+    schema_alias = True
 
     permissions = ('ec2:CreateTags',)
 
@@ -698,6 +703,7 @@ class NormalizeTag(Action):
 
     """
 
+    schema_alias = True
     schema = utils.type_schema(
         'normalize-tag',
         key={'type': 'string'},
