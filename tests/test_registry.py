@@ -48,15 +48,15 @@ class RegistryTest(unittest.TestCase):
     def test_condition(self):
 
         registry = PluginRegistry('dummy')
-    
+
         @registry.register('mud', condition=False)
         class _plugin_impl:
             pass
-        
+
         self.assertEqual(list(registry.keys()), [])
 
         def _plugin_impl_func():
             pass
-    
+
         registry.register('concrete', _plugin_impl_func, condition=False)
         self.assertEqual(list(registry.keys()), [])
