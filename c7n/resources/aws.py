@@ -233,7 +233,6 @@ class XrayTracer(object):
         self.config = config or {}
         self.client = None
         self.metadata = {}
-        self.index = 0
 
     @contextlib.contextmanager
     def subsegment(self, name):
@@ -275,18 +274,7 @@ class XrayTracer(object):
         xray_recorder.end_segment()
         if not self.use_daemon:
             self.emitter.flush()
-
-
-def get_path(s):
-    p = []
-    step = s
-    while True:
-        p.append(str((step.name, step.in_progress)))
-        try:
-            step = step.parent_segment
-        except AttributeError:
-            break
-    return "/".join(reversed(p))
+        self.metadata.clear()
 
 
 @api_stats_outputs.register('aws')
