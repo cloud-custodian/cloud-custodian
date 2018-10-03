@@ -50,25 +50,21 @@ class TestSsm(BaseTest):
 
     def test_ssm_activation_expired(self):
         session_factory = self.replay_flight_data("test_ssm_activation_expired")
-        client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "ssm-list-expired-activations",
                 "resource": "ssm-activation",
-                "filters": [{
-                  "type": "value",
-                  "key": "Expired",
-                  "value": True
-                }]
+                "filters": [{"type": "value",
+                             "key": "Expired",
+                             "value": True}]
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
-    
+
     def test_ssm_get_manager_instances(self):
         session_factory = self.replay_flight_data("test_ssm_get_managed_instances")
-        client = session_factory().client("ssm")
         p = self.load_policy(
             {
                 "name": "ssm-get-managed-instances",
@@ -79,4 +75,3 @@ class TestSsm(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "mi-1111aa111aa11a111")
-

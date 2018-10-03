@@ -19,6 +19,7 @@ from c7n.manager import resources
 from c7n.utils import get_retry, local_session, type_schema
 from c7n.actions import Action
 
+
 @resources.register('ssm-parameter')
 class SSMParameter(QueryResourceManager):
     class resource_type(object):
@@ -34,6 +35,7 @@ class SSMParameter(QueryResourceManager):
     permissions = ('ssm:GetParameters',
                    'ssm:DescribeParameters')
 
+
 @resources.register('ssm-managed-instance')
 class ManagedInstance(QueryResourceManager):
     class resource_type(object):
@@ -45,6 +47,7 @@ class ManagedInstance(QueryResourceManager):
         dimension = None
         filter_name = None
     permissions = ('ssm:DescribeInstanceInformation',)
+
 
 @resources.register('ssm-activation')
 class SSMActivation(QueryResourceManager):
@@ -58,13 +61,13 @@ class SSMActivation(QueryResourceManager):
         filter_name = None
     permissions = ('ssm:DescribeActivations',)
 
+
 @SSMActivation.action_registry.register('delete')
 class DeleteSSMActivation(Action):
     schema = type_schema('delete')
     permissions = ('ssm:DeleteActivation',)
+
     def process(self, resources):
-        if not len(resources):
-            return
         client = local_session(self.manager.session_factory).client('ssm')
         for a in resources:
             client.delete_activation(ActivationId=a["ActivationId"])
