@@ -96,14 +96,10 @@ class FunctionPackage(object):
             binding['schedule'] = policy['mode']['schedule']
 
         elif mode_type == CONST_AZURE_EVENT_TRIGGER_MODE:
-            binding['type'] = 'httpTrigger'
-            binding['authLevel'] = 'function'
+            binding['type'] = 'queueTrigger'
+            binding['connection'] = 'AzureWebJobsStorage'
             binding['name'] = 'input'
-            binding['methods'] = ['post']
-            config['bindings'].append({
-                "name": "$return",
-                "type": "http",
-                "direction": "out"})
+            binding['queueName'] = self.name
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"

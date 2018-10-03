@@ -34,6 +34,7 @@ class FunctionAppUtilities(object):
         return str(hexlify(os.urandom(32)).decode()).upper()
 
     def deploy_webapp(self, app_name, group_name, service_plan, storage_account_name):
+
         self.log.info("Deploying Function App %s (%s) in group %s" %
                       (app_name, service_plan.location, group_name))
 
@@ -47,20 +48,20 @@ class FunctionAppUtilities(object):
         site_config.always_on = True
 
         app_insights_key = self.get_application_insights_key(group_name,
-                                                             service_plan.app_service_plan_name)
+                                                             service_plan.name)
 
         if app_insights_key:
             site_config.app_settings.append(
-                NameValuePair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
+                self._name_value('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
 
         con_string = self.get_storage_connection_string(group_name, storage_account_name)
-        site_config.app_settings.append(NameValuePair('AzureWebJobsStorage', con_string))
-        site_config.app_settings.append(NameValuePair('AzureWebJobsDashboard', con_string))
-        site_config.app_settings.append(NameValuePair('FUNCTIONS_EXTENSION_VERSION',
+        site_config.app_settings.append(self._name_value('AzureWebJobsStorage', con_string))
+        site_config.app_settings.append(self._name_value('AzureWebJobsDashboard', con_string))
+        site_config.app_settings.append(self._name_value('FUNCTIONS_EXTENSION_VERSION',
                                                       CONST_FUNCTIONS_EXT_VERSION))
-        site_config.app_settings.append(NameValuePair('FUNCTIONS_WORKER_RUNTIME', 'python'))
+        site_config.app_settings.append(self._name_value('FUNCTIONS_WORKER_RUNTIME', 'python'))
         site_config.app_settings.append(
-            NameValuePair('MACHINEKEY_DecryptionKey',
+            self._name_value('MACHINEKEY_DecryptionKey',
                           FunctionAppUtilities.generate_machine_decryption_key()))
 
         #: :type: azure.mgmt.web.WebSiteManagementClient
@@ -93,3 +94,6 @@ class FunctionAppUtilities(object):
 
         except Exception:
             return False
+
+    def _name_value(self, name, value):
+        return NameValuePair(**{'name': name, 'value': value})

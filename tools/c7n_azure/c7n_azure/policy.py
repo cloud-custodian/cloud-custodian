@@ -17,8 +17,9 @@ import logging
 import time
 
 import requests
+from azure.storage.queue import QueueService
 from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
-                                         WebHookEventSubscriptionDestination)
+                                         StorageQueueEventSubscriptionDestination)
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
                                  CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
@@ -95,19 +96,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 self.log.info("Found existing App %s (%s) in group %s" %
                               (self.webapp_name, existing_webapp.location, self.group_name))
 
-        self.log.info("Building function package for %s" % self.webapp_name)
-
-        archive = FunctionPackage(self.policy_name)
-        archive.build(self.policy.data)
-        archive.close()
-
-        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
-
-        if archive.wait_for_status(self.webapp_name):
-            archive.publish(self.webapp_name)
-        else:
-            self.log.error("Aborted deployment, ensure Application Service is healthy.")
-
     def _get_parameters(self, template_util):
         parameters = template_util.get_default_parameters(
             'dedicated_functionapp.parameters.json')
@@ -153,6 +141,21 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
                                schedule={'type': 'string'},
                                rinherit=AzureFunctionMode.schema)
 
+    def provision(self):
+        super(AzurePeriodicMode, self).provision()
+        self.log.info("Building function package for %s" % self.webapp_name)
+
+        archive = FunctionPackage(self.policy_name)
+        archive.build(self.policy.data)
+        archive.close()
+
+        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
+
+        if archive.wait_for_status(self.webapp_name):
+            archive.publish(self.webapp_name)
+        else:
+            self.log.error("Aborted deployment, ensure Application Service is healthy.")
+
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
         return PullMode.run(self)
@@ -182,12 +185,19 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def provision(self):
         super(AzureEventGridMode, self).provision()
-        key = self._get_webhook_key()
-        webhook_url = 'https://%s.azurewebsites.net/api/%s?code=%s' % (self.webapp_name,
-                                                                       self.policy_name, key)
-        destination = WebHookEventSubscriptionDestination(
-            endpoint_url=webhook_url
-        )
+
+        self.log.info("Creating Storage Queue")
+        #: :type: azure.mgmt.storage.StorageManagementClient
+        storage_client = self.session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_name = self.parameters['storageName']['value']
+        storage_account_keys = storage_client.storage_accounts.list_keys(
+            self.group_name, storage_name)
+
+        storage_account = storage_client.storage_accounts.get_properties(self.group_name, storage_name)
+        queue_service = QueueService(account_name=storage_name, account_key=storage_account_keys.keys[0].value)
+        queue_service.create_queue(self.policy_name)
+
+        destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id, queue_name=self.policy_name)
 
         self.log.info("Creating Event Grid subscription")
         event_filter = EventSubscriptionFilter()
@@ -197,45 +207,24 @@ class AzureEventGridMode(AzureFunctionMode):
         #: :type: azure.mgmt.eventgrid.EventGridManagementClient
         eventgrid_client = self.session.client('azure.mgmt.eventgrid.EventGridManagementClient')
 
-        status_success = False
-        while not status_success:
-            try:
-                event_subscription = eventgrid_client.event_subscriptions.create_or_update(
-                    scope, self.webapp_name, event_info)
+        event_subscription = eventgrid_client.event_subscriptions.create_or_update(
+            scope, self.webapp_name, event_info)
+        event_subscription.result()
+        self.log.info('Event Grid subscription creation succeeded')
 
-                event_subscription.result()
-                self.log.info('Event Grid subscription creation succeeded')
-                status_success = True
-            except CloudError as e:
-                self.log.info(e)
-                self.log.info('Retrying in 30 seconds')
-                time.sleep(30)
+        self.log.info("Building function package for %s" % self.webapp_name)
 
-    def _get_webhook_key(self):
-        self.log.info("Fetching Function's API keys")
-        token_headers = {
-            'Authorization': 'Bearer %s' % self.session.get_bearer_token()
-        }
+        archive = FunctionPackage(self.policy_name)
+        archive.build(self.policy.data)
+        archive.close()
 
-        key_url = (
-            'https://management.azure.com'
-            '/subscriptions/{0}/resourceGroups/{1}/'
-            'providers/Microsoft.Web/sites/{2}/{3}').format(
-            self.session.subscription_id,
-            self.group_name,
-            self.webapp_name,
-            CONST_AZURE_FUNCTION_KEY_URL)
+        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
 
-        retrieved_key = False
+        if archive.wait_for_status(self.webapp_name):
+            archive.publish(self.webapp_name)
+        else:
+            self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
-        while not retrieved_key:
-            response = requests.get(key_url, headers=token_headers)
-            if response.status_code == 200:
-                key = json.loads(response.content)
-                return key['value']
-            else:
-                self.log.info('Function app key unavailable, will retry in 30 seconds')
-                time.sleep(30)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
