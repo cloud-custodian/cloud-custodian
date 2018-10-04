@@ -31,6 +31,12 @@ from c7n.utils import chunks, dumps
 from c7n_org.cli import CONFIG_SCHEMA
 
 try:
+    import elasticsearch
+    HAVE_ELASTIC = True
+except ImportError:
+    HAVE_ELASTIC = False
+
+try:
     from influxdb import InfluxDBClient
     HAVE_INFLUXDB = True
 except ImportError:
@@ -148,10 +154,30 @@ class EBS(Resource):
         return [{'Name': 'VolumeId', 'Value': r['volume_id']}]
 
 
+class Policy(Resource):
+
+    mid = 'name'
+    table = 'policies'
+    namespace = 'CloudMaid'
+    type = 'Policy'
+    metrics = [
+        dict(name='ResourceCount'),
+        dict(name='ActionTime'),
+        dict(name='ResourceTime'),
+        dict(name='ResourceLimitExceeded')]
+
+    def get_dimensions(r):
+        return [
+            {'Name': 'Policy', 'Value': r['name']},
+            {'Name': 'ResType', 'Value': r['resource_type']},
+            {'Name': 'Scope', 'Value': 'Policy'}]
+
+
 RESOURCE_INFO = {
     'Instance': EC2,
     'Volume': EBS,
-    'LoadBalancer': ELB}
+    'LoadBalancer': ELB,
+    'Policy': Policy}
 
 
 def get_indexer(config):
@@ -191,6 +217,66 @@ class SQLIndexer(object):
     def __init__(self, config):
         self.config = config
         self.engine = self.config['indexer']['dsn']
+
+
+class ElasticIndexer(object):
+
+    def __init__(self, config):
+        config = {'hosts': [{'host': 'localhost', 'port': 32769}]}
+        self.config = config
+        self.client = elasticsearch.Elasticsearch(self.config.get('hosts', None))
+
+    def first(self, resource, resource_type, metric):
+        pass
+
+    def last(self, resource, resource_type, metric):
+        pass
+
+    def get_resource_time(self, rid, mkey, direction='desc'):
+        pass
+
+    def index(self, metrics_set):
+        docs = []
+        for r, rtype_name, m, point_set in metrics_set:
+            rtype = Resource.get_type(rtype_name)
+            rtags = {
+                'ResourceId': rtype.id(r),
+                'ResourceType': rtype.__name__,
+                'AccountId': r['account_id'],
+                'Region': r['region'],
+                'App': r['app'],
+                'Env': r['env']}
+            s = m.get('statistic', 'Average')
+            for p in point_set:
+                d = {'doc': {}}
+                # todo interpolate date
+                d['_index'] = self.config.get(
+                    'metrics_index', 'resource-metrics')
+                d['_type'] = self.config.get('index-type', 'document')
+                if 'Unit' in p:
+                    pu = p.pop('Unit', None)
+                    if pu != 'None':
+                        d['doc']['unit'] = pu
+                d['doc']['measurement'] = ("%s_%s" % (
+                    rtype.namespace.split('/')[-1],
+                    m['name'])).lower()
+                d['doc']['time'] = p.pop('Timestamp')
+                d['doc'].update(rtags)
+                docs.append(d)
+
+        for point_set in chunks(docs, 500):
+            errs = 0
+            while True:
+                try:
+                    elasticsearch.bulk(self.client, point_set)
+                except ConnectionError:
+                    errs += 1
+                    if errs > 3:
+                        raise
+                    time.sleep(3)
+                    continue
+                else:
+                    break
 
 
 class InfluxIndexer(object):
@@ -398,7 +484,7 @@ def cli(app, env, resources, cmdb, config, start, end, debug):
     start, end = parse_date(start), parse_date(end)
     log.info("Collecting app:%s env:%s metrics %s to %s", app, env, start, end)
 
-    MainThreadExecutor.async = False
+    MainThreadExecutor.c7n_async = False
     executor = debug and MainThreadExecutor or ThreadPoolExecutor
     indexer = get_indexer(accounts_config)
 
