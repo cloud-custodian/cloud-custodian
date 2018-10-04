@@ -243,7 +243,7 @@ def report_account(account, region, policies_config, output_path, debug):
         log.debug(
             "Report policy:%s account:%s region:%s path:%s",
             p.name, account['name'], region, output_path)
-        policy_records = fs_record_set(p.ctx.output_path, p.name)
+        policy_records = fs_record_set(p.ctx.log_dir, p.name)
         for r in policy_records:
             r['policy'] = p.name
             r['region'] = p.options.region
