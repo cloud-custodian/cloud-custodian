@@ -82,7 +82,6 @@ class DeleteConnection(BaseAction):
             list(w.map(self.delete_connection, resources))
 
 
-
 @resources.register('glue-dev-endpoint')
 class GlueDevEndpoint(QueryResourceManager):
 
