@@ -40,6 +40,12 @@ class FunctionPackage(object):
         self.pkg.add_file(self.function_path,
                           dest=self.name + '/function.py')
 
+        parent_path = os.path.abspath(os.path.join(__file__, os.pardir))
+
+        extensions_path = os.path.join(parent_path, 'bin')
+
+        self.pkg.add_directory(extensions_path)
+
         self.pkg.add_contents(dest=self.name + '/__init__.py', contents='')
 
         self._add_host_config()
@@ -127,15 +133,15 @@ class FunctionPackage(object):
                     self.pkg.add_file(os.path.join(site_pkg, so_file))
 
             self.pkg.add_directory(os.path.join(site_pkg, '.libs_cffi_backend'))
-
-        # MacOS
-        elif platform == "darwin":
-            raise NotImplementedError('Cannot package Azure Function in MacOS host OS, '
-                                      'please use linux.')
-        # Windows
-        elif platform == "win32":
-            raise NotImplementedError('Cannot package Azure Function in Windows host OS, '
-                                      'please use linux or WSL.')
+        #
+        # # MacOS
+        # elif platform == "darwin":
+        #     raise NotImplementedError('Cannot package Azure Function in MacOS host OS, '
+        #                               'please use linux.')
+        # # Windows
+        # elif platform == "win32":
+        #     raise NotImplementedError('Cannot package Azure Function in Windows host OS, '
+        #                               'please use linux or WSL.')
 
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
