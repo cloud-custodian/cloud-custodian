@@ -5,7 +5,7 @@ src/
 deps/
 include/
 lib/
-bin/
+
 dist/
 man/
 lib64
