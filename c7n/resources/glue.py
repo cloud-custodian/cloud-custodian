@@ -80,3 +80,50 @@ class DeleteConnection(BaseAction):
     def process(self, resources):
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.delete_connection, resources))
+
+
+@resources.register('glue-dev-endpoint')
+class GlueDevEndpoint(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'glue'
+        enum_spec = ('get_dev_endpoints', 'DevEndpoints', None)
+        detail_spec = None
+        id = name = 'EndpointName'
+        date = 'CreatedTimestamp'
+        dimension = None
+        filter_name = None
+
+    permissions = ('glue:GetDevEndpoints',)
+
+
+@GlueDevEndpoint.action_registry.register('delete')
+class DeleteDevEndpoint(BaseAction):
+    """Delete a connection from the data catalog
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-public-dev-endpoints
+            resource: glue-dev-endpoint
+            filters:
+              - PublicAddress: present
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteDevEndpoint',)
+
+    def delete_dev_endpoint(self, r):
+        client = local_session(self.manager.session_factory).client('glue')
+        try:
+            client.delete_dev_endpoint(EndpointName=r['EndpointName'])
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'EntityNotFoundException':
+                raise
+
+    def process(self, resources):
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(self.delete_dev_endpoint, resources))
