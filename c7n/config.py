@@ -40,6 +40,7 @@ class Config(Bag):
             'assume_role': None,
             'external_id': None,
             'log_group': None,
+            'tracer': 'default',
             'metrics_enabled': False,
             'output_dir': '',
             'cache_period': 0,

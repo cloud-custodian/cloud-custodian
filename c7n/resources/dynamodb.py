@@ -229,8 +229,7 @@ class DeleteTable(BaseAction, StatusFilter):
     schema = type_schema('delete')
     permissions = ("dynamodb:DeleteTable",)
 
-    def delete_table(self, table_set):
-        client = local_session(self.manager.session_factory).client('dynamodb')
+    def delete_table(self, client, table_set):
         for t in table_set:
             client.delete_table(TableName=t['TableName'])
 
@@ -241,10 +240,11 @@ class DeleteTable(BaseAction, StatusFilter):
             return
 
         futures = []
+        client = local_session(self.manager.session_factory).client('dynamodb')
 
         with self.executor_factory(max_workers=2) as w:
             for table_set in chunks(resources, 20):
-                futures.append(w.submit(self.delete_table, table_set))
+                futures.append(w.submit(self.delete_table, client, table_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -504,20 +504,15 @@ def _dax_cluster_tags(tables, session_factory, executor_factory, retry, log):
         try:
             tags = retry(
                 client.list_tags, ResourceName=r['ClusterArn'])['Tags']
-        except ClientError as e:
-            if e.response['Error']['Code'] in (
-                    'ClusterNotFoundFault',
-                    'InvalidARNFault',
-                    'InvalidClusterStateFault'):
-                log.warning('Exception collecting tags for %s: \n%s' % (
-                    r['ClusterName'], e))
-            else:
-                raise
+        except (client.exceptions.ClusterNotFoundFault,
+                client.exceptions.InvalidARNFault,
+                client.exceptions.InvalidClusterStateFault):
+            return None
         r['Tags'] = tags
         return r
 
     with executor_factory(max_workers=2) as w:
-        return list(w.map(process_tags, tables))
+        return filter(None, list(w.map(process_tags, tables)))
 
 
 @DynamoDbAccelerator.filter_registry.register('security-group')
@@ -551,15 +546,10 @@ class DaxTagging(Tag):
         for r in resources:
             try:
                 client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidClusterStateFault',
-                        'InvalidARNFault'):
-                    self.log.warning('Exception tagging %s: \n%s' % (
-                        r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception tagging %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('remove-tag')
@@ -587,16 +577,11 @@ class DaxRemoveTagging(RemoveTag):
             try:
                 client.untag_resource(
                     ResourceName=r['ClusterArn'], TagKeys=tag_keys)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidARNFault',
-                        'InvalidClusterStateFault',
-                        'TagNotFoundFault'):
-                    self.log.warning('Exception removing tags on %s: \n%s' % (
-                        r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.TagNotFoundFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception removing tags on %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('mark-for-op')
@@ -627,15 +612,10 @@ class DaxMarkForOp(TagDelayedAction):
         for r in resources:
             try:
                 client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidARNFault',
-                        'InvalidClusterStateFault'):
-                    self.log.warning(
-                        'Exception marking %s: \n%s' % (r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception marking %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('delete')
@@ -662,14 +642,10 @@ class DaxDeleteCluster(BaseAction):
         for r in resources:
             try:
                 client.delete_cluster(ClusterName=r['ClusterName'])
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidClusterStateFault'):
-                    self.log.warning('Exception marking %s: \n%s' % (
-                        r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception marking %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('update-cluster')
@@ -711,15 +687,11 @@ class DaxUpdateCluster(BaseAction):
             params['ClusterName'] = r['ClusterName']
             try:
                 client.update_cluster(**params)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidClusterStateFault'):
-                    self.log.warning(
-                        'Exception updating dax cluster %s: \n%s' % (
-                            r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning(
+                    'Exception updating dax cluster %s: \n%s',
+                    r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('modify-security-groups')
