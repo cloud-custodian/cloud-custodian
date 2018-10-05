@@ -82,6 +82,7 @@ class DeleteConnection(BaseAction):
             list(w.map(self.delete_connection, resources))
 
 
+
 @resources.register('glue-dev-endpoint')
 class GlueDevEndpoint(QueryResourceManager):
 
@@ -97,16 +98,9 @@ class GlueDevEndpoint(QueryResourceManager):
     permissions = ('glue:GetDevEndpoints',)
 
 
-
-@GlueDevEndpoint.filter_registry.register('security-group')
-class DevEndpointsSecurityGroupFilter(SecurityGroupFilter):
-
-    RelatedIdsExpression = 'SecurityGroupIds[]'
-
-
 @GlueDevEndpoint.action_registry.register('delete')
 class DeleteDevEndpoint(BaseAction):
-    """Delete a Dev Endpoint from glue
+    """Delete a connection from the data catalog
 
     :example:
 
