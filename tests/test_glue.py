@@ -80,6 +80,7 @@ class TestGlueConnections(BaseTest):
         connections = client.get_connections()["ConnectionList"]
         self.assertFalse(connections)
 
+
 class TestGlueDevEndpoints(BaseTest):
 
     def test_dev_endpoints_query(self):
