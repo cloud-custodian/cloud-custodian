@@ -1,0 +1,50 @@
+{
+    "status_code": 200, 
+    "data": {
+        "NextToken": "", 
+        "DevEndpoints": [
+            {
+                "Status": "READY", 
+                "AvailabilityZone": "us-east-1c", 
+                "PublicAddress": "ec2-54-196-134-254.compute-1.amazonaws.com", 
+                "RoleArn": "arn:aws:iam::12345678910:role/Glue-Service-Role", 
+                "ZeppelinRemoteSparkInterpreterPort": 9007, 
+                "CreatedTimestamp": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 36, 
+                    "microsecond": 632000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 51
+                }, 
+                "EndpointName": "public-test-bad-end2", 
+                "SecurityGroupIds": [], 
+                "LastModifiedTimestamp": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 46, 
+                    "microsecond": 580000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 30
+                }, 
+                "NumberOfNodes": 5
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "73e213cf-c8d7-11e8-af80-17647f59ab9f", 
+            "HTTPHeaders": {
+                "date": "Fri, 05 Oct 2018 19:47:12 GMT", 
+                "x-amzn-requestid": "73e213cf-c8d7-11e8-af80-17647f59ab9f", 
+                "content-length": "406", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}
