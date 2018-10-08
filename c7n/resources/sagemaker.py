@@ -22,7 +22,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 
@@ -51,7 +51,7 @@ class NotebookInstance(QueryResourceManager):
 
         def _augment(r):
             # List tags for the Notebook-Instance & set as attribute
-            tags = client.list_tags(
+            tags = self.retry(client.list_tags,
                 ResourceArn=r['NotebookInstanceArn'])['Tags']
             r['Tags'] = tags
             return r
@@ -99,7 +99,8 @@ class SagemakerJob(QueryResourceManager):
         client = local_session(self.session_factory).client('sagemaker')
 
         def _augment(j):
-            tags = client.list_tags(ResourceArn=j['TrainingJobArn'])['Tags']
+            tags = self.retry(client.list_tags,
+                ResourceArn=j['TrainingJobArn'])['Tags']
             j['Tags'] = tags
             return j
 
@@ -192,7 +193,7 @@ class SagemakerEndpoint(QueryResourceManager):
         client = local_session(self.session_factory).client('sagemaker')
 
         def _augment(e):
-            tags = client.list_tags(
+            tags = self.retry(client.list_tags,
                 ResourceArn=e['EndpointArn'])['Tags']
             e['Tags'] = tags
             return e
@@ -226,7 +227,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
         client = local_session(self.session_factory).client('sagemaker')
 
         def _augment(e):
-            tags = client.list_tags(
+            tags = self.retry(client.list_tags,
                 ResourceArn=e['EndpointConfigArn'])['Tags']
             e['Tags'] = tags
             return e
@@ -258,7 +259,7 @@ class Model(QueryResourceManager):
         client = local_session(self.session_factory).client('sagemaker')
 
         def _augment(r):
-            tags = client.list_tags(
+            tags = self.retry(client.list_tags,
                 ResourceArn=r['ModelArn'])['Tags']
             r.setdefault('Tags', []).extend(tags)
             return r
