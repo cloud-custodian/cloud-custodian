@@ -422,8 +422,12 @@ class AWS(object):
             options.regions, policy_collection.resource_types)
 
         for p in policy_collection:
+            if 'aws.' in p.resource_type:
+                _, resource_type = p.resource_type.split('.', 1)
+            else:
+                resource_type = p.resource_type
             available_regions = service_region_map.get(
-                resource_service_map.get(p.resource_type), ())
+                resource_service_map.get(resource_type), ())
 
             # its a global service/endpoint, use user provided region
             # or us-east-1.

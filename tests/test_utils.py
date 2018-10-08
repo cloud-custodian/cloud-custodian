@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 import os
-import unittest
 import sys
 import tempfile
 import time

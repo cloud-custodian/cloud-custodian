@@ -47,6 +47,27 @@ class AccountTests(BaseTest):
         self.assertEqual(sorted(list(resources[0].keys())),
                          sorted(['account_id', 'account_name']))
 
+    def test_missing_multi_region(self):
+        # missing filter needs some special handling as it embeds
+        # a resource policy inside an account. We treat the account
+        # as a global resource, while the resources are typically regional
+        # specific. By default missing fires if any region executed against
+        # is missing the regional resource.
+        cfg = Config.empty(regions=["eu-west-1", "us-east-2", "us-west-2"])
+        session_factory = self.replay_flight_data(
+            'test_account_missing_region_resource', cfg)
+        p = self.load_policy({
+            'name': 'missing-lambda',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'missing',
+                'policy': {
+                    'resource': 'aws.lambda'}
+            }]},
+            session_factory=session_factory, config=cfg)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_root_mfa_enabled(self):
         session_factory = self.replay_flight_data("test_account_root_mfa")
         p = self.load_policy(
