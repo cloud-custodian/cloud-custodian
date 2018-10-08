@@ -357,23 +357,23 @@ class LambdaManager(object):
 
     @staticmethod
     def delta_function(old_config, new_config):
-        found = False
+        changed = []
         for k in new_config:
             # Vpc needs special handling as a dict with lists
             if k == 'VpcConfig' and k in old_config and new_config[k]:
                 if set(old_config[k]['SubnetIds']) != set(
                         new_config[k]['SubnetIds']):
-                    found = True
+                    changed.append(k)
                 elif set(old_config[k]['SecurityGroupIds']) != set(
                         new_config[k]['SecurityGroupIds']):
-                    found = True
+                    changed.append(k)
             elif k not in old_config:
                 if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
                     continue
-                found = True
+                changed.append(k)
             elif new_config[k] != old_config[k]:
-                found = True
-        return found
+                changed.append(k)
+        return changed
 
     @staticmethod
     def diff_tags(old_tags, new_tags):
@@ -403,22 +403,23 @@ class LambdaManager(object):
         changed = False
         if existing:
             old_config = existing['Configuration']
-            if archive.get_checksum() != old_config[
-                    'CodeSha256'].encode('ascii'):
+            if archive.get_checksum() != old_config['CodeSha256']:
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)
                 result = self.client.update_function_code(**params)
                 changed = True
+
             # TODO/Consider also set publish above to false, and publish
             # after configuration change?
 
             new_config = func.get_config()
-            new_config['Role'] = role
             new_tags = new_config.pop('Tags', {})
 
-            if self.delta_function(old_config, new_config):
-                log.debug("Updating function: %s config" % func.name)
+            config_changed = self.delta_function(old_config, new_config)
+            if config_changed:
+                log.debug("Updating function: %s config %s",
+                          func.name, ", ".join(sorted(config_changed)))
                 result = self.client.update_function_configuration(**new_config)
                 changed = True
 
@@ -851,22 +852,14 @@ class CloudWatchEventSource(object):
         'terminate-success': 'EC2 Instance Terminate Successful',
         'terminate-failure': 'EC2 Instance Terminate Unsuccessful'}
 
-    def __init__(self, data, session_factory, prefix="custodian-"):
+    def __init__(self, data, session_factory):
         self.session_factory = session_factory
         self.session = session_factory()
         self.client = self.session.client('events')
         self.data = data
-        self.prefix = prefix
-
-    def _make_notification_id(self, function_name):
-        if not function_name.startswith(self.prefix):
-            return "%s%s" % (self.prefix, function_name)
-        return function_name
 
     def get(self, rule_name):
-        return resource_exists(
-            self.client.describe_rule,
-            Name=self._make_notification_id(rule_name))
+        return resource_exists(self.client.describe_rule, Name=rule_name)
 
     @staticmethod
     def delta(src, tgt):
@@ -953,7 +946,7 @@ class CloudWatchEventSource(object):
         rule = self.get(func.name)
 
         if rule and self.delta(rule, params):
-            log.debug("Updating cwe rule for %s" % self)
+            log.debug("Updating cwe rule for %s" % func.name)
             response = self.client.put_rule(**params)
         elif not rule:
             log.debug("Creating cwe rule for %s" % (self))
