@@ -54,7 +54,7 @@ class AccountTests(BaseTest):
         # as a global resource, while the resources are typically regional
         # specific. By default missing fires if any region executed against
         # is missing the regional resource.
-        cfg = Config.empty(regions=["eu-west-1", "us-east-2", "us-west-2"])
+        cfg = Config.empty(regions=["eu-west-1", "us-west-2"])
 
         session_factory = self.replay_flight_data('test_account_missing_region_resource')
 

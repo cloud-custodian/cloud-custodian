@@ -2,182 +2,35 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "4b5c1d85-cb20-11e8-a51b-291c4a43bb4a",
+            "RequestId": "ce9599dc-cb21-11e8-be70-47f565f207b9",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Mon, 08 Oct 2018 17:33:39 GMT",
+                "date": "Mon, 08 Oct 2018 17:44:29 GMT",
                 "content-type": "application/json",
-                "content-length": "5195",
+                "content-length": "655",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "4b5c1d85-cb20-11e8-a51b-291c4a43bb4a"
+                "x-amzn-requestid": "ce9599dc-cb21-11e8-be70-47f565f207b9"
             },
             "RetryAttempts": 0
         },
         "Functions": [
             {
-                "FunctionName": "custodian-good-vol",
-                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:custodian-good-vol",
+                "FunctionName": "c7n-s3-encrypt",
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt",
                 "Runtime": "python2.7",
-                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
-                "Handler": "custodian_policy.run",
-                "CodeSize": 1858507,
-                "Description": "cloud-custodian lambda policy",
-                "Timeout": 60,
-                "MemorySize": 512,
-                "LastModified": "2018-07-11T12:20:03.890+0000",
-                "CodeSha256": "pqF2Zz0upEgF2mu+C4nn8qnaoYQFsaQ9aWLwheL3/R4=",
+                "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+                "Handler": "s3crypt.process_event",
+                "CodeSize": 1526205,
+                "Description": "Custodian S3 Key Encrypt",
+                "Timeout": 30,
+                "MemorySize": 256,
+                "LastModified": "2017-09-15T20:31:23.412+0000",
+                "CodeSha256": "Ag2piyr2O8kx8US38tdG8giriNst2Iu+qIZq2g1fgOQ=",
                 "Version": "$LATEST",
-                "VpcConfig": {
-                    "SubnetIds": [],
-                    "SecurityGroupIds": [],
-                    "VpcId": ""
-                },
-                "Environment": {
-                    "Variables": {}
-                },
                 "TracingConfig": {
                     "Mode": "PassThrough"
                 },
-                "RevisionId": "9d0fdf82-b593-4fdc-b473-f5faaf8ac3b2"
-            },
-            {
-                "FunctionName": "custodian-ec2-run",
-                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:custodian-ec2-run",
-                "Runtime": "python2.7",
-                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
-                "Handler": "custodian_policy.run",
-                "CodeSize": 1830822,
-                "Description": "cloud-custodian lambda policy",
-                "Timeout": 60,
-                "MemorySize": 512,
-                "LastModified": "2018-05-23T01:03:40.085+0000",
-                "CodeSha256": "OKDy8zs0SlCG0ihgLoA+n3ZvIJ+pkv/CbBnn2b3asSs=",
-                "Version": "$LATEST",
-                "VpcConfig": {
-                    "SubnetIds": [],
-                    "SecurityGroupIds": [],
-                    "VpcId": ""
-                },
-                "Environment": {
-                    "Variables": {}
-                },
-                "TracingConfig": {
-                    "Mode": "PassThrough"
-                },
-                "RevisionId": "0e734258-a622-49f8-a2fd-bde88febd0c1"
-            },
-            {
-                "FunctionName": "omnissm-process-deferred-actions",
-                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-process-deferred-actions",
-                "Runtime": "go1.x",
-                "Role": "arn:aws:iam::644160558196:role/SSM-Register-API",
-                "Handler": "main",
-                "CodeSize": 8496496,
-                "Description": "",
-                "Timeout": 300,
-                "MemorySize": 128,
-                "LastModified": "2018-10-04T02:03:23.283+0000",
-                "CodeSha256": "3uxyeqdMORwf+0qveqAtKqhS+6BZsRXw17TaaYFef/Q=",
-                "Version": "$LATEST",
-                "Environment": {
-                    "Variables": {
-                        "OMNISSM_S3_DOWNLOAD_ROLE": "",
-                        "OMNISSM_REGISTRATIONS_TABLE": "omnissm-registrations",
-                        "OMNISSM_CONFIG_ASSUME_ROLE_NAME": "",
-                        "OMNISSM_MAX_RETRIES": "10",
-                        "OMNISSM_SPILLOVER_QUEUE": "omnissm-deferred-actions-queue",
-                        "OMNISSM_RESOURCE_TAGS": "App,ASV,CMDBEnvironment,OwnerContact"
-                    }
-                },
-                "TracingConfig": {
-                    "Mode": "Active"
-                },
-                "RevisionId": "6383cdd0-4cf0-4596-b84c-3cd86ec68d9a"
-            },
-            {
-                "FunctionName": "omnissm-enrich-registrations",
-                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-enrich-registrations",
-                "Runtime": "go1.x",
-                "Role": "arn:aws:iam::644160558196:role/SSM-Register-API",
-                "Handler": "main",
-                "CodeSize": 8763489,
-                "Description": "",
-                "Timeout": 300,
-                "MemorySize": 128,
-                "LastModified": "2018-10-04T02:03:23.386+0000",
-                "CodeSha256": "VzxoUs/YxW8fQ+LCysiGJBsRxHUtSB3PIUXLJi5uPDk=",
-                "Version": "$LATEST",
-                "Environment": {
-                    "Variables": {
-                        "OMNISSM_S3_DOWNLOAD_ROLE": "",
-                        "OMNISSM_REGISTRATIONS_TABLE": "omnissm-registrations",
-                        "OMNISSM_CONFIG_ASSUME_ROLE_NAME": "",
-                        "OMNISSM_MAX_RETRIES": "10",
-                        "OMNISSM_SPILLOVER_QUEUE": "omnissm-deferred-actions-queue",
-                        "OMNISSM_RESOURCE_TAGS": "App,ASV,CMDBEnvironment,OwnerContact"
-                    }
-                },
-                "TracingConfig": {
-                    "Mode": "Active"
-                },
-                "RevisionId": "20211141-d041-4319-8982-e0d9cf970fe8"
-            },
-            {
-                "FunctionName": "omnissm-handle-registrations",
-                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-handle-registrations",
-                "Runtime": "go1.x",
-                "Role": "arn:aws:iam::644160558196:role/SSM-Register-API",
-                "Handler": "main",
-                "CodeSize": 8857013,
-                "Description": "",
-                "Timeout": 60,
-                "MemorySize": 128,
-                "LastModified": "2018-10-04T02:03:23.061+0000",
-                "CodeSha256": "dBRQVJeqTmd8/VcNKKkrpt14xQJeBSpI427id05auzI=",
-                "Version": "$LATEST",
-                "Environment": {
-                    "Variables": {
-                        "OMNISSM_S3_DOWNLOAD_ROLE": "",
-                        "OMNISSM_REGISTRATIONS_TABLE": "omnissm-registrations",
-                        "OMNISSM_CONFIG_ASSUME_ROLE_NAME": "",
-                        "OMNISSM_MAX_RETRIES": "10",
-                        "OMNISSM_SPILLOVER_QUEUE": "omnissm-deferred-actions-queue",
-                        "OMNISSM_RESOURCE_TAGS": "App,ASV,CMDBEnvironment,OwnerContact",
-                        "OMNISSM_INSTANCE_ROLE": "SSMServiceRole"
-                    }
-                },
-                "TracingConfig": {
-                    "Mode": "Active"
-                },
-                "RevisionId": "54727f01-dcff-40e8-bfbf-4176404aa6b6"
-            },
-            {
-                "FunctionName": "omnissm-process-config-events",
-                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-process-config-events",
-                "Runtime": "go1.x",
-                "Role": "arn:aws:iam::644160558196:role/SSM-Register-API",
-                "Handler": "main",
-                "CodeSize": 8506560,
-                "Description": "",
-                "Timeout": 3,
-                "MemorySize": 128,
-                "LastModified": "2018-10-04T02:03:23.121+0000",
-                "CodeSha256": "9BOKPs2j8zjp/pF6Xda8XY0u105egCiYt85Xh+9KDMU=",
-                "Version": "$LATEST",
-                "Environment": {
-                    "Variables": {
-                        "OMNISSM_S3_DOWNLOAD_ROLE": "",
-                        "OMNISSM_REGISTRATIONS_TABLE": "omnissm-registrations",
-                        "OMNISSM_CONFIG_ASSUME_ROLE_NAME": "",
-                        "OMNISSM_MAX_RETRIES": "10",
-                        "OMNISSM_SPILLOVER_QUEUE": "omnissm-deferred-actions-queue",
-                        "OMNISSM_RESOURCE_TAGS": "App,ASV,CMDBEnvironment,OwnerContact"
-                    }
-                },
-                "TracingConfig": {
-                    "Mode": "Active"
-                },
-                "RevisionId": "7e2ccc70-ec17-44a5-ab73-264252312a40"
+                "RevisionId": "9a94240a-d120-44d1-b978-85e8fac4f75b"
             }
         ]
     }
