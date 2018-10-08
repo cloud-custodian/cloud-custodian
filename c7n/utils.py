@@ -255,18 +255,22 @@ def local_session(factory):
     """Cache a session thread local for up to 45m"""
     s = getattr(CONN_CACHE, 'session', None)
     t = getattr(CONN_CACHE, 'time', 0)
+    r = getattr(CONN_CACHE, 'region', None)
+
     n = time.time()
-    if s is not None and t + (60 * 45) > n:
+    if s is not None and t + (60 * 45) > n and r == getattr(factory, 'region', None):
         return s
     s = factory()
     CONN_CACHE.session = s
     CONN_CACHE.time = n
+    CONN_CACHE.region = getattr(factory, 'region', None)
     return s
 
 
 def reset_session_cache():
     setattr(CONN_CACHE, 'session', None)
     setattr(CONN_CACHE, 'time', 0)
+    setattr(CONN_CACHE, 'region', None)
 
 
 def annotation(i, k):

@@ -21,6 +21,7 @@ import datetime
 import itertools
 import logging
 import os
+import operator
 import shutil
 import sys
 import tempfile
@@ -454,7 +455,13 @@ class AWS(object):
                 policies.append(
                     Policy(p.data, options_copy,
                            session_factory=policy_collection.session_factory()))
-        return PolicyCollection(policies, options)
+
+        return PolicyCollection(
+            # order policies by region to minimize local session invalidation.
+            # note relative ordering of policies must be preserved, python sort
+            # is stable.
+            sorted(policies, key=operator.attrgetter('options.region')),
+            options)
 
 
 def get_service_region_map(regions, resource_types):
