@@ -179,10 +179,10 @@ class Filter(object):
         return list(filter(self, resources))
 
 
-class Or(Filter):
+class BooleanGroupFilter(Filter):
 
     def __init__(self, data, registry, manager):
-        super(Or, self).__init__(data)
+        super(BooleanGroupFilter, self).__init__(data)
         self.registry = registry
         self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
@@ -191,6 +191,9 @@ class Or(Filter):
         for f in self.filters:
             f.validate()
         return self
+
+
+class Or(BooleanGroupFilter):
 
     def process(self, resources, event=None):
         if self.manager:
@@ -214,18 +217,7 @@ class Or(Filter):
         return [resource_map[r_id] for r_id in results]
 
 
-class And(Filter):
-
-    def __init__(self, data, registry, manager):
-        super(And, self).__init__(data)
-        self.registry = registry
-        self.filters = registry.parse(list(self.data.values())[0], manager)
-        self.manager = manager
-
-    def validate(self):
-        for f in self.filters:
-            f.validate()
-        return self
+class And(BooleanGroupFilter):
 
     def process(self, resources, events=None):
         if self.manager:
@@ -240,23 +232,12 @@ class And(Filter):
         return resources
 
 
-class Not(Filter):
-
-    def __init__(self, data, registry, manager):
-        super(Not, self).__init__(data)
-        self.registry = registry
-        self.filters = registry.parse(list(self.data.values())[0], manager)
-        self.manager = manager
+class Not(BooleanGroupFilter):
 
     def process(self, resources, event=None):
         if self.manager:
             return self.process_set(resources, event)
         return super(Not, self).process(resources, event)
-
-    def validate(self):
-        for f in self.filters:
-            f.validate()
-        return self
 
     def __call__(self, r):
         """Fallback for older unit tests that don't utilize a query manager"""
