@@ -43,10 +43,12 @@ class FunctionPackage(object):
         parent_path = os.path.abspath(os.path.join(__file__, os.pardir))
 
         extensions_path = os.path.join(parent_path, 'bin')
+        obj_path = os.path.join(parent_path, 'obj')
 
         self.pkg.add_file(os.path.join(parent_path, 'extensions.csproj'))
 
         self.pkg.add_directory(extensions_path)
+        self.pkg.add_directory(object)
 
         self.pkg.add_contents(dest=self.name + '/__init__.py', contents='')
 
