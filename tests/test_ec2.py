@@ -18,7 +18,7 @@ import unittest
 import time
 
 from datetime import datetime
-from dateutil import tz, zoneinfo
+from dateutil import tz
 from mock import mock
 from jsonschema.exceptions import ValidationError
 
@@ -646,7 +646,7 @@ class TestTag(BaseTest):
         self.assertEqual(len(resources), 3)
 
     def test_ec2_mark_zero(self):
-        localtz = zoneinfo.gettz("America/New_York")
+        localtz = tz.gettz("America/New_York")
         dt = datetime.now(localtz)
         dt = dt.replace(year=2017, month=11, day=24, hour=7, minute=00)
         session_factory = self.replay_flight_data("test_ec2_mark_zero")
@@ -695,7 +695,7 @@ class TestTag(BaseTest):
         self.assertEqual(result.date(), dt.date())
 
     def test_ec2_mark_hours(self):
-        localtz = zoneinfo.gettz("America/New_York")
+        localtz = tz.gettz("America/New_York")
         dt = datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=2, day=20, hour=18, minute=00, second=0, microsecond=0

@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 import json
 import logging
 import os
@@ -237,7 +237,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_mark_hours(self):
-        localtz = zoneinfo.gettz("Etc/UTC")
+        localtz = tzutil.gettz("Etc/UTC")
         dt = datetime.datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=5, day=9, hour=21, minute=20, second=0, microsecond=0
