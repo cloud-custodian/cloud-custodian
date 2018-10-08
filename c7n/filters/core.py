@@ -187,6 +187,11 @@ class Or(Filter):
         self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
+    def validate(self):
+        for f in self.filters:
+            f.validate()
+        return self
+
     def process(self, resources, event=None):
         if self.manager:
             return self.process_set(resources, event)
@@ -217,6 +222,11 @@ class And(Filter):
         self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
 
+    def validate(self):
+        for f in self.filters:
+            f.validate()
+        return self
+
     def process(self, resources, events=None):
         if self.manager:
             sweeper = AnnotationSweeper(self.manager.get_model().id, resources)
@@ -242,6 +252,11 @@ class Not(Filter):
         if self.manager:
             return self.process_set(resources, event)
         return super(Not, self).process(resources, event)
+
+    def validate(self):
+        for f in self.filters:
+            f.validate()
+        return self
 
     def __call__(self, r):
         """Fallback for older unit tests that don't utilize a query manager"""
