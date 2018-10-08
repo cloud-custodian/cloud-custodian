@@ -59,12 +59,12 @@ class Missing(Filter):
 
         # if the embedded policy only specifies one region, or only
         # being executed on a single region.
-        if self.embedded_policy.region or len(self.manager.config.regions) == 1:
+        if self.embedded_policy.region or len(self.manager.config.regions) <= 1:
             if (self.embedded_policy.region and
                     self.embedded_policy.region != self.manager.config.region):
                 return []
             self.embedded_policy.expand_variables(self.embedded_policy.get_variables())
-            return self.embedded_policy.poll() or []
+            return not self.embedded_policy.poll() and resources or []
 
         # For regional resources and multi-region execution, the policy matches if
         # the resource is missing in any region.

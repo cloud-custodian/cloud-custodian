@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
@@ -54,8 +55,20 @@ class AccountTests(BaseTest):
         # specific. By default missing fires if any region executed against
         # is missing the regional resource.
         cfg = Config.empty(regions=["eu-west-1", "us-east-2", "us-west-2"])
-        session_factory = self.replay_flight_data(
-            'test_account_missing_region_resource', cfg)
+
+        session_factory = self.replay_flight_data('test_account_missing_region_resource')
+
+        class SessionFactory(object):
+
+            def __init__(self, options):
+                self.region = options.region
+
+            def __call__(self, region=None, assume=None):
+                return session_factory(region=self.region)
+
+        self.patch(clouds['aws'], 'get_session_factory',
+                   lambda x, *args: SessionFactory(*args))
+
         p = self.load_policy({
             'name': 'missing-lambda',
             'resource': 'aws.account',

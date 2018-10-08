@@ -1,0 +1,103 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-enrich-registrations",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "CMDBEnvironment",
+                        "Value": "ENVNPCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "OwnerContact",
+                        "Value": "kyle.travis@capitalone.com"
+                    },
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-handle-registrations",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "CMDBEnvironment",
+                        "Value": "ENVNPCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "OwnerContact",
+                        "Value": "kyle.travis@capitalone.com"
+                    },
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-process-config-events",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "CMDBEnvironment",
+                        "Value": "ENVNPCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "OwnerContact",
+                        "Value": "kyle.travis@capitalone.com"
+                    },
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-2:644160558196:function:omnissm-process-deferred-actions",
+                "Tags": [
+                    {
+                        "Key": "ASV",
+                        "Value": "ASVCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "CMDBEnvironment",
+                        "Value": "ENVNPCLOUDSYSTEMSMANAGER"
+                    },
+                    {
+                        "Key": "OwnerContact",
+                        "Value": "kyle.travis@capitalone.com"
+                    },
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "4b7c28a8-cb20-11e8-a423-1340297c04d1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4b7c28a8-cb20-11e8-a423-1340297c04d1",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1302",
+                "date": "Mon, 08 Oct 2018 17:33:39 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
