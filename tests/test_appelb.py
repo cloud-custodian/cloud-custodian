@@ -633,3 +633,19 @@ class TestAppElbIsNOtLoggingFilter(BaseTest):
         self.assertGreater(
             len(resources), 0, "Test should find appelbs not" "logging to otherbucket"
         )
+
+
+class TestHealthEventsFilter(BaseTest):
+
+    def test_rds_health_events_filter(self):
+        session_factory = self.replay_flight_data("test_appelb_health_events_filter")
+        policy = self.load_policy(
+            {
+                "name": "appelb-health-events-filter",
+                "resource": "app-elb",
+                "filters": [{"type": "health-event", "statuses": ["open", "upcoming", "closed"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)

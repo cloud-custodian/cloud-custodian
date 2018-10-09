@@ -33,7 +33,6 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -45,8 +44,6 @@ from c7n.utils import type_schema
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')

@@ -240,7 +240,7 @@ import datetime
 import logging
 from os.path import join
 
-from dateutil import zoneinfo
+from dateutil import zoneinfo, tz as tzutil
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter
@@ -351,16 +351,16 @@ class Time(Filter):
 
     def process(self, resources, event=None):
         resources = super(Time, self).process(resources)
-        if self.parse_errors and self.manager and self.manager.log_dir:
+        if self.parse_errors and self.manager and self.manager.ctx.log_dir:
             self.log.warning("parse errors %d", len(self.parse_errors))
             with open(join(
-                    self.manager.log_dir, 'parse_errors.json'), 'w') as fh:
+                    self.manager.ctx.log_dir, 'parse_errors.json'), 'w') as fh:
                 dumps(self.parse_errors, fh=fh)
             self.parse_errors = []
-        if self.opted_out and self.manager and self.manager.log_dir:
+        if self.opted_out and self.manager and self.manager.ctx.log_dir:
             self.log.debug("disabled count %d", len(self.opted_out))
             with open(join(
-                    self.manager.log_dir, 'opted_out.json'), 'w') as fh:
+                    self.manager.ctx.log_dir, 'opted_out.json'), 'w') as fh:
                 dumps(self.opted_out, fh=fh)
             self.opted_out = []
         return resources
@@ -466,8 +466,8 @@ class Time(Filter):
     def get_tz(cls, tz):
         found = cls.TZ_ALIASES.get(tz)
         if found:
-            return zoneinfo.gettz(found)
-        return zoneinfo.gettz(tz.title())
+            return tzutil.gettz(found)
+        return tzutil.gettz(tz.title())
 
     def get_default_schedule(self):
         raise NotImplementedError("use subclass")

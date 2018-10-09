@@ -106,6 +106,9 @@ func main() {
 							}
 							tags[k] = v
 						}
+						tags["AccountId"] = ci.AWSAccountId
+						tags["VPCId"] = ci.Configuration.VPCId
+						tags["SubnetId"] = ci.Configuration.SubnetId
 						err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.AddTagsToResource,
 							Value: &ssm.ResourceTags{

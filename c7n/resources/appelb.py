@@ -889,7 +889,7 @@ class AppELBTargetGroup(QueryResourceManager):
         client = local_session(self.session_factory).client('elbv2')
 
         def _describe_target_group_health(target_group):
-            result = client.describe_target_health(
+            result = self.retry(client.describe_target_health,
                 TargetGroupArn=target_group['TargetGroupArn'])
             target_group['TargetHealthDescriptions'] = result[
                 'TargetHealthDescriptions']

@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import time
+import uuid
 import os
 
-from c7n.output import FSOutput, MetricsOutput, CloudWatchLogOutput
-from c7n.utils import reset_session_cache
+
+from c7n.output import (
+    api_stats_outputs,
+    blob_outputs,
+    log_outputs,
+    metrics_outputs,
+    sys_stats_outputs,
+    tracer_outputs)
+
+from c7n.utils import reset_session_cache, dumps
+from c7n.version import version
 
 
 class ExecutionContext(object):
@@ -27,47 +37,92 @@ class ExecutionContext(object):
         self.policy = policy
         self.options = options
         self.session_factory = session_factory
-        self.cloudwatch_logs = None
+
+        # Runtime initialized during policy execution
+        # We treat policies as a fly weight pre-execution.
         self.start_time = None
+        self.execution_id = None
+        self.output = None
+        self.api_stats = None
+        self.sys_stats = None
 
-        metrics_enabled = getattr(options, 'metrics_enabled', None)
-        factory = MetricsOutput.select(metrics_enabled)
-        self.metrics = factory(self)
+        # A few tests patch on metrics flush
+        self.metrics = metrics_outputs.select(self.options.metrics_enabled, self)
 
-        output_dir = getattr(options, 'output_dir', '')
-        if output_dir:
-            factory = FSOutput.select(output_dir)
-            self.output_path = factory.join(output_dir, policy.name)
-            self.output = factory(self)
-        else:
-            self.output_path = self.output = None
+        # Tracer is wired into core filtering code / which is getting
+        # invoked sans execution context entry in tests
+        self.tracer = tracer_outputs.select(self.options.tracer, self)
 
-        if options.log_group:
-            self.cloudwatch_logs = CloudWatchLogOutput(self)
+    def initialize(self):
+        self.output = blob_outputs.select(self.options.output_dir, self)
+        self.logs = log_outputs.select(self.options.log_group, self)
+
+        # Look for customizations, but fallback to default
+        for api_stats_type in (self.policy.provider_name, 'default'):
+            if api_stats_type in api_stats_outputs:
+                self.api_stats = api_stats_outputs.select(api_stats_type, self)
+                break
+        for sys_stats_type in ('psutil', 'default'):
+            if sys_stats_type in sys_stats_outputs:
+                self.sys_stats = sys_stats_outputs.select(sys_stats_type, self)
+                break
+
+        self.start_time = time.time()
+        self.execution_id = str(uuid.uuid4())
 
     @property
     def log_dir(self):
-        if self.output:
-            return self.output.root_dir
+        return self.output.root_dir
 
     def __enter__(self):
-        if self.output:
-            self.output.__enter__()
-        if self.cloudwatch_logs:
-            self.cloudwatch_logs.__enter__()
-        self.start_time = time.time()
+        self.initialize()
+        self.session_factory.policy_name = self.policy.name
+        self.sys_stats.__enter__()
+        self.output.__enter__()
+        self.logs.__enter__()
+        self.api_stats.__enter__()
+        self.tracer.__enter__()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
-        self.metrics.flush()
-        # Clear policy execution thread local session cache if running in tests.
-        # IMPORTANT: multi-account execution (c7n-org and others) need to manually reset this.
-        # Why: Not doing this means we get excessive memory usage from client
-        # reconstruction.
+        if exc_type is not None and self.metrics:
+            self.metrics.put_metric('PolicyException', 1, "Count")
+        self.policy._write_file(
+            'metadata.json', dumps(self.get_metadata(), indent=2))
+        self.api_stats.__exit__(exc_type, exc_value, exc_traceback)
+
+        with self.tracer.subsegment('output'):
+            self.metrics.flush()
+            self.logs.__exit__(exc_type, exc_value, exc_traceback)
+            self.output.__exit__(exc_type, exc_value, exc_traceback)
+
+        self.tracer.__exit__()
+
+        self.session_factory.policy_name = None
+        # IMPORTANT: multi-account execution (c7n-org and others) need
+        # to manually reset this.  Why: Not doing this means we get
+        # excessive memory usage from client reconstruction for dynamic-gen
+        # sdks.
         if os.environ.get('C7N_TEST_RUN'):
             reset_session_cache()
-        if self.cloudwatch_logs:
-            self.cloudwatch_logs.__exit__(exc_type, exc_value, exc_traceback)
-            self.cloudwatch_logs = None
-        if self.output:
-            self.output.__exit__(exc_type, exc_value, exc_traceback)
+
+    def get_metadata(self, include=('sys-stats', 'api-stats', 'metrics')):
+        t = time.time()
+        md = {
+            'policy': self.policy.data,
+            'version': version,
+            'execution': {
+                'id': self.execution_id,
+                'start': self.start_time,
+                'end_time': t,
+                'duration': t - self.start_time},
+            'config': dict(self.options)
+        }
+
+        if 'sys-stats' in include and self.sys_stats:
+            md['sys-stats'] = self.sys_stats.get_metadata()
+        if 'api-stats' in include and self.api_stats:
+            md['api-stats'] = self.api_stats.get_metadata()
+        if 'metrics' in include and self.metrics:
+            md['metrics'] = self.metrics.get_metadata()
+        return md

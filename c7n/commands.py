@@ -266,6 +266,8 @@ def logs(options, policies):
         sys.exit(1)
 
     policy = policies.pop()
+    # initialize policy execution context for access to outputs
+    policy.ctx.initialize()
 
     for e in policy.get_logs(options.start, options.end):
         print("%s: %s" % (

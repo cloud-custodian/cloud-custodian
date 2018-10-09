@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "NextToken": "", 
+        "DevEndpoints": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d6d5aa30-c8db-11e8-b29f-8f943bd9b259", 
+            "HTTPHeaders": {
+                "date": "Fri, 05 Oct 2018 20:18:36 GMT", 
+                "x-amzn-requestid": "d6d5aa30-c8db-11e8-b29f-8f943bd9b259", 
+                "content-length": "34", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

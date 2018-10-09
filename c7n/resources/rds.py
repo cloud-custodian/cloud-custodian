@@ -63,7 +63,6 @@ from c7n.filters import (
     OPERATORS)
 
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
@@ -79,8 +78,6 @@ log = logging.getLogger('custodian.rds')
 
 filters = FilterRegistry('rds.filters')
 actions = ActionRegistry('rds.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('rds')
