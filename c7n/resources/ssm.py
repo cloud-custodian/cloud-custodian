@@ -16,12 +16,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.query import QueryResourceManager
 from c7n.manager import resources
-from c7n.utils import get_retry
+from c7n.utils import get_retry, local_session, type_schema
+from c7n.actions import Action
 
 
 @resources.register('ssm-parameter')
 class SSMParameter(QueryResourceManager):
-
     class resource_type(object):
         service = 'ssm'
         enum_spec = ('describe_parameters', 'Parameters', None)
@@ -34,3 +34,40 @@ class SSMParameter(QueryResourceManager):
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',
                    'ssm:DescribeParameters')
+
+
+@resources.register('ssm-managed-instance')
+class ManagedInstance(QueryResourceManager):
+    class resource_type(object):
+        service = 'ssm'
+        enum_spec = ('describe_instance_information', 'InstanceInformationList', None)
+        id = 'InstanceId'
+        name = 'Name'
+        date = 'RegistrationDate'
+        dimension = None
+        filter_name = None
+    permissions = ('ssm:DescribeInstanceInformation',)
+
+
+@resources.register('ssm-activation')
+class SSMActivation(QueryResourceManager):
+    class resource_type(object):
+        service = 'ssm'
+        enum_spec = ('describe_activations', 'ActivationList', None)
+        id = 'ActivationId'
+        name = 'Description'
+        date = 'CreatedDate'
+        dimension = None
+        filter_name = None
+    permissions = ('ssm:DescribeActivations',)
+
+
+@SSMActivation.action_registry.register('delete')
+class DeleteSSMActivation(Action):
+    schema = type_schema('delete')
+    permissions = ('ssm:DeleteActivation',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for a in resources:
+            client.delete_activation(ActivationId=a["ActivationId"])

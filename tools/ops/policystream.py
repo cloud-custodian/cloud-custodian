@@ -65,6 +65,7 @@ import shutil
 import os
 import pygit2
 import requests
+import sqlite3
 import tempfile
 import yaml
 
@@ -534,11 +535,62 @@ class OutputTransport(Transport):
             print(change)
 
 
+class SQLiteTransport(Transport):
+
+    table_ddl = """\
+    create table if not exists policy_changes (
+       name   text not null,
+       repo   text,
+       author text,
+       email  text,
+       msg    text,
+       change text,
+       revid  text not null,
+       resource text,
+       policy text,
+       start  text,
+       end    text,
+       app    text,
+       env    text
+       PRIMARY KEY (name, revid)
+    )
+    """
+
+    def __init__(self, session, info):
+        super(SQLiteTransport, self).__init__(session, info)
+        self.conn = sqlite3.open(info['stream_uri'])
+        self.conn.cursor().execute(self.table_ddl)
+
+    def flush(self):
+        buf = self.buf
+        self.buf = []
+        rows = [
+            (d['policy']['name'],
+             d['repo_uri'],
+             d['commit']['author'],
+             d['commit']['email'],
+             d['commit']['message'],
+             d['change'],
+             d['commit']['id'],
+             d['policy']['resource'],
+             d['policy'],
+             d['commit']['date'],
+             None,
+             'custodian',
+             None) for d in buf]
+        with self.conn.cursor() as cursor:
+            cursor.executemany('''\
+            insert or replace in policy_changes values (
+               ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
+
+
 def transport(stream_uri, assume):
     if stream_uri == 'stdout':
         return OutputTransport(None, {})
     elif stream_uri == 'json':
         return OutputTransport(None, {'format': 'json'})
+    elif stream_uri.startswith('sqlite'):
+        return SQLiteTransport(None, {'uri': stream_uri})
     if not stream_uri.startswith('arn'):
         raise ValueError("invalid transport")
     info = parse_arn(stream_uri)

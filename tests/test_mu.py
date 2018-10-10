@@ -311,7 +311,8 @@ class PolicyLambdaProvision(BaseTest):
 
         lines = output.getvalue().strip().split("\n")
         self.assertTrue("Updating function custodian-s3-bucket-policy code" in lines)
-        self.assertTrue("Updating function: custodian-s3-bucket-policy config" in lines)
+        self.assertTrue(
+            "Updating function: custodian-s3-bucket-policy config MemorySize, Role" in lines)
         self.assertEqual(result["FunctionName"], result2["FunctionName"])
         # drive by coverage
         functions = [

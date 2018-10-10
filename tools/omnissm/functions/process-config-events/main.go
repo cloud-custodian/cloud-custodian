@@ -87,27 +87,29 @@ func handleConfigurationItemChange(ctx context.Context, detail configservice.Con
 			}
 			tags[k] = v
 		}
-		if len(tags) > 0 {
-			resourceTags := &ssm.ResourceTags{
-				ManagedId: entry.ManagedId,
-				Tags:      tags,
-			}
-			err := omni.SSM.AddTagsToResource(ctx, resourceTags)
-			if err != nil {
-				if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-					sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
-						Type:  omnissm.AddTagsToResource,
-						Value: resourceTags,
-					})
-					if sqsErr != nil {
-						return sqsErr
-					}
-					return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
-				}
-				return err
-			}
-			log.Info().Msgf("AddTagsToResource successful for %#v", entry.ManagedId)
+		ci := detail.ConfigurationItem
+		tags["AccountId"] = ci.AWSAccountId
+		tags["VPCId"] = ci.Configuration.VPCId
+		tags["SubnetId"] = ci.Configuration.SubnetId
+		resourceTags := &ssm.ResourceTags{
+			ManagedId: entry.ManagedId,
+			Tags:      tags,
 		}
+		err := omni.SSM.AddTagsToResource(ctx, resourceTags)
+		if err != nil {
+			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
+				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
+					Type:  omnissm.AddTagsToResource,
+					Value: resourceTags,
+				})
+				if sqsErr != nil {
+					return sqsErr
+				}
+				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
+			}
+			return err
+		}
+		log.Info().Msgf("AddTagsToResource successful for %#v", entry.ManagedId)
 		// NOTE: CanfigurationItemCaptureTime is sometimes sent by AWS as
 		// a timestamp with milliseconds, which are not accepted by SSM when
 		// calling PutInventory. Here we must attempt to remove milliseconds
