@@ -76,7 +76,11 @@ from c7n.resources import load_resources
 from c7n.utils import get_retry
 
 import boto3
-
+try:
+    import sqlalchemy as rdb
+    HAVE_SQLA = True
+except ImportError:
+    HAVE_SQLA = False
 
 log = logging.getLogger('c7n.policystream')
 
@@ -502,6 +506,53 @@ class KinesisTransport(Transport):
         self.buf = []
 
 
+class SQLTransport(Transport):
+
+    def __init__(self, session, info):
+        self.buf = []
+        self.metadata = rdb.MetaData()
+        self.table = rdb.Table(
+            'policy_changes', self.metadata,
+            rdb.Column('commit_id', rdb.String(32), primary_key=True),
+            rdb.Column('policy_name', rdb.String(256), primary_key=True),
+            rdb.Column('resource_type', rdb.String(32)),
+            rdb.Column('change_type', rdb.String(8)),
+            rdb.Column('commit_date', rdb.DateTime()),
+            rdb.Column('committer_name', rdb.String(128)),
+            rdb.Column('committer_email', rdb.String(64)),
+            rdb.Column('repo_uri', rdb.String(384)),
+            rdb.Column('repo_file', rdb.String(1024)),
+            rdb.Column('commit_msg', rdb.String(4096)),
+            rdb.Column('policy', rdb.Text())
+        )
+        self.engine = rdb.create_engine(info['db_uri'])
+        self.metadata.bind = self.engine
+        self.metadata.create_all()
+
+    def flush(self):
+        if not self.buf:
+            return
+        buf = self.buf
+        self.buf = []
+        with self.engine.connect() as conn:
+            conn.execute(
+                self.table.insert(),
+                [dict(
+                    commit_id=str(c.commit.id),
+                    policy_name=c.policy.name,
+                    resource_type=c.policy.resource_type,
+                    change_type=c.kind,
+                    commit_date=c.date,
+                    committer_name=c.commit.committer.name,
+                    committer_email=c.commit.committer.email,
+                    repo_uri=c.repo_uri,
+                    repo_file=c.file_path,
+                    commit_msg=c.commit.message,
+                    policy=json.dumps(c.policy.data),
+                    )
+                 for c in buf])
+
+
 class SQSTransport(Transport):
 
     BUF_SIZE = 10
@@ -539,6 +590,12 @@ def transport(stream_uri, assume):
         return OutputTransport(None, {})
     elif stream_uri == 'json':
         return OutputTransport(None, {'format': 'json'})
+    if (stream_uri.startswith('sqlite') or
+            stream_uri.startswith('postgresql') or
+            stream_uri.startswith('mysql')):
+        if not HAVE_SQLA:
+            raise ValueError("missing dependency sqlalchemy")
+        return SQLTransport(None, {'db_uri': stream_uri})
     if not stream_uri.startswith('arn'):
         raise ValueError("invalid transport")
     info = parse_arn(stream_uri)
@@ -609,6 +666,39 @@ def github_repos(organization, github_url, github_token):
             next_cursor = False
 
 
+@cli.command(name='org-stream')
+@click.option('--organization', envvar="GITHUB_ORG",
+              required=True, help="Github Organization")
+@click.option('--github-url', envvar="GITHUB_API_URL",
+              default='https://api.github.com/graphql')
+@click.option('--github-token', envvar='GITHUB_TOKEN',
+              help="Github credential token")
+@click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
+@click.option('-d', '--clone-dir')
+@click.option('-f', '--filter', multiple=True)
+@click.option('-e', '--exclude', multiple=True)
+@click.option('-s', '--stream-uri', default="stdout")
+@click.option('--assume', '--assume',
+              help="Assume role for cloud stream destinations")
+@click.pass_context
+def org_stream(ctx, organization, github_url, github_token, clone_dir,
+               verbose, filter, exclude, stream_uri, assume):
+    """Stream changes for a whole organization"""
+    logging.basicConfig(
+        format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
+        level=(verbose and logging.DEBUG or logging.INFO))
+
+    log.info("Checkout/Update org repos")
+    repos = ctx.forward(org_checkout)
+
+    for r in repos:
+        ctx.invoke(
+            repo_uri=r,
+            stream_uri=stream_uri,
+            verbose=verbose,
+            assume=assume)
+
+
 @cli.command(name='org-checkout')
 @click.option('--organization', envvar="GITHUB_ORG",
               required=True, help="Github Organization")
@@ -630,6 +720,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
     callbacks = pygit2.RemoteCallbacks(
         pygit2.UserPass(github_token, 'x-oauth-basic'))
 
+    repos = []
     for r in github_repos(organization, github_url, github_token):
         if filter:
             found = False
@@ -650,6 +741,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
                 continue
 
         repo_path = os.path.join(clone_dir, r['name'])
+        repos.append(repo_path)
         if not os.path.exists(repo_path):
             log.info("cloning repo: %s/%s" % (organization, r['name']))
             repo = pygit2.clone_repository(
@@ -661,6 +753,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
                 continue
             log.info("syncing repo: %s/%s" % (organization, r['name']))
             pull(repo, callbacks)
+    return repos
 
 
 def pull(repo, creds, remote_name='origin', branch='master'):
@@ -698,7 +791,7 @@ def pull(repo, creds, remote_name='origin', branch='master'):
 @cli.command(name='diff')
 @click.option('-r', '--repo-uri')
 @click.option('--source', default='master', help="source/baseline revision spec")
-@click.option('--target', default=None, help="target revisiion spec")
+@click.option('--target', default=None, help="target revision spec")
 @click.option('-o', '--output', type=click.File('wb'), default='-')
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def diff(repo_uri, source, target, output, verbose):
