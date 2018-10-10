@@ -241,6 +241,14 @@ class PolicyCollection(BaseCollection):
     def __getitem__(self, key):
         return self.pmap[key]
 
+    def __repr__(self):
+        return "<PolicyCollection count:%d>" % (len(self.policies))
+
+    def select(self, names):
+        """return the named subset of policies"""
+        return PolicyCollection(
+            [p for p in self.policies if p.name in names], self.options)
+
     def add(self, p):
         assert p.name not in self.pmap
         self.policies.append(p)
@@ -404,7 +412,11 @@ class PolicyRepo(object):
                     current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_DELETED']:
                 if f in self.policy_files:
-                    current_policies += self.policy_files[f]
+                    # if the policies were moved, only add in policies
+                    # that are not already accounted for.
+                    current_policies += self.policy_files[f].select(
+                        set(current_policies.keys()).difference(
+                            self.policy_files[f].keys()))
                     removed.add(f)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_RENAMED']:
                 change_policies += self._policy_file_rev(f, change)
@@ -683,16 +695,24 @@ def github_repos(organization, github_url, github_token):
 @click.pass_context
 def org_stream(ctx, organization, github_url, github_token, clone_dir,
                verbose, filter, exclude, stream_uri, assume):
-    """Stream changes for a whole organization"""
+    """Stream changes for a whole organization's git history"""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
 
     log.info("Checkout/Update org repos")
-    repos = ctx.forward(org_checkout)
+    repos = ctx.invoke(
+        org_checkout,
+        organization=organization,
+        github_url=github_url,
+        github_token=github_token,
+        clone_dir=clone_dir,
+        filter=filter,
+        exclude=exclude)
 
     for r in repos:
         ctx.invoke(
+            stream,
             repo_uri=r,
             stream_uri=stream_uri,
             verbose=verbose,
@@ -785,7 +805,7 @@ def pull(repo, creds, remote_name='origin', branch='master'):
             repo.create_branch(branch, repo.get(remote_master_id))
         repo.head.set_target(remote_master_id)
     elif merge_result & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
-        log.info("Local commits, repo %s must be manually synced", repo)
+        log.warning("Local commits, repo %s must be manually synced", repo)
 
 
 @cli.command(name='diff')
@@ -795,6 +815,7 @@ def pull(repo, creds, remote_name='origin', branch='master'):
 @click.option('-o', '--output', type=click.File('wb'), default='-')
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def diff(repo_uri, source, target, output, verbose):
+    """Diff two arbitrary repo commits and output the diff"""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -824,7 +845,7 @@ def diff(repo_uri, source, target, output, verbose):
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('--assume')
 def stream(repo_uri, stream_uri, verbose, assume):
-    """Stream policy changes to destination"""
+    """Stream git history policy changes to destination"""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
