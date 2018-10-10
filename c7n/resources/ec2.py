@@ -1373,14 +1373,17 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         profile_name = self.data.get('name')
         profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
 
-        associations = {
-            a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
-            for a in client.describe_iam_instance_profile_associations(
-                Filters=[
-                    {'Name': 'instance-id',
-                     'Values': [i['InstanceId'] for i in profile_instances]},
-                    {'Name': 'state', 'Values': ['associating', 'associated']}]
-            ).get('IamInstanceProfileAssociations', ())}
+        if profile_instances:
+            associations = {
+                a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+                for a in client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {'Name': 'instance-id',
+                         'Values': [i['InstanceId'] for i in profile_instances]},
+                        {'Name': 'state', 'Values': ['associating', 'associated']}]
+                ).get('IamInstanceProfileAssociations', ())}
+        else:
+            associations = {}
 
         for i in instances:
             if profile_name and i['InstanceId'] not in associations:

@@ -66,6 +66,7 @@ import shutil
 import os
 import pygit2
 import requests
+import sqlite3
 import tempfile
 import yaml
 
