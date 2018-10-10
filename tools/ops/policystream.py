@@ -56,7 +56,8 @@ import click
 import contextlib
 from collections import deque
 from datetime import datetime, timedelta
-from dateutil.tz import tzoffset
+from dateutil.tz import tzoffset, tzutc
+from dateutil.parser import parse
 from fnmatch import fnmatch
 from functools import partial
 import jmespath
@@ -66,7 +67,7 @@ import shutil
 import os
 import pygit2
 import requests
-import sqlite3
+import six
 import tempfile
 import yaml
 
@@ -350,7 +351,8 @@ class PolicyRepo(object):
             baseline_policies, target_policies, target, self.repo_uri).delta()
 
     def delta_stream(self, target='HEAD', limit=None,
-                sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):
+                     sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE,
+                     after=None, before=None):
         """Return an iterator of policy changes along a commit lineage in a repo.
         """
         if target == 'HEAD':
@@ -358,10 +360,15 @@ class PolicyRepo(object):
 
         commits = []
         for commit in self.repo.walk(target, sort):
+            cdate = commit_date(commit)
             log.debug(
                 "processing commit id:%s date:%s parents:%d msg:%s",
-                str(commit.id)[:6], commit_date(commit).isoformat(),
+                str(commit.id)[:6], cdate.isoformat(),
                 len(commit.parents), commit.message)
+            if after and cdate > after:
+                continue
+            if before and cdate < before:
+                continue
             commits.append(commit)
             if limit and len(commits) > limit:
                 break
@@ -485,6 +492,7 @@ class Transport(object):
     def __init__(self, session, info):
         self.session = session
         self.info = info
+        self.buf = []
 
     def send(self, change):
         """send the given policy change"""
@@ -494,6 +502,10 @@ class Transport(object):
 
     def flush(self):
         """flush any buffered messages"""
+        buf = self.buf
+        self.buf = []
+        if buf:
+            self._flush(buf)
 
     def close(self):
         self.flush()
@@ -506,28 +518,32 @@ class KinesisTransport(Transport):
     retry = staticmethod(get_retry(('ProvisionedThroughputExceededException',)))
 
     def __init__(self, session, info):
-        self.session = session
-        self.info = info
+        super(KinesisTransport, self).__init__(session, info)
         self.client = self.session.client('kinesis', region_name=info['region'])
-        self.buf = []
 
-    def flush(self):
-        if not self.buf:
-            return
+    def _flush(self, buf):
         self.retry(
             self.client.put_records,
             StreamName=self.info['resource'],
             Records=[
                 {'Data': json.dumps(c.data()),
                  'PartitionKey': c.repo_uri}
-                for c in self.buf])
-        self.buf = []
+                for c in buf])
 
 
-class SQLTransport(Transport):
+class IndexedTransport(Transport):
+    """marker denoting transports that support querying for last seen value"""
+
+    def last(self):
+        raise NotImplementedError()
+
+
+class SQLTransport(IndexedTransport):
+
+    BUF_SIZE = 200
 
     def __init__(self, session, info):
-        self.buf = []
+        super(SQLTransport, self).__init__(session, info)
         self.metadata = rdb.MetaData()
         self.table = rdb.Table(
             'policy_changes', self.metadata,
@@ -546,14 +562,11 @@ class SQLTransport(Transport):
         self.engine = rdb.create_engine(info['db_uri'])
         self.metadata.bind = self.engine
         self.metadata.create_all()
+        self.conn = self.engine.connect()
 
-    def flush(self):
-        if not self.buf:
-            return
-        buf = self.buf
-        self.buf = []
-        with self.engine.connect() as conn:
-            conn.execute(
+    def _flush(self, buf):
+        with self.conn.begin():
+            self.conn.execute(
                 self.table.insert(),
                 [dict(
                     commit_id=str(c.commit.id),
@@ -566,9 +579,22 @@ class SQLTransport(Transport):
                     repo_uri=c.repo_uri,
                     repo_file=c.file_path,
                     commit_msg=c.commit.message,
-                    policy=json.dumps(c.policy.data),
-                    )
+                    policy=json.dumps(c.policy.data))
                  for c in buf])
+
+    def last(self):
+        value = self.conn.execute(
+            'select max(commit_date) from policy_changes').fetchone()[0]
+        if not value:
+            return None
+        if isinstance(value, six.string_types):
+            last_seen = parse(value)
+            last_seen = last_seen.replace(tzinfo=tzutc())
+        return last_seen
+
+    def close(self):
+        super(SQLTransport, self).close()
+        self.conn.close()
 
 
 class SQSTransport(Transport):
@@ -576,14 +602,10 @@ class SQSTransport(Transport):
     BUF_SIZE = 10
 
     def __init__(self, session, info):
-        self.session = session
-        self.info = info
+        super(SQSTransport, self).__init__(session, info)
         self.client = self.session.client('sqs', region_name=info['region'])
-        self.buf = []
 
-    def flush(self):
-        if not self.buf:
-            return
+    def _flush(self, buf):
         self.client.send_message_batch(
             QueueUrl=self.info['resource'],
             Entries=[{
@@ -591,7 +613,7 @@ class SQSTransport(Transport):
                 'MessageDeduplicationId': str(change.commit.id) + change.policy.name,
                 'MessageGroupId': change.repo_uri,
                 'MessageBody': json.dumps(change.data())}
-                for change in self.buf])
+                for change in buf])
 
 
 class OutputTransport(Transport):
@@ -713,16 +735,20 @@ def org_stream(ctx, organization, github_url, github_token, clone_dir,
         github_url=github_url,
         github_token=github_token,
         clone_dir=clone_dir,
+        verbose=verbose,
         filter=filter,
         exclude=exclude)
 
+    log.info('Streaming org changes')
+    change_count = 0
     for r in repos:
-        ctx.invoke(
+        change_count += ctx.invoke(
             stream,
             repo_uri=r,
             stream_uri=stream_uri,
             verbose=verbose,
             assume=assume)
+    log.info("Streamed %d org changes", change_count)
 
 
 @cli.command(name='org-checkout')
@@ -769,7 +795,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
         repo_path = os.path.join(clone_dir, r['name'])
         repos.append(repo_path)
         if not os.path.exists(repo_path):
-            log.info("cloning repo: %s/%s" % (organization, r['name']))
+            log.debug("Cloning repo: %s/%s" % (organization, r['name']))
             repo = pygit2.clone_repository(
                 r['url'], repo_path, callbacks=callbacks)
         else:
@@ -777,7 +803,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
             if repo.status():
                 log.warning('repo %s not clean skipping update')
                 continue
-            log.info("syncing repo: %s/%s" % (organization, r['name']))
+            log.debug("Syncing repo: %s/%s" % (organization, r['name']))
             pull(repo, callbacks)
     return repos
 
@@ -850,7 +876,9 @@ def diff(repo_uri, source, target, output, verbose):
 @click.option('-s', '--stream-uri', default="stdout")
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('--assume')
-def stream(repo_uri, stream_uri, verbose, assume):
+@click.option('--before', help="Only stream commits before given date")
+@click.option('--after', help="Only stream commits after given date")
+def stream(repo_uri, stream_uri, verbose, assume, before=None, after=None):
     """Stream git history policy changes to destination"""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
@@ -871,11 +899,14 @@ def stream(repo_uri, stream_uri, verbose, assume):
         change_count = 0
 
         with contextlib.closing(transport(stream_uri, assume)) as t:
-            for change in policy_repo.delta_stream():
+            if after is None and isinstance(t, IndexedTransport):
+                after = t.last()
+            for change in policy_repo.delta_stream(after=after):
                 change_count += 1
                 t.send(change)
 
-        log.info("Streamed %d policy changes", change_count)
+        log.info("Streamed %d policy repo changes", change_count)
+    return change_count
 
 
 if __name__ == '__main__':
