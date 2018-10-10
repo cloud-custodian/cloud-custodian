@@ -19,6 +19,7 @@ import json
 import six
 
 from botocore.exceptions import ClientError
+from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, FilterRegistry, ValueFilter
@@ -32,6 +33,8 @@ from c7n.utils import get_retry, local_session, type_schema, generate_arn
 filters = FilterRegistry('lambda.filters')
 actions = ActionRegistry('lambda.actions')
 filters.register('marked-for-op', TagActionFilter)
+
+ErrAccessDenied = "AccessDeniedException"
 
 
 @resources.register('lambda')
@@ -145,7 +148,7 @@ class ReservedConcurrency(ValueFilter):
                     client.get_function, FunctionName=r['FunctionArn'])
                 r[self.annotation_key].pop('ResponseMetadata')
             except ClientError as e:
-                if e.response['Error']['Code'] == 'AccessDeniedException':
+                if e.response['Error']['Code'] == ErrAccessDenied:
                     self.log.warning(
                         "Access denied getting lambda:%s",
                         r['FunctionName'])
@@ -155,6 +158,42 @@ class ReservedConcurrency(ValueFilter):
         with self.executor_factory(max_workers=3) as w:
             resources = list(filter(None, w.map(_augment, resources)))
             return super(ReservedConcurrency, self).process(resources, event)
+
+
+def get_lambda_policies(client, executor_factory, resources, log):
+
+    def _augment(r):
+        try:
+            r['c7n:Policy'] = client.get_policy(
+                FunctionName=r['FunctionName'])['Policy']
+        except client.exceptions.ResourceNotFoundException:
+            return None
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDeniedException':
+                log.warning(
+                    "Access denied getting policy lambda:%s",
+                    r['FunctionName'])
+        return r
+
+    results = []
+    futures = {}
+
+    with executor_factory(max_workers=3) as w:
+        for r in resources:
+            if 'c7n:Policy' in r:
+                results.append(r)
+                continue
+            futures[w.submit(_augment, r)] = r
+
+        for f in as_completed(futures):
+            if f.exception():
+                log.warning("Error getting policy for:%s err:%s",
+                            r['FunctionName'], f.exception())
+                r = futures[f]
+                continue
+            results.append(f.result())
+
+    return filter(None, results)
 
 
 @filters.register('event-source')
@@ -167,28 +206,12 @@ class LambdaEventSource(ValueFilter):
     permissions = ('lambda:GetPolicy',)
 
     def process(self, resources, event=None):
-        def _augment(r):
-            if 'c7n:Policy' in r:
-                return
-            client = local_session(
-                self.manager.session_factory).client('lambda')
-            try:
-                r['c7n:Policy'] = client.get_policy(
-                    FunctionName=r['FunctionName'])['Policy']
-                return r
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'AccessDeniedException':
-                    self.log.warning(
-                        "Access denied getting policy lambda:%s",
-                        r['FunctionName'])
-                raise
-
+        client = local_session(self.manager.session_factory).client('lambda')
         self.log.debug("fetching policy for %d lambdas" % len(resources))
+        resources = get_lambda_policies(
+            client, self.executor_factory, resources, self.log)
         self.data['key'] = self.annotation_key
-
-        with self.executor_factory(max_workers=3) as w:
-            resources = list(filter(None, w.map(_augment, resources)))
-            return super(LambdaEventSource, self).process(resources, event)
+        return super(LambdaEventSource, self).process(resources, event)
 
     def __call__(self, r):
         if 'c7n:Policy' not in r:
@@ -203,9 +226,6 @@ class LambdaEventSource(ValueFilter):
             if sources:
                 r[self.annotation_key] = list(sources)
         return self.match(r)
-
-
-ErrAccessDenied = "AccessDeniedException"
 
 
 @filters.register('cross-account')
@@ -236,25 +256,10 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
     policy_attribute = 'c7n:Policy'
 
     def process(self, resources, event=None):
-
-        client = local_session(
-            self.manager.session_factory).client('lambda')
-
-        def _augment(r):
-            try:
-                r['c7n:Policy'] = client.get_policy(
-                    FunctionName=r['FunctionName'])['Policy']
-                return r
-            except ClientError as e:
-                if e.response['Error']['Code'] == ErrAccessDenied:
-                    self.log.warning(
-                        "Access denied getting policy lambda:%s",
-                        r['FunctionName'])
-
+        client = local_session(self.manager.session_factory).client('lambda')
         self.log.debug("fetching policy for %d lambdas" % len(resources))
-        with self.executor_factory(max_workers=3) as w:
-            resources = list(filter(None, w.map(_augment, resources)))
-
+        resources = get_lambda_policies(
+            client, self.executor_factory, resources, self.log)
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
 

@@ -554,7 +554,7 @@ class HealthFilter(HealthEventFilter):
         paginator = client.get_paginator('describe_events')
         events = list(itertools.chain(
             *[p['events']for p in paginator.paginate(filter=f)]))
-        entities = self.process_event(events)
+        entities = self.process_event(client, events)
 
         event_map = {e['arn']: e for e in events}
         config = local_session(self.manager.session_factory).client('config')

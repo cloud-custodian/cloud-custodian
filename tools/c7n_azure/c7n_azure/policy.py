@@ -12,27 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import requests
-import logging
 import json
+import logging
 import time
 
-from c7n_azure.function_package import FunctionPackage
-from msrestazure.azure_exceptions import CloudError
-from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.template_utils import TemplateUtilities
+import requests
+from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
+                                         WebHookEventSubscriptionDestination)
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
                                  CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
                                  CONST_AZURE_FUNCTION_KEY_URL)
+from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.template_utils import TemplateUtilities
+from msrestazure.azure_exceptions import CloudError
 
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
 from c7n.utils import local_session
-
-from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
-                                         WebHookEventSubscriptionDestination)
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -102,7 +101,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         archive.build(self.policy.data)
         archive.close()
 
-        self.log.info("Function package built")
+        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
 
         if archive.wait_for_status(self.webapp_name):
             archive.publish(self.webapp_name)
@@ -117,7 +116,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         updated_parameters = {
             'dockerVersion': CONST_DOCKER_VERSION,
-            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION
+            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION,
+            'machineDecryptionKey': FunctionAppUtilities.generate_machine_decryption_key()
         }
 
         if 'mode' in data:
@@ -221,10 +221,10 @@ class AzureEventGridMode(AzureFunctionMode):
             'https://management.azure.com'
             '/subscriptions/{0}/resourceGroups/{1}/'
             'providers/Microsoft.Web/sites/{2}/{3}').format(
-                self.session.subscription_id,
-                self.group_name,
-                self.webapp_name,
-                CONST_AZURE_FUNCTION_KEY_URL)
+            self.session.subscription_id,
+            self.group_name,
+            self.webapp_name,
+            CONST_AZURE_FUNCTION_KEY_URL)
 
         retrieved_key = False
 

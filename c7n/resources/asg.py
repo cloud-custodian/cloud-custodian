@@ -19,7 +19,7 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import logging
@@ -1410,7 +1410,7 @@ class MarkForOp(Tag):
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
     def validate(self):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise PolicyValidationError(
@@ -1418,7 +1418,7 @@ class MarkForOp(Tag):
         return self
 
     def process(self, asgs):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('message', self.default_template)

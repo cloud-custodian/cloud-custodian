@@ -127,7 +127,7 @@ class AutoScalingTest(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         snap = NotEncryptedFilter.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-malformedsnap")
+        self.assertEqual(snap, "snap-malformedsnap")
 
     def test_get_bad_snapshot_notfound(self):
         operation_name = "DescribeSnapshots"
@@ -139,7 +139,7 @@ class AutoScalingTest(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         snap = NotEncryptedFilter.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-notfound")
+        self.assertEqual(snap, "snap-notfound")
 
     def test_asg_image_age_filter(self):
         factory = self.replay_flight_data("test_asg_image_age_filter")

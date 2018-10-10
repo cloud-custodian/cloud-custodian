@@ -24,8 +24,6 @@ from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 
 from c7n.actions import BaseAction
-from c7n.config import Config
-from c7n.ctx import ExecutionContext
 from c7n.filters import Filter
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
@@ -181,9 +179,7 @@ class ResourceAccessFilter(RelatedResourceFilter):
             resource_type.rsplit('.', 1)[-1])
 
     def get_related(self, resources):
-        ctx = ExecutionContext(local_session(Session), self.data, Config.empty())
-        manager = self.factory(ctx, self.data)
-        related = manager.source.get_resources(None)
+        related = self.manager.get_resource_manager(self.factory.type).resources()
         if self.data.get('op'):
             return [r['id'] for r in related if self.match(r)]
         else:

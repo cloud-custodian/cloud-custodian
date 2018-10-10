@@ -1,4 +1,20 @@
+# Copyright 2015-2018 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
 import logging
+from binascii import hexlify
 
 from azure.mgmt.web.models import (Site, SiteConfig, NameValuePair)
 from c7n_azure.session import Session
@@ -11,6 +27,11 @@ class FunctionAppUtilities(object):
     def __init__(self):
         self.local_session = local_session(Session)
         self.log = logging.getLogger('custodian.azure.function_app_utils')
+
+    @staticmethod
+    def generate_machine_decryption_key():
+        # randomly generated decryption key for Functions key
+        return str(hexlify(os.urandom(32)).decode()).upper()
 
     def deploy_webapp(self, app_name, group_name, service_plan, storage_account_name):
         self.log.info("Deploying Function App %s (%s) in group %s" %
@@ -38,6 +59,9 @@ class FunctionAppUtilities(object):
         site_config.app_settings.append(NameValuePair('FUNCTIONS_EXTENSION_VERSION',
                                                       CONST_FUNCTIONS_EXT_VERSION))
         site_config.app_settings.append(NameValuePair('FUNCTIONS_WORKER_RUNTIME', 'python'))
+        site_config.app_settings.append(
+            NameValuePair('MACHINEKEY_DecryptionKey',
+                          FunctionAppUtilities.generate_machine_decryption_key()))
 
         #: :type: azure.mgmt.web.WebSiteManagementClient
         web_client = self.local_session.client('azure.mgmt.web.WebSiteManagementClient')
@@ -64,7 +88,7 @@ class FunctionAppUtilities(object):
 
         try:
             app_insights = insights_client.components.get(resource_group_name,
-                                                      application_insights_name)
+                                                          application_insights_name)
             return app_insights.instrumentation_key
 
         except Exception:

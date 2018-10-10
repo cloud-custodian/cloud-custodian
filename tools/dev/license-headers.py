@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Add License headers to all py files."""
+from __future__ import print_function
 
 import fnmatch
 import os
@@ -43,11 +44,11 @@ suffix = """\
 
 def update_headers(src_tree):
     """Main."""
-    print "src tree", src_tree
+    print("src tree", src_tree)
     for root, dirs, files in os.walk(src_tree):
         py_files = fnmatch.filter(files, "*.py")
         for f in py_files:
-            print "checking", f
+            print("checking", f)
             p = os.path.join(root, f)
             with open(p) as fh:
                 contents = fh.read()
