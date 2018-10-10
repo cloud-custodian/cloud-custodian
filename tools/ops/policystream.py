@@ -54,6 +54,7 @@ Pull request use, output policies changes between two branches::
 """ # NOQA
 import click
 import contextlib
+from collections import deque
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset
 from fnmatch import fnmatch
@@ -65,6 +66,7 @@ import shutil
 import os
 import pygit2
 import requests
+import sqlite3
 import tempfile
 import yaml
 
@@ -307,21 +309,25 @@ class PolicyRepo(object):
                 yaml.safe_load(self.repo.get(tree[fpath].id).data),
                 Config.empty(), fpath)
 
+    def _get_policy_fents(self, tree):
+        # get policy file entries from a tree recursively
+        results = {}
+        q = deque([tree])
+        while q:
+            t = q.popleft()
+            for fent in t:
+                if fent.type == 'tree':
+                    q.append(fent)
+                elif self.matcher(fent.name):
+                    results[fent.name] = fent
+
     def delta_commits(self, baseline, target):
         """Show policies changes between arbitrary commits.
 
         The common use form is comparing the heads of two branches.
         """
-
-        baseline_files = {}
-        for fent in baseline.tree:
-            if self.matcher(fent.name):
-                baseline_files[fent.name] = fent
-
-        target_files = {}
-        for fent in target.tree:
-            if self.matcher(fent.name):
-                target_files[fent.name] = fent
+        baseline_files = self._get_policy_fents(baseline.tree)
+        target_files = self._get_policy_fents(target.tree)
 
         baseline_policies = PolicyCollection()
         target_policies = PolicyCollection()

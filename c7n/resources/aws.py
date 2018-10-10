@@ -58,11 +58,10 @@ log = logging.getLogger('custodian.aws')
 try:
     from aws_xray_sdk.core import xray_recorder, patch
     from aws_xray_sdk.core.context import Context
-    from aws_xray_sdk.core.sampling.local.sampler import LocalSampler
     HAVE_XRAY = True
 except ImportError:
     HAVE_XRAY = False
-    class Context: pass  # NOQA
+    class Context(object): pass  # NOQA
 
 _profile_session = None
 
@@ -191,7 +190,6 @@ class XrayContext(Context):
 
     def __init__(self, *args, **kw):
         super(XrayContext, self).__init__(*args, **kw)
-        self.sampler = LocalSampler()
         # We want process global semantics as policy execution
         # can span threads.
         self._local = Bag()
