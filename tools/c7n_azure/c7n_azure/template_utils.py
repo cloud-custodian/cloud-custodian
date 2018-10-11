@@ -54,7 +54,13 @@ class TemplateUtilities(object):
         return client.deployments.create_or_update(
             group_name, group_name, deployment_properties)
 
-    def resource_exist(self, group_name, resource_name):
+    def get_default_parameters(self, file_name):
+        # deployment client expects only the parameters, not the full parameters file
+        json_parameters_file = self.get_json_template(file_name)
+        return json_parameters_file['parameters']
+
+    @staticmethod
+    def resource_exist(group_name, resource_name):
         s = local_session(Session)
         #: :type: azure.mgmt.resource.ResourceManagementClient
         client = s.client('azure.mgmt.resource.ResourceManagementClient')
@@ -67,11 +73,6 @@ class TemplateUtilities(object):
         for resource in client.resources.list_by_resource_group(group_name, filter=r_filter):
             return resource
         return False
-
-    def get_default_parameters(self, file_name):
-        # deployment client expects only the parameters, not the full parameters file
-        json_parameters_file = self.get_json_template(file_name)
-        return json_parameters_file['parameters']
 
     @staticmethod
     def get_json_template(file_name):
