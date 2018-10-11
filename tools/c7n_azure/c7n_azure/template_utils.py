@@ -67,7 +67,7 @@ class TemplateUtilities(object):
         for resource in client.resources.list_by_resource_group(group_name, filter=r_filter):
             return resource
         return False
-    
+
     def get_default_parameters(self, file_name):
         # deployment client expects only the parameters, not the full parameters file
         json_parameters_file = self.get_json_template(file_name)
