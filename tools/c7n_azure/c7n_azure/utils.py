@@ -113,11 +113,13 @@ class GraphHelper(object):
 
     @staticmethod
     def get_principal_name(graph_object):
-        if hasattr(graph_object, 'service_principal_name'):
+        if hasattr(graph_object, 'user_principal_name'):
             return graph_object.user_principal_name
         elif hasattr(graph_object, 'service_principal_names'):
             return graph_object.service_principal_names[0]
-        return graph_object.display_name or ''
+        elif hasattr(graph_object, 'display_name'):
+            return graph_object.display_name
+        return ''
 
 
 class PortsRangeHelper(object):
