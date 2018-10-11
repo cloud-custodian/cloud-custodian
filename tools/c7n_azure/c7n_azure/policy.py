@@ -12,27 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import requests
-import logging
 import json
+import logging
 import time
 
-from c7n_azure.function_package import FunctionPackage
-from msrestazure.azure_exceptions import CloudError
-from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.template_utils import TemplateUtilities
+import requests
+from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
+                                         WebHookEventSubscriptionDestination)
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
                                  CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
                                  CONST_AZURE_FUNCTION_KEY_URL)
+from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.template_utils import TemplateUtilities
+from msrestazure.azure_exceptions import CloudError
 
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
 from c7n.utils import local_session
-
-from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
-                                         WebHookEventSubscriptionDestination)
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -60,8 +59,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def __init__(self, policy):
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
-        self.session = local_session(self.policy.session_factory)
-        self.client = self.session.client('azure.mgmt.web.WebSiteManagementClient')
 
         self.template_util = TemplateUtilities()
         self.parameters = self._get_parameters(self.template_util)
@@ -75,7 +72,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def provision(self):
         """Provision any resources needed for the policy."""
-        existing_service_plan = self.client.app_service_plans.get(
+        session = local_session(self.policy.session_factory)
+        client = session.client('azure.mgmt.web.WebSiteManagementClient')
+
+        existing_service_plan = client.app_service_plans.get(
             self.group_name, self.parameters['servicePlanName']['value'])
 
         if not existing_service_plan:
@@ -86,7 +86,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 self.group_name, 'dedicated_functionapp.json', self.parameters).wait()
 
         else:
-            existing_webapp = self.client.web_apps.get(self.group_name, self.webapp_name)
+            existing_webapp = client.web_apps.get(self.group_name, self.webapp_name)
             if not existing_webapp:
                 functionapp_util = FunctionAppUtilities()
                 functionapp_util.deploy_webapp(self.webapp_name,
@@ -102,7 +102,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         archive.build(self.policy.data)
         archive.close()
 
-        self.log.info("Function package built")
+        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
 
         if archive.wait_for_status(self.webapp_name):
             archive.publish(self.webapp_name)
@@ -117,7 +117,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         updated_parameters = {
             'dockerVersion': CONST_DOCKER_VERSION,
-            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION
+            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION,
+            'machineDecryptionKey': FunctionAppUtilities.generate_machine_decryption_key()
         }
 
         if 'mode' in data:
@@ -182,7 +183,8 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def provision(self):
         super(AzureEventGridMode, self).provision()
-        key = self._get_webhook_key()
+        session = local_session(self.policy.session_factory)
+        key = self._get_webhook_key(session)
         webhook_url = 'https://%s.azurewebsites.net/api/%s?code=%s' % (self.webapp_name,
                                                                        self.policy_name, key)
         destination = WebHookEventSubscriptionDestination(
@@ -192,10 +194,10 @@ class AzureEventGridMode(AzureFunctionMode):
         self.log.info("Creating Event Grid subscription")
         event_filter = EventSubscriptionFilter()
         event_info = EventSubscription(destination=destination, filter=event_filter)
-        scope = '/subscriptions/%s' % self.session.subscription_id
+        scope = '/subscriptions/%s' % session.subscription_id
 
         #: :type: azure.mgmt.eventgrid.EventGridManagementClient
-        eventgrid_client = self.session.client('azure.mgmt.eventgrid.EventGridManagementClient')
+        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
 
         status_success = False
         while not status_success:
@@ -211,20 +213,20 @@ class AzureEventGridMode(AzureFunctionMode):
                 self.log.info('Retrying in 30 seconds')
                 time.sleep(30)
 
-    def _get_webhook_key(self):
+    def _get_webhook_key(self, session):
         self.log.info("Fetching Function's API keys")
         token_headers = {
-            'Authorization': 'Bearer %s' % self.session.get_bearer_token()
+            'Authorization': 'Bearer %s' % session.get_bearer_token()
         }
 
         key_url = (
             'https://management.azure.com'
             '/subscriptions/{0}/resourceGroups/{1}/'
             'providers/Microsoft.Web/sites/{2}/{3}').format(
-                self.session.subscription_id,
-                self.group_name,
-                self.webapp_name,
-                CONST_AZURE_FUNCTION_KEY_URL)
+            session.subscription_id,
+            self.group_name,
+            self.webapp_name,
+            CONST_AZURE_FUNCTION_KEY_URL)
 
         retrieved_key = False
 

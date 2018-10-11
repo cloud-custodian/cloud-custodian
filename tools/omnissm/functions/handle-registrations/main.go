@@ -18,6 +18,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/rs/zerolog/log"
@@ -33,7 +35,7 @@ type registrationHandler struct {
 
 func (r *registrationHandler) RequestActivation(ctx context.Context, req *omnissm.RegistrationRequest) (*omnissm.RegistrationResponse, error) {
 	logger := log.With().Str("handler", "RequestActivation").Logger()
-	logger.Info().Interface("identity", req.Identity()).Msg("new registration request")
+	logger.Info().Interface("request", req).Interface("identity", req.Identity()).Msg("new registration request")
 	resp, err := r.OmniSSM.RequestActivation(ctx, req)
 	if err != nil {
 		return nil, err
@@ -48,7 +50,7 @@ func (r *registrationHandler) RequestActivation(ctx context.Context, req *omniss
 
 func (r *registrationHandler) UpdateRegistration(ctx context.Context, req *omnissm.RegistrationRequest) (*omnissm.RegistrationResponse, error) {
 	logger := log.With().Str("handler", "UpdateRegistration").Logger()
-	logger.Info().Interface("identity", req.Identity()).Msg("update registration request")
+	logger.Info().Interface("request", req).Interface("identity", req.Identity()).Msg("update registration request")
 	if !ssm.IsManagedInstance(req.ManagedId) {
 		return nil, lambda.BadRequestError{fmt.Sprintf("invalid managedId %#v", req.ManagedId)}
 	}
@@ -88,6 +90,21 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	var amiWhitelist map[string]bool
+	if config.AMIWhitelistFile != "" {
+		b, err := ioutil.ReadFile(config.AMIWhitelistFile)
+		if err != nil {
+			panic(fmt.Sprintf("unable to read AMI whitelist: %v", err))
+		}
+		var tmp omnissm.ImageWhitelist
+		if err := json.Unmarshal(b, &tmp); err != nil {
+			panic(fmt.Sprintf("unable to unmarshal AMI whitelist file: %v", err))
+		}
+		amiWhitelist = make(map[string]bool)
+		for _, i := range tmp.Images {
+			amiWhitelist[strings.Join([]string{i.AccountId, i.RegionName, i.ImageId}, ",")] = true
+		}
+	}
 	r := registrationHandler{omni}
 	lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 		switch req.Resource {
@@ -101,12 +118,20 @@ func main() {
 				log.Error().Err(err).Msg("cannot verify request")
 				return nil, lambda.BadRequestError{}
 			}
-			if a := registerReq.Identity().AccountId; !config.IsAuthorized(a) {
+			doc := registerReq.Identity()
+			if a := doc.AccountId; !config.IsAuthorized(a) {
 				return nil, lambda.UnauthorizedError{fmt.Sprintf("account not authorized: %#v", a)}
 			}
 			if !omni.RequestVersionValid(registerReq.ClientVersion) {
 				return nil, lambda.BadRequestError{fmt.Sprintf("client version does not meet constraints %#v", omni.Config.ClientVersionConstraints)}
 			}
+			if amiWhitelist != nil {
+				k := strings.Join([]string{doc.AccountId, doc.Region, doc.ImageId}, ",")
+				if doc.ImageId == "" || !amiWhitelist[k] {
+					return nil, lambda.BadRequestError{fmt.Sprintf("registration from AMI %#v is not permitted", doc.ImageId)}
+				}
+			}
+
 			switch req.HTTPMethod {
 			case "POST":
 				return lambda.JSON(r.RequestActivation(ctx, &registerReq))

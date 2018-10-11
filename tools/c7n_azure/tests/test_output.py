@@ -29,12 +29,14 @@ class OutputTest(BaseTest):
         super(OutputTest, self).setUp()
 
     def get_azure_output(self):
+        output_dir = "azure://mystorage.blob.core.windows.net/logs"
         output = AzureStorageOutput(
             ExecutionContext(
                 None,
-                Bag(name="xyz"),
-                Config.empty(output_dir="azure://mystorage.blob.core.windows.net/logs"),
-            )
+                Bag(name="xyz", provider_name='azure'),
+                Config.empty(output_dir=output_dir)
+            ),
+            {'url': output_dir},
         )
         self.addCleanup(shutil.rmtree, output.root_dir)
 

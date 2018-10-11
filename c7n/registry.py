@@ -59,7 +59,10 @@ class PluginRegistry(object):
             raise ValueError('Invalid event')
         self._subscribers[event].append(func)
 
-    def register(self, name, klass=None):
+    def register(self, name, klass=None, condition=True,
+                 condition_message="Missing dependency for {}"):
+        if not condition and klass:
+            return klass
         # invoked as function
         if klass:
             klass.type = name
@@ -69,6 +72,8 @@ class PluginRegistry(object):
 
         # invoked as class decorator
         def _register_class(klass):
+            if not condition:
+                return klass
             self._factories[name] = klass
             klass.type = name
             self.notify(self.EVENT_REGISTER, klass)
@@ -82,6 +87,9 @@ class PluginRegistry(object):
     def notify(self, event, key=None):
         for subscriber in self._subscribers[event]:
             subscriber(self, key)
+
+    def __contains__(self, key):
+        return key in self._factories
 
     def __getitem__(self, name):
         return self.get(name)

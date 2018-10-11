@@ -24,7 +24,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import itertools
@@ -274,7 +274,7 @@ class TagActionFilter(Filter):
             raise PolicyValidationError(
                 "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified '%s' in %s" % (
@@ -286,7 +286,7 @@ class TagActionFilter(Filter):
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         v = None
         for n in i.get('Tags', ()):
@@ -604,7 +604,7 @@ class TagDelayedAction(Action):
                 "mark-for-op specifies invalid op:%s in %s" % (
                     op, self.manager.data))
 
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise PolicyValidationError(
@@ -626,7 +626,7 @@ class TagDelayedAction(Action):
         return action_date_string
 
     def process(self, resources):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
@@ -875,7 +875,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
