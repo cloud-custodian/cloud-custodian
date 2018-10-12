@@ -46,13 +46,12 @@ class AzureStorageOutput(DirectoryOutput):
         self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
         self.root_dir = tempfile.mkdtemp()
         self.blob_service, self.container, self.file_prefix = \
-            self.get_blob_client_wrapper(self.root_dir, ctx)
+            self.get_blob_client_wrapper(self.ctx.options.output_dir, ctx)
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if exc_type is not None:
             self.log.exception("Error while executing policy")
         self.log.debug("Uploading policy logs")
-        self.leave_log()
         self.compress()
         self.upload()
         shutil.rmtree(self.root_dir)
