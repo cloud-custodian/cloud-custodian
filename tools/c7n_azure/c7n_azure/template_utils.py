@@ -26,14 +26,15 @@ from c7n.utils import local_session
 
 class TemplateUtilities(object):
     def __init__(self):
-        s = local_session(Session)
-        #: :type: azure.mgmt.resource.ResourceManagementClient
-        self.client = s.client('azure.mgmt.resource.ResourceManagementClient')
         self.log = logging.getLogger('custodian.azure.template_utils')
 
     def create_resource_group(self, group_name, group_parameters):
         self.log.info("Create or update resource group: %s" % group_name)
-        self.client.resource_groups.create_or_update(group_name, group_parameters)
+
+        s = local_session(Session)
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+        client.resource_groups.create_or_update(group_name, group_parameters)
 
     def deploy_resource_template(self, group_name, template_file_name, template_parameters=None):
         self.log.info("Deploy resource template: %s" % template_file_name)
@@ -46,23 +47,32 @@ class TemplateUtilities(object):
         if template_parameters:
             deployment_properties['parameters'] = template_parameters
 
-        return self.client.deployments.create_or_update(
+        s = local_session(Session)
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+
+        return client.deployments.create_or_update(
             group_name, group_name, deployment_properties)
-
-    def resource_exist(self, group_name, resource_name):
-        if not self.client.resource_groups.check_existence(group_name):
-            return False
-
-        r_filter = ("name eq '%s'" % resource_name)
-
-        for resource in self.client.resources.list_by_resource_group(group_name, filter=r_filter):
-            return resource
-        return False
 
     def get_default_parameters(self, file_name):
         # deployment client expects only the parameters, not the full parameters file
         json_parameters_file = self.get_json_template(file_name)
         return json_parameters_file['parameters']
+
+    @staticmethod
+    def resource_exist(group_name, resource_name):
+        s = local_session(Session)
+        #: :type: azure.mgmt.resource.ResourceManagementClient
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+
+        if not client.resource_groups.check_existence(group_name):
+            return False
+
+        r_filter = ("name eq '%s'" % resource_name)
+
+        for resource in client.resources.list_by_resource_group(group_name, filter=r_filter):
+            return resource
+        return False
 
     @staticmethod
     def get_json_template(file_name):

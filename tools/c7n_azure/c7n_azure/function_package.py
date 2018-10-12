@@ -152,7 +152,8 @@ class FunctionPackage(object):
 
         # add all loaded modules
         modules.discard('azure')
-        modules = modules.union({'c7n', 'c7n_azure', 'pkg_resources'})
+        modules = modules.union({'c7n', 'c7n_azure', 'pkg_resources',
+                                 'knack', 'argcomplete', 'applicationinsights'})
         if extra_modules:
             modules = modules.union(extra_modules)
 
