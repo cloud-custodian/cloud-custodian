@@ -43,6 +43,8 @@ class AzureStorageOutput(DirectoryOutput):
     def __init__(self, ctx, config=None):
         super(AzureStorageOutput, self).__init__(ctx, config)
         self.log = logging.getLogger('custodian.output')
+
+        # date Year/Month/Day/Hour/Second
         self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H/%M/%S')
         self.root_dir = tempfile.mkdtemp()
         self.blob_service, self.container, self.file_prefix = \
