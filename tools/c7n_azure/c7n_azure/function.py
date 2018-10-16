@@ -40,7 +40,7 @@ def main(input):
     event = None
 
     if type(input) is QueueMessage:
-        event = input
+        event = [input.get_json()]
         logging.info(event)
 
     handler.run(event, context)
