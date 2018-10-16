@@ -16,7 +16,7 @@ By default, Custodian will add the policy name and date as the prefix to the blo
         custodian run -s azure://mystorage.blob.core.windows.net/logs mypolicy.yml
 
 In addition, you can use `pyformat` syntax to format the output prefix.
-This is example is the as same structure as the default one.
+This example is the same structure as the default one.
 
     .. code-block:: sh
 
