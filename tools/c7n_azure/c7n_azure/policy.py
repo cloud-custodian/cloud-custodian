@@ -188,8 +188,10 @@ class AzureEventGridMode(AzureFunctionMode):
         super(AzureEventGridMode, self).provision()
 
         self.log.info("Creating Storage Queue")
+        session = local_session(self.policy.session_factory)
+
         #: :type: azure.mgmt.storage.StorageManagementClient
-        storage_client = self.session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
         storage_name = self.parameters['storageName']['value']
         storage_account_keys = storage_client.storage_accounts.list_keys(
             self.group_name, storage_name)
