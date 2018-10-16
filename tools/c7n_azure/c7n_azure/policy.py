@@ -60,8 +60,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def __init__(self, policy):
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
-        self.session = local_session(self.policy.session_factory)
-        self.client = self.session.client('azure.mgmt.web.WebSiteManagementClient')
 
         self.template_util = TemplateUtilities()
         self.parameters = self._get_parameters(self.template_util)
@@ -75,7 +73,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def provision(self):
         """Provision any resources needed for the policy."""
-        existing_service_plan = self.client.app_service_plans.get(
+        session = local_session(self.policy.session_factory)
+        client = session.client('azure.mgmt.web.WebSiteManagementClient')
+
+        existing_service_plan = client.app_service_plans.get(
             self.group_name, self.parameters['servicePlanName']['value'])
 
         if not existing_service_plan:
@@ -86,7 +87,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 self.group_name, 'dedicated_functionapp.json', self.parameters).wait()
 
         else:
-            existing_webapp = self.client.web_apps.get(self.group_name, self.webapp_name)
+            existing_webapp = client.web_apps.get(self.group_name, self.webapp_name)
             if not existing_webapp:
                 functionapp_util = FunctionAppUtilities()
                 functionapp_util.deploy_webapp(self.webapp_name,
@@ -202,10 +203,10 @@ class AzureEventGridMode(AzureFunctionMode):
         self.log.info("Creating Event Grid subscription")
         event_filter = EventSubscriptionFilter()
         event_info = EventSubscription(destination=destination, filter=event_filter)
-        scope = '/subscriptions/%s' % self.session.subscription_id
+        scope = '/subscriptions/%s' % session.subscription_id
 
         #: :type: azure.mgmt.eventgrid.EventGridManagementClient
-        eventgrid_client = self.session.client('azure.mgmt.eventgrid.EventGridManagementClient')
+        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
 
         event_subscription = eventgrid_client.event_subscriptions.create_or_update(
             scope, self.webapp_name, event_info)

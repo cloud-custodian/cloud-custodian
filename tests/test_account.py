@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
@@ -46,6 +47,39 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(sorted(list(resources[0].keys())),
                          sorted(['account_id', 'account_name']))
+
+    def test_missing_multi_region(self):
+        # missing filter needs some special handling as it embeds
+        # a resource policy inside an account. We treat the account
+        # as a global resource, while the resources are typically regional
+        # specific. By default missing fires if any region executed against
+        # is missing the regional resource.
+        cfg = Config.empty(regions=["eu-west-1", "us-west-2"])
+
+        session_factory = self.replay_flight_data('test_account_missing_region_resource')
+
+        class SessionFactory(object):
+
+            def __init__(self, options):
+                self.region = options.region
+
+            def __call__(self, region=None, assume=None):
+                return session_factory(region=self.region)
+
+        self.patch(clouds['aws'], 'get_session_factory',
+                   lambda x, *args: SessionFactory(*args))
+
+        p = self.load_policy({
+            'name': 'missing-lambda',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'missing',
+                'policy': {
+                    'resource': 'aws.lambda'}
+            }]},
+            session_factory=session_factory, config=cfg)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_root_mfa_enabled(self):
         session_factory = self.replay_flight_data("test_account_root_mfa")

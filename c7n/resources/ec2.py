@@ -33,7 +33,6 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -45,8 +44,6 @@ from c7n.utils import type_schema
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
@@ -1376,14 +1373,17 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         profile_name = self.data.get('name')
         profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
 
-        associations = {
-            a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
-            for a in client.describe_iam_instance_profile_associations(
-                Filters=[
-                    {'Name': 'instance-id',
-                     'Values': [i['InstanceId'] for i in profile_instances]},
-                    {'Name': 'state', 'Values': ['associating', 'associated']}]
-            ).get('IamInstanceProfileAssociations', ())}
+        if profile_instances:
+            associations = {
+                a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+                for a in client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {'Name': 'instance-id',
+                         'Values': [i['InstanceId'] for i in profile_instances]},
+                        {'Name': 'state', 'Values': ['associating', 'associated']}]
+                ).get('IamInstanceProfileAssociations', ())}
+        else:
+            associations = {}
 
         for i in instances:
             if profile_name and i['InstanceId'] not in associations:

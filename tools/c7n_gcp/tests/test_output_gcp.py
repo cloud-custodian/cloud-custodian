@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 import time
 
 from c7n.config import Bag
-from c7n.output import MetricsOutput
+from c7n.output import metrics_outputs
 from c7n_gcp.output import StackDriverMetrics
 
 from gcp_common import BaseTest
@@ -26,7 +26,7 @@ class MetricsOutputTest(BaseTest):
 
     def test_metrics_selector(self):
         self.assertEqual(
-            MetricsOutput.select('gcp'),
+            metrics_outputs.get('gcp'),
             StackDriverMetrics)
 
     def test_metrics_output(self):

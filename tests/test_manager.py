@@ -23,9 +23,31 @@ class TestEC2Manager(BaseTest):
 
     def get_manager(self, data, config=None, session_factory=None):
         ctx = ExecutionContext(
-            session_factory, Bag({"name": "test-policy"}), config or Config.empty()
+            session_factory, Bag(
+                {"name": "test-policy", 'provider_name': 'aws'}), config or Config.empty()
         )
         return EC2(ctx, data)
+
+    def test_get_resource_manager(self):
+        p = self.load_policy(
+            {'resource': 'ec2',
+             'name': 'instances'})
+        self.assertEqual(p.resource_manager.get_resource_manager(
+            'aws.lambda').type, 'lambda')
+        self.assertEqual(p.resource_manager.source_type, 'describe')
+        self.assertRaises(
+            ValueError,
+            p.resource_manager.get_resource_manager,
+            'gcp.lambda')
+
+    def test_source_propagate(self):
+        p = self.load_policy(
+            {'resource': 'ec2',
+             'source': 'config',
+             'name': 'instances'})
+        manager = p.resource_manager.get_resource_manager(
+            'aws.security-group')
+        self.assertEqual(manager.source_type, 'config')
 
     def test_manager(self):
         ec2_mgr = self.get_manager(
