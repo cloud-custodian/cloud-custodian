@@ -190,8 +190,9 @@ class AzureEventGridMode(AzureFunctionMode):
     def provision(self):
         super(AzureEventGridMode, self).provision()
         session = local_session(self.policy.session_factory)
-        storage_account = self._create_storage_queue(session)
-        self._create_event_subscription(storage_account, session)
+        queue_name = self.webapp_name + '-' + self.policy_name
+        storage_account = self._create_storage_queue(queue_name, session)
+        self._create_event_subscription(storage_account, queue_name, session)
         self._publish_functions_package()
 
     def run(self, event=None, lambda_context=None):
@@ -247,7 +248,7 @@ class AzureEventGridMode(AzureFunctionMode):
 
         return True
 
-    def _create_storage_queue(self, session):
+    def _create_storage_queue(self, queue_name, session):
         self.log.info("Creating Storage Queue")
 
         #: :type: azure.mgmt.storage.StorageManagementClient
@@ -258,14 +259,13 @@ class AzureEventGridMode(AzureFunctionMode):
 
         storage_account = storage_client.storage_accounts.get_properties(self.group_name, storage_name)
         queue_service = QueueService(account_name=storage_name, account_key=storage_account_keys.keys[0].value)
-        queue_name = self.webapp_name + '-' + self.policy_name
         queue_service.create_queue(queue_name)
 
         return storage_account
 
-    def _create_event_subscription(self, storage_account, session):
+    def _create_event_subscription(self, storage_account, queue_name, session):
         destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
-                                                               queue_name=self.policy_name)
+                                                               queue_name=queue_name)
 
         self.log.info("Creating Event Grid subscription")
         event_filter = EventSubscriptionFilter()
