@@ -133,17 +133,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def validate(self):
         """Validate configuration settings for execution mode."""
 
-
-@execution.register(CONST_AZURE_TIME_TRIGGER_MODE)
-class AzurePeriodicMode(AzureFunctionMode, PullMode):
-    """A policy that runs/executes in azure functions at specified
-    time intervals."""
-    schema = utils.type_schema(CONST_AZURE_TIME_TRIGGER_MODE,
-                               schedule={'type': 'string'},
-                               rinherit=AzureFunctionMode.schema)
-
-    def provision(self):
-        super(AzurePeriodicMode, self).provision()
+    def _publish_functions_package(self):
         self.log.info("Building function package for %s" % self.webapp_name)
 
         archive = FunctionPackage(self.policy_name)
@@ -156,6 +146,19 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
             archive.publish(self.webapp_name)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
+
+
+@execution.register(CONST_AZURE_TIME_TRIGGER_MODE)
+class AzurePeriodicMode(AzureFunctionMode, PullMode):
+    """A policy that runs/executes in azure functions at specified
+    time intervals."""
+    schema = utils.type_schema(CONST_AZURE_TIME_TRIGGER_MODE,
+                               schedule={'type': 'string'},
+                               rinherit=AzureFunctionMode.schema)
+
+    def provision(self):
+        super(AzurePeriodicMode, self).provision()
+        self._publish_functions_package()
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -186,48 +189,10 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def provision(self):
         super(AzureEventGridMode, self).provision()
-
-        self.log.info("Creating Storage Queue")
         session = local_session(self.policy.session_factory)
-
-        #: :type: azure.mgmt.storage.StorageManagementClient
-        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
-        storage_name = self.parameters['storageName']['value']
-        storage_account_keys = storage_client.storage_accounts.list_keys(
-            self.group_name, storage_name)
-
-        storage_account = storage_client.storage_accounts.get_properties(self.group_name, storage_name)
-        queue_service = QueueService(account_name=storage_name, account_key=storage_account_keys.keys[0].value)
-        queue_service.create_queue(self.policy_name)
-
-        destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id, queue_name=self.policy_name)
-
-        self.log.info("Creating Event Grid subscription")
-        event_filter = EventSubscriptionFilter()
-        event_info = EventSubscription(destination=destination, filter=event_filter)
-        scope = '/subscriptions/%s' % session.subscription_id
-
-        #: :type: azure.mgmt.eventgrid.EventGridManagementClient
-        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
-
-        event_subscription = eventgrid_client.event_subscriptions.create_or_update(
-            scope, self.webapp_name, event_info)
-        event_subscription.result()
-        self.log.info('Event Grid subscription creation succeeded')
-
-        self.log.info("Building function package for %s" % self.webapp_name)
-
-        archive = FunctionPackage(self.policy_name)
-        archive.build(self.policy.data)
-        archive.close()
-
-        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
-
-        if archive.wait_for_status(self.webapp_name):
-            archive.publish(self.webapp_name)
-        else:
-            self.log.error("Aborted deployment, ensure Application Service is healthy.")
-
+        storage_account = self._create_storage_queue(session)
+        self._create_event_subscription(storage_account, session)
+        self._publish_functions_package()
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -281,3 +246,36 @@ class AzureEventGridMode(AzureFunctionMode):
             return False
 
         return True
+
+    def _create_storage_queue(self, session):
+        self.log.info("Creating Storage Queue")
+
+        #: :type: azure.mgmt.storage.StorageManagementClient
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_name = self.parameters['storageName']['value']
+        storage_account_keys = storage_client.storage_accounts.list_keys(
+            self.group_name, storage_name)
+
+        storage_account = storage_client.storage_accounts.get_properties(self.group_name, storage_name)
+        queue_service = QueueService(account_name=storage_name, account_key=storage_account_keys.keys[0].value)
+        queue_name = self.webapp_name + '-' + self.policy_name
+        queue_service.create_queue(queue_name)
+
+        return storage_account
+
+    def _create_event_subscription(self, storage_account, session):
+        destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
+                                                               queue_name=self.policy_name)
+
+        self.log.info("Creating Event Grid subscription")
+        event_filter = EventSubscriptionFilter()
+        event_info = EventSubscription(destination=destination, filter=event_filter)
+        scope = '/subscriptions/%s' % session.subscription_id
+
+        #: :type: azure.mgmt.eventgrid.EventGridManagementClient
+        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
+
+        event_subscription = eventgrid_client.event_subscriptions.create_or_update(
+            scope, self.webapp_name, event_info)
+        event_subscription.result()
+        self.log.info('Event Grid subscription creation succeeded')
