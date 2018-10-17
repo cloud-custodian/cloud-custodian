@@ -42,14 +42,6 @@ class FunctionPackage(object):
 
         parent_path = os.path.abspath(os.path.join(__file__, os.pardir))
 
-        extensions_path = os.path.join(parent_path, 'bin')
-        # obj_path = os.path.join(parent_path, 'obj')
-
-        self.pkg.add_file(os.path.join(parent_path, 'extensions.csproj'))
-
-        self.pkg.add_directory(extensions_path)
-        # self.pkg.add_directory(obj_path)
-
         self.pkg.add_contents(dest=self.name + '/__init__.py', contents='')
 
         self._add_host_config()
@@ -62,6 +54,11 @@ class FunctionPackage(object):
 
             self.pkg.add_contents(dest=self.name + '/config.json',
                                   contents=policy_contents)
+
+        if policy['mode']['type'] == CONST_AZURE_EVENT_TRIGGER_MODE:
+            self.pkg.add_file(os.path.join(parent_path, 'extensions.csproj'))
+            extensions_path = os.path.join(parent_path, 'bin')
+            self.pkg.add_directory(extensions_path)
 
     def _add_host_config(self):
         config = \
@@ -109,7 +106,7 @@ class FunctionPackage(object):
             binding['type'] = 'queueTrigger'
             binding['connection'] = 'AzureWebJobsStorage'
             binding['name'] = 'input'
-            binding['queueName'] = self.name
+            binding['queueName'] = self.queueName
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"

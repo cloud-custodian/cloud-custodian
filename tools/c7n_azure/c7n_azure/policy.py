@@ -190,7 +190,7 @@ class AzureEventGridMode(AzureFunctionMode):
     def provision(self):
         super(AzureEventGridMode, self).provision()
         session = local_session(self.policy.session_factory)
-        queue_name = self.webapp_name + '-' + self.policy_name
+        queue_name = self.webapp_name
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
         self._publish_functions_package()
