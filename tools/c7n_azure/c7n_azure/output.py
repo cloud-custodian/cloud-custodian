@@ -62,20 +62,25 @@ class AzureStorageOutput(DirectoryOutput):
 
         # if pyformat is not specified, then use the policy name and a formatted date structure
         if '{' not in output_url:
-            output_url = os.path.join(output_url, self.DEFAULT_BLOB_FOLDER_PREFIX)
+            output_url = self.join(output_url, self.DEFAULT_BLOB_FOLDER_PREFIX)
 
         return output_url.format(**self.get_output_vars())
 
     def upload(self):
         for root, dirs, files in os.walk(self.root_dir):
             for f in files:
-                blob_name = os.path.join(self.file_prefix, root[len(self.root_dir):], f)
+                blob_name = self.join(self.file_prefix, root[len(self.root_dir):], f)
+                blob_name.strip('/')
                 self.blob_service.create_blob_from_path(
                     self.container,
                     blob_name,
                     os.path.join(root, f))
 
                 self.log.debug("%s uploaded" % blob_name)
+
+    @staticmethod
+    def join(*parts):
+        return "/".join([s.strip('/') for s in parts if s != ''])
 
     @staticmethod
     def get_blob_client_wrapper(output_path, ctx):
