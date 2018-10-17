@@ -40,8 +40,6 @@ class FunctionPackage(object):
         self.pkg.add_file(self.function_path,
                           dest=self.name + '/function.py')
 
-        parent_path = os.path.abspath(os.path.join(__file__, os.pardir))
-
         self.pkg.add_contents(dest=self.name + '/__init__.py', contents='')
 
         self._add_host_config()
@@ -56,6 +54,7 @@ class FunctionPackage(object):
                                   contents=policy_contents)
 
         if policy['mode']['type'] == CONST_AZURE_EVENT_TRIGGER_MODE:
+            parent_path = os.path.abspath(os.path.join(__file__, os.pardir))
             self.pkg.add_file(os.path.join(parent_path, 'extensions.csproj'))
             extensions_path = os.path.join(parent_path, 'bin')
             self.pkg.add_directory(extensions_path)
