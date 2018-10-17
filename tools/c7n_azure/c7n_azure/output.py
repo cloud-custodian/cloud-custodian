@@ -60,7 +60,7 @@ class AzureStorageOutput(DirectoryOutput):
 
     def get_output_path(self, output_url):
 
-        # if pyformat is not specified, then use the policy name and a formatted date structure
+        # if pyformat is not specified, then use the policy name and formatted date
         if '{' not in output_url:
             output_url = self.join(output_url, self.DEFAULT_BLOB_FOLDER_PREFIX)
 
