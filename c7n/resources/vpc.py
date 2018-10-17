@@ -987,8 +987,8 @@ class SGPermission(Filter):
             perm_matches = {}
             for idx, f in enumerate(self.vfilters):
                 perm_matches[idx] = bool(f(perm))
-            perm_matches['ports'] = self.process_ports(perm)
-            perm_matches['cidrs'] = self.process_cidrs(perm)
+            perm_matches['ports'] = self.process_ports(perm) or False
+            perm_matches['cidrs'] = self.process_cidrs(perm) or False
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
             perm_match_values = list(filter(
                 lambda x: x is not None, perm_matches.values()))
