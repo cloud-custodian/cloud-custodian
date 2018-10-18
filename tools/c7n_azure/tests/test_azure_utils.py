@@ -153,3 +153,9 @@ class UtilsTest(BaseTest):
                          {k: True for k in range(85, 90)})
         self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Outbound', '*'),
                          {k: True for k in range(80, 90)})
+
+    def test_snake_to_camel(self):
+        self.assertEqual(StringUtils.snake_to_camel(""), "")
+        self.assertEqual(StringUtils.snake_to_camel("test"), "test")
+        self.assertEqual(StringUtils.snake_to_camel("test_abc"), "testAbc")
+        self.assertEqual(StringUtils.snake_to_camel("test_abc_def"), "testAbcDef")

@@ -15,9 +15,10 @@ import collections
 import datetime
 import logging
 import re
-import six
 
+import six
 from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
+from azure.mgmt.web.models import NameValuePair
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
@@ -63,6 +64,11 @@ class StringUtils(object):
 
         return False
 
+    @staticmethod
+    def snake_to_camel(string):
+        components = string.split('_')
+        return components[0] + ''.join(x.title() for x in components[1:])
+
 
 def utcnow():
     """The datetime object for the current time in UTC
@@ -74,6 +80,10 @@ def now(tz=None):
     """The datetime object for the current time in UTC
     """
     return datetime.datetime.now(tz=tz)
+
+
+def azure_name_value_pair(name, value):
+    return NameValuePair(**{'name': name, 'value': value})
 
 
 class Math(object):

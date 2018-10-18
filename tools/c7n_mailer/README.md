@@ -228,12 +228,17 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 #### Standard Azure Functions Config
 
-| Required? | Key                            | Type             |
-|:---------:|:-------------------------------|:-----------------|
-|           | `function_name`                | string           |
-| &#x2705;  | `function_servicePlanName`     | string           |
-|           | `function_location`            | string           |
-|           | `function_appInsightsLocation` | string           |
+| Required? | Key                            | Type             | Notes                                                                 |
+|:---------:|:-------------------------------|:-----------------|:----------------------------------------------------------------------|
+|           | `function_properties`          | object           | Contains `appInsights`, `storageAccount` and `servicePlan` objects    |
+|           | `appInsights`                  | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `storageAccount`               | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `servicePlan`                  | object           | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties      |
+|           | `name`                         | string           | |
+|           | `location`                     | string           | Default: `west us 2`|
+|           | `resource_group_name`          | string           | Default `cloud-custodian`|
+|           | `skuTier`                      | string           | Default: `Basic` |
+|           | `skuName`                      | string           | Default: `B1`    |
 
 
 
@@ -423,7 +428,19 @@ where `mailer.yml` may look like:
 queue_url: asq://storage.queue.core.windows.net/custodian
 from_address: foo@mail.com
 sendgrid_api_key: <key>
-function_servicePlanName: mycustodianfunctions
+function_properties:
+  servicePlan:
+    name: 'testmailer1'
+    resourceGroupName: 'custodianmailer1'
+    skuTier: Basic
+    skuName: B1
+    location: WestUS2
+storageAccount:
+    name: 'testmaileraccount1'
+    resourceGroupName: 'custodianmailer1'
+  storageAccount:
+    name: 'testmaileraccount1'
+    resourceGroupName: 'custodianmailer1'
 ```
 
 ## Writing an email template

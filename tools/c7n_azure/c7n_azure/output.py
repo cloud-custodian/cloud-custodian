@@ -16,7 +16,6 @@ Provides output support for Azure Blob Storage using
 the 'azure://' prefix
 
 """
-import datetime
 import logging
 import os
 import shutil
@@ -40,15 +39,15 @@ class AzureStorageOutput(DirectoryOutput):
 
     """
 
+    DEFAULT_BLOB_FOLDER_PREFIX = '{policy}/{now:%Y/%m/%d/%H/}'
+
     def __init__(self, ctx, config=None):
         super(AzureStorageOutput, self).__init__(ctx, config)
         self.log = logging.getLogger('custodian.output')
-
-        # folder structure Year/Month/Day/Hour/Second
-        self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H/%M/%S')
         self.root_dir = tempfile.mkdtemp()
+        self.output_dir = self.get_output_path(self.ctx.options.output_dir)
         self.blob_service, self.container, self.file_prefix = \
-            self.get_blob_client_wrapper(self.ctx.options.output_dir, ctx)
+            self.get_blob_client_wrapper(self.output_dir, ctx)
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if exc_type is not None:
@@ -59,21 +58,29 @@ class AzureStorageOutput(DirectoryOutput):
         shutil.rmtree(self.root_dir)
         self.log.debug("Policy Logs uploaded")
 
+    def get_output_path(self, output_url):
+
+        # if pyformat is not specified, then use the policy name and formatted date
+        if '{' not in output_url:
+            output_url = self.join(output_url, self.DEFAULT_BLOB_FOLDER_PREFIX)
+
+        return output_url.format(**self.get_output_vars())
+
     def upload(self):
         for root, dirs, files in os.walk(self.root_dir):
             for f in files:
-                blob_name = "%s/%s%s" % (
-                    self.file_prefix,
-                    self.date_path,
-                    "%s/%s" % (
-                        root[len(self.root_dir):], f))
-                blob_name = blob_name.strip('/')
+                blob_name = self.join(self.file_prefix, root[len(self.root_dir):], f)
+                blob_name.strip('/')
                 self.blob_service.create_blob_from_path(
                     self.container,
                     blob_name,
                     os.path.join(root, f))
 
                 self.log.debug("%s uploaded" % blob_name)
+
+    @staticmethod
+    def join(*parts):
+        return "/".join([s.strip('/') for s in parts if s != ''])
 
     @staticmethod
     def get_blob_client_wrapper(output_path, ctx):

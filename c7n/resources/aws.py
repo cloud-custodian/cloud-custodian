@@ -358,7 +358,6 @@ class S3Output(DirectoryOutput):
         if exc_type is not None:
             log.exception("Error while executing policy")
         log.debug("Uploading policy logs")
-        self.leave_log()
         self.compress()
         self.transfer = S3Transfer(
             self.ctx.session_factory(assume=False).client('s3'))

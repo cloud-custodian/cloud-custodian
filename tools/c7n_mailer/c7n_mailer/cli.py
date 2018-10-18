@@ -37,10 +37,47 @@ CONFIG_SCHEMA = {
         'lambda_schedule': {'type': 'string'},
 
         # Azure Function Config
-        'function_name': {'type': 'string'},
-        'function_servicePlanName': {'type': 'string'},
-        'function_location': {'type': 'string'},
-        'function_appInsightsLocation': {'type': 'string'},
+        'function_properties': {
+            'type': 'object',
+            'appInsights': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'storageAccount': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'servicePlan': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string',
+                            'skuTier': 'string',
+                            'skuName': 'string'}
+                     }
+                ]
+            },
+        },
         'function_schedule': {'type': 'string'},
         'function_skuCode': {'type': 'string'},
         'function_sku': {'type': 'string'},

@@ -90,7 +90,7 @@ class FunctionPackage(object):
         self.pkg.add_directory(bin_path)
         self.pkg.add_file(os.path.join(bindings_dir_path, 'extensions.csproj'))
 
-    def get_function_config(self, policy):
+    def get_function_config(self, policy, function_app):
         config = \
             {
                 "scriptFile": "function.py",
@@ -111,7 +111,7 @@ class FunctionPackage(object):
             binding['type'] = 'queueTrigger'
             binding['connection'] = 'AzureWebJobsStorage'
             binding['name'] = 'input'
-            binding['queueName'] = self.name
+            binding['queueName'] = function_app
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"
@@ -139,20 +139,20 @@ class FunctionPackage(object):
                     self.pkg.add_file(os.path.join(site_pkg, so_file))
 
             self.pkg.add_directory(os.path.join(site_pkg, '.libs_cffi_backend'))
-        #
-        # # MacOS
-        # elif platform == "darwin":
-        #     raise NotImplementedError('Cannot package Azure Function in MacOS host OS, '
-        #                               'please use linux.')
-        # # Windows
-        # elif platform == "win32":
-        #     raise NotImplementedError('Cannot package Azure Function in Windows host OS, '
-        #                               'please use linux or WSL.')
+
+        # MacOS
+        elif platform == "darwin":
+            raise NotImplementedError('Cannot package Azure Function in MacOS host OS, '
+                                      'please use linux.')
+        # Windows
+        elif platform == "win32":
+            raise NotImplementedError('Cannot package Azure Function in Windows host OS, '
+                                      'please use linux or WSL.')
 
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
 
-    def build(self, policy, entry_point=None, extra_modules=None):
+    def build(self, policy, function_app, entry_point=None, extra_modules=None):
         # Get dependencies for azure entry point
         entry_point = entry_point or \
             os.path.join(os.path.dirname(os.path.realpath(__file__)), 'entry.py')
@@ -173,7 +173,7 @@ class FunctionPackage(object):
         self.pkg.add_modules(lambda f: f == 'azure/__init__.py', 'azure')
 
         # add config and policy
-        self._add_functions_required_files(policy)
+        self._add_functions_required_files(policy, function_app)
 
         # generate and add auth
         s = local_session(Session)
