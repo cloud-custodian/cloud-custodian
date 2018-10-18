@@ -1,0 +1,80 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "cloud-custodian test SG", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 80, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 80, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 0, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.2.0.0/16"
+                            }
+                        ], 
+                        "ToPort": 62000, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 443, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 443, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "c7n-only-ports-and-cidr-test", 
+                "VpcId": "vpc-007084954cd5c3c96", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-02a60363e2b087ff8"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "519b2842-0a87-4c39-a4a2-5733c526846e", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "vary": "Accept-Encoding", 
+                "date": "Thu, 18 Oct 2018 11:59:59 GMT", 
+                "server": "AmazonEC2"
+            }
+        }
+    }
+}
