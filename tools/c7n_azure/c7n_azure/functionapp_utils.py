@@ -16,7 +16,8 @@ import os
 import logging
 from binascii import hexlify
 
-from azure.mgmt.web.models import (Site, SiteConfig, NameValuePair)
+from azure.mgmt.web.models import (Site, SiteConfig)
+from c7n_azure.utils import azure_name_value_pair
 from c7n_azure.session import Session
 from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
 
@@ -47,21 +48,21 @@ class FunctionAppUtilities(object):
         site_config.always_on = True
 
         app_insights_key = self.get_application_insights_key(group_name,
-                                                             service_plan.app_service_plan_name)
+                                                             service_plan.name)
 
         if app_insights_key:
             site_config.app_settings.append(
-                NameValuePair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
+                azure_name_value_pair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
 
         con_string = self.get_storage_connection_string(group_name, storage_account_name)
-        site_config.app_settings.append(NameValuePair('AzureWebJobsStorage', con_string))
-        site_config.app_settings.append(NameValuePair('AzureWebJobsDashboard', con_string))
-        site_config.app_settings.append(NameValuePair('FUNCTIONS_EXTENSION_VERSION',
+        site_config.app_settings.append(azure_name_value_pair('AzureWebJobsStorage', con_string))
+        site_config.app_settings.append(azure_name_value_pair('AzureWebJobsDashboard', con_string))
+        site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_EXTENSION_VERSION',
                                                       CONST_FUNCTIONS_EXT_VERSION))
-        site_config.app_settings.append(NameValuePair('FUNCTIONS_WORKER_RUNTIME', 'python'))
+        site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_WORKER_RUNTIME', 'python'))
         site_config.app_settings.append(
-            NameValuePair('MACHINEKEY_DecryptionKey',
-                          FunctionAppUtilities.generate_machine_decryption_key()))
+            azure_name_value_pair('MACHINEKEY_DecryptionKey',
+                                  FunctionAppUtilities.generate_machine_decryption_key()))
 
         #: :type: azure.mgmt.web.WebSiteManagementClient
         web_client = self.local_session.client('azure.mgmt.web.WebSiteManagementClient')
