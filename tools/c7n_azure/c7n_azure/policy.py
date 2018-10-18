@@ -144,8 +144,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         FunctionAppUtilities().deploy_dedicated_function_app(params)
 
-        self._publish_functions_package()
-
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
         raise NotImplementedError("subclass responsibility")
@@ -274,10 +272,11 @@ class AzureEventGridMode(AzureFunctionMode):
         storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
 
         storage_name = self.storage_account['name']
+        group_name = self.storage_account['resource_group_name']
         storage_account_keys = storage_client.storage_accounts.list_keys(
-            self.storage_account['resourceGroupName'], storage_name)
+            group_name, storage_name)
 
-        storage_account = storage_client.storage_accounts.get_properties(self.group_name, storage_name)
+        storage_account = storage_client.storage_accounts.get_properties(group_name, storage_name)
         queue_service = QueueService(account_name=storage_name, account_key=storage_account_keys.keys[0].value)
         queue_service.create_queue(queue_name)
         self.log.info("Storage Queue creation succeeded")
