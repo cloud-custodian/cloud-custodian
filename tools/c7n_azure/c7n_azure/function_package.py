@@ -18,6 +18,7 @@ import logging
 import os
 import sys
 import time
+import tempfile
 
 import requests
 from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE
@@ -54,10 +55,7 @@ class FunctionPackage(object):
                                   contents=policy_contents)
 
         if policy['mode']['type'] == CONST_AZURE_EVENT_TRIGGER_MODE:
-            parent_path = os.path.abspath(os.path.join(__file__, os.pardir))
-            self.pkg.add_file(os.path.join(parent_path, 'extensions.csproj'))
-            extensions_path = os.path.join(parent_path, 'bin')
-            self.pkg.add_directory(extensions_path)
+            self._add_queue_binding_extensions()
 
     def _add_host_config(self):
         config = \
@@ -84,6 +82,14 @@ class FunctionPackage(object):
             }
         self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
 
+    def _add_queue_binding_extensions(self):
+        bindings_dir_path = os.path.abspath(
+            os.path.join(os.path.join(__file__, os.pardir), 'function_binding_resources'))
+        bin_path = os.path.join(bindings_dir_path, 'bin')
+
+        self.pkg.add_directory(bin_path)
+        self.pkg.add_file(os.path.join(bindings_dir_path, 'extensions.csproj'))
+
     def get_function_config(self, policy):
         config = \
             {
@@ -105,7 +111,7 @@ class FunctionPackage(object):
             binding['type'] = 'queueTrigger'
             binding['connection'] = 'AzureWebJobsStorage'
             binding['name'] = 'input'
-            binding['queueName'] = self.queueName
+            binding['queueName'] = self.name
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"

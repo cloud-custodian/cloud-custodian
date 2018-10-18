@@ -12,22 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
-import time
 
-import requests
+from azure.mgmt.eventgrid.models import (StorageQueueEventSubscriptionDestination)
 from azure.storage.queue import QueueService
-from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
-                                         StorageQueueEventSubscriptionDestination)
-from c7n_azure.azure_events import AzureEvents
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
-                                 CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
-                                 CONST_AZURE_FUNCTION_KEY_URL)
+                                 CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.template_utils import TemplateUtilities
-from msrestazure.azure_exceptions import CloudError
 
 from c7n import utils
 from c7n.actions import EventAction
@@ -249,8 +243,7 @@ class AzureEventGridMode(AzureFunctionMode):
         return True
 
     def _create_storage_queue(self, queue_name, session):
-        self.log.info("Creating Storage Queue")
-
+        self.log.info("Creating storage queue")
         #: :type: azure.mgmt.storage.StorageManagementClient
         storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
         storage_name = self.parameters['storageName']['value']
@@ -260,6 +253,7 @@ class AzureEventGridMode(AzureFunctionMode):
         storage_account = storage_client.storage_accounts.get_properties(self.group_name, storage_name)
         queue_service = QueueService(account_name=storage_name, account_key=storage_account_keys.keys[0].value)
         queue_service.create_queue(queue_name)
+        self.log.info("Storage Queue creation succeeded")
 
         return storage_account
 
@@ -267,15 +261,5 @@ class AzureEventGridMode(AzureFunctionMode):
         destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
                                                                queue_name=queue_name)
 
-        self.log.info("Creating Event Grid subscription")
-        event_filter = EventSubscriptionFilter()
-        event_info = EventSubscription(destination=destination, filter=event_filter)
-        scope = '/subscriptions/%s' % session.subscription_id
-
-        #: :type: azure.mgmt.eventgrid.EventGridManagementClient
-        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
-
-        event_subscription = eventgrid_client.event_subscriptions.create_or_update(
-            scope, self.webapp_name, event_info)
-        event_subscription.result()
+        AzureEventSubscription.create(destination, queue_name, session)
         self.log.info('Event Grid subscription creation succeeded')
