@@ -40,6 +40,7 @@ from c7n.policy import PolicyCollection
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_resources
 from c7n.manager import resources as resource_registry
+from c7n.output import blob_outputs
 from c7n.utils import CONN_CACHE, dumps
 
 from c7n_org.utils import environ, account_tags
@@ -220,9 +221,10 @@ def filter_policies(policies_config, tags, policies, resource, not_policies=None
     policies_config['policies'] = filtered_policies
 
 
-def report_account(account, region, policies_config, output_path, debug):
-    cache_path = os.path.join(output_path, "c7n.cache")
+def report_account(account, region, policies_config, output_path, cache_path, debug):
     output_path = os.path.join(output_path, account['name'], region)
+    cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['name'], region))
+
     config = Config.empty(
         region=region,
         output_dir=output_path,
@@ -273,9 +275,10 @@ def report_account(account, region, policies_config, output_path, debug):
               multiple=True, default=None, help="Policy tag filter")
 @click.option('--format', default='csv', type=click.Choice(['csv', 'json']))
 @click.option('--resource', default=None)
+@click.option('--cache-path', required=False, type=click.Path(), default="~/.cache/c7n-org")
 def report(config, output, use, output_dir, accounts,
            field, no_default_fields, tags, region, debug, verbose,
-           policy, policy_tags, format, resource):
+           policy, policy_tags, format, resource, cache_path):
     """report on a cross account policy execution."""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy,
@@ -299,6 +302,7 @@ def report(config, output, use, output_dir, accounts,
                     a, r,
                     custodian_config,
                     output_dir,
+                    cache_path,
                     debug)] = (a, r)
 
         for f in as_completed(futures):
@@ -440,23 +444,22 @@ def accounts_iterator(config):
 
 
 def run_account(account, region, policies_config, output_path,
-                cache_period, metrics, dryrun, debug):
+                cache_period, cache_path, metrics, dryrun, debug):
     """Execute a set of policies on an account.
     """
     logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
     CONN_CACHE.session = None
     CONN_CACHE.time = None
-    output_path = os.path.join(output_path, account['name'], region)
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
 
-    cache_path = os.path.join(output_path, "c7n.cache")
+    output_path = os.path.join(output_path, account['name'], region)
+    cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['name'], region))
 
     config = Config.empty(
-        region=region,
+        region=region, cache_path=cache_path,
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
-        cache=cache_path, log_group=None, profile=None, external_id=None)
+        log_group=None, profile=None, external_id=None)
+
     if account.get('role'):
         config['assume_role'] = account['role']
         config['external_id'] = account.get('external_id')
@@ -519,12 +522,13 @@ def run_account(account, region, policies_config, output_path,
 @click.option('-l', '--policytags', 'policy_tags',
               multiple=True, default=None, help="Policy tag filter")
 @click.option('--cache-period', default=15, type=int)
+@click.option('--cache-path', required=False, type=click.Path(), default="~/.cache/c7n-org")
 @click.option("--metrics", default=False, is_flag=True)
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, tags,
-        region, policy, policy_tags, cache_period, metrics, dryrun, debug, verbose):
+def run(config, use, output_dir, accounts, tags, region,
+            policy, policy_tags, cache_period, cache_path, metrics, dryrun, debug, verbose):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
@@ -539,6 +543,7 @@ def run(config, use, output_dir, accounts, tags,
                     custodian_config,
                     output_dir,
                     cache_period,
+                    cache_path,
                     metrics,
                     dryrun,
                     debug)] = (a, r)
