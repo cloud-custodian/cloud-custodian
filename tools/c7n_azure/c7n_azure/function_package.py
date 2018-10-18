@@ -37,7 +37,7 @@ class FunctionPackage(object):
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
 
-    def _add_functions_required_files(self, policy):
+    def _add_functions_required_files(self, policy, function_app):
         self.pkg.add_file(self.function_path,
                           dest=self.name + '/function.py')
 
@@ -46,7 +46,7 @@ class FunctionPackage(object):
         self._add_host_config()
 
         if policy:
-            config_contents = self.get_function_config(policy)
+            config_contents = self.get_function_config(policy, function_app)
             policy_contents = self._get_policy(policy)
             self.pkg.add_contents(dest=self.name + '/function.json',
                                   contents=config_contents)
