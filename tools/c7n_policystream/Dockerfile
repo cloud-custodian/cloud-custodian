@@ -1,4 +1,5 @@
 FROM ubuntu:cosmic
+MAINTAINER Kapil Thangavelu http://twitter.com/kapilvt
 
 ADD . /src
 WORKDIR /src
