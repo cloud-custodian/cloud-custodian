@@ -1,0 +1,6 @@
+click
+boto3
+requests
+c7n
+pygit2
+pyyaml
