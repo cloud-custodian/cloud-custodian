@@ -277,7 +277,8 @@ class AzureEventGridMode(AzureFunctionMode):
             group_name, storage_name)
 
         storage_account = storage_client.storage_accounts.get_properties(group_name, storage_name)
-        queue_service = QueueService(account_name=storage_name, account_key=storage_account_keys.keys[0].value)
+        queue_service = QueueService(account_name=storage_name,
+                                     account_key=storage_account_keys.keys[0].value)
         queue_service.create_queue(queue_name)
         self.log.info("Storage Queue creation succeeded")
 
