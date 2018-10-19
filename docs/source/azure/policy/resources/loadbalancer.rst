@@ -48,7 +48,7 @@ This policy will find all load balancers with 1000 or less transmitted packets o
         filters:
           - type: metric
             metric: PacketCount
-            op: ge
+            op: le
             aggregation: total
             threshold: 1000
             timeframe: 72

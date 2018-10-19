@@ -43,7 +43,7 @@ keys:
   - skuTier (default: Basic)
   - skuName (default: B1)
 - storageAccount
-  - name (default: custodianstorageaccount)
+  - name (default: cloudcustodian + sha256(resourceGroupName+subscription_id)[:8])
   - location (default: servicePlan location)
   - resourceGroupName (default: servicePlan resource group)
 - appInsights

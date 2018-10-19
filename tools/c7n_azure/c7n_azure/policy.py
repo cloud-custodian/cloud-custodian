@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import logging
 
 import six
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
-
 from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
@@ -85,7 +85,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
+    default_storage_name = "cloudcustodian"
+
     def __init__(self, policy):
+
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
 
@@ -103,9 +106,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         location = self.service_plan.get('location', 'westus2')
         rg_name = self.service_plan['resource_group_name']
+
         self.storage_account = AzureFunctionMode.extract_properties(provision_options,
                                                         'storageAccount',
-                                                        {'name': 'custodianstorageaccount',
+                                                        {'name': self.default_storage_name,
                                                          'location': location,
                                                          'resource_group_name': rg_name})
 
@@ -137,6 +141,17 @@ class AzureFunctionMode(ServerlessExecutionMode):
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
+
+        # If storage account name is not provided, we'll try to make it unique using
+        # resource group name & subscription id values.
+        # Can't be a part of constructor because local_session is not working with
+        # custodian validate.
+        if self.storage_account['name'] == self.default_storage_name:
+            rg_name = self.storage_account['resource_group_name']
+            sub_id = local_session(self.policy.session_factory).get_subscription_id()
+            suffix = hashlib.sha256(bytes(rg_name + sub_id, 'utf-8')).hexdigest().lower()[:8]
+            self.storage_account['name'] = self.default_storage_name + suffix
+
         params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights=self.app_insights,
             service_plan=self.service_plan,
