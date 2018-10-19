@@ -53,8 +53,8 @@ class FunctionPackage(object):
             self.pkg.add_contents(dest=self.name + '/config.json',
                                   contents=policy_contents)
 
-        if policy['mode']['type'] == CONST_AZURE_EVENT_TRIGGER_MODE:
-            self._add_queue_binding_extensions()
+            if policy['mode']['type'] == CONST_AZURE_EVENT_TRIGGER_MODE:
+                self._add_queue_binding_extensions()
 
     def _add_host_config(self):
         config = \

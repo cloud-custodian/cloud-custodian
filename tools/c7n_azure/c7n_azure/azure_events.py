@@ -153,8 +153,6 @@ class AzureEventSubscription(object):
         event_info = EventSubscription(destination=destination, filter=event_filter)
         scope = '/subscriptions/%s' % s.subscription_id
 
-        #: :type: azure.mgmt.eventgrid.EventGridManagementClient
-        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
-        event_subscription = eventgrid_client.event_subscriptions.create_or_update(
-            scope, name, event_info)
-        event_subscription.result()
+        client = s.client('azure.mgmt.eventgrid.EventGridManagementClient')
+        event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)
+        return event_subscription.result()

@@ -15,13 +15,14 @@
 import logging
 
 import six
-from azure.mgmt.eventgrid.models import (StorageQueueEventSubscriptionDestination)
-from azure.storage.queue import QueueService
+from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
+
 from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
@@ -268,18 +269,11 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def _create_storage_queue(self, queue_name, session):
         self.log.info("Creating storage queue")
-        #: :type: azure.mgmt.storage.StorageManagementClient
         storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_account = storage_client.storage_accounts.get_properties(
+            self.storage_account['resource_group_name'], self.storage_account['name'])
 
-        storage_name = self.storage_account['name']
-        group_name = self.storage_account['resource_group_name']
-        storage_account_keys = storage_client.storage_accounts.list_keys(
-            group_name, storage_name)
-
-        storage_account = storage_client.storage_accounts.get_properties(group_name, storage_name)
-        queue_service = QueueService(account_name=storage_name,
-                                     account_key=storage_account_keys.keys[0].value)
-        queue_service.create_queue(queue_name)
+        StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
         self.log.info("Storage Queue creation succeeded")
 
         return storage_account
