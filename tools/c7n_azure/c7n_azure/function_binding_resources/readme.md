@@ -4,5 +4,5 @@ Azure functions storage queue binding support requires installing the dotnet sto
 
 To update the files ensure [dotnet is installed](https://www.microsoft.com/net/download) on your local machine. Then run the following command:
 
-`dotnet build tools\c7n_azure\c7n_azure\function_binding_resources\extensions.csproj --configureation Release`
+`dotnet build tools\c7n_azure\c7n_azure\function_binding_resources\extensions.csproj --configuration Release --output tools\c7n_azure\c7n_azure\function_binding_resources\extensions\bin`
  

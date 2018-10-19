@@ -18,7 +18,6 @@ import logging
 import os
 import sys
 import time
-import tempfile
 
 import requests
 from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE
