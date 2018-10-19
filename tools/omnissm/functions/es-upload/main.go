@@ -54,7 +54,6 @@ type snsEvent struct {
 
 type record struct {
 	Records []s3Event `json:"Records"`
-	// Records []map[string]interface{} `json:"Records"`
 }
 type s3Event struct {
 	AwsRegion   string `json:"awsRegion"`
