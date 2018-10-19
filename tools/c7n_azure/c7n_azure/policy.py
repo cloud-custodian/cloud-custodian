@@ -151,11 +151,11 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def validate(self):
         """Validate configuration settings for execution mode."""
 
-    def _publish_functions_package(self):
+    def _publish_functions_package(self, queue_name=None):
         self.log.info("Building function package for %s" % self.functionapp_name)
 
         archive = FunctionPackage(self.policy_name)
-        archive.build(self.policy.data, self.functionapp_name)
+        archive.build(self.policy.data, queue_name=queue_name)
         archive.close()
 
         self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
@@ -211,7 +211,7 @@ class AzureEventGridMode(AzureFunctionMode):
         queue_name = self.functionapp_name
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
-        self._publish_functions_package()
+        self._publish_functions_package(queue_name)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""

@@ -36,7 +36,7 @@ class FunctionPackage(object):
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
 
-    def _add_functions_required_files(self, policy, function_app):
+    def _add_functions_required_files(self, policy, queue_name=None):
         self.pkg.add_file(self.function_path,
                           dest=self.name + '/function.py')
 
@@ -45,7 +45,7 @@ class FunctionPackage(object):
         self._add_host_config()
 
         if policy:
-            config_contents = self.get_function_config(policy, function_app)
+            config_contents = self.get_function_config(policy, queue_name)
             policy_contents = self._get_policy(policy)
             self.pkg.add_contents(dest=self.name + '/function.json',
                                   contents=config_contents)
@@ -89,7 +89,7 @@ class FunctionPackage(object):
         self.pkg.add_directory(bin_path)
         self.pkg.add_file(os.path.join(bindings_dir_path, 'extensions.csproj'))
 
-    def get_function_config(self, policy, function_app):
+    def get_function_config(self, policy, queue_name=None):
         config = \
             {
                 "scriptFile": "function.py",
@@ -110,7 +110,7 @@ class FunctionPackage(object):
             binding['type'] = 'queueTrigger'
             binding['connection'] = 'AzureWebJobsStorage'
             binding['name'] = 'input'
-            binding['queueName'] = function_app
+            binding['queueName'] = queue_name
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"
@@ -151,7 +151,7 @@ class FunctionPackage(object):
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
 
-    def build(self, policy, function_app, entry_point=None, extra_modules=None):
+    def build(self, policy, queue_name=None, entry_point=None, extra_modules=None):
         # Get dependencies for azure entry point
         entry_point = entry_point or \
             os.path.join(os.path.dirname(os.path.realpath(__file__)), 'entry.py')
@@ -172,7 +172,7 @@ class FunctionPackage(object):
         self.pkg.add_modules(lambda f: f == 'azure/__init__.py', 'azure')
 
         # add config and policy
-        self._add_functions_required_files(policy, function_app)
+        self._add_functions_required_files(policy, queue_name)
 
         # generate and add auth
         s = local_session(Session)
