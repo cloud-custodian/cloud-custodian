@@ -15,6 +15,8 @@ pytest>=3.2.1
 pytest-xdist>=1.2.0
 pytest-cov
 tox
+psutil
+aws_xray_sdk
 
 # Local package required for Sphinx docs
 -e tools/c7n_sphinxext

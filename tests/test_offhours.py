@@ -17,49 +17,13 @@ import datetime
 import json
 import os
 
-from dateutil import zoneinfo
-
-from mock import mock
+from dateutil import tz as tzutil
 
 from .common import BaseTest, instance
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.offhours import OffHour, OnHour, ScheduleParser, Time
-
-
-# Per http://blog.xelnor.net/python-mocking-datetime/
-# naive implementation has issues with pypy
-
-real_datetime_class = datetime.datetime
-
-
-def mock_datetime_now(tgt, dt):
-
-    class DatetimeSubclassMeta(type):
-
-        @classmethod
-        def __instancecheck__(mcs, obj):
-            return isinstance(obj, real_datetime_class)
-
-    class BaseMockedDatetime(real_datetime_class):
-        target = tgt
-
-        @classmethod
-        def now(cls, tz=None):
-            return cls.target.replace(tzinfo=tz)
-
-        @classmethod
-        def utcnow(cls):
-            return cls.target
-
-        # Python2 & Python3 compatible metaclass
-
-    MockedDatetime = DatetimeSubclassMeta(
-        b"datetime" if str is bytes else "datetime",  # hack Python2/3 port
-        (BaseMockedDatetime,),
-        {},
-    )
-    return mock.patch.object(dt, "datetime", MockedDatetime)
+from c7n.testing import mock_datetime_now
 
 
 class OffHoursFilterTest(BaseTest):
@@ -67,7 +31,7 @@ class OffHoursFilterTest(BaseTest):
 
     def test_offhours_records(self):
         session_factory = self.replay_flight_data("test_offhours_records")
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=8, day=14, hour=19, minute=00)
 
         with mock_datetime_now(t, datetime):
@@ -146,7 +110,7 @@ class OffHoursFilterTest(BaseTest):
             day=1,
             hour=19,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         with mock_datetime_now(t, datetime):
             self.assertEqual(
@@ -162,7 +126,7 @@ class OffHoursFilterTest(BaseTest):
             day=1,
             hour=19,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         f = OffHour({"opt-out": True})
 
@@ -191,7 +155,7 @@ class OffHoursFilterTest(BaseTest):
             day=1,
             hour=19,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         f = OffHour({})
 
@@ -206,7 +170,7 @@ class OffHoursFilterTest(BaseTest):
             day=1,
             hour=7,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         f = OnHour({})
 
@@ -223,7 +187,7 @@ class OffHoursFilterTest(BaseTest):
             day=1,
             hour=hour,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])
         f = OnHour({"skew": 1})
@@ -236,7 +200,7 @@ class OffHoursFilterTest(BaseTest):
         self.assertEqual(results, [True, True, False, False])
 
     def test_resource_schedule_error(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2015, month=12, day=1, hour=19, minute=5)
         f = OffHour({})
         f.process_resource_schedule = lambda: False
@@ -326,7 +290,7 @@ class OffHoursFilterTest(BaseTest):
         self.assertEqual(results, [True, False, False, True])
 
     def test_current_time_test(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2015, month=12, day=1, hour=19, minute=5)
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])
@@ -335,13 +299,13 @@ class OffHoursFilterTest(BaseTest):
             self.assertEqual(p, "tz=est")
             tz = f.get_tz("est")
             self.assertTrue(
-                str(tz) in ("tzfile('US/Eastern')", "tzfile('America/New_York')")
-            )
+                'America/New_York' in str(tz) or
+                'US/Eastern' in str(tz))
             self.assertEqual(datetime.datetime.now(tz), t)
             self.assertEqual(t.hour, 19)
 
     def test_offhours_real_world_values(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2015, month=12, day=1, hour=19, minute=5)
         with mock_datetime_now(t, datetime):
             results = [
@@ -375,7 +339,7 @@ class OffHoursFilterTest(BaseTest):
             day=1,
             hour=19,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])
@@ -388,7 +352,7 @@ class OffHoursFilterTest(BaseTest):
             day=1,
             hour=7,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])
@@ -400,7 +364,7 @@ class OffHoursFilterTest(BaseTest):
         self.assertEqual(OffHour({})(i), False)
 
     def test_custom_offhours(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=19, minute=00)
         results = []
 
@@ -427,7 +391,7 @@ class OffHoursFilterTest(BaseTest):
             self.assertEqual(results, [True, False])
 
     def test_custom_onhours(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
         results = []
 
@@ -454,7 +418,7 @@ class OffHoursFilterTest(BaseTest):
             self.assertEqual(results, [True, False])
 
     def test_arizona_tz(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
         with mock_datetime_now(t, datetime):
             i = instance(
@@ -472,7 +436,7 @@ class OffHoursFilterTest(BaseTest):
             self.assertEqual(OnHour({})(i), False)
 
     def test_custom_bad_tz(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
         with mock_datetime_now(t, datetime):
             i = instance(
@@ -490,7 +454,7 @@ class OffHoursFilterTest(BaseTest):
             self.assertEqual(OnHour({})(i), False)
 
     def test_custom_bad_hours(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=19, minute=00)
         # default error handling is to exclude the resource
 
@@ -521,17 +485,17 @@ class OffHoursFilterTest(BaseTest):
             self.assertEqual(OffHour({})(i), False)
 
     def test_tz_only(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])
             self.assertEqual(OnHour({})(i), True)
 
     def test_tz_long_form_resolve(self):
-        pacific = zoneinfo.gettz("America/Los_Angeles")
-        nzt = zoneinfo.gettz("Pacific/Auckland")
-        gmt = zoneinfo.gettz("Etc/GMT")
-        easter_island = zoneinfo.gettz("Chile/EasterIsland")
+        pacific = tzutil.gettz("America/Los_Angeles")
+        nzt = tzutil.gettz("Pacific/Auckland")
+        gmt = tzutil.gettz("Etc/GMT")
+        easter_island = tzutil.gettz("Chile/EasterIsland")
         self.assertEqual(
             OnHour({}).get_tz('america/los_angeles'),
             pacific)
@@ -549,14 +513,14 @@ class OffHoursFilterTest(BaseTest):
             easter_island)
 
     def test_empty_tag(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": ""}])
             self.assertEqual(OnHour({})(i), True)
 
     def test_on_tag(self):
-        t = datetime.datetime.now(zoneinfo.gettz("America/New_York"))
+        t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": "on"}])
@@ -676,7 +640,7 @@ class ScheduleParserTest(BaseTest):
             day=1,
             hour=19,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])
@@ -694,7 +658,7 @@ class ScheduleParserTest(BaseTest):
             day=1,
             hour=7,
             minute=5,
-            tzinfo=zoneinfo.gettz("America/New_York"),
+            tzinfo=tzutil.gettz("America/New_York"),
         )
         with mock_datetime_now(t, datetime):
             i = instance(Tags=[{"Key": "maid_offhours", "Value": "tz=est"}])

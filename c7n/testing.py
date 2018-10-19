@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import datetime
 import io
 import logging
 import os
@@ -21,13 +22,15 @@ import shutil
 import tempfile
 import unittest
 
+
+import mock
 import six
 import yaml
 
 from c7n import policy
 from c7n.schema import validate as schema_validate
 from c7n.ctx import ExecutionContext
-from c7n.utils import CONN_CACHE
+from c7n.utils import reset_session_cache
 from c7n.config import Bag, Config
 
 C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
@@ -54,7 +57,7 @@ class TestUtils(unittest.TestCase):
 
     def cleanUp(self):
         # Clear out thread local session cache
-        CONN_CACHE.session = None
+        reset_session_cache()
 
     def write_policy_file(self, policy, format="yaml"):
         """ Write a policy file to disk in the specified format.
@@ -83,8 +86,8 @@ class TestUtils(unittest.TestCase):
             self.context_output_dir = self.get_temp_dir()
             config = Config.empty(output_dir=self.context_output_dir)
         ctx = ExecutionContext(
-            session_factory, policy or Bag({"name": "test-policy"}), config
-        )
+            session_factory, policy or Bag({
+                "name": "test-policy", "provider_name": "aws"}), config)
         return ctx
 
     def load_policy(
@@ -197,3 +200,38 @@ class TextTestIO(io.StringIO):
         if not isinstance(b, six.text_type):
             b = b.decode("utf8")
         return super(TextTestIO, self).write(b)
+
+
+# Per http://blog.xelnor.net/python-mocking-datetime/
+# naive implementation has issues with pypy
+
+real_datetime_class = datetime.datetime
+
+
+def mock_datetime_now(tgt, dt):
+
+    class DatetimeSubclassMeta(type):
+
+        @classmethod
+        def __instancecheck__(mcs, obj):
+            return isinstance(obj, real_datetime_class)
+
+    class BaseMockedDatetime(real_datetime_class):
+        target = tgt
+
+        @classmethod
+        def now(cls, tz=None):
+            return cls.target.replace(tzinfo=tz)
+
+        @classmethod
+        def utcnow(cls):
+            return cls.target
+
+        # Python2 & Python3 compatible metaclass
+
+    MockedDatetime = DatetimeSubclassMeta(
+        b"datetime" if str is bytes else "datetime",  # hack Python2/3 port
+        (BaseMockedDatetime,),
+        {},
+    )
+    return mock.patch.object(dt, "datetime", MockedDatetime)

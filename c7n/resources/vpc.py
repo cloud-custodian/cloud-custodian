@@ -907,6 +907,8 @@ class SGPermission(Filter):
                     only_found = True
             if self.only_ports and not only_found:
                 found = found is None or found and True or False
+            if self.only_ports and only_found:
+                found = False
         return found
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):

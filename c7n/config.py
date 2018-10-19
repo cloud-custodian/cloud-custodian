@@ -34,12 +34,14 @@ class Config(Bag):
         d = {}
         d.update({
             'region': os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
+            'regions': (),
             'cache': '',
             'profile': None,
             'account_id': None,
             'assume_role': None,
             'external_id': None,
             'log_group': None,
+            'tracer': 'default',
             'metrics_enabled': False,
             'output_dir': '',
             'cache_period': 0,

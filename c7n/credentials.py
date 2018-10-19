@@ -38,6 +38,7 @@ class SessionFactory(object):
         if 'C7N_SESSION_SUFFIX' in os.environ:
             self.session_name = "%s@%s" % (
                 self.session_name, os.environ['C7N_SESSION_SUFFIX'])
+        self._subscribers = []
 
     def _set_policy_name(self, name):
         self.user_agent_name = ("CloudCustodian(%s)" % name).strip()
@@ -56,7 +57,14 @@ class SessionFactory(object):
 
         session._session.user_agent_name = self.user_agent_name
         session._session.user_agent_version = version
+
+        for s in self._subscribers:
+            s(session)
+
         return session
+
+    def set_subscribers(self, subscribers):
+        self._subscribers = subscribers
 
 
 def assumed_session(role_arn, session_name, session=None, region=None, external_id=None):

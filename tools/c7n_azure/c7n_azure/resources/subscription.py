@@ -90,7 +90,7 @@ class AddPolicy(BaseAction):
 
     def _get_definition_id(self, name):
         return next((r for r in self.policyClient.policy_definitions.list()
-                     if name == r.display_name or name == r.id), None)
+                     if name == r.display_name or name == r.id or name == r.name), None)
 
     def _add_policy(self, subscription):
         parameters = PolicyAssignment(

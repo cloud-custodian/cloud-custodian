@@ -12,15 +12,15 @@ import time
 
 from c7n.output import (
     blob_outputs,
-    FSOutput,
     metrics_outputs,
-    MetricsOutput,
+    DirectoryOutput,
+    Metrics,
     LogOutput)
 from c7n.utils import local_session
 
 
 @metrics_outputs.register('gcp')
-class StackDriverMetrics(MetricsOutput):
+class StackDriverMetrics(Metrics):
 
     METRICS_PREFIX = 'custom.googleapis.com/custodian/policy'
 
@@ -59,9 +59,10 @@ class StackDriverMetrics(MetricsOutput):
 
     log = logging.getLogger('c7n_gcp.metrics')
 
-    def __init__(self, ctx):
-        super(StackDriverMetrics, self).__init__(ctx)
-        self.project_id = local_session(self.ctx.session_factory).get_default_project()
+    def __init__(self, ctx, config=None):
+        super(StackDriverMetrics, self).__init__(ctx, config)
+        self.project_id = local_session(
+            self.ctx.session_factory).get_default_project()
 
     def initialize(self):
         """One time initialization of metrics descriptors.
@@ -93,7 +94,7 @@ class StackDriverMetrics(MetricsOutput):
         # Resource is a Google controlled vocabulary with artificial
         # limitations on resource type there's not much useful we can
         # utilize.
-        now = self.get_timestamp()
+        now = datetime.datetime.utcnow()
         metrics_series = {
             'metric': {
                 'type': 'custom.googleapis.com/custodian/policy/%s' % key.lower(),
@@ -158,10 +159,10 @@ class StackDriverLogging(LogOutput):
 
 
 @blob_outputs.register('gs')
-class GCPStorageOutput(FSOutput):
+class GCPStorageOutput(DirectoryOutput):
 
-    def __init__(self, ctx):
-        super(GCPStorageOutput, self).__init__(ctx)
+    def __init__(self, ctx, config=None):
+        super(GCPStorageOutput, self).__init__(ctx, config)
         self.date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
         self.gs_path, self.bucket, self.key_prefix = parse_gs(
             self.ctx.output_path)

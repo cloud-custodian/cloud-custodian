@@ -152,7 +152,7 @@ class ChildResourceQuery(ResourceQuery):
         for parent_id in parent_ids:
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
-                client, enum_op, merged_params, path)
+                client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
                 for r in subset:
                     r[self.parent_key] = parent_id
@@ -417,10 +417,16 @@ class QueryResourceManager(ResourceManager):
         if query is None:
             query = {}
 
-        resources = self.augment(self.source.resources(query))
+        with self.ctx.tracer.subsegment('resource-fetch'):
+            resources = self.source.resources(query)
+        with self.ctx.tracer.subsegment('resource-augment'):
+            resources = self.augment(resources)
+
         resource_count = len(resources)
         self._cache.save(key, resources)
-        resources = self.filter_resources(resources)
+
+        with self.ctx.tracer.subsegment('filter'):
+            resources = self.filter_resources(resources)
 
         # Check if we're out of a policies execution limits.
         if self.data == self.ctx.policy.data:
