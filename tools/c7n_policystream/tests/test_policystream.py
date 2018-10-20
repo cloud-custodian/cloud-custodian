@@ -138,7 +138,7 @@ class StreamTest(TestUtils):
             policystream.cli,
             ['stream', '-r', git.repo_path, '-s', 'jsonline'])
         self.assertEqual(result.exit_code, 0)
-        
+
         rows = [json.loads(l) for l in result.stdout.splitlines()]
         self.maxDiff = None
         self.assertEqual(len(rows), 3)
