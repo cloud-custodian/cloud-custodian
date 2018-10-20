@@ -40,7 +40,6 @@ from c7n.policy import PolicyCollection
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_resources
 from c7n.manager import resources as resource_registry
-from c7n.output import blob_outputs
 from c7n.utils import CONN_CACHE, dumps
 
 from c7n_org.utils import environ, account_tags
@@ -132,6 +131,27 @@ def cli():
     """custodian organization multi-account runner."""
 
 
+class LogFilter(object):
+    """We want to keep the main c7n-org cli output to be readable.
+
+    We previously did so via squelching custodian's log output via
+    level filter on the logger, however doing that meant that log
+    outputs stored to output locations were also squelched.
+
+    We effectively want differential handling at the top level logger
+    stream handler, ie. we want `custodian` log messages to propagate
+    to the root logger based on level, but we also want them to go the
+    custodian logger's directly attached handlers on debug level.
+    """
+
+    def filter(self, r):
+        if not r.name.startswith('custodian'):
+            return 1
+        elif r.levelno >= logging.WARNING:
+            return 1
+        return 0
+
+
 def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=()):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
@@ -139,9 +159,14 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
 
     logging.getLogger('botocore').setLevel(logging.ERROR)
-    logging.getLogger('custodian').setLevel(logging.WARNING)
     logging.getLogger('custodian.s3').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+    # Filter out custodian log messages on console output if not
+    # at warning level or higher, see LogFilter docs and #2674
+    for h in logging.getLogger().handlers:
+        if isinstance(h, logging.StreamHandler):
+            h.addFilter(LogFilter())
 
     with open(config) as fh:
         accounts_config = yaml.safe_load(fh.read())
@@ -528,7 +553,7 @@ def run_account(account, region, policies_config, output_path,
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def run(config, use, output_dir, accounts, tags, region,
-            policy, policy_tags, cache_period, cache_path, metrics, dryrun, debug, verbose):
+        policy, policy_tags, cache_period, cache_path, metrics, dryrun, debug, verbose):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
