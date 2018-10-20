@@ -260,14 +260,17 @@ class PolicyRepo(object):
     def _get_policy_fents(self, tree):
         # get policy file entries from a tree recursively
         results = {}
-        q = deque([tree])
+        q = deque([(tree, '')])
         while q:
-            t = q.popleft()
+            t, prefix = q.popleft()
             for fent in t:
                 if fent.type == 'tree':
-                    q.append(fent)
+                    q.append((
+                        self.repo.get(fent.id),
+                        os.path.join(prefix, fent.name)))
                 elif self.matcher(fent.name):
-                    results[fent.name] = fent
+                    results[os.path.join(prefix, fent.name)] = fent
+        return results
 
     def delta_commits(self, baseline, target):
         """Show policies changes between arbitrary commits.

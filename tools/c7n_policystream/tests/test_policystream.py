@@ -99,6 +99,24 @@ class StreamTest(TestUtils):
         git.commit('switch')
         return git
 
+    def test_diff_subdir_policies(self):
+        git = self.setup_basic_repo()
+        git.change('subdir/notary.yml', {
+            'policies': [
+                {'resource': 'azure.vm',
+                 'name': 'ornithopter'}]})
+        git.commit('azure example')
+        repo = git.repo()
+        policy_repo = policystream.PolicyRepo(git.repo_path, repo)
+        changes = [c.data() for c in policy_repo.delta_commits(
+            repo.revparse_single('HEAD^'),
+            repo.revparse_single('HEAD'))]
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]['change'], 'add')
+        self.assertEqual(changes[0]['commit']['message'].strip(), 'azure example')
+        self.assertEqual(changes[0]['policy']['file'], 'subdir/notary.yml')
+        self.assertEqual(changes[0]['policy']['data']['name'], 'ornithopter')
+
     def test_stream_basic(self):
         git = self.setup_basic_repo()
         policy_repo = policystream.PolicyRepo(git.repo_path, git.repo())
