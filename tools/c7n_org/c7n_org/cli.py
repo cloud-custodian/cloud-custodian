@@ -159,6 +159,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
 
     logging.getLogger('botocore').setLevel(logging.ERROR)
+    logging.getLogger('s3transfer').setLevel(logging.WARNING)
     logging.getLogger('custodian.s3').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -476,7 +477,10 @@ def run_account(account, region, policies_config, output_path,
     CONN_CACHE.session = None
     CONN_CACHE.time = None
 
-    output_path = os.path.join(output_path, account['name'], region)
+    # allow users to specify interpolated output paths
+    if '{' not in output_path:
+        output_path = os.path.join(output_path, account['name'], region)
+
     cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['name'], region))
 
     config = Config.empty(
