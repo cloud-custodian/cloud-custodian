@@ -1,9 +1,31 @@
 FROM ubuntu:cosmic
 MAINTAINER Kapil Thangavelu http://twitter.com/kapilvt
 
-ADD . /src
-WORKDIR /src
+# Note this must be run from the root directory of the checkout
+# as we install custodian w/ aws, azure, and gcp support from the same
+# repo.
+
 RUN apt-get update && apt-get install -y libgit2-dev python3-pip
+
+ADD . /src
+
+# Install Custodian Core & AWS
+WORKDIR /src
+RUN pip3 install -r requirements.txt
+RUN python3 setup.py develop
+
+# Install Custodian Azure
+WORKDIR /src/tools/c7n_azure
+RUN pip3 install -r requirements.txt
+RUN python3 setup.py develop
+
+# Install Custodian GCP
+WORKDIR /src/tools/c7n_gcp
+RUN pip3 install -r requirements.txt
+RUN python3 setup.py develop
+
+# Install PolicyStream Tool
+WORKDIR /src/tools/c7n_policystream
 RUN pip3 install -r requirements.txt
 RUN python3 setup.py develop
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
