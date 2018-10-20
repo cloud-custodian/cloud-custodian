@@ -13,10 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import itertools
 import operator
 import random
 import re
+import zlib
 
 import six
 from botocore.exceptions import ClientError
@@ -31,7 +33,6 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -43,8 +44,6 @@ from c7n.utils import type_schema
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
@@ -657,6 +656,80 @@ class DefaultVpc(DefaultVpcBase):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 
 
+def deserialize_user_data(user_data):
+    data = base64.b64decode(user_data)
+    # try raw and compressed
+    try:
+        return data.decode('utf8')
+    except UnicodeDecodeError:
+        return zlib.decompress(data, 16).decode('utf8')
+
+
+@filters.register('user-data')
+class UserData(ValueFilter):
+    """Filter on EC2 instances which have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ec2_userdata_stop
+                resource: ec2
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - stop
+    """
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources, event=None):
+        self.data['key'] = '"c7n:user-data"'
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        results = []
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for instance_set in utils.chunks(resources, self.batch_size):
+                futures[w.submit(
+                    self.process_instance_set,
+                    client, instance_set)] = instance_set
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error processing userdata on instance set %s", f.exception())
+                results.extend(f.result())
+        return results
+
+    def process_instance_set(self, client, resources):
+        results = []
+        for r in resources:
+            if self.annotation not in r:
+                try:
+                    result = client.describe_instance_attribute(
+                        Attribute='userData',
+                        InstanceId=r['InstanceId'])
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
+                        continue
+                if 'Value' not in result['UserData']:
+                    r[self.annotation] = None
+                else:
+                    r[self.annotation] = deserialize_user_data(
+                        result['UserData']['Value'])
+            if self.match(r):
+                results.append(r)
+        return results
+
+
 @filters.register('singleton')
 class SingletonFilter(Filter, StateTransitionFilter):
     """EC2 instances without autoscaling or a recover alarm
@@ -1183,6 +1256,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 if i.get('c7n:matched-security-groups'):
                     eni['c7n:matched-security-groups'] = i[
                         'c7n:matched-security-groups']
+                if i.get('c7n:NetworkLocation'):
+                    eni['c7n:NetworkLocation'] = i[
+                        'c7n:NetworkLocation']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
@@ -1297,14 +1373,17 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         profile_name = self.data.get('name')
         profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
 
-        associations = {
-            a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
-            for a in client.describe_iam_instance_profile_associations(
-                Filters=[
-                    {'Name': 'instance-id',
-                     'Values': [i['InstanceId'] for i in profile_instances]},
-                    {'Name': 'state', 'Values': ['associating', 'associated']}]
-            ).get('IamInstanceProfileAssociations', ())}
+        if profile_instances:
+            associations = {
+                a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+                for a in client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {'Name': 'instance-id',
+                         'Values': [i['InstanceId'] for i in profile_instances]},
+                        {'Name': 'state', 'Values': ['associating', 'associated']}]
+                ).get('IamInstanceProfileAssociations', ())}
+        else:
+            associations = {}
 
         for i in instances:
             if profile_name and i['InstanceId'] not in associations:

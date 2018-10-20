@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InvalidParameters": [
+            "secure-test-value", 
+            "test-value"
+        ], 
+        "DeletedParameters": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "af51bb7f-bb9b-43ec-bcdb-1ed8cddda2ef", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "af51bb7f-bb9b-43ec-bcdb-1ed8cddda2ef", 
+                "date": "Thu, 16 Aug 2018 16:55:57 GMT", 
+                "content-length": "79", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

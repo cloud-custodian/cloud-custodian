@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from datetime import datetime
+from dateutil import tz, parser
 import json
 import fnmatch
 import itertools
@@ -20,13 +22,13 @@ import logging
 import os
 import time
 
-from botocore.client import ClientError
 import jmespath
 import six
 
 from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
+from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
@@ -92,10 +94,10 @@ class PolicyCollection(object):
         policies = [Policy(p, options,
                            session_factory=cls.session_factory())
                     for p in data.get('policies', ())]
-        return PolicyCollection(policies, options)
+        return cls(policies, options)
 
     def __add__(self, other):
-        return PolicyCollection(self.policies + other.policies, self.options)
+        return self.__class__(self.policies + other.policies, self.options)
 
     def filter(self, policy_name=None, resource_type=None):
         results = []
@@ -224,12 +226,7 @@ class PullMode(PolicyExecutionMode):
     schema = utils.type_schema('pull')
 
     def run(self, *args, **kw):
-        if self.policy.region and (
-                self.policy.region != self.policy.options.region):
-            self.policy.log.info(
-                "Skipping policy %s target-region: %s current-region: %s",
-                self.policy.name, self.policy.region,
-                self.policy.options.region)
+        if not self.is_runnable():
             return
 
         with self.policy.ctx:
@@ -240,7 +237,14 @@ class PullMode(PolicyExecutionMode):
                 version)
 
             s = time.time()
-            resources = self.policy.resource_manager.resources()
+            try:
+                resources = self.policy.resource_manager.resources()
+            except ResourceLimitExceeded as e:
+                self.policy.log.error(str(e))
+                self.policy.ctx.metrics.put_metric(
+                    'ResourceLimitExceeded', e.selection_count, "Count")
+                raise
+
             rt = time.time() - s
             self.policy.log.info(
                 "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
@@ -257,13 +261,6 @@ class PullMode(PolicyExecutionMode):
 
             if not resources:
                 return []
-            elif (self.policy.max_resources is not None and
-                  len(resources) > self.policy.max_resources):
-                msg = "policy %s matched %d resources max resources %s" % (
-                    self.policy.name, len(resources),
-                    self.policy.max_resources)
-                self.policy.log.warning(msg)
-                raise RuntimeError(msg)
 
             if self.policy.options.dryrun:
                 self.policy.log.debug("dryrun: skipping actions")
@@ -272,7 +269,8 @@ class PullMode(PolicyExecutionMode):
             at = time.time()
             for a in self.policy.resource_manager.actions:
                 s = time.time()
-                results = a.process(resources)
+                with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+                    results = a.process(resources)
                 self.policy.log.info(
                     "policy: %s action: %s"
                     " resources: %d"
@@ -320,6 +318,27 @@ class PullMode(PolicyExecutionMode):
             start,
             end,
         )
+
+    def is_runnable(self):
+        now = datetime.now(self.policy.tz)
+        if self.policy.start and self.policy.start > now:
+            self.policy.log.info(
+                "Skipping policy %s start-date: %s is after current date: %s",
+                self.policy.name, self.policy.start, now)
+            return False
+        if self.policy.end and self.policy.end < now:
+            self.policy.log.info(
+                "Skipping policy %s end-date: %s is before current date: %s",
+                self.policy.name, self.policy.end, now)
+            return False
+        if self.policy.region and (
+                self.policy.region != self.policy.options.region):
+            self.policy.log.info(
+                "Skipping policy %s target-region: %s current-region: %s",
+                self.policy.name, self.policy.region,
+                self.policy.options.region)
+            return False
+        return True
 
 
 class LambdaMode(ServerlessExecutionMode):
@@ -459,40 +478,19 @@ class LambdaMode(ServerlessExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
-    def expand_variables(self, variables):
-        """expand variables in the mode role and output_dir fields.
-        """
-        p = self.policy.data
-        if 'mode' in p:
-            if 'role' in p['mode']:
-                p['mode']['role'] = utils.format_string_values(p['mode']['role'], **variables)
-            if 'execution-options' in p['mode']:
-                if 'output_dir' in p['mode']['execution-options']:
-                    p['mode']['execution-options']['output_dir'] = utils.format_string_values(
-                        p['mode']['execution-options']['output_dir'], **variables)
-        return p
-
     def provision(self):
-        # Avoiding runtime lambda dep, premature optimization?
-        from c7n.mu import PolicyLambda, LambdaManager
-
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
-            variables = {
-                'account_id': self.policy.options.account_id,
-                'region': self.policy.options.region
-            }
-            self.policy.data = self.expand_variables(variables)
             try:
-                manager = LambdaManager(self.policy.session_factory)
+                manager = mu.LambdaManager(self.policy.session_factory)
             except ClientError:
                 # For cli usage by normal users, don't assume the role just use
                 # it for the lambda
-                manager = LambdaManager(
+                manager = mu.LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                PolicyLambda(self.policy), 'current',
+                mu.PolicyLambda(self.policy), 'current',
                 role=self.policy.options.assume_role)
 
     def get_logs(self, start, end):
@@ -554,12 +552,16 @@ class CloudTrailMode(LambdaMode):
 
 @execution.register('ec2-instance-state')
 class EC2InstanceState(LambdaMode):
-    """a lambda policy that executes on ec2 instance state changes."""
+    """
+    A lambda policy that executes on ec2 instance state changes.
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
+    """
 
     schema = utils.type_schema(
         'ec2-instance-state', rinherit=LambdaMode.schema,
         events={'type': 'array', 'items': {
-            'enum': ['running', 'shutting-down',
+            'enum': ['pending', 'running', 'shutting-down',
                      'stopped', 'stopping', 'terminated']}})
 
 
@@ -687,7 +689,7 @@ class Policy(object):
             session_factory = clouds[self.provider_name]().get_session_factory(options)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
 
     def __repr__(self):
         return "<Policy resource: %s name: %s region: %s>" % (
@@ -714,16 +716,42 @@ class Policy(object):
         return self.data.get('region')
 
     @property
+    def tz(self):
+        return tz.gettz(self.data.get('tz', 'UTC'))
+
+    @property
+    def start(self):
+        if self.data.get('start'):
+            return parser.parse(self.data.get('start'), ignoretz=True).replace(tzinfo=self.tz)
+        return None
+
+    @property
+    def end(self):
+        if self.data.get('end'):
+            return parser.parse(self.data.get('end'), ignoretz=True).replace(tzinfo=self.tz)
+        return None
+
+    @property
     def max_resources(self):
         return self.data.get('max-resources')
+
+    @property
+    def max_resources_percent(self):
+        return self.data.get('max-resources-percent')
 
     @property
     def tags(self):
         return self.data.get('tags', ())
 
+    def get_cache(self):
+        return self.resource_manager._cache
+
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        return execution.get(exec_mode_type)(self)
+        exec_mode = execution[exec_mode_type]
+        if exec_mode is None:
+            return None
+        return exec_mode(self)
 
     @property
     def is_lambda(self):
@@ -733,11 +761,73 @@ class Policy(object):
 
     def validate(self):
         m = self.get_execution_mode()
+        if m is None:
+            raise PolicyValidationError(
+                "Invalid Execution mode in policy %s" % (self.data,))
         m.validate()
+        self.validate_policy_start_stop()
         for f in self.resource_manager.filters:
             f.validate()
         for a in self.resource_manager.actions:
             a.validate()
+
+    def get_variables(self):
+        # Global policy variable expansion, we have to carry forward on
+        # various filter/action local vocabularies. Where possible defer
+        # by using a format string.
+        #
+        # See https://github.com/capitalone/cloud-custodian/issues/2330
+        return {
+            # standard runtime variables for interpolation
+            'account': '{account}',
+            'account_id': self.options.account_id,
+            'region': self.options.region,
+            # non-standard runtime variables from local filter/action vocabularies
+            #
+            # notify action
+            'policy': self.data,
+            'event': '{event}',
+            # mark for op action
+            'op': '{op}',
+            'action_date': '{action_date}',
+            # tag action pyformat-date handling
+            'now': utils.FormatDate(datetime.utcnow()),
+            # account increase limit action
+            'service': '{service}',
+            # s3 set logging action :-( see if we can revisit this one.
+            'bucket_region': '{bucket_region}',
+            'bucket_name': '{bucket_name}',
+            'source_bucket_name': '{source_bucket_name}',
+            'target_bucket_name': '{target_bucket_name}',
+            'target_prefix': '{target_prefix}',
+            'LoadBalancerName': '{LoadBalancerName}'
+        }
+
+    def expand_variables(self, variables):
+        """Expand variables in policy data.
+
+        Updates the policy data in-place.
+        """
+        # format string values returns a copy
+        updated = utils.format_string_values(self.data, **variables)
+
+        # Several keys should only be expanded at runtime, perserve them.
+        if 'member-role' in updated.get('mode', {}):
+            updated['mode']['member-role'] = self.data['mode']['member-role']
+
+        # Update ourselves in place
+        self.data = updated
+        # Reload filters/actions using updated data, we keep a reference
+        # for some compatiblity preservation work.
+        m = self.resource_manager
+        self.resource_manager = self.load_resource_manager()
+
+        # XXX: Compatiblity hack
+        # Preserve notify action subject lines which support
+        # embedded jinja2 as a passthrough to the mailer.
+        for old_a, new_a in zip(m.actions, self.resource_manager.actions):
+            if old_a.type == 'notify' and 'subject' in old_a.data:
+                new_a.data['subject'] = old_a.data['subject']
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()
@@ -781,7 +871,7 @@ class Policy(object):
         else:
             resources = mode.run()
         # clear out resource manager post run, to clear cache
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
         return resources
 
     run = __call__
@@ -790,7 +880,7 @@ class Policy(object):
         with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
-    def get_resource_manager(self):
+    def load_resource_manager(self):
         resource_type = self.data.get('resource')
 
         provider = clouds.get(self.provider_name)
@@ -804,3 +894,27 @@ class Policy(object):
             raise ValueError(
                 "Invalid resource type: %s" % resource_type)
         return factory(self.ctx, self.data)
+
+    def validate_policy_start_stop(self):
+        policy_name = self.data.get('name')
+        policy_tz = self.data.get('tz')
+        policy_start = self.data.get('start')
+        policy_end = self.data.get('end')
+
+        if policy_tz:
+            try:
+                p_tz = tz.gettz(policy_tz)
+            except Exception as e:
+                raise ValueError(
+                    "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
+            if not isinstance(p_tz, tz.tzfile):
+                raise ValueError(
+                    "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
+
+        for i in [policy_start, policy_end]:
+            if i:
+                try:
+                    parser.parse(i)
+                except Exception as e:
+                    raise ValueError(
+                        "Policy: %s Date/Time not parsable: %s, %s" % (policy_name, i, e))

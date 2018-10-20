@@ -21,7 +21,7 @@ import os
 from azure.cli.core._profile import Profile
 from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
-from c7n_azure.utils import ResourceIdParser
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class Session(object):
@@ -119,24 +119,31 @@ class Session(object):
         self._initialize_session()
         return self.credentials
 
+    def get_subscription_id(self):
+        self._initialize_session()
+        return self.subscription_id
+
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
 
         namespace = ResourceIdParser.get_namespace(resource_id)
         resource_type = ResourceIdParser.get_resource_type(resource_id)
 
-        if resource_type in self._provider_cache:
-            return self._provider_cache[resource_type]
+        cache_id = namespace + resource_type
+
+        if cache_id in self._provider_cache:
+            return self._provider_cache[cache_id]
 
         resource_client = self.client('azure.mgmt.resource.ResourceManagementClient')
         provider = resource_client.providers.get(namespace)
 
         rt = next((t for t in provider.resource_types
-            if t.resource_type == str(resource_type).split('/')[-1]), None)
+            if StringUtils.equal(t.resource_type, resource_type)), None)
+
         if rt and rt.api_versions:
             versions = [v for v in rt.api_versions if 'preview' not in v.lower()]
             api_version = versions[0] if versions else rt.api_versions[0]
-            self._provider_cache[resource_type] = api_version
+            self._provider_cache[cache_id] = api_version
             return api_version
 
     def get_tenant_id(self):
@@ -177,4 +184,4 @@ class Session(object):
             'subscription': self.subscription_id
         }
 
-        return json.dumps(auth)
+        return json.dumps(auth, indent=2)

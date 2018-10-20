@@ -14,7 +14,7 @@
 
 import six
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction, DeleteAction
-from c7n_azure.filters import MetricFilter, TagActionFilter
+from c7n_azure.filters import MetricFilter, TagActionFilter, PolicyCompliantFilter
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta
 from c7n_azure.utils import ResourceIdParser
@@ -67,6 +67,7 @@ class ArmResourceManager(QueryResourceManager):
                 klass.filter_registry.register('metric', MetricFilter)
                 klass.filter_registry.register('marked-for-op', TagActionFilter)
                 klass.action_registry.register('mark-for-op', TagDelayedAction)
+                klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

@@ -98,7 +98,7 @@ def _default_options(p, blacklist=""):
 
     if 'output-dir' not in blacklist:
         p.add_argument("-s", "--output-dir", required=True,
-                       help="Directory or S3 URL For policy output")
+                       help="[REQUIRED] Directory or S3 URL For policy output")
 
     if 'cache' not in blacklist:
         p.add_argument(
@@ -291,8 +291,13 @@ def setup_parser():
         help="Skips validation of policies (assumes you've run the validate command seperately).")
     run.add_argument(
         "-m", "--metrics-enabled",
-        default=False, action="store_true",
-        help="Emit metrics to CloudWatch Metrics")
+        default=None, nargs="?", const="aws",
+        help="Emit metrics to provider metrics")
+    run.add_argument(
+        "--trace",
+        dest="tracer",
+        help=argparse.SUPPRESS,
+        default=None, nargs="?", const="default")
 
     return parser
 
@@ -324,7 +329,9 @@ def _setup_logger(options):
         external_log_level = logging.INFO
 
     logging.getLogger('botocore').setLevel(external_log_level)
+    logging.getLogger('urllib3').setLevel(external_log_level)
     logging.getLogger('s3transfer').setLevel(external_log_level)
+    logging.getLogger('urllib3').setLevel(logging.ERROR)
 
 
 def main():

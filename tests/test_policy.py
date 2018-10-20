@@ -15,11 +15,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from datetime import datetime, timedelta
 import json
+import logging
 import mock
 import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.exceptions import ResourceLimitExceeded
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
@@ -135,7 +137,7 @@ class PolicyPermissions(BaseTest):
             if not getattr(v.resource_type, "config_type", None):
                 continue
 
-            p = Bag({"name": "permcheck", "resource": k})
+            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
             mgr = v(ctx, p)
 
@@ -167,9 +169,9 @@ class PolicyPermissions(BaseTest):
         self.capture_logging("c7n.cache")
         missing = []
         cfg = Config.empty()
-        for k, v in manager.resources.items():
 
-            p = Bag({"name": "permcheck", "resource": k})
+        for k, v in manager.resources.items():
+            p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
 
             mgr = v(ctx, p)
@@ -188,7 +190,7 @@ class PolicyPermissions(BaseTest):
                     missing.append("%s.actions.%s" % (k, n))
 
             for n, f in v.filter_registry.items():
-                if n in ("and", "or", "not"):
+                if n in ("and", "or", "not", "missing"):
                     continue
                 p["filters"] = [n]
                 perms = f({}, mgr).get_permissions()
@@ -256,6 +258,28 @@ class TestPolicyCollection(BaseTest):
         collection = AWS().initialize_policies(original, Config.empty(regions=["all"]))
         self.assertEqual(len(collection), 1)
 
+    def test_policy_expand_group_region(self):
+        cfg = Config.empty(regions=["us-east-1", "us-east-2", "us-west-2"])
+        original = policy.PolicyCollection.from_data(
+            {"policies": [
+                {"name": "bar", "resource": "lambda"},
+                {"name": "middle", "resource": "security-group"},
+                {"name": "foo", "resource": "ec2"}]},
+            cfg)
+
+        collection = AWS().initialize_policies(original, cfg)
+        self.assertEqual(
+            [(p.name, p.options.region) for p in collection],
+            [('bar', 'us-east-1'),
+             ('middle', 'us-east-1'),
+             ('foo', 'us-east-1'),
+             ('bar', 'us-east-2'),
+             ('middle', 'us-east-2'),
+             ('foo', 'us-east-2'),
+             ('bar', 'us-west-2'),
+             ('middle', 'us-west-2'),
+             ('foo', 'us-west-2')])
+
     def test_policy_region_expand_global(self):
         original = policy.PolicyCollection.from_data(
             {
@@ -286,6 +310,38 @@ class TestPolicyCollection(BaseTest):
 
 
 class TestPolicy(BaseTest):
+
+    def test_policy_variable_interpolation(self):
+
+        p = self.load_policy({
+            'name': 'compute',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'member-role': 'arn:iam:{account_id}/role/BarFoo',
+                'role': 'arn:iam::{account_id}/role/FooBar'},
+            'actions': [
+                {'type': 'tag',
+                 'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
+                {'type': 'notify',
+                 'to': ['me@example.com'],
+                 'transport': {
+                     'type': 'sns',
+                     'topic': 'arn:::::',
+                 },
+                 'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
+            ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
+
+        ivalue = 'bad monkey 12312311 zanzibar %s' % (
+            (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d'))
+        p.expand_variables(p.get_variables())
+        self.assertEqual(p.data['actions'][0]['value'], ivalue)
+        self.assertEqual(
+            p.data['actions'][1]['subject'],
+            "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
+        self.assertEqual(p.data['mode']['role'], 'arn:iam::12312311/role/FooBar')
+        self.assertEqual(p.data['mode']['member-role'], 'arn:iam:{account_id}/role/BarFoo')
+        self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
 
     def test_child_resource_trail_validation(self):
         self.assertRaises(
@@ -446,6 +502,69 @@ class TestPolicy(BaseTest):
             },
         )
 
+    def test_policy_resource_limits(self):
+        session_factory = self.replay_flight_data(
+            "test_policy_resource_limits")
+        p = self.load_policy(
+            {
+                "name": "log-delete",
+                "resource": "log-group",
+                "max-resources-percent": 2.5,
+            },
+            session_factory=session_factory)
+        p.ctx.metrics.flush = mock.MagicMock()
+        output = self.capture_logging('custodian.policy', level=logging.ERROR)
+        self.assertRaises(ResourceLimitExceeded, p.run)
+        self.assertEqual(
+            output.getvalue().strip(),
+            "policy: log-delete exceeded resource limit: 2.5% found: 1 total: 1")
+        self.assertEqual(
+            p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
+
+    def test_policy_resource_limits_count(self):
+        session_factory = self.replay_flight_data(
+            "test_policy_resource_count")
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-resource-count",
+                "resource": "ecs",
+                "max-resources": 1
+            },
+            session_factory=session_factory)
+        self.assertRaises(ResourceLimitExceeded, p.run)
+        policy = {
+            "name": "ecs-cluster-resource-count",
+            "resource": "ecs",
+            "max-resources": 0
+        }
+        config = Config.empty(validate=True)
+        self.assertRaises(
+            Exception,
+            self.load_policy,
+            policy,
+            config=config,
+            validate=True,
+            session_factory=session_factory
+        )
+
+    def test_policy_resource_limits_with_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_policy_resource_count_with_filter")
+        p = self.load_policy(
+            {
+                "name": "asg-with-image-age-resource-count",
+                "resource": "asg",
+                "max-resources": 1,
+                "filters": [{
+                    "type": "image-age",
+                    "op": "ge",
+                    "days": 0
+                }]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(resources)
+
     def test_policy_metrics(self):
         session_factory = self.replay_flight_data("test_policy_metrics")
         p = self.load_policy(
@@ -520,7 +639,7 @@ class TestPolicy(BaseTest):
             }
         )
         p = collection.policies[0]
-        self.assertTrue(isinstance(p.get_resource_manager(), EC2))
+        self.assertTrue(isinstance(p.load_resource_manager(), EC2))
 
     def test_get_logs_from_group(self):
         p_data = {
@@ -557,6 +676,58 @@ class TestPolicy(BaseTest):
         p = collection.policies[0]
         p()
         self.assertEqual(len(p.ctx.metrics.data), 3)
+
+    def test_validate_policy_start_stop(self):
+        data = {
+            'name': 'bad-str-parse',
+            'resource': 'ec2',
+            'start': 'asdf'
+        }
+        with self.assertRaises(ValueError):
+            self.load_policy(data)
+
+        data = {
+            'name': 'bad-non-str-parse',
+            'resource': 'ec2',
+            'start': 2
+        }
+        with self.assertRaises(Exception):
+            self.load_policy(data)
+
+        data = {
+            'name': 'bad-tz-parse',
+            'resource': 'ec2',
+            'tz': 'asdf'
+        }
+        with self.assertRaises(ValueError):
+            self.load_policy(data)
+
+        data = {
+            'name': 'bad-tz-int-parse',
+            'resource': 'ec2',
+            'tz': 2
+        }
+        with self.assertRaises(Exception):
+            self.load_policy(data)
+
+        data = {
+            'name': 'good-time-parse',
+            'resource': 'ec2',
+            'start': '4 AM'
+        }
+        p = self.load_policy(data)
+        result = p.validate_policy_start_stop()
+        self.assertEqual(result, None)
+
+        data = {
+            'name': 'good-tz-str-parse',
+            'resource': 'ec2',
+            'tz': 'UTC'
+        }
+
+        p = self.load_policy(data)
+        result = p.validate_policy_start_stop()
+        self.assertEqual(result, None)
 
 
 class PolicyExecutionModeTest(BaseTest):
@@ -596,6 +767,100 @@ class PullModeTest(BaseTest):
             ),
             lines,
         )
+
+    def test_is_runnable_mismatch_region(self):
+        p = self.load_policy(
+            {'name': 'region-mismatch',
+             'resource': 'ec2',
+             'region': 'us-east-1'},
+            config={'region': 'us-west-2', 'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), False)
+
+    def test_is_runnable_dates(self):
+        p = self.load_policy(
+            {'name': 'good-start-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': '2018-3-29'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), True)
+
+        tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
+        p = self.load_policy(
+            {'name': 'bad-start-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': tomorrow_date},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), False)
+
+        p = self.load_policy(
+            {'name': 'good-end-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'end': tomorrow_date},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), True)
+
+        p = self.load_policy(
+            {'name': 'bad-end-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'end': '2018-3-29'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), False)
+
+        p = self.load_policy(
+            {'name': 'bad-start-end-date',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': '2018-3-28',
+             'end': '2018-3-29'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), False)
+
+    def test_is_runnable_parse_dates(self):
+        p = self.load_policy(
+            {'name': 'parse-date-policy',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': 'March 3 2018'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), True)
+
+        p = self.load_policy(
+            {'name': 'parse-date-policy',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': 'March 3rd 2018'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), True)
+
+        p = self.load_policy(
+            {'name': 'parse-date-policy',
+             'resource': 'ec2',
+             'tz': 'UTC',
+             'start': '28 March 2018'},
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), True)
 
 
 class GuardModeTest(BaseTest):

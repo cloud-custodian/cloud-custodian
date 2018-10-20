@@ -24,7 +24,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import itertools
@@ -80,8 +80,12 @@ def universal_augment(self, resources):
     if not resources:
         return resources
 
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1
+    region = getattr(self.resource_type, 'global_resource', None) and 'us-east-1' or self.region
+
     client = utils.local_session(
-        self.session_factory).client('resourcegroupstaggingapi')
+        self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 
     paginator = client.get_paginator('get_resources')
     resource_type = getattr(self.get_model(), 'resource_type', None)
@@ -163,6 +167,7 @@ class TagTrim(Action):
         'tag-trim',
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
+    schema_alias = True
 
     permissions = ('ec2:DeleteTags',)
 
@@ -259,6 +264,7 @@ class TagActionFilter(Filter):
         skew={'type': 'number', 'minimum': 0},
         skew_hours={'type': 'number', 'minimum': 0},
         op={'type': 'string'})
+    schema_alias = True
 
     current_date = None
 
@@ -268,7 +274,7 @@ class TagActionFilter(Filter):
             raise PolicyValidationError(
                 "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified '%s' in %s" % (
@@ -280,7 +286,7 @@ class TagActionFilter(Filter):
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         v = None
         for n in i.get('Tags', ()):
@@ -338,6 +344,7 @@ class TagCountFilter(Filter):
         'tag-count',
         count={'type': 'integer', 'minimum': 0},
         op={'enum': list(OPERATORS.keys())})
+    schema_alias = True
 
     def __call__(self, i):
         count = self.data.get('count', 10)
@@ -363,7 +370,7 @@ class Tag(Action):
         value={'type': 'string'},
         tag={'type': 'string'},
     )
-
+    schema_alias = True
     permissions = ('ec2:CreateTags',)
 
     def validate(self):
@@ -465,6 +472,7 @@ class RenameTag(Action):
         'rename-tag',
         old_key={'type': 'string'},
         new_key={'type': 'string'})
+    schema_alias = True
 
     permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
 
@@ -580,6 +588,7 @@ class TagDelayedAction(Action):
         hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
         op={'type': 'string'})
+    schema_alias = True
 
     permissions = ('ec2:CreateTags',)
 
@@ -595,7 +604,7 @@ class TagDelayedAction(Action):
                 "mark-for-op specifies invalid op:%s in %s" % (
                     op, self.manager.data))
 
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise PolicyValidationError(
@@ -617,7 +626,7 @@ class TagDelayedAction(Action):
         return action_date_string
 
     def process(self, resources):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
@@ -694,6 +703,7 @@ class NormalizeTag(Action):
 
     """
 
+    schema_alias = True
     schema = utils.type_schema(
         'normalize-tag',
         key={'type': 'string'},
@@ -865,7 +875,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 

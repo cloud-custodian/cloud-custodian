@@ -62,7 +62,7 @@ class ConfigCompliance(Filter):
             'COMPLIANT', 'NON_COMPLIANT',
             'NOT_APPLICABLE', 'INSUFFICIENT_DATA']}},
         rules={'type': 'array', 'items': {'type': 'string'}})
-
+    schema_alias = True
     annotation_key = 'c7n:config-compliance'
 
     def get_resource_map(self, filters, resource_model, resources):

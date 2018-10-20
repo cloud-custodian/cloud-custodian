@@ -104,6 +104,10 @@ Resources:
           AttributeType: S
         - AttributeName: ManagedId
           AttributeType: S
+        - AttributeName: IsInventoried
+          AttributeType: "N"
+        - AttributeName: IsTagged
+          AttributeType: "N"
       KeySchema:
         - AttributeName: id
           KeyType: HASH
@@ -112,6 +116,24 @@ Resources:
           KeySchema:
             - AttributeName: ManagedId
               KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+        - IndexName: IsTagged-index
+          KeySchema:
+          - AttributeName: IsTagged
+            KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
+        - IndexName: IsInventoried-index
+          KeySchema:
+          - AttributeName: IsInventoried
+            KeyType: HASH
           Projection:
             ProjectionType: ALL
           ProvisionedThroughput:

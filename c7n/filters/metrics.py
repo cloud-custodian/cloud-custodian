@@ -49,8 +49,10 @@ class MetricsFilter(Filter):
     Note periods when a resource is not sending metrics are not part
     of calculated statistics as in the case of a stopped ec2 instance,
     nor for resources to new to have existed the entire
-    period. ie. being stopped for an ec2 intsance wouldn't lower the
-    average cpu utilization, nor would
+    period. ie. being stopped for an ec2 instance wouldn't lower the
+    average cpu utilization.
+
+    Note the default statistic for metrics is Average.
     """
 
     schema = type_schema(
@@ -68,7 +70,7 @@ class MetricsFilter(Filter):
            'attr-multiplier': {'type': 'number'},
            'percent-attr': {'type': 'string'},
            'required': ('value', 'name')})
-
+    schema_alias = True
     permissions = ("cloudwatch:GetMetricStatistics",)
 
     MAX_QUERY_POINTS = 50850

@@ -24,9 +24,8 @@ import logging
 import zlib
 
 import six
-from botocore.exceptions import ClientError
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.manager import resources
 from c7n.registry import PluginRegistry
@@ -90,8 +89,6 @@ class ActionRegistry(PluginRegistry):
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         self.register('notify', Notify)
-        self.register('invoke-lambda', LambdaInvoke)
-        self.register('put-metric', PutMetric)
 
     def parse(self, data, manager):
         results = []
@@ -115,7 +112,7 @@ class ActionRegistry(PluginRegistry):
                 "Invalid action type %s, valid actions %s" % (
                     action_type, list(self.keys())))
         # Construct a ResourceManager
-        return action_class(data, manager).validate()
+        return action_class(data, manager)
 
 
 class Action(object):
@@ -128,6 +125,7 @@ class Action(object):
     executor_factory = ThreadPoolExecutor
     permissions = ()
     schema = {'type': 'object'}
+    schema_alias = None
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
@@ -168,8 +166,9 @@ class ModifyVpcSecurityGroupsAction(Action):
     """Common actions for modifying security groups on a resource
 
     Can target either physical groups as a list of group ids or
-    symbolic groups like 'matched' or 'all'. 'matched' uses
-    the annotations of the 'security-group' interface filter.
+    symbolic groups like 'matched', 'network-location' or 'all'. 'matched' uses
+    the annotations of the 'security-group' interface filter. 'network-location' uses
+    the annotations of the 'network-location' interface filter for `SecurityGroupMismatch`.
 
     Note an interface always gets at least one security group, so
     we mandate the specification of an isolation/quarantine group
@@ -177,9 +176,10 @@ class ModifyVpcSecurityGroupsAction(Action):
 
     type: modify-security-groups
         add: []
-        remove: [] | matched
+        remove: [] | matched | network-location
         isolation-group: sg-xyz
     """
+    schema_alias = True
     schema = {
         'type': 'object',
         'additionalProperties': False,
@@ -194,7 +194,7 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'array', 'items': {
                     'type': 'string', 'pattern': '^sg-*'}},
                 {'enum': [
-                    'matched', 'all',
+                    'matched', 'network-location', 'all',
                     {'type': 'string', 'pattern': '^sg-*'}]}]},
             'isolation-group': {'oneOf': [
                 {'type': 'string', 'pattern': '^sg-*'},
@@ -276,6 +276,10 @@ class ModifyVpcSecurityGroupsAction(Action):
             # Parse remove_groups
             if remove_target_group_ids == 'matched':
                 remove_groups = r.get('c7n:matched-security-groups', ())
+            elif remove_target_group_ids == 'network-location':
+                for reason in r.get('c7n:NetworkLocation', ()):
+                    if reason['reason'] == 'SecurityGroupMismatch':
+                        remove_groups = list(reason['security-groups'])
             elif remove_target_group_ids == 'all':
                 remove_groups = rgroups
             elif isinstance(remove_target_group_ids, list):
@@ -335,7 +339,7 @@ class LambdaInvoke(EventAction):
      - type: invoke-lambda
        function: my-function
     """
-
+    schema_alias = True
     schema = {
         'type': 'object',
         'required': ['type', 'function'],
@@ -378,8 +382,19 @@ class LambdaInvoke(EventAction):
             params['Payload'] = utils.dumps(payload)
             result = client.invoke(**params)
             result['Payload'] = result['Payload'].read()
+            if isinstance(result['Payload'], bytes):
+                result['Payload'] = result['Payload'].decode('utf-8')
             results.append(result)
         return results
+
+
+def register_action_invoke_lambda(registry, _):
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        klass.action_registry.register('invoke-lambda', LambdaInvoke)
+
+
+resources.subscribe(resources.EVENT_FINAL, register_action_invoke_lambda)
 
 
 class BaseNotify(EventAction):
@@ -418,7 +433,12 @@ class Notify(BaseNotify):
     extraction, batch periods, etc.
 
     For expedience and flexibility then, we instead send the data to
-    an sqs queue, for processing. ie. actual communications is DIY atm.
+    an sqs queue, for processing. ie. actual communications can be enabled
+    with the c7n-mailer tool, found under tools/c7n_mailer.
+
+    Attaching additional string message attributes are supported on the SNS
+    transport, with the exception of the ``mtype`` attribute, which is a
+    reserved attribute used by Cloud Custodian.
 
     Example::
 
@@ -442,10 +462,33 @@ class Notify(BaseNotify):
                type: sqs
                region: us-east-1
                queue: xyz
+
+        - name: ec2-notify-with-attributes
+          resource: ec2
+          filters:
+           - Name: bad-instance
+          actions:
+           - type: notify
+             to:
+              - event-user
+              - resource-creator
+              - email@address
+             owner_absent_contact:
+              - other_email@address
+             # which template for the email should we use
+             template: policy-template
+             transport:
+               type: sns
+               region: us-east-1
+               topic: your-notify-topic
+               attributes:
+                 - attribute_key: attribute_value
+                 - attribute_key_2: attribute_value_2
     """
 
     C7N_DATA_MESSAGE = "maidmsg/1.0"
 
+    schema_alias = True
     schema = {
         'type': 'object',
         'anyOf': [
@@ -474,6 +517,7 @@ class Notify(BaseNotify):
                      'properties': {
                          'topic': {'type': 'string'},
                          'type': {'enum': ['sns']},
+                         'attributes': {'type': 'object'},
                      }}]
             },
             'assume_role': {'type': 'boolean'}
@@ -483,6 +527,14 @@ class Notify(BaseNotify):
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Notify, self).__init__(data, manager, log_dir)
         self.assume_role = data.get('assume_role', True)
+
+    def validate(self):
+        if self.data.get('transport', {}).get('type') == 'sns' and \
+                self.data.get('transport').get('attributes') and \
+                'mtype' in self.data.get('transport').get('attributes').keys():
+                    raise PolicyValidationError(
+                        "attribute: mtype is a reserved attribute for sns transport")
+        return self
 
     def get_permissions(self):
         if self.data.get('transport', {}).get('type') == 'sns':
@@ -509,6 +561,42 @@ class Notify(BaseNotify):
                 receipt, self.manager.data['name'],
                 self.data.get('template', 'default'), len(batch)))
 
+    def prepare_resources(self, resources):
+        """Resources preparation for transport.
+
+        If we have sensitive or overly large resource metadata we want to
+        remove or additional serialization we need to perform, this
+        provides a mechanism.
+
+        TODO: consider alternative implementations, at min look at adding
+        provider as additional discriminator to resource type. One alternative
+        would be dynamically adjusting buffer size based on underlying
+        transport.
+        """
+        handler = getattr(self, "prepare_%s" % (
+            self.manager.type.replace('-', '_')),
+            None)
+        if handler is None:
+            return resources
+        return handler(resources)
+
+    def prepare_launch_config(self, resources):
+        for r in resources:
+            r.pop('UserData', None)
+        return resources
+
+    def prepare_asg(self, resources):
+        for r in resources:
+            if 'c7n:user-data' in r:
+                r.pop('c7n:user-data', None)
+        return resources
+
+    def prepare_ec2(self, resources):
+        for r in resources:
+            if 'c7n:user-data' in r:
+                r.pop('c7n:user-data')
+        return resources
+
     def send_data_message(self, message):
         if self.data['transport']['type'] == 'sqs':
             return self.send_sqs(message)
@@ -517,6 +605,7 @@ class Notify(BaseNotify):
 
     def send_sns(self, message):
         topic = self.data['transport']['topic'].format(**message)
+        user_attributes = self.data['transport'].get('attributes')
         if topic.startswith('arn:aws:sns'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
@@ -532,6 +621,10 @@ class Notify(BaseNotify):
                 'StringValue': self.C7N_DATA_MESSAGE,
             },
         }
+        if user_attributes:
+            for k, v in user_attributes.items():
+                if k != 'mtype':
+                    attrs[k] = {'DataType': 'String', 'StringValue': v}
         client.publish(
             TopicArn=topic_arn,
             Message=self.pack(message),
@@ -615,6 +708,7 @@ class AutoTagUser(EventAction):
      - CloudTrail User - http://goo.gl/XQhIG6
     """
 
+    schema_alias = True
     schema = utils.type_schema(
         'auto-tag-user',
         required=['tag'],
@@ -700,14 +794,14 @@ class AutoTagUser(EventAction):
         return new_tags
 
 
-def add_auto_tag_user(registry, _):
+def register_action_tag_user(registry, _):
     for resource in registry.keys():
         klass = registry.get(resource)
         if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
             klass.action_registry.register('auto-tag-user', AutoTagUser)
 
 
-resources.subscribe(resources.EVENT_FINAL, add_auto_tag_user)
+resources.subscribe(resources.EVENT_FINAL, register_action_tag_user)
 
 
 class PutMetric(BaseAction):
@@ -736,6 +830,7 @@ class PutMetric(BaseAction):
     """
     # permissions are typically lowercase servicename:TitleCaseActionName
     permissions = {'cloudwatch:PutMetricData', }
+    schema_alias = True
     schema = {
         'type': 'object',
         'required': ['type', 'key', 'namespace', 'metric_name'],
@@ -813,6 +908,16 @@ class PutMetric(BaseAction):
         return resources
 
 
+def register_action_put_metric(registry, _):
+    # apply put metric to each resource
+    for resource in registry.keys():
+        klass = registry.get(resource)
+        klass.action_registry.register('put-metric', PutMetric)
+
+
+resources.subscribe(resources.EVENT_FINAL, register_action_put_metric)
+
+
 class RemovePolicyBase(BaseAction):
 
     schema = utils.type_schema(
@@ -851,6 +956,7 @@ def remove_statements(match_ids, statements, matched=()):
 
 class ModifyPolicyBase(BaseAction):
 
+    schema_alias = True
     schema = utils.type_schema(
         'modify-policy',
         **{

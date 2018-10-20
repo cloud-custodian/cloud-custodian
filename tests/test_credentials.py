@@ -48,3 +48,13 @@ class Credential(BaseTest):
             self.fail("sts user not identifyable this way")
 
         self.assertEqual(user["User"]["UserName"], "kapil")
+
+    def test_policy_name_user_agent(self):
+        session = SessionFactory("us-east-1")
+        session.policy_name = "test-policy-name-ua"
+        client = session().client('s3')
+        self.assertTrue(
+            client._client_config.user_agent.startswith(
+                "CloudCustodian(test-policy-name-ua)/%s" % version
+            )
+        )

@@ -50,7 +50,10 @@ func groupEntriesByAccountIdAndRegion(entries []*omnissm.RegistrationEntry) map[
 
 func main() {
 	lambda.Start(func(ctx context.Context) error {
-		entries, err := omni.Registrations.Scan()
+		entries, err := omni.Registrations.QueryIndexes(ctx, []omnissm.QueryIndexInput{
+			{"IsTagged-index", "IsTagged", "0"},
+			{"IsInventoried-index", "IsInventoried", "0"},
+		}...)
 		if err != nil {
 			return err
 		}
@@ -74,13 +77,13 @@ func main() {
 				})
 				var i, j int
 				for _, entry := range entries {
-					ci, err := cs.GetLatestResourceConfig("AWS::EC2::Instance", entry.InstanceId)
+					ci, err := cs.GetLatestResourceConfig(ctx, "AWS::EC2::Instance", entry.InstanceId)
 					if err != nil {
 						log.Info().Err(err).Msg("configservice.GetLatestResourceConfig failed")
 						continue
 					}
 					if !ssm.IsManagedInstance(entry.ManagedId) {
-						m, err := omni.SSM.DescribeInstanceInformation(entry.ActivationId)
+						m, err := omni.SSM.DescribeInstanceInformation(ctx, entry.ActivationId)
 						if err != nil {
 							log.Info().Err(err).Msg("")
 							continue
@@ -90,12 +93,12 @@ func main() {
 							continue
 						}
 						entry.ManagedId = m.ManagedId
-						if err := omni.Registrations.Put(entry); err != nil {
+						if err := omni.Registrations.Put(ctx, entry); err != nil {
 							log.Info().Err(err).Msg("")
 							continue
 						}
 					}
-					if !entry.IsTagged {
+					if entry.IsTagged == 0 {
 						tags := make(map[string]string)
 						for k, v := range ci.Tags {
 							if !omni.HasResourceTag(k) {
@@ -103,19 +106,24 @@ func main() {
 							}
 							tags[k] = v
 						}
-						if err := omni.SQS.Send(&omnissm.DeferredActionMessage{
+						tags["AccountId"] = ci.AWSAccountId
+						tags["VPCId"] = ci.Configuration.VPCId
+						tags["SubnetId"] = ci.Configuration.SubnetId
+						err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.AddTagsToResource,
 							Value: &ssm.ResourceTags{
 								ManagedId: entry.ManagedId,
 								Tags:      tags,
 							},
-						}); err != nil {
+						})
+						if err == nil {
+							i++
+						} else {
 							log.Info().Err(err).Msg("unable to defer AddTagsToResource")
 						}
-						i++
 					}
-					if !entry.IsInventoried {
-						if err := omni.SQS.Send(&omnissm.DeferredActionMessage{
+					if entry.IsInventoried == 0 {
+						err := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 							Type: omnissm.PutInventory,
 							Value: &ssm.CustomInventory{
 								TypeName:    "Custom:CloudInfo",
@@ -123,16 +131,20 @@ func main() {
 								CaptureTime: ci.ConfigurationItemCaptureTime,
 								Content:     configservice.ConfigurationItemContentMap(*ci),
 							},
-						}); err != nil {
+						})
+						if err == nil {
+							j++
+						} else {
 							log.Info().Err(err).Msg("unable to defer PutInventory")
 						}
-						j++
 					}
 				}
-				log.Info().Str("accountId", accountId).
-					Int("AddTagsToResource", i).
-					Int("PutInventory", j).
-					Msg("enqueued deferred actions")
+				if i+j > 0 {
+					log.Info().Str("accountId", accountId).
+						Int("AddTagsToResource", i).
+						Int("PutInventory", j).
+						Msg("enqueued deferred actions")
+				}
 			}(omni.Config.Copy().WithRegion(region), accountId, entries)
 		}
 		wg.Wait()

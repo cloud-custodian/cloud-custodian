@@ -4,6 +4,7 @@ A mailer implementation for Custodian. Outbound mail delivery is still somewhat
 organization-specific, so this at the moment serves primarily as an example
 implementation.
 
+> The Cloud Custodian Mailer can now be easily run in a Docker container. Click [here](https://hub.docker.com/r/troylar/c7n-mailer/) for details.
 
 ## Message Relay
 
@@ -17,7 +18,7 @@ should be cross-account enabled for sending between accounts.
 Our goal in starting out with the Custodian mailer is to install the mailer,
 and run a policy that triggers an email to your inbox.
 
-1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop.
+1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/troylar/c7n-mailer/))
 1. In your text editor, create a `mailer.yml` file to hold your mailer config.
 1. In the AWS console, create a new standard SQS queue (quick create is fine).
    Copy the queue URL to `queue_url` in `mailer.yml`.
@@ -137,6 +138,7 @@ policies:
           - slack://foo@bar.com
           - slack://#custodian-test
           - slack://webhook/#c7n-webhook-test
+          - https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
@@ -146,17 +148,15 @@ Slack messages support use of a unique template field specified by `slack_templa
 existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
 and if not specified, the mailer will use the default value `slack_default`.
 
-Slack integration for the mailer supports three flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used.
+Slack integration for the mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
 
-| Required? | Key                  | Type             | Notes                               |
+| Requires&nbsp;`slack_token` | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
-|           | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
-|           | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
-|           | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
-|           | `slack://webhook/#c7n-webhook-test` | string      | Send to a Slack webhook; appended with the target channel. |
-
-
-The `slack_token` field is required for any of the first three Slack notify forms. However, a token is not required for use of the webhook.
+| No        | `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX` | string | **(PREFERRED)** Send to an [incoming webhook](https://api.slack.com/incoming-webhooks) (the channel is defined in the webhook) |
+| Yes       | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
+| Yes       | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
+| Yes       | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
+| No        | `slack://webhook/#c7n-webhook-test` | string      | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
 
 ### Now run:
 
@@ -228,12 +228,17 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 #### Standard Azure Functions Config
 
-| Required? | Key                            | Type             |
-|:---------:|:-------------------------------|:-----------------|
-|           | `function_name`                | string           |
-| &#x2705;  | `function_servicePlanName`     | string           |
-|           | `function_location`            | string           |
-|           | `function_appInsightsLocation` | string           |
+| Required? | Key                            | Type             | Notes                                                                 |
+|:---------:|:-------------------------------|:-----------------|:----------------------------------------------------------------------|
+|           | `function_properties`          | object           | Contains `appInsights`, `storageAccount` and `servicePlan` objects    |
+|           | `appInsights`                  | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `storageAccount`               | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `servicePlan`                  | object           | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties      |
+|           | `name`                         | string           | |
+|           | `location`                     | string           | Default: `west us 2`|
+|           | `resource_group_name`          | string           | Default `cloud-custodian`|
+|           | `skuTier`                      | string           | Default: `Basic` |
+|           | `skuName`                      | string           | Default: `B1`    |
 
 
 
@@ -248,7 +253,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
 |           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
 |           | `ldap_bind_password`       | string           | ldap bind password     |
-|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
 |           | `ldap_email_attribute`     | string           |                                     |
 |           | `ldap_email_key`           | string           | eg 'mail'     |
 |           | `ldap_manager_attribute`   | string           | eg 'manager'    |
@@ -368,9 +373,13 @@ For reference purposes, the JSON Schema of the `notify` action:
 
 ## Using on Azure
 
-Requires `c7n_azure` package.  See [Installing Azure Plugin](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html#install-cloud-custodian)
+Requires:
 
-The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.  
+- `c7n_azure` package.  See [Installing Azure Plugin](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html#install-cloud-custodian)
+- SendGrid account. See [Using SendGrid with Azure](https://docs.microsoft.com/en-us/azure/sendgrid-dotnet-how-to-send-email)
+- [Azure Storage Queue](https://azure.microsoft.com/en-us/services/storage/queues/)
+
+The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.
 Configuration for this scenario requires only minor changes from AWS deployments.
 
 The notify action in your policy will reflect transport type `asq` with the URL
@@ -419,7 +428,19 @@ where `mailer.yml` may look like:
 queue_url: asq://storage.queue.core.windows.net/custodian
 from_address: foo@mail.com
 sendgrid_api_key: <key>
-function_servicePlanName: mycustodianfunctions
+function_properties:
+  servicePlan:
+    name: 'testmailer1'
+    resourceGroupName: 'custodianmailer1'
+    skuTier: Basic
+    skuName: B1
+    location: WestUS2
+storageAccount:
+    name: 'testmaileraccount1'
+    resourceGroupName: 'custodianmailer1'
+  storageAccount:
+    name: 'testmaileraccount1'
+    resourceGroupName: 'custodianmailer1'
 ```
 
 ## Writing an email template

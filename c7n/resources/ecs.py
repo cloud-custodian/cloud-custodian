@@ -193,11 +193,12 @@ class ECSTaskDescribeSource(ECSClusterResourceDescribeSource):
 
     def process_cluster_resources(self, client, cluster_id, tasks):
         results = []
-        for service_set in chunks(tasks, self.manager.chunk_size):
+        for task_set in chunks(tasks, self.manager.chunk_size):
             results.extend(
-                client.describe_tasks(
+                self.manager.retry(
+                    client.describe_tasks,
                     cluster=cluster_id,
-                    tasks=tasks).get('tasks', []))
+                    tasks=task_set).get('tasks', []))
         return results
 
 

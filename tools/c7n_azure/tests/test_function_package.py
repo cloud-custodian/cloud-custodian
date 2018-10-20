@@ -17,6 +17,7 @@ import json
 
 from azure_common import BaseTest
 from c7n_azure.function_package import FunctionPackage
+from c7n_azure.constants import CONST_AZURE_TIME_TRIGGER_MODE, CONST_AZURE_EVENT_TRIGGER_MODE
 
 
 class FunctionPackageTest(BaseTest):
@@ -28,7 +29,7 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': 'azure-periodic',
+                {'type': CONST_AZURE_TIME_TRIGGER_MODE,
                  'schedule': '0 1 0 0 0'}
         })
 
@@ -47,7 +48,8 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': 'azure-stream'}
+                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
         })
 
         packer = FunctionPackage(p.data['name'])
@@ -63,7 +65,8 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': 'azure-stream'}
+                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
         })
 
         packer = FunctionPackage(p.data['name'])
@@ -73,4 +76,5 @@ class FunctionPackageTest(BaseTest):
         self.assertEqual(policy['policies'][0],
                          {u'resource': u'azure.publicip',
                           u'name': u'test-azure-public-ip',
-                          u'mode': {u'type': u'azure-stream'}})
+                          u'mode': {u'type': u'azure-event-grid',
+                                    u'events': [u'VmWrite']}})

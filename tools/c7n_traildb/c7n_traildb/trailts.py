@@ -16,6 +16,7 @@
 
 Todo: Consider direct processing trails here and bypass the traildb/sqlite.
 """
+from __future__ import print_function
 
 from collections import defaultdict
 import datetime
@@ -347,7 +348,7 @@ def status(config):
     accounts = {}
     for (a, region), last in last_index.items():
         accounts.setdefault(a, {})[region] = last
-    print yaml.safe_dump(accounts, default_flow_style=False)
+    print(yaml.safe_dump(accounts, default_flow_style=False))
 
 
 @trailts.command()

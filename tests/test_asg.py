@@ -53,6 +53,28 @@ class LaunchConfigTest(BaseTest):
         self.assertEqual(resources[0]["LaunchConfigurationName"], "CloudClusterCopy")
 
 
+class TestUserData(BaseTest):
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_launch_config_userdata")
+        policy = self.load_policy(
+            {
+                "name": "launch_config_userdata",
+                "resource": "asg",
+                'filters': [
+                    {
+                        'or': [
+                            {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'}
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = policy.run()
+        self.assertGreater(len(resources), 0)
+
+
 class AutoScalingTest(BaseTest):
 
     def get_ec2_tags(self, ec2, instance_id):
@@ -105,7 +127,7 @@ class AutoScalingTest(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         snap = NotEncryptedFilter.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-malformedsnap")
+        self.assertEqual(snap, "snap-malformedsnap")
 
     def test_get_bad_snapshot_notfound(self):
         operation_name = "DescribeSnapshots"
@@ -117,7 +139,7 @@ class AutoScalingTest(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         snap = NotEncryptedFilter.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-notfound")
+        self.assertEqual(snap, "snap-notfound")
 
     def test_asg_image_age_filter(self):
         factory = self.replay_flight_data("test_asg_image_age_filter")
@@ -642,6 +664,19 @@ class AutoScalingTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n.asg.ec2.01")
+
+        policy = self.load_policy(
+            {
+                "name": "asg-propagated-tag-filter",
+                "resource": "asg",
+                "filters": [
+                    {"type": "propagated-tags", "keys": ["Tag01", "Tag02", "Tag03"]}
+                ],
+            },
+            session_factory=session,
+        )
+
+        policy.validate()
 
     def test_asg_propagate_tag_missing(self):
         session = self.replay_flight_data("test_asg_propagate_tag_missing")

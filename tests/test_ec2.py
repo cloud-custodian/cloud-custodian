@@ -913,6 +913,38 @@ class TestSnapshot(BaseTest):
 
 class TestSetInstanceProfile(BaseTest):
 
+    def test_ec2_set_instance_profile_missing(self):
+        factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_missing')
+        p = self.load_policy({
+            'name': 'ec2-set-profile-missing',
+            'resource': 'ec2',
+            'filters': [{'IamInstanceProfile': 'absent'}],
+            'actions': [
+                {
+                    'type': 'set-instance-profile',
+                    'name': 'aws-opsworks-ec2-role'
+                }
+            ]},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertFalse(resources[0].get('IamInstanceProfile'))
+
+        client = factory().client('ec2')
+        associations = {
+            a['InstanceId']: a['IamInstanceProfile']['Arn']
+            for a in client.describe_iam_instance_profile_associations(
+                Filters=[
+                    {'Name': 'instance-id',
+                     'Values': [i['InstanceId'] for i in resources]},
+                    {'Name': 'state', 'Values': ['associating', 'associated']}]
+            ).get('IamInstanceProfileAssociations', ())}
+        self.assertEqual(
+            associations,
+            {resources[0]['InstanceId']: 'arn:aws:iam::644160558196:instance-profile/aws-opsworks-ec2-role'}) # noqa
+
     def test_ec2_set_instance_profile_existing(self):
         factory = self.replay_flight_data(
             'test_ec2_set_instance_profile_existing')
@@ -1378,3 +1410,21 @@ class TestFilter(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestUserData(BaseTest):
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_userdata")
+        policy = self.load_policy(
+            {
+                "name": "ec2_userdata",
+                "resource": "ec2",
+                'filters': [{'or': [
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'}
+                ]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertGreater(len(resources), 0)

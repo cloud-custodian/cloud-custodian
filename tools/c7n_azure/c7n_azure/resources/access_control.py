@@ -13,18 +13,18 @@
 # limitations under the License.
 
 import logging
+import re
+import six
 
 from azure.graphrbac import GraphRbacManagementClient
-from azure.graphrbac.models import GetObjectsParameters
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
 from c7n_azure.session import Session
-from msrestazure.azure_exceptions import CloudError
+from c7n_azure.utils import GraphHelper
 
 from c7n.actions import BaseAction
-from c7n.config import Config
-from c7n.ctx import ExecutionContext
+from c7n.filters import Filter
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
@@ -62,35 +62,17 @@ class RoleAssignment(QueryResourceManager):
             resource['properties']['principalId'] for resource in resources
             if resource['properties']['principalId']))
 
-        object_params = GetObjectsParameters(
-            include_directory_object_references=True,
-            object_ids=object_ids)
+        principal_dics = GraphHelper.get_principal_dictionary(graph_client, object_ids)
 
-        aad_objects = graph_client.objects.get_objects_by_object_ids(object_params)
-
-        try:
-            principal_dics = {aad_object.object_id: aad_object for aad_object in aad_objects}
-
-            for resource in resources:
+        for resource in resources:
+            if resource['properties']['principalId'] in principal_dics.keys():
                 graph_resource = principal_dics[resource['properties']['principalId']]
-                resource['principalName'] = self.get_principal_name(graph_resource)
-                resource['displayName'] = graph_resource.display_name
-                resource['aadType'] = graph_resource.object_type
-
-        except CloudError:
-            log.warning('Credentials not authorized for access to read from Microsoft Graph. \n '
-                        'Can not query on principalName, displayName, or aadType. \n'
-                        )
+                if graph_resource.object_id:
+                    resource['principalName'] = GraphHelper.get_principal_name(graph_resource)
+                    resource['displayName'] = graph_resource.display_name
+                    resource['aadType'] = graph_resource.object_type
 
         return resources
-
-    @staticmethod
-    def get_principal_name(graph_object):
-        if graph_object.user_principal_name:
-            return graph_object.user_principal_name
-        elif graph_object.service_principal_names:
-            return graph_object.service_principal_names[0]
-        return graph_object.display_name or ''
 
 
 @resources.register('roledefinition')
@@ -126,6 +108,21 @@ class DescribeSource(DescribeSource):
         scope = '/subscriptions/%s' % (s.subscription_id)
         resources = client.role_definitions.list(scope)
         return [r.serialize(True) for r in resources]
+
+
+def is_scope(scope, scope_type):
+    if not isinstance(scope, six.string_types):
+        return False
+
+    regex = ""
+    if scope_type == "subscription":
+        regex = "^\/subscriptions\/[^\/]+$"
+    elif scope_type == "resource-group":
+        regex = "^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
+    else:
+        return False
+
+    return bool(re.match(regex, scope, flags=re.IGNORECASE))
 
 
 @RoleAssignment.filter_registry.register('role')
@@ -183,9 +180,7 @@ class ResourceAccessFilter(RelatedResourceFilter):
             resource_type.rsplit('.', 1)[-1])
 
     def get_related(self, resources):
-        ctx = ExecutionContext(local_session(Session), self.data, Config.empty())
-        manager = self.factory(ctx, self.data)
-        related = manager.source.get_resources(None)
+        related = self.manager.get_resource_manager(self.factory.type).resources()
         if self.data.get('op'):
             return [r['id'] for r in related if self.match(r)]
         else:
@@ -208,6 +203,31 @@ class ResourceAccessFilter(RelatedResourceFilter):
             raise FilterValidationError(
                 "The related resource can not be role assignments or role definitions"
             )
+
+
+@RoleAssignment.filter_registry.register('scope')
+class ScopeFilter(Filter):
+    """Filters role assignments that have subscription level scope access
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: assignments-with-subscription-scope
+                resource: azure.roleassignment
+                filters:
+                  - type: scope
+                    value: subscription
+    """
+
+    schema = type_schema(
+        'scope',
+        value={'type': 'string', 'enum': ['subscription', 'resource-group']})
+
+    def process(self, data, event=None):
+        scope_value = self.data.get('value', '')
+        return [d for d in data if is_scope(d["properties"]["scope"], scope_value)]
 
 
 @RoleAssignment.action_registry.register('delete')

@@ -4,6 +4,7 @@
     "parameters": {
         "dataFactoryName": {
             "type": "string",
+            "defaultValue": "cctest-data-factory",
             "metadata": {
                 "description": "Name of the data factory. Must be globally unique."
             }
@@ -22,54 +23,63 @@
         },
         "storageAccountName": {
             "type": "string",
+            "defaultValue": "[concat(uniquestring(resourceGroup().id), 'datafactory')]",
             "metadata": {
                 "description": "Name of the Azure storage account that contains the input/output data."
             }
         },
         "storageAccountKey": {
             "type": "securestring",
+            "defaultValue": "randomwrongkey",
             "metadata": {
                 "description": "Key for the Azure storage account."
             }
         },
         "blobContainer": {
             "type": "string",
+            "defaultValue": "blobContainer",
             "metadata": {
                 "description": "Name of the blob container in the Azure Storage account."
             }
         },
         "inputBlobFolder": {
             "type": "string",
+            "defaultValue": "inputBlobFolder",
             "metadata": {
                 "description": "The folder in the blob container that has the input file."
             }
         },
         "inputBlobName": {
             "type": "string",
+            "defaultValue": "inputBlobName",
             "metadata": {
                 "description": "Name of the input file/blob."
             }
         },
         "outputBlobFolder": {
             "type": "string",
+            "defaultValue": "outputBlobFolder",
             "metadata": {
                 "description": "The folder in the blob container that will hold the transformed data."
             }
         },
         "outputBlobName": {
             "type": "string",
+            "defaultValue": "outputBlobName",
             "metadata": {
                 "description": "Name of the output file/blob."
             }
         },
         "triggerStartTime": {
             "type": "string",
+            "defaultValue": "2018-09-10T00:00:00",
             "metadata": {
                 "description": "Start time for the trigger."
             }
         },
         "triggerEndTime": {
             "type": "string",
+            "defaultValue": "2018-09-10T01:00:00",
             "metadata": {
                 "description": "End time for the trigger."
             }

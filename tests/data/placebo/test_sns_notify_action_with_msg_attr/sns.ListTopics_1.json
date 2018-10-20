@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "655f054f-eac7-50c0-948a-569e04b42697",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "655f054f-eac7-50c0-948a-569e04b42697",
+                "content-type": "text/xml",
+                "content-length": "1196",
+                "date": "Wed, 25 Jul 2018 03:19:15 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

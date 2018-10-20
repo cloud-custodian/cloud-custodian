@@ -13,6 +13,7 @@
 # limitations under the License.
 import os
 import re
+import datetime
 
 from c7n_azure.session import Session
 from vcr_unittest import VCRTestCase
@@ -25,6 +26,9 @@ load_resources()
 
 C7N_SCHEMA = generate()
 DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
+# latest VCR recording date that tag tests
+# If tests need to be re-recorded, update to current date
+TEST_DATE = datetime.datetime(2018, 9, 10, 23, 59, 59)
 
 
 class AzureVCRBaseTest(VCRTestCase):
@@ -66,6 +70,9 @@ class AzureVCRBaseTest(VCRTestCase):
             DEFAULT_SUBSCRIPTION_ID,
             r2.path)
 
+        r1_path = r1_path.replace('//', '/')
+        r2_path = r2_path.replace('//', '/')
+
         return r1_path == r2_path
 
     def request_callback(self, request):
@@ -75,6 +82,10 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
                 DEFAULT_SUBSCRIPTION_ID,
                 request.url)
+        if request.body:
+            request.body = b'mock_body'
+        if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
+            return None
         if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
             return None
         return request

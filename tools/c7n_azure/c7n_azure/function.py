@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import sys
 from os.path import dirname, join
@@ -23,7 +24,7 @@ from c7n_azure import handler, entry
 
 try:
     import azure.functions as func
-    from azure.worker.bindings.http import HttpRequest
+    from azure.functions_worker.bindings.http import HttpRequest
 except ImportError:
     pass
 
@@ -36,10 +37,21 @@ def main(input):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
 
-    if type(input) is HttpRequest:
-        context['event'] = input.get_json()
+    event = None
 
-    handler.run(None, context)
+    if type(input) is HttpRequest:
+        event = input.get_json()
+        logging.info(event)
+
+        # handshake with event grid subscription creation
+        if 'data' in event[0] and 'validationCode' in event[0]['data']:
+            code = event[0]['data']['validationCode']
+            response = {
+                "validationResponse": code
+            }
+            return func.HttpResponse(body=json.dumps(response, indent=2), status_code=200)
+
+    handler.run(event, context)
 
     if type(input) is HttpRequest:
         return func.HttpResponse("OK")

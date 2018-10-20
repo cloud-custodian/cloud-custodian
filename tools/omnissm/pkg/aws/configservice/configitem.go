@@ -101,7 +101,6 @@ type ConfigurationState string
 
 func (s *ConfigurationState) UnmarshalJSON(b []byte) (err error) {
 	var st struct {
-		Code int    `json:"code"`
 		Name string `json:"name"`
 	}
 	err = json.Unmarshal(b, &st)

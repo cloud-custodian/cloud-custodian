@@ -14,10 +14,13 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.tags import TagHelper
 
 from c7n.actions import BaseAction
 from c7n.filters.core import ValueFilter, type_schema
 from c7n.filters.related import RelatedResourceFilter
+
+from c7n.filters.offhours import OffHour, OnHour
 
 
 @resources.register('vm')
@@ -61,6 +64,23 @@ class NetworkInterfaceFilter(RelatedResourceFilter):
     RelatedIdsExpression = "properties.networkProfile.networkInterfaces[0].id"
 
 
+@VirtualMachine.action_registry.register('poweroff')
+class VmPowerOffAction(BaseAction):
+
+    schema = type_schema('poweroff')
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(VmPowerOffAction, self).__init__(data, manager, log_dir)
+        self.client = self.manager.get_client()
+
+    def poweroff(self, resource_group, vm_name):
+        self.client.virtual_machines.power_off(resource_group, vm_name)
+
+    def process(self, vms):
+        for vm in vms:
+            self.poweroff(vm['resourceGroup'], vm['name'])
+
+
 @VirtualMachine.action_registry.register('stop')
 class VmStopAction(BaseAction):
 
@@ -71,7 +91,7 @@ class VmStopAction(BaseAction):
         self.client = self.manager.get_client()
 
     def stop(self, resource_group, vm_name):
-        self.client.virtual_machines.power_off(resource_group, vm_name)
+        self.client.virtual_machines.deallocate(resource_group, vm_name)
 
     def process(self, vms):
         for vm in vms:
@@ -110,3 +130,31 @@ class VmRestartAction(BaseAction):
     def process(self, vms):
         for vm in vms:
             self.restart(vm['resourceGroup'], vm['name'])
+
+
+@VirtualMachine.filter_registry.register('offhour')
+class AzureVMOffHour(OffHour):
+
+    # Override get_tag_value because Azure stores tags differently from AWS
+    def get_tag_value(self, i):
+        tag_value = TagHelper.get_tag_value(resource=i,
+                                       tag=self.tag_key,
+                                       utf_8=True)
+
+        if tag_value is not False:
+            tag_value = tag_value.lower().strip("'\"")
+        return tag_value
+
+
+@VirtualMachine.filter_registry.register('onhour')
+class AzureVMOnHour(OnHour):
+
+    # Override get_tag_value because Azure stores tags differently from AWS
+    def get_tag_value(self, i):
+        tag_value = TagHelper.get_tag_value(resource=i,
+                                       tag=self.tag_key,
+                                       utf_8=True)
+
+        if tag_value is not False:
+            tag_value = tag_value.lower().strip("'\"")
+        return tag_value

@@ -150,6 +150,8 @@ def resource_format(resource, resource_type):
     elif resource_type == 'ami':
         return "%s %s %s" % (
             resource.get('Name'), resource['ImageId'], resource['CreationDate'])
+    elif resource_type == 'sagemaker-notebook':
+        return "%s" % (resource['NotebookInstanceName'])
     elif resource_type == 's3':
         return "%s" % (resource['Name'])
     elif resource_type == 'ebs':

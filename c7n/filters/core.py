@@ -130,7 +130,7 @@ class FilterRegistry(PluginRegistry):
                 return And(data, self, manager)
             elif op == 'not':
                 return Not(data, self, manager)
-            return ValueFilter(data, manager).validate()
+            return ValueFilter(data, manager)
         if isinstance(data, six.string_types):
             filter_type = data
             data = {'type': data}
@@ -161,6 +161,7 @@ class Filter(object):
     metrics = ()
     permissions = ()
     schema = {'type': 'object'}
+    schema_alias = None
 
     def __init__(self, data, manager=None):
         self.data = data
@@ -312,7 +313,8 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'enum': [
                 'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr', 'unique_size']},
+                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
+                'unique_size']},
             'default': {'type': 'object'},
             'value_from': ValuesFrom.schema,
             'value': {'oneOf': [

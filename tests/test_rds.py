@@ -707,7 +707,7 @@ class RDSTest(BaseTest):
 
         resources = policy.run()
 
-        self.assertEquals(len(resources), 1, "Resources should be unused")
+        self.assertEqual(len(resources), 1, "Resources should be unused")
 
 
 class RDSSnapshotTest(BaseTest):

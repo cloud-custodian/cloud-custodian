@@ -1,0 +1,50 @@
+{
+  "body": {
+    "timeSeries": [
+      {
+        "metricKind": "GAUGE", 
+        "metric": {
+          "labels": {
+            "policy": "custodian-works", 
+            "project_id": "cloud-custodian"
+          }, 
+          "type": "custom.googleapis.com/custodian/policy/resourcecount"
+        }, 
+        "points": [
+          {
+            "interval": {
+              "endTime": "2018-08-12T22:30:53.524505Z", 
+              "startTime": "2018-08-12T22:30:53.524505Z"
+            }, 
+            "value": {
+              "int64Value": "43"
+            }
+          }
+        ], 
+        "resource": {
+          "labels": {
+            "project_id": "cloud-custodian"
+          }, 
+          "type": "global"
+        }, 
+        "valueType": "INT64"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "688", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://monitoring.googleapis.com/v3/projects/cloud-custodian/timeSeries?filter=metric.type%3D%22custom.googleapis.com%2Fcustodian%2Fpolicy%2Fresourcecount%22&interval.endTime=2018-08-12T22%3A31%3A40.059778Z&alt=json&interval.startTime=2018-08-12T22%3A26%3A40.059753Z&pageSize=3", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Sun, 12 Aug 2018 22:31:40 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

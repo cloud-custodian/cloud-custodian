@@ -263,6 +263,11 @@ class NetworkLocationTest(BaseTest):
                 {
                     "reason": "SecurityGroupLocationAbsent",
                     "security-groups": {sg_id: None, web_sg_id: "web"},
+                },
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "security-groups": {sg_id: None},
+                    "resource": "web"
                 }
             ],
         )
@@ -406,7 +411,11 @@ class NetworkLocationTest(BaseTest):
                     "security-groups": {db_sg_id: "db", web_sg_id: "web"},
                     "subnets": {web_sub_id: "web"},
                 },
-            ],
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "resource": "web",
+                    "security-groups": {db_sg_id: "db"}
+                }]
         )
 
     @functional
@@ -458,7 +467,12 @@ class NetworkLocationTest(BaseTest):
         matched = resources.pop()
         self.assertEqual(
             matched["c7n:NetworkLocation"],
-            [{"reason": "ResourceLocationAbsent", "resource": None}],
+            [
+                {"reason": "ResourceLocationAbsent",
+                "resource": None},
+                {"security-groups": {web_sg_id: "web"},
+                "resource": None,
+                "reason": "SecurityGroupMismatch"}],
         )
 
     @functional
@@ -1407,8 +1421,182 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    @functional
+    def test_only_ports_and_cidr_ingress(self):
+        factory = self.replay_flight_data("test_only_ports_and_cidr_ingress")
+        client = factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        sg_id = client.create_security_group(
+            GroupName="c7n-only-ports-and-cidr-test", VpcId=vpc_id,
+            Description="cloud-custodian test SG"
+        )["GroupId"]
+        self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=0,
+            ToPort=62000,
+            CidrIp="10.2.0.0/16",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=80,
+            ToPort=80,
+            CidrIp="0.0.0.0/0",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=1234,
+            ToPort=4321,
+            CidrIp="0.0.0.0/0",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=443,
+            ToPort=443,
+            CidrIp="0.0.0.0/0",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=8080,
+            ToPort=8080,
+            CidrIp="0.0.0.0/0",
+        )
+        p = self.load_policy(
+            {
+                "name": "sg-find",
+                "resource": "security-group",
+                "filters": [
+                    {"VpcId": vpc_id},
+                    {"GroupName": "c7n-only-ports-and-cidr-test"},
+                    {
+                        "type": "ingress",
+                        "OnlyPorts": [80, 443],
+                        "Cidr": {"value": "0.0.0.0/0"}
+                    }
+                ],
+                "actions": [
+                    {"type": "remove-permissions", "ingress": "matched"}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["GroupId"], sg_id)
+        self.assertEqual(resources[0]['IpPermissions'], [
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 80,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 80,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 8080,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 8080,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 0,
+                u'IpRanges': [{u'CidrIp': '10.2.0.0/16'}],
+                u'ToPort': 62000,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 1234,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 4321,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 443,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 443,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            }
+        ])
+        self.assertEqual(
+            resources[0]['c7n:MatchedFilters'], [u'VpcId', u'GroupName']
+        )
+        self.assertEqual(
+            resources[0]['MatchedIpPermissions'],
+            [
+                {
+                    u'FromPort': 8080,
+                    u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                    u'PrefixListIds': [],
+                    u'ToPort': 8080,
+                    u'IpProtocol': 'tcp',
+                    u'UserIdGroupPairs': [],
+                    u'Ipv6Ranges': []
+                },
+                {
+                    u'FromPort': 1234,
+                    u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                    u'PrefixListIds': [],
+                    u'ToPort': 4321,
+                    u'IpProtocol': 'tcp',
+                    u'UserIdGroupPairs': [],
+                    u'Ipv6Ranges': []
+                }
+            ]
+        )
+        group_info = client.describe_security_groups(
+            GroupIds=[sg_id]
+        )["SecurityGroups"][0]
+        self.assertEqual(group_info.get("IpPermissions", []), [
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 80,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 80,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 0,
+                u'IpRanges': [{u'CidrIp': '10.2.0.0/16'}],
+                u'ToPort': 62000,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 443,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 443,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            }
+        ])
 
     def test_multi_attribute_ingress(self):
         p = self.load_policy(
@@ -1444,7 +1632,7 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_ports_ingress(self):
@@ -1479,7 +1667,7 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_self_reference_ingress_false_positives(self):
@@ -1524,7 +1712,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1541,7 +1729,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         p = self.load_policy(
@@ -1560,8 +1748,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
-
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         resources = [
@@ -1608,7 +1795,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1627,7 +1814,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         p = self.load_policy(
@@ -1645,7 +1832,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1663,7 +1850,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_egress_ipv6(self):
@@ -1713,7 +1900,7 @@ class SecurityGroupTest(BaseTest):
             "OwnerId": "644160558196",
             "GroupId": "sg-b744bafc"
         }]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_permission_expansion(self):

@@ -17,7 +17,7 @@ from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import Filter
+from c7n.filters import Filter, MetricsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.manager import resources
@@ -89,8 +89,15 @@ class EventRule(QueryResourceManager):
         name = "Name"
         id = "Name"
         filter_name = "NamePrefix"
-        filer_type = "scalar"
-        dimension = "RuleName"
+        filter_type = "scalar"
+        dimension = None
+
+
+@EventRule.filter_registry.register('metrics')
+class EventRuleMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': 'RuleName', 'Value': resource['Name']}]
 
 
 @resources.register('event-rule-target')
@@ -242,14 +249,13 @@ class LastWriteDays(Filter):
     permissions = ('logs:DescribeLogStreams',)
 
     def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('logs')
         self.date_threshold = datetime.utcnow() - timedelta(
             days=self.data['days'])
-        return super(LastWriteDays, self).process(resources)
+        return [r for r in resources if self.check_group(client, r)]
 
-    def __call__(self, group):
-        self.log.debug("Processing group %s", group['logGroupName'])
-        logs = local_session(self.manager.session_factory).client('logs')
-        streams = logs.describe_log_streams(
+    def check_group(self, client, group):
+        streams = client.describe_log_streams(
             logGroupName=group['logGroupName'],
             orderBy='LastEventTime',
             descending=True,
@@ -282,7 +288,7 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
         client = local_session(self.manager.session_factory).client('logs')
         accounts = self.get_accounts()
         results = []
-        with self.executor_factory(max_workers=2) as w:
+        with self.executor_factory(max_workers=1) as w:
             futures = []
             for rset in chunks(resources, 50):
                 futures.append(
