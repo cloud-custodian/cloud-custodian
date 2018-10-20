@@ -1,0 +1,52 @@
+# Policy Changes from Git
+
+Using custodian in accordance with infrastructure as code principles,
+we store policy assets in a versioned control repository. This
+provides for an audit log and facilitate change reviews. However this
+capability is primarily of use to humans making semantic
+interpretations of changes. This script also provides logical custodian
+policy changes over a git repo and allows streaming those changes.
+
+
+Two example use cases:
+
+  - Doing dryrun only on changed policies within a pull request
+  - Dashboard metrics of policy changes
+
+# Install
+
+Pre-requisites. pygit2, click, requests and custodian/c7n.
+
+# Usage
+
+Streaming use case (default stream is to stdout, also supports kinesis, rdbms and sqs)
+
+```
+  $ python tools/ops/policystream.py stream -r foo
+  2018-08-12 12:37:00,567: c7n.policystream:INFO Cloning repository: foo
+  <policy-add policy:foi provider:aws resource:ec2 date:2018-08-02T15:13:28-07:00 author:Kapil commit:09cb85>
+  <policy-moved policy:foi provider:aws resource:ec2 date:2018-08-02T15:14:24-07:00 author:Kapil commit:76fce7>
+  <policy-remove policy:foi provider:aws resource:ec2 date:2018-08-02T15:14:46-07:00 author:Kapil commit:570ca4>
+  <policy-add policy:ec2-guard-duty provider:aws resource:ec2 date:2018-08-02T15:14:46-07:00 author:Kapil commit:570ca4>
+  <policy-add policy:ec2-run provider:aws resource:ec2 date:2018-08-02T15:16:00-07:00 author:Kapil commit:d3d8d4>
+  <policy-remove policy:ec2-run provider:aws resource:ec2 date:2018-08-02T15:18:31-07:00 author:Kapil commit:922c1a>
+  <policy-modified policy:ec2-guard-duty provider:aws resource:ec2 date:2018-08-12T09:39:43-04:00 author:Kapil commit:189ea1>
+  2018-08-12 12:37:01,275: c7n.policystream:INFO Streamed 7 policy changes
+```
+
+Diff use case, output policies changes in the last commit
+
+```
+  $ python tools/ops/policystream.py diff -r foo -v
+```
+
+Pull request use, output policies changes between two branches
+
+```
+  $ python tools/ops/policystream.py diff -r foo
+  policies:
+  - filters:
+    - {type: cross-account}
+    name: lambda-access-check
+    resource: aws.lambda
+```
