@@ -566,8 +566,8 @@ class SQSTransport(Transport):
 class OutputTransport(Transport):
 
     def send(self, change):
-        if self.info.get('format', '') == 'json':
-            print(json.dumps(change.data(), indent=2))
+        if self.info.get('format', '') == 'jsonline':
+            print(json.dumps(change.data(), indent=None))
         else:
             print(change)
 
@@ -575,8 +575,8 @@ class OutputTransport(Transport):
 def transport(stream_uri, assume):
     if stream_uri == 'stdout':
         return OutputTransport(None, {})
-    elif stream_uri == 'json':
-        return OutputTransport(None, {'format': 'json'})
+    elif stream_uri == 'jsonline':
+        return OutputTransport(None, {'format': 'jsonline'})
     if (stream_uri.startswith('sqlite') or
             stream_uri.startswith('postgresql') or
             stream_uri.startswith('mysql')):

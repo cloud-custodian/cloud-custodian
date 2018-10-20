@@ -3,9 +3,18 @@ import json
 import subprocess
 import os
 
-import pygit2
+import pytest
 
+try:
+    import pygit2
+    import policystream
+except ImportError:
+    pygit2 = None
+
+
+from click.testing import CliRunner
 from c7n.testing import TestUtils
+
 
 DEFAULT_CONFIG = """\
 [user]
@@ -46,7 +55,7 @@ class GitRepo(object):
         os.remove(os.path.join(self.repo_path, path))
 
     def repo(self):
-        return pygit2.discover_repository(self.repo_path)
+        return pygit2.Repository(os.path.join(self.repo_path, '.git'))
 
     def move(self, src, tgt):
         subprocess.check_output(['git', 'mv', src, tgt], cwd=self.repo_path)
@@ -70,23 +79,58 @@ class GitRepo(object):
         subprocess.check_output(args, cwd=self.repo_path)
 
 
+@pytest.mark.skipif(pygit2 is None, reason="pygit2 not installed")
 class StreamTest(TestUtils):
 
-    def test_stream_basic(self):
-        self.git = GitRepo(self.get_temp_dir())
-        self.git.init()
-        self.git.change('example.yml', {'policies': []})
-        self.git.commit('init')
-        self.git.change('example.yml', {
+    def setup_basic_repo(self):
+        git = GitRepo(self.get_temp_dir())
+        git.init()
+        git.change('example.yml', {'policies': []})
+        git.commit('init')
+        git.change('example.yml', {
             'policies': [{
                 'name': 'codebuild-check',
                 'resource': 'aws.codebuild'}]})
-        self.git.commit('add something')
-        self.git.change('example.yml', {
+        git.commit('add something')
+        git.change('example.yml', {
             'policies': [{
                 'name': 'lambda-check',
                 'resource': 'aws.lambda'}]})
-        self.git.commit('switch')
+        git.commit('switch')
+        return git
+
+    def test_stream_basic(self):
+        git = self.setup_basic_repo()
+        policy_repo = policystream.PolicyRepo(git.repo_path, git.repo())
+        changes = [c.data() for c in policy_repo.delta_stream(
+            sort=pygit2.GIT_SORT_TOPOLOGICAL | pygit2.GIT_SORT_REVERSE)]
+        self.assertEqual(len(changes), 3)
+        self.assertEqual(
+            [(c['change'],
+              c['policy']['data']['name'],
+              c['commit']['message'].strip()) for c in changes],
+            [('add', 'codebuild-check', 'add something'),
+             ('remove', 'codebuild-check', 'switch'),
+             ('add', 'lambda-check', 'switch')])
+
+    def test_cli_stream_basic(self):
+        git = self.setup_basic_repo()
+        runner = CliRunner()
+        result = runner.invoke(
+            policystream.cli,
+            ['stream', '-r', git.repo_path, '-s', 'jsonline'])
+        self.assertEqual(result.exit_code, 0)
         
-        
-        
+        rows = [json.loads(l) for l in result.stdout.splitlines()]
+        self.maxDiff = None
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(
+            list(sorted(rows[0].keys())),
+            ['change', 'commit', 'policy', 'repo_uri'])
+        self.assertEqual(
+            [r['change'] for r in rows],
+            ['add', 'remove', 'add'])
+        self.assertEqual(
+            rows[-1]['policy'],
+            {'data': {'name': 'lambda-check', 'resource': 'aws.lambda'},
+             'file': 'example.yml'})
