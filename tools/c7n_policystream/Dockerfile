@@ -1,5 +1,10 @@
 FROM ubuntu:cosmic
-MAINTAINER Kapil Thangavelu http://twitter.com/kapilvt
+
+LABEL name="c7n-policystream" \
+      description="Custodian policy changes streamed from Git" \
+      repository="http://github.com/capitalone/cloud-custodian" \
+      homepage="http://github.com/capitalone/cloud-custodian" \
+      maintainer="Kapil Thangavelu <http://twitter.com/kapilvt>"
 
 # Note this must be run from the root directory of the checkout
 # as we install custodian w/ aws, azure, and gcp support from the same
