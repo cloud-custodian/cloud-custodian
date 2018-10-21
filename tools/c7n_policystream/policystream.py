@@ -26,6 +26,7 @@ import jmespath
 import json
 import logging
 import shutil
+import operator
 import os
 import pygit2
 import requests
@@ -75,6 +76,12 @@ class ChangeType(object):
     MODIFIED = 3
     MOVED = 4
 
+
+SORT_TYPE = {
+    'topo': pygit2.GIT_SORT_TOPOLOGICAL,
+    'time': pygit2.GIT_SORT_TIME,
+    'reverse': pygit2.GIT_SORT_REVERSE
+}
 
 CHANGE_TYPE = {
     1: 'ADD',
@@ -817,7 +824,11 @@ def pull(repo, creds, remote_name='origin', branch='master'):
 @click.option('-o', '--output', type=click.File('wb'), default='-')
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def diff(repo_uri, source, target, output, verbose):
-    """Policy diff between two arbitrary revisions"""
+    """Policy diff between two arbitrary revisions.
+
+    Revision specifiers for source and target can use fancy git refspec syntax
+    for symbolics, dates, etc.
+    """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -846,17 +857,40 @@ def diff(repo_uri, source, target, output, verbose):
 @click.option(
     '-s', '--stream-uri', default="stdout",
     help=("Destination stream for logical changes "
-          "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"))
+          "(supports stdout/jsonline/kinesis/sqs/sqlalchemy)"))
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('--assume', help="Role assumption for AWS stream outputs")
 @click.option('--before', help="Only stream commits before given date")
 @click.option('--after', help="Only stream commits after given date")
-def stream(repo_uri, stream_uri, verbose, assume, before=None, after=None):
-    """Stream git history policy changes to destination"""
+@click.option('--sort', multiple=True, default=["reverse", "time"],
+              type=click.Choice(SORT_TYPE.keys()),
+              help="Git sort ordering")
+def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None):
+    """Stream git history policy changes to destination.
+
+
+    Default stream destination is a summary of the policy changes to stdout, one
+    per line. Also supported for stdout streaming is `jsonline`.
+
+    AWS Kinesis and SQS destinations are specified by providing the ARN.
+
+    Database destinations are supported by providing a sqlalchemy DSN. Note
+    SQLAlchemy and db drivers must be installed separately as they an optional
+    dependency.
+
+    When using database destinations, streaming defaults to incremental.
+    """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
     logging.getLogger('botocore').setLevel(logging.WARNING)
+
+    if before:
+        before = parse(before)
+    if after:
+        after = parse(after)
+    if sort:
+        sort = six.moves.reduce(operator.or_, [SORT_TYPE[s] for s in sort])
 
     with contextlib.closing(TempDir().open()) as temp_dir:
         if repo_uri is None:
@@ -874,7 +908,7 @@ def stream(repo_uri, stream_uri, verbose, assume, before=None, after=None):
         with contextlib.closing(transport(stream_uri, assume)) as t:
             if after is None and isinstance(t, IndexedTransport):
                 after = t.last()
-            for change in policy_repo.delta_stream(after=after):
+            for change in policy_repo.delta_stream(after=after, before=before):
                 change_count += 1
                 t.send(change)
 
