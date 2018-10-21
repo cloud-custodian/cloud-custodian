@@ -258,6 +258,28 @@ class TestPolicyCollection(BaseTest):
         collection = AWS().initialize_policies(original, Config.empty(regions=["all"]))
         self.assertEqual(len(collection), 1)
 
+    def test_policy_expand_group_region(self):
+        cfg = Config.empty(regions=["us-east-1", "us-east-2", "us-west-2"])
+        original = policy.PolicyCollection.from_data(
+            {"policies": [
+                {"name": "bar", "resource": "lambda"},
+                {"name": "middle", "resource": "security-group"},
+                {"name": "foo", "resource": "ec2"}]},
+            cfg)
+
+        collection = AWS().initialize_policies(original, cfg)
+        self.assertEqual(
+            [(p.name, p.options.region) for p in collection],
+            [('bar', 'us-east-1'),
+             ('middle', 'us-east-1'),
+             ('foo', 'us-east-1'),
+             ('bar', 'us-east-2'),
+             ('middle', 'us-east-2'),
+             ('foo', 'us-east-2'),
+             ('bar', 'us-west-2'),
+             ('middle', 'us-west-2'),
+             ('foo', 'us-west-2')])
+
     def test_policy_region_expand_global(self):
         original = policy.PolicyCollection.from_data(
             {

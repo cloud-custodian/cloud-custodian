@@ -119,6 +119,10 @@ class Session(object):
         self._initialize_session()
         return self.credentials
 
+    def get_subscription_id(self):
+        self._initialize_session()
+        return self.subscription_id
+
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
 

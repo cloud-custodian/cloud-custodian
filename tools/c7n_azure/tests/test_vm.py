@@ -17,7 +17,7 @@ import datetime
 
 from azure_common import BaseTest, arm_template
 from mock import patch
-from tests.test_offhours import mock_datetime_now
+from c7n.testing import mock_datetime_now
 from dateutil import zoneinfo
 
 

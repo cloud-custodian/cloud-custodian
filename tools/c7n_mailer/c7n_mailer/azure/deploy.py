@@ -20,10 +20,10 @@ import logging
 try:
     from c7n_azure.function_package import FunctionPackage
     from c7n_azure.functionapp_utils import FunctionAppUtilities
-    from c7n_azure.template_utils import TemplateUtilities
     from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
+    from c7n_azure.policy import AzureFunctionMode
 except ImportError:
-    FunctionPackage = TemplateUtilities = None
+    FunctionPackage = None
     CONST_DOCKER_VERSION = CONST_FUNCTIONS_EXT_VERSION = None
     pass
 
@@ -32,37 +32,43 @@ def provision(config):
     log = logging.getLogger('c7n_mailer.azure.deploy')
 
     function_name = config.get('function_name', 'mailer')
+    schedule = config.get('function_schedule', '0 */10 * * * *')
+    function_properties = config.get('function_properties', {})
 
-    func_config = dict(
-        name=function_name,
-        servicePlanName=config.get('function_servicePlanName', 'cloudcustodian'),
-        location=config.get('function_location'),
-        appInsightsLocation=config.get('function_appInsightsLocation'),
-        schedule=config.get('function_schedule', '0 */10 * * * *'),
-        skuCode=config.get('function_skuCode'),
-        sku=config.get('function_sku'))
+    # service plan is parse first, because its location might be shared with storage & insights
+    service_plan = AzureFunctionMode.extract_properties(function_properties,
+                                                'servicePlan',
+                                                {'name': 'cloud-custodian',
+                                                 'location': 'westus2',
+                                                 'resource_group_name': 'cloud-custodian',
+                                                 'sku_name': 'B1',
+                                                 'sku_tier': 'Basic'})
 
-    template_util = TemplateUtilities()
+    location = service_plan.get('location', 'westus2')
+    rg_name = service_plan['resource_group_name']
+    storage_account = AzureFunctionMode.extract_properties(function_properties,
+                                                    'storageAccount',
+                                                    {'name': 'custodianstorageaccount',
+                                                     'location': location,
+                                                     'resource_group_name': rg_name})
 
-    parameters = _get_parameters(template_util, func_config)
-    group_name = parameters['servicePlanName']['value']
-    webapp_name = parameters['name']['value']
+    app_insights = AzureFunctionMode.extract_properties(function_properties,
+                                                    'appInsights',
+                                                    {'name': service_plan['name'],
+                                                     'location': location,
+                                                     'resource_group_name': rg_name})
 
-    # Check if already existing
-    existing_webapp = template_util.resource_exist(group_name, webapp_name)
+    functionapp_name = (service_plan['name'] + '-' + function_name).replace(' ', '-').lower()
 
-    # Deploy
-    if not existing_webapp:
-        template_util.create_resource_group(
-            group_name, {'location': parameters['location']['value']})
+    params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
+        app_insights=app_insights,
+        service_plan=service_plan,
+        storage_account=storage_account,
+        functionapp_name=functionapp_name)
 
-        template_util.deploy_resource_template(
-            group_name, 'dedicated_functionapp.json', parameters).wait()
-    else:
-        log.info("Found existing App %s (%s) in group %s" %
-                 (webapp_name, existing_webapp.location, group_name))
+    FunctionAppUtilities().deploy_dedicated_function_app(params)
 
-    log.info("Building function package for %s" % webapp_name)
+    log.info("Building function package for %s" % functionapp_name)
 
     # Build package
     packager = FunctionPackage(
@@ -81,7 +87,7 @@ def provision(config):
         function_name + '/function.json',
         contents=packager.get_function_config({'mode':
                                               {'type': 'azure-periodic',
-                                               'schedule': func_config['schedule']}}))
+                                               'schedule': schedule}}))
     # Add mail templates
     template_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), '../..', 'msg-templates'))
@@ -92,24 +98,7 @@ def provision(config):
 
     packager.close()
 
-    if packager.wait_for_status(webapp_name):
-        packager.publish(webapp_name)
+    if packager.wait_for_status(functionapp_name):
+        packager.publish(functionapp_name)
     else:
         log.error("Aborted deployment, ensure Application Service is healthy.")
-
-
-def _get_parameters(template_util, func_config):
-    parameters = template_util.get_default_parameters(
-        'dedicated_functionapp.parameters.json')
-
-    func_config['name'] = (func_config['servicePlanName'] + '-' +
-                           func_config['name']).replace(' ', '-').lower()
-
-    func_config['storageName'] = (func_config['servicePlanName']).replace('-', '')
-    func_config['dockerVersion'] = CONST_DOCKER_VERSION
-    func_config['functionsExtVersion'] = CONST_FUNCTIONS_EXT_VERSION
-    func_config['machineDecryptionKey'] = FunctionAppUtilities.generate_machine_decryption_key()
-
-    parameters = template_util.update_parameters(parameters, func_config)
-
-    return parameters
