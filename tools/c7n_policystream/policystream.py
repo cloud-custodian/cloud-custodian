@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+#
+# Copyright 2018 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import click
 import contextlib
 from collections import deque
@@ -26,6 +41,7 @@ from c7n.resources import load_resources
 from c7n.utils import get_retry
 
 import boto3
+
 try:
     import sqlalchemy as rdb
     HAVE_SQLA = True
@@ -286,6 +302,7 @@ class PolicyRepo(object):
         # Added
         for f in set(target_files) - set(baseline_files):
             target_policies += self._policy_file_rev(f, target)
+
         # Removed
         for f in set(baseline_files) - set(target_files):
             baseline_policies += self._policy_file_rev(f, baseline)
@@ -664,16 +681,19 @@ def github_repos(organization, github_url, github_token):
 @click.option('--github-token', envvar='GITHUB_TOKEN',
               help="Github credential token")
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-@click.option('-d', '--clone-dir')
-@click.option('-f', '--filter', multiple=True)
-@click.option('-e', '--exclude', multiple=True)
-@click.option('-s', '--stream-uri', default="stdout")
+@click.option('-d', '--clone-dir', help="Local directory to checkout repos to")
+@click.option('-f', '--filter', multiple=True, help="glob for repositories within org to include")
+@click.option('-e', '--exclude', multiple=True, help="glob for repository within org to exclude")
+@click.option('-s', '--stream-uri', default="stdout",
+              help=("Destination stream for logical changes "
+                    "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"))
 @click.option('--assume', '--assume',
               help="Assume role for cloud stream destinations")
 @click.pass_context
 def org_stream(ctx, organization, github_url, github_token, clone_dir,
                verbose, filter, exclude, stream_uri, assume):
-    """Stream changes for a whole organization's git history"""
+    """Stream changes for repos in a GitHub organization.
+    """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -714,7 +734,7 @@ def org_stream(ctx, organization, github_url, github_token, clone_dir,
 @click.option('-e', '--exclude', multiple=True)
 def org_checkout(organization, github_url, github_token, clone_dir,
                  verbose, filter, exclude):
-    """Checkout repositories from an organization."""
+    """Checkout repositories from a GitHub organization."""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -791,13 +811,13 @@ def pull(repo, creds, remote_name='origin', branch='master'):
 
 
 @cli.command(name='diff')
-@click.option('-r', '--repo-uri')
+@click.option('-r', '--repo-uri', help="Path/Url to git repository")
 @click.option('--source', default='master', help="source/baseline revision spec")
 @click.option('--target', default=None, help="target revision spec")
 @click.option('-o', '--output', type=click.File('wb'), default='-')
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def diff(repo_uri, source, target, output, verbose):
-    """Diff two arbitrary repo commits and output the diff"""
+    """Policy diff between two arbitrary revisions"""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -822,10 +842,13 @@ def diff(repo_uri, source, target, output, verbose):
 
 
 @cli.command()
-@click.option('-r', '--repo-uri')
-@click.option('-s', '--stream-uri', default="stdout")
+@click.option('-r', '--repo-uri', help="Path/Url to git repository")
+@click.option(
+    '-s', '--stream-uri', default="stdout",
+    help=("Destination stream for logical changes "
+          "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"))
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-@click.option('--assume')
+@click.option('--assume', help="Role assumption for AWS stream outputs")
 @click.option('--before', help="Only stream commits before given date")
 @click.option('--after', help="Only stream commits after given date")
 def stream(repo_uri, stream_uri, verbose, assume, before=None, after=None):
