@@ -37,13 +37,12 @@ def main(input):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
 
-    event = None
+    events = None
 
     if type(input) is QueueMessage:
-        event = [input.get_json()]
-        logging.info(event)
+        events = [input.get_json()]
 
-    handler.run(event, context)
+    handler.run(events, context)
 
 
 # Need to manually initialize c7n_azure
