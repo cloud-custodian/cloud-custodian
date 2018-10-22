@@ -100,6 +100,7 @@ class FunctionPackageTest(BaseTest):
         self.assertTrue(FunctionPackageTest._file_exists(files, 'test-azure-package/config.json'))
         self.assertTrue(FunctionPackageTest._file_exists(files, 'host.json'))
         self.assertTrue(FunctionPackageTest._file_exists(files, 'extensions.csproj'))
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'bin/extensions.dll'))
 
     @staticmethod
     def _file_exists(files, name):
