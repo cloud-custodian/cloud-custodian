@@ -289,7 +289,7 @@ class AzureEventGridMode(AzureFunctionMode):
             self.storage_account['resource_group_name'], self.storage_account['name'])
 
         StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
-        self.log.info("Storage Queue creation succeeded")
+        self.log.info("Storage queue creation succeeded")
 
         return storage_account
 
@@ -299,4 +299,4 @@ class AzureEventGridMode(AzureFunctionMode):
                                                                queue_name=queue_name)
 
         AzureEventSubscription.create(destination, queue_name, session)
-        self.log.info('Event Grid subscription creation succeeded')
+        self.log.info('Event grid subscription creation succeeded')
