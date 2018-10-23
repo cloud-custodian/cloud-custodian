@@ -131,6 +131,11 @@ func main() {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
 		}
 
+		client, err := newElasticClient(esClient)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		for _, message := range sqsEvent.Records {
 			var sns snsEvent
 			json.Unmarshal([]byte(message.Body), &sns)
@@ -149,12 +154,7 @@ func main() {
 				}
 
 				if bucketName == "" || bucketKey == "" {
-					log.Fatal("Cloudwatch event missing BucketName or Key")
-				}
-
-				client, err := newElasticClient(esClient)
-				if err != nil {
-					log.Fatal(err)
+					log.Fatal("Event missing BucketName or Key")
 				}
 
 				err = processEventRecord(ctx, bucketName, bucketKey, client)
