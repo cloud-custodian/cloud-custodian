@@ -63,7 +63,10 @@ class Session(object):
             'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
             'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
         ]
-        token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
+
+        token_auth_variables = [
+            'AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID'
+        ]
 
         if self.authorization_file:
             self.credentials, self.subscription_id = self.load_auth_file(self.authorization_file)
@@ -169,19 +172,51 @@ class Session(object):
                 tenant=data['credentials']['tenant']
             ), data['subscription'])
 
-    def get_auth_string(self):
-        if type(self.credentials) is not ServicePrincipalCredentials:
-            raise NotImplementedError(
-                "Writing auth file only supported for Service Principal credentials.")
+    def get_functions_auth_string(self):
+        """
+        Build auth json string for deploying
+        Azure Functions.  Look for dedicated
+        Functions environment variables or
+        fall back to normal Service Principal
+        variables.
 
-        auth = {
-            'credentials':
-                {
-                    'client_id': os.environ['AZURE_CLIENT_ID'],
-                    'secret': os.environ['AZURE_CLIENT_SECRET'],
-                    'tenant': os.environ['AZURE_TENANT_ID']
-                },
-            'subscription': self.subscription_id
-        }
+        """
+
+        function_auth_variables = [
+            'AZURE_FUNCTION_TENANT_ID',
+            'AZURE_FUNCTION_CLIENT_ID',
+            'AZURE_FUNCTION_CLIENT_SECRET'
+        ]
+
+        function_subscription_id = (os.environ['AZURE_FUNCTION_SUBSCRIPTION_ID'] or
+                                    self.subscription_id)
+
+        # Use dedicated function env vars if available
+        if all(k in os.environ for k in function_auth_variables):
+            auth = {
+                'credentials':
+                    {
+                        'client_id': os.environ['AZURE_FUNCTION_CLIENT_ID'],
+                        'secret': os.environ['AZURE_FUNCTION_CLIENT_SECRET'],
+                        'tenant': os.environ['AZURE_FUNCTION_TENANT_ID']
+                    },
+                'subscription': function_subscription_id
+            }
+
+        elif type(self.credentials) is ServicePrincipalCredentials:
+            auth = {
+                'credentials':
+                    {
+                        'client_id': os.environ['AZURE_CLIENT_ID'],
+                        'secret': os.environ['AZURE_CLIENT_SECRET'],
+                        'tenant': os.environ['AZURE_TENANT_ID']
+                    },
+                'subscription': function_subscription_id
+            }
+
+        else:
+            raise NotImplementedError(
+                "Service Principal credentials are the only "
+                "supported auth mechanism for deploying functions.")
 
         return json.dumps(auth, indent=2)

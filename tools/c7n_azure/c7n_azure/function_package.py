@@ -169,7 +169,7 @@ class FunctionPackage(object):
 
         # generate and add auth
         s = local_session(Session)
-        self.pkg.add_contents(dest=self.name + '/auth.json', contents=s.get_auth_string())
+        self.pkg.add_contents(dest=self.name + '/auth.json', contents=s.get_functions_auth_string())
 
         # cffi module needs special handling
         self._add_cffi_module()
