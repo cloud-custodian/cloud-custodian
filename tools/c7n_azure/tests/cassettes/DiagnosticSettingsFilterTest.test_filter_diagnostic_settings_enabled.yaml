@@ -5,11 +5,11 @@ interactions:
       Accept: [application/json]
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.4 msrest_azure/0.5.0 networkmanagementclient/2.0.1 Azure-SDK-For-Python]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          networkmanagementclient/2.2.1 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2018-06-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2018-08-01
   response:
     body:
       string: !!binary |
@@ -18,32 +18,32 @@ interactions:
         6UeXWbnOP3qUfg9/pSl/iOejZbbA5x9Np23etLMiu1hWTVtMf/+yymaTrMyW07z+aGTbFzO0vtus
         J820LlZtUS2bu1n28ODhg/3J9v3ZXra9P3t4sJ09OMi27x3snd97sHt/tvMgv1vnTbWup/nndbVe
         NXfR3e/v+ttu8rYtlhfN3VVdXRazvG7uflFM66qpztvxi7y9quq3d4HUE0WquXtbnPM2uwDW3737
-        +370MN/NznfPZ9v39x4+2N7f3d/ZPnh4fp9QzR+cz3bOZ3t7k9/3I+/l9nrFBLoBGe+NsppmoAve
-        oiG382m+bOusXPuNaJSrvG6LvKFmdjrki8uiodeJGK/brOXOX6+n0zyf5TMHgZpaiq5lVnbu7WSf
-        znbvbe8e3Pt0ez/LZ9vZzk6+Pct26fXJwfnB/l4A4Lyulm2+nJ29PKmW58XFumbEgZIyijwefngs
-        0zz3KPAMsE6XAYZ4/r/DMXeHyHH3VuP8EC6T57a8NohoDyBRJspl8uDrW/KaPPRCcUnNzl4el4bL
-        v8jbecVT/PSa+KKYxl5bT8piSm/NZjSnUVyo1c8to3RwzG9glt9f2v/+xeqj7lB+SfhB8Kf3x/c9
-        On00yaZvaUK185dVVYJK3wvaoHvhARrMq3XJkxo2oQFOIh8Xy0m1Xs5eZG38NVJS3CD+rXvb4WW+
-        /iW24UfN2zV95U2sVRNPsiZki4+II2t88yq/oFnOSktDpY8Ba6FZWDIpIIWZCQf455iDgJTMD77f
-        iKivK+7vzqaz6f797fPdBzPC79O97Um++3B7uvcg373/aTY52D33dcVttYT3hpFVvEXj/OFZpMnB
-        5GD/UyL75P69h9v7D2cH25MHB6QWdx/u3pvlWX5+cB4AGNRsxHSumccY8lj2uJWmFtzu/r+UTQa1
-        +/ubofdlLXluy2CDiPYAEjmirCUPvr4lg8lDL/y8M0OgvOGQH9kefoyRoGbfqO3BD+rkl/w/lb78
-        qjoNAAA=
+        +360nz14mN/LZts759M9QvXBbDub5LPtg3sHD2f3P50dTO9nv+9H3svt9YoJdAMy3htlNc1AF7xF
+        Q27n03zZ1lm59hvRKFd53RZ5Q83sdMgXl0VDrxMxXrdZy52/Xk+neT7LZw4CNbUUXcus7NzbyT6d
+        7d7b3j249+n2fkbDynZ28u1ZtkuvTw7OD/b3AgDndbVs8+Xs7OVJtTwvLtY1Iw6UlFHk8fDDY5nm
+        uUeBZ4B1ugwwxPP/HY65O0SOu7ca54dwmTy35bVBRHsAiTJRLpMHX9+S1+ShF4pLanb28rg0XP5F
+        3s4rnuKn18QXxTT22npSFlN6azajOY3iQq1+bhmlg2N+A7P8/tL+9y9WH3WH8kvCD4I/vT++79Hp
+        o0k2fUsTqp2/rKoSVPpe0AbdCw/QYF6tS57UsAkNcBL5uFhOqvVy9iJr46+RkuIG8W/d2w4v8/Uv
+        sQ0/at6u6StvYq2aeJI1IVt8RBxZ45tX+QXNclZaGip9DFgLzcKSSQEpzEw4wD/HHASkZH7w/UZE
+        fV1xf3c2nU3372+f75Ka2J99urc9yXcfbk/3HuS79z/NJge7576uuK2W8N4wsoq3aJw/PIs0OZgc
+        7H9KZJ/cv/dwe//h7GB78uBgtn1/9+HuvVme5ecH5wGAQc1GTOeaeYwhj2WPW2lqwe3u/0vZZFC7
+        v78Zel/Wkue2DDaIaA8gkSPKWvLg61symDz0ws87MwTKGw75ke3hxxgJavaN2h78oE5+yf8DES7B
+        ZToNAAA=
     headers:
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 19 Sep 2018 16:58:03 GMT']
+      Date: ['Tue, 23 Oct 2018 22:15:29 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
       Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [6bd1d1fa-dc22-4f71-83c2-ff704d2bf19e]
-      x-ms-ratelimit-remaining-subscription-reads: ['11998']
-      x-ms-request-id: [e2fbab51-9aee-4ade-b404-b7d44f0697d7]
-      x-ms-routing-request-id: ['WESTUS2:20180919T165803Z:6bd1d1fa-dc22-4f71-83c2-ff704d2bf19e']
+      x-ms-correlation-request-id: [a2448748-267a-455b-a45b-5649365deb1d]
+      x-ms-ratelimit-remaining-subscription-reads: ['11947']
+      x-ms-request-id: [38cb6b51-422a-42f3-8ace-52d4cc7820ce]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221529Z:a2448748-267a-455b-a45b-5649365deb1d']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -52,8 +52,8 @@ interactions:
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-monitor/0.5.2 Azure-SDK-For-Python]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          azure-mgmt-monitor/0.5.2 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview
@@ -74,17 +74,17 @@ interactions:
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 19 Sep 2018 16:58:04 GMT']
+      Date: ['Tue, 23 Oct 2018 22:15:30 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
       Server: [Microsoft-IIS/10.0]
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [b4af1383-5b82-4cad-906c-8728fa091bfc]
-      x-ms-ratelimit-remaining-subscription-reads: ['11998']
-      x-ms-request-id: [69ff897f-36e3-4e33-b56b-c2955d912d74]
-      x-ms-routing-request-id: ['WESTUS2:20180919T165805Z:b4af1383-5b82-4cad-906c-8728fa091bfc']
+      x-ms-correlation-request-id: [204ed6fc-4f2c-461c-9503-701f0a73feee]
+      x-ms-ratelimit-remaining-subscription-reads: ['11781']
+      x-ms-request-id: [1f59f0f2-c5bd-4e2b-9744-084d2471681c]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221531Z:204ed6fc-4f2c-461c-9503-701f0a73feee']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -92,11 +92,11 @@ interactions:
       Accept: [application/json]
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.4 msrest_azure/0.5.0 networkmanagementclient/2.0.1 Azure-SDK-For-Python]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          networkmanagementclient/2.2.1 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2018-06-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2018-08-01
   response:
     body:
       string: !!binary |
@@ -105,32 +105,32 @@ interactions:
         6UeXWbnOP3qUfg9/pSl/iOejZbbA5x9Np23etLMiu1hWTVtMf/+yymaTrMyW07z+aGTbFzO0vtus
         J820LlZtUS2bu1n28ODhg/3J9v3ZXra9P3t4sJ09OMi27x3snd97sHt/tvMgv1vnTbWup/nndbVe
         NXfR3e/v+ttu8rYtlhfN3VVdXRazvG7uflFM66qpztvxi7y9quq3d4HUE0WquXtbnPM2uwDW3737
-        +370MN/NznfPZ9v39x4+2N7f3d/ZPnh4fp9QzR+cz3bOZ3t7k9/3I+/l9nrFBLoBGe+NsppmoAve
-        oiG382m+bOusXPuNaJSrvG6LvKFmdjrki8uiodeJGK/brOXOX6+n0zyf5TMHgZpaiq5lVnbu7WSf
-        znbvbe8e3Pt0ez/LZ9vZzk6+Pct26fXJwfnB/l4A4Lyulm2+nJ29PKmW58XFumbEgZIyijwefngs
-        0zz3KPAMsE6XAYZ4/r/DMXeHyHH3VuP8EC6T57a8NohoDyBRJspl8uDrW/KaPPRCcUnNzl4el4bL
-        v8jbecVT/PSa+KKYxl5bT8piSm/NZjSnUVyo1c8to3RwzG9glt9f2v/+xeqj7lB+SfhB8Kf3x/c9
-        On00yaZvaUK185dVVYJK3wvaoHvhARrMq3XJkxo2oQFOIh8Xy0m1Xs5eZG38NVJS3CD+rXvb4WW+
-        /iW24UfN2zV95U2sVRNPsiZki4+II2t88yq/oFnOSktDpY8Ba6FZWDIpIIWZCQf455iDgJTMD77f
-        iKivK+7vzqaz6f797fPdBzPC79O97Um++3B7uvcg373/aTY52D33dcVttYT3hpFVvEXj/OFZpMnB
-        5GD/UyL75P69h9v7D2cH25MHB6QWdx/u3pvlWX5+cB4AGNRsxHSumccY8lj2uJWmFtzu/r+UTQa1
-        +/ubofdlLXluy2CDiPYAEjmirCUPvr4lg8lDL/y8M0OgvOGQH9kefoyRoGbfqO3BD+rkl/w/lb78
-        qjoNAAA=
+        +360nz14mN/LZts759M9QvXBbDub5LPtg3sHD2f3P50dTO9nv+9H3svt9YoJdAMy3htlNc1AF7xF
+        Q27n03zZ1lm59hvRKFd53RZ5Q83sdMgXl0VDrxMxXrdZy52/Xk+neT7LZw4CNbUUXcus7NzbyT6d
+        7d7b3j249+n2fkbDynZ28u1ZtkuvTw7OD/b3AgDndbVs8+Xs7OVJtTwvLtY1Iw6UlFHk8fDDY5nm
+        uUeBZ4B1ugwwxPP/HY65O0SOu7ca54dwmTy35bVBRHsAiTJRLpMHX9+S1+ShF4pLanb28rg0XP5F
+        3s4rnuKn18QXxTT22npSFlN6azajOY3iQq1+bhmlg2N+A7P8/tL+9y9WH3WH8kvCD4I/vT++79Hp
+        o0k2fUsTqp2/rKoSVPpe0AbdCw/QYF6tS57UsAkNcBL5uFhOqvVy9iJr46+RkuIG8W/d2w4v8/Uv
+        sQ0/at6u6StvYq2aeJI1IVt8RBxZ45tX+QXNclZaGip9DFgLzcKSSQEpzEw4wD/HHASkZH7w/UZE
+        fV1xf3c2nU3372+f75Ka2J99urc9yXcfbk/3HuS79z/NJge7576uuK2W8N4wsoq3aJw/PIs0OZgc
+        7H9KZJ/cv/dwe//h7GB78uBgtn1/9+HuvVme5ecH5wGAQc1GTOeaeYwhj2WPW2lqwe3u/0vZZFC7
+        v78Zel/Wkue2DDaIaA8gkSPKWvLg61symDz0ws87MwTKGw75ke3hxxgJavaN2h78oE5+yf8DES7B
+        ZToNAAA=
     headers:
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 19 Sep 2018 16:58:05 GMT']
+      Date: ['Tue, 23 Oct 2018 22:15:31 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
       Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [8541f486-4875-427f-8b59-b55d997fbfb5]
-      x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [2f10a8b5-5232-48b0-a95b-164249358694]
-      x-ms-routing-request-id: ['WESTUS2:20180919T165805Z:8541f486-4875-427f-8b59-b55d997fbfb5']
+      x-ms-correlation-request-id: [a60716c9-21b9-4d09-879d-5b9d65ce3397]
+      x-ms-ratelimit-remaining-subscription-reads: ['11978']
+      x-ms-request-id: [79fe0a21-b2a8-4083-8021-a0d22e66a699]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221531Z:a60716c9-21b9-4d09-879d-5b9d65ce3397']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -139,8 +139,8 @@ interactions:
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-monitor/0.5.2 Azure-SDK-For-Python]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          azure-mgmt-monitor/0.5.2 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview
@@ -161,16 +161,16 @@ interactions:
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Wed, 19 Sep 2018 16:58:07 GMT']
+      Date: ['Tue, 23 Oct 2018 22:15:32 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
       Server: [Microsoft-IIS/10.0]
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [9076437e-4f64-4fa2-af34-60484d0d6beb]
-      x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [83038583-663f-442a-acf6-e6298ce24bb3]
-      x-ms-routing-request-id: ['WESTUS2:20180919T165807Z:9076437e-4f64-4fa2-af34-60484d0d6beb']
+      x-ms-correlation-request-id: [efb1356f-2e43-460d-a59e-2f7942081e12]
+      x-ms-ratelimit-remaining-subscription-reads: ['11900']
+      x-ms-request-id: [54a287c1-4703-471a-9153-de1d648892a9]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221533Z:efb1356f-2e43-460d-a59e-2f7942081e12']
     status: {code: 200, message: OK}
 version: 1
