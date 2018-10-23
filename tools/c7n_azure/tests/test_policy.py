@@ -41,7 +41,7 @@ class AzurePolicyModeTest(BaseTest):
         function_mode = AzureFunctionMode(p)
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
-        self.assertEqual(function_mode.storage_account['name'], 'custodianstorageaccount')
+        self.assertEqual(function_mode.storage_account['name'], 'cloudcustodian')
         self.assertEqual(function_mode.app_insights['name'], 'test-cloud-custodian')
         self.assertEqual(function_mode.service_plan['name'], "test-cloud-custodian")
 
@@ -76,7 +76,7 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(function_mode.app_insights['location'], "westus2")
         self.assertEqual(function_mode.app_insights['resource_group_name'], 'cloud-custodian')
 
-        self.assertEqual(function_mode.storage_account['name'], 'custodianstorageaccount')
+        self.assertEqual(function_mode.storage_account['name'], 'cloudcustodian')
         self.assertEqual(function_mode.storage_account['location'], "westus2")
         self.assertEqual(function_mode.storage_account['resource_group_name'], 'cloud-custodian')
 

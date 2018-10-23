@@ -431,16 +431,10 @@ sendgrid_api_key: <key>
 function_properties:
   servicePlan:
     name: 'testmailer1'
-    resourceGroupName: 'custodianmailer1'
+    resourceGroupName: custodianmailer1
     skuTier: Basic
     skuName: B1
     location: WestUS2
-storageAccount:
-    name: 'testmaileraccount1'
-    resourceGroupName: 'custodianmailer1'
-  storageAccount:
-    name: 'testmaileraccount1'
-    resourceGroupName: 'custodianmailer1'
 ```
 
 ## Writing an email template
