@@ -206,7 +206,7 @@ Example Policies
 ----------------
 
 Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus category and LoadBalancerAlertEvent category
-enabled.
+enabled. The use of value_type: swap is important for these examples because it swaps the value and the evaluated key.
 
 .. code-block:: yaml
 
@@ -230,7 +230,7 @@ Find KeyVaults that have logs enabled for the AuditEvent category.
 .. code-block:: yaml
 
     policies
-      - name: find-load-balancers-with-logs-enabled
+      - name: find-keyvaults-with-logs-enabled
         resource: azure.keyvault
         filters:
           - type: diagnostic-settings

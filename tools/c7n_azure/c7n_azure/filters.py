@@ -20,7 +20,7 @@ from dateutil import zoneinfo
 from dateutil.parser import parse
 
 from c7n.filters import Filter, ValueFilter
-from c7n.filters.core import PolicyValidationError, FilterValidationError
+from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
 from c7n.utils import type_schema
 

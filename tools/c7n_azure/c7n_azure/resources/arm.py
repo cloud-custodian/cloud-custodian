@@ -75,5 +75,4 @@ class ArmResourceManager(QueryResourceManager):
                     klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
 
 
-
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)
