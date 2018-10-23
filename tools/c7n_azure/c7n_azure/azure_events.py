@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import logging
+
 import six
 from azure.mgmt.eventgrid.models import EventSubscription, EventSubscriptionFilter
 from c7n_azure.session import Session
@@ -154,5 +156,11 @@ class AzureEventSubscription(object):
         scope = '/subscriptions/%s' % s.subscription_id
 
         client = s.client('azure.mgmt.eventgrid.EventGridManagementClient')
-        event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)
-        return event_subscription.result()
+
+        try:
+            event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)
+            return event_subscription.result()
+        except Exception as e:
+            log = logging.getLogger('custodian.azure.AzureEventSubscription')
+            log.error('Event Subscription creation failed with error: %s' % e)
+            raise SystemExit
