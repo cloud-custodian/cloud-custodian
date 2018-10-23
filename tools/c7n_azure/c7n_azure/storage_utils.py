@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 from collections import namedtuple
 
 from azure.storage.blob import BlockBlobService
@@ -53,12 +52,7 @@ class StorageUtilities(object):
         keys = StorageUtilities.get_storage_keys(storage_account.id)
         queue_service = QueueService(account_name=storage_account.name,
                                      account_key=keys[0].value)
-        try:
-            return queue_service.create_queue(name)
-        except Exception as e:
-            log = logging.getLogger('custodian.azure.StorageUtilities')
-            log.error('Queue creation failed with error: %s' % e)
-            raise SystemExit
+        return queue_service.create_queue(name)
 
     @staticmethod
     def put_queue_message(queue_service, queue_name, content):

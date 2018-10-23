@@ -288,15 +288,22 @@ class AzureEventGridMode(AzureFunctionMode):
         storage_account = storage_client.storage_accounts.get_properties(
             self.storage_account['resource_group_name'], self.storage_account['name'])
 
-        StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
-        self.log.info("Storage queue creation succeeded")
-
-        return storage_account
+        try:
+            StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
+            self.log.info("Storage queue creation succeeded")
+            return storage_account
+        except Exception as e:
+            self.log.error('Queue creation failed with error: %s' % e)
+            raise SystemExit
 
     def _create_event_subscription(self, storage_account, queue_name, session):
         self.log.info('Creating event grid subscription')
         destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
                                                                queue_name=queue_name)
 
-        AzureEventSubscription.create(destination, queue_name, session)
-        self.log.info('Event grid subscription creation succeeded')
+        try:
+            AzureEventSubscription.create(destination, queue_name, session)
+            self.log.info('Event grid subscription creation succeeded')
+        except Exception as e:
+            self.log.error('Event Subscription creation failed with error: %s' % e)
+            raise SystemExit
