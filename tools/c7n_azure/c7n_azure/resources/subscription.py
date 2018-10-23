@@ -71,22 +71,11 @@ class AddPolicy(BaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AddPolicy, self).__init__(data, manager, log_dir)
-        self.session = local_session(self.manager.session_factory)
-        self.policyClient = self.session.client("azure.mgmt.resource.policy.PolicyClient")
 
         self.paName = self.data.get('name')
         self.displayName = self.data.get('display_name')
-        self.scope = '/subscriptions/' + self.session.subscription_id + \
-                     '/' + self.data.get('scope', '')
 
         self.policyDefinitionName = self.data['definition_name']
-        self.policyDefinition = self._get_definition_id(self.policyDefinitionName)
-
-    def validate(self):
-        if self.policyDefinition is None:
-            raise PolicyValidationError(
-                "Azure Policy Definition '%s' not found." % (
-                    self.policyDefinitionName))
 
     def _get_definition_id(self, name):
         return next((r for r in self.policyClient.policy_definitions.list()
@@ -103,5 +92,16 @@ class AddPolicy(BaseAction):
         )
 
     def process(self, subscriptions):
+        self.session = local_session(self.manager.session_factory)
+        self.policyClient = self.session.client("azure.mgmt.resource.policy.PolicyClient")
+
+        self.scope = '/subscriptions/' + self.session.subscription_id + \
+                     '/' + self.data.get('scope', '')
+        self.policyDefinition = self._get_definition_id(self.policyDefinitionName)
+        if self.policyDefinition is None:
+            raise PolicyValidationError(
+                "Azure Policy Definition '%s' not found." % (
+                    self.policyDefinitionName))
+
         for s in subscriptions:
             self._add_policy(s)
