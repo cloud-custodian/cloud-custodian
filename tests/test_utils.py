@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 import os
-import unittest
 import sys
 import tempfile
 import time
@@ -25,6 +24,7 @@ from dateutil.parser import parse as parse_date
 import six
 
 from c7n import ipaddress, utils
+from c7n.config import Config
 
 from .common import BaseTest
 
@@ -114,7 +114,27 @@ class WorkerDecorator(BaseTest):
         self.assertTrue("more carrots" in log_output.getvalue())
 
 
-class UtilTest(unittest.TestCase):
+class UtilTest(BaseTest):
+
+    def test_local_session_region(self):
+        policies = [
+            self.load_policy(
+                {'name': 'ec2', 'resource': 'ec2'},
+                config=Config.empty(region="us-east-1")),
+            self.load_policy(
+                {'name': 'ec2', 'resource': 'ec2'},
+                config=Config.empty(region='us-west-2'))]
+        previous = None
+        previous_region = None
+        for p in policies:
+            self.assertEqual(p.options.region, p.session_factory.region)
+            session = utils.local_session(p.session_factory)
+            self.assertNotEqual(session.region_name, previous_region)
+            self.assertNotEqual(session, previous)
+            previous = session
+            previous_region = p.options.region
+
+        self.assertEqual(utils.local_session(p.session_factory), previous)
 
     def test_format_date(self):
         d = parse_date("2018-02-02 12:00")

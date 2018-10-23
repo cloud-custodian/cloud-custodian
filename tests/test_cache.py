@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from unittest import TestCase
-from c7n import cache
+from c7n import cache, config
 from argparse import Namespace
 from six.moves import cPickle as pickle
 import tempfile
@@ -29,6 +29,25 @@ class TestCache(TestCase):
         self.assertIsInstance(cache.factory(test_config), cache.FileCacheManager)
         test_config.cache = None
         self.assertIsInstance(cache.factory(test_config), cache.NullCache)
+
+
+class MemCacheTest(TestCase):
+
+    def test_mem_factory(self):
+        self.assertEqual(
+            cache.factory(config.Bag(cache='memory', cache_period=5)).__class__,
+            cache.InMemoryCache)
+
+    def test_get_set(self):
+        mem_cache = cache.InMemoryCache()
+        mem_cache.save({'region': 'us-east-1'}, {'hello': 'world'})
+        self.assertEqual(mem_cache.size(), 1)
+        self.assertEqual(mem_cache.load(), True)
+
+        mem_cache = cache.InMemoryCache()
+        self.assertEqual(
+            mem_cache.get({'region': 'us-east-1'}),
+            {'hello': 'world'})
 
 
 class FileCacheManagerTest(TestCase):
@@ -68,8 +87,8 @@ class FileCacheManagerTest(TestCase):
         self.test_cache.data = pickle.loads(test_pickle)
 
         # assert
-        self.assertEquals(self.test_cache.get(self.test_key), self.test_value)
-        self.assertEquals(self.test_cache.get(self.bad_key), None)
+        self.assertEqual(self.test_cache.get(self.test_key), self.test_value)
+        self.assertEqual(self.test_cache.get(self.bad_key), None)
 
     def test_load(self):
         t = tempfile.NamedTemporaryFile(suffix=".cache")
@@ -98,9 +117,9 @@ class FileCacheManagerTest(TestCase):
         self.assertTrue(mock_dump.called)
 
         # mkdir should NOT be called, but pickles should
-        self.assertEquals(mock_mkdir.call_count, 0)
-        self.assertEquals(mock_dump.call_count, 1)
-        self.assertEquals(mock_dumps.call_count, 1)
+        self.assertEqual(mock_mkdir.call_count, 0)
+        self.assertEqual(mock_dump.call_count, 1)
+        self.assertEqual(mock_dumps.call_count, 1)
 
     @mock.patch.object(cache.os, "makedirs")
     @mock.patch.object(cache.os.path, "exists")
@@ -125,6 +144,6 @@ class FileCacheManagerTest(TestCase):
         self.assertTrue(mock_dump.called)
 
         # all 3 should be called once
-        self.assertEquals(mock_mkdir.call_count, 1)
-        self.assertEquals(mock_dump.call_count, 1)
-        self.assertEquals(mock_dumps.call_count, 1)
+        self.assertEqual(mock_mkdir.call_count, 1)
+        self.assertEqual(mock_dump.call_count, 1)
+        self.assertEqual(mock_dumps.call_count, 1)

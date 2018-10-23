@@ -24,6 +24,10 @@ class CustodianError(Exception):
     """
 
 
+class InvalidOutputConfig(CustodianError):
+    """Invalid configuration for an output"""
+
+
 class PolicySyntaxError(CustodianError):
     """Policy Syntax Error
     """

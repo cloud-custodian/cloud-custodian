@@ -293,6 +293,11 @@ def setup_parser():
         "-m", "--metrics-enabled",
         default=None, nargs="?", const="aws",
         help="Emit metrics to provider metrics")
+    run.add_argument(
+        "--trace",
+        dest="tracer",
+        help=argparse.SUPPRESS,
+        default=None, nargs="?", const="default")
 
     return parser
 
@@ -326,6 +331,7 @@ def _setup_logger(options):
     logging.getLogger('botocore').setLevel(external_log_level)
     logging.getLogger('urllib3').setLevel(external_log_level)
     logging.getLogger('s3transfer').setLevel(external_log_level)
+    logging.getLogger('urllib3').setLevel(logging.ERROR)
 
 
 def main():

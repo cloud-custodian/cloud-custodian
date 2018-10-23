@@ -238,10 +238,12 @@ def report_account(account, region, policies_config, output_path, debug):
     policies = PolicyCollection.from_data(policies_config, config)
     records = []
     for p in policies:
+        # initializee policy execution context for output access
+        p.ctx.initialize()
         log.debug(
             "Report policy:%s account:%s region:%s path:%s",
             p.name, account['name'], region, output_path)
-        policy_records = fs_record_set(p.ctx.output_path, p.name)
+        policy_records = fs_record_set(p.ctx.log_dir, p.name)
         for r in policy_records:
             r['policy'] = p.name
             r['region'] = p.options.region
@@ -463,9 +465,16 @@ def run_account(account, region, policies_config, output_path,
 
     policies = PolicyCollection.from_data(policies_config, config)
     policy_counts = {}
+    success = True
     st = time.time()
+
     with environ(**account_tags(account)):
         for p in policies:
+
+            # Variable expansion and non schema validation (not optional)
+            p.expand_variables(p.get_variables())
+            p.validate()
+
             log.debug(
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)
@@ -479,15 +488,17 @@ def run_account(account, region, policies_config, output_path,
                     account['name'], region, p.name, len(resources),
                     time.time() - st)
             except ClientError as e:
+                success = False
                 if e.response['Error']['Code'] == 'AccessDenied':
                     log.warning('Access denied account:%s region:%s',
                                 account['name'], region)
-                    return policy_counts
+                    return policy_counts, success
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",
                     p.name, account['name'], region, e)
                 continue
             except Exception as e:
+                success = False
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",
                     p.name, account['name'], region, e)
@@ -498,7 +509,7 @@ def run_account(account, region, policies_config, output_path,
                 pdb.post_mortem(sys.exc_info()[-1])
                 raise
 
-    return policy_counts
+    return policy_counts, success
 
 
 @cli.command(name='run')
@@ -522,6 +533,7 @@ def run(config, use, output_dir, accounts, tags,
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
     policy_counts = Counter()
+    success = True
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config['accounts']:
@@ -545,7 +557,14 @@ def run(config, use, output_dir, accounts, tags,
                     "Error running policy in %s @ %s exception: %s",
                     a['name'], r, f.exception())
 
-            for p, count in f.result().items():
+            account_region_pcounts, account_region_success = f.result()
+            for p, count in account_region_pcounts:
                 policy_counts[p] += count
 
+            if not account_region_success:
+                success = False
+
     log.info("Policy resource counts %s" % policy_counts)
+
+    if not success:
+        sys.exit(1)

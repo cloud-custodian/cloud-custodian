@@ -228,12 +228,17 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 #### Standard Azure Functions Config
 
-| Required? | Key                            | Type             |
-|:---------:|:-------------------------------|:-----------------|
-|           | `function_name`                | string           |
-| &#x2705;  | `function_servicePlanName`     | string           |
-|           | `function_location`            | string           |
-|           | `function_appInsightsLocation` | string           |
+| Required? | Key                            | Type             | Notes                                                                 |
+|:---------:|:-------------------------------|:-----------------|:----------------------------------------------------------------------|
+|           | `function_properties`          | object           | Contains `appInsights`, `storageAccount` and `servicePlan` objects    |
+|           | `appInsights`                  | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `storageAccount`               | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `servicePlan`                  | object           | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties      |
+|           | `name`                         | string           | |
+|           | `location`                     | string           | Default: `west us 2`|
+|           | `resource_group_name`          | string           | Default `cloud-custodian`|
+|           | `skuTier`                      | string           | Default: `Basic` |
+|           | `skuName`                      | string           | Default: `B1`    |
 
 
 
@@ -248,7 +253,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
 |           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
 |           | `ldap_bind_password`       | string           | ldap bind password     |
-|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
 |           | `ldap_email_attribute`     | string           |                                     |
 |           | `ldap_email_key`           | string           | eg 'mail'     |
 |           | `ldap_manager_attribute`   | string           | eg 'manager'    |
@@ -374,7 +379,7 @@ Requires:
 - SendGrid account. See [Using SendGrid with Azure](https://docs.microsoft.com/en-us/azure/sendgrid-dotnet-how-to-send-email)
 - [Azure Storage Queue](https://azure.microsoft.com/en-us/services/storage/queues/)
 
-The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.  
+The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.
 Configuration for this scenario requires only minor changes from AWS deployments.
 
 The notify action in your policy will reflect transport type `asq` with the URL
@@ -423,7 +428,13 @@ where `mailer.yml` may look like:
 queue_url: asq://storage.queue.core.windows.net/custodian
 from_address: foo@mail.com
 sendgrid_api_key: <key>
-function_servicePlanName: mycustodianfunctions
+function_properties:
+  servicePlan:
+    name: 'testmailer1'
+    resourceGroupName: custodianmailer1
+    skuTier: Basic
+    skuName: B1
+    location: WestUS2
 ```
 
 ## Writing an email template

@@ -80,11 +80,23 @@ type Config struct {
 	// This is optional and x-ray is currently only supported when using lambda.
 	XRayTracingEnabled string `yaml:"xrayTracingEnabled"`
 
+	// The number of days to wait to clean up registered ssm instances that have a
+	// PingStatus of ConnectionLost
+	CleanupAfterDays float64 `yaml:"cleanupAfterDays"`
+
 	// Version constraints for allowable client requests during registration. If
 	// constraints are empty, all versions are allowed. Version string should
 	// conform with github.com/hashicorp/go-version format, i.e. comma-separated
 	// rules like ">= 1.1.0, < 2.0.0"
 	ClientVersionConstraints string `yaml:"clientVersionConstraints"`
+
+	// The name of a JSON file containing an ImageWhitelist structure. If the
+	// value is not an empty string, the registration handler will attempt to
+	// read the named file on lambda startup and construct a whitelist of valid
+	// image IDs for each AccountId/RegionName pair. Instances presenting an
+	// identity document with an image ID not present in the whitelist will not
+	// be allowed to register.
+	AMIWhitelistFile string `yaml:"amiWhitelistFile"`
 
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
@@ -96,6 +108,15 @@ func NewConfig() *Config {
 	c := &Config{}
 	MergeConfig(c, ReadConfigFromEnv())
 	return c
+}
+
+type ImageWhitelist struct {
+	Images []struct {
+		AccountId   string `json:"AccountId"`
+		RegionName  string `json:"RegionName"`
+		ImageId     string `json:"ImageId"`
+		ReleaseDate string `json:"ReleaseDate"`
+	} `json:"Images"`
 }
 
 // ReadConfig loads configuration values from a yaml file.

@@ -22,7 +22,6 @@ import logging
 import os
 import time
 
-
 import jmespath
 import six
 
@@ -270,7 +269,8 @@ class PullMode(PolicyExecutionMode):
             at = time.time()
             for a in self.policy.resource_manager.actions:
                 s = time.time()
-                results = a.process(resources)
+                with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+                    results = a.process(resources)
                 self.policy.log.info(
                     "policy: %s action: %s"
                     " resources: %d"
@@ -743,6 +743,9 @@ class Policy(object):
     def tags(self):
         return self.data.get('tags', ())
 
+    def get_cache(self):
+        return self.resource_manager._cache
+
     def get_execution_mode(self):
         exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
         exec_mode = execution[exec_mode_type]
@@ -861,7 +864,6 @@ class Policy(object):
     def __call__(self):
         """Run policy in default mode"""
         mode = self.get_execution_mode()
-        self.session_factory.policy_name = self.name
         if self.options.dryrun:
             resources = PullMode(self).run()
         elif isinstance(mode, ServerlessExecutionMode):

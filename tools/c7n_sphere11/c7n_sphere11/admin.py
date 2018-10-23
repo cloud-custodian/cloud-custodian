@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+
 from datetime import datetime, timedelta
 import json
 import pprint
@@ -39,7 +41,7 @@ def format_json(config):
     """format config for lambda exec
     """
     with open(config) as fh:
-        print json.dumps(yaml.safe_load(fh.read()), indent=2)
+        print(json.dumps(yaml.safe_load(fh.read()), indent=2))
 
 
 def render_metrics(header, values):

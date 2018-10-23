@@ -973,3 +973,80 @@ class SetShieldAdvanced(BaseAction):
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
                     return
                 raise
+
+
+@filters.register('xray-encrypt-key')
+class XrayEncrypted(Filter):
+    """Determine if xray is encrypted.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: xray-encrypt-with-default
+                resource: aws.account
+                filters:
+                  - type: xray-encrypt-key
+                    key: default
+              - name: xray-encrypt-with-kms
+                  - type: xray-encrypt-key
+                    key: kms
+              - name: xray-encrypt-with-specific-key
+                  -type: xray-encrypt-key
+                   key: alias/my-alias or arn or keyid
+    """
+
+    permissions = ('xray:GetEncryptionConfig',)
+    schema = type_schema(
+        'xray-encrypt-key',
+        required=['key'],
+        key={'type': 'string'}
+    )
+
+    def process(self, resources, event=None):
+        client = self.manager.session_factory().client('xray')
+        gec_result = client.get_encryption_config()['EncryptionConfig']
+        resources[0]['c7n:XrayEncryptionConfig'] = gec_result
+        k = self.data.get('key')
+        if k not in ['default', 'kms']:
+            kmsclient = self.manager.session_factory().client('kms')
+            keyid = kmsclient.describe_key(KeyId=k)['KeyMetadata']['Arn']
+            rc = resources if (gec_result['KeyId'] == keyid) else []
+        else:
+            kv = 'KMS' if self.data.get('key') == 'kms' else 'NONE'
+            rc = resources if (gec_result['Type'] == kv) else []
+        return rc
+
+
+@actions.register('set-xray-encrypt')
+class SetXrayEncryption(BaseAction):
+    """Enable specific xray encryption.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: xray-default-encrypt
+                resource: aws.account
+                actions:
+                  - type: set-xray-encrypt
+                    key: default
+              - name: xray-kms-encrypt
+                  - type: set-xray-encrypt
+                    key: alias/some/alias/ke
+    """
+
+    permissions = ('xray:PutEncryptionConfig',)
+    schema = type_schema(
+        'set-xray-encrypt',
+        required=['key'],
+        key={'type': 'string'}
+    )
+
+    def process(self, resources):
+        client = self.manager.session_factory().client('xray')
+        key = self.data.get('key')
+        req = {'Type': 'NONE'} if key == 'default' else {'Type': 'KMS', 'KeyId': key}
+        client.put_encryption_config(**req)
