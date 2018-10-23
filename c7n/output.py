@@ -207,10 +207,15 @@ class SystemStats(DeltaStats):
     def get_snapshot(self):
         snapshot = {
             'num_threads': self.process.num_threads(),
-            'num_fds': self.process.num_fds(),
             'snapshot_time': time.time(),
             'cache_size': self.ctx.policy.get_cache().size()
         }
+
+        # no num_fds on Windows, but likely num_handles
+        if hasattr(self.process, "num_fds"):
+            snapshot['num_fds'] = self.process.num_fds()
+        elif hasattr(self.process, "num_handles"):
+            snapshot['num_handles'] = self.process.num_handles()
 
         with self.process.oneshot():
             # simpler would be json.dumps(self.process.as_dict()), but
