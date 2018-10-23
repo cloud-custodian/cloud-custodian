@@ -205,8 +205,8 @@ an azure resource.
 Example Policies
 ----------------
 
-Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus category and LoadBalancerAlertEvent category
-enabled. The use of value_type: swap is important for these examples because it swaps the value and the evaluated key.
+Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus category and LoadBalancerAlertEvent category enabled.
+The use of value_type: swap is important for these examples because it swaps the value and the evaluated key so that it evaluates the value provided is in the logs.
 
 .. code-block:: yaml
 
