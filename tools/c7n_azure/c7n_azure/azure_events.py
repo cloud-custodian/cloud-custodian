@@ -158,7 +158,8 @@ class AzureEventSubscription(object):
         client = s.client('azure.mgmt.eventgrid.EventGridManagementClient')
 
         try:
-            event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)
+            event_subscription = client.event_subscriptions\
+                .create_or_update(scope, name, event_info)
             return event_subscription.result()
         except Exception as e:
             log = logging.getLogger('custodian.azure.AzureEventSubscription')
