@@ -14,6 +14,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import six
+from azure.mgmt.eventgrid.models import EventSubscription, EventSubscriptionFilter
+from c7n_azure.session import Session
+
+from c7n.utils import local_session
 
 
 class AzureEvents(object):
@@ -137,3 +141,18 @@ class AzureEvents(object):
                 event_operations.append('%s/%s' % (e['resourceProvider'], e['event']))
 
         return event_operations
+
+
+class AzureEventSubscription(object):
+
+    @classmethod
+    def create(cls, destination, name, session=None, event_filter=None):
+        s = session or local_session(Session)
+        event_filter = event_filter or EventSubscriptionFilter()
+
+        event_info = EventSubscription(destination=destination, filter=event_filter)
+        scope = '/subscriptions/%s' % s.subscription_id
+
+        client = s.client('azure.mgmt.eventgrid.EventGridManagementClient')
+        event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)
+        return event_subscription.result()

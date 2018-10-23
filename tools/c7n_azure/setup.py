@@ -65,7 +65,7 @@ setup(
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
                       "azure-mgmt-subscription",
-                      "azure-mgmt-eventgrid",
+                      "azure-mgmt-eventgrid>=2.0.0rc1",
                       "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",

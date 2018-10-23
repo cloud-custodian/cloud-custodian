@@ -36,7 +36,7 @@ class FunctionPackage(object):
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
 
-    def _add_functions_required_files(self, policy):
+    def _add_functions_required_files(self, policy, queue_name=None):
         self.pkg.add_file(self.function_path,
                           dest=self.name + '/function.py')
 
@@ -45,13 +45,16 @@ class FunctionPackage(object):
         self._add_host_config()
 
         if policy:
-            config_contents = self.get_function_config(policy)
+            config_contents = self.get_function_config(policy, queue_name)
             policy_contents = self._get_policy(policy)
             self.pkg.add_contents(dest=self.name + '/function.json',
                                   contents=config_contents)
 
             self.pkg.add_contents(dest=self.name + '/config.json',
                                   contents=policy_contents)
+
+            if policy['mode']['type'] == CONST_AZURE_EVENT_TRIGGER_MODE:
+                self._add_queue_binding_extensions()
 
     def _add_host_config(self):
         config = \
@@ -78,7 +81,15 @@ class FunctionPackage(object):
             }
         self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
 
-    def get_function_config(self, policy):
+    def _add_queue_binding_extensions(self):
+        bindings_dir_path = os.path.abspath(
+            os.path.join(os.path.join(__file__, os.pardir), 'function_binding_resources'))
+        bin_path = os.path.join(bindings_dir_path, 'bin')
+
+        self.pkg.add_directory(bin_path)
+        self.pkg.add_file(os.path.join(bindings_dir_path, 'extensions.csproj'))
+
+    def get_function_config(self, policy, queue_name=None):
         config = \
             {
                 "scriptFile": "function.py",
@@ -96,14 +107,10 @@ class FunctionPackage(object):
             binding['schedule'] = policy['mode']['schedule']
 
         elif mode_type == CONST_AZURE_EVENT_TRIGGER_MODE:
-            binding['type'] = 'httpTrigger'
-            binding['authLevel'] = 'function'
+            binding['type'] = 'queueTrigger'
+            binding['connection'] = 'AzureWebJobsStorage'
             binding['name'] = 'input'
-            binding['methods'] = ['post']
-            config['bindings'].append({
-                "name": "$return",
-                "type": "http",
-                "direction": "out"})
+            binding['queueName'] = queue_name
 
         else:
             self.log.error("Mode not yet supported for Azure functions (%s)"
@@ -144,7 +151,7 @@ class FunctionPackage(object):
     def _update_perms_package(self):
         os.chmod(self.pkg.path, 0o0644)
 
-    def build(self, policy, entry_point=None, extra_modules=None):
+    def build(self, policy, queue_name=None, entry_point=None, extra_modules=None):
         # Get dependencies for azure entry point
         entry_point = entry_point or \
             os.path.join(os.path.dirname(os.path.realpath(__file__)), 'entry.py')
@@ -165,7 +172,7 @@ class FunctionPackage(object):
         self.pkg.add_modules(lambda f: f == 'azure/__init__.py', 'azure')
 
         # add config and policy
-        self._add_functions_required_files(policy)
+        self._add_functions_required_files(policy, queue_name)
 
         # generate and add auth
         s = local_session(Session)

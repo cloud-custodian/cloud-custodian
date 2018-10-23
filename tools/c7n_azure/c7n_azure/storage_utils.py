@@ -48,6 +48,13 @@ class StorageUtilities(object):
         return queue_service, storage.container_name
 
     @staticmethod
+    def create_queue_from_storage_account(storage_account, name):
+        keys = StorageUtilities.get_storage_keys(storage_account.id)
+        queue_service = QueueService(account_name=storage_account.name,
+                                     account_key=keys[0].value)
+        return queue_service.create_queue(name)
+
+    @staticmethod
     def put_queue_message(queue_service, queue_name, content):
         return queue_service.put_message(queue_name, content)
 

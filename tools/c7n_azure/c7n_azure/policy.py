@@ -12,28 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import hashlib
 import logging
-import requests
-import six
-import time
 
-from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
-                                         WebHookEventSubscriptionDestination)
+import six
+from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
+from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.azure_events import AzureEvents
-from c7n_azure.constants import (CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
-                                 CONST_AZURE_FUNCTION_KEY_URL)
+from c7n_azure.constants import (CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
-from msrestazure.azure_exceptions import CloudError
+from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.policy import ServerlessExecutionMode, PullMode, execution
 from c7n.utils import local_session
-
-from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -165,10 +160,18 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         FunctionAppUtilities().deploy_dedicated_function_app(params)
 
+    def get_logs(self, start, end):
+        """Retrieve logs for the policy"""
+        raise NotImplementedError("subclass responsibility")
+
+    def validate(self):
+        """Validate configuration settings for execution mode."""
+
+    def _publish_functions_package(self, queue_name=None):
         self.log.info("Building function package for %s" % self.functionapp_name)
 
         archive = FunctionPackage(self.policy_name)
-        archive.build(self.policy.data)
+        archive.build(self.policy.data, queue_name=queue_name)
         archive.close()
 
         self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
@@ -178,13 +181,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
-    def get_logs(self, start, end):
-        """Retrieve logs for the policy"""
-        raise NotImplementedError("subclass responsibility")
-
-    def validate(self):
-        """Validate configuration settings for execution mode."""
-
 
 @execution.register(CONST_AZURE_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
@@ -193,6 +189,10 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
     schema = utils.type_schema(CONST_AZURE_TIME_TRIGGER_MODE,
                                schedule={'type': 'string'},
                                rinherit=AzureFunctionMode.schema)
+
+    def provision(self):
+        super(AzurePeriodicMode, self).provision()
+        self._publish_functions_package()
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -224,60 +224,10 @@ class AzureEventGridMode(AzureFunctionMode):
     def provision(self):
         super(AzureEventGridMode, self).provision()
         session = local_session(self.policy.session_factory)
-        key = self._get_webhook_key(session)
-        webhook_url = 'https://%s.azurewebsites.net/api/%s?code=%s' % (self.functionapp_name,
-                                                                       self.policy_name, key)
-        destination = WebHookEventSubscriptionDestination(
-            endpoint_url=webhook_url
-        )
-
-        self.log.info("Creating Event Grid subscription")
-        event_filter = EventSubscriptionFilter()
-        event_info = EventSubscription(destination=destination, filter=event_filter)
-        scope = '/subscriptions/%s' % session.subscription_id
-
-        #: :type: azure.mgmt.eventgrid.EventGridManagementClient
-        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
-
-        status_success = False
-        while not status_success:
-            try:
-                event_subscription = eventgrid_client.event_subscriptions.create_or_update(
-                    scope, self.functionapp_name, event_info)
-
-                event_subscription.result()
-                self.log.info('Event Grid subscription creation succeeded')
-                status_success = True
-            except CloudError as e:
-                self.log.info(e)
-                self.log.info('Retrying in 30 seconds')
-                time.sleep(30)
-
-    def _get_webhook_key(self, session):
-        self.log.info("Fetching Function's API keys")
-        token_headers = {
-            'Authorization': 'Bearer %s' % session.get_bearer_token()
-        }
-
-        key_url = (
-            'https://management.azure.com'
-            '/subscriptions/{0}/resourceGroups/{1}/'
-            'providers/Microsoft.Web/sites/{2}/{3}').format(
-            session.subscription_id,
-            self.service_plan['resource_group_name'],
-            self.functionapp_name,
-            CONST_AZURE_FUNCTION_KEY_URL)
-
-        retrieved_key = False
-
-        while not retrieved_key:
-            response = requests.get(key_url, headers=token_headers)
-            if response.status_code == 200:
-                key = json.loads(response.content)
-                return key['value']
-            else:
-                self.log.info('Function app key unavailable, will retry in 30 seconds')
-                time.sleep(30)
+        queue_name = self.functionapp_name
+        storage_account = self._create_storage_queue(queue_name, session)
+        self._create_event_subscription(storage_account, queue_name, session)
+        self._publish_functions_package(queue_name)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -331,3 +281,29 @@ class AzureEventGridMode(AzureFunctionMode):
             return False
 
         return True
+
+    def _create_storage_queue(self, queue_name, session):
+        self.log.info("Creating storage queue")
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_account = storage_client.storage_accounts.get_properties(
+            self.storage_account['resource_group_name'], self.storage_account['name'])
+
+        try:
+            StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
+            self.log.info("Storage queue creation succeeded")
+            return storage_account
+        except Exception as e:
+            self.log.error('Queue creation failed with error: %s' % e)
+            raise SystemExit
+
+    def _create_event_subscription(self, storage_account, queue_name, session):
+        self.log.info('Creating event grid subscription')
+        destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
+                                                               queue_name=queue_name)
+
+        try:
+            AzureEventSubscription.create(destination, queue_name, session)
+            self.log.info('Event grid subscription creation succeeded')
+        except Exception as e:
+            self.log.error('Event Subscription creation failed with error: %s' % e)
+            raise SystemExit
