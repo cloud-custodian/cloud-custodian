@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import hashlib
 import json
 import os
 import logging
@@ -22,6 +23,8 @@ try:
     from c7n_azure.functionapp_utils import FunctionAppUtilities
     from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
     from c7n_azure.policy import AzureFunctionMode
+    from c7n_azure.session import Session
+    from c7n.utils import local_session
 except ImportError:
     FunctionPackage = None
     CONST_DOCKER_VERSION = CONST_FUNCTIONS_EXT_VERSION = None
@@ -46,9 +49,13 @@ def provision(config):
 
     location = service_plan.get('location', 'westus2')
     rg_name = service_plan['resource_group_name']
+
+    sub_id = local_session(Session).get_subscription_id()
+    suffix = hashlib.sha256(bytes(rg_name + sub_id, 'utf-8')).hexdigest().lower()[:8]
+
     storage_account = AzureFunctionMode.extract_properties(function_properties,
                                                     'storageAccount',
-                                                    {'name': 'custodianstorageaccount',
+                                                    {'name': 'mailerstorage' + suffix,
                                                      'location': location,
                                                      'resource_group_name': rg_name})
 
@@ -58,7 +65,8 @@ def provision(config):
                                                      'location': location,
                                                      'resource_group_name': rg_name})
 
-    functionapp_name = (service_plan['name'] + '-' + function_name).replace(' ', '-').lower()
+    functionapp_name = '-'.join([service_plan['name'], function_name, suffix]) \
+                          .replace(' ', '-').lower()
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
