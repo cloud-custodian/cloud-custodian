@@ -14,8 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
-
-from c7n.filters.core import PolicyValidationError
+from jsonschema.exceptions import ValidationError
 
 
 class DiagnosticSettingsFilterTest(BaseTest):
@@ -77,18 +76,17 @@ class DiagnosticSettingsFilterTest(BaseTest):
         """Verifies validation fails if the resource type
             does not use diagnostic settings.
         """
-        with self.assertRaises(PolicyValidationError):
-            p = self.load_policy({
-                'name': 'test-azure-tag',
-                'resource': 'azure.vm',
-                'filters': [
-                    {
-                        'type': 'diagnostic-settings',
-                        'key': "logs[*][].enabled",
-                        'op': 'in',
-                        'value_type': 'swap',
-                        'value': True
-                    }
-                ]
-            })
-            p.run()
+        policy = {
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {
+                    'type': 'diagnostic-settings',
+                    'key': "logs[*][].enabled",
+                    'op': 'in',
+                    'value_type': 'swap',
+                    'value': True
+                }
+            ]
+        }
+        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
