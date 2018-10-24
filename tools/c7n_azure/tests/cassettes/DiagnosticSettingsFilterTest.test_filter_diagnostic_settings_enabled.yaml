@@ -1,0 +1,176 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          networkmanagementclient/2.2.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2018-08-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UeXWbnOP3qUfg9/pSl/iOejZbbA5x9Np23etLMiu1hWTVtMf/+yymaTrMyW07z+aGTbFzO0vtus
+        J820LlZtUS2bu1n28ODhg/3J9v3ZXra9P3t4sJ09OMi27x3snd97sHt/tvMgv1vnTbWup/nndbVe
+        NXfR3e/v+ttu8rYtlhfN3VVdXRazvG7uflFM66qpztvxi7y9quq3d4HUE0WquXtbnPM2uwDW3737
+        +360nz14mN/LZts759M9QvXBbDub5LPtg3sHD2f3P50dTO9nv+9H3svt9YoJdAMy3htlNc1AF7xF
+        Q27n03zZ1lm59hvRKFd53RZ5Q83sdMgXl0VDrxMxXrdZy52/Xk+neT7LZw4CNbUUXcus7NzbyT6d
+        7d7b3j249+n2fkbDynZ28u1ZtkuvTw7OD/b3AgDndbVs8+Xs7OVJtTwvLtY1Iw6UlFHk8fDDY5nm
+        uUeBZ4B1ugwwxPP/HY65O0SOu7ca54dwmTy35bVBRHsAiTJRLpMHX9+S1+ShF4pLanb28rg0XP5F
+        3s4rnuKn18QXxTT22npSFlN6azajOY3iQq1+bhmlg2N+A7P8/tL+9y9WH3WH8kvCD4I/vT++79Hp
+        o0k2fUsTqp2/rKoSVPpe0AbdCw/QYF6tS57UsAkNcBL5uFhOqvVy9iJr46+RkuIG8W/d2w4v8/Uv
+        sQ0/at6u6StvYq2aeJI1IVt8RBxZ45tX+QXNclZaGip9DFgLzcKSSQEpzEw4wD/HHASkZH7w/UZE
+        fV1xf3c2nU3372+f75Ka2J99urc9yXcfbk/3HuS79z/NJge7576uuK2W8N4wsoq3aJw/PIs0OZgc
+        7H9KZJ/cv/dwe//h7GB78uBgtn1/9+HuvVme5ecH5wGAQc1GTOeaeYwhj2WPW2lqwe3u/0vZZFC7
+        v78Zel/Wkue2DDaIaA8gkSPKWvLg61symDz0ws87MwTKGw75ke3hxxgJavaN2h78oE5+yf8DES7B
+        ZToNAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Tue, 23 Oct 2018 22:15:29 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [a2448748-267a-455b-a45b-5649365deb1d]
+      x-ms-ratelimit-remaining-subscription-reads: ['11947']
+      x-ms-request-id: [38cb6b51-422a-42f3-8ace-52d4cc7820ce]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221529Z:a2448748-267a-455b-a45b-5649365deb1d']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          azure-mgmt-monitor/0.5.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXM3yx4ePHywP9m+P9vLtvdnDw+2swcH2fa9g73zew92
+        7892HuR367yp1vU0v6ir9aq52+ZN+/vPiuxiWTVtMd1u8rYtlhfN3VVdXRazvG7uLoppXTXVeTte
+        5u1VVb+9W1bZbJKV2XKK76dTAHEwfn//6yicYtkUF/O2ueteem36nU7dh4oMwH80+qi9XtHYl+uy
+        HH20zBb0+0fDjctqmoEq5oW3xZIoJr+32UVjfif0VnndFjl98os/atqqzi7y4+m0Wi/bM3rjg2j8
+        +a1p/IWlzWtB4W6Iik+qen11/WD/fHav/kV5RkNt8vqymOZP1s2rdZkDaRkapqpZZVPvo/wyX7bf
+        Xk+O1+28qosfMInCt0yTF0xh+WyRtzURmBmPyJpfVPU1kea4LL/Qb+i9ZTYpcwJznpVNPvqozlsC
+        ROBfVmUxpea/uNdkll0TzJ1f8ku+j/nCnITwnxMfPVE+ellXk/zbeVa289dt1q6DLtt6TeDep8fR
+        YEfHJbHDKYjg96Dvv08X3/8lI5JSNG+pIQj5S77/S/4fpC+BwcMDAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Tue, 23 Oct 2018 22:15:30 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-IIS/10.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [204ed6fc-4f2c-461c-9503-701f0a73feee]
+      x-ms-ratelimit-remaining-subscription-reads: ['11781']
+      x-ms-request-id: [1f59f0f2-c5bd-4e2b-9744-084d2471681c]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221531Z:204ed6fc-4f2c-461c-9503-701f0a73feee']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          networkmanagementclient/2.2.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2018-08-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UeXWbnOP3qUfg9/pSl/iOejZbbA5x9Np23etLMiu1hWTVtMf/+yymaTrMyW07z+aGTbFzO0vtus
+        J820LlZtUS2bu1n28ODhg/3J9v3ZXra9P3t4sJ09OMi27x3snd97sHt/tvMgv1vnTbWup/nndbVe
+        NXfR3e/v+ttu8rYtlhfN3VVdXRazvG7uflFM66qpztvxi7y9quq3d4HUE0WquXtbnPM2uwDW3737
+        +360nz14mN/LZts759M9QvXBbDub5LPtg3sHD2f3P50dTO9nv+9H3svt9YoJdAMy3htlNc1AF7xF
+        Q27n03zZ1lm59hvRKFd53RZ5Q83sdMgXl0VDrxMxXrdZy52/Xk+neT7LZw4CNbUUXcus7NzbyT6d
+        7d7b3j249+n2fkbDynZ28u1ZtkuvTw7OD/b3AgDndbVs8+Xs7OVJtTwvLtY1Iw6UlFHk8fDDY5nm
+        uUeBZ4B1ugwwxPP/HY65O0SOu7ca54dwmTy35bVBRHsAiTJRLpMHX9+S1+ShF4pLanb28rg0XP5F
+        3s4rnuKn18QXxTT22npSFlN6azajOY3iQq1+bhmlg2N+A7P8/tL+9y9WH3WH8kvCD4I/vT++79Hp
+        o0k2fUsTqp2/rKoSVPpe0AbdCw/QYF6tS57UsAkNcBL5uFhOqvVy9iJr46+RkuIG8W/d2w4v8/Uv
+        sQ0/at6u6StvYq2aeJI1IVt8RBxZ45tX+QXNclZaGip9DFgLzcKSSQEpzEw4wD/HHASkZH7w/UZE
+        fV1xf3c2nU3372+f75Ka2J99urc9yXcfbk/3HuS79z/NJge7576uuK2W8N4wsoq3aJw/PIs0OZgc
+        7H9KZJ/cv/dwe//h7GB78uBgtn1/9+HuvVme5ecH5wGAQc1GTOeaeYwhj2WPW2lqwe3u/0vZZFC7
+        v78Zel/Wkue2DDaIaA8gkSPKWvLg61symDz0ws87MwTKGw75ke3hxxgJavaN2h78oE5+yf8DES7B
+        ZToNAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Tue, 23 Oct 2018 22:15:31 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [a60716c9-21b9-4d09-879d-5b9d65ce3397]
+      x-ms-ratelimit-remaining-subscription-reads: ['11978']
+      x-ms-request-id: [79fe0a21-b2a8-4083-8021-a0d22e66a699]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221531Z:a60716c9-21b9-4d09-879d-5b9d65ce3397']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          azure-mgmt-monitor/0.5.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXM3yx4ePHywP9m+P9vLtvdnDw+2swcH2fa9g73zew92
+        7892HuR367yp1vU0v6ir9aq52+ZN+/vPiuxiWTVtMd1u8rYtlhfN3VVdXRazvG7uLoppXTXVeTte
+        5u1VVb+9W1bZbJKV2XKK76dTAHEwfn//6yicYtkUF/O2ueteem36nU7dh4oMwH80+qi9XtHYl+uy
+        HH20zBb0+0fDjctqmoEq5oW3xZIoJr+32UVjfif0VnndFjl98os/atqqzi7y4+m0Wi/bM3rjg2j8
+        +a1p/IWlzWtB4W6Iik+qen11/WD/fHav/kV5RkNt8vqymOZP1s2rdZkDaRkapqpZZVPvo/wyX7bf
+        Xk+O1+28qosfMInCt0yTF0xh+WyRtzURmBmPyJpfVPU1kea4LL/Qb+i9ZTYpcwJznpVNPvqozlsC
+        ROBfVmUxpea/uNdkll0TzJ1f8ku+j/nCnITwnxMfPVE+ellXk/zbeVa289dt1q6DLtt6TeDep8fR
+        YEfHJbHDKYjg96Dvv08X3/8lI5JSNG+pIQj5S77/S/4fpC+BwcMDAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Tue, 23 Oct 2018 22:15:32 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-IIS/10.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [efb1356f-2e43-460d-a59e-2f7942081e12]
+      x-ms-ratelimit-remaining-subscription-reads: ['11900']
+      x-ms-request-id: [54a287c1-4703-471a-9153-de1d648892a9]
+      x-ms-routing-request-id: ['WESTUS2:20181023T221533Z:efb1356f-2e43-460d-a59e-2f7942081e12']
+    status: {code: 200, message: OK}
+version: 1
