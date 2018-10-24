@@ -16,13 +16,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import os
 import re
-from unittest.mock import patch
 
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from azure_common import BaseTest
-from c7n_azure.session import Session
-
 from c7n_azure import constants
+from c7n_azure.session import Session
+from mock import patch
 
 
 class SessionTest(BaseTest):
