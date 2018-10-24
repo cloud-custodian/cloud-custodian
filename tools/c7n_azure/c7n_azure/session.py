@@ -188,8 +188,11 @@ class Session(object):
             'AZURE_FUNCTION_CLIENT_SECRET'
         ]
 
-        function_subscription_id = (os.environ['AZURE_FUNCTION_SUBSCRIPTION_ID'] or
-                                    self.subscription_id)
+        # Check for override on subscription ID
+        if 'AZURE_FUNCTION_SUBSCRIPTION_ID' in os.environ:
+            function_subscription_id = os.environ['AZURE_FUNCTION_SUBSCRIPTION_ID']
+        else:
+            function_subscription_id = self.subscription_id
 
         # Use dedicated function env vars if available
         if all(k in os.environ for k in function_auth_variables):
