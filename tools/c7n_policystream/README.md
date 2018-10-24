@@ -2,20 +2,43 @@
 
 Using custodian in accordance with infrastructure as code principles,
 we store policy assets in a versioned control repository. This
-provides for an audit log and facilitate change reviews. However this
-capability is primarily of use to humans making semantic
-interpretations of changes. This script also provides logical custodian
-policy changes over a git repo and allows streaming those changes.
+provides for an audit log and facilitates code reviews. However this
+capability is primarily of use to humans making semantic interpretations
+of changes.
 
+This script also provides logical custodian policy changes over a git
+repo and allows streaming those changes for machine readable/application
+consumption. Its typically used as a basis for CI integrations or indexes
+over policies.
 
 Two example use cases:
 
   - Doing dryrun only on changed policies within a pull request
-  - Dashboard metrics of policy changes
+  - Constructing a database of policy changes.
+
+Policystream works on individual github repositories, or per Github integration
+across an organization's set of repositories.
 
 # Install
 
-Pre-requisites. pygit2, click, requests and custodian/c7n.
+policystream can be installed via pypi, provided the require pre-requisites
+libraries are available (libgit2 > 0.26)
+
+```
+pip install c7n
+```
+
+Docker images available soon, see build for constructing your own.
+
+# Build
+
+Alternatively a docker image can be built as follows
+
+```shell
+# Note must be top level directory of checkout
+cd cloud-custodian
+docker build -t policystream:latest -f tools/c7n_policystream/Dockerfile .
+```
 
 # Usage
 
@@ -49,4 +72,22 @@ Pull request use, output policies changes between two branches
     - {type: cross-account}
     name: lambda-access-check
     resource: aws.lambda
+```
+
+# Options
+
+```
+$ c7n-policystream --help
+Usage: c7n-policystream [OPTIONS] COMMAND [ARGS]...
+
+  Policy changes from git history
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  diff          Policy diff between two arbitrary revisions.
+  org-checkout  Checkout repositories from a GitHub organization.
+  org-stream    Stream changes for repos in a GitHub organization.
+  stream        Stream git history policy changes to destination.
 ```
