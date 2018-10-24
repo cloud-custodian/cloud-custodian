@@ -13,7 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest
+import hashlib
+
+from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
@@ -41,7 +43,7 @@ class AzurePolicyModeTest(BaseTest):
         function_mode = AzureFunctionMode(p)
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
-        self.assertEqual(function_mode.storage_account['name'], 'cloudcustodian')
+        self.assertEqual(function_mode.storage_account['name'], 'custodian')
         self.assertEqual(function_mode.app_insights['name'], 'test-cloud-custodian')
         self.assertEqual(function_mode.service_plan['name'], "test-cloud-custodian")
 
@@ -53,8 +55,9 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(function_mode.app_insights['resource_group_name'], 'test')
         self.assertEqual(function_mode.service_plan['resource_group_name'], "test")
 
-        self.assertEqual(function_mode.functionapp_name,
-                         function_mode.service_plan['name'] + '-' + function_mode.policy_name)
+        suffix = hashlib.sha256(
+            bytes('test' + DEFAULT_SUBSCRIPTION_ID, 'utf-8')).hexdigest().lower()[:8]
+        self.assertEqual(function_mode.functionapp_name, function_mode.policy_name + "-" + suffix)
 
     def test_init_azure_function_mode_no_service_plan_name(self):
         p = self.load_policy({
@@ -76,12 +79,13 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(function_mode.app_insights['location'], "westus2")
         self.assertEqual(function_mode.app_insights['resource_group_name'], 'cloud-custodian')
 
-        self.assertEqual(function_mode.storage_account['name'], 'cloudcustodian')
+        self.assertEqual(function_mode.storage_account['name'], 'custodian')
         self.assertEqual(function_mode.storage_account['location'], "westus2")
         self.assertEqual(function_mode.storage_account['resource_group_name'], 'cloud-custodian')
 
-        self.assertEqual(function_mode.functionapp_name,
-                         function_mode.service_plan['name'] + '-' + function_mode.policy_name)
+        suffix = hashlib.sha256(
+            bytes('cloud-custodian' + DEFAULT_SUBSCRIPTION_ID, 'utf-8')).hexdigest().lower()[:8]
+        self.assertEqual(function_mode.functionapp_name, function_mode.policy_name + "-" + suffix)
 
     def test_init_azure_function_mode_with_resource_ids(self):
 
@@ -119,8 +123,9 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(function_mode.service_plan['name'], "testsp")
         self.assertEqual(function_mode.service_plan['resource_group_name'], "testrg")
 
-        self.assertEqual(function_mode.functionapp_name,
-                         function_mode.service_plan['name'] + '-' + function_mode.policy_name)
+        suffix = hashlib.sha256(
+            bytes('testrg' + DEFAULT_SUBSCRIPTION_ID, 'utf-8')).hexdigest().lower()[:8]
+        self.assertEqual(function_mode.functionapp_name, function_mode.policy_name + "-" + suffix)
 
     def test_event_mode_is_subscribed_to_event_true(self):
         p = self.load_policy({
