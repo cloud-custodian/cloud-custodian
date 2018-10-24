@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
-from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE
+from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 
 
@@ -28,7 +28,7 @@ class AzurePolicyModeTest(BaseTest):
             'name': 'test-azure-serverless-mode',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite'],
                  'provision-options': {
                      'servicePlan': {
@@ -61,7 +61,7 @@ class AzurePolicyModeTest(BaseTest):
             'name': 'test-azure-serverless-mode',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']}
         })
 
@@ -95,7 +95,7 @@ class AzurePolicyModeTest(BaseTest):
             'name': 'test-azure-serverless-mode',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite'],
                  'provision-options': {
                      'servicePlan': sp_id,
@@ -127,7 +127,7 @@ class AzurePolicyModeTest(BaseTest):
             'name': 'test-azure-event',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']},
         })
 
@@ -146,7 +146,7 @@ class AzurePolicyModeTest(BaseTest):
             'name': 'test-azure-event',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']},
         })
 

@@ -19,7 +19,7 @@ import six
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
 from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.azure_events import AzureEvents
-from c7n_azure.constants import (CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
+from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.storage_utils import StorageUtilities
@@ -182,11 +182,11 @@ class AzureFunctionMode(ServerlessExecutionMode):
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
 
-@execution.register(CONST_AZURE_TIME_TRIGGER_MODE)
+@execution.register(FUNCTION_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
     """A policy that runs/executes in azure functions at specified
     time intervals."""
-    schema = utils.type_schema(CONST_AZURE_TIME_TRIGGER_MODE,
+    schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
                                schedule={'type': 'string'},
                                rinherit=AzureFunctionMode.schema)
 
@@ -203,12 +203,12 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
         raise NotImplementedError("error - not implemented")
 
 
-@execution.register(CONST_AZURE_EVENT_TRIGGER_MODE)
+@execution.register(FUNCTION_EVENT_TRIGGER_MODE)
 class AzureEventGridMode(AzureFunctionMode):
     """A policy that runs/executes in azure functions from an
     azure event."""
 
-    schema = utils.type_schema(CONST_AZURE_EVENT_TRIGGER_MODE,
+    schema = utils.type_schema(FUNCTION_EVENT_TRIGGER_MODE,
                                events={'type': 'array', 'items': {
                                    'oneOf': [
                                        {'type': 'string'},

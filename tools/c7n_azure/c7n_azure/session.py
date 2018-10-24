@@ -13,14 +13,15 @@
 # limitations under the License.
 
 import importlib
-import jwt
 import json
 import logging
 import os
 
+import jwt
 from azure.cli.core._profile import Profile
 from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
+from c7n_azure import constants
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
@@ -60,12 +61,12 @@ class Session(object):
             return
 
         tenant_auth_variables = [
-            'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
-            'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
+            constants.ENV_TENANT_ID, constants.ENV_SUB_ID,
+            constants.ENV_CLIENT_ID, constants.ENV_CLIENT_SECRET
         ]
 
         token_auth_variables = [
-            'AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID'
+            constants.ENV_ACCESS_TOKEN, constants.ENV_SUB_ID
         ]
 
         if self.authorization_file:
@@ -76,21 +77,21 @@ class Session(object):
             # Token authentication
             self.credentials = BasicTokenAuthentication(
                 token={
-                    'access_token': os.environ['AZURE_ACCESS_TOKEN']
+                    'access_token': os.environ[constants.ENV_ACCESS_TOKEN]
                 })
-            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            self.subscription_id = os.environ[constants.ENV_SUB_ID]
             self.log.info("Creating session with Token Authentication")
             self._is_token_auth = True
 
         elif all(k in os.environ for k in tenant_auth_variables):
             # Tenant (service principal) authentication
             self.credentials = ServicePrincipalCredentials(
-                client_id=os.environ['AZURE_CLIENT_ID'],
-                secret=os.environ['AZURE_CLIENT_SECRET'],
-                tenant=os.environ['AZURE_TENANT_ID'],
+                client_id=os.environ[constants.ENV_CLIENT_ID],
+                secret=os.environ[constants.ENV_CLIENT_SECRET],
+                tenant=os.environ[constants.ENV_TENANT_ID],
                 resource=self.resource_namespace)
-            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
-            self.tenant_id = os.environ['AZURE_TENANT_ID']
+            self.subscription_id = os.environ[constants.ENV_SUB_ID]
+            self.tenant_id = os.environ[constants.ENV_TENANT_ID]
             self.log.info("Creating session with Service Principal Authentication")
 
         else:
@@ -182,15 +183,17 @@ class Session(object):
 
         """
 
+        self._initialize_session()
+
         function_auth_variables = [
-            'AZURE_FUNCTION_TENANT_ID',
-            'AZURE_FUNCTION_CLIENT_ID',
-            'AZURE_FUNCTION_CLIENT_SECRET'
+            constants.ENV_FUNCTION_TENANT_ID,
+            constants.ENV_FUNCTION_CLIENT_ID,
+            constants.ENV_FUNCTION_CLIENT_SECRET
         ]
 
         # Check for override on subscription ID
-        if 'AZURE_FUNCTION_SUBSCRIPTION_ID' in os.environ:
-            function_subscription_id = os.environ['AZURE_FUNCTION_SUBSCRIPTION_ID']
+        if constants.ENV_FUNCTION_SUB_ID in os.environ:
+            function_subscription_id = os.environ[constants.ENV_FUNCTION_SUB_ID]
         else:
             function_subscription_id = self.subscription_id
 
@@ -199,9 +202,9 @@ class Session(object):
             auth = {
                 'credentials':
                     {
-                        'client_id': os.environ['AZURE_FUNCTION_CLIENT_ID'],
-                        'secret': os.environ['AZURE_FUNCTION_CLIENT_SECRET'],
-                        'tenant': os.environ['AZURE_FUNCTION_TENANT_ID']
+                        'client_id': os.environ[constants.ENV_FUNCTION_CLIENT_ID],
+                        'secret': os.environ[constants.ENV_FUNCTION_CLIENT_SECRET],
+                        'tenant': os.environ[constants.ENV_FUNCTION_TENANT_ID]
                     },
                 'subscription': function_subscription_id
             }
@@ -210,9 +213,9 @@ class Session(object):
             auth = {
                 'credentials':
                     {
-                        'client_id': os.environ['AZURE_CLIENT_ID'],
-                        'secret': os.environ['AZURE_CLIENT_SECRET'],
-                        'tenant': os.environ['AZURE_TENANT_ID']
+                        'client_id': os.environ[constants.ENV_CLIENT_ID],
+                        'secret': os.environ[constants.ENV_CLIENT_SECRET],
+                        'tenant': os.environ[constants.ENV_TENANT_ID]
                     },
                 'subscription': function_subscription_id
             }

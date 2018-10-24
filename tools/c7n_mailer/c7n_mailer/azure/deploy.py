@@ -21,13 +21,11 @@ import logging
 try:
     from c7n_azure.function_package import FunctionPackage
     from c7n_azure.functionapp_utils import FunctionAppUtilities
-    from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
     from c7n_azure.policy import AzureFunctionMode
     from c7n_azure.session import Session
     from c7n.utils import local_session
 except ImportError:
     FunctionPackage = None
-    CONST_DOCKER_VERSION = CONST_FUNCTIONS_EXT_VERSION = None
     pass
 
 
