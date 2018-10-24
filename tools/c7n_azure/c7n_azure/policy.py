@@ -85,7 +85,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
-    default_storage_name = "cloudcustodian"
+    default_storage_name = "custodian"
 
     def __init__(self, policy):
 
@@ -107,6 +107,11 @@ class AzureFunctionMode(ServerlessExecutionMode):
         location = self.service_plan.get('location', 'westus2')
         rg_name = self.service_plan['resource_group_name']
 
+        target_sub_id = \
+            local_session(self.policy.session_factory).get_function_target_subscription_id()
+        function_suffix = \
+            hashlib.sha256(bytes(rg_name + target_sub_id, 'utf-8')).hexdigest().lower()[:8]
+
         self.storage_account = AzureFunctionMode.extract_properties(provision_options,
                                                         'storageAccount',
                                                         {'name': self.default_storage_name,
@@ -119,7 +124,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                                                       'location': location,
                                                       'resource_group_name': rg_name})
 
-        self.functionapp_name = self.service_plan['name'] + "-" + self.policy_name
+        self.functionapp_name = self.policy_name + '-' + function_suffix
 
     @staticmethod
     def extract_properties(options, name, properties):

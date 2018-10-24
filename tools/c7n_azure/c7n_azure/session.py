@@ -127,6 +127,13 @@ class Session(object):
         self._initialize_session()
         return self.subscription_id
 
+    def get_function_target_subscription_id(self):
+        self._initialize_session()
+        if constants.ENV_FUNCTION_SUB_ID in os.environ:
+            return os.environ[constants.ENV_FUNCTION_SUB_ID]
+        else:
+            return self.subscription_id
+
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
 
@@ -191,11 +198,7 @@ class Session(object):
             constants.ENV_FUNCTION_CLIENT_SECRET
         ]
 
-        # Check for override on subscription ID
-        if constants.ENV_FUNCTION_SUB_ID in os.environ:
-            function_subscription_id = os.environ[constants.ENV_FUNCTION_SUB_ID]
-        else:
-            function_subscription_id = self.subscription_id
+        function_subscription_id = self.get_function_target_subscription_id()
 
         # Use dedicated function env vars if available
         if all(k in os.environ for k in function_auth_variables):
