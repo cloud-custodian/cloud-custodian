@@ -23,3 +23,4 @@ class Storage(ArmResourceManager):
         service = 'azure.mgmt.storage'
         client = 'StorageManagementClient'
         enum_spec = ('storage_accounts', 'list', None)
+        diagnostic_settings_enabled = False
