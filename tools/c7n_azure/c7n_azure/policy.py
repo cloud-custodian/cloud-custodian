@@ -14,6 +14,7 @@
 
 import hashlib
 import logging
+import re
 
 import six
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
@@ -224,7 +225,9 @@ class AzureEventGridMode(AzureFunctionMode):
     def provision(self):
         super(AzureEventGridMode, self).provision()
         session = local_session(self.policy.session_factory)
-        queue_name = self.functionapp_name
+
+        # queue name is restricted to lowercase letters, numbers, and single hyphens
+        queue_name = re.sub(r'(-{2,})+', '-', self.functionapp_name.lower())
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
         self._publish_functions_package(queue_name)
