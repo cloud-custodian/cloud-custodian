@@ -14,15 +14,16 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.query import QueryResourceManager
 
 from c7n.actions import BaseAction
-from c7n.filters.core import type_schema
+from c7n.filters.core import type_schema, Filter
 
 
 @resources.register('eventsubscription')
-class EventSubscription(ArmResourceManager):
+class EventSubscription(QueryResourceManager):
 
-    class resource_type(ArmResourceManager.resource_type):
+    class resource_type(object):
         service = 'azure.mgmt.eventgrid'
         client = 'EventGridManagementClient'
         enum_spec = ('event_subscriptions', 'list_global_by_subscription', None)
@@ -32,17 +33,18 @@ class EventSubscription(ArmResourceManager):
             'properties.topic'
         )
 
+
 @EventSubscription.action_registry.register('delete')
-class Delete(BaseAction)
-    schema = type_schema('poweroff')
+class Delete(BaseAction):
+    schema = type_schema('delete')
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Delete, self).__init__(data, manager, log_dir)
         self.client = self.manager.get_client()
 
     def delete(self, scope, name):
-        self.client.delete(scope, name)
+        self.client.event_subscriptions.delete(scope, name)
 
     def process(self, resources):
         for resource in resources:
-            self.delete(resource['scope'], resource['name'])
+            self.delete(resource['properties']['topic'], resource['name'])
