@@ -16,23 +16,19 @@ ADD . /src
 
 # Install Custodian Core & AWS
 WORKDIR /src
-RUN pip3 install -r requirements.txt
-RUN python3 setup.py develop
+RUN pip3 install -r requirements.txt -e .
 
 # Install Custodian Azure
 WORKDIR /src/tools/c7n_azure
-RUN pip3 install -r requirements.txt
-RUN python3 setup.py develop
+RUN pip3 install -r requirements.txt -e .
 
 # Install Custodian GCP
 WORKDIR /src/tools/c7n_gcp
-RUN pip3 install -r requirements.txt
-RUN python3 setup.py develop
+RUN pip3 install -r requirements.txt -e .
 
 # Install PolicyStream Tool
 WORKDIR /src/tools/c7n_policystream
-RUN pip3 install -r requirements.txt
-RUN python3 setup.py develop
+RUN pip3 install -r requirements.txt -e .
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/repos/"]
 ENTRYPOINT ["c7n-policystream"]
