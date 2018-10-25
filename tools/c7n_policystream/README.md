@@ -57,13 +57,19 @@ Streaming use case (default stream is to stdout, also supports kinesis, rdbms an
   2018-08-12 12:37:01,275: c7n.policystream:INFO Streamed 7 policy changes
 ```
 
-Diff use case, output policies changes in the last commit
+Policy diff between two source and target revision specs. If source
+and target are not specified default revision selection is dependent
+on current working tree branch. The intent is for two use cases, if on
+a non-master branch then show the diff to master.  If on master show
+the diff to previous commit on master. For repositories not using the
+`master` convention, please specify explicit source and target.
+
 
 ```
   $ python tools/ops/policystream.py diff -r foo -v
 ```
 
-Pull request use, output policies changes between two branches
+Pull request use, output policies changes between current branch and master.
 
 ```
   $ python tools/ops/policystream.py diff -r foo
