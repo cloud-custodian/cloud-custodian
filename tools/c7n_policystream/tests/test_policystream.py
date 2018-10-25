@@ -2,6 +2,7 @@
 import json
 import subprocess
 import os
+import yaml
 
 import pytest
 
@@ -98,6 +99,38 @@ class StreamTest(TestUtils):
                 'resource': 'aws.lambda'}]})
         git.commit('switch')
         return git
+
+    def test_cli_diff_master(self):
+        git = self.setup_basic_repo()
+        runner = CliRunner()
+        result = runner.invoke(
+            policystream.cli,
+            ['diff', '-r', git.repo_path])
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            yaml.safe_load(result.stdout),
+            {'policies': [
+                {'name': 'lambda-check', 'resource': 'aws.lambda'}]})
+
+    def test_cli_diff_branch(self):
+        git = self.setup_basic_repo()
+        git.checkout('pull-request')
+        git.change('example.yml', {
+            'policies': [
+                {'name': 'lambda-check',
+                 'resource': 'aws.lambda'},
+                {'name': 'ec2-check',
+                 'resource': 'aws.ec2'}]})
+        git.commit('new stuff')
+        runner = CliRunner()
+        result = runner.invoke(
+            policystream.cli,
+            ['diff', '-r', git.repo_path])
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            yaml.safe_load(result.stdout),
+            {'policies': [
+                {'name': 'ec2-check', 'resource': 'aws.ec2'}]})
 
     def test_diff_subdir_policies(self):
         git = self.setup_basic_repo()

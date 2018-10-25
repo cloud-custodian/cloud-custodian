@@ -819,7 +819,7 @@ def pull(repo, creds, remote_name='origin', branch='master'):
 
 @cli.command(name='diff')
 @click.option('-r', '--repo-uri', help="Path/Url to git repository")
-@click.option('--source', default='master', help="source/baseline revision spec")
+@click.option('--source', default=None, help="source/baseline revision spec")
 @click.option('--target', default=None, help="target revision spec")
 @click.option('-o', '--output', type=click.File('wb'), default='-')
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
@@ -828,6 +828,14 @@ def diff(repo_uri, source, target, output, verbose):
 
     Revision specifiers for source and target can use fancy git refspec syntax
     for symbolics, dates, etc.
+
+    See: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection
+
+    Default revision selection is dependent on current working tree
+    branch. The intent is for two use cases, if on a non-master branch
+    then show the diff to master.  If on master show the diff to
+    previous commit on master. For repositories not using the
+    `master` convention, please specify explicit source and target.
     """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
@@ -840,8 +848,17 @@ def diff(repo_uri, source, target, output, verbose):
     repo = pygit2.Repository(repo_uri)
     load_resources()
 
-    if target is None:
+    # If on master show diff between last commit to current head
+    if repo.head.shorthand == 'master':
+        if source is None:
+            source = 'master@{1}'
+        if target is None:
+            target = 'master'
+    # Else show difference between master and current head
+    elif target is None:
         target = repo.head.shorthand
+    if source is None:
+        source = 'master'
 
     policy_repo = PolicyRepo(repo_uri, repo)
     changes = list(policy_repo.delta_commits(
