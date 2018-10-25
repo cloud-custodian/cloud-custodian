@@ -92,7 +92,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
+
+        # function app data
         self.function_app_name = None
+        self.function_params = None
         self.function_app = None
 
     def get_function_app_params(self):
@@ -144,7 +147,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             app_insights=app_insights,
             service_plan=service_plan,
             storage_account=storage_account,
-            functionapp_name=self.function_app_name)
+            function_app_name=self.function_app_name)
 
         return params
 
@@ -168,8 +171,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
-        params = self.get_function_app_params()
-        self.function_app = FunctionAppUtilities().deploy_dedicated_function_app(params)
+        self.function_params = self.get_function_app_params()
+        self.function_app = FunctionAppUtilities().deploy_dedicated_function_app(self.function_params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
@@ -195,7 +198,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
-    """A policy that runs/executes in azure functions at specified
+    """A policy that runs/execute s in azure functions at specified
     time intervals."""
     schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
                                schedule={'type': 'string'},
@@ -237,7 +240,7 @@ class AzureEventGridMode(AzureFunctionMode):
         session = local_session(self.policy.session_factory)
 
         # queue name is restricted to lowercase letters, numbers, and single hyphens
-        queue_name = re.sub(r'(-{2,})+', '-', self.functionapp_name.lower())
+        queue_name = re.sub(r'(-{2,})+', '-', self.function_app_name.lower())
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
         self._publish_functions_package(queue_name)
@@ -299,7 +302,8 @@ class AzureEventGridMode(AzureFunctionMode):
         self.log.info("Creating storage queue")
         storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
         storage_account = storage_client.storage_accounts.get_properties(
-            self.storage_account['resource_group_name'], self.storage_account['name'])
+            self.function_params.storage_account['resource_group_name'],
+            self.function_params.storage_account['name'])
 
         try:
             StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
