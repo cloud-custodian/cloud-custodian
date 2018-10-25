@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "JobTag",
+                "Value": "JobTagValue"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "66364a43-bbb3-42f3-ae71-00b134a38c32",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "66364a43-bbb3-42f3-ae71-00b134a38c32",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "49",
+                "date": "Wed, 24 Oct 2018 20:12:02 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

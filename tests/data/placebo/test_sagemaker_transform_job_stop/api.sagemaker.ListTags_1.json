@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [],
+        "ResponseMetadata": {
+            "RequestId": "cfd4204e-c3da-43c1-9bc3-e6e6b1e5a279",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cfd4204e-c3da-43c1-9bc3-e6e6b1e5a279",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "11",
+                "date": "Wed, 24 Oct 2018 19:47:47 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
