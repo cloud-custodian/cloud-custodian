@@ -94,7 +94,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_app_name = None
 
-    def configure(self):
+    def get_function_app_params(self):
         session = local_session(self.policy.session_factory)
 
         provision_options = self.policy.data['mode'].get('provision-options', {})
@@ -167,7 +167,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
-        params = self.configure()
+        params = self.get_function_app_params()
         FunctionAppUtilities().deploy_dedicated_function_app(params)
 
     def get_logs(self, start, end):

@@ -39,7 +39,7 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         function_mode = AzureFunctionMode(p)
-        params = function_mode.configure()
+        params = function_mode.get_function_app_params()
 
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
@@ -67,7 +67,7 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         function_mode = AzureFunctionMode(p)
-        params = function_mode.configure()
+        params = function_mode.get_function_app_params()
 
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
@@ -107,7 +107,7 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         function_mode = AzureFunctionMode(p)
-        params = function_mode.configure()
+        params = function_mode.get_function_app_params()
 
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
