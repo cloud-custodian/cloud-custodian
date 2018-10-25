@@ -129,10 +129,7 @@ class Session(object):
 
     def get_function_target_subscription_id(self):
         self._initialize_session()
-        if constants.ENV_FUNCTION_SUB_ID in os.environ:
-            return os.environ[constants.ENV_FUNCTION_SUB_ID]
-        else:
-            return self.subscription_id
+        return os.environ.get(constants.ENV_FUNCTION_SUB_ID, self.subscription_id)
 
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """

@@ -42,23 +42,23 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         function_mode = AzureFunctionMode(p)
+        params = function_mode.configure()
+
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
-        self.assertEqual(function_mode.storage_account['name'], 'custodian')
-        self.assertEqual(function_mode.app_insights['name'], 'test-cloud-custodian')
-        self.assertEqual(function_mode.service_plan['name'], "test-cloud-custodian")
+        self.assertEqual(params.storage_account['name'], 'custodian24d368c7')
+        self.assertEqual(params.app_insights['name'], 'test-cloud-custodian')
+        self.assertEqual(params.service_plan['name'], "test-cloud-custodian")
 
-        self.assertEqual(function_mode.service_plan['location'], "eastus")
-        self.assertEqual(function_mode.app_insights['location'], "eastus")
-        self.assertEqual(function_mode.storage_account['location'], "eastus")
+        self.assertEqual(params.service_plan['location'], "eastus")
+        self.assertEqual(params.app_insights['location'], "eastus")
+        self.assertEqual(params.storage_account['location'], "eastus")
 
-        self.assertEqual(function_mode.storage_account['resource_group_name'], 'test')
-        self.assertEqual(function_mode.app_insights['resource_group_name'], 'test')
-        self.assertEqual(function_mode.service_plan['resource_group_name'], "test")
+        self.assertEqual(params.storage_account['resource_group_name'], 'test')
+        self.assertEqual(params.app_insights['resource_group_name'], 'test')
+        self.assertEqual(params.service_plan['resource_group_name'], "test")
 
-        suffix = hashlib.sha256(
-            bytes('test' + DEFAULT_SUBSCRIPTION_ID, 'utf-8')).hexdigest().lower()[:8]
-        self.assertEqual(function_mode.functionapp_name, function_mode.policy_name + "-" + suffix)
+        self.assertEqual(function_mode.function_app_name, 'test-azure-serverless-mode-24d368c7')
 
     def test_init_azure_function_mode_no_service_plan_name(self):
         p = self.load_policy({
@@ -70,23 +70,23 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         function_mode = AzureFunctionMode(p)
+        params = function_mode.configure()
+
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
-        self.assertEqual(function_mode.service_plan['name'], "cloud-custodian")
-        self.assertEqual(function_mode.service_plan['location'], "westus2")
-        self.assertEqual(function_mode.service_plan['resource_group_name'], "cloud-custodian")
+        self.assertEqual(params.service_plan['name'], "cloud-custodian")
+        self.assertEqual(params.service_plan['location'], "westus2")
+        self.assertEqual(params.service_plan['resource_group_name'], "cloud-custodian")
 
-        self.assertEqual(function_mode.app_insights['name'], 'cloud-custodian')
-        self.assertEqual(function_mode.app_insights['location'], "westus2")
-        self.assertEqual(function_mode.app_insights['resource_group_name'], 'cloud-custodian')
+        self.assertEqual(params.app_insights['name'], 'cloud-custodian')
+        self.assertEqual(params.app_insights['location'], "westus2")
+        self.assertEqual(params.app_insights['resource_group_name'], 'cloud-custodian')
 
-        self.assertEqual(function_mode.storage_account['name'], 'custodian')
-        self.assertEqual(function_mode.storage_account['location'], "westus2")
-        self.assertEqual(function_mode.storage_account['resource_group_name'], 'cloud-custodian')
+        self.assertEqual(params.storage_account['name'], 'custodian7564f106')
+        self.assertEqual(params.storage_account['location'], "westus2")
+        self.assertEqual(params.storage_account['resource_group_name'], 'cloud-custodian')
 
-        suffix = hashlib.sha256(
-            bytes('cloud-custodian' + DEFAULT_SUBSCRIPTION_ID, 'utf-8')).hexdigest().lower()[:8]
-        self.assertEqual(function_mode.functionapp_name, function_mode.policy_name + "-" + suffix)
+        self.assertEqual(function_mode.function_app_name, 'test-azure-serverless-mode-7564f106')
 
     def test_init_azure_function_mode_with_resource_ids(self):
 
@@ -110,23 +110,23 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         function_mode = AzureFunctionMode(p)
+        params = function_mode.configure()
+
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
-        self.assertEqual(function_mode.storage_account['id'], sa_id)
-        self.assertEqual(function_mode.storage_account['name'], 'testsa')
-        self.assertEqual(function_mode.storage_account['resource_group_name'], 'testrg')
+        self.assertEqual(params.storage_account['id'], sa_id)
+        self.assertEqual(params.storage_account['name'], 'testsa')
+        self.assertEqual(params.storage_account['resource_group_name'], 'testrg')
 
-        self.assertEqual(function_mode.app_insights['id'], ai_id)
-        self.assertEqual(function_mode.app_insights['name'], 'testai')
-        self.assertEqual(function_mode.app_insights['resource_group_name'], 'testrg')
+        self.assertEqual(params.app_insights['id'], ai_id)
+        self.assertEqual(params.app_insights['name'], 'testai')
+        self.assertEqual(params.app_insights['resource_group_name'], 'testrg')
 
-        self.assertEqual(function_mode.service_plan['id'], sp_id)
-        self.assertEqual(function_mode.service_plan['name'], "testsp")
-        self.assertEqual(function_mode.service_plan['resource_group_name'], "testrg")
+        self.assertEqual(params.service_plan['id'], sp_id)
+        self.assertEqual(params.service_plan['name'], "testsp")
+        self.assertEqual(params.service_plan['resource_group_name'], "testrg")
 
-        suffix = hashlib.sha256(
-            bytes('testrg' + DEFAULT_SUBSCRIPTION_ID, 'utf-8')).hexdigest().lower()[:8]
-        self.assertEqual(function_mode.functionapp_name, function_mode.policy_name + "-" + suffix)
+        self.assertEqual(function_mode.function_app_name, 'test-azure-serverless-mode-8614f79d')
 
     def test_event_mode_is_subscribed_to_event_true(self):
         p = self.load_policy({
