@@ -63,18 +63,18 @@ def provision(config):
                                                      'location': location,
                                                      'resource_group_name': rg_name})
 
-    functionapp_name = '-'.join([service_plan['name'], function_name, suffix]) \
+    function_app_name = '-'.join([service_plan['name'], function_name, suffix]) \
                           .replace(' ', '-').lower()
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
         service_plan=service_plan,
         storage_account=storage_account,
-        functionapp_name=functionapp_name)
+        function_app_name=function_app_name)
 
     function_app = FunctionAppUtilities().deploy_dedicated_function_app(params)
 
-    log.info("Building function package for %s" % functionapp_name)
+    log.info("Building function package for %s" % function_app_name)
 
     # Build package
     packager = FunctionPackage(
