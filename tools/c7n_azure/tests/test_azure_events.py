@@ -13,8 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest
-from c7n_azure.azure_events import AzureEvents
+from azure_common import BaseTest, arm_template
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
+from c7n_azure.storage_utils import StorageUtilities
 
 
 class AzureEventsTest(BaseTest):
@@ -51,3 +53,15 @@ class AzureEventsTest(BaseTest):
         self.assertEqual(len(event_operations), 2)
         self.assertTrue('Microsoft.Compute/virtualMachines/write' in event_operations)
         self.assertTrue('Microsoft.Web/serverFarms/write' in event_operations)
+
+    @arm_template('storage.json')
+    def test_create_azure_event_subscription(self):
+        account = self.setup_account()
+        queue_name = 'cctestevensub'
+        StorageUtilities.create_queue_from_storage_account(account, queue_name)
+        sub_destination = StorageQueueEventSubscriptionDestination(resource_id=account.id,
+                                                                   queue_name=queue_name)
+        sub_name = 'custodiantestsubscription'
+        event_subscription = AzureEventSubscription.create(sub_destination, sub_name)
+        self.assertEqual(event_subscription.name, sub_name)
+        self.assertEqual(event_subscription.destination.endpoint_type, 'StorageQueue')

@@ -14,7 +14,8 @@
 
 import six
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction, DeleteAction
-from c7n_azure.filters import MetricFilter, TagActionFilter, PolicyCompliantFilter
+from c7n_azure.filters import (MetricFilter, TagActionFilter,
+                               DiagnosticSettingsFilter, PolicyCompliantFilter)
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta
 from c7n_azure.utils import ResourceIdParser
@@ -32,6 +33,7 @@ class ArmResourceManager(QueryResourceManager):
         enum_spec = ('resources', 'list', None)
         id = 'id'
         name = 'name'
+        diagnostic_settings_enabled = True
         default_report_fields = (
             'name',
             'location',
@@ -68,6 +70,9 @@ class ArmResourceManager(QueryResourceManager):
                 klass.filter_registry.register('marked-for-op', TagActionFilter)
                 klass.action_registry.register('mark-for-op', TagDelayedAction)
                 klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
+                if hasattr(klass.resource_type, 'diagnostic_settings_enabled') \
+                        and klass.resource_type.diagnostic_settings_enabled:
+                    klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

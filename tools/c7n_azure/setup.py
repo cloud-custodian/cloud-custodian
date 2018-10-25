@@ -65,7 +65,7 @@ setup(
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
                       "azure-mgmt-subscription",
-                      "azure-mgmt-eventgrid",
+                      "azure-mgmt-eventgrid>=2.0.0rc1",
                       "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
@@ -77,5 +77,7 @@ setup(
                       "adal~=1.0.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
-
+    package_data={str(''): [str('function_binding_resources/bin/*.dll'),
+                            str('function_binding_resources/*.csproj'),
+                            str('function_binding_resources/bin/*.json')]}
 )
