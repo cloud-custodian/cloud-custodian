@@ -93,6 +93,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_app_name = None
+        self.function_app = None
 
     def get_function_app_params(self):
         session = local_session(self.policy.session_factory)
@@ -168,7 +169,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def provision(self):
         params = self.get_function_app_params()
-        FunctionAppUtilities().deploy_dedicated_function_app(params)
+        self.function_app = FunctionAppUtilities().deploy_dedicated_function_app(params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
@@ -186,8 +187,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
 
-        if archive.wait_for_status(self.function_app_name):
-            archive.publish(self.function_app_name)
+        if archive.wait_for_status(self.function_app):
+            archive.publish(self.function_app)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 

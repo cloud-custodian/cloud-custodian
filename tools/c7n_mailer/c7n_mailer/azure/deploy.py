@@ -72,7 +72,7 @@ def provision(config):
         storage_account=storage_account,
         functionapp_name=functionapp_name)
 
-    FunctionAppUtilities().deploy_dedicated_function_app(params)
+    function_app = FunctionAppUtilities().deploy_dedicated_function_app(params)
 
     log.info("Building function package for %s" % functionapp_name)
 
@@ -104,7 +104,7 @@ def provision(config):
 
     packager.close()
 
-    if packager.wait_for_status(functionapp_name):
-        packager.publish(functionapp_name)
+    if packager.wait_for_status(function_app):
+        packager.publish(function_app)
     else:
         log.error("Aborted deployment, ensure Application Service is healthy.")
