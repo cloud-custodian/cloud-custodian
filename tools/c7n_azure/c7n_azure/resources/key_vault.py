@@ -13,13 +13,12 @@
 # limitations under the License.
 
 from azure.graphrbac import GraphRbacManagementClient
+from azure.keyvault import KeyVaultClient
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
-
 from c7n.filters import Filter
 from c7n.utils import type_schema
 from c7n_azure.utils import GraphHelper
-
 from c7n_azure.resources.arm import ArmResourceManager
 
 
@@ -30,6 +29,30 @@ class KeyVault(ArmResourceManager):
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
         enum_spec = ('vaults', 'list', None)
+
+    def augment(self, resources):
+        url_base = 'vault.azure.net'
+        s = Session(resource='https://' + url_base)
+        self.keyvault_client = KeyVaultClient(s.get_credentials())
+
+        for index, item in enumerate(resources):
+            vault_keys = []
+            vault_url = 'https://' + resources[index]["name"] + '.vault.azure.net'
+            try:
+                vkeys = self.keyvault_client.get_keys(vault_url)
+                for vkey in vkeys:
+                    vault_keys.append({'kid': vkey.kid,
+                                       'attributes': {'enabled': vkey.attributes.enabled,
+                                                      'created': vkey.attributes.created,
+                                                      'updated': vkey.attributes.updated},
+                                       'tags': vkey.tags})
+
+            except Exception:
+                pass
+
+            resources[index]['keys'] = vault_keys
+
+        return resources
 
 
 @KeyVault.filter_registry.register('whitelist')

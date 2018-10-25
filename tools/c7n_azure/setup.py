@@ -67,6 +67,7 @@ setup(
                       "azure-mgmt-subscription",
                       "azure-mgmt-eventgrid>=2.0.0rc1",
                       "azure-graphrbac",
+                      "azure-keyvault",
                       "azure-storage-blob",
                       "azure-storage-queue",
                       "requests",
