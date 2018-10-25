@@ -90,25 +90,19 @@ def azure_name_value_pair(name, value):
 
 
 class ThreadHelper:
-    class Parameters:
-        def __init__(self, resources, execution_method, executor_factory, log, chunk_size=20):
-            self.resources = resources
-            self.execution_method = execution_method
-            self.executor_factory = executor_factory
-            self.log = log
-            self.chunk_size = chunk_size
 
     @staticmethod
-    def execute(parameters):
+    def execute_in_parallel(resources, execution_method, executor_factory,
+                            log, max_workers=3, chunk_size=20):
         futures = []
         results = []
-        with parameters.executor_factory(max_workers=3) as w:
-            for resource_set in chunks(parameters.resources, parameters.chunk_size):
-                futures.append(w.submit(parameters.execution_method, resource_set))
+        with executor_factory(max_workers=max_workers) as w:
+            for resource_set in chunks(resources, chunk_size):
+                futures.append(w.submit(execution_method, resource_set))
 
             for f in as_completed(futures):
                 if f.exception():
-                    parameters.log.warning(
+                    log.warning(
                         "Execution failed with error: %s" % f.exception())
                     continue
                 else:

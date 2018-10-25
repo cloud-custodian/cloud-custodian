@@ -38,20 +38,14 @@ class EventSubscription(QueryResourceManager):
 class Delete(BaseAction):
     schema = type_schema('delete')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(Delete, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
     def process(self, resources, event=None):
-        params = ThreadHelper.Parameters(resources=resources,
-                                         execution_method=self.process_resource_set,
-                                         executor_factory=self.executor_factory,
-                                         log=self.log)
-
-        return ThreadHelper.execute(params)
+        return ThreadHelper.execute_in_parallel(resources=resources,
+                                                execution_method=self.process_resource_set,
+                                                executor_factory=self.executor_factory,
+                                                log=self.log)
 
     def process_resource_set(self, resources):
+        client = self.manager.get_client()
         for resource in resources:
-            self.client.event_subscriptions.delete(
+            client.event_subscriptions.delete(
                 resource['properties']['topic'], resource['name'])
-
