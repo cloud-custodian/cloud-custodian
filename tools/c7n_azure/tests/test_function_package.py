@@ -17,7 +17,7 @@ import json
 
 from azure_common import BaseTest
 from c7n_azure.function_package import FunctionPackage
-from c7n_azure.constants import CONST_AZURE_TIME_TRIGGER_MODE, CONST_AZURE_EVENT_TRIGGER_MODE
+from c7n_azure.constants import FUNCTION_TIME_TRIGGER_MODE, FUNCTION_EVENT_TRIGGER_MODE
 
 
 class FunctionPackageTest(BaseTest):
@@ -29,7 +29,7 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': CONST_AZURE_TIME_TRIGGER_MODE,
+                {'type': FUNCTION_TIME_TRIGGER_MODE,
                  'schedule': '0 1 0 0 0'}
         })
 
@@ -48,7 +48,7 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']},
         })
 
@@ -66,7 +66,7 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']},
         })
 
@@ -85,7 +85,7 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-package',
             'resource': 'azure.resourcegroup',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']},
         })
 
