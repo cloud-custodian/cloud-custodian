@@ -13,10 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import hashlib
-
-from builtins import bytes
-from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
+from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
