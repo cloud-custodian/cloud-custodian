@@ -185,9 +185,9 @@ class FunctionPackage(object):
         # cffi module needs special handling
         self._add_cffi_module()
 
-    def wait_for_status(self, function_app, retries=10, delay=15):
+    def wait_for_status(self, deployment_creds, retries=10, delay=15):
         for r in range(retries):
-            if self.status(function_app):
+            if self.status(deployment_creds):
                 return True
             else:
                 self.log.info('(%s/%s) Will retry Function App status check in %s seconds...'
@@ -195,12 +195,8 @@ class FunctionPackage(object):
                 time.sleep(delay)
         return False
 
-    def status(self, function_app):
-        s = local_session(Session)
-        client = s.client('azure.mgmt.web.WebSiteManagementClient')
-        creds = client.web_apps.list_publishing_credentials(
-            function_app.resource_group, function_app.name).result()
-        status_url = '%s/api/deployments' % creds.scm_uri
+    def status(self, deployment_creds):
+        status_url = '%s/api/deployments' % deployment_creds.scm_uri
 
         try:
             r = requests.get(status_url, timeout=30, verify=self.enable_ssl_cert)
@@ -215,18 +211,12 @@ class FunctionPackage(object):
 
         return True
 
-    def publish(self, function_app):
+    def publish(self, deployment_creds):
         self.close()
 
         # update perms of the package
         self._update_perms_package()
-
-        s = local_session(Session)
-
-        client = s.client('azure.mgmt.web.WebSiteManagementClient')
-        creds = client.web_apps.list_publishing_credentials(
-            function_app.resource_group, function_app.name).result()
-        zip_api_url = '%s/api/zipdeploy?isAsync=true' % creds.scm_uri
+        zip_api_url = '%s/api/zipdeploy?isAsync=true' % deployment_creds.scm_uri
 
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 

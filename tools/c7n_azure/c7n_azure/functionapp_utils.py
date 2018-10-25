@@ -29,10 +29,12 @@ class FunctionAppUtilities(object):
         self.log = logging.getLogger('custodian.azure.function_app_utils')
 
     class FunctionAppInfrastructureParameters:
-        def __init__(self, app_insights, service_plan, storage_account, function_app_name):
+        def __init__(self, app_insights, service_plan, storage_account,
+                     function_app_resource_group_name, function_app_name):
             self.app_insights = app_insights
             self.service_plan = service_plan
             self.storage_account = storage_account
+            self.function_app_resource_group_name = function_app_resource_group_name
             self.function_app_name = function_app_name
 
     @staticmethod
@@ -54,7 +56,7 @@ class FunctionAppUtilities(object):
         function_app_unit = FunctionAppDeploymentUnit()
         function_app_params = \
             {'name': parameters.function_app_name,
-             'resource_group_name': parameters.service_plan['resource_group_name']}
+             'resource_group_name': parameters.function_app_resource_group_name}
         function_app = function_app_unit.get(function_app_params)
         if function_app:
             return function_app

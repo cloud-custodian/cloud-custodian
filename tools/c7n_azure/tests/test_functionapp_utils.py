@@ -64,6 +64,7 @@ class FunctionAppUtilsTest(BaseTest):
                 'resource_group_name': CONST_GROUP_NAME,
                 'name': 'cloud-custodian-test'
             },
+            function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name='custodian-test-app')
 
         app = self.functionapp_util.deploy_dedicated_function_app(parameters)
