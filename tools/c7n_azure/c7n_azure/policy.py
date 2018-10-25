@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import hashlib
 import logging
 import re
 
@@ -20,7 +19,7 @@ import six
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
 from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.azure_events import AzureEvents
-from c7n_azure.constants import (CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE)
+from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.storage_utils import StorageUtilities
@@ -86,41 +85,67 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
-    default_storage_name = "cloudcustodian"
+    default_storage_name = "custodian"
 
     def __init__(self, policy):
 
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
-
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
+        self.function_app_name = None
+
+    def get_function_app_params(self):
+        session = local_session(self.policy.session_factory)
 
         provision_options = self.policy.data['mode'].get('provision-options', {})
-        # service plan is parse first, because its location might be shared with storage & insights
-        self.service_plan = AzureFunctionMode.extract_properties(provision_options,
-                                                     'servicePlan',
-                                                     {'name': 'cloud-custodian',
-                                                      'location': 'westus2',
-                                                      'resource_group_name': 'cloud-custodian',
-                                                      'sku_name': 'B1',
-                                                      'sku_tier': 'Basic'})
 
-        location = self.service_plan.get('location', 'westus2')
-        rg_name = self.service_plan['resource_group_name']
+        # Service plan is parsed first, location might be shared with storage & insights
+        service_plan = AzureFunctionMode.extract_properties(
+            provision_options,
+            'servicePlan',
+            {
+                'name': 'cloud-custodian',
+                'location': 'westus2',
+                'resource_group_name': 'cloud-custodian',
+                'sku_name': 'B1',
+                'sku_tier': 'Basic'
+            })
 
-        self.storage_account = AzureFunctionMode.extract_properties(provision_options,
-                                                        'storageAccount',
-                                                        {'name': self.default_storage_name,
-                                                         'location': location,
-                                                         'resource_group_name': rg_name})
+        # Metadata used for automatic naming
+        location = service_plan.get('location', 'westus2')
+        rg_name = service_plan['resource_group_name']
+        sub_id = session.get_subscription_id()
+        target_sub_id = session.get_function_target_subscription_id()
+        function_suffix = StringUtils.naming_hash(rg_name + target_sub_id)
+        storage_suffix = StringUtils.naming_hash(rg_name + sub_id)
 
-        self.app_insights = AzureFunctionMode.extract_properties(provision_options,
-                                                     'appInsights',
-                                                     {'name': self.service_plan['name'],
-                                                      'location': location,
-                                                      'resource_group_name': rg_name})
+        storage_account = AzureFunctionMode.extract_properties(
+            provision_options,
+            'storageAccount',
+            {
+                'name': self.default_storage_name + storage_suffix,
+                'location': location,
+                'resource_group_name': rg_name
+            })
 
-        self.functionapp_name = self.service_plan['name'] + "-" + self.policy_name
+        app_insights = AzureFunctionMode.extract_properties(
+            provision_options,
+            'appInsights',
+            {
+                'name': service_plan['name'],
+                'location': location,
+                'resource_group_name': rg_name
+            })
+
+        self.function_app_name = self.policy_name + '-' + function_suffix
+
+        params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
+            app_insights=app_insights,
+            service_plan=service_plan,
+            storage_account=storage_account,
+            functionapp_name=self.function_app_name)
+
+        return params
 
     @staticmethod
     def extract_properties(options, name, properties):
@@ -142,23 +167,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
-
-        # If storage account name is not provided, we'll try to make it unique using
-        # resource group name & subscription id values.
-        # Can't be a part of constructor because local_session is not working with
-        # custodian validate.
-        if self.storage_account['name'] == self.default_storage_name:
-            rg_name = self.storage_account['resource_group_name']
-            sub_id = local_session(self.policy.session_factory).get_subscription_id()
-            suffix = hashlib.sha256(bytes(rg_name + sub_id, 'utf-8')).hexdigest().lower()[:8]
-            self.storage_account['name'] = self.default_storage_name + suffix
-
-        params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
-            app_insights=self.app_insights,
-            service_plan=self.service_plan,
-            storage_account=self.storage_account,
-            functionapp_name=self.functionapp_name)
-
+        params = self.get_function_app_params()
         FunctionAppUtilities().deploy_dedicated_function_app(params)
 
     def get_logs(self, start, end):
@@ -169,7 +178,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         """Validate configuration settings for execution mode."""
 
     def _publish_functions_package(self, queue_name=None):
-        self.log.info("Building function package for %s" % self.functionapp_name)
+        self.log.info("Building function package for %s" % self.function_app_name)
 
         archive = FunctionPackage(self.policy_name)
         archive.build(self.policy.data, queue_name=queue_name)
@@ -177,17 +186,17 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
 
-        if archive.wait_for_status(self.functionapp_name):
-            archive.publish(self.functionapp_name)
+        if archive.wait_for_status(self.function_app_name):
+            archive.publish(self.function_app_name)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
 
-@execution.register(CONST_AZURE_TIME_TRIGGER_MODE)
+@execution.register(FUNCTION_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
     """A policy that runs/executes in azure functions at specified
     time intervals."""
-    schema = utils.type_schema(CONST_AZURE_TIME_TRIGGER_MODE,
+    schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
                                schedule={'type': 'string'},
                                rinherit=AzureFunctionMode.schema)
 
@@ -204,12 +213,12 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
         raise NotImplementedError("error - not implemented")
 
 
-@execution.register(CONST_AZURE_EVENT_TRIGGER_MODE)
+@execution.register(FUNCTION_EVENT_TRIGGER_MODE)
 class AzureEventGridMode(AzureFunctionMode):
     """A policy that runs/executes in azure functions from an
     azure event."""
 
-    schema = utils.type_schema(CONST_AZURE_EVENT_TRIGGER_MODE,
+    schema = utils.type_schema(FUNCTION_EVENT_TRIGGER_MODE,
                                events={'type': 'array', 'items': {
                                    'oneOf': [
                                        {'type': 'string'},

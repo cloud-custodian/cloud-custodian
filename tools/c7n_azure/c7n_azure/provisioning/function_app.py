@@ -6,7 +6,7 @@ from azure.mgmt.web.models import (Site, SiteConfig)
 from c7n_azure.utils import azure_name_value_pair
 
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
-from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION)
+from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 
 
 class FunctionAppDeploymentUnit(DeploymentUnit):
@@ -26,7 +26,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         functionapp_def.kind = 'functionapp,linux'
         functionapp_def.server_farm_id = params['app_service_plan_id']
 
-        site_config.linux_fx_version = CONST_DOCKER_VERSION
+        site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
         site_config.always_on = True
 
         app_insights_key = params['app_insights_key']
@@ -38,7 +38,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         site_config.app_settings.append(azure_name_value_pair('AzureWebJobsStorage', con_string))
         site_config.app_settings.append(azure_name_value_pair('AzureWebJobsDashboard', con_string))
         site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_EXTENSION_VERSION',
-                                                      CONST_FUNCTIONS_EXT_VERSION))
+                                                              FUNCTION_EXT_VERSION))
         site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_WORKER_RUNTIME', 'python'))
         site_config.app_settings.append(
             azure_name_value_pair('MACHINEKEY_DecryptionKey',

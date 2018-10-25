@@ -13,12 +13,14 @@
 # limitations under the License.
 import collections
 import datetime
+import hashlib
 import logging
 import re
 
 import six
 from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
 from azure.mgmt.web.models import NameValuePair
+from builtins import bytes
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
@@ -68,6 +70,10 @@ class StringUtils(object):
     def snake_to_camel(string):
         components = string.split('_')
         return components[0] + ''.join(x.title() for x in components[1:])
+
+    @staticmethod
+    def naming_hash(string, length=8):
+        return hashlib.sha256(bytes(string, 'utf-8')).hexdigest().lower()[:length]
 
 
 def utcnow():

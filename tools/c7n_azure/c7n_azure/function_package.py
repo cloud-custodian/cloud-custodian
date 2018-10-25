@@ -20,7 +20,7 @@ import sys
 import time
 
 import requests
-from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE
+from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
@@ -53,7 +53,7 @@ class FunctionPackage(object):
             self.pkg.add_contents(dest=self.name + '/config.json',
                                   contents=policy_contents)
 
-            if policy['mode']['type'] == CONST_AZURE_EVENT_TRIGGER_MODE:
+            if policy['mode']['type'] == FUNCTION_EVENT_TRIGGER_MODE:
                 self._add_queue_binding_extensions()
 
     def _add_host_config(self):
@@ -101,12 +101,12 @@ class FunctionPackage(object):
         mode_type = policy['mode']['type']
         binding = config['bindings'][0]
 
-        if mode_type == CONST_AZURE_TIME_TRIGGER_MODE:
+        if mode_type == FUNCTION_TIME_TRIGGER_MODE:
             binding['type'] = 'timerTrigger'
             binding['name'] = 'input'
             binding['schedule'] = policy['mode']['schedule']
 
-        elif mode_type == CONST_AZURE_EVENT_TRIGGER_MODE:
+        elif mode_type == FUNCTION_EVENT_TRIGGER_MODE:
             binding['type'] = 'queueTrigger'
             binding['connection'] = 'AzureWebJobsStorage'
             binding['name'] = 'input'
@@ -176,7 +176,7 @@ class FunctionPackage(object):
 
         # generate and add auth
         s = local_session(Session)
-        self.pkg.add_contents(dest=self.name + '/auth.json', contents=s.get_auth_string())
+        self.pkg.add_contents(dest=self.name + '/auth.json', contents=s.get_functions_auth_string())
 
         # cffi module needs special handling
         self._add_cffi_module()

@@ -22,5 +22,7 @@ This example is the same structure as the default one.
 
         custodian run -s azure://mystorage.blob.core.windows.net/logs/{policy}/{now:%Y/%m/%d/%H/} mypolicy.yml
 
+Use `{account_id}` for Subscription ID.
+
 Custodian will use your current credentials to discover the storage account and
 load the storage account keys.  The account must be in your current subscription.
