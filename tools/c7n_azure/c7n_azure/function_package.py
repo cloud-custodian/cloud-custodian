@@ -40,6 +40,9 @@ class FunctionPackage(object):
         self.enable_ssl_cert = not distutils.util.strtobool(
             os.environ.get(ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, 'no'))
 
+        if not self.enable_ssl_cert:
+            self.log.warning('SSL Certificate Validation is disabled')
+
     def _add_functions_required_files(self, policy, queue_name=None):
         self.pkg.add_file(self.function_path,
                           dest=self.name + '/function.py')
