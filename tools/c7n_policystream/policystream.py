@@ -1,71 +1,36 @@
-#!/usr/bin/env python
-"""Policy Changes from Git.
----------------------------
+#!/usr/bin/env python3
+#
+# Copyright 2018 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-Using custodian in accordance with infrastructure as code principles,
-we store policy assets in a versioned control repository. This
-provides for an audit log and facilitate change reviews. However this
-capability is primarily of use to humans making semantic
-interpretations of changes. This script also provides logical custodian
-policy changes over a git repo and allows streaming those changes.
-
-
-Two example use cases:
-
-  - Doing dryrun only on changed policies within a pull request
-  - Dashboard metrics of policy changes
-
-Install
-+++++++
-
-Pre-requisites. pygit2, click, requests and custodian/c7n.
-
-Usage
-+++++
-
-Streaming use case (default stream is to stdout, also supports kinesis and sqs)::
-
-  $ python tools/ops/policystream.py stream -r foo
-  2018-08-12 12:37:00,567: c7n.policystream:INFO Cloning repository: foo
-  <policy-add policy:foi provider:aws resource:ec2 date:2018-08-02T15:13:28-07:00 author:Kapil commit:09cb85>
-  <policy-moved policy:foi provider:aws resource:ec2 date:2018-08-02T15:14:24-07:00 author:Kapil commit:76fce7>
-  <policy-remove policy:foi provider:aws resource:ec2 date:2018-08-02T15:14:46-07:00 author:Kapil commit:570ca4>
-  <policy-add policy:ec2-guard-duty provider:aws resource:ec2 date:2018-08-02T15:14:46-07:00 author:Kapil commit:570ca4>
-  <policy-add policy:ec2-run provider:aws resource:ec2 date:2018-08-02T15:16:00-07:00 author:Kapil commit:d3d8d4>
-  <policy-remove policy:ec2-run provider:aws resource:ec2 date:2018-08-02T15:18:31-07:00 author:Kapil commit:922c1a>
-  <policy-modified policy:ec2-guard-duty provider:aws resource:ec2 date:2018-08-12T09:39:43-04:00 author:Kapil commit:189ea1>
-  2018-08-12 12:37:01,275: c7n.policystream:INFO Streamed 7 policy changes
-
-
-Diff use case, output policies changes in the last commit::
-
-  $ python tools/ops/policystream.py diff -r foo -v
-
-
-Pull request use, output policies changes between two branches::
-
-  $ python tools/ops/policystream.py diff -r foo
-  policies:
-  - filters:
-    - {type: cross-account}
-    name: lambda-access-check
-    resource: aws.lambda
-
-""" # NOQA
 import click
 import contextlib
+from collections import deque
 from datetime import datetime, timedelta
-from dateutil.tz import tzoffset
+from dateutil.tz import tzoffset, tzutc
+from dateutil.parser import parse
 from fnmatch import fnmatch
 from functools import partial
 import jmespath
 import json
 import logging
 import shutil
+import operator
 import os
 import pygit2
 import requests
-import sqlite3
+import six
 import tempfile
 import yaml
 
@@ -78,6 +43,11 @@ from c7n.utils import get_retry
 
 import boto3
 
+try:
+    import sqlalchemy as rdb
+    HAVE_SQLA = True
+except ImportError:
+    HAVE_SQLA = False
 
 log = logging.getLogger('c7n.policystream')
 
@@ -106,6 +76,12 @@ class ChangeType(object):
     MODIFIED = 3
     MOVED = 4
 
+
+SORT_TYPE = {
+    'topo': pygit2.GIT_SORT_TOPOLOGICAL,
+    'time': pygit2.GIT_SORT_TIME,
+    'reverse': pygit2.GIT_SORT_REVERSE
+}
 
 CHANGE_TYPE = {
     1: 'ADD',
@@ -238,6 +214,14 @@ class PolicyCollection(BaseCollection):
     def __getitem__(self, key):
         return self.pmap[key]
 
+    def __repr__(self):
+        return "<PolicyCollection count:%d>" % (len(self.policies))
+
+    def select(self, names):
+        """return the named subset of policies"""
+        return PolicyCollection(
+            [p for p in self.policies if p.name in names], self.options)
+
     def add(self, p):
         assert p.name not in self.pmap
         self.policies.append(p)
@@ -296,21 +280,28 @@ class PolicyRepo(object):
                 yaml.safe_load(self.repo.get(tree[fpath].id).data),
                 Config.empty(), fpath)
 
+    def _get_policy_fents(self, tree):
+        # get policy file entries from a tree recursively
+        results = {}
+        q = deque([(tree, '')])
+        while q:
+            t, prefix = q.popleft()
+            for fent in t:
+                if fent.type == 'tree':
+                    q.append((
+                        self.repo.get(fent.id),
+                        os.path.join(prefix, fent.name)))
+                elif self.matcher(fent.name):
+                    results[os.path.join(prefix, fent.name)] = fent
+        return results
+
     def delta_commits(self, baseline, target):
         """Show policies changes between arbitrary commits.
 
         The common use form is comparing the heads of two branches.
         """
-
-        baseline_files = {}
-        for fent in baseline.tree:
-            if self.matcher(fent.name):
-                baseline_files[fent.name] = fent
-
-        target_files = {}
-        for fent in target.tree:
-            if self.matcher(fent.name):
-                target_files[fent.name] = fent
+        baseline_files = self._get_policy_fents(baseline.tree)
+        target_files = self._get_policy_fents(target.tree)
 
         baseline_policies = PolicyCollection()
         target_policies = PolicyCollection()
@@ -318,6 +309,7 @@ class PolicyRepo(object):
         # Added
         for f in set(target_files) - set(baseline_files):
             target_policies += self._policy_file_rev(f, target)
+
         # Removed
         for f in set(baseline_files) - set(target_files):
             baseline_policies += self._policy_file_rev(f, baseline)
@@ -333,7 +325,8 @@ class PolicyRepo(object):
             baseline_policies, target_policies, target, self.repo_uri).delta()
 
     def delta_stream(self, target='HEAD', limit=None,
-                sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):
+                     sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE,
+                     after=None, before=None):
         """Return an iterator of policy changes along a commit lineage in a repo.
         """
         if target == 'HEAD':
@@ -341,10 +334,15 @@ class PolicyRepo(object):
 
         commits = []
         for commit in self.repo.walk(target, sort):
+            cdate = commit_date(commit)
             log.debug(
                 "processing commit id:%s date:%s parents:%d msg:%s",
-                str(commit.id)[:6], commit_date(commit).isoformat(),
+                str(commit.id)[:6], cdate.isoformat(),
                 len(commit.parents), commit.message)
+            if after and cdate > after:
+                continue
+            if before and cdate < before:
+                continue
             commits.append(commit)
             if limit and len(commits) > limit:
                 break
@@ -401,7 +399,11 @@ class PolicyRepo(object):
                     current_policies += self.policy_files[f]
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_DELETED']:
                 if f in self.policy_files:
-                    current_policies += self.policy_files[f]
+                    # if the policies were moved, only add in policies
+                    # that are not already accounted for.
+                    current_policies += self.policy_files[f].select(
+                        set(current_policies.keys()).difference(
+                            self.policy_files[f].keys()))
                     removed.add(f)
             elif delta.status == GIT_DELTA_INVERT['GIT_DELTA_RENAMED']:
                 change_policies += self._policy_file_rev(f, change)
@@ -464,6 +466,7 @@ class Transport(object):
     def __init__(self, session, info):
         self.session = session
         self.info = info
+        self.buf = []
 
     def send(self, change):
         """send the given policy change"""
@@ -473,6 +476,10 @@ class Transport(object):
 
     def flush(self):
         """flush any buffered messages"""
+        buf = self.buf
+        self.buf = []
+        if buf:
+            self._flush(buf)
 
     def close(self):
         self.flush()
@@ -485,22 +492,83 @@ class KinesisTransport(Transport):
     retry = staticmethod(get_retry(('ProvisionedThroughputExceededException',)))
 
     def __init__(self, session, info):
-        self.session = session
-        self.info = info
+        super(KinesisTransport, self).__init__(session, info)
         self.client = self.session.client('kinesis', region_name=info['region'])
-        self.buf = []
 
-    def flush(self):
-        if not self.buf:
-            return
+    def _flush(self, buf):
         self.retry(
             self.client.put_records,
             StreamName=self.info['resource'],
             Records=[
                 {'Data': json.dumps(c.data()),
                  'PartitionKey': c.repo_uri}
-                for c in self.buf])
-        self.buf = []
+                for c in buf])
+
+
+class IndexedTransport(Transport):
+    """marker denoting transports that support querying for last seen value"""
+
+    def last(self):
+        raise NotImplementedError()
+
+
+class SQLTransport(IndexedTransport):
+
+    BUF_SIZE = 200
+
+    def __init__(self, session, info):
+        super(SQLTransport, self).__init__(session, info)
+        self.metadata = rdb.MetaData()
+        self.table = rdb.Table(
+            'policy_changes', self.metadata,
+            rdb.Column('commit_id', rdb.String(32), primary_key=True),
+            rdb.Column('policy_name', rdb.String(256), primary_key=True),
+            rdb.Column('resource_type', rdb.String(32)),
+            rdb.Column('change_type', rdb.String(8)),
+            rdb.Column('commit_date', rdb.DateTime()),
+            rdb.Column('committer_name', rdb.String(128)),
+            rdb.Column('committer_email', rdb.String(64)),
+            rdb.Column('repo_uri', rdb.String(384)),
+            rdb.Column('repo_file', rdb.String(1024)),
+            rdb.Column('commit_msg', rdb.String(4096)),
+            rdb.Column('policy', rdb.Text())
+        )
+        self.engine = rdb.create_engine(info['db_uri'])
+        self.metadata.bind = self.engine
+        self.metadata.create_all()
+        self.conn = self.engine.connect()
+
+    def _flush(self, buf):
+        with self.conn.begin():
+            self.conn.execute(
+                self.table.insert(),
+                [dict(
+                    commit_id=str(c.commit.id),
+                    policy_name=c.policy.name,
+                    resource_type=c.policy.resource_type,
+                    change_type=c.kind,
+                    commit_date=c.date,
+                    committer_name=c.commit.committer.name,
+                    committer_email=c.commit.committer.email,
+                    repo_uri=c.repo_uri,
+                    repo_file=c.file_path,
+                    commit_msg=c.commit.message,
+                    policy=json.dumps(c.policy.data))
+                 for c in buf])
+
+    def last(self):
+        value = self.conn.execute(
+            'select max(commit_date) from policy_changes').fetchone()[0]
+        if not value:
+            return None
+        if isinstance(value, six.string_types):
+            last_seen = parse(value)
+            last_seen = last_seen.replace(tzinfo=tzutc())
+        return last_seen
+
+    def close(self):
+        super(SQLTransport, self).close()
+        self.conn.close()
 
 
 class SQSTransport(Transport):
@@ -508,14 +576,10 @@ class SQSTransport(Transport):
     BUF_SIZE = 10
 
     def __init__(self, session, info):
-        self.session = session
-        self.info = info
+        super(SQSTransport, self).__init__(session, info)
         self.client = self.session.client('sqs', region_name=info['region'])
-        self.buf = []
 
-    def flush(self):
-        if not self.buf:
-            return
+    def _flush(self, buf):
         self.client.send_message_batch(
             QueueUrl=self.info['resource'],
             Entries=[{
@@ -523,74 +587,29 @@ class SQSTransport(Transport):
                 'MessageDeduplicationId': str(change.commit.id) + change.policy.name,
                 'MessageGroupId': change.repo_uri,
                 'MessageBody': json.dumps(change.data())}
-                for change in self.buf])
+                for change in buf])
 
 
 class OutputTransport(Transport):
 
     def send(self, change):
-        if self.info.get('format', '') == 'json':
-            print(json.dumps(change.data(), indent=2))
+        if self.info.get('format', '') == 'jsonline':
+            print(json.dumps(change.data(), indent=None))
         else:
             print(change)
-
-
-class SQLiteTransport(Transport):
-
-    table_ddl = """\
-    create table if not exists policy_changes (
-       name   text not null,
-       repo   text,
-       author text,
-       email  text,
-       msg    text,
-       change text,
-       revid  text not null,
-       resource text,
-       policy text,
-       start  text,
-       end    text,
-       app    text,
-       env    text
-       PRIMARY KEY (name, revid)
-    )
-    """
-
-    def __init__(self, session, info):
-        super(SQLiteTransport, self).__init__(session, info)
-        self.conn = sqlite3.open(info['stream_uri'])
-        self.conn.cursor().execute(self.table_ddl)
-
-    def flush(self):
-        buf = self.buf
-        self.buf = []
-        rows = [
-            (d['policy']['name'],
-             d['repo_uri'],
-             d['commit']['author'],
-             d['commit']['email'],
-             d['commit']['message'],
-             d['change'],
-             d['commit']['id'],
-             d['policy']['resource'],
-             d['policy'],
-             d['commit']['date'],
-             None,
-             'custodian',
-             None) for d in buf]
-        with self.conn.cursor() as cursor:
-            cursor.executemany('''\
-            insert or replace in policy_changes values (
-               ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
 
 
 def transport(stream_uri, assume):
     if stream_uri == 'stdout':
         return OutputTransport(None, {})
-    elif stream_uri == 'json':
-        return OutputTransport(None, {'format': 'json'})
-    elif stream_uri.startswith('sqlite'):
-        return SQLiteTransport(None, {'uri': stream_uri})
+    elif stream_uri == 'jsonline':
+        return OutputTransport(None, {'format': 'jsonline'})
+    if (stream_uri.startswith('sqlite') or
+            stream_uri.startswith('postgresql') or
+            stream_uri.startswith('mysql')):
+        if not HAVE_SQLA:
+            raise ValueError("missing dependency sqlalchemy")
+        return SQLTransport(None, {'db_uri': stream_uri})
     if not stream_uri.startswith('arn'):
         raise ValueError("invalid transport")
     info = parse_arn(stream_uri)
@@ -661,6 +680,54 @@ def github_repos(organization, github_url, github_token):
             next_cursor = False
 
 
+@cli.command(name='org-stream')
+@click.option('--organization', envvar="GITHUB_ORG",
+              required=True, help="Github Organization")
+@click.option('--github-url', envvar="GITHUB_API_URL",
+              default='https://api.github.com/graphql')
+@click.option('--github-token', envvar='GITHUB_TOKEN',
+              help="Github credential token")
+@click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
+@click.option('-d', '--clone-dir', help="Local directory to checkout repos to")
+@click.option('-f', '--filter', multiple=True, help="glob for repositories within org to include")
+@click.option('-e', '--exclude', multiple=True, help="glob for repository within org to exclude")
+@click.option('-s', '--stream-uri', default="stdout",
+              help=("Destination stream for logical changes "
+                    "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"))
+@click.option('--assume', '--assume',
+              help="Assume role for cloud stream destinations")
+@click.pass_context
+def org_stream(ctx, organization, github_url, github_token, clone_dir,
+               verbose, filter, exclude, stream_uri, assume):
+    """Stream changes for repos in a GitHub organization.
+    """
+    logging.basicConfig(
+        format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
+        level=(verbose and logging.DEBUG or logging.INFO))
+
+    log.info("Checkout/Update org repos")
+    repos = ctx.invoke(
+        org_checkout,
+        organization=organization,
+        github_url=github_url,
+        github_token=github_token,
+        clone_dir=clone_dir,
+        verbose=verbose,
+        filter=filter,
+        exclude=exclude)
+
+    log.info('Streaming org changes')
+    change_count = 0
+    for r in repos:
+        change_count += ctx.invoke(
+            stream,
+            repo_uri=r,
+            stream_uri=stream_uri,
+            verbose=verbose,
+            assume=assume)
+    log.info("Streamed %d org changes", change_count)
+
+
 @cli.command(name='org-checkout')
 @click.option('--organization', envvar="GITHUB_ORG",
               required=True, help="Github Organization")
@@ -674,7 +741,7 @@ def github_repos(organization, github_url, github_token):
 @click.option('-e', '--exclude', multiple=True)
 def org_checkout(organization, github_url, github_token, clone_dir,
                  verbose, filter, exclude):
-    """Checkout repositories from an organization."""
+    """Checkout repositories from a GitHub organization."""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -682,6 +749,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
     callbacks = pygit2.RemoteCallbacks(
         pygit2.UserPass(github_token, 'x-oauth-basic'))
 
+    repos = []
     for r in github_repos(organization, github_url, github_token):
         if filter:
             found = False
@@ -702,8 +770,9 @@ def org_checkout(organization, github_url, github_token, clone_dir,
                 continue
 
         repo_path = os.path.join(clone_dir, r['name'])
+        repos.append(repo_path)
         if not os.path.exists(repo_path):
-            log.info("cloning repo: %s/%s" % (organization, r['name']))
+            log.debug("Cloning repo: %s/%s" % (organization, r['name']))
             repo = pygit2.clone_repository(
                 r['url'], repo_path, callbacks=callbacks)
         else:
@@ -711,8 +780,9 @@ def org_checkout(organization, github_url, github_token, clone_dir,
             if repo.status():
                 log.warning('repo %s not clean skipping update')
                 continue
-            log.info("syncing repo: %s/%s" % (organization, r['name']))
+            log.debug("Syncing repo: %s/%s" % (organization, r['name']))
             pull(repo, callbacks)
+    return repos
 
 
 def pull(repo, creds, remote_name='origin', branch='master'):
@@ -744,16 +814,29 @@ def pull(repo, creds, remote_name='origin', branch='master'):
             repo.create_branch(branch, repo.get(remote_master_id))
         repo.head.set_target(remote_master_id)
     elif merge_result & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
-        log.info("Local commits, repo %s must be manually synced", repo)
+        log.warning("Local commits, repo %s must be manually synced", repo)
 
 
 @cli.command(name='diff')
-@click.option('-r', '--repo-uri')
-@click.option('--source', default='master', help="source/baseline revision spec")
-@click.option('--target', default=None, help="target revisiion spec")
+@click.option('-r', '--repo-uri', help="Path/Url to git repository")
+@click.option('--source', default=None, help="source/baseline revision spec")
+@click.option('--target', default=None, help="target revision spec")
 @click.option('-o', '--output', type=click.File('wb'), default='-')
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def diff(repo_uri, source, target, output, verbose):
+    """Policy diff between two arbitrary revisions.
+
+    Revision specifiers for source and target can use fancy git refspec syntax
+    for symbolics, dates, etc.
+
+    See: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection
+
+    Default revision selection is dependent on current working tree
+    branch. The intent is for two use cases, if on a non-master branch
+    then show the diff to master.  If on master show the diff to
+    previous commit on master. For repositories not using the
+    `master` convention, please specify explicit source and target.
+    """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
@@ -765,8 +848,17 @@ def diff(repo_uri, source, target, output, verbose):
     repo = pygit2.Repository(repo_uri)
     load_resources()
 
-    if target is None:
+    # If on master show diff between last commit to current head
+    if repo.head.shorthand == 'master':
+        if source is None:
+            source = 'master@{1}'
+        if target is None:
+            target = 'master'
+    # Else show difference between master and current head
+    elif target is None:
         target = repo.head.shorthand
+    if source is None:
+        source = 'master'
 
     policy_repo = PolicyRepo(repo_uri, repo)
     changes = list(policy_repo.delta_commits(
@@ -778,16 +870,44 @@ def diff(repo_uri, source, target, output, verbose):
 
 
 @cli.command()
-@click.option('-r', '--repo-uri')
-@click.option('-s', '--stream-uri', default="stdout")
+@click.option('-r', '--repo-uri', help="Path/Url to git repository")
+@click.option(
+    '-s', '--stream-uri', default="stdout",
+    help=("Destination stream for logical changes "
+          "(supports stdout/jsonline/kinesis/sqs/sqlalchemy)"))
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-@click.option('--assume')
-def stream(repo_uri, stream_uri, verbose, assume):
-    """Stream policy changes to destination"""
+@click.option('--assume', help="Role assumption for AWS stream outputs")
+@click.option('--before', help="Only stream commits before given date")
+@click.option('--after', help="Only stream commits after given date")
+@click.option('--sort', multiple=True, default=["reverse", "time"],
+              type=click.Choice(SORT_TYPE.keys()),
+              help="Git sort ordering")
+def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None):
+    """Stream git history policy changes to destination.
+
+
+    Default stream destination is a summary of the policy changes to stdout, one
+    per line. Also supported for stdout streaming is `jsonline`.
+
+    AWS Kinesis and SQS destinations are specified by providing the ARN.
+
+    Database destinations are supported by providing a sqlalchemy DSN. Note
+    SQLAlchemy and db drivers must be installed separately as they an optional
+    dependency.
+
+    When using database destinations, streaming defaults to incremental.
+    """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
         level=(verbose and logging.DEBUG or logging.INFO))
     logging.getLogger('botocore').setLevel(logging.WARNING)
+
+    if before:
+        before = parse(before)
+    if after:
+        after = parse(after)
+    if sort:
+        sort = six.moves.reduce(operator.or_, [SORT_TYPE[s] for s in sort])
 
     with contextlib.closing(TempDir().open()) as temp_dir:
         if repo_uri is None:
@@ -803,11 +923,14 @@ def stream(repo_uri, stream_uri, verbose, assume):
         change_count = 0
 
         with contextlib.closing(transport(stream_uri, assume)) as t:
-            for change in policy_repo.delta_stream():
+            if after is None and isinstance(t, IndexedTransport):
+                after = t.last()
+            for change in policy_repo.delta_stream(after=after, before=before):
                 change_count += 1
                 t.send(change)
 
-        log.info("Streamed %d policy changes", change_count)
+        log.info("Streamed %d policy repo changes", change_count)
+    return change_count
 
 
 if __name__ == '__main__':
