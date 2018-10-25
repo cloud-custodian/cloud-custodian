@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.query import QueryResourceManager
+from c7n_azure.utils import ThreadHelper
 
 from c7n.actions import BaseAction
-from c7n.filters.core import type_schema, Filter
+from c7n.filters.core import type_schema
 
 
 @resources.register('eventsubscription')
@@ -42,9 +42,16 @@ class Delete(BaseAction):
         super(Delete, self).__init__(data, manager, log_dir)
         self.client = self.manager.get_client()
 
-    def delete(self, scope, name):
-        self.client.event_subscriptions.delete(scope, name)
+    def process(self, resources, event=None):
+        params = ThreadHelper.Parameters(resources=resources,
+                                         execution_method=self.process_resource_set,
+                                         executor_factory=self.executor_factory,
+                                         log=self.log)
 
-    def process(self, resources):
+        return ThreadHelper.execute(params)
+
+    def process_resource_set(self, resources):
         for resource in resources:
-            self.delete(resource['properties']['topic'], resource['name'])
+            self.client.event_subscriptions.delete(
+                resource['properties']['topic'], resource['name'])
+

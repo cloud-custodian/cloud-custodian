@@ -15,12 +15,15 @@ import collections
 import datetime
 import logging
 import re
+from concurrent.futures import as_completed
 
 import six
 from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
 from azure.mgmt.web.models import NameValuePair
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
+
+from c7n.utils import chunks
 
 
 class ResourceIdParser(object):
@@ -84,6 +87,36 @@ def now(tz=None):
 
 def azure_name_value_pair(name, value):
     return NameValuePair(**{'name': name, 'value': value})
+
+
+class ThreadHelper:
+    class Parameters:
+        def __init__(self, resources, execution_method, executor_factory, log, chunk_size=20):
+            self.resources = resources
+            self.execution_method = execution_method
+            self.executor_factory = executor_factory
+            self.log = log
+            self.chunk_size = chunk_size
+
+    @staticmethod
+    def execute(parameters):
+        futures = []
+        results = []
+        with parameters.executor_factory(max_workers=3) as w:
+            for resource_set in chunks(parameters.resources, parameters.chunk_size):
+                futures.append(w.submit(parameters.execution_method, resource_set))
+
+            for f in as_completed(futures):
+                if f.exception():
+                    parameters.log.warning(
+                        "Execution failed with error: %s" % f.exception())
+                    continue
+                else:
+                    result = f.result()
+                    if result:
+                        results.extend(result)
+
+            return results
 
 
 class Math(object):
