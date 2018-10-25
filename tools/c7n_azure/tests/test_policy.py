@@ -55,7 +55,7 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.app_insights['resource_group_name'], 'test')
         self.assertEqual(params.service_plan['resource_group_name'], "test")
 
-        self.assertEqual(function_mode.function_app_name, 'test-azure-serverless-mode-24d368c7')
+        self.assertEqual(params.function_app_name, 'test-azure-serverless-mode-24d368c7')
 
     def test_init_azure_function_mode_no_service_plan_name(self):
         p = self.load_policy({
@@ -83,7 +83,7 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.storage_account['location'], "westus2")
         self.assertEqual(params.storage_account['resource_group_name'], 'cloud-custodian')
 
-        self.assertEqual(function_mode.function_app_name, 'test-azure-serverless-mode-7564f106')
+        self.assertEqual(params.function_app_name, 'test-azure-serverless-mode-7564f106')
 
     def test_init_azure_function_mode_with_resource_ids(self):
 
@@ -123,7 +123,7 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.service_plan['name'], "testsp")
         self.assertEqual(params.service_plan['resource_group_name'], "testrg")
 
-        self.assertEqual(function_mode.function_app_name, 'test-azure-serverless-mode-8614f79d')
+        self.assertEqual(params.function_app_name, 'test-azure-serverless-mode-8614f79d')
 
     def test_event_mode_is_subscribed_to_event_true(self):
         p = self.load_policy({
