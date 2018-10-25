@@ -43,7 +43,7 @@ keys:
   - skuTier (default: Basic)
   - skuName (default: B1)
 - storageAccount
-  - name (default: cloudcustodian + sha256(resourceGroupName+subscription_id)[:8])
+  - name (default: custodian + sha256(resourceGroupName+subscription_id)[:8])
   - location (default: servicePlan location)
   - resourceGroupName (default: servicePlan resource group)
 - appInsights
@@ -203,3 +203,25 @@ of one of the `shortcuts <https://github.com/capitalone/cloud-custodian/blob/mas
             - type: auto-tag-user
               tag: CreatorEmail
               days: 10
+
+Advanced Authentication Options
+###############################
+
+By default the function is both deployed and executed with the credentials and subscription ID you have configured
+for the custodian CLI.  You may optionally provide environment variables to use exclusively at function execution time
+which also allow you to target your policy towards a subscription ID different than the one to which you are deploying.
+
+The following variables will be obeyed if set:
+
+.. code-block:: bash
+
+    AZURE_FUNCTION_TENANT_ID
+    AZURE_FUNCTION_CLIENT_ID
+    AZURE_FUNCTION_CLIENT_SECRET
+    AZURE_FUNCTION_SUBSCRIPTION_ID
+
+These will be used for function execution, but the normal service principal credentials will still be
+used for deployment.
+
+You may provide the service principal but omit the subscription ID if you wish.
+

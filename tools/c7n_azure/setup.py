@@ -77,5 +77,7 @@ setup(
                       "adal~=1.0.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
-
+    package_data={str(''): [str('function_binding_resources/bin/*.dll'),
+                            str('function_binding_resources/*.csproj'),
+                            str('function_binding_resources/bin/*.json')]}
 )
