@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransformJobSummaries": [
+            {
+                "TransformJobName": "Batch-Transform-2018-10-24-20-11-42-225",
+                "TransformJobArn": "arn:aws:sagemaker:us-east-1:644160558196:transform-job/batch-transform-2018-10-24-20-11-42-225",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 16,
+                    "minute": 11,
+                    "second": 42,
+                    "microsecond": 400000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 24,
+                    "hour": 16,
+                    "minute": 11,
+                    "second": 42,
+                    "microsecond": 740000
+                },
+                "TransformJobStatus": "InProgress"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "bbe6527b-a4d6-4c4f-ae2b-c85f43db312a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bbe6527b-a4d6-4c4f-ae2b-c85f43db312a",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "304",
+                "date": "Wed, 24 Oct 2018 20:12:00 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
