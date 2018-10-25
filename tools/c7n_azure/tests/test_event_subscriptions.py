@@ -20,22 +20,19 @@ from c7n_azure.storage_utils import StorageUtilities
 
 
 class AzureEventSubscriptionsTest(BaseTest):
+    event_sub_name = 'custodiantestsubscription'
+
     def setUp(self):
         super(AzureEventSubscriptionsTest, self).setUp()
-
-    def _create_event_subscription(self):
         account = self.setup_account()
         queue_name = 'cctesteventsub'
         StorageUtilities.create_queue_from_storage_account(account, queue_name)
         event_sub_destination = StorageQueueEventSubscriptionDestination(
             resource_id=account.id, queue_name=queue_name)
-        event_sub_name = 'custodiantestsubscription'
-        AzureEventSubscription.create(event_sub_destination, event_sub_name)
-        return event_sub_name
+        AzureEventSubscription.create(event_sub_destination, self.event_sub_name)
 
     @arm_template('storage.json')
     def test_azure_event_subscription_policy_run(self):
-        event_sub_name = self._create_event_subscription()
         p = self.load_policy({
             'name': 'test-azure-event-subscriptions',
             'resource': 'azure.eventsubscription',
@@ -43,14 +40,13 @@ class AzureEventSubscriptionsTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': event_sub_name}],
-        }, validate=True)
+                 'value': self.event_sub_name}],
+        })
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
     @arm_template('storage.json')
     def test_azure_event_subscription_delete(self):
-        event_sub_name = self._create_event_subscription()
         p_get = self.load_policy({
             'name': 'test-azure-event-subscriptions',
             'resource': 'azure.eventsubscription',
@@ -58,7 +54,7 @@ class AzureEventSubscriptionsTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': event_sub_name}],
+                 'value': self.event_sub_name}],
         })
         resources_pre_delete = p_get.run()
         self.assertEqual(len(resources_pre_delete), 1)
@@ -70,7 +66,7 @@ class AzureEventSubscriptionsTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': event_sub_name}],
+                 'value': self.event_sub_name}],
             'actions': [
                 {'type': 'delete'}
             ]
