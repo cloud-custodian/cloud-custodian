@@ -34,23 +34,6 @@ class AzureEventSubscriptionsTest(BaseTest):
         return event_sub_name
 
     @arm_template('storage.json')
-    def test_azure_event_subscription_policy_validate(self):
-        p = self.load_policy({
-            'name': 'test-azure-event-subscriptions',
-            'resource': 'azure.eventsubscription',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value': 'eventsubscriptiontest'}],
-            'actions': [
-                {'type': 'delete'}
-            ]
-        }, validate=True)
-
-        self.assertTrue(p)
-
-    @arm_template('storage.json')
     def test_azure_event_subscription_policy_run(self):
         event_sub_name = self._create_event_subscription()
         p = self.load_policy({
@@ -61,7 +44,7 @@ class AzureEventSubscriptionsTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value': event_sub_name}],
-        })
+        }, validate=True)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -91,7 +74,7 @@ class AzureEventSubscriptionsTest(BaseTest):
             'actions': [
                 {'type': 'delete'}
             ]
-        })
+        }, validate=True)
 
         p_delete.run()
         resources_post_delete = p_get.run()
