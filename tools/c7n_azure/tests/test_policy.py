@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import hashlib
 
+from builtins import bytes
 from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE

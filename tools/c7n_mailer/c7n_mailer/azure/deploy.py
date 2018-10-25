@@ -24,6 +24,7 @@ try:
     from c7n_azure.policy import AzureFunctionMode
     from c7n_azure.session import Session
     from c7n.utils import local_session
+    from builtins import bytes
 except ImportError:
     FunctionPackage = None
     pass

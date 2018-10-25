@@ -17,6 +17,7 @@ import logging
 
 import six
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
+from builtins import bytes
 from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE)
