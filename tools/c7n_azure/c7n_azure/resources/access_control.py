@@ -235,13 +235,8 @@ class DeleteAssignmentAction(BaseAction):
 
     schema = type_schema('delete')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(DeleteAssignmentAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def delete(self, assignment_scope, assignment_name):
-        self.client.role_assignments.delete(assignment_scope, assignment_name)
-
     def process(self, assignments):
+        client = self.manager.get_client()
         for assignment in assignments:
-            self.delete(assignment['properties']['scope'], assignment['name'])
+            client.role_assignments.delete(
+                assignment['properties']['scope'], assignment['name'])
