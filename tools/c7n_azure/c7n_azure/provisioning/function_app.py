@@ -14,7 +14,7 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
     def __init__(self):
         super(FunctionAppDeploymentUnit, self).__init__(
             'azure.mgmt.web.WebSiteManagementClient')
-        self.type = "Web Application"
+        self.type = "Function Application"
 
     def _get(self, params):
         return self.client.web_apps.get(params['resource_group_name'], params['name'])

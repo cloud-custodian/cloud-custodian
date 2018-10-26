@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import distutils.util
 import fnmatch
 import json
 import logging
@@ -20,7 +20,9 @@ import sys
 import time
 
 import requests
-from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
+from c7n_azure.constants import ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, \
+    FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
+
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
@@ -35,6 +37,11 @@ class FunctionPackage(object):
         self.name = name
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
+        self.enable_ssl_cert = not distutils.util.strtobool(
+            os.environ.get(ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, 'no'))
+
+        if not self.enable_ssl_cert:
+            self.log.warning('SSL Certificate Validation is disabled')
 
     def _add_functions_required_files(self, policy, queue_name=None):
         self.pkg.add_file(self.function_path,
@@ -181,9 +188,9 @@ class FunctionPackage(object):
         # cffi module needs special handling
         self._add_cffi_module()
 
-    def wait_for_status(self, app_name, retries=10, delay=15):
+    def wait_for_status(self, deployment_creds, retries=10, delay=15):
         for r in range(retries):
-            if self.status(app_name):
+            if self.status(deployment_creds):
                 return True
             else:
                 self.log.info('(%s/%s) Will retry Function App status check in %s seconds...'
@@ -191,15 +198,11 @@ class FunctionPackage(object):
                 time.sleep(delay)
         return False
 
-    def status(self, app_name):
-        s = local_session(Session)
-        status_url = 'https://%s.scm.azurewebsites.net/api/deployments' % (app_name)
-        headers = {
-            'Authorization': 'Bearer %s' % (s.get_bearer_token())
-        }
+    def status(self, deployment_creds):
+        status_url = '%s/api/deployments' % deployment_creds.scm_uri
 
         try:
-            r = requests.get(status_url, headers=headers, timeout=30)
+            r = requests.get(status_url, timeout=30, verify=self.enable_ssl_cert)
         except requests.exceptions.ReadTimeout:
             self.log.error("Your Function app is not responding to a status request.")
             return False
@@ -211,31 +214,25 @@ class FunctionPackage(object):
 
         return True
 
-    def publish(self, app_name):
+    def publish(self, deployment_creds):
         self.close()
 
         # update perms of the package
         self._update_perms_package()
-
-        s = local_session(Session)
-        zip_api_url = 'https://%s.scm.azurewebsites.net/api/zipdeploy?isAsync=true' % (app_name)
-        headers = {
-            'Content-type': 'application/zip',
-            'Authorization': 'Bearer %s' % (s.get_bearer_token())
-        }
+        zip_api_url = '%s/api/zipdeploy?isAsync=true' % deployment_creds.scm_uri
 
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
         zip_file = open(self.pkg.path, 'rb').read()
 
         try:
-            r = requests.post(zip_api_url, headers=headers, data=zip_file, timeout=300)
+            r = requests.post(zip_api_url, data=zip_file, timeout=300, verify=self.enable_ssl_cert)
         except requests.exceptions.ReadTimeout:
             self.log.error("Your Function App deployment timed out after 5 minutes. Try again.")
 
         r.raise_for_status()
 
-        self.log.info("Function publish result: %s %s" % (r.status_code, r.text))
+        self.log.info("Function publish result: %s" % r.status_code)
 
     def close(self):
         self.pkg.close()
@@ -261,8 +258,8 @@ class FunctionPackage(object):
                 site_packages.append(os.path.join(prefix, "Lib", "site-packages"))
             elif os.sep == '/':
                 site_packages.append(os.path.join(prefix, "lib",
-                                                 "python" + sys.version[:3],
-                                                 "site-packages"))
+                                                  "python" + sys.version[:3],
+                                                  "site-packages"))
                 site_packages.append(os.path.join(prefix, "lib", "site-python"))
             else:
                 site_packages.append(prefix)
