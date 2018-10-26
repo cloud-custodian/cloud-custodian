@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import hashlib
 import json
 import os
 import logging
@@ -21,13 +20,12 @@ import logging
 try:
     from c7n_azure.function_package import FunctionPackage
     from c7n_azure.functionapp_utils import FunctionAppUtilities
-    from c7n_azure.constants import CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION
     from c7n_azure.policy import AzureFunctionMode
     from c7n_azure.session import Session
+    from c7n_azure.utils import StringUtils
     from c7n.utils import local_session
 except ImportError:
     FunctionPackage = None
-    CONST_DOCKER_VERSION = CONST_FUNCTIONS_EXT_VERSION = None
     pass
 
 
@@ -51,7 +49,7 @@ def provision(config):
     rg_name = service_plan['resource_group_name']
 
     sub_id = local_session(Session).get_subscription_id()
-    suffix = hashlib.sha256(bytes(rg_name + sub_id, 'utf-8')).hexdigest().lower()[:8]
+    suffix = StringUtils.naming_hash(rg_name + sub_id)
 
     storage_account = AzureFunctionMode.extract_properties(function_properties,
                                                     'storageAccount',
@@ -65,18 +63,20 @@ def provision(config):
                                                      'location': location,
                                                      'resource_group_name': rg_name})
 
-    functionapp_name = '-'.join([service_plan['name'], function_name, suffix]) \
-                          .replace(' ', '-').lower()
+    function_app_name = \
+        '-'.join([service_plan['name'], function_name, suffix]) \
+        .replace(' ', '-').lower()
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
         service_plan=service_plan,
         storage_account=storage_account,
-        functionapp_name=functionapp_name)
+        function_app_resource_group_name=service_plan['resource_group_name'],
+        function_app_name=function_app_name)
 
-    FunctionAppUtilities().deploy_dedicated_function_app(params)
+    function_app = FunctionAppUtilities().deploy_dedicated_function_app(params)
 
-    log.info("Building function package for %s" % functionapp_name)
+    log.info("Building function package for %s" % function_app_name)
 
     # Build package
     packager = FunctionPackage(
@@ -106,7 +106,7 @@ def provision(config):
 
     packager.close()
 
-    if packager.wait_for_status(functionapp_name):
-        packager.publish(functionapp_name)
+    if packager.wait_for_status(function_app):
+        packager.publish(function_app)
     else:
         log.error("Aborted deployment, ensure Application Service is healthy.")

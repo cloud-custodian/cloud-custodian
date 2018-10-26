@@ -159,3 +159,10 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.snake_to_camel("test"), "test")
         self.assertEqual(StringUtils.snake_to_camel("test_abc"), "testAbc")
         self.assertEqual(StringUtils.snake_to_camel("test_abc_def"), "testAbcDef")
+
+    def test_naming_hash(self):
+        source = 'Lorem ipsum dolor sit amet'
+        source2 = 'amet sit dolor ipsum Lorem'
+        self.assertEqual(StringUtils.naming_hash(source), '16aba539')
+        self.assertEqual(StringUtils.naming_hash(source, 10), '16aba5393a')
+        self.assertNotEqual(StringUtils.naming_hash(source), StringUtils.naming_hash(source2))
