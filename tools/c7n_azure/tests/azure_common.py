@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import datetime
 import os
 import re
-import datetime
 
+from c7n_azure import constants
 from c7n_azure.session import Session
+from mock import patch
 from vcr_unittest import VCRTestCase
 
 from c7n.resources import load_resources
@@ -103,6 +105,16 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         accounts = list(client.storage_accounts.list())
         matching_account = [a for a in accounts if a.name.startswith("cctstorage")]
         return matching_account[0]
+
+    @staticmethod
+    def sign_out_patch():
+        return patch.dict(os.environ,
+                          {
+                              constants.ENV_TENANT_ID: '',
+                              constants.ENV_SUB_ID: '',
+                              constants.ENV_CLIENT_ID: '',
+                              constants.ENV_CLIENT_SECRET: ''
+                          }, clear=True)
 
 
 def arm_template(template):

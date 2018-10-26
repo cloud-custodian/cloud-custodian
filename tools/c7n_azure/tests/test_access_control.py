@@ -12,14 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
-from mock import patch
 from c7n_azure.resources.access_control import is_scope
+from mock import patch
 
 
 class AccessControlTest(BaseTest):
     def setUp(self):
         super(AccessControlTest, self).setUp()
+
+    def test_validate_role_assignments_schema(self):
+        with self.sign_out_patch():
+
+            p = self.load_policy({
+                'name': 'test-assignments-by-role',
+                'resource': 'azure.roleassignment',
+                'filters': [
+                    {'type': 'role',
+                     'key': 'properties.roleName',
+                     'op': 'eq',
+                     'value': 'Owner'},
+                    {'type': 'resource-access',
+                     'relatedResource': 'azure.vm'},
+                    {'type': 'scope',
+                     'value': 'subscription'}
+                ],
+                'actions': [
+                    {'type': 'delete'}
+                ]
+            }, validate=True)
+
+            self.assertTrue(p)
+
+    def test_validate_role_definitions_schema(self):
+        with self.sign_out_patch():
+
+            p = self.load_policy({
+                'name': 'test-assignments-by-role',
+                'resource': 'azure.roledefinition'
+            }, validate=True)
+
+            self.assertTrue(p)
 
     @patch('c7n_azure.resources.access_control.RoleAssignment.augment')
     def test_find_assignments_by_role(self, mock_augment):
