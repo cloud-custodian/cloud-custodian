@@ -92,7 +92,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
-        self.function_app_name = None
+        self.function_params = None
 
     def get_function_app_params(self):
         session = local_session(self.policy.session_factory)
@@ -137,13 +137,14 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'resource_group_name': rg_name
             })
 
-        self.function_app_name = self.policy_name + '-' + function_suffix
+        function_app_name = self.policy_name + '-' + function_suffix
 
         params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights=app_insights,
             service_plan=service_plan,
             storage_account=storage_account,
-            functionapp_name=self.function_app_name)
+            function_app_resource_group_name=service_plan['resource_group_name'],
+            function_app_name=function_app_name)
 
         return params
 
@@ -167,8 +168,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
-        params = self.get_function_app_params()
-        FunctionAppUtilities().deploy_dedicated_function_app(params)
+        self.function_params = self.get_function_app_params()
+        FunctionAppUtilities().deploy_dedicated_function_app(self.function_params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
@@ -178,7 +179,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         """Validate configuration settings for execution mode."""
 
     def _publish_functions_package(self, queue_name=None):
-        self.log.info("Building function package for %s" % self.function_app_name)
+        self.log.info("Building function package for %s" % self.function_params.function_app_name)
 
         archive = FunctionPackage(self.policy_name)
         archive.build(self.policy.data, queue_name=queue_name)
@@ -186,15 +187,21 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
         self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
 
-        if archive.wait_for_status(self.function_app_name):
-            archive.publish(self.function_app_name)
+        client = local_session(self.policy.session_factory)\
+            .client('azure.mgmt.web.WebSiteManagementClient')
+        publish_creds = client.web_apps.list_publishing_credentials(
+            self.function_params.function_app_resource_group_name,
+            self.function_params.function_app_name).result()
+
+        if archive.wait_for_status(publish_creds):
+            archive.publish(publish_creds)
         else:
             self.log.error("Aborted deployment, ensure Application Service is healthy.")
 
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
-    """A policy that runs/executes in azure functions at specified
+    """A policy that runs/execute s in azure functions at specified
     time intervals."""
     schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
                                schedule={'type': 'string'},
@@ -236,7 +243,7 @@ class AzureEventGridMode(AzureFunctionMode):
         session = local_session(self.policy.session_factory)
 
         # queue name is restricted to lowercase letters, numbers, and single hyphens
-        queue_name = re.sub(r'(-{2,})+', '-', self.functionapp_name.lower())
+        queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app_name.lower())
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
         self._publish_functions_package(queue_name)
@@ -298,7 +305,8 @@ class AzureEventGridMode(AzureFunctionMode):
         self.log.info("Creating storage queue")
         storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
         storage_account = storage_client.storage_accounts.get_properties(
-            self.storage_account['resource_group_name'], self.storage_account['name'])
+            self.function_params.storage_account['resource_group_name'],
+            self.function_params.storage_account['name'])
 
         try:
             StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
