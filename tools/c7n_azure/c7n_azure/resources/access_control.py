@@ -239,4 +239,4 @@ class DeleteAssignmentAction(BaseAction):
         client = self.manager.get_client()
         for assignment in assignments:
             client.role_assignments.delete(
-                assignment['properties']['scope'], assignment['name'], client)
+                assignment['properties']['scope'], assignment['name'])
