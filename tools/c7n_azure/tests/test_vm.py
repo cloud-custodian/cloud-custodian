@@ -15,12 +15,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 
-from azure.mgmt.compute.v2018_10_01.operations import VirtualMachinesOperations
 from azure_common import BaseTest, arm_template
+from c7n_azure.session import Session
 from dateutil import zoneinfo
 from mock import patch
 
 from c7n.testing import mock_datetime_now
+from c7n.utils import local_session
 
 
 class VMTest(BaseTest):
@@ -93,7 +94,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_stop(self, filter_mock):
-        with patch.object(VirtualMachinesOperations, 'deallocate') as stop_action_mock:
+        with patch(self._get_vm_client_string() + '.deallocate') as stop_action_mock:
             p = self.load_policy({
                 'name': 'test-azure-vm',
                 'resource': 'azure.vm',
@@ -120,7 +121,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_poweroff(self, filter_mock):
-        with patch.object(VirtualMachinesOperations, 'power_off') as poweroff_action_mock:
+        with patch(self._get_vm_client_string() + '.power_off') as poweroff_action_mock:
             p = self.load_policy({
                 'name': 'test-azure-vm',
                 'resource': 'azure.vm',
@@ -149,7 +150,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_start(self, filter_mock):
-        with patch.object(VirtualMachinesOperations, 'start') as start_action_mock:
+        with patch(self._get_vm_client_string() + '.start') as start_action_mock:
 
             p = self.load_policy({
                 'name': 'test-azure-vm',
@@ -177,7 +178,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
     def test_restart(self, filter_mock):
-        with patch.object(VirtualMachinesOperations, 'restart') as restart_action_mock:
+        with patch(self._get_vm_client_string() + '.restart') as restart_action_mock:
             p = self.load_policy({
                 'name': 'test-azure-vm',
                 'resource': 'azure.vm',
@@ -303,3 +304,8 @@ class VMTest(BaseTest):
 
             resources = p.run()
             self.assertEqual(len(resources), 1)
+
+    def _get_vm_client_string(self):
+        client = local_session(Session)\
+            .client('azure.mgmt.compute.ComputeManagementClient').virtual_machines
+        return client.__module__ + '.' + client.__class__.__name__
