@@ -227,11 +227,15 @@ class SystemStats(DeltaStats):
                 snapshot['num_ctx_switches_involuntary']) = self.process.num_ctx_switches()
             # io counters ( not available on osx)
             if getattr(self.process, 'io_counters', None):
-                io = self.process.io_counters()
-                for counter in (
-                        'read_count', 'write_count',
-                        'write_bytes', 'read_bytes'):
-                    snapshot[counter] = getattr(io, counter)
+                try:
+                    io = self.process.io_counters()
+                    for counter in (
+                            'read_count', 'write_count',
+                            'write_bytes', 'read_bytes'):
+                        snapshot[counter] = getattr(io, counter)
+                except NotImplementedError:
+                    # some old kernels and Windows Linux Subsystem throw this
+                    pass
             # memory counters
             mem = self.process.memory_info()
             for counter in (
