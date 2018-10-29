@@ -20,7 +20,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 
 
@@ -75,8 +75,7 @@ class SagemakerJob(QueryResourceManager):
         filter_name = None
 
     permissions = (
-        'sagemaker:ListTrainingJobs', 'sagemaker:DescribeTrainingJobs',
-        'sagemaker:ListTags')
+        'sagemaker:ListTrainingJobs', 'sagemaker:DescribeTrainingJobs')
 
     def __init__(self, ctx, data):
         super(SagemakerJob, self).__init__(ctx, data)
@@ -111,6 +110,7 @@ class SagemakerJob(QueryResourceManager):
 class SagemakerTransformJob(QueryResourceManager):
 
     class resource_type(object):
+        type = 'None'
         service = 'sagemaker'
         enum_spec = ('list_transform_jobs', 'TransformJobSummaries', None)
         detail_spec = (
@@ -119,7 +119,7 @@ class SagemakerTransformJob(QueryResourceManager):
         name = 'TransformJobName'
         date = 'CreationTime'
         dimension = None
-        filter_name = None
+        filter_name = 'TransformJobArn'
 
     permissions = (
         'sagemaker:ListTransformJobs', 'sagemaker:DescribeTransformJobs',
@@ -150,8 +150,9 @@ class SagemakerTransformJob(QueryResourceManager):
             return j
 
         jobs = super(SagemakerTransformJob, self).augment(jobs)
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, jobs)))
+        with self.executor_factory(max_workers=2) as w:
+            return universal_augment(
+                self, list(filter(None, w.map(_augment, jobs))))
 
 
 class QueryFilter(object):

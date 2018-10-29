@@ -1,15 +1,20 @@
 {
     "status_code": 200,
     "data": {
-        "Tags": [],
+        "Tags": [
+            {
+                "Key": "JobTag",
+                "Value": "JobTagValue"
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "0c7c576f-1c5d-4767-a4b2-4123aac4760e",
+            "RequestId": "4b98a7f0-703f-4b9a-8859-603db5c3c527",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "0c7c576f-1c5d-4767-a4b2-4123aac4760e",
+                "x-amzn-requestid": "4b98a7f0-703f-4b9a-8859-603db5c3c527",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "11",
-                "date": "Wed, 24 Oct 2018 19:37:29 GMT"
+                "content-length": "49",
+                "date": "Mon, 29 Oct 2018 15:28:46 GMT"
             },
             "RetryAttempts": 0
         }
