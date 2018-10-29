@@ -558,8 +558,8 @@ def run(config, use, output_dir, accounts, tags,
                     a['name'], r, f.exception())
 
             account_region_pcounts, account_region_success = f.result()
-            for p, count in account_region_pcounts:
-                policy_counts[p] += count
+            for p in account_region_pcounts:
+                policy_counts[p] += account_region_pcounts[p]
 
             if not account_region_success:
                 success = False

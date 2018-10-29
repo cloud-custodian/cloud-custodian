@@ -70,16 +70,10 @@ class VmPowerOffAction(BaseAction):
 
     schema = type_schema('poweroff')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmPowerOffAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def poweroff(self, resource_group, vm_name):
-        self.client.virtual_machines.power_off(resource_group, vm_name)
-
     def process(self, vms):
+        client = self.manager.get_client()
         for vm in vms:
-            self.poweroff(vm['resourceGroup'], vm['name'])
+            client.virtual_machines.power_off(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('stop')
@@ -87,16 +81,10 @@ class VmStopAction(BaseAction):
 
     schema = type_schema('stop')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmStopAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def stop(self, resource_group, vm_name):
-        self.client.virtual_machines.deallocate(resource_group, vm_name)
-
     def process(self, vms):
+        client = self.manager.get_client()
         for vm in vms:
-            self.stop(vm['resourceGroup'], vm['name'])
+            client.virtual_machines.deallocate(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('start')
@@ -104,16 +92,10 @@ class VmStartAction(BaseAction):
 
     schema = type_schema('start')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmStartAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def start(self, resource_group, vm_name):
-        self.client.virtual_machines.start(resource_group, vm_name)
-
     def process(self, vms):
+        client = self.manager.get_client()
         for vm in vms:
-            self.start(vm['resourceGroup'], vm['name'])
+            client.virtual_machines.start(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('restart')
@@ -121,16 +103,10 @@ class VmRestartAction(BaseAction):
 
     schema = type_schema('restart')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmRestartAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def restart(self, resource_group, vm_name):
-        self.client.virtual_machines.restart(resource_group, vm_name)
-
     def process(self, vms):
+        client = self.manager.get_client()
         for vm in vms:
-            self.restart(vm['resourceGroup'], vm['name'])
+            client.virtual_machines.restart(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.filter_registry.register('offhour')
