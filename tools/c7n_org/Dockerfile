@@ -9,22 +9,19 @@ ADD . /src
 
 # Install Custodian Core & AWS
 WORKDIR /src
-RUN pip2 install -r requirements.txt
-RUN pypy setup.py develop
+RUN pip2 install -r requirements.txt -e .
 
 # Install Custodian Azure
 WORKDIR /src/tools/c7n_azure
-RUN pip2 install -r requirements.txt
-RUN pypy setup.py develop
+RUN pip2 install -r requirements.txt -e .
 
 # Install Custodian GCP
 WORKDIR /src/tools/c7n_gcp
-RUN pip2 install -r requirements.txt
-RUN pypy setup.py develop
+RUN pip2 install -r requirements.txt -e .
 
 # Install Custodian Org
 WORKDIR /src/tools/c7n_org
-RUN pypy setup.py develop
+RUN pip2 install -e .
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 
 ENTRYPOINT ["c7n-org"]
