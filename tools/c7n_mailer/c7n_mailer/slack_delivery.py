@@ -13,23 +13,20 @@
 # limitations under the License.
 import time
 
-from botocore.vendored import requests
+import requests
 import six
-from c7n_mailer.email_delivery import EmailDelivery
 from c7n_mailer.ldap_lookup import Redis
-from c7n_mailer.utils import kms_decrypt, get_rendered_jinja
+from c7n_mailer.utils import get_rendered_jinja
+from c7n_mailer.utils_email import is_email
 
 
 class SlackDelivery(object):
 
-    def __init__(self, config, session, logger):
-        if config.get('slack_token'):
-            config['slack_token'] = kms_decrypt(config, logger, session, 'slack_token')
+    def __init__(self, config, logger, email_handler):
         self.caching = self.cache_factory(config, config.get('cache_engine', None))
         self.config = config
         self.logger = logger
-        self.session = session
-        self.email_handler = EmailDelivery(config, session, logger)
+        self.email_handler = email_handler
 
     def cache_factory(self, config, type):
         if type == 'redis':
@@ -78,8 +75,7 @@ class SlackDelivery(object):
                     self.logger, 'slack_template', 'slack_default')
                 self.logger.debug(
                     "Generating message for webhook %s." % self.config.get('slack_webhook'))
-            elif target.startswith('slack://') and self.email_handler.target_is_email(
-                    target.split('slack://', 1)[1]):
+            elif target.startswith('slack://') and is_email(target.split('slack://', 1)[1]):
                 resolved_addrs = self.retrieve_user_im([target.split('slack://', 1)[1]])
                 for address, slack_target in resolved_addrs.items():
                     slack_messages[address] = get_rendered_jinja(

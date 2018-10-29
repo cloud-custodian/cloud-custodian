@@ -23,6 +23,8 @@ from common import logger, get_ldap_lookup
 from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1
 from mock import patch, call
 
+from c7n_mailer.utils_email import is_email
+
 # note principalId is very org/domain specific for federated?, it would be good to get
 # confirmation from capone on this event / test.
 CLOUDTRAIL_EVENT = {
@@ -55,9 +57,10 @@ class EmailTest(unittest.TestCase):
         SQS_MESSAGE_1['action']['template'] = template_abs_filename
 
     def test_valid_email(self):
-        self.assertFalse(self.email_delivery.target_is_email('foobar'))
-        self.assertFalse(self.email_delivery.target_is_email('foo@bar'))
-        self.assertTrue(self.email_delivery.target_is_email('foo@bar.com'))
+        self.assertFalse(is_email('foobar'))
+        self.assertFalse(is_email('foo@bar'))
+        self.assertFalse(is_email('slack://foo@bar.com'))
+        self.assertTrue(is_email('foo@bar.com'))
 
     def test_priority_header_is_valid(self):
         self.assertFalse(self.email_delivery.priority_header_is_valid('0'))

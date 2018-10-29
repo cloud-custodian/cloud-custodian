@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from email.utils import parseaddr
-
 import sendgrid
 import six
 from c7n_mailer.utils import (get_message_subject, get_rendered_jinja)
+from c7n_mailer.utils_email import is_email
 from python_http_client import exceptions
 from sendgrid.helpers.mail import Email, Content, Mail
 
@@ -26,7 +25,8 @@ class SendGridDelivery(object):
     def __init__(self, config, logger):
         self.config = config
         self.logger = logger
-        self.sendgrid_client = sendgrid.SendGridAPIClient(apikey=self.config['sendgrid_api_key'])
+        self.sendgrid_client = \
+            sendgrid.SendGridAPIClient(apikey=self.config.get('sendgrid_api_key', ''))
 
     def get_to_addrs_sendgrid_messages_map(self, queue_message):
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
@@ -57,9 +57,9 @@ class SendGridDelivery(object):
                 if target.startswith('tag:') and 'tags' in resource:
                     tag_name = target.split(':', 1)[1]
                     result = resource.get('tags', {}).get(tag_name, None)
-                    if SendGridDelivery.is_email(result):
+                    if is_email(result):
                         resource_emails.append(result)
-                else:
+                elif is_email(target):
                     resource_emails.append(target)
 
             resource_emails = tuple(sorted(set(resource_emails)))
@@ -85,7 +85,7 @@ class SendGridDelivery(object):
             queue_message['action'].get('template', 'default'),
             to_addrs_to_email_messages_map))
 
-        from_email = Email(self.config['from_address'])
+        from_email = Email(self.config.get('from_address', ''))
         subject = get_message_subject(queue_message)
         email_format = queue_message['action'].get('template_format', None)
         if not email_format:
@@ -113,10 +113,3 @@ class SendGridDelivery(object):
                     )
                     return False
         return True
-
-    @staticmethod
-    def is_email(target):
-        if parseaddr(target)[1] and '@' in target and '.' in target:
-            return True
-        else:
-            return False

@@ -13,11 +13,11 @@
 # limitations under the License.
 import smtplib
 from email.mime.text import MIMEText
-from email.utils import parseaddr
 from itertools import chain
 import six
 
 from .ldap_lookup import LdapLookup
+from c7n_mailer.utils_email import is_email
 from .utils import (
     format_struct, get_message_subject, get_resource_tag_targets,
     get_rendered_jinja, kms_decrypt)
@@ -98,7 +98,7 @@ class EmailDelivery(object):
     def get_valid_emails_from_list(self, targets):
         emails = []
         for target in targets:
-            if self.target_is_email(target):
+            if is_email(target):
                 emails.append(target)
         return emails
 
@@ -107,7 +107,7 @@ class EmailDelivery(object):
             aws_username = self.get_aws_username_from_event(event)
             if aws_username:
                 # is using SSO, the target might already be an email
-                if self.target_is_email(aws_username):
+                if is_email(aws_username):
                     return [aws_username]
                 # if the LDAP config is set, lookup in ldap
                 elif self.config.get('ldap_uri', False):
@@ -246,15 +246,6 @@ class EmailDelivery(object):
             )
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
         return to_addrs_to_mimetext_map
-
-    def target_is_email(self, target):
-        if target.startswith('slack://'):
-            self.logger.debug("Slack payload, skipping email.")
-            return False
-        if parseaddr(target)[1] and '@' in target and '.' in target:
-            return True
-        else:
-            return False
 
     def send_smtp_email(self, smtp_server, message, to_addrs):
         smtp_port = int(self.config.get('smtp_port', 25))
