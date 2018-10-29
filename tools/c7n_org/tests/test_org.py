@@ -107,7 +107,7 @@ class OrgTest(TestUtils):
         t4 = copy.deepcopy(d)
         org.filter_policies(t4, [], [], 'gcp.instance', [])
         self.assertEqual(
-            [n['name'] for n in t4['policies']], ['find-ml'])        
+            [n['name'] for n in t4['policies']], ['find-ml'])
 
     def test_resolve_regions(self):
         self.assertEqual(
@@ -135,18 +135,16 @@ class OrgTest(TestUtils):
         org.filter_accounts(t2, [], [], ['prod'])
         self.assertEqual(
             [a['name'] for a in t2['accounts']],
-            ['dev'])        
+            ['dev'])
 
         t3 = copy.deepcopy(d)
         org.filter_accounts(t3, [], ['dev'], [])
         self.assertEqual(
             [a['name'] for a in t3['accounts']],
-            ['dev'])        
+            ['dev'])
 
         t4 = copy.deepcopy(d)
         org.filter_accounts(t4, ['red', 'blue'], [], [])
         self.assertEqual(
             [a['name'] for a in t4['accounts']],
-            ['dev'])        
-
-            
+            ['dev'])
