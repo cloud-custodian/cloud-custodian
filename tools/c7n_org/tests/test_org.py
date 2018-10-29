@@ -1,10 +1,83 @@
 import copy
+import mock
+import os
+import yaml
+
 from c7n.testing import TestUtils
+from click.testing import CliRunner
 
 from c7n_org import cli as org
 
 
+ACCOUNTS_DEFAULT = yaml.safe_dump({
+    'accounts': [
+        {'name': 'dev',
+         'account_id': 'foobar',
+         'tags': ['red', 'black'],
+         'role': 'arn:aws:iam:{account_id}::/role/foobar'},
+        {'name': 'qa',
+         'account_id': 'barfoo',
+         'tags': ['red', 'green'],
+         'role': 'arn:aws:iam:{account_id}::/role/foobar'},
+    ],
+}, default_flow_style=False)
+
+POLICIES_DEFAULT = yaml.safe_dump({
+    'policies': [
+        {'name': 'compute',
+         'resource': 'aws.ec2',
+         'tags': ['red', 'green']},
+        {'name': 'serverless',
+         'resource': 'aws.lambda',
+         'tags': ['red', 'black']},
+
+    ],
+}, default_flow_style=False)
+
+
 class OrgTest(TestUtils):
+
+    def setup_run_dir(self, accounts=None, policies=None):
+        root = self.get_temp_dir()
+
+        if accounts:
+            accounts = yaml.safe_dump(accounts, default_flow_style=False)
+        else:
+            accounts = ACCOUNTS_DEFAULT
+
+        with open(os.path.join(root, 'accounts.yml'), 'w') as fh:
+            fh.write(accounts)
+
+        if policies:
+            policies = yaml.safe_dump(policies, default_flow_style=False)
+        else:
+            policies = POLICIES_DEFAULT
+
+        with open(os.path.join(root, 'policies.yml'), 'w') as fh:
+            fh.write(policies)
+        return root
+
+    def test_cli_run(self):
+        run_dir = self.setup_run_dir()
+        logger = mock.MagicMock()
+        run_account = mock.MagicMock()
+        run_account.return_value = (
+            {'compute': 24, 'serverless': 12}, True)
+        self.patch(org, 'logging', logger)
+        self.patch(org, 'run_account', run_account)
+        self.change_cwd(run_dir)
+        log_output = self.capture_logging('c7n_org')
+        runner = CliRunner()
+        result = runner.invoke(
+            org.cli,
+            ['run', '-c', 'accounts.yml', '-u', 'policies.yml',
+             '--debug', '-s', 'output', '--cache-path', 'cache'],
+            catch_exceptions=False)
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            log_output.getvalue().strip(),
+            "Policy resource counts Counter({'compute': 96, 'serverless': 48})")
 
     def test_filter_policies(self):
         d = {'policies': [
