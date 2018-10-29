@@ -16,10 +16,15 @@ from azure.graphrbac import GraphRbacManagementClient
 from azure.keyvault import KeyVaultClient
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
-from c7n.filters import Filter
+from c7n.filters import (
+    AgeFilter, Filter, OPERATORS
+)
+import logging
 from c7n.utils import type_schema
 from c7n_azure.utils import GraphHelper
 from c7n_azure.resources.arm import ArmResourceManager
+
+log = logging.getLogger('custodian.azure.keyvault')
 
 
 @resources.register('keyvault')
@@ -29,30 +34,6 @@ class KeyVault(ArmResourceManager):
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
         enum_spec = ('vaults', 'list', None)
-
-    def augment(self, resources):
-        url_base = 'vault.azure.net'
-        s = Session(resource='https://' + url_base)
-        self.keyvault_client = KeyVaultClient(s.get_credentials())
-
-        for index, item in enumerate(resources):
-            vault_keys = []
-            vault_url = 'https://' + resources[index]["name"] + '.vault.azure.net'
-            try:
-                vkeys = self.keyvault_client.get_keys(vault_url)
-                for vkey in vkeys:
-                    vault_keys.append({'kid': vkey.kid,
-                                       'attributes': {'enabled': vkey.attributes.enabled,
-                                                      'created': vkey.attributes.created,
-                                                      'updated': vkey.attributes.updated},
-                                       'tags': vkey.tags})
-
-            except Exception:
-                pass
-
-            resources[index]['keys'] = vault_keys
-
-        return resources
 
 
 @KeyVault.filter_registry.register('whitelist')
@@ -80,6 +61,7 @@ class WhiteListFilter(Filter):
             vault = client.vaults.get(i['resourceGroup'], i['name'])
             # Retrieve access policies for the keyvaults
             access_policies = []
+
             for policy in vault.properties.access_policies:
                 access_policies.append({
                     'tenantId': policy.tenant_id,
@@ -137,3 +119,48 @@ class WhiteListFilter(Filter):
             policy['principalName'] = GraphHelper.get_principal_name(aad_object)
 
         return access_policies
+
+
+@resources.register('key')
+class KeyVaultKey(ArmResourceManager):
+
+    class resource_type(ArmResourceManager.resource_type):
+        service = 'azure.mgmt.keyvault'
+        client = 'KeyVaultManagementClient'
+        enum_spec = ('vaults', 'list', None)
+
+    def augment(self, resources):
+        url_base = 'vault.azure.net'
+        s = Session(resource='https://' + url_base)
+        self.keyvault_client = KeyVaultClient(s.get_credentials())
+        r = []
+        for index, item in enumerate(resources):
+            vault_url = 'https://' + resources[index]["name"] + '.vault.azure.net'
+            try:
+                vkeys = self.keyvault_client.get_keys(vault_url)
+                for vkey in vkeys:
+                    r.append({'kid': vkey.kid,
+                              'keyvault': {'id': resources[index]["id"],
+                                           'name': resources[index]["name"],
+                                           'location': resources[index]["location"],
+                                           'tags': resources[index]["tags"]},
+                              'enabled': vkey.attributes.enabled,
+                              'created': vkey.attributes.created,
+                              'updated': vkey.attributes.updated,
+                              'tags': vkey.tags})
+
+            except Exception as e:
+                self.log.error(e.message + ' on keyvault: ' + resources[index]["id"])
+                pass
+
+        return r
+
+
+@KeyVaultKey.filter_registry.register('age')
+class KeyAgeFilter(AgeFilter):
+    date_attribute = "created"
+
+    schema = type_schema(
+        'age',
+        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        days={'type': 'number'})
