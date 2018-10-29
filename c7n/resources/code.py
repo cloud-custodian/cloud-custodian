@@ -82,7 +82,7 @@ class CodeBuildProject(QueryResourceManager):
         enum_spec = ('list_projects', 'projects', None)
         batch_detail_spec = (
             'batch_get_projects', 'names', None, 'projects')
-        name = id = 'project'
+        name = id = 'name'
         date = 'created'
         dimension = None
         filter_name = None

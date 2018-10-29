@@ -153,3 +153,16 @@ class UtilsTest(BaseTest):
                          {k: True for k in range(85, 90)})
         self.assertEqual(PortsRangeHelper.build_ports_dict(nsg, 'Outbound', '*'),
                          {k: True for k in range(80, 90)})
+
+    def test_snake_to_camel(self):
+        self.assertEqual(StringUtils.snake_to_camel(""), "")
+        self.assertEqual(StringUtils.snake_to_camel("test"), "test")
+        self.assertEqual(StringUtils.snake_to_camel("test_abc"), "testAbc")
+        self.assertEqual(StringUtils.snake_to_camel("test_abc_def"), "testAbcDef")
+
+    def test_naming_hash(self):
+        source = 'Lorem ipsum dolor sit amet'
+        source2 = 'amet sit dolor ipsum Lorem'
+        self.assertEqual(StringUtils.naming_hash(source), '16aba539')
+        self.assertEqual(StringUtils.naming_hash(source, 10), '16aba5393a')
+        self.assertNotEqual(StringUtils.naming_hash(source), StringUtils.naming_hash(source2))

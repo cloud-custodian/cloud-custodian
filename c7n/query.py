@@ -152,7 +152,7 @@ class ChildResourceQuery(ResourceQuery):
         for parent_id in parent_ids:
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
-                client, enum_op, merged_params, path)
+                client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
                 for r in subset:
                     r[self.parent_key] = parent_id

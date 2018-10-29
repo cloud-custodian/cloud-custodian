@@ -12,21 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
-import time
+import re
 
-import requests
-from azure.mgmt.eventgrid.models import (EventSubscription, EventSubscriptionFilter,
-                                         WebHookEventSubscriptionDestination)
+import six
+from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
+from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.azure_events import AzureEvents
-from c7n_azure.constants import (CONST_DOCKER_VERSION, CONST_FUNCTIONS_EXT_VERSION,
-                                 CONST_AZURE_EVENT_TRIGGER_MODE, CONST_AZURE_TIME_TRIGGER_MODE,
-                                 CONST_AZURE_FUNCTION_KEY_URL)
+from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.template_utils import TemplateUtilities
-from msrestazure.azure_exceptions import CloudError
+from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
@@ -43,12 +40,44 @@ class AzureFunctionMode(ServerlessExecutionMode):
         'properties': {
             'provision-options': {
                 'type': 'object',
-                'location': 'string',
-                'appInsightsLocation': 'string',
-                'servicePlanName': 'string',
-                'sku': 'string',
-                'workerSize': 'number',
-                'skuCode': 'string'
+                'appInsights': {
+                    'type': 'object',
+                    'oneOf': [
+                        {'type': 'string'},
+                        {'type': 'object',
+                         'properties': {
+                             'name': 'string',
+                             'location': 'string',
+                             'resourceGroupName': 'string'}
+                         }
+                    ]
+                },
+                'storageAccount': {
+                    'type': 'object',
+                    'oneOf': [
+                        {'type': 'string'},
+                        {'type': 'object',
+                         'properties': {
+                             'name': 'string',
+                             'location': 'string',
+                             'resourceGroupName': 'string'}
+                         }
+                    ]
+                },
+                'servicePlan': {
+                    'type': 'object',
+                    'oneOf': [
+                        {'type': 'string'},
+                        {'type': 'object',
+                         'properties': {
+                             'name': 'string',
+                             'location': 'string',
+                             'resourceGroupName': 'string',
+                             'skuTier': 'string',
+                             'skuName': 'string'}
+                         }
+                    ]
+                },
             },
             'execution-options': {'type': 'object'}
         }
@@ -56,87 +85,91 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
+    default_storage_name = "custodian"
+
     def __init__(self, policy):
+
         self.policy = policy
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
-
-        self.template_util = TemplateUtilities()
-        self.parameters = self._get_parameters(self.template_util)
-        self.group_name = self.parameters['servicePlanName']['value']
-        self.webapp_name = self.parameters['name']['value']
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
+        self.function_params = None
+
+    def get_function_app_params(self):
+        session = local_session(self.policy.session_factory)
+
+        provision_options = self.policy.data['mode'].get('provision-options', {})
+
+        # Service plan is parsed first, location might be shared with storage & insights
+        service_plan = AzureFunctionMode.extract_properties(
+            provision_options,
+            'servicePlan',
+            {
+                'name': 'cloud-custodian',
+                'location': 'westus2',
+                'resource_group_name': 'cloud-custodian',
+                'sku_name': 'B1',
+                'sku_tier': 'Basic'
+            })
+
+        # Metadata used for automatic naming
+        location = service_plan.get('location', 'westus2')
+        rg_name = service_plan['resource_group_name']
+        sub_id = session.get_subscription_id()
+        target_sub_id = session.get_function_target_subscription_id()
+        function_suffix = StringUtils.naming_hash(rg_name + target_sub_id)
+        storage_suffix = StringUtils.naming_hash(rg_name + sub_id)
+
+        storage_account = AzureFunctionMode.extract_properties(
+            provision_options,
+            'storageAccount',
+            {
+                'name': self.default_storage_name + storage_suffix,
+                'location': location,
+                'resource_group_name': rg_name
+            })
+
+        app_insights = AzureFunctionMode.extract_properties(
+            provision_options,
+            'appInsights',
+            {
+                'name': service_plan['name'],
+                'location': location,
+                'resource_group_name': rg_name
+            })
+
+        function_app_name = self.policy_name + '-' + function_suffix
+
+        params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
+            app_insights=app_insights,
+            service_plan=service_plan,
+            storage_account=storage_account,
+            function_app_resource_group_name=service_plan['resource_group_name'],
+            function_app_name=function_app_name)
+
+        return params
+
+    @staticmethod
+    def extract_properties(options, name, properties):
+        settings = options.get(name, {})
+        result = {}
+        # str type implies settings is a resource id
+        if isinstance(settings, six.string_types):
+            result['id'] = settings
+            result['name'] = ResourceIdParser.get_resource_name(settings)
+            result['resource_group_name'] = ResourceIdParser.get_resource_group(settings)
+        else:
+            for key in properties.keys():
+                result[key] = settings.get(StringUtils.snake_to_camel(key), properties[key])
+
+        return result
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
-        """Provision any resources needed for the policy."""
-        session = local_session(self.policy.session_factory)
-        client = session.client('azure.mgmt.web.WebSiteManagementClient')
-
-        existing_service_plan = client.app_service_plans.get(
-            self.group_name, self.parameters['servicePlanName']['value'])
-
-        if not existing_service_plan:
-            self.template_util.create_resource_group(
-                self.group_name, {'location': self.parameters['location']['value']})
-
-            self.template_util.deploy_resource_template(
-                self.group_name, 'dedicated_functionapp.json', self.parameters).wait()
-
-        else:
-            existing_webapp = client.web_apps.get(self.group_name, self.webapp_name)
-            if not existing_webapp:
-                functionapp_util = FunctionAppUtilities()
-                functionapp_util.deploy_webapp(self.webapp_name,
-                                               self.group_name, existing_service_plan,
-                                               self.parameters['storageName']['value'])
-            else:
-                self.log.info("Found existing App %s (%s) in group %s" %
-                              (self.webapp_name, existing_webapp.location, self.group_name))
-
-        self.log.info("Building function package for %s" % self.webapp_name)
-
-        archive = FunctionPackage(self.policy_name)
-        archive.build(self.policy.data)
-        archive.close()
-
-        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
-
-        if archive.wait_for_status(self.webapp_name):
-            archive.publish(self.webapp_name)
-        else:
-            self.log.error("Aborted deployment, ensure Application Service is healthy.")
-
-    def _get_parameters(self, template_util):
-        parameters = template_util.get_default_parameters(
-            'dedicated_functionapp.parameters.json')
-
-        data = self.policy.data
-
-        updated_parameters = {
-            'dockerVersion': CONST_DOCKER_VERSION,
-            'functionsExtVersion': CONST_FUNCTIONS_EXT_VERSION,
-            'machineDecryptionKey': FunctionAppUtilities.generate_machine_decryption_key()
-        }
-
-        if 'mode' in data:
-            if 'provision-options' in data['mode']:
-                updated_parameters.update(data['mode']['provision-options'])
-                if 'servicePlanName' in data['mode']['provision-options']:
-                    updated_parameters['name'] = (
-                        data['mode']['provision-options']['servicePlanName'] +
-                        '-' + data['name']
-                    ).replace(' ', '-').lower()
-
-                    updated_parameters['storageName'] = (
-                        data['mode']['provision-options']['servicePlanName']
-                    ).replace('-', '').lower()
-
-        parameters = template_util.update_parameters(parameters, updated_parameters)
-
-        return parameters
+        self.function_params = self.get_function_app_params()
+        FunctionAppUtilities().deploy_dedicated_function_app(self.function_params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
@@ -145,14 +178,38 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def validate(self):
         """Validate configuration settings for execution mode."""
 
+    def _publish_functions_package(self, queue_name=None):
+        self.log.info("Building function package for %s" % self.function_params.function_app_name)
 
-@execution.register(CONST_AZURE_TIME_TRIGGER_MODE)
+        archive = FunctionPackage(self.policy_name)
+        archive.build(self.policy.data, queue_name=queue_name)
+        archive.close()
+
+        self.log.info("Function package built, size is %dMB" % (archive.pkg.size / (1024 * 1024)))
+
+        client = local_session(self.policy.session_factory)\
+            .client('azure.mgmt.web.WebSiteManagementClient')
+        publish_creds = client.web_apps.list_publishing_credentials(
+            self.function_params.function_app_resource_group_name,
+            self.function_params.function_app_name).result()
+
+        if archive.wait_for_status(publish_creds):
+            archive.publish(publish_creds)
+        else:
+            self.log.error("Aborted deployment, ensure Application Service is healthy.")
+
+
+@execution.register(FUNCTION_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
-    """A policy that runs/executes in azure functions at specified
+    """A policy that runs/execute s in azure functions at specified
     time intervals."""
-    schema = utils.type_schema(CONST_AZURE_TIME_TRIGGER_MODE,
+    schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
                                schedule={'type': 'string'},
                                rinherit=AzureFunctionMode.schema)
+
+    def provision(self):
+        super(AzurePeriodicMode, self).provision()
+        self._publish_functions_package()
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -163,12 +220,12 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
         raise NotImplementedError("error - not implemented")
 
 
-@execution.register(CONST_AZURE_EVENT_TRIGGER_MODE)
+@execution.register(FUNCTION_EVENT_TRIGGER_MODE)
 class AzureEventGridMode(AzureFunctionMode):
     """A policy that runs/executes in azure functions from an
     azure event."""
 
-    schema = utils.type_schema(CONST_AZURE_EVENT_TRIGGER_MODE,
+    schema = utils.type_schema(FUNCTION_EVENT_TRIGGER_MODE,
                                events={'type': 'array', 'items': {
                                    'oneOf': [
                                        {'type': 'string'},
@@ -184,60 +241,12 @@ class AzureEventGridMode(AzureFunctionMode):
     def provision(self):
         super(AzureEventGridMode, self).provision()
         session = local_session(self.policy.session_factory)
-        key = self._get_webhook_key(session)
-        webhook_url = 'https://%s.azurewebsites.net/api/%s?code=%s' % (self.webapp_name,
-                                                                       self.policy_name, key)
-        destination = WebHookEventSubscriptionDestination(
-            endpoint_url=webhook_url
-        )
 
-        self.log.info("Creating Event Grid subscription")
-        event_filter = EventSubscriptionFilter()
-        event_info = EventSubscription(destination=destination, filter=event_filter)
-        scope = '/subscriptions/%s' % session.subscription_id
-
-        #: :type: azure.mgmt.eventgrid.EventGridManagementClient
-        eventgrid_client = session.client('azure.mgmt.eventgrid.EventGridManagementClient')
-
-        status_success = False
-        while not status_success:
-            try:
-                event_subscription = eventgrid_client.event_subscriptions.create_or_update(
-                    scope, self.webapp_name, event_info)
-
-                event_subscription.result()
-                self.log.info('Event Grid subscription creation succeeded')
-                status_success = True
-            except CloudError as e:
-                self.log.info(e)
-                self.log.info('Retrying in 30 seconds')
-                time.sleep(30)
-
-    def _get_webhook_key(self, session):
-        self.log.info("Fetching Function's API keys")
-        token_headers = {
-            'Authorization': 'Bearer %s' % session.get_bearer_token()
-        }
-
-        key_url = (
-            'https://management.azure.com'
-            '/subscriptions/{0}/resourceGroups/{1}/'
-            'providers/Microsoft.Web/sites/{2}/{3}').format(
-            session.subscription_id,
-            self.group_name,
-            self.webapp_name,
-            CONST_AZURE_FUNCTION_KEY_URL)
-
-        retrieved_key = False
-
-        while not retrieved_key:
-            response = requests.get(key_url, headers=token_headers)
-            if response.status_code == 200:
-                key = json.loads(response.content)
-                return key['value']
-            else:
-                self.log.info('Function app key unavailable, will retry in 30 seconds')
-                time.sleep(30)
+        # queue name is restricted to lowercase letters, numbers, and single hyphens
+        queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app_name.lower())
+        storage_account = self._create_storage_queue(queue_name, session)
+        self._create_event_subscription(storage_account, queue_name, session)
+        self._publish_functions_package(queue_name)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -291,3 +300,30 @@ class AzureEventGridMode(AzureFunctionMode):
             return False
 
         return True
+
+    def _create_storage_queue(self, queue_name, session):
+        self.log.info("Creating storage queue")
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_account = storage_client.storage_accounts.get_properties(
+            self.function_params.storage_account['resource_group_name'],
+            self.function_params.storage_account['name'])
+
+        try:
+            StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
+            self.log.info("Storage queue creation succeeded")
+            return storage_account
+        except Exception as e:
+            self.log.error('Queue creation failed with error: %s' % e)
+            raise SystemExit
+
+    def _create_event_subscription(self, storage_account, queue_name, session):
+        self.log.info('Creating event grid subscription')
+        destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
+                                                               queue_name=queue_name)
+
+        try:
+            AzureEventSubscription.create(destination, queue_name, session)
+            self.log.info('Event grid subscription creation succeeded')
+        except Exception as e:
+            self.log.error('Event Subscription creation failed with error: %s' % e)
+            raise SystemExit

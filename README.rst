@@ -22,11 +22,12 @@
 Cloud Custodian
 ---------------
 
-Cloud Custodian is a rules engine for managing public cloud fleets. It
-allows users to define policies to enable a well managed cloud infrastructure,
-that's both secure and cost optimized. It consolidates many of the adhoc
-scripts organizations have into a lightweight and flexible tool, with unified
-metrics and reporting.
+Cloud Custodian is a rules engine for managing public cloud accounts
+and resources. It allows users to define policies to enable a well
+managed cloud infrastructure, that's both secure and cost
+optimized. It consolidates many of the adhoc scripts organizations
+have into a lightweight and flexible tool, with unified metrics and
+reporting.
 
 Custodian can be used to manage AWS, Azure, and GCP environments by
 ensuring real time compliance to security policies (like encryption
@@ -49,16 +50,18 @@ execute against large existing fleets.
 Features
 ########
 
-- Comprehensive support for AWS services and resources with a rich library of actions and filters to build policies with.
+- Comprehensive support for public cloud services and resources with a
+  rich library of actions and filters to build policies with.
 - Supports arbitrary filtering on resources with nested boolean conditions.
 - Dry run any policy to see what it would do.
 - Automatically provisions serverless functions and event sources (
-    AWS CloudWatchEvents, AWS Config Rules, Azure EventGrid, GCP AuditLog & Pub/Sub, etc)
+  AWS CloudWatchEvents, AWS Config Rules, Azure EventGrid, GCP AuditLog & Pub/Sub, etc)
 - Cloud provider native metrics outputs on resources that matched a policy
 - Structured outputs into cloud native object storage of which resources matched a policy.
 - Intelligent cache usage to minimize api calls.
-- Battle-tested - in production on some very large cloud environments.
 - Supports multi-account/subscription/project usage.
+- Battle-tested - in production on some very large cloud environments.
+
 
 Links
 #####
@@ -66,7 +69,7 @@ Links
 - `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
 - `Docs <http://capitalone.github.io/cloud-custodian/docs/>`_
 - `Developer Install <http://capitalone.github.io/cloud-custodian/docs/developer/installing.html>`_
-
+- `Presentations <https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid>`_
 
 Quick Install
 #############
@@ -160,6 +163,12 @@ The Custodian project also develops and maintains a suite of additional tools
 here https://github.com/capitalone/cloud-custodian/tree/master/tools:
 
 
+Org
+   Multi-account policy execution.
+
+PolicyStream
+   Git history as stream of logical policy changes.
+
 Salactus
    Scale out s3 scanning.
 
@@ -167,7 +176,7 @@ Mailer
    A reference implementation of sending messages to users to notify them.
 
 TrailDB
-   Cloudtrail indexing and timeseries generation for dashboarding
+   Cloudtrail indexing and timeseries generation for dashboarding.
 
 LogExporter
    Cloud watch log exporting to s3
@@ -176,7 +185,7 @@ Index
    Indexing of custodian metrics and outputs for dashboarding
 
 Sentry
-   Log parsing for python tracebacks to integrate with
+   Cloudwatch Log parsing for python tracebacks to integrate with
    https://sentry.io/welcome/
 
 

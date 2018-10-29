@@ -50,6 +50,13 @@ class StorageUtilsTest(BaseTest):
         self.assertEqual(queue_name, "testcc")
 
     @arm_template('storage.json')
+    def test_create_queue_from_storage_account(self):
+        account = self.setup_account()
+        queue_name = 'testqueuecc'
+        queue = StorageUtilities.create_queue_from_storage_account(account, queue_name)
+        self.assertTrue(queue)
+
+    @arm_template('storage.json')
     def test_cycle_queue_message_by_uri(self):
         account = self.setup_account()
         url = "https://" + account.name + ".queue.core.windows.net/testcyclemessage"

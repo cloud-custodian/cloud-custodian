@@ -44,7 +44,28 @@ setup(
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
     },
-    install_requires=["azure-mgmt",
+    install_requires=["azure-mgmt-authorization",
+                      "azure-mgmt-applicationinsights",
+                      "azure-mgmt-batch",
+                      "azure-mgmt-cognitiveservices",
+                      "azure-mgmt-cosmosdb",
+                      "azure-mgmt-compute",
+                      "azure-mgmt-cdn",
+                      "azure-mgmt-containerservice",
+                      "azure-mgmt-datalake-store",
+                      "azure-mgmt-datafactory",
+                      "azure-mgmt-iothub",
+                      "azure-mgmt-keyvault",
+                      "azure-mgmt-network",
+                      "azure-mgmt-redis",
+                      "azure-mgmt-resource",
+                      "azure-mgmt-sql",
+                      "azure-mgmt-storage",
+                      "azure-mgmt-web",
+                      "azure-mgmt-monitor",
+                      "azure-mgmt-policyinsights",
+                      "azure-mgmt-subscription",
+                      "azure-mgmt-eventgrid>=2.0.0rc1",
                       "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
@@ -56,5 +77,7 @@ setup(
                       "adal~=1.0.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
-
+    package_data={str(''): [str('function_binding_resources/bin/*.dll'),
+                            str('function_binding_resources/*.csproj'),
+                            str('function_binding_resources/bin/*.json')]}
 )

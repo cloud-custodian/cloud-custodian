@@ -20,9 +20,14 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
+
+	"strconv"
 	"strings"
-	"time"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-xray-sdk-go/xray"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
@@ -30,26 +35,38 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/olivere/elastic"
 	"github.com/sha1sum/aws_signing_client"
 )
 
-type cloudWatchEvent struct {
-	Version    string    `json:"version"`
-	ID         string    `json:"id"`
-	DetailType string    `json:"detail-type"`
-	Source     string    `json:"source"`
-	AccountId  string    `json:"account"`
-	Time       time.Time `json:"time"`
-	Region     string    `json:"region"`
-	Resources  []string  `json:"resources"`
-	Detail     struct {
-		RequestParameters struct {
-			BucketName string
-			Key        string
+type snsEvent struct {
+	Message          json.RawMessage
+	Type             string
+	MessageId        string
+	TopicArn         string
+	Subject          string
+	Timestamp        string
+	SignatureVersion string
+	Signature        string
+	SigningCertURL   string
+	UnsubscribeURL   string
+}
+
+type record struct {
+	Records []s3Event `json:"Records"`
+}
+type s3Event struct {
+	AwsRegion   string `json:"awsRegion"`
+	EventSource string `json:"eventSource"`
+	EventTime   string `json:"eventTime"`
+	S3          struct {
+		Bucket struct {
+			Name string
 		}
-	} `json:"detail"`
+		Object struct {
+			Key string
+		}
+	} `json:"s3"`
 }
 
 type myOutput struct {
@@ -105,25 +122,13 @@ var (
 )
 
 func main() {
-	lambda.Start(func(ctx context.Context, event cloudWatchEvent) {
-		if event.Source != "aws.s3" {
-			return
-		}
+	lambda.Start(func(ctx context.Context, sqsEvent events.SQSEvent) {
 		if xRayTracingEnabled != "" {
 			xray.AWS(s3Svc.Client)
 		}
+
 		if esClient == "" || indexName == "" || typeName == "" {
 			log.Fatal("Missing required env variables OMNISSM_ELASTIC_SEARCH_HTTP, OMNISSM_INDEX_NAME, OMNISSM_TYPE_NAME")
-		}
-
-		var bucketName = event.Detail.RequestParameters.BucketName
-		var bucketKey = event.Detail.RequestParameters.Key
-
-		if bucketName == "" || bucketKey == "" {
-			log.Fatal("Cloudwatch event missing BucketName or Key")
-		}
-		if !strings.Contains(bucketKey, "Custom:ProcessInfo") {
-			return
 		}
 
 		client, err := newElasticClient(esClient)
@@ -131,10 +136,35 @@ func main() {
 			log.Fatal(err)
 		}
 
-		err = processEventRecord(ctx, bucketName, bucketKey, client)
-		if err != nil {
-			log.Fatal(err)
+		for _, message := range sqsEvent.Records {
+			var sns snsEvent
+			json.Unmarshal([]byte(message.Body), &sns)
+			var aRecord record
+			s, err := strconv.Unquote(string(sns.Message))
+			if err != nil {
+				log.Fatal(err)
+			}
+			json.Unmarshal([]byte(s), &aRecord)
+			for _, s3Event := range aRecord.Records {
+
+				var bucketName = s3Event.S3.Bucket.Name
+				bucketKey, err := url.QueryUnescape(s3Event.S3.Object.Key)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				if bucketName == "" || bucketKey == "" {
+					log.Fatal("Event missing BucketName or Key")
+				}
+
+				err = processEventRecord(ctx, bucketName, bucketKey, client)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+
 		}
+
 	})
 }
 
