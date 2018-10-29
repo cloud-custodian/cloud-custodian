@@ -75,7 +75,8 @@ class SagemakerJob(QueryResourceManager):
         filter_name = None
 
     permissions = (
-        'sagemaker:ListTrainingJobs', 'sagemaker:DescribeTrainingJobs')
+        'sagemaker:ListTrainingJobs', 'sagemaker:DescribeTrainingJobs',
+        'sagemaker:ListTags')
 
     def __init__(self, ctx, data):
         super(SagemakerJob, self).__init__(ctx, data)
@@ -122,8 +123,7 @@ class SagemakerTransformJob(QueryResourceManager):
         filter_name = 'TransformJobArn'
 
     permissions = (
-        'sagemaker:ListTransformJobs', 'sagemaker:DescribeTransformJobs',
-        'sagemaker:ListTags')
+        'sagemaker:ListTransformJobs', 'sagemaker:DescribeTransformJobs')
 
     def __init__(self, ctx, data):
         super(SagemakerTransformJob, self).__init__(ctx, data)
