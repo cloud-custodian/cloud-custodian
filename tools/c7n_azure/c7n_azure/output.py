@@ -60,7 +60,6 @@ class AzureStorageOutput(DirectoryOutput):
         self.log.debug("Policy Logs uploaded")
 
     def get_output_path(self, output_url):
-
         # if pyformat is not specified, then use the policy name and formatted date
         if '{' not in output_url:
             output_url = self.join(output_url, self.DEFAULT_BLOB_FOLDER_PREFIX)
