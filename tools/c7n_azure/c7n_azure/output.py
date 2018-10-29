@@ -23,7 +23,6 @@ import tempfile
 
 from c7n_azure.storage_utils import StorageUtilities
 
-from c7n.utils import local_session
 from c7n.output import DirectoryOutput, blob_outputs
 
 
@@ -42,12 +41,14 @@ class AzureStorageOutput(DirectoryOutput):
     DEFAULT_BLOB_FOLDER_PREFIX = '{policy}/{now:%Y/%m/%d/%H/}'
 
     def __init__(self, ctx, config=None):
-        super(AzureStorageOutput, self).__init__(ctx, config)
+        self.ctx = ctx
+        self.config = config
+
         self.log = logging.getLogger('custodian.output')
         self.root_dir = tempfile.mkdtemp()
         self.output_dir = self.get_output_path(self.ctx.options.output_dir)
         self.blob_service, self.container, self.file_prefix = \
-            self.get_blob_client_wrapper(self.output_dir, ctx)
+            self.get_blob_client_wrapper(self.output_dir)
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if exc_type is not None:
@@ -83,7 +84,6 @@ class AzureStorageOutput(DirectoryOutput):
         return "/".join([s.strip('/') for s in parts if s != ''])
 
     @staticmethod
-    def get_blob_client_wrapper(output_path, ctx):
+    def get_blob_client_wrapper(output_path):
         # provides easier test isolation
-        s = local_session(ctx.session_factory)
-        return StorageUtilities.get_blob_client_by_uri(output_path, s)
+        return StorageUtilities.get_blob_client_by_uri(output_path)

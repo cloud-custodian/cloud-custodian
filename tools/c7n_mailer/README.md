@@ -382,6 +382,9 @@ Requires:
 The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.
 Configuration for this scenario requires only minor changes from AWS deployments.
 
+You will need to grant `Queue Data Contributor` role on the Queue for the identity
+mailer is running under.
+
 The notify action in your policy will reflect transport type `asq` with the URL
 to an Azure Storage Queue.  For example:
 

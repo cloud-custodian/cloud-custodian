@@ -57,6 +57,12 @@ Once the service principal is created, follow these steps:
 - Type name of service principal in search bar and select it
 - Click `Save`
 
+If this service principal will be writing logs to storage or leveraging queues
+for mailer you should also assign Storage roles, either at the subscription
+level or resource group/storage account level.
+
+- `Blob Data Contributor`
+- `Queue Data Contributor`
 
 Access Token
 ------------
