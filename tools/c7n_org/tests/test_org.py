@@ -9,7 +9,7 @@ from click.testing import CliRunner
 from c7n_org import cli as org
 
 
-ACCOUNTS_DEFAULT = yaml.safe_dump({
+ACCOUNTS_AWS_DEFAULT = yaml.safe_dump({
     'accounts': [
         {'name': 'dev',
          'account_id': 'foobar',
@@ -22,7 +22,7 @@ ACCOUNTS_DEFAULT = yaml.safe_dump({
     ],
 }, default_flow_style=False)
 
-POLICIES_DEFAULT = yaml.safe_dump({
+POLICIES_AWS_DEFAULT = yaml.safe_dump({
     'policies': [
         {'name': 'compute',
          'resource': 'aws.ec2',
@@ -43,7 +43,7 @@ class OrgTest(TestUtils):
         if accounts:
             accounts = yaml.safe_dump(accounts, default_flow_style=False)
         else:
-            accounts = ACCOUNTS_DEFAULT
+            accounts = ACCOUNTS_AWS_DEFAULT
 
         with open(os.path.join(root, 'accounts.yml'), 'w') as fh:
             fh.write(accounts)
@@ -51,13 +51,13 @@ class OrgTest(TestUtils):
         if policies:
             policies = yaml.safe_dump(policies, default_flow_style=False)
         else:
-            policies = POLICIES_DEFAULT
+            policies = POLICIES_AWS_DEFAULT
 
         with open(os.path.join(root, 'policies.yml'), 'w') as fh:
             fh.write(policies)
         return root
 
-    def test_cli_run(self):
+    def test_cli_run_aws(self):
         run_dir = self.setup_run_dir()
         logger = mock.MagicMock()
         run_account = mock.MagicMock()
