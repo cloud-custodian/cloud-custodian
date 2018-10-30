@@ -100,3 +100,35 @@ This policy will find all KeyVaults with an access of Service Principals not in 
                     - get
                   certificates:
                     - get
+
+This policy will find all Keys in all KeyVaults that are older than 30 days
+
+.. code-block:: yaml
+
+    policies:
+        - name: keyvault-keys
+          description:
+            List all keys that are older than 30 days
+          resource: azure.keyvault-key
+          filters:
+            - type: value
+              key: created
+              value_type: age
+              op: gt
+              value: 30
+
+This policy will find all Certificates in all KeyVaults that are older than 30 days
+
+.. code-block:: yaml
+
+    policies:
+        - name: keyvault-certificates
+          description:
+            List all certificates that are older than 30 days
+          resource: azure.keyvault-certificate
+          filters:
+            - type: value
+              key: created
+              value_type: age
+              op: gt
+              value: 30

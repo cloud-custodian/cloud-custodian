@@ -16,13 +16,13 @@ from azure.graphrbac import GraphRbacManagementClient
 from azure.keyvault import KeyVaultClient
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
-from c7n.filters import (
-    AgeFilter, Filter, OPERATORS
-)
+from c7n.filters import Filter
 import logging
 from c7n.utils import type_schema
 from c7n_azure.utils import GraphHelper
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.constants import CONST_AZURE_KEYVAULT_BASEURL
+
 
 log = logging.getLogger('custodian.azure.keyvault')
 
@@ -46,7 +46,7 @@ class WhiteListFilter(Filter):
                              'certificates': {'type': 'array'},
                              'secrets': {'type': 'array'},
                              'keys': {'type': 'array'}})
-    graph_client = None
+    graph_cllsient = None
 
     def __init__(self, data, manager=None):
         super(WhiteListFilter, self).__init__(data, manager)
@@ -121,7 +121,7 @@ class WhiteListFilter(Filter):
         return access_policies
 
 
-@resources.register('key')
+@resources.register('keyvault-key')
 class KeyVaultKey(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
@@ -130,37 +130,71 @@ class KeyVaultKey(ArmResourceManager):
         enum_spec = ('vaults', 'list', None)
 
     def augment(self, resources):
-        url_base = 'vault.azure.net'
-        s = Session(resource='https://' + url_base)
+        s = Session(resource='https://' + CONST_AZURE_KEYVAULT_BASEURL)
         self.keyvault_client = KeyVaultClient(s.get_credentials())
         r = []
-        for index, item in enumerate(resources):
-            vault_url = 'https://' + resources[index]["name"] + '.vault.azure.net'
+
+        for ritem in resources:
+
+            vault_url = 'https://' + ritem["name"] + "." + CONST_AZURE_KEYVAULT_BASEURL
             try:
                 vkeys = self.keyvault_client.get_keys(vault_url)
                 for vkey in vkeys:
+                    keyname = vkey.kid.split("/")[-1:]
+                    keyname = keyname[0]
+
                     r.append({'kid': vkey.kid,
-                              'keyvault': {'id': resources[index]["id"],
-                                           'name': resources[index]["name"],
-                                           'location': resources[index]["location"],
-                                           'tags': resources[index]["tags"]},
+                              'keyname': keyname,
+                              'keyvault': {'id': ritem["id"],
+                                           'name': ritem["name"],
+                                           'location': ritem["location"],
+                                           'tags': ritem["tags"]},
                               'enabled': vkey.attributes.enabled,
                               'created': vkey.attributes.created,
                               'updated': vkey.attributes.updated,
                               'tags': vkey.tags})
 
             except Exception as e:
-                self.log.error(e.message + ' on keyvault: ' + resources[index]["id"])
+                self.log.error(e.message + ' on keyvault: ' + ritem["id"])
                 pass
 
         return r
 
 
-@KeyVaultKey.filter_registry.register('age')
-class KeyAgeFilter(AgeFilter):
-    date_attribute = "created"
+@resources.register('keyvault-certificate')
+class KeyVaultCert(ArmResourceManager):
 
-    schema = type_schema(
-        'age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
-        days={'type': 'number'})
+    class resource_type(ArmResourceManager.resource_type):
+        service = 'azure.mgmt.keyvault'
+        client = 'KeyVaultManagementClient'
+        enum_spec = ('vaults', 'list', None)
+
+    def augment(self, resources):
+        s = Session(resource='https://' + CONST_AZURE_KEYVAULT_BASEURL)
+        self.keyvault_client = KeyVaultClient(s.get_credentials())
+        r = []
+
+        for ritem in resources:
+            vault_url = 'https://' + ritem["name"] + "." + CONST_AZURE_KEYVAULT_BASEURL
+            try:
+                vcerts = self.keyvault_client.get_certificates(vault_url)
+                for vcert in vcerts:
+                    certname = vcert.id.split("/")[-1:]
+                    certname = certname[0]
+
+                    r.append({'id': vcert.id,
+                              'certificate_name': certname,
+                              'keyvault': {'id': ritem["id"],
+                                           'name': ritem["name"],
+                                           'location': ritem["location"],
+                                           'tags': ritem["tags"]},
+                              'enabled': vcert.attributes.enabled,
+                              'created': vcert.attributes.created,
+                              'updated': vcert.attributes.updated,
+                              'tags': vcert.tags})
+
+            except Exception as e:
+                self.log.error(e.message + ' on keyvault: ' + ritem["id"])
+                pass
+
+        return r
