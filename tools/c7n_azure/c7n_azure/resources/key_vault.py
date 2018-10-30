@@ -46,7 +46,7 @@ class WhiteListFilter(Filter):
                              'certificates': {'type': 'array'},
                              'secrets': {'type': 'array'},
                              'keys': {'type': 'array'}})
-    graph_cllsient = None
+    graph_client = None
 
     def __init__(self, data, manager=None):
         super(WhiteListFilter, self).__init__(data, manager)
