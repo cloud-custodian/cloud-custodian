@@ -17,6 +17,9 @@ import logging
 import os
 import uuid
 
+from azure.common import AzureHttpError
+from msrestazure.azure_exceptions import CloudError
+
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
@@ -25,7 +28,6 @@ log = logging.getLogger('custodian.azure.functions')
 
 
 def run(event, context):
-
     # policies file should always be valid in functions so do loading naively
     with open(context['config_file']) as f:
         policy_config = json.load(f)
@@ -52,7 +54,10 @@ def run(event, context):
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:
-            p.push(event, context)
+            try:
+                p.push(event, context)
+            except (CloudError, AzureHttpError) as error:
+                log.error("Unable to process policy: %s :: %s" % (p.name, error))
     return True
 
 
@@ -62,5 +67,5 @@ def get_tmp_output_dir():
         try:
             os.mkdir(output_dir)
         except OSError as error:
-            log.warning("Unable to make output directory: {}".format(error))
+            log.error("Unable to make output directory: {}".format(error))
     return output_dir
