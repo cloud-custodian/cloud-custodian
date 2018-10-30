@@ -21,7 +21,7 @@ import logging
 from c7n.utils import type_schema
 from c7n_azure.utils import GraphHelper
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.constants import CONST_AZURE_KEYVAULT_BASEURL
+from c7n_azure.constants import RESOURCE_KEYVAULT_BASEURL
 
 
 log = logging.getLogger('custodian.azure.keyvault')
@@ -130,13 +130,13 @@ class KeyVaultKey(ArmResourceManager):
         enum_spec = ('vaults', 'list', None)
 
     def augment(self, resources):
-        s = Session(resource='https://' + CONST_AZURE_KEYVAULT_BASEURL)
+        s = Session(resource='https://' + RESOURCE_KEYVAULT_BASEURL)
         self.keyvault_client = KeyVaultClient(s.get_credentials())
         r = []
 
         for ritem in resources:
 
-            vault_url = 'https://' + ritem["name"] + "." + CONST_AZURE_KEYVAULT_BASEURL
+            vault_url = 'https://' + ritem["name"] + "." + RESOURCE_KEYVAULT_BASEURL
             try:
                 vkeys = self.keyvault_client.get_keys(vault_url)
                 for vkey in vkeys:
@@ -170,12 +170,12 @@ class KeyVaultCert(ArmResourceManager):
         enum_spec = ('vaults', 'list', None)
 
     def augment(self, resources):
-        s = Session(resource='https://' + CONST_AZURE_KEYVAULT_BASEURL)
+        s = Session(resource='https://' + RESOURCE_KEYVAULT_BASEURL)
         self.keyvault_client = KeyVaultClient(s.get_credentials())
         r = []
 
         for ritem in resources:
-            vault_url = 'https://' + ritem["name"] + "." + CONST_AZURE_KEYVAULT_BASEURL
+            vault_url = 'https://' + ritem["name"] + "." + RESOURCE_KEYVAULT_BASEURL
             try:
                 vcerts = self.keyvault_client.get_certificates(vault_url)
                 for vcert in vcerts:
