@@ -17,6 +17,8 @@ import logging
 import os
 import uuid
 
+from msrestazure.azure_exceptions import CloudError
+
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
@@ -25,7 +27,6 @@ log = logging.getLogger('custodian.azure.functions')
 
 
 def run(event, context):
-
     # policies file should always be valid in functions so do loading naively
     with open(context['config_file']) as f:
         policy_config = json.load(f)
@@ -52,7 +53,10 @@ def run(event, context):
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:
-            p.push(event, context)
+            try:
+                p.push(event, context)
+            except CloudError as error:
+                log.warning("Failed to process policy: %s :: %s" % (p.name, error))
     return True
 
 
