@@ -32,7 +32,7 @@ class OutputTest(BaseTest):
     def get_azure_output(self, custom_pyformat=None):
         output_dir = "azure://mystorage.blob.core.windows.net/logs"
         if custom_pyformat:
-            output_dir = os.path.join(output_dir, custom_pyformat)
+            output_dir = AzureStorageOutput.join(output_dir, custom_pyformat)
 
         output = AzureStorageOutput(
             ExecutionContext(

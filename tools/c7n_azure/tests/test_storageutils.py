@@ -78,19 +78,6 @@ class StorageUtilsTest(BaseTest):
         self.assertEqual(len(messages), 0)
 
     @arm_template('storage.json')
-    def test_get_account_by_name(self):
-        account = self.setup_account()
-        found = StorageUtilities.get_storage_account_by_name(account.name)
-        self.assertEqual(found.id, account.id)
-
-    @arm_template('storage.json')
-    def test_get_account_by_name_not_exists(self):
-        account = self.setup_account()
-        found = StorageUtilities.get_storage_account_by_name(account.name + "break")
-        self.assertIsNone(found)
-
-    @arm_template('storage.json')
-    def test_get_keys(self):
-        account = self.setup_account()
-        keys = StorageUtilities.get_storage_keys(account.id)
-        self.assertEqual(len(keys), 2)
+    def test_get_storage_token(self):
+        token = StorageUtilities.get_storage_token()
+        self.assertIsNotNone(token.token)

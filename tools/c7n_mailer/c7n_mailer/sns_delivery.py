@@ -48,7 +48,8 @@ class SnsDelivery(object):
             resources,
             self.logger,
             'template',
-            'default'
+            'default',
+            self.config['templates_folders']
         )
         return {
             'topic': policy_sns_address,
