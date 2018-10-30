@@ -481,10 +481,10 @@ def run_account(account, region, policies_config, output_path,
     if '{' not in output_path:
         output_path = os.path.join(output_path, account['name'], region)
 
-    cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['name'], region))
+    cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['account_id'], region))
 
     config = Config.empty(
-        region=region, cache_path=cache_path,
+        region=region, cache=cache_path,
         cache_period=cache_period, dryrun=dryrun, output_dir=output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         log_group=None, profile=None, external_id=None)
@@ -555,7 +555,12 @@ def run_account(account, region, policies_config, output_path,
 @click.option('-l', '--policytags', 'policy_tags',
               multiple=True, default=None, help="Policy tag filter")
 @click.option('--cache-period', default=15, type=int)
-@click.option('--cache-path', required=False, type=click.Path(), default="~/.cache/c7n-org")
+@click.option('--cache-path', required=False,
+              type=click.Path(
+                  writable=True, readable=True, exists=True,
+                  resolve_path=True, allow_dash=False,
+                  file_okay=False, dir_okay=True),
+              default=None)
 @click.option("--metrics", default=False, is_flag=True)
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
@@ -567,6 +572,11 @@ def run(config, use, output_dir, accounts, tags, region,
         config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
     policy_counts = Counter()
     success = True
+
+    if not cache_path:
+        cache_path = os.path.expanduser("~/.cache/c7n-org")
+        if not os.path.exists(cache_path):
+            os.makedirs(cache_path)
 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
