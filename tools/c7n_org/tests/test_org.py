@@ -55,6 +55,9 @@ class OrgTest(TestUtils):
 
         with open(os.path.join(root, 'policies.yml'), 'w') as fh:
             fh.write(policies)
+
+        cache_path = os.path.join(root, 'cache')
+        os.makedirs(cache_path)
         return root
 
     def test_cli_run_aws(self):
