@@ -35,7 +35,7 @@ class StorageUtilities(object):
 
         blob_service = BlockBlobService(
             account_name=storage.storage_name,
-            token_credential=storage.key)
+            token_credential=storage.token)
         blob_service.create_container(storage.container_name)
         return blob_service, storage.container_name, storage.file_prefix
 
@@ -45,17 +45,17 @@ class StorageUtilities(object):
 
         queue_service = QueueService(
             account_name=storage.storage_name,
-            token_credential=storage.key)
+            token_credential=storage.token)
         queue_service.create_queue(storage.container_name)
 
         return queue_service, storage.container_name
 
     @staticmethod
     def create_queue_from_storage_account(storage_account, name):
-        keys = StorageUtilities.get_storage_token()
+        token = StorageUtilities.get_storage_token()
         queue_service = QueueService(
             account_name=storage_account.name,
-            token_credential=keys)
+            token_credential=token)
         return queue_service.create_queue(name)
 
     @staticmethod
@@ -91,12 +91,12 @@ class StorageUtilities(object):
         else:
             prefix = ""
 
-        key = StorageUtilities.get_storage_token(session)
+        token = StorageUtilities.get_storage_token(session)
 
-        Storage = namedtuple('Storage', 'container_name, storage_name, key, file_prefix')
+        Storage = namedtuple('Storage', 'container_name, storage_name, token, file_prefix')
 
         return Storage(
             container_name=container_name,
             storage_name=storage_name,
-            key=key,
+            token=token,
             file_prefix=prefix)

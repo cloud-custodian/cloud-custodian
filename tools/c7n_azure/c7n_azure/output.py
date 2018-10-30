@@ -22,8 +22,9 @@ import shutil
 import tempfile
 
 from c7n_azure.storage_utils import StorageUtilities
-
 from c7n.output import DirectoryOutput, blob_outputs
+
+from azure.common import AzureHttpError
 
 
 @blob_outputs.register('azure')
@@ -71,10 +72,15 @@ class AzureStorageOutput(DirectoryOutput):
             for f in files:
                 blob_name = self.join(self.file_prefix, root[len(self.root_dir):], f)
                 blob_name.strip('/')
-                self.blob_service.create_blob_from_path(
-                    self.container,
-                    blob_name,
-                    os.path.join(root, f))
+                try:
+                    self.blob_service.create_blob_from_path(
+                        self.container,
+                        blob_name,
+                        os.path.join(root, f))
+                except AzureHttpError as e:
+                    self.log.error("Error writing output. Confirm output storage URL is correct "
+                                   "and that 'Storage Blob Contributor' role is assigned. \n" +
+                                   str(e))
 
                 self.log.debug("%s uploaded" % blob_name)
 
