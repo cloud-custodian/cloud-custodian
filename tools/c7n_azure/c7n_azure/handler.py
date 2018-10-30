@@ -17,6 +17,7 @@ import logging
 import os
 import uuid
 
+from azure.common import AzureHttpError
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.config import Config
@@ -55,8 +56,8 @@ def run(event, context):
         for p in policies:
             try:
                 p.push(event, context)
-            except CloudError as error:
-                log.warning("Failed to process policy: %s :: %s" % (p.name, error))
+            except (CloudError, AzureHttpError) as error:
+                log.warning("Unable to process policy: %s :: %s" % (p.name, error))
     return True
 
 
