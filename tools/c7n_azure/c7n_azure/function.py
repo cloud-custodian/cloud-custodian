@@ -28,6 +28,7 @@ try:
 except ImportError:
     pass
 
+max_dequeue_count = 3
 
 def main(input):
     logging.info("Running Azure Cloud Custodian Policy")
@@ -40,6 +41,8 @@ def main(input):
     events = None
 
     if type(input) is QueueMessage:
+        if input.dequeue_count() > max_dequeue_count:
+            return
         events = [input.get_json()]
 
     handler.run(events, context)

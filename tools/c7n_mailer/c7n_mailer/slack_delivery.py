@@ -59,20 +59,23 @@ class SlackDelivery(object):
                     for address, slack_target in resolved_addrs.items():
                         slack_messages[address] = get_rendered_jinja(
                             slack_target, sqs_message, resources,
-                            self.logger, 'slack_template', 'slack_default')
+                            self.logger, 'slack_template', 'slack_default',
+                            self.config['templates_folders'])
                 self.logger.debug(
                     "Generating messages for recipient list produced by resource owner resolution.")
             elif target.startswith('https://hooks.slack.com/'):
                 slack_messages[target] = get_rendered_jinja(
                     target, sqs_message,
                     resource_list,
-                    self.logger, 'slack_template', 'slack_default')
+                    self.logger, 'slack_template', 'slack_default',
+                    self.config['templates_folders'])
             elif target.startswith('slack://webhook/#') and self.config.get('slack_webhook'):
                 webhook_target = self.config.get('slack_webhook')
                 slack_messages[webhook_target] = get_rendered_jinja(
                     target.split('slack://webhook/#', 1)[1], sqs_message,
                     resource_list,
-                    self.logger, 'slack_template', 'slack_default')
+                    self.logger, 'slack_template', 'slack_default',
+                    self.config['templates_folders'])
                 self.logger.debug(
                     "Generating message for webhook %s." % self.config.get('slack_webhook'))
             elif target.startswith('slack://') and is_email(target.split('slack://', 1)[1]):
@@ -80,13 +83,15 @@ class SlackDelivery(object):
                 for address, slack_target in resolved_addrs.items():
                     slack_messages[address] = get_rendered_jinja(
                         slack_target, sqs_message, resource_list,
-                        self.logger, 'slack_template', 'slack_default')
+                        self.logger, 'slack_template', 'slack_default',
+                        self.config['templates_folders'])
             elif target.startswith('slack://#'):
                 resolved_addrs = target.split('slack://#', 1)[1]
                 slack_messages[resolved_addrs] = get_rendered_jinja(
                     resolved_addrs, sqs_message,
                     resource_list,
-                    self.logger, 'slack_template', 'slack_default')
+                    self.logger, 'slack_template', 'slack_default',
+                    self.config['templates_folders'])
 
                 self.logger.debug("Generating message for specified Slack channel.")
 

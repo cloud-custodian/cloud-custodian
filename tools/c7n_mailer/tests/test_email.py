@@ -52,8 +52,8 @@ class EmailTest(unittest.TestCase):
         self.aws_session = boto3.Session()
         self.email_delivery = MockEmailDelivery(MAILER_CONFIG, self.aws_session, logger)
         self.email_delivery.ldap_lookup.uid_regex = ''
-        tests_dir = '/tools/c7n_mailer/tests/'
-        template_abs_filename = '%s%sexample.jinja' % (os.path.abspath(os.curdir), tests_dir)
+        template_abs_filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                             'example.jinja')
         SQS_MESSAGE_1['action']['template'] = template_abs_filename
 
     def test_valid_email(self):
@@ -263,11 +263,11 @@ class EmailTest(unittest.TestCase):
             RESOURCE_2
         )
 
-        self.assertEquals(ldap_emails, ['milton@initech.com'])
+        self.assertEqual(ldap_emails, ['milton@initech.com'])
 
         ldap_emails = self.email_delivery.get_resource_owner_emails_from_resource(
             SQS_MESSAGE_1,
             RESOURCE_3
         )
 
-        self.assertEquals(ldap_emails, ['milton@initech.com'])
+        self.assertEqual(ldap_emails, ['milton@initech.com'])

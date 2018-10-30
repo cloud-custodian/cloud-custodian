@@ -263,7 +263,8 @@ class EmailDelivery(object):
 
     def get_mimetext_message(self, sqs_message, resources, to_addrs):
         body = get_rendered_jinja(
-            to_addrs, sqs_message, resources, self.logger, 'template', 'default')
+            to_addrs, sqs_message, resources, self.logger,
+            'template', 'default', self.config['templates_folders'])
         if not body:
             return None
         email_format = sqs_message['action'].get('template_format', None)

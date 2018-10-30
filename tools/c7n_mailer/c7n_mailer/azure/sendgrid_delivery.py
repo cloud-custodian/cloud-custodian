@@ -74,7 +74,8 @@ class SendGridDelivery(object):
 
     def get_message_content(self, queue_message, resources, to_addrs):
         return get_rendered_jinja(
-            to_addrs, queue_message, resources, self.logger, 'template', 'default')
+            to_addrs, queue_message, resources, self.logger,
+            'template', 'default', self.config['templates_folders'])
 
     def sendgrid_handler(self, queue_message, to_addrs_to_email_messages_map):
         self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" % (
