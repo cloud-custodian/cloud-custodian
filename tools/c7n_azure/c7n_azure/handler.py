@@ -57,7 +57,7 @@ def run(event, context):
             try:
                 p.push(event, context)
             except (CloudError, AzureHttpError) as error:
-                log.warning("Unable to process policy: %s :: %s" % (p.name, error))
+                log.error("Unable to process policy: %s :: %s" % (p.name, error))
     return True
 
 
@@ -67,5 +67,5 @@ def get_tmp_output_dir():
         try:
             os.mkdir(output_dir)
         except OSError as error:
-            log.warning("Unable to make output directory: {}".format(error))
+            log.error("Unable to make output directory: {}".format(error))
     return output_dir
