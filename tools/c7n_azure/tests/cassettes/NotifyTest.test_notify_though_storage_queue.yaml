@@ -5,12 +5,11 @@ interactions:
       Accept: [application/json]
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
       User-Agent: [python/2.7.15 (Windows-10-10.0.17134) msrest/0.6.1 msrest_azure/0.5.0
-          azure-mgmt-storage/2.0.0rc4 Azure-SDK-For-Python]
+          azure-mgmt-storage/3.0.0 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2018-02-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2018-07-01
   response:
     body:
       string: !!binary |
@@ -56,18 +55,18 @@ interactions:
       content-encoding: [gzip]
       content-length: ['2067']
       content-type: [application/json; charset=utf-8]
-      date: ['Wed, 31 Oct 2018 20:07:29 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:17 GMT']
       expires: ['-1']
       pragma: [no-cache]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [4581630b-ff48-40d3-bfae-1a619656a64e]
-      x-ms-original-request-ids: [470e2415-483b-4b90-b992-da9ea667f3d4, 468e6953-cf89-4137-8095-ed2dcc229547,
-        5932345e-45e7-4692-8c94-8c9e6d9bd092]
+      x-ms-correlation-request-id: [a5423d39-51fb-4ba1-9318-cd08187a86f4]
+      x-ms-original-request-ids: [bbccab3f-b4d9-4763-b1e7-a70935f98f3b, 59ce00ba-b5e9-4a6d-b61c-d307b7705fe5,
+        fb0071d1-394a-4947-aafe-5be146512aeb]
       x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [4581630b-ff48-40d3-bfae-1a619656a64e]
-      x-ms-routing-request-id: ['WESTUS2:20181031T200729Z:4581630b-ff48-40d3-bfae-1a619656a64e']
+      x-ms-request-id: [a5423d39-51fb-4ba1-9318-cd08187a86f4]
+      x-ms-routing-request-id: ['WESTUS2:20181031T202617Z:a5423d39-51fb-4ba1-9318-cd08187a86f4']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -75,7 +74,7 @@ interactions:
       Connection: [keep-alive]
       Content-Length: ['0']
       User-Agent: [Azure-Storage/1.3.0-1.3.0 (Python CPython 2.7.15; Windows 10)]
-      x-ms-date: ['Wed, 31 Oct 2018 20:07:29 GMT']
+      x-ms-date: ['Wed, 31 Oct 2018 20:26:17 GMT']
       x-ms-version: ['2018-03-28']
     method: PUT
     uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testnotify
@@ -83,9 +82,9 @@ interactions:
     body: {string: !!python/unicode ''}
     headers:
       content-length: ['0']
-      date: ['Wed, 31 Oct 2018 20:07:35 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:20 GMT']
       server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [4dba7b5e-d003-00ad-0755-715802000000]
+      x-ms-request-id: [a5517c14-7003-0127-5b57-71a474000000]
       x-ms-version: ['2018-03-28']
     status: {code: 204, message: No Content}
 - request:
@@ -94,7 +93,7 @@ interactions:
       Connection: [keep-alive]
       Content-Length: ['0']
       User-Agent: [Azure-Storage/1.3.0-1.3.0 (Python CPython 2.7.15; Windows 10)]
-      x-ms-date: ['Wed, 31 Oct 2018 20:07:36 GMT']
+      x-ms-date: ['Wed, 31 Oct 2018 20:26:20 GMT']
       x-ms-version: ['2018-03-28']
     method: DELETE
     uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testnotify/messages
@@ -102,9 +101,9 @@ interactions:
     body: {string: !!python/unicode ''}
     headers:
       content-length: ['0']
-      date: ['Wed, 31 Oct 2018 20:07:35 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:20 GMT']
       server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [4dba8446-d003-00ad-4055-715802000000]
+      x-ms-request-id: [a5517db0-7003-0127-2857-71a474000000]
       x-ms-version: ['2018-03-28']
     status: {code: 204, message: No Content}
 - request:
@@ -133,16 +132,16 @@ interactions:
       content-encoding: [gzip]
       content-length: ['295']
       content-type: [application/json; charset=utf-8]
-      date: ['Wed, 31 Oct 2018 20:07:36 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:21 GMT']
       expires: ['-1']
       pragma: [no-cache]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [4e33b0ec-8952-4fb4-811f-5abae5adcfbe]
+      x-ms-correlation-request-id: [eac299ea-d2a9-480d-a4d8-c27938aef2dc]
       x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [4e33b0ec-8952-4fb4-811f-5abae5adcfbe]
-      x-ms-routing-request-id: ['WESTUS2:20181031T200737Z:4e33b0ec-8952-4fb4-811f-5abae5adcfbe']
+      x-ms-request-id: [eac299ea-d2a9-480d-a4d8-c27938aef2dc]
+      x-ms-routing-request-id: ['WESTUS2:20181031T202621Z:eac299ea-d2a9-480d-a4d8-c27938aef2dc']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -162,16 +161,16 @@ interactions:
       cache-control: [no-cache]
       content-length: ['119']
       content-type: [application/json; charset=utf-8]
-      date: ['Wed, 31 Oct 2018 20:07:38 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:26 GMT']
       expires: ['-1']
       pragma: [no-cache]
       server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
       strict-transport-security: [max-age=31536000; includeSubDomains]
       x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [ff8b9a2d-ed74-427d-8d33-a36b19577d1d]
+      x-ms-correlation-request-id: [391d661f-91a0-438e-a82b-a71c4da1f570]
       x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [9100d72e-d5c4-4787-bfe8-93c6df255b55]
-      x-ms-routing-request-id: ['WESTUS2:20181031T200738Z:ff8b9a2d-ed74-427d-8d33-a36b19577d1d']
+      x-ms-request-id: [a684c696-c088-4d3b-a59c-4915ef7face5]
+      x-ms-routing-request-id: ['WESTUS2:20181031T202627Z:391d661f-91a0-438e-a82b-a71c4da1f570']
     status: {code: 404, message: Not Found}
 - request:
     body: null
@@ -179,7 +178,7 @@ interactions:
       Connection: [keep-alive]
       Content-Length: ['0']
       User-Agent: [Azure-Storage/1.3.0-1.3.0 (Python CPython 2.7.15; Windows 10)]
-      x-ms-date: ['Wed, 31 Oct 2018 20:08:10 GMT']
+      x-ms-date: ['Wed, 31 Oct 2018 20:26:21 GMT']
       x-ms-version: ['2018-03-28']
     method: PUT
     uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testnotify
@@ -187,9 +186,9 @@ interactions:
     body: {string: !!python/unicode ''}
     headers:
       content-length: ['0']
-      date: ['Wed, 31 Oct 2018 20:08:15 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:29 GMT']
       server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [b7eba108-4003-0064-5755-71c8c8000000]
+      x-ms-request-id: [8ba0e0f1-8003-0079-2257-711122000000]
       x-ms-version: ['2018-03-28']
     status: {code: 204, message: No Content}
 - request:
@@ -198,20 +197,20 @@ interactions:
       Connection: [keep-alive]
       Content-Length: ['619']
       User-Agent: [Azure-Storage/1.3.0-1.3.0 (Python CPython 2.7.15; Windows 10)]
-      x-ms-date: ['Wed, 31 Oct 2018 20:08:15 GMT']
+      x-ms-date: ['Wed, 31 Oct 2018 20:26:30 GMT']
       x-ms-version: ['2018-03-28']
     method: POST
     uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testnotify/messages
   response:
-    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><QueueMessagesList><QueueMessage><MessageId>6c22b6d5-a473-4035-a440-0545cf3e8bff</MessageId><InsertionTime>Wed,
-        31 Oct 2018 20:08:15 GMT</InsertionTime><ExpirationTime>Wed, 07 Nov 2018 20:08:15
-        GMT</ExpirationTime><PopReceipt>AgAAAAMAAAAAAAAA60d+dVVx1AE=</PopReceipt><TimeNextVisible>Wed,
-        31 Oct 2018 20:08:15 GMT</TimeNextVisible></QueueMessage></QueueMessagesList>"}
+    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><QueueMessagesList><QueueMessage><MessageId>b42e6de5-4777-47f5-8f08-865742f7314c</MessageId><InsertionTime>Wed,
+        31 Oct 2018 20:26:30 GMT</InsertionTime><ExpirationTime>Wed, 07 Nov 2018 20:26:30
+        GMT</ExpirationTime><PopReceipt>AgAAAAMAAAAAAAAAiH0UAlhx1AE=</PopReceipt><TimeNextVisible>Wed,
+        31 Oct 2018 20:26:30 GMT</TimeNextVisible></QueueMessage></QueueMessagesList>"}
     headers:
       content-type: [application/xml]
-      date: ['Wed, 31 Oct 2018 20:08:15 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:29 GMT']
       server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [b7ebaa7a-4003-0064-5c55-71c8c8000000]
+      x-ms-request-id: [8ba0e864-8003-0079-0258-711122000000]
       x-ms-version: ['2018-03-28']
     status: {code: 201, message: Created}
 - request:
@@ -219,21 +218,21 @@ interactions:
     headers:
       Connection: [keep-alive]
       User-Agent: [Azure-Storage/1.3.0-1.3.0 (Python CPython 2.7.15; Windows 10)]
-      x-ms-date: ['Wed, 31 Oct 2018 20:08:15 GMT']
+      x-ms-date: ['Wed, 31 Oct 2018 20:26:30 GMT']
       x-ms-version: ['2018-03-28']
     method: GET
     uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testnotify/messages
   response:
-    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><QueueMessagesList><QueueMessage><MessageId>6c22b6d5-a473-4035-a440-0545cf3e8bff</MessageId><InsertionTime>Wed,
-        31 Oct 2018 20:08:15 GMT</InsertionTime><ExpirationTime>Wed, 07 Nov 2018 20:08:15
-        GMT</ExpirationTime><PopReceipt>AgAAAAMAAAAAAAAAo55zh1Vx1AE=</PopReceipt><TimeNextVisible>Wed,
-        31 Oct 2018 20:08:45 GMT</TimeNextVisible><DequeueCount>1</DequeueCount><MessageText>eJzlUz1v2zAQ3fUrDM6R2NhJbWfqliHo2iUIjAt5ktnQPJo8OlCM/PdKpG1YQ4B27kTg+D7uHo/HSoBSlByLh5kAWK/Wy7vX+l7Pob7T61UNyxXUi9W8XSxv7/W3JYqb2YWzMfqfaAE7Qy5TrD0JcakcK8E0nM+VSBHDD007MK5RtBPVy4hk3HkLjCNbYwvJclbwwVAw3G+2CBrDeD3PF9z7DHbEpu1LKYCLngIXw33ClCFbZh8fpFSKI1OADvvv8NbvPXSaF9Rk4NBLwObdOE3vsXHIkjHytfrJEOJeVJ9jJabX36hytCPWuG5W8LPT3AXmyRrVl54CRkpBFaGPNDi+YX+4TOtgh2e5umjVLYV6AiriMaf5v+ZavRQoHjDvtkvWlhUs+V7SOSeq1DnD2+IK3Yg5fl6zHgMlf7bdTEK3pOC0y2IA81YNxgFsipMhfhoVKFLLzRP2v0a2zBoFVf6THOaLKhifn1H+zfeSkw6jnPQnfaCDGR4xyi/t5fX8Jb4/KLJRfw==</MessageText></QueueMessage></QueueMessagesList>"}
+    body: {string: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?><QueueMessagesList><QueueMessage><MessageId>b42e6de5-4777-47f5-8f08-865742f7314c</MessageId><InsertionTime>Wed,
+        31 Oct 2018 20:26:30 GMT</InsertionTime><ExpirationTime>Wed, 07 Nov 2018 20:26:30
+        GMT</ExpirationTime><PopReceipt>AgAAAAMAAAAAAAAAsukIFFhx1AE=</PopReceipt><TimeNextVisible>Wed,
+        31 Oct 2018 20:27:00 GMT</TimeNextVisible><DequeueCount>1</DequeueCount><MessageText>eJzlUz1v2zAQ3fUrDM6R2NhJbWfqliHo2iUIjAt5ktnQPJo8OlCM/PdKpG1YQ4B27kTg+D7uHo/HSoBSlByLh5kAWK/Wy7vX+l7Pob7T61UNyxXUi9W8XSxv7/W3JYqb2YWzMfqfaAE7Qy5TrD0JcakcK8E0nM+VSBHDD007MK5RtBPVy4hk3HkLjCNbYwvJclbwwVAw3G+2CBrDeD3PF9z7DHbEpu1LKYCLngIXw33ClCFbZh8fpFSKI1OADvvv8NbvPXSaF9Rk4NBLwObdOE3vsXHIkjHytfrJEOJeVJ9jJabX36hytCPWuG5W8LPT3AXmyRrVl54CRkpBFaGPNDi+YX+4TOtgh2e5umjVLYV6AiriMaf5v+ZavRQoHjDvtkvWlhUs+V7SOSeq1DnD2+IK3Yg5fl6zHgMlf7bdTEK3pOC0y2IA81YNxgFsipMhfhoVKFLLzRP2v0a2zBoFVf6THOaLKhifn1H+zfeSkw6jnPQnfaCDGR4xyi/t5fX8Jb4/KLJRfw==</MessageText></QueueMessage></QueueMessagesList>"}
     headers:
       cache-control: [no-cache]
       content-type: [application/xml]
-      date: ['Wed, 31 Oct 2018 20:08:15 GMT']
+      date: ['Wed, 31 Oct 2018 20:26:30 GMT']
       server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [4dbab755-d003-00ad-0455-715802000000]
+      x-ms-request-id: [a55184b9-7003-0127-5d58-71a474000000]
       x-ms-version: ['2018-03-28']
     status: {code: 200, message: OK}
 version: 1
