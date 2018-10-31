@@ -104,7 +104,7 @@ class SnapshotTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_snapshot_delete(self):
-        factory = self.record_flight_data('snapshot-delete')
+        factory = self.replay_flight_data('snapshot-delete')
         p = self.load_policy(
             {'name': 'all-disks',
              'resource': 'gcp.snapshot',
