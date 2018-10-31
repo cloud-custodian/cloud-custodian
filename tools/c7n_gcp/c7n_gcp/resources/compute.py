@@ -134,6 +134,12 @@ class DeleteSnapshot(MethodAction):
 
     schema = type_schema('delete')
     method_spec = {'op': 'delete'}
-    attr_filter = ('status', ('READY',))
+    attr_filter = ('status', ('READY', 'UPLOADING'))
+    path_param_re = re.compile('.*?/projects/(.*?)/global/snapshots/(.*)')
 
+    def get_resource_params(self, m, r):
+        project, snapshot_id = self.path_param_re.match(r['selfLink']).groups()
+        # Docs are wrong :-(
+        # https://cloud.google.com/compute/docs/reference/rest/v1/snapshots/delete
+        return {'project': project, 'snapshot': snapshot_id}
 
