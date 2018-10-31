@@ -352,10 +352,11 @@ class Notify(BaseNotify):
 
     def process(self, resources, event=None):
         session = utils.local_session(self.manager.session_factory)
+        subscription_id = session.get_subscription_id()
         message = {
             'event': event,
-            'account_id': session.subscription_id,
-            'account': session.subscription_id,
+            'account_id': subscription_id,
+            'account': subscription_id,
             'region': 'all',
             'policy': self.manager.data}
 
@@ -363,18 +364,18 @@ class Notify(BaseNotify):
 
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = batch
-            receipt = self.send_data_message(message, session)
+            receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
                 receipt, self.manager.data['name'],
                 self.data.get('template', 'default'), len(batch)))
 
-    def send_data_message(self, message, session):
+    def send_data_message(self, message):
         if self.data['transport']['type'] == 'asq':
             queue_uri = self.data['transport']['queue']
-            return self.send_to_azure_queue(queue_uri, message, session)
+            return self.send_to_azure_queue(queue_uri, message)
 
-    def send_to_azure_queue(self, queue_uri, message, session):
-        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri, session)
+    def send_to_azure_queue(self, queue_uri, message):
+        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri)
         return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
 
 
