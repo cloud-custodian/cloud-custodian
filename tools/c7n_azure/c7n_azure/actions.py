@@ -15,8 +15,11 @@
 Actions to perform on Azure resources
 """
 import datetime
+import logging
 from datetime import timedelta
 
+import jmespath
+from c7n_azure import constants
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import utcnow
 from c7n_azure.tags import TagHelper
@@ -24,7 +27,7 @@ from dateutil import zoneinfo
 from msrestazure.azure_exceptions import CloudError
 
 from c7n import utils
-from c7n.actions import BaseAction, BaseNotify
+from c7n.actions import BaseAction, BaseNotify, EventAction
 from c7n.filters import FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
@@ -117,7 +120,7 @@ class RemoveTag(BaseAction):
         TagHelper.remove_tags(self, resource, tags_to_delete)
 
 
-class AutoTagUser(BaseAction):
+class AutoTagUser(EventAction):
     """Attempts to tag a resource with the first user who created/modified it.
 
     .. code-block:: yaml
@@ -141,6 +144,11 @@ class AutoTagUser(BaseAction):
     query_select = "eventTimestamp, operationName, caller"
     max_query_days = 90
 
+    # compiled JMES paths
+    sp_jmes_path = jmespath.compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
+    user_jmes_path = jmespath.compile(constants.EVENT_GRID_USER_NAME_JMES_PATH)
+    principal_type_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
+
     schema = utils.type_schema(
         'auto-tag-user',
         required=['tag'],
@@ -150,10 +158,17 @@ class AutoTagUser(BaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
+        self.log = logging.getLogger('custodian.azure.actions.auto-tag-user')
 
     def validate(self):
+
         if self.manager.action_registry.get('tag') is None:
             raise FilterValidationError("Resource does not support tagging")
+
+        if self.manager.data.get('mode', {}).get('type') == 'azure-event-grid' \
+                and self.data.get('days') is not None:
+            raise PolicyValidationError(
+                "Auto tag user in event mode does not use days.")
 
         if (self.data.get('days') is not None and
                 (self.data.get('days') < 1 or self.data.get('days') > 90)):
@@ -161,54 +176,67 @@ class AutoTagUser(BaseAction):
 
         return self
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         self.session = self.manager.get_session()
         self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
         self.tag_key = self.data['tag']
         self.should_update = self.data.get('update', False)
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_resource, resources))
 
-    def process_resource(self, resource):
+        with self.executor_factory(max_workers=3) as w:
+            if event:
+                list(w.map(self.process_resource, resources, event))
+            else:
+                list(w.map(self.process_resource, resources))
+
+    def process_resource(self, resource, event_item=None):
         # if the auto-tag-user policy set update to False (or it's unset) then we
         # will skip writing their UserName tag and not overwrite pre-existing values
         if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
             return
 
         user = self.default_user
-
-        # Calculate start time
-        delta_days = self.data.get('days', self.max_query_days)
-        start_time = utcnow() - datetime.timedelta(days=delta_days)
-
-        # resource group type
-        if self.manager.type == 'resourcegroup':
-            resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
-            query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % start_time,
-                "resourceGroupName eq '%s'" % resource['name'],
-                "eventChannels eq 'Operation'"
-            ])
-        # other Azure resources
+        if event_item:
+            principal_type = self.principal_type_jmes_path.search(event_item)
+            if principal_type == 'User':
+                user = self.user_jmes_path.search(event_item) or user
+            elif principal_type == 'ServicePrincipal':
+                user = self.sp_jmes_path.search(event_item) or user
+            else:
+                self.log.error('Principal type of event cannot be determined.')
+                return
         else:
-            resource_type = resource['type']
-            query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % start_time,
-                "resourceUri eq '%s'" % resource['id'],
-                "eventChannels eq 'Operation'"
-            ])
+            # Calculate start time
+            delta_days = self.data.get('days', self.max_query_days)
+            start_time = utcnow() - datetime.timedelta(days=delta_days)
 
-        # fetch activity logs
-        logs = self.client.activity_logs.list(
-            filter=query_filter,
-            select=self.query_select
-        )
+            # resource group type
+            if self.manager.type == 'resourcegroup':
+                resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
+                query_filter = " and ".join([
+                    "eventTimestamp ge '%s'" % start_time,
+                    "resourceGroupName eq '%s'" % resource['name'],
+                    "eventChannels eq 'Operation'"
+                ])
+            # other Azure resources
+            else:
+                resource_type = resource['type']
+                query_filter = " and ".join([
+                    "eventTimestamp ge '%s'" % start_time,
+                    "resourceUri eq '%s'" % resource['id'],
+                    "eventChannels eq 'Operation'"
+                ])
 
-        # get the user who issued the first operation
-        operation_name = "%s/write" % resource_type
-        first_op = self.get_first_operation(logs, operation_name)
-        if first_op is not None:
-            user = first_op.caller
+            # fetch activity logs
+            logs = self.client.activity_logs.list(
+                filter=query_filter,
+                select=self.query_select
+            )
+
+            # get the user who issued the first operation
+            operation_name = "%s/write" % resource_type
+            first_op = self.get_first_operation(logs, operation_name)
+            if first_op is not None:
+                user = first_op.caller
 
         # issue tag action to label user
         try:
