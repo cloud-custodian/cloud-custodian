@@ -125,8 +125,7 @@ class Snapshot(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'zone': resource_info['zone'],
-                        'resourceId': resource_info['disk_id']})
+                        'snapshot_id': resource_info['snapshot_id']})
 
 
 @Snapshot.action_registry.register('delete')
@@ -142,4 +141,3 @@ class DeleteSnapshot(MethodAction):
         # Docs are wrong :-(
         # https://cloud.google.com/compute/docs/reference/rest/v1/snapshots/delete
         return {'project': project, 'snapshot': snapshot_id}
-
