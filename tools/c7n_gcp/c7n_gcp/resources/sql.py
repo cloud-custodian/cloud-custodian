@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import re
+
+
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -25,13 +29,17 @@ sql instances represent roots in a logical hierarchy
 
 
 @resources.register('sql-instance')
-class SQLInstance(QueryResourceManager):
+class SqlInstance(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'sql'
+        service = 'sqladmin'
         version = 'v1beta4'
-        component = 'projects.locations.clusters'
-        enum_spec = ('list', 'items[]', None)
+        component = 'instances'
+        enum_spec = ('list', "items[]", None)
         scope = 'project'
-        # scope_key = 'project'
-        scope_template = "projects/{}/instances"
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project'],
+                        'instance': resource_info['name']})
