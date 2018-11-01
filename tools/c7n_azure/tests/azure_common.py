@@ -99,25 +99,6 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     """
 
     @staticmethod
-    def get_auth_file_session(session=None, resource=None):
-        s = session or Session()
-
-        # Delete=false for windows compatibility
-        tf = tempfile.NamedTemporaryFile(delete=False)
-        tf.write(s.get_functions_auth_string())
-        tf.close()
-
-        file_session = Session(authorization_file=tf.name, resource=resource)
-
-        # Call something to init the session
-        file_session.get_subscription_id()
-
-        # Cleanup
-        os.remove(tf.name)
-
-        return file_session
-
-    @staticmethod
     def setup_account():
         # Find actual name of storage account provisioned in our test environment
         s = Session()
