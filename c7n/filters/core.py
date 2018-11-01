@@ -223,6 +223,8 @@ class And(Filter):
 
         for f in self.filters:
             resources = f.process(resources, events)
+            if not resources:
+                break
 
         if self.manager:
             sweeper.sweep(resources)
@@ -260,6 +262,8 @@ class Not(Filter):
 
         for f in self.filters:
             resources = f.process(resources, event)
+            if not resources:
+                break
 
         before = set(resource_map.keys())
         after = set([r[resource_type.id] for r in resources])

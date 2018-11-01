@@ -13,6 +13,7 @@
 # limitations under the License.
 import fakeredis
 import logging
+import os
 
 from c7n_mailer.ldap_lookup import LdapLookup, Redis
 from ldap3 import Server, Connection, MOCK_SYNC
@@ -51,12 +52,16 @@ MAILER_CONFIG = {
     'cache_engine': 'sqlite',
     'role': 'arn:aws:iam::xxxx:role/cloudcustodian-mailer',
     'ldap_uid_tags': ['CreatorName', 'Owner'],
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
 }
 
 MAILER_CONFIG_AZURE = {
     'queue_url': 'asq://storageaccount.queue.core.windows.net/queuename',
     'from_address': 'you@youremail.com',
-    'sendgrid_api_key': 'SENDGRID_API_KEY'
+    'sendgrid_api_key': 'SENDGRID_API_KEY',
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
 }
 
 RESOURCE_1 = {

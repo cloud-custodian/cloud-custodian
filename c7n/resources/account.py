@@ -1008,6 +1008,7 @@ class XrayEncrypted(Filter):
         client = self.manager.session_factory().client('xray')
         gec_result = client.get_encryption_config()['EncryptionConfig']
         resources[0]['c7n:XrayEncryptionConfig'] = gec_result
+
         k = self.data.get('key')
         if k not in ['default', 'kms']:
             kmsclient = self.manager.session_factory().client('kms')
