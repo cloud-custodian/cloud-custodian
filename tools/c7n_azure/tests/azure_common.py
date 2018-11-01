@@ -14,7 +14,6 @@
 import datetime
 import os
 import re
-import tempfile
 
 from c7n_azure import constants
 from c7n_azure.session import Session
