@@ -13,12 +13,20 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure.functions_worker.bindings.queue import QueueMessage
+import sys
+import unittest
+
+try:
+    from azure.functions_worker.bindings.queue import QueueMessage
+except ImportError:
+    pass
+
 from azure_common import BaseTest
 from c7n_azure.function import main as functionMain
 from mock import patch
 
 
+@unittest.skipIf(sys.version_info < (3,6), "Functions is not supported in this version")
 class FunctionTest(BaseTest):
 
     @patch('c7n_azure.handler.run')
