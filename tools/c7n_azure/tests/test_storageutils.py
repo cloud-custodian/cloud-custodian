@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.session import Session
+from c7n_azure.constants import RESOURCE_STORAGE
 
 
 class StorageUtilsTest(BaseTest):
@@ -52,6 +53,17 @@ class StorageUtilsTest(BaseTest):
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url, self.session)
         self.assertIsNotNone(queue_service)
         self.assertEqual(queue_name, "testcc")
+
+    @arm_template('storage.json')
+    def test_get_queue_client_by_uri_auth_file(self):
+        file_session = self.get_auth_file_session(self.session, RESOURCE_STORAGE)
+        account = self.setup_account()
+        url = "https://" + account.name + ".queue.core.windows.net/testcc"
+        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url, file_session)
+        self.assertIsNotNone(queue_service)
+        self.assertEqual(queue_name, "testcc")
+
+
 
     @arm_template('storage.json')
     def test_create_queue_from_storage_account(self):

@@ -180,7 +180,8 @@ class Session(object):
             return (ServicePrincipalCredentials(
                 client_id=data['credentials']['client_id'],
                 secret=data['credentials']['secret'],
-                tenant=data['credentials']['tenant']
+                tenant=data['credentials']['tenant'],
+                resource=self.resource_namespace
             ), data['subscription'])
 
     def get_functions_auth_string(self):

@@ -14,6 +14,7 @@
 import datetime
 import os
 import re
+import tempfile
 
 from c7n_azure import constants
 from c7n_azure.session import Session
@@ -96,6 +97,25 @@ class AzureVCRBaseTest(VCRTestCase):
 class BaseTest(TestUtils, AzureVCRBaseTest):
     """ Azure base testing class.
     """
+
+    @staticmethod
+    def get_auth_file_session(session=None, resource=None):
+        s = session or Session()
+
+        # Delete=false for windows compatibility
+        tf = tempfile.NamedTemporaryFile(delete=False)
+        tf.write(s.get_functions_auth_string())
+        tf.close()
+
+        file_session = Session(authorization_file=tf.name, resource=resource)
+
+        # Call something to init the session
+        file_session.get_subscription_id()
+
+        # Cleanup
+        os.remove(tf.name)
+
+        return file_session
 
     @staticmethod
     def setup_account():
