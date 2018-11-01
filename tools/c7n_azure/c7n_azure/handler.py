@@ -24,6 +24,8 @@ from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
 
+from c7n_azure.provider import Azure
+
 log = logging.getLogger('custodian.azure.functions')
 
 
@@ -50,6 +52,8 @@ def run(event, context):
     options = Config.empty(**options_overrides)
 
     load_resources()
+
+    options = Azure().initialize(options)
 
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:

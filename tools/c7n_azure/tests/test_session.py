@@ -122,3 +122,8 @@ class SessionTest(BaseTest):
         resource = next(client.resources.list())
         self.assertTrue(re.match('\\d{4}-\\d{2}-\\d{2}',
                                  s.resource_api_version(resource.id)) is not None)
+
+    def test_get_session_for_resource(self):
+        s = Session()
+        resource_session = s.get_session_for_resource(constants.RESOURCE_STORAGE)
+        self.assertEqual(resource_session.resource_namespace, constants.RESOURCE_STORAGE)

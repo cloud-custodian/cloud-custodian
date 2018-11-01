@@ -364,18 +364,18 @@ class Notify(BaseNotify):
 
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = batch
-            receipt = self.send_data_message(message)
+            receipt = self.send_data_message(message, session)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
                 receipt, self.manager.data['name'],
                 self.data.get('template', 'default'), len(batch)))
 
-    def send_data_message(self, message):
+    def send_data_message(self, message, session):
         if self.data['transport']['type'] == 'asq':
             queue_uri = self.data['transport']['queue']
-            return self.send_to_azure_queue(queue_uri, message)
+            return self.send_to_azure_queue(queue_uri, message, session)
 
-    def send_to_azure_queue(self, queue_uri, message):
-        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri)
+    def send_to_azure_queue(self, queue_uri, message, session):
+        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri, session)
         return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
 
 
