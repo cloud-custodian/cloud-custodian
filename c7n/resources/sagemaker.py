@@ -152,7 +152,7 @@ class SagemakerTransformJob(QueryResourceManager):
 
         jobs = super(SagemakerTransformJob, self).augment(jobs)
         for j in jobs:
-           _augment(j)
+            _augment(j)
         return jobs
 
 
