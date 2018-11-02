@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Unsuccessful": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "18dae9e0-76f7-4cb0-9a98-606857b4f370", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "vary": "Accept-Encoding", 
+                "date": "Fri, 02 Nov 2018 19:35:49 GMT", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "FlowLogIds": [
+            "fl-04028fd3a164dea49"
+        ], 
+        "ClientToken": "LeufVjrP/fkZbjxFlNUErFlijDZf1A89z4aCjHIqCxM="
+    }
+}

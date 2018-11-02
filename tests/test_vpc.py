@@ -2283,7 +2283,7 @@ class FlowLogsTest(BaseTest):
         )[
             "FlowLogs"
         ]
-        # self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
+        self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
 
 
     def test_vpc_delete_flow_logs(self):
