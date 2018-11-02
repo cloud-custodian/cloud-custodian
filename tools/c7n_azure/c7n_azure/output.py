@@ -41,7 +41,7 @@ class AzureStorageOutput(DirectoryOutput):
 
     """
 
-    DEFAULT_BLOB_FOLDER_PREFIX = '{policy}/{now:%Y/%m/%d/%H/}'
+    DEFAULT_BLOB_FOLDER_PREFIX = '{policy_name}/{now:%Y/%m/%d/%H/}'
 
     def __init__(self, ctx, config=None):
         self.ctx = ctx
