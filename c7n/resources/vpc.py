@@ -1750,13 +1750,22 @@ class CreateFlowLogs(BaseAction):
     schema = {
         'type': 'object',
         'additionalProperties': False,
+        'required': ['DeliverLogsPermissionArn'],
+        'oneOf': [
+            {'required': ['LogGroupName']},
+            {'required': ['LogDestination']}
+        ],
         'properties': {
             'type': {'enum': ['set-flow-log']},
             'state': {'type': 'boolean'},
             'DeliverLogsPermissionArn': {'type': 'string'},
             'LogGroupName': {'type': 'string'},
-            'TrafficType': {'type': 'string',
-                            'enum': ['ACCEPT', 'REJECT', 'ALL']}
+            'LogDestination': {'type': 'string'},
+            'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
+            'TrafficType': {
+                'type': 'string',
+                'enum': ['ACCEPT', 'REJECT', 'ALL']
+            }
         }
     }
 
@@ -1769,20 +1778,15 @@ class CreateFlowLogs(BaseAction):
     def validate(self):
         self.state = self.data.get('state', True)
         if self.state:
-            if not self.data.get('DeliverLogsPermissionArn'):
+            if (self.data.get('LogDestinationType') == 's3' and
+               not self.data.get('LogDestination')):
                 raise PolicyValidationError(
-                    'DeliverLogsPermissionArn required when '
-                    'creating flow-logs on %s' % (self.manager.data,))
-            if not self.data.get('LogGroupName'):
-                raise ValueError(
-                    'LogGroupName required when creating flow-logs on %s' % (
-                        self.manager.data))
+                        'LogDestination required when LogDestinationType is s3')
         return self
 
     def delete_flow_logs(self, client, rids):
         flow_logs = client.describe_flow_logs(
             Filters=[{'Name': 'resource-id', 'Values': rids}])['FlowLogs']
-
         try:
             results = client.delete_flow_logs(
                 FlowLogIds=[f['FlowLogId'] for f in flow_logs])
