@@ -2285,7 +2285,6 @@ class FlowLogsTest(BaseTest):
         ]
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
 
-
     def test_vpc_delete_flow_logs(self):
         session_factory = self.replay_flight_data("test_vpc_delete_flow_logs")
         p = self.load_policy(
