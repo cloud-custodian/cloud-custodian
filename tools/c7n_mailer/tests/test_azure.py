@@ -82,7 +82,7 @@ class AzureTest(unittest.TestCase):
     def test_get_email_to_addrs_to_resources_map_tag(self):
         delivery = SendGridDelivery(MAILER_CONFIG_AZURE, logger)
         result_map = delivery.get_email_to_addrs_to_resources_map(self.tag_message)
-        self.assertEqual(result_map.keys()[0][0], 'user@domain.com')
+        self.assertEqual(list(result_map.keys())[0][0], 'user@domain.com')
 
     def test_get_email_to_addrs_to_resources_map_null_tag(self):
         delivery = SendGridDelivery(MAILER_CONFIG_AZURE, logger)
