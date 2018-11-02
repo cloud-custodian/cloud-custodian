@@ -1779,7 +1779,7 @@ class CreateFlowLogs(BaseAction):
                     'creating flow-logs on %s' % (self.manager.data,))
             if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
                 raise PolicyValidationError(
-                    'LoggroupName or LogDestination required')
+                    'Either LogGroupName or LogDestination required')
             if (self.data.get('LogDestinationType') == 's3' and
                not self.data.get('LogDestination')):
                 raise PolicyValidationError(
