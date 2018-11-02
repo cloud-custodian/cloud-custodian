@@ -90,3 +90,29 @@ class DiskTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 6)
+
+
+class SnapshotTest(BaseTest):
+
+    def test_snapshot_query(self):
+        factory = self.replay_flight_data(
+            'snapshot-query', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'all-disks',
+             'resource': 'gcp.snapshot'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_snapshot_delete(self):
+        factory = self.replay_flight_data(
+            'snapshot-delete', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'all-disks',
+             'resource': 'gcp.snapshot',
+             'filters': [
+                 {'name': 'snapshot-1'}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

@@ -15,11 +15,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest, arm_template
 from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.session import Session
 
 
 class NotifyTest(BaseTest):
     def setUp(self):
         super(NotifyTest, self).setUp()
+        self.session = Session()
 
     def test_notify_schema_validate(self):
         with self.sign_out_patch():
@@ -45,7 +47,7 @@ class NotifyTest(BaseTest):
 
         # Create queue, make sure it is empty
         queue_url = "https://" + account.name + ".queue.core.windows.net/testnotify"
-        queue, name = StorageUtilities.get_queue_client_by_uri(queue_url)
+        queue, name = StorageUtilities.get_queue_client_by_uri(queue_url, self.session)
         queue.clear_messages(name)
 
         p = self.load_policy({
