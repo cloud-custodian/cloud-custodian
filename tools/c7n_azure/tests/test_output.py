@@ -95,7 +95,7 @@ class OutputTest(BaseTest):
                 'now': date(2018, 10, 1)
             })
 
-        output = self.get_azure_output('{policy}/{now:%Y}')
+        output = self.get_azure_output('{policy_name}/{now:%Y}')
         path = output.get_output_path(output.config['url'])
         self.assertEqual(path,
                          'azure://mystorage.blob.core.windows.net/logs/MyPolicy/2018')
