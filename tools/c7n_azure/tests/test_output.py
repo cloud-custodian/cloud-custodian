@@ -76,7 +76,7 @@ class OutputTest(BaseTest):
 
         AzureStorageOutput.get_output_vars = mock.Mock(
             return_value={
-                'policy': 'MyPolicy',
+                'policy_name': 'MyPolicy',
                 'now': date(2018, 10, 1)
             })
 
