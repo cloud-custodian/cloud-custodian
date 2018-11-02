@@ -41,7 +41,7 @@ def main(input):
     events = None
 
     if type(input) is QueueMessage:
-        if input.dequeue_count() > max_dequeue_count:
+        if input.dequeue_count > max_dequeue_count:
             return
         events = [input.get_json()]
 

@@ -17,7 +17,6 @@ from collections import namedtuple
 from azure.storage.common import TokenCredential
 from azure.storage.blob import BlockBlobService
 from azure.storage.queue import QueueService
-from c7n_azure.session import Session
 from c7n_azure.constants import RESOURCE_STORAGE
 from six.moves.urllib.parse import urlparse
 
@@ -30,7 +29,7 @@ except ImportError:
 class StorageUtilities(object):
 
     @staticmethod
-    def get_blob_client_by_uri(storage_uri, session=None):
+    def get_blob_client_by_uri(storage_uri, session):
         storage = StorageUtilities.get_storage_from_uri(storage_uri, session)
 
         blob_service = BlockBlobService(
@@ -40,7 +39,7 @@ class StorageUtilities(object):
         return blob_service, storage.container_name, storage.file_prefix
 
     @staticmethod
-    def get_queue_client_by_uri(queue_uri, session=None):
+    def get_queue_client_by_uri(queue_uri, session):
         storage = StorageUtilities.get_storage_from_uri(queue_uri, session)
 
         queue_service = QueueService(
@@ -51,8 +50,8 @@ class StorageUtilities(object):
         return queue_service, storage.container_name
 
     @staticmethod
-    def create_queue_from_storage_account(storage_account, name):
-        token = StorageUtilities.get_storage_token()
+    def create_queue_from_storage_account(storage_account, name, session):
+        token = StorageUtilities.get_storage_token(session)
         queue_service = QueueService(
             account_name=storage_account.name,
             token_credential=token)
@@ -74,13 +73,14 @@ class StorageUtilities(object):
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
     @staticmethod
-    def get_storage_token(session=None):
-        s = session or Session(resource=RESOURCE_STORAGE)
-        return TokenCredential(s.get_bearer_token())
+    def get_storage_token(session):
+        if session.resource_namespace != RESOURCE_STORAGE:
+            session = session.get_session_for_resource(RESOURCE_STORAGE)
+        return TokenCredential(session.get_bearer_token())
 
     @staticmethod
     @lru_cache()
-    def get_storage_from_uri(storage_uri, session=None):
+    def get_storage_from_uri(storage_uri, session):
         parts = urlparse(storage_uri)
         storage_name = str(parts.netloc).partition('.')[0]
 
