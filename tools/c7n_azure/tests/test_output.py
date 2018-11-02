@@ -76,7 +76,7 @@ class OutputTest(BaseTest):
 
         AzureStorageOutput.get_output_vars = mock.Mock(
             return_value={
-                'policy': 'MyPolicy',
+                'policy_name': 'MyPolicy',
                 'now': date(2018, 10, 1)
             })
 
@@ -92,11 +92,11 @@ class OutputTest(BaseTest):
         AzureStorageOutput.get_output_vars = mock.Mock(
             return_value={
                 'account_id': 'MyAccountId',
-                'policy': 'MyPolicy',
+                'policy_name': 'MyPolicy',
                 'now': date(2018, 10, 1)
             })
 
-        output = self.get_azure_output('{account_id}/{policy}/{now:%Y}')
+        output = self.get_azure_output('{account_id}/{policy_name}/{now:%Y}')
         path = output.get_output_path(output.config['url'])
         self.assertEqual(path,
                          'azure://mystorage.blob.core.windows.net/logs/MyAccountId/MyPolicy/2018')

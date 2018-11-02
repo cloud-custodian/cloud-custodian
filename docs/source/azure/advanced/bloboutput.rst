@@ -20,7 +20,7 @@ This example is the same structure as the default one.
 
     .. code-block:: sh
 
-        custodian run -s azure://mystorage.blob.core.windows.net/logs/{policy}/{now:%Y/%m/%d/%H/} mypolicy.yml
+        custodian run -s azure://mystorage.blob.core.windows.net/logs/{policy_name}/{now:%Y/%m/%d/%H/} mypolicy.yml
 
 Use `{account_id}` for Subscription ID.
 
