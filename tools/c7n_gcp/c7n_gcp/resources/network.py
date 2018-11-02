@@ -43,8 +43,7 @@ class Firewall(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
-        component = 'firewall'
-        scope_template = "projects/{}/global/firewalls"
+        component = 'firewalls'
 
 
 @resources.register('router')
