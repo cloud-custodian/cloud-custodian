@@ -6,18 +6,18 @@
                 "LogDestinationType": "s3", 
                 "ResourceId": "vpc-d2d616b5", 
                 "CreationTime": {
-                    "hour": 19, 
+                    "hour": 21, 
                     "__class__": "datetime", 
                     "month": 11, 
-                    "second": 50, 
-                    "microsecond": 244000, 
+                    "second": 21, 
+                    "microsecond": 961000, 
                     "year": 2018, 
                     "day": 2, 
-                    "minute": 35
+                    "minute": 48
                 }, 
                 "TrafficType": "ALL", 
                 "FlowLogStatus": "ACTIVE", 
-                "FlowLogId": "fl-04028fd3a164dea49", 
+                "FlowLogId": "fl-061d3f3b816da485e", 
                 "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/testing-vpc-flow-log-role", 
                 "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz", 
                 "DeliverLogsStatus": "SUCCESS"
@@ -26,12 +26,12 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "927c7e03-8568-45ba-b7c5-85c441392201", 
+            "RequestId": "8b3a9439-620d-440b-8b4a-3634460f9684", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "content-type": "text/xml;charset=UTF-8", 
                 "vary": "Accept-Encoding", 
-                "date": "Fri, 02 Nov 2018 19:35:49 GMT", 
+                "date": "Fri, 02 Nov 2018 21:48:21 GMT", 
                 "server": "AmazonEC2"
             }
         }

@@ -89,7 +89,7 @@
                 "InstanceTenancy": "default", 
                 "Tags": [
                     {
-                        "Value": "FlowLog", 
+                        "Value": "FlowLogTest", 
                         "Key": "Name"
                     }
                 ], 
@@ -111,11 +111,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c197913b-fd9c-49b9-bf9c-4209c0c22b4c", 
+            "RequestId": "94ac021a-47d5-440d-8c38-4096ad2b4868", 
             "HTTPHeaders": {
-                "date": "Fri, 02 Nov 2018 19:35:48 GMT", 
+                "date": "Fri, 02 Nov 2018 21:48:20 GMT", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "content-length": "4414", 
+                "content-length": "4418", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2"
             }
