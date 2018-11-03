@@ -119,6 +119,24 @@ class RestAPI(query.QueryResourceManager):
         dimension = 'GatewayName'
 
 
+@RestAPI.action_registry('update')
+class UpdateAPI(BaseAction):
+
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema(
+        'update',
+        patch={'type': 'array', 'items': OP_SCHEMA},
+        required=['patch'])
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            client.update_stage(
+                restApiId=r['restApiId'],
+                patchOperations=self.data['patch'])
+
+
 @resources.register('rest-stage')
 class RestStage(query.ChildResourceManager):
 
