@@ -73,7 +73,7 @@ class Start(InstanceAction):
     method_spec = {'op': 'start'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-    attr_filter = ('status', ('STOPPED',))
+    attr_filter = ('status', ('TERMINATED',))
 
 
 @Instance.action_registry.register('stop')
