@@ -112,6 +112,12 @@ class Firewall(QueryResourceManager):
         version = 'v1'
         component = 'firewalls'
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'project': resource_info['project_id'],
+                        'firewall': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
 
 @resources.register('router')
 class Router(QueryResourceManager):

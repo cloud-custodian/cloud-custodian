@@ -2,11 +2,25 @@
 from gcp_common import BaseTest
 
 
+class FirewallTest(BaseTest):
+
+    def test_firewall_get(self):
+        factory = self.replay_flight_data(
+            'firewall-get', project_id='cloud-custodian')
+        p = self.load_policy({'name': 'fw', 'resource': 'gcp.firewall'},
+                             session_factory=factory)
+        fw = p.resource_manager.get_resource({
+            'resourceName': 'projects/cloud-custodian/global/firewalls/allow-inbound-xyz',
+            'firewall_rule_id': '4746899906201084445',
+            'project_id': 'cloud-custodian'})
+        self.assertEqual(fw['name'], 'allow-inbound-xyz')
+
+
 class SubnetTest(BaseTest):
 
     def test_subnet_get(self):
-        project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('subnet-get-resource')
+        factory = self.replay_flight_data(
+            'subnet-get-resource', project_id='cloud-custodian')
         p = self.load_policy({'name': 'subnet', 'resource': 'gcp.subnet'},
                              session_factory=factory)
         subnet = p.resource_manager.get_resource({
