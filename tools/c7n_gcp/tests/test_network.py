@@ -4,6 +4,19 @@ from gcp_common import BaseTest
 
 class SubnetTest(BaseTest):
 
+    def test_subnet_get(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('subnet-get-resource')
+        p = self.load_policy({'name': 'subnet', 'resource': 'gcp.subnet'},
+                             session_factory=factory)
+        subnet = p.resource_manager.get_resource({
+            "location": "us-central1",
+            "project_id": "cloud-custodian",
+            "subnetwork_id": "4686700484947109325",
+            "subnetwork_name": "default"})
+        self.assertEqual(subnet['name'], 'default')
+        self.assertEqual(subnet['privateIpGoogleAccess'], True)
+
     def test_subnet_set_flow(self):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data('subnet-set-flow', project_id=project_id)

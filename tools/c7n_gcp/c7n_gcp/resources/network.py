@@ -39,6 +39,13 @@ class Subnet(QueryResourceManager):
         component = 'subnetworks'
         enum_spec = ('aggregatedList', 'items.*.subnetworks[]', None)
 
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'project': resource_info['project_id'],
+                        'region': resource_info['location'],
+                        'subnetwork': resource_info['subnetwork_name']})
+
 
 class SubnetAction(MethodAction):
 
