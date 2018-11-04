@@ -5,8 +5,8 @@ interactions:
       Accept: [application/json]
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [python/3.6.7 (Linux-4.4.0-17134-Microsoft-x86_64-with-debian-buster-sid)
-          msrest/0.6.1 msrest_azure/0.5.0 azure-mgmt-storage/3.0.0 Azure-SDK-For-Python]
+      User-Agent: [python/2.7.15 (Windows-10-10.0.17134) msrest/0.6.1 msrest_azure/0.5.0
+          azure-mgmt-storage/3.0.0 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2018-07-01
@@ -31,59 +31,57 @@ interactions:
         rj/N3l7/olV2MWvvVYSaDmq4wY+UC/EWft5OJ8AVePhm9/4j/G9/fI/k88GncEfeV7kMAiJIPyvK
         pdvh7v2DBw8+vaVyGeCf2yuXIQDcLgqhBcluAYHbRSHIzN4IAM0i7zOZmTD/P1Iul4v30iv79xe/
         aHqRPVi9ba6KJiuL5frd5YKQ0uEMfv8jrUJMhZ+3UwYw/A/f7O09uvfw0c7e+OGDg539Tx+QMnhf
-        rTIIiCD9rGiVTocP9vf39vZu67LE2ef2SmXgfW4WBdCCYDcD4GZRADKtN72PVpHXmcRMlP9/aBTq
-        4hpaJVut3kureO9lBzvnhJGOpf/F19MjPjl/vqgQmPf9Nzv3H+3tP9rbHe89uH+P5o4k/31VyCAg
-        gvSzokI6He5+uvfwwQPqENBYBDapkA7L3F53dF/k76NvtiDRhjf5++ibMoODL+LryHtMRh64pyZ8
-        liYIP380xMH04S5hpGPpf/EjDfH+gv3po/t7408PDu7vfEqmmnCA1HwDgAjSz7KG4A7vP3i4u3+f
-        vBpAYxG4pYYAy3wtDcEv8vfRN1uQaMOb/H30TZnBwRfxdeQ9JiMP/P/zGmKWtZSkfy/lIK8QDoq9
-        /fvrqYIrordkpH++KALy2Xfuc5rx4NH9h+NPP71PmcYdkt/3VQSDgAjSz4oi6HR4/8HOzv3d2yoC
-        4ZPby7+254+jL7QgSP8F/jj6gkxTtz0+jTRnEvGgPCF3zPr/HRGnLq63s+b9Mpp4id5BQphQ0UGE
-        H/5I3G8npbCevHq5f//R/i4tY+zv3b9H/jXhAFn4EEAKiCD9rIh7B/ODT2nddZ9ypIDGXL9J3D1m
-        ub3M+y/xd9G3WtB44C3+LvqWzFr0JXwVeYfJxgP9/7gKmJbVerY9XZNk0niX76UJ+F376nRv//z+
-        pw8/JeR0WIPf/0g/3F4/7L/Z/RTx9/374wf39w527u+TWH8d/RAFRJB+1vSD1+Gn9x/u3N+7rTsQ
-        55vbq4qB97lZFEALgt0MgJtFAci03vQ+WkVeZxIzUf4/rkveFnVRbi8Iubx+P0ViSEU/8AX5XviC
-        UNNBDTf4kSp5Hw2ws/PoHq0x3hvf+3R/jyw2aYCvp0oigAjSz6IqsR3uPdjZ30coA2gsERtVSZxx
-        3kOXDADgdlEILUh2CwjcLgpBZvZGAGgWeZ/JzIT5/7g6YS36dV0T89Ze9unD6c70PuGlI4p99SMt
-        8j7CT1H+7oNHuwdjmr2HDx9+SsL/9bRIBBBB+lnUIrbDvYOHew93KUICNBaEW2kRwzJfQ3/YV7lF
-        9N0WZNr4LreIvivzuOFVNIi8yeRkAvx/XFt8bedDXtFPPz2YHNAy+QEhpkMa+vpHKuP2ks6JQQoG
-        yHzfu7f/8IAXLb+OyogCIkg/ayrD63Bvf3f3YOe2MUyUbW6vNuKvc6vo+y3IdeP73Cr6vszpDa+j
-        UeRtJi8T5P/jKmSRtXXxbu89tQe/Q1go/u6DH2mI9xHsvR1aQHy092B8b3//3sMHJGeEA+TlGwBE
-        kH4WNYTtcI8WW+/v3DY0UUZ5H50gL/Dn0TdakCTyBn8efUNmqvcCPo60ZzLxwL6GpH//l/w/3Pvw
-        spQ2AAA=
+        rTIIiCD9rGiVTocP9vf39vZu67LE2ef2SmXgfW4WBdCCYDcD4GZRADKtN72PVpHXmcRMlP9/aJRZ
+        1lKA/V4KRV4hHBR7+/fXUxhXpNMkmvx5pCl27nOIcPDo/sPxp5/epyhhhwT8a2iKOCCC9LOlKfwO
+        7z/Y2bm/S6oJ0JjTN2kK4ZPbawZtzx9HX2hBkP4L/HH0BZmmbnt8GmnOJOJBeZLumPX/OyJOXVxv
+        Z837RSN4id5BMEeo6CDCD38k7reTUjjtnHncv/9of5dSEPt79+/tkZS+r7gPAiJIPyvi3unw4FPK
+        me5TfANozPWbxN1jltvLvP8Sfxd9qwVpBt7i76JvyaxFX8JXkXeYbDzQ/4+rAM70bk/nWbG8915q
+        AAGHfra7d/Dg3v7u3oMDQkyHNPT1j1TD7SWaPO97j3buP9rZH+892NvZ2YdEfx3VEAVEkH7WVIPX
+        4e7Dewf7t85ERNnm9koi/jq3ir7fglw3vs+tou/LnN7wOhpF3mbyMkH+f6FCZLXovVTIdE2fkJZd
+        0g98QS4XviDUdFDDDX6kRm4v/ftvdnYe3aO0IK2vfrq/R4aapP82auRWgAjSz5oa8Trce7Czv48I
+        BtBYIjapkQHGub0iGQLA7aIQWtD+FhC4XRSCzOyNANAs8j6TmQnz/3F1Mi2r9Wzbjv7raZS97NOH
+        053pfcJLRxT76kda5H20CAX3uw8e7R6MafYePnxIJp1wgER9A4AI0s+iFrEd7h083Hu4S94PoLEg
+        3EqLGJb5GvrDvsotou+2INPGd7lF9F2Zxw2vokHkTSYnE+D/49riazsf8op++unB5IAy2whQdEhD
+        X/9IZdxe0jkfuPspzPe9e/sPDw5I8AgHCNE3AIgg/aypDK/Dvf3d3YOd22Yyo2xze7URf51bRd9v
+        Qa4b3+dW0fdlTm94HY0ibzN5mSD/H1ch34jDMd3bP7//6cNPCS8dUeyrH2mPWwv9vZ03u/cf7e08
+        2qMcwqfEhwe07kg4QJa+AUAE6WdLe/gd7tzfO7j/8OCW2qPHMrfXHP1XuUX03RZk2vgut4i+K/O4
+        4VU0iLzJ5GQC/H9cWyyyti7e7b2XltB3CAvF333wDWmEj05O3tBne/RdlmUgAOH3/38F8YDWGinP
+        OP70wf0HBzvwCr6mgugDIkg/mwrCdHj/YG9n78HuLRWE8s3t1YJ5gT+PvtGCJJE3+PPoGzJTvRfw
+        caQ9k4kH9jUE//u/5P8BFxl9i4QyAAA=
     headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Length: ['2057']
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 29 Oct 2018 15:54:36 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [df3383fa-a1b3-44c2-8c22-d5ff20bc0f80]
-      x-ms-original-request-ids: [fee1b036-9f32-442e-9611-cac356acea53, 2e09525a-9c1d-44f9-8473-9389dc7ef02b,
-        610bf409-6f9c-48d6-af45-392c2d95e588, 7496d3ba-da8b-4b61-bb43-850c8e739941]
+      cache-control: [no-cache]
+      content-encoding: [gzip]
+      content-length: ['1961']
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 01 Nov 2018 15:54:04 GMT']
+      expires: ['-1']
+      pragma: [no-cache]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [fba6bd54-46fe-4119-88a0-24ddc2df03dc]
+      x-ms-original-request-ids: [22c0ca10-e402-4bc3-93a2-82fb3e9404e0, 2b3610c2-6f0e-496f-87e1-6341f265134b,
+        ff88bc96-b72d-4f2c-8735-1ae93229ef37]
       x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [df3383fa-a1b3-44c2-8c22-d5ff20bc0f80]
-      x-ms-routing-request-id: ['WESTUS2:20181029T155436Z:df3383fa-a1b3-44c2-8c22-d5ff20bc0f80']
+      x-ms-request-id: [fba6bd54-46fe-4119-88a0-24ddc2df03dc]
+      x-ms-routing-request-id: ['WESTUS2:20181101T155405Z:fba6bd54-46fe-4119-88a0-24ddc2df03dc']
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Connection: [keep-alive]
       Content-Length: ['0']
-      User-Agent: [Azure-Storage/1.3.0-1.3.0 (Python CPython 3.6.7; Linux 4.4.0-17134-Microsoft)]
-      x-ms-date: ['Mon, 29 Oct 2018 15:54:36 GMT']
+      User-Agent: [Azure-Storage/1.3.0-1.3.0 (Python CPython 2.7.15; Windows 10)]
+      x-ms-date: ['Thu, 01 Nov 2018 15:55:34 GMT']
       x-ms-version: ['2018-03-28']
     method: PUT
     uri: https://cctstoragey6akyqpagdt3o.queue.core.windows.net/testqueuecc
   response:
-    body: {string: ''}
+    body: {string: !!python/unicode ''}
     headers:
-      Date: ['Mon, 29 Oct 2018 15:54:43 GMT']
-      Server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
-      x-ms-request-id: [39dab7d9-c003-00df-0e9f-6f293c000000]
+      date: ['Thu, 01 Nov 2018 15:55:46 GMT']
+      server: [Windows-Azure-Queue/1.0 Microsoft-HTTPAPI/2.0]
+      x-ms-request-id: [1fd51571-d003-00a6-12fb-714076000000]
       x-ms-version: ['2018-03-28']
     status: {code: 201, message: Created}
 version: 1

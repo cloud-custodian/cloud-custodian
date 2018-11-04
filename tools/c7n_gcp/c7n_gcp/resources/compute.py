@@ -100,3 +100,44 @@ class Disk(QueryResourceManager):
                 'get', {'project': resource_info['project_id'],
                         'zone': resource_info['zone'],
                         'resourceId': resource_info['disk_id']})
+
+
+@Disk.action_registry.register('snapshot')
+class DiskSnapshot(MethodAction):
+
+    schema = type_schema('snapshot')
+    method_spec = {'op': 'createSnapshot'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+    attr_filter = ('status', ('RUNNING',))
+
+
+@resources.register('snapshot')
+class Snapshot(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'snapshots'
+        enum_spec = ('list', 'items[]', None)
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'snapshot_id': resource_info['snapshot_id']})
+
+
+@Snapshot.action_registry.register('delete')
+class DeleteSnapshot(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    attr_filter = ('status', ('READY', 'UPLOADING'))
+    path_param_re = re.compile('.*?/projects/(.*?)/global/snapshots/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, snapshot_id = self.path_param_re.match(r['selfLink']).groups()
+        # Docs are wrong :-(
+        # https://cloud.google.com/compute/docs/reference/rest/v1/snapshots/delete
+        return {'project': project, 'snapshot': snapshot_id}

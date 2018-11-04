@@ -18,14 +18,15 @@ import logging
 import re
 
 from azure_common import BaseTest, arm_template, TEST_DATE
+from c7n_azure.actions import AutoTagUser
 from c7n_azure.session import Session
 from mock import patch
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 
 
 class TagsTest(BaseTest):
-
     # regex for identifying valid email addresses
     EMAIL_REGEX = "[^@]+@[^@]+\.[^@]+"
 
@@ -49,14 +50,15 @@ class TagsTest(BaseTest):
                 'resource': 'azure.vm',
                 'filters': [
                     {'type': 'value',
-                    'key': 'name',
-                    'op': 'eq',
-                    'value_type': 'normalize',
-                    'value': 'cctestvm'}
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'}
                 ],
                 'actions': [
                     {'type': 'untag',
-                    'tags': [k for k in self.after_tags.keys() if k not in self.before_tags.keys()]}
+                     'tags':
+                         [k for k in self.after_tags.keys() if k not in self.before_tags.keys()]}
                 ],
             })
             p.run()
@@ -65,9 +67,13 @@ class TagsTest(BaseTest):
         self.assertEqual(self.before_tags, self.after_tags)
         super(TagsTest, self).tearDown()
 
-    def get_tags(self, rg_name, vm_name):
+    def get_tags(self, rg_name=rg_name, vm_name=vm_name):
         vm = self.client.virtual_machines.get(rg_name, vm_name)
         return vm.tags
+
+    def get_vm_resource_id(self, rg_name=rg_name, vm_name=vm_name):
+        vm = self.client.virtual_machines.get(rg_name, vm_name)
+        return vm.id
 
     def dict_diff(self, a, b):
         return set(a.items()) ^ set(b.items())
@@ -484,6 +490,259 @@ class TagsTest(BaseTest):
             })
             p.run()
 
+    def test_auto_tag_user_event_grid_mode_with_days_fails_validation(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.resourcegroup',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Resources/subscriptions/resourceGroups',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'days': 40}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_user_event(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = [{
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'User'
+                    }
+                },
+                'claims': {
+                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name':
+                        'cloud@custodian.com',
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }]
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], 'cloud@custodian.com')
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_sp_event(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = [{
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'ServicePrincipal'
+                    }
+                },
+                'claims': {
+                    'appid': '12345',
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }]
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], '12345')
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_user_event_missing_info(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = [{
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'User'
+                    }
+                },
+                'claims': {
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }]
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], AutoTagUser.default_user)
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_sp_event_missing_info(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = [{
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'ServicePrincipal'
+                    }
+                },
+                'claims': {
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }]
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], AutoTagUser.default_user)
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_unsupported_principal_type(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = [{
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'UnknownType'
+                    }
+                },
+                'claims': {
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }]
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertNotIn('CreatorEmail', after_tags)
+
     def test_tag_trim_space_must_be_btwn_0_and_15(self):
         with self.assertRaises(FilterValidationError):
             p = self.load_policy({
@@ -759,14 +1018,14 @@ class TagsTest(BaseTest):
                 'resource': 'azure.vm',
                 'filters': [
                     {'type': 'value',
-                    'key': 'name',
-                    'op': 'eq',
-                    'value_type': 'normalize',
-                    'value': 'cctestvm'}],
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'}],
                 'actions': [
                     {'type': 'mark-for-op',
-                    'op': 'stop',
-                    'days': self.DAYS}
+                     'op': 'stop',
+                     'days': self.DAYS}
                 ]
             }
             p = self.load_policy(policy)
@@ -778,12 +1037,12 @@ class TagsTest(BaseTest):
                 'resource': 'azure.vm',
                 'filters': [
                     {'type': 'value',
-                    'key': 'name',
-                    'op': 'eq',
-                    'value_type': 'normalize',
-                    'value': 'cctestvm'},
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'},
                     {'type': 'marked-for-op',
-                    'op': 'stop'}]
+                     'op': 'stop'}]
             }
             p = self.load_policy(policy)
             resources = p.run()
@@ -795,12 +1054,12 @@ class TagsTest(BaseTest):
                 'resource': 'azure.vm',
                 'filters': [
                     {'type': 'value',
-                    'key': 'name',
-                    'op': 'eq',
-                    'value_type': 'normalize',
-                    'value': 'cctestvm'},
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'},
                     {'type': 'marked-for-op',
-                    'op': 'stop'}]
+                     'op': 'stop'}]
             }
             p = self.load_policy(policy)
             resources = p.run()

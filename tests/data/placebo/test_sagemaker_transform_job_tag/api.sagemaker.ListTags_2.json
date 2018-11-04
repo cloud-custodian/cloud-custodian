@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "JobTag",
+                "Value": "JobTagValue"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "f4b79c03-a77d-4d62-aa5d-1270279b0149",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f4b79c03-a77d-4d62-aa5d-1270279b0149",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "49",
+                "date": "Mon, 29 Oct 2018 15:41:50 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
