@@ -16,11 +16,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 import json
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.actions import RemovePolicyBase
-from c7n.utils import local_session
+from c7n.actions import RemovePolicyBase, Action
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('ecr')
@@ -77,6 +78,62 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
 
         return super(ECRCrossAccountAccessFilter, self).process(
             resources, event)
+
+
+LIFECYCLE_RULE_SCHEMA = {
+    'type': 'object',
+    'additionalProperties': False,
+    'required': ['rulePriority',
+                 'action', 'countNumber', 'countType'],
+    'properties': {
+        'rulePriority': {'type': 'integer'},
+        'description': {'type': 'string'},
+        'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
+        'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
+        'countUnit': {'enum': ['hours', 'days']},
+        'countType': {
+            'enum': ['imageCountMoreThan', 'sinceImagePushed']},
+        'action': {
+            'type': 'object',
+            'required': ['type'],
+            'additionalProperties': False,
+            'properties': {'type': {'enum': ['expire']}}
+        }
+    }
+}
+
+
+def lifecycle_rule_validate(policy, rule):
+    if rule['tagStatus'] == 'tagged' and 'tagPrefixList' not in rule:
+        raise PolicyValidationError(
+            ("{} has invalid lifecycle rule {} tagprefixlist "
+             "required for tagStatus: tagged").format(
+                 policy.name, rule))
+    if rule['countType'] == 'sinceImagePushed' and 'countUnit' not in rule:
+        raise PolicyValidationError(
+            ("{} has invalid lifecycle rule {} countUnit "
+             "required for countType: sinceImagePushed").format(
+                 policy.name, rule))
+
+
+@ECR.action_registry.register('set-lifecycle')
+class SetLifecycle(Action):
+
+    permissions = ('ecr:PutLifecyclePolicy',)
+
+    schema = type_schema(
+        'set-lifecycle',
+        statements={
+            'type': 'array',
+            'items': LIFECYCLE_RULE_SCHEMA})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecr')
+        for r in resources:
+            client.put_lifecycle_policy(
+                registryId=r['registryId'],
+                repositoryName=r['repositoryName'],
+                lifecyclePolicyText=json.dumps(self.data['statements']))
 
 
 @ECR.action_registry.register('remove-statements')
