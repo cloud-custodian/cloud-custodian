@@ -65,7 +65,7 @@ class TestRestAccount(BaseTest):
 class TestRestApi(BaseTest):
 
     def test_rest_api_update(self):
-        session_factory = self.record_flight_data('test_rest_api_update')
+        session_factory = self.replay_flight_data('test_rest_api_update')
         p = self.load_policy({
             'name': 'update-api',
             'resource': 'rest-api',
