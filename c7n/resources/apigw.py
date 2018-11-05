@@ -124,6 +124,7 @@ class RestAPI(query.QueryResourceManager):
 class RestApiCrossAccount(CrossAccountAccessFilter):
 
     policy_attribute = 'policy'
+    permissions = ('apigateway:GET',)
 
 
 @RestAPI.action_registry.register('update')
