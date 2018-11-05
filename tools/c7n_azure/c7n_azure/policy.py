@@ -309,7 +309,7 @@ class AzureEventGridMode(AzureFunctionMode):
             self.function_params.storage_account['name'])
 
         try:
-            StorageUtilities.create_queue_from_storage_account(storage_account, queue_name)
+            StorageUtilities.create_queue_from_storage_account(storage_account, queue_name, session)
             self.log.info("Storage queue creation succeeded")
             return storage_account
         except Exception as e:
