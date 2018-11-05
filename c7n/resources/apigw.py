@@ -125,6 +125,23 @@ class UpdateAPI(BaseAction):
 
     Non-exhaustive list of updateable attributes.
     https://docs.aws.amazon.com/apigateway/api-reference/link-relation/restapi-update/#remarks
+
+    :example:
+
+    contrived example to update description on api gateways
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-description
+           filters:
+             - description: empty
+           actions:
+             - type: update
+               patch:
+                - op: replace
+                  path: /description
+                  value: "not empty :-)"
     """
     permissions = ('apigateway:PATCH',)
     schema = utils.type_schema(
