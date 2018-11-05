@@ -79,8 +79,8 @@ class TestRestApi(BaseTest):
                     'op': 'replace',
                     'path': '/description',
                     'value': 'for replacement'}]
-                }],
-            }, session_factory=session_factory)
+            }],
+        }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
