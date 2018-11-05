@@ -119,9 +119,13 @@ class RestAPI(query.QueryResourceManager):
         dimension = 'GatewayName'
 
 
-@RestAPI.action_registry('update')
+@RestAPI.action_registry.register('update')
 class UpdateAPI(BaseAction):
+    """Update configuration of a REST API.
 
+    Non-exhaustive list of updateable attributes.
+    https://docs.aws.amazon.com/apigateway/api-reference/link-relation/restapi-update/#remarks
+    """
     permissions = ('apigateway:PATCH',)
     schema = utils.type_schema(
         'update',
@@ -132,8 +136,8 @@ class UpdateAPI(BaseAction):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         for r in resources:
-            client.update_stage(
-                restApiId=r['restApiId'],
+            client.update_rest_api(
+                restApiId=r['id'],
                 patchOperations=self.data['patch'])
 
 
