@@ -225,7 +225,8 @@ class UpdateStage(BaseAction):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         for r in resources:
-            client.update_stage(
+            self.manager.retry(
+                client.update_stage,
                 restApiId=r['restApiId'],
                 stageName=r['stageName'],
                 patchOperations=self.data['patch'])
