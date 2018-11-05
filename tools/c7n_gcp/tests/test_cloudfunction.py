@@ -18,7 +18,8 @@ from gcp_common import BaseTest
 class FunctionTest(BaseTest):
 
     def test_delete(self):
-        factory = self.replay_flight_data('function-delete')
+        factory = self.replay_flight_data(
+            'function-delete', project_id='cloud-custodian')
         p = self.load_policy({
             'name': 'func-del',
             'resource': 'gcp.function',
