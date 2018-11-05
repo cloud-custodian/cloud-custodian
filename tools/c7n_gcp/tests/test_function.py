@@ -34,7 +34,3 @@ class FunctionTest(BaseTest):
             'get', {'name': resources[0]['name']})
         self.maxDiff = None
         self.assertEqual(func['status'], 'DELETE_IN_PROGRESS')
-
-
-
-
