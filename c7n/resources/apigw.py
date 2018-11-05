@@ -19,6 +19,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 
@@ -117,6 +118,12 @@ class RestAPI(query.QueryResourceManager):
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
+
+
+@RestAPI.filter_registry.register('cross-account')
+class RestApiCrossAccount(CrossAccountAccessFilter):
+
+    policy_attribute = 'policy'
 
 
 @RestAPI.action_registry.register('update')
