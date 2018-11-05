@@ -33,6 +33,16 @@ class TestECR(BaseTest):
         client.create_repository(repositoryName=name)
         self.addCleanup(client.delete_repository, repositoryName=name)
 
+#    def test_ecr_lifecycle_policy(self):
+#        session_factory = self.replay_flight_data('test_ecr_lifecycle_update')
+#        p = self.load_policy({
+#            'name': 'ecr-update',
+#            'resource': 'aws.ecr',
+#            'filters': [{'repositoryName': 'c7n'}]},
+#            session_factory=session_factory)
+#        resources = p.run()
+#        self.assertEqual(len(resources), 1)
+
     @functional
     def test_ecr_no_policy(self):
         # running against a registry with no policy causes no issues.
