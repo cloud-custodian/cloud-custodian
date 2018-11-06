@@ -14,18 +14,11 @@
 
 import re
 
+from c7n.utils import type_schema
 
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
-
-"""
-sql instances represent roots in a logical hierarchy
-
- - sql instance
-  - logical databases
-  - users list
-
-"""
 
 
 @resources.register('sql-instance')
@@ -43,3 +36,20 @@ class SqlInstance(QueryResourceManager):
             return client.execute_command(
                 'get', {'project': resource_info['project'],
                         'instance': resource_info['name']})
+
+
+class SqlInstanceAction(MethodAction):
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project, 'instance': instance}
+
+
+@SqlInstance.action_registry.register('delete')
+class SqlInstanceDelete(SqlInstanceAction):
+
+    schema = type_schema('sqldelete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/instances/(.*)')
