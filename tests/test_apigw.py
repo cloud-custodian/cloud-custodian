@@ -62,6 +62,33 @@ class TestRestAccount(BaseTest):
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
 
 
+class TestRestApi(BaseTest):
+
+    def test_rest_api_update(self):
+        session_factory = self.replay_flight_data('test_rest_api_update')
+        p = self.load_policy({
+            'name': 'update-api',
+            'resource': 'rest-api',
+            'filters': [
+                {'name': 'testapi'},
+                {'description': 'for demo only'}
+            ],
+            'actions': [{
+                'type': 'update',
+                'patch': [{
+                    'op': 'replace',
+                    'path': '/description',
+                    'value': 'for replacement'}]
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        updated = session_factory().client('apigateway').get_rest_api(
+            restApiId=resources[0]['id'])
+        self.assertEqual(updated['description'], 'for replacement')
+
+
 class TestRestResource(BaseTest):
 
     def test_rest_resource_query(self):

@@ -11,16 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from c7n_azure.actions import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.tags import TagHelper
 
-from c7n.actions import BaseAction
 from c7n.filters.core import ValueFilter, type_schema
-from c7n.filters.related import RelatedResourceFilter
-
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.related import RelatedResourceFilter
 
 
 @resources.register('vm')
@@ -66,44 +64,44 @@ class NetworkInterfaceFilter(RelatedResourceFilter):
 
 
 @VirtualMachine.action_registry.register('poweroff')
-class VmPowerOffAction(BaseAction):
+class VmPowerOffAction(AzureBaseAction):
 
     schema = type_schema('poweroff')
 
-    def process(self, vms):
+    def process_resource_set(self, vms):
         client = self.manager.get_client()
         for vm in vms:
             client.virtual_machines.power_off(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('stop')
-class VmStopAction(BaseAction):
+class VmStopAction(AzureBaseAction):
 
     schema = type_schema('stop')
 
-    def process(self, vms):
+    def process_resource_set(self, vms):
         client = self.manager.get_client()
         for vm in vms:
             client.virtual_machines.deallocate(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('start')
-class VmStartAction(BaseAction):
+class VmStartAction(AzureBaseAction):
 
     schema = type_schema('start')
 
-    def process(self, vms):
+    def process_resource_set(self, vms):
         client = self.manager.get_client()
         for vm in vms:
             client.virtual_machines.start(vm['resourceGroup'], vm['name'])
 
 
 @VirtualMachine.action_registry.register('restart')
-class VmRestartAction(BaseAction):
+class VmRestartAction(AzureBaseAction):
 
     schema = type_schema('restart')
 
-    def process(self, vms):
+    def process_resource_set(self, vms):
         client = self.manager.get_client()
         for vm in vms:
             client.virtual_machines.restart(vm['resourceGroup'], vm['name'])
