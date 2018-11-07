@@ -242,7 +242,7 @@ class UpdateStage(BaseAction):
 
 @RestStage.action_registry.register('delete')
 class DeleteStage(BaseAction):
-    """Delete an api stage 
+    """Delete an api stage
 
     :example:
 
