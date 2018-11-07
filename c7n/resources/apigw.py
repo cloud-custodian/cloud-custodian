@@ -240,6 +240,34 @@ class UpdateStage(BaseAction):
                 patchOperations=self.data['patch'])
 
 
+@RestStage.action_registry.register('delete')
+class DeleteStage(BaseAction):
+    """Delete an api stage 
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-rest-stage
+            resource: rest-stage
+            filters:
+              - methodSettings."*/*".cachingEnabled: true
+            actions:
+              - type: delete
+    """
+    permissions = ('apigateway:Delete',)
+    schema = utils.type_schema('delete')
+
+    def process(self, resources):
+        client = utils.local_session(self.manager.session_factory).client('apigateway')
+        for r in resources:
+            self.manager.retry(
+                client.delete_stage,
+                restApiId=r['restApiId'],
+                stageName=r['stageName'])
+
+
 @resources.register('rest-resource')
 class RestResource(query.ChildResourceManager):
 

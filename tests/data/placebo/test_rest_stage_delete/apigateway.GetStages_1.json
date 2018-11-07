@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "item": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "649c8d6d-e2cb-11e8-a17e-3f554308e78a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "649c8d6d-e2cb-11e8-a17e-3f554308e78a", 
+                "content-length": "12", 
+                "x-amz-apigw-id": "QAiRVK74IAMEciA=", 
+                "connection": "keep-alive", 
+                "date": "Wed, 07 Nov 2018 20:26:22 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

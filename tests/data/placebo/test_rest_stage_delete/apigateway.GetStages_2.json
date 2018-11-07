@@ -1,0 +1,135 @@
+{
+    "status_code": 200, 
+    "data": {
+        "item": [
+            {
+                "tracingEnabled": false, 
+                "stageName": "latest", 
+                "cacheClusterSize": "0.5", 
+                "variables": {}, 
+                "tags": {
+                    "ENV": "DEV"
+                }, 
+                "cacheClusterEnabled": false, 
+                "cacheClusterStatus": "NOT_AVAILABLE", 
+                "deploymentId": "49ijxa", 
+                "lastUpdatedDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 41, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 19, 
+                    "minute": 33
+                }, 
+                "createdDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 22, 
+                    "minute": 28
+                }, 
+                "methodSettings": {
+                    "*/*": {
+                        "cacheTtlInSeconds": 300, 
+                        "loggingLevel": "INFO", 
+                        "dataTraceEnabled": true, 
+                        "metricsEnabled": false, 
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER", 
+                        "throttlingRateLimit": 1000.0, 
+                        "cacheDataEncrypted": false, 
+                        "cachingEnabled": false, 
+                        "throttlingBurstLimit": 2000, 
+                        "requireAuthorizationForCacheControl": true
+                    }
+                }
+            }, 
+            {
+                "tracingEnabled": false, 
+                "stageName": "noop", 
+                "cacheClusterEnabled": false, 
+                "cacheClusterStatus": "NOT_AVAILABLE", 
+                "deploymentId": "49ijxa", 
+                "lastUpdatedDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 20, 
+                    "minute": 26
+                }, 
+                "createdDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 22, 
+                    "minute": 28
+                }, 
+                "methodSettings": {
+                    "*/*": {
+                        "cacheTtlInSeconds": 300, 
+                        "loggingLevel": "INFO", 
+                        "dataTraceEnabled": true, 
+                        "metricsEnabled": false, 
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER", 
+                        "throttlingRateLimit": 10000.0, 
+                        "cacheDataEncrypted": false, 
+                        "cachingEnabled": false, 
+                        "throttlingBurstLimit": 5000, 
+                        "requireAuthorizationForCacheControl": true
+                    }
+                }
+            }, 
+            {
+                "tracingEnabled": false, 
+                "stageName": "testing-skunk-2", 
+                "cacheClusterEnabled": false, 
+                "cacheClusterStatus": "NOT_AVAILABLE", 
+                "deploymentId": "49ijxa", 
+                "lastUpdatedDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 46
+                }, 
+                "createdDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 46
+                }, 
+                "methodSettings": {}
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "64a714d2-e2cb-11e8-a589-b10b34e2a8b7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "64a714d2-e2cb-11e8-a589-b10b34e2a8b7", 
+                "content-length": "1351", 
+                "x-amz-apigw-id": "QAiRVIk9oAMEdtg=", 
+                "connection": "keep-alive", 
+                "date": "Wed, 07 Nov 2018 20:26:23 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

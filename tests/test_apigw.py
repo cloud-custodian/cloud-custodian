@@ -214,3 +214,17 @@ class TestRestStage(BaseTest):
             self.assertEqual(m["loggingLevel"], "INFO")
             self.assertEqual(m["dataTraceEnabled"], True)
         self.assertTrue(found)
+
+    def test_rest_stage_delete(self):
+        session_factory = self.replay_flight_data("test_rest_stage_delete")
+        p = self.load_policy(
+            {
+                "name": "rest-stage-delete",
+                "resource": "rest-stage",
+                "filters": [{"type": "value", "key": "stageName", "value": "testing-skunk-1"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

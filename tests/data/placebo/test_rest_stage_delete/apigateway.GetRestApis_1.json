@@ -1,0 +1,82 @@
+{
+    "status_code": 200, 
+    "data": {
+        "items": [
+            {
+                "apiKeySource": "HEADER", 
+                "createdDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 23, 
+                    "minute": 22
+                }, 
+                "endpointConfiguration": {
+                    "types": [
+                        "PRIVATE"
+                    ]
+                }, 
+                "id": "10iz2fxfq3", 
+                "name": "test"
+            }, 
+            {
+                "apiKeySource": "HEADER", 
+                "description": "The volume goes to 11", 
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                }, 
+                "createdDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 22, 
+                    "minute": 27
+                }, 
+                "id": "5xhc1cnb7h", 
+                "name": "sphere11"
+            }, 
+            {
+                "apiKeySource": "HEADER", 
+                "description": "for replacement", 
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                }, 
+                "createdDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 55, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 34
+                }, 
+                "id": "rtmgxfiay5", 
+                "name": "testapi"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "647f1adb-e2cb-11e8-8331-b74f555e6c6a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "647f1adb-e2cb-11e8-8331-b74f555e6c6a", 
+                "content-length": "508", 
+                "x-amz-apigw-id": "QAiRTIWEIAMEdRQ=", 
+                "connection": "keep-alive", 
+                "date": "Wed, 07 Nov 2018 20:26:22 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}
