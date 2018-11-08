@@ -417,6 +417,11 @@ class ValueFilter(Filter):
                     if t.get('Key') == tk:
                         r = t.get('Value')
                         break
+            # GCP schema: 'labels': {'key': 'value'}
+            elif 'labels' in i:
+                r = i.get('labels', {}).get(tk, None)
+            # GCP has a secondary form of labels called tags
+            # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
                 r = i.get('tags', {}).get(tk, None)
