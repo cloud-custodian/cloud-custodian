@@ -11,12 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from c7n_azure.actions import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager
-from c7n_azure.utils import ThreadHelper
 
-from c7n.actions import BaseAction
 from c7n.filters.core import type_schema
 
 
@@ -35,14 +33,8 @@ class EventSubscription(QueryResourceManager):
 
 
 @EventSubscription.action_registry.register('delete')
-class Delete(BaseAction):
+class Delete(AzureBaseAction):
     schema = type_schema('delete')
-
-    def process(self, resources, event=None):
-        return ThreadHelper.execute_in_parallel(resources=resources,
-                                                execution_method=self.process_resource_set,
-                                                executor_factory=self.executor_factory,
-                                                log=self.log)
 
     def process_resource_set(self, resources):
         client = self.manager.get_client()

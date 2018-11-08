@@ -25,8 +25,10 @@ from c7n_mailer.azure.sendgrid_delivery import SendGridDelivery
 
 try:
     from c7n_azure.storage_utils import StorageUtilities
+    from c7n_azure.session import Session
 except ImportError:
     StorageUtilities = None
+    Session = None
     pass
 
 
@@ -42,7 +44,7 @@ class MailerAzureQueueProcessor(object):
         self.receive_queue = self.config['queue_url']
         self.batch_size = 16
         self.max_message_retry = 3
-        self.session = session
+        self.session = session or Session()
 
     def run(self, parallel=False):
         if parallel:
@@ -78,6 +80,31 @@ class MailerAzureQueueProcessor(object):
             len(queue_message['resources']),
             queue_message['policy']['name'],
             ', '.join(queue_message['action'].get('to'))))
+
+        if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
+                for e in queue_message.get('action', ()).get('to')):
+            from c7n_mailer.slack_delivery import SlackDelivery
+            slack_delivery = SlackDelivery(self.config,
+                                           self.logger,
+                                           SendGridDelivery(self.config, self.logger))
+            slack_messages = slack_delivery.get_to_addrs_slack_messages_map(queue_message)
+            try:
+                slack_delivery.slack_handler(queue_message, slack_messages)
+            except Exception:
+                traceback.print_exc()
+                pass
+
+        # this section gets the map of metrics to send to datadog and delivers it
+        if any(e.startswith('datadog') for e in queue_message.get('action', ()).get('to')):
+            from c7n_mailer.datadog_delivery import DataDogDelivery
+            datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+            datadog_message_packages = datadog_delivery.get_datadog_message_packages(queue_message)
+
+            try:
+                datadog_delivery.deliver_datadog_messages(datadog_message_packages, queue_message)
+            except Exception:
+                traceback.print_exc()
+                pass
 
         # this section sends a notification to the resource owner via SendGrid
         try:

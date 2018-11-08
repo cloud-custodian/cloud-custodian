@@ -93,6 +93,36 @@ class TestNotFilter(unittest.TestCase):
         f = filters.factory({"not": [{"Architecture": "x86_64"}, {"Color": "green"}]})
         self.assertEqual(len(f.process(results)), 2)
 
+    def test_not_break_empty_set(self):
+        results = [
+            instance(Architecture="x86_64", Color="green")]
+
+        f = filters.factory({"not": [{"Architecture": "amd64"}]})
+
+        class Manager(object):
+
+            class resource_type(object):
+                id = 'Color'
+
+            @classmethod
+            def get_model(cls):
+                return cls.resource_type
+
+        class FakeFilter(object):
+
+            def __init__(self):
+                self.invoked = False
+
+            def process(self, resources, event=None):
+                self.invoked = True
+                return resources
+
+        fake = FakeFilter()
+        f.filters.append(fake)
+        f.manager = Manager()
+        self.assertEqual(len(f.process(results)), 1)
+        self.assertFalse(fake.invoked)
+
 
 class TestValueFilter(unittest.TestCase):
 

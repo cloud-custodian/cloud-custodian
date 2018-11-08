@@ -20,6 +20,14 @@ class IoTHubTest(BaseTest):
     def setUp(self):
         super(IoTHubTest, self).setUp()
 
+    def test_iot_hub_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-iot-hub-compliance',
+                'resource': 'azure.iothub'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('iothub.json')
     def test_find_by_name(self):
         p = self.load_policy({

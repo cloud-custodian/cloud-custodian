@@ -20,6 +20,30 @@ class SubscriptionTest(BaseTest):
     def setUp(self):
         super(SubscriptionTest, self).setUp()
 
+    def test_subscription_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-add-policy',
+                'resource': 'azure.subscription',
+                'filters': [
+                    {'type': 'missing',
+                     'policy':
+                         {'resource': 'azure.policyassignments',
+                          'filters': [
+                              {'type': 'value',
+                               'key': 'properties.displayName',
+                               'op': 'eq',
+                               'value': 'cctestpolicydn'}]}}
+                ],
+                'actions': [
+                    {'type': 'add-policy',
+                     'name': 'cctestpolicy',
+                     'display_name': 'cctestpolicydn',
+                     'definition_name': "Audit use of classic storage accounts"}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
     def test_add_policy(self):
         p = self.load_policy({
             'name': 'test-add-policy',

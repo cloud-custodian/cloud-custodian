@@ -23,6 +23,14 @@ class ArmResourceTest(BaseTest):
     def setUp(self):
         super(ArmResourceTest, self).setUp()
 
+    def test_arm_resource_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-armresource',
+                'resource': 'azure.armresource'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('vm.json')
     def test_find_by_name(self):
         p = self.load_policy({

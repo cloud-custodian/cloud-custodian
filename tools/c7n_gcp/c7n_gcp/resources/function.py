@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from c7n.utils import type_schema
+
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -34,3 +38,13 @@ class Function(QueryResourceManager):
                     'projects/{project_id}/locations/'
                     '{location_id}/functions/{function_name}').format(
                         **resource_info)})
+
+
+@Function.action_registry.register('delete')
+class Delete(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}

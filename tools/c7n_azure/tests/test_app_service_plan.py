@@ -20,6 +20,14 @@ class AppServicePlanTest(BaseTest):
     def setUp(self):
         super(AppServicePlanTest, self).setUp()
 
+    def test_app_service_plan_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-appserviceplan',
+                'resource': 'azure.appserviceplan',
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('appserviceplan.json')
     def test_find_by_name(self):
         p = self.load_policy({

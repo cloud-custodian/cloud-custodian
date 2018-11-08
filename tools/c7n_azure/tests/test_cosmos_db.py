@@ -20,6 +20,14 @@ class CosmosDBTest(BaseTest):
     def setUp(self):
         super(CosmosDBTest, self).setUp()
 
+    def test_cosmos_db_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-cosmos-db',
+                'resource': 'azure.cosmosdb'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('cosmosdb.json')
     def test_find_by_name(self):
         p = self.load_policy({

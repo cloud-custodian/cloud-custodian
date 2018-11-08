@@ -13,15 +13,17 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
 from azure_common import BaseTest, arm_template
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
-from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
+from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 
 
 class AzureEventsTest(BaseTest):
     def setUp(self):
         super(AzureEventsTest, self).setUp()
+        self.session = Session()
 
     def test_get_returns_event_dict(self):
         event_dic = AzureEvents.get('VmWrite')
@@ -58,7 +60,7 @@ class AzureEventsTest(BaseTest):
     def test_create_azure_event_subscription(self):
         account = self.setup_account()
         queue_name = 'cctestevensub'
-        StorageUtilities.create_queue_from_storage_account(account, queue_name)
+        StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
         sub_destination = StorageQueueEventSubscriptionDestination(resource_id=account.id,
                                                                    queue_name=queue_name)
         sub_name = 'custodiantestsubscription'

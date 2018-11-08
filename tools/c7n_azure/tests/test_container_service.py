@@ -20,6 +20,14 @@ class ContainerServiceTest(BaseTest):
     def setUp(self):
         super(ContainerServiceTest, self).setUp()
 
+    def test_container_service_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-container-service',
+                'resource': 'azure.containerservice'
+            }, validate=True)
+            self.assertTrue(p)
+
     # Container service arm template requires SP id/secret, so please use az cli to deploy it
     # az acs create -n cctestacs -d cctestacsdns
     #               -g $rgName --generate-ssh-keys --orchestrator-type kubernetes

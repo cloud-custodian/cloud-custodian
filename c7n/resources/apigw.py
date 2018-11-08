@@ -19,6 +19,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter
+from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 
@@ -119,6 +120,52 @@ class RestAPI(query.QueryResourceManager):
         dimension = 'GatewayName'
 
 
+@RestAPI.filter_registry.register('cross-account')
+class RestApiCrossAccount(CrossAccountAccessFilter):
+
+    policy_attribute = 'policy'
+    permissions = ('apigateway:GET',)
+
+
+@RestAPI.action_registry.register('update')
+class UpdateAPI(BaseAction):
+    """Update configuration of a REST API.
+
+    Non-exhaustive list of updateable attributes.
+    https://docs.aws.amazon.com/apigateway/api-reference/link-relation/restapi-update/#remarks
+
+    :example:
+
+    contrived example to update description on api gateways
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-description
+           filters:
+             - description: empty
+           actions:
+             - type: update
+               patch:
+                - op: replace
+                  path: /description
+                  value: "not empty :-)"
+    """
+    permissions = ('apigateway:PATCH',)
+    schema = utils.type_schema(
+        'update',
+        patch={'type': 'array', 'items': OP_SCHEMA},
+        required=['patch'])
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            client.update_rest_api(
+                restApiId=r['id'],
+                patchOperations=self.data['patch'])
+
+
 @resources.register('rest-stage')
 class RestStage(query.ChildResourceManager):
 
@@ -186,7 +233,8 @@ class UpdateStage(BaseAction):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         for r in resources:
-            client.update_stage(
+            self.manager.retry(
+                client.update_stage,
                 restApiId=r['restApiId'],
                 stageName=r['stageName'],
                 patchOperations=self.data['patch'])

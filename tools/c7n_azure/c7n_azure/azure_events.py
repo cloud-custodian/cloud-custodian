@@ -151,7 +151,7 @@ class AzureEventSubscription(object):
         event_filter = event_filter or EventSubscriptionFilter()
 
         event_info = EventSubscription(destination=destination, filter=event_filter)
-        scope = '/subscriptions/%s' % s.subscription_id
+        scope = '/subscriptions/%s' % s.get_subscription_id()
 
         client = s.client('azure.mgmt.eventgrid.EventGridManagementClient')
         event_subscription = client.event_subscriptions.create_or_update(scope, name, event_info)

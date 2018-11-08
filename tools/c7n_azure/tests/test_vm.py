@@ -32,7 +32,7 @@ class VMTest(BaseTest):
         with self.sign_out_patch():
 
             p = self.load_policy({
-                'name': 'test-assignments-by-role',
+                'name': 'test-azure-vm',
                 'resource': 'azure.vm',
                 'filters': [
                     {'type': 'offhour'},

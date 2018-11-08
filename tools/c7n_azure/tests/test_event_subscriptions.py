@@ -13,9 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
 from azure_common import BaseTest, arm_template
 from c7n_azure.azure_events import AzureEventSubscription
-from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
+from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 
 
@@ -24,12 +25,24 @@ class AzureEventSubscriptionsTest(BaseTest):
 
     def setUp(self):
         super(AzureEventSubscriptionsTest, self).setUp()
+        self.session = Session()
         account = self.setup_account()
         queue_name = 'cctesteventsub'
-        StorageUtilities.create_queue_from_storage_account(account, queue_name)
+        StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
         event_sub_destination = StorageQueueEventSubscriptionDestination(
             resource_id=account.id, queue_name=queue_name)
         AzureEventSubscription.create(event_sub_destination, self.event_sub_name)
+
+    def test_event_subscription_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-event-subscription',
+                'resource': 'azure.eventsubscription',
+                'actions': [
+                    {'type': 'delete'}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
 
     @arm_template('storage.json')
     def test_azure_event_subscription_policy_run(self):

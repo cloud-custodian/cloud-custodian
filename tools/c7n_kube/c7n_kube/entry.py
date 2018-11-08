@@ -21,4 +21,5 @@ log = logging.getLogger('custodian.k8s')
 
 
 def initialize_kube():
-    log.info('initialize_kube')
+    """kubernetes entry point
+    """
