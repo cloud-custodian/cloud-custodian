@@ -20,6 +20,8 @@ from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
+from c7n.filters.offhours import OffHour, OnHour
+
 
 @resources.register('instance')
 class Instance(QueryResourceManager):
@@ -42,12 +44,36 @@ class Instance(QueryResourceManager):
                             'resourceName'].rsplit('/', 1)[-1]})
 
 
+@Instance.filter_registry.register('offhour')
+class InstanceOffHour(OffHour):
+
+    def get_tag_value(self, instance):
+        return instance.get('labels', {}).get(self.tag_key)
+
+
+@Instance.filter_registry.register('onhour')
+class InstanceOnHour(OnHour):
+
+    def get_tag_value(self, instance):
+        return instance.get('labels', {}).get(self.tag_key)
+
+
 class InstanceAction(MethodAction):
 
     def get_resource_params(self, model, resource):
         project, zone, instance = self.path_param_re.match(
             resource['selfLink']).groups()
         return {'project': project, 'zone': zone, 'instance': instance}
+
+
+@Instance.action_registry.register('start')
+class Start(InstanceAction):
+
+    schema = type_schema('start')
+    method_spec = {'op': 'start'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+    attr_filter = ('status', ('TERMINATED',))
 
 
 @Instance.action_registry.register('stop')
