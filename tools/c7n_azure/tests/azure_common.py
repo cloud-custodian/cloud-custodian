@@ -17,6 +17,7 @@ import re
 
 from c7n_azure import constants
 from c7n_azure.session import Session
+from c7n_azure.utils import ThreadHelper
 from mock import patch
 from vcr_unittest import VCRTestCase
 
@@ -55,6 +56,11 @@ class AzureVCRBaseTest(VCRTestCase):
         myvcr = super(VCRTestCase, self)._get_vcr(**kwargs)
         myvcr.register_matcher('azurematcher', self.azure_matcher)
         myvcr.match_on = ['azurematcher']
+
+        # Block recording when using fake token (tox runs)
+        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
+            myvcr.record_mode = 'none'
+
         return myvcr
 
     def azure_matcher(self, r1, r2):
@@ -96,6 +102,10 @@ class AzureVCRBaseTest(VCRTestCase):
 class BaseTest(TestUtils, AzureVCRBaseTest):
     """ Azure base testing class.
     """
+
+    def setUp(self):
+        super(BaseTest, self).setUp()
+        ThreadHelper.disable_multi_threading = True
 
     @staticmethod
     def setup_account():

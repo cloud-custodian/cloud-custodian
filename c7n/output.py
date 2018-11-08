@@ -414,7 +414,7 @@ class DirectoryOutput(object):
         data = {
             'account_id': self.ctx.options.account_id,
             'region': self.ctx.options.region,
-            'policy': self.ctx.policy.name,
+            'policy_name': self.ctx.policy.name,
             'now': datetime.utcnow(),
             'uuid': str(uuid.uuid4())}
         return data

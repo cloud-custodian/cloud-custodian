@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "expires": "Sun, 04 Nov 2018 11:26:20 GMT",
+    "date": "Sun, 04 Nov 2018 11:26:20 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "etag": "\"f4a5L8Xc0qS6WBhG3ScyvS07t68=/xnzQDl-lLztlz57puVdKbZphRdI=\"",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "808",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default?alt=json"
+  },
+  "body": {
+    "kind": "compute#subnetwork",
+    "id": "4686700484947109325",
+    "creationTimestamp": "2018-07-08T02:36:34.617-07:00",
+    "name": "default",
+    "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+    "ipCidrRange": "10.128.0.0/20",
+    "gatewayAddress": "10.128.0.1",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
+    "privateIpGoogleAccess": true,
+    "secondaryIpRanges": [
+      {
+        "rangeName": "gke-dev-services-c80c41a4",
+        "ipCidrRange": "10.0.0.0/20"
+      },
+      {
+        "rangeName": "gke-dev-pods-c80c41a4",
+        "ipCidrRange": "10.52.0.0/14"
+      }
+    ],
+    "fingerprint": "6bFgEFLj_vw=",
+    "enableFlowLogs": true
+  }
+}

@@ -25,8 +25,10 @@ from c7n_mailer.azure.sendgrid_delivery import SendGridDelivery
 
 try:
     from c7n_azure.storage_utils import StorageUtilities
+    from c7n_azure.session import Session
 except ImportError:
     StorageUtilities = None
+    Session = None
     pass
 
 
@@ -42,7 +44,7 @@ class MailerAzureQueueProcessor(object):
         self.receive_queue = self.config['queue_url']
         self.batch_size = 16
         self.max_message_retry = 3
-        self.session = session
+        self.session = session or Session()
 
     def run(self, parallel=False):
         if parallel:
