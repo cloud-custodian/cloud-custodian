@@ -59,6 +59,28 @@ class InstanceTest(BaseTest):
                      'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
         self.assertEqual(result['items'][0]['status'], 'STOPPING')
 
+    def test_start_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('instance-start', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'istart',
+             'resource': 'gcp.instance',
+             'filters': [{'tag:env': 'dev'}, {'status': 'TERMINATED'}],
+             'actions': ['start']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(3)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'labels.env=dev',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['status'], 'PROVISIONING')
+
     def test_delete_instance(self):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data('instance-terminate', project_id=project_id)
