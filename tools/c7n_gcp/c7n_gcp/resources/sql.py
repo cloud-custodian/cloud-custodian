@@ -53,5 +53,3 @@ class SqlInstanceDelete(SqlInstanceAction):
     method_spec = {'op': 'delete'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/instances/(.*)')
-
-
