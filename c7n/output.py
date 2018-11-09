@@ -227,11 +227,15 @@ class SystemStats(DeltaStats):
                 snapshot['num_ctx_switches_involuntary']) = self.process.num_ctx_switches()
             # io counters ( not available on osx)
             if getattr(self.process, 'io_counters', None):
-                io = self.process.io_counters()
-                for counter in (
-                        'read_count', 'write_count',
-                        'write_bytes', 'read_bytes'):
-                    snapshot[counter] = getattr(io, counter)
+                try:
+                    io = self.process.io_counters()
+                    for counter in (
+                            'read_count', 'write_count',
+                            'write_bytes', 'read_bytes'):
+                        snapshot[counter] = getattr(io, counter)
+                except NotImplementedError:
+                    # some old kernels and Windows Linux Subsystem throw this
+                    pass
             # memory counters
             mem = self.process.memory_info()
             for counter in (
@@ -409,7 +413,8 @@ class DirectoryOutput(object):
     def get_output_vars(self):
         data = {
             'account_id': self.ctx.options.account_id,
-            'policy': self.ctx.policy.name,
+            'region': self.ctx.options.region,
+            'policy_name': self.ctx.policy.name,
             'now': datetime.utcnow(),
             'uuid': str(uuid.uuid4())}
         return data

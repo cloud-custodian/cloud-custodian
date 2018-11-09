@@ -20,6 +20,14 @@ class DiskTest(BaseTest):
     def setUp(self):
         super(DiskTest, self).setUp()
 
+    def test_azure_disk_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-disk',
+                'resource': 'azure.disk'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('disk.json')
     def test_find_by_name(self):
         p = self.load_policy({

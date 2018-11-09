@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import copy
 import json
 import os
 import logging
@@ -63,18 +64,20 @@ def provision(config):
                                                      'location': location,
                                                      'resource_group_name': rg_name})
 
-    functionapp_name = '-'.join([service_plan['name'], function_name, suffix]) \
-                          .replace(' ', '-').lower()
+    function_app_name = \
+        '-'.join([service_plan['name'], function_name, suffix]) \
+        .replace(' ', '-').lower()
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
         service_plan=service_plan,
         storage_account=storage_account,
-        functionapp_name=functionapp_name)
+        function_app_resource_group_name=service_plan['resource_group_name'],
+        function_app_name=function_app_name)
 
-    FunctionAppUtilities().deploy_dedicated_function_app(params)
+    function_app = FunctionAppUtilities().deploy_dedicated_function_app(params)
 
-    log.info("Building function package for %s" % functionapp_name)
+    log.info("Building function package for %s" % function_app_name)
 
     # Build package
     packager = FunctionPackage(
@@ -86,25 +89,28 @@ def provision(config):
                    extra_modules={'c7n_mailer', 'ruamel'})
 
     packager.pkg.add_contents(
-        function_name + '/config.json',
-        contents=json.dumps(config))
-
-    packager.pkg.add_contents(
         function_name + '/function.json',
         contents=packager.get_function_config({'mode':
                                               {'type': 'azure-periodic',
                                                'schedule': schedule}}))
-    # Add mail templates
-    template_dir = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '../..', 'msg-templates'))
 
-    for t in os.listdir(template_dir):
-        with open(os.path.join(template_dir, t)) as fh:
-            packager.pkg.add_contents('msg-templates/%s' % t, fh.read())
+    # Add mail templates
+    for d in set(config['templates_folders']):
+        if not os.path.exists(d):
+            continue
+        for t in [f for f in os.listdir(d) if os.path.splitext(f)[1] == '.j2']:
+            with open(os.path.join(d, t)) as fh:
+                packager.pkg.add_contents(function_name + '/msg-templates/%s' % t, fh.read())
+
+    function_config = copy.deepcopy(config)
+    function_config['templates_folders'] = [function_name + '/msg-templates/']
+    packager.pkg.add_contents(
+        function_name + '/config.json',
+        contents=json.dumps(function_config))
 
     packager.close()
 
-    if packager.wait_for_status(functionapp_name):
-        packager.publish(functionapp_name)
+    if packager.wait_for_status(function_app):
+        packager.publish(function_app)
     else:
         log.error("Aborted deployment, ensure Application Service is healthy.")

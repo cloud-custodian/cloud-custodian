@@ -22,9 +22,11 @@ import shutil
 import tempfile
 
 from c7n_azure.storage_utils import StorageUtilities
+from c7n.output import DirectoryOutput, blob_outputs
 
 from c7n.utils import local_session
-from c7n.output import DirectoryOutput, blob_outputs
+
+from azure.common import AzureHttpError
 
 
 @blob_outputs.register('azure')
@@ -39,10 +41,12 @@ class AzureStorageOutput(DirectoryOutput):
 
     """
 
-    DEFAULT_BLOB_FOLDER_PREFIX = '{policy}/{now:%Y/%m/%d/%H/}'
+    DEFAULT_BLOB_FOLDER_PREFIX = '{policy_name}/{now:%Y/%m/%d/%H/}'
 
     def __init__(self, ctx, config=None):
-        super(AzureStorageOutput, self).__init__(ctx, config)
+        self.ctx = ctx
+        self.config = config
+
         self.log = logging.getLogger('custodian.output')
         self.root_dir = tempfile.mkdtemp()
         self.output_dir = self.get_output_path(self.ctx.options.output_dir)
@@ -59,7 +63,6 @@ class AzureStorageOutput(DirectoryOutput):
         self.log.debug("Policy Logs uploaded")
 
     def get_output_path(self, output_url):
-
         # if pyformat is not specified, then use the policy name and formatted date
         if '{' not in output_url:
             output_url = self.join(output_url, self.DEFAULT_BLOB_FOLDER_PREFIX)
@@ -71,10 +74,15 @@ class AzureStorageOutput(DirectoryOutput):
             for f in files:
                 blob_name = self.join(self.file_prefix, root[len(self.root_dir):], f)
                 blob_name.strip('/')
-                self.blob_service.create_blob_from_path(
-                    self.container,
-                    blob_name,
-                    os.path.join(root, f))
+                try:
+                    self.blob_service.create_blob_from_path(
+                        self.container,
+                        blob_name,
+                        os.path.join(root, f))
+                except AzureHttpError as e:
+                    self.log.error("Error writing output. Confirm output storage URL is correct "
+                                   "and that 'Storage Blob Contributor' role is assigned. \n" +
+                                   str(e))
 
                 self.log.debug("%s uploaded" % blob_name)
 

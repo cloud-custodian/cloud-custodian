@@ -157,7 +157,7 @@ class TagDelayedAction(TagDelayedAction):
         client = local_session(
             self.manager.session_factory).client('emr')
         for r in resources:
-            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
+            self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
 
 
 @actions.register('tag')
@@ -186,7 +186,7 @@ class TagTable(Tag):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
-            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
+            self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
 
 
 @actions.register('remove-tag')

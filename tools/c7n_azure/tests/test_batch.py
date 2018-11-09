@@ -20,10 +20,18 @@ class BatchTest(BaseTest):
     def setUp(self):
         super(BatchTest, self).setUp()
 
+    def test_batch_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-batch',
+                'resource': 'azure.batch'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('batch.json')
     def test_find_by_name(self):
         p = self.load_policy({
-            'name': 'test-vm-scale-set',
+            'name': 'test-azure-batch',
             'resource': 'azure.batch',
             'filters': [
                 {'type': 'value',

@@ -19,6 +19,23 @@ from jsonschema.exceptions import ValidationError
 
 class DiagnosticSettingsFilterTest(BaseTest):
 
+    def test_diagnostic_settings_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-diagnostic-settings',
+                'resource': 'azure.loadbalancer',
+                'filters': [
+                    {
+                        'type': 'diagnostic-settings',
+                        'key': "logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled",
+                        'op': 'in',
+                        'value_type': 'swap',
+                        'value': True
+                    }
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('diagnostic-settings.json')
     def test_filter_diagnostic_settings_enabled(self):
         """Verifies we can filter by a diagnostic setting
