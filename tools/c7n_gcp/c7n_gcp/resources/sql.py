@@ -49,7 +49,9 @@ class SqlInstanceAction(MethodAction):
 @SqlInstance.action_registry.register('delete')
 class SqlInstanceDelete(SqlInstanceAction):
 
-    schema = type_schema('sqldelete')
+    schema = type_schema('delete')
     method_spec = {'op': 'delete'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/instances/(.*)')
+
+
