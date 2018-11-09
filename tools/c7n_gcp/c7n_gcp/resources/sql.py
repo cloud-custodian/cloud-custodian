@@ -18,6 +18,7 @@ from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n import query, utils
 
 
 @resources.register('sql-instance')
@@ -68,3 +69,15 @@ class SqlInstanceStop(MethodAction):
         return {'project': project,
                         'instance': instance, 
                         'body': {'settings': {'activationPolicy':'NEVER'}}}
+
+@resources.register('sql-instance-backup')
+class SqlInstanceBackup():
+
+    class resource_type(TypeInfo):
+        service = 'sqladmin'
+        version = 'v1beta4'
+        component = 'backups'
+        enum_spec = ('list', "items[]", None)
+        scope = 'project'
+
+
