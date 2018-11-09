@@ -299,8 +299,6 @@ class ApiStats(DeltaStats):
             self.ctx.session_factory.set_subscribers(())
         self.ctx.metrics.put_metric(
             "ApiCalls", sum(self.api_calls.values()), "Count")
-        self.ctx.policy._write_file(
-            'api-stats.json', utils.dumps(dict(self.api_calls)))
         self.pop_snapshot()
 
     def __call__(self, s):

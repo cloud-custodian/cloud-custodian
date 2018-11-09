@@ -14,10 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import os
 
 from azure_common import BaseTest
 from c7n_azure.function_package import FunctionPackage
-from c7n_azure.constants import FUNCTION_TIME_TRIGGER_MODE, FUNCTION_EVENT_TRIGGER_MODE
+from c7n_azure.constants import ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,\
+    FUNCTION_TIME_TRIGGER_MODE, FUNCTION_EVENT_TRIGGER_MODE
+from mock import patch
 
 
 class FunctionPackageTest(BaseTest):
@@ -101,6 +104,34 @@ class FunctionPackageTest(BaseTest):
         self.assertTrue(FunctionPackageTest._file_exists(files, 'host.json'))
         self.assertTrue(FunctionPackageTest._file_exists(files, 'extensions.csproj'))
         self.assertTrue(FunctionPackageTest._file_exists(files, 'bin/extensions.dll'))
+
+    def test_env_var_disables_cert_validation(self):
+        p = self.load_policy({
+            'name': 'test-azure-package',
+            'resource': 'azure.resourcegroup',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
+        })
+
+        with patch.dict(os.environ,
+                        {
+                            ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION: 'YES'
+                        }, clear=True):
+            packer = FunctionPackage(p.data['name'])
+            self.assertFalse(packer.enable_ssl_cert)
+
+    def def_cert_validation_on_by_default(self):
+        p = self.load_policy({
+            'name': 'test-azure-package',
+            'resource': 'azure.resourcegroup',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
+        })
+
+        packer = FunctionPackage(p.data['name'])
+        self.assertTrue(packer.enable_ssl_cert)
 
     @staticmethod
     def _file_exists(files, name):

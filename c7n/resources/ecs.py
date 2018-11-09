@@ -130,15 +130,15 @@ class ServiceMetrics(MetricsFilter):
             {'Name': 'ServiceName', 'Value': resource['serviceName']}]
 
 
-@Service.filter_registry.register('task-definition')
-class ServiceTaskFilter(ValueFilter):
+class RelatedTaskDefinitionFilter(ValueFilter):
 
     schema = type_schema('task-definition', rinherit=ValueFilter.schema)
     permissions = ('ecs:DescribeTaskDefinition',
                    'ecs:ListTaskDefinitions')
+    related_key = 'taskDefinition'
 
     def process(self, resources, event=None):
-        task_def_ids = [s['taskDefinition'] for s in resources]
+        task_def_ids = list({s[self.related_key] for s in resources})
         task_def_manager = self.manager.get_resource_manager(
             'ecs-task-definition')
 
@@ -155,11 +155,38 @@ class ServiceTaskFilter(ValueFilter):
         else:
             task_defs = task_def_manager.augment(task_def_ids)
         self.task_defs = {t['taskDefinitionArn']: t for t in task_defs}
-        return super(ServiceTaskFilter, self).process(resources)
+        return super(RelatedTaskDefinitionFilter, self).process(resources)
 
     def __call__(self, i):
-        task = self.task_defs[i['taskDefinition']]
+        task = self.task_defs[i[self.related_key]]
         return self.match(task)
+
+
+@Service.filter_registry.register('task-definition')
+class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
+    """Filter services by their task definitions.
+
+    :Example:
+
+     Find any fargate services that are running with a particular
+     image in the task and delete them.
+
+    .. code-block:: yaml
+
+       policies:
+         - name: fargate-readonly-tasks
+           resource: ecs-task
+           filters:
+            - launchType: FARGATE
+            - type: task-definition
+              key: "containerDefinitions[].image"
+              value: "elasticsearch/elasticsearch:6.4.3
+              value_type: swap
+              op: contains
+           actions:
+            - delete
+
+    """
 
 
 @Service.action_registry.register('delete')
@@ -220,6 +247,34 @@ class Task(query.ChildResourceManager):
         if source in ('describe', 'describe-child'):
             source = 'describe-ecs-task'
         return source
+
+
+@Task.filter_registry.register('task-definition')
+class TaskTaskDefinitionFilter(RelatedTaskDefinitionFilter):
+    """Filter tasks by their task definition.
+
+    :Example:
+
+     Find any fargate tasks that are running without read only root
+     and stop them.
+
+    .. code-block:: yaml
+
+       policies:
+         - name: fargate-readonly-tasks
+           resource: ecs-task
+           filters:
+            - launchType: FARGATE
+            - type: task-definition
+              key: "containerDefinitions[].readonlyRootFilesystem"
+              value: None
+              value_type: swap
+              op: contains
+           actions:
+            - stop
+
+    """
+    related_key = 'taskDefinitionArn'
 
 
 @Task.action_registry.register('stop')

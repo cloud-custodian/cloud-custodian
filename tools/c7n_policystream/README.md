@@ -25,7 +25,7 @@ policystream can be installed via pypi, provided the require pre-requisites
 libraries are available (libgit2 > 0.26)
 
 ```
-pip install c7n
+pip install c7n-policystream
 ```
 
 Docker images available soon, see build for constructing your own.
@@ -37,7 +37,10 @@ Alternatively a docker image can be built as follows
 ```shell
 # Note must be top level directory of checkout
 cd cloud-custodian
+
 docker build -t policystream:latest -f tools/c7n_policystream/Dockerfile .
+
+docker run --mount src="$(pwd)",target=/repos,type=bind policystream:latest
 ```
 
 # Usage
@@ -45,7 +48,7 @@ docker build -t policystream:latest -f tools/c7n_policystream/Dockerfile .
 Streaming use case (default stream is to stdout, also supports kinesis, rdbms and sqs)
 
 ```
-  $ python tools/ops/policystream.py stream -r foo
+  $ c7n-policystream stream -r foo
   2018-08-12 12:37:00,567: c7n.policystream:INFO Cloning repository: foo
   <policy-add policy:foi provider:aws resource:ec2 date:2018-08-02T15:13:28-07:00 author:Kapil commit:09cb85>
   <policy-moved policy:foi provider:aws resource:ec2 date:2018-08-02T15:14:24-07:00 author:Kapil commit:76fce7>
@@ -66,13 +69,13 @@ the diff to previous commit on master. For repositories not using the
 
 
 ```
-  $ python tools/ops/policystream.py diff -r foo -v
+  $ c7n-policystream diff -r foo -v
 ```
 
 Pull request use, output policies changes between current branch and master.
 
 ```
-  $ python tools/ops/policystream.py diff -r foo
+  $ c7n-policystream diff -r foo
   policies:
   - filters:
     - {type: cross-account}
