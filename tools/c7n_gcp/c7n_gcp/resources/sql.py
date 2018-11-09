@@ -15,7 +15,6 @@
 import re
 
 from c7n.utils import type_schema
-
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
@@ -53,3 +52,19 @@ class SqlInstanceDelete(SqlInstanceAction):
     method_spec = {'op': 'delete'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/instances/(.*)')
+
+
+@SqlInstance.action_registry.register('stop')
+class SqlInstanceStop(MethodAction):
+
+    schema = type_schema('stop')
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile(
+       '.*?/projects/(.*?)/instances/(.*)')
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project,
+                        'instance': instance, 
+                        'body': {'settings': {'activationPolicy':'NEVER'}}}

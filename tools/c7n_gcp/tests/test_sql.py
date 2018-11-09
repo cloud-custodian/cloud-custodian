@@ -38,6 +38,20 @@ class SqlInstanceTest(BaseTest):
              "name": "brenttest-2"})
         self.assertEqual(instance['state'], 'RUNNABLE')
 
+    def test_stop_instance(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('sqlinstance-stop', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'istop',
+             'resource': 'gcp.sql-instance',
+             'filters': [{'name': 'brenttest-5'}],
+             'actions': ['stop']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+
     def test_delete_instance(self):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data('sqlinstance-terminate', project_id=project_id)
