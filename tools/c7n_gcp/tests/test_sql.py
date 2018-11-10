@@ -21,11 +21,11 @@ class SqlInstanceTest(BaseTest):
     def test_sqlinstance_query(self):
         factory = self.replay_flight_data('sqlinstance-query')
         p = self.load_policy(
-            {'name': 'all-instances',
+            {'name': 'all-sqlinstances',
              'resource': 'gcp.sql-instance'},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
     def test_sqlinstance_get(self):
         factory = self.replay_flight_data('sqlinstance-get')
