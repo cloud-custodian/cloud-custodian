@@ -56,6 +56,7 @@ class SqlInstanceTest(BaseTest):
         project_id = 'cloud-custodian'
         instance_name = 'brenttest-8'
         factory = self.replay_flight_data('sqlinstance-terminate', project_id=project_id)
+
         # Before Delete Resource Count
         p = self.load_policy(
             {'name': 'iterm',
@@ -64,6 +65,7 @@ class SqlInstanceTest(BaseTest):
         resources = p.run()
         beforeDeleteCount = len(resources)
         self.assertEqual(beforeDeleteCount, 2)
+
         # After Delete Resource Count
         p = self.load_policy(
             {'name': 'sqliterm',
