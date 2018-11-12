@@ -54,11 +54,21 @@ class SqlInstanceTest(BaseTest):
 
     def test_delete_instance(self):
         project_id = 'cloud-custodian'
+        instance_name = 'brenttest-8'
         factory = self.replay_flight_data('sqlinstance-terminate', project_id=project_id)
+        # Before Delete Resource Count
         p = self.load_policy(
             {'name': 'iterm',
+             'resource': 'gcp.sql-instance'},
+            session_factory=factory)
+        resources = p.run()
+        beforeDeleteCount = len(resources)
+        self.assertEqual(beforeDeleteCount, 2)
+        # After Delete Resource Count
+        p = self.load_policy(
+            {'name': 'sqliterm',
              'resource': 'gcp.sql-instance',
-             'filters': [{'name': 'brenttest-4'}],
+             'filters': [{'name': instance_name}],
              'actions': ['delete']},
             session_factory=factory)
         resources = p.run()
@@ -68,4 +78,7 @@ class SqlInstanceTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query(
             'list', {'project': project_id})
-        self.assertEqual(len(result['items']), 2)
+        afterDeleteCount = len(result["items"])
+        self.assertEqual(afterDeleteCount, 1)
+        # Check to see if number of resources is 1 less than before delete
+        self.assertEqual(beforeDeleteCount - afterDeleteCount, 1)
