@@ -54,7 +54,7 @@ class SqlInstanceTest(BaseTest):
 
     def test_delete_instance(self):
         project_id = 'cloud-custodian'
-        instance_name = 'brenttest-8'
+        instance_name = 'brenttest-12'
         factory = self.replay_flight_data('sqlinstance-terminate', project_id=project_id)
 
         # Before Delete Resource Count
