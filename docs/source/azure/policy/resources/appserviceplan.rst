@@ -11,14 +11,14 @@ Filters
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
-- ``onhours``
+- ``onhour``
 
-  .. c7n-schema:: AzureOnHours
+  .. c7n-schema:: AzureOnHour
        :module: c7n_azure.filters
 
-- ``offhours``
+- ``offhour``
 
-  .. c7n-schema:: AzureOffHours
+  .. c7n-schema:: AzureOffHour
        :module: c7n_azure.filters
 
 Actions
