@@ -30,6 +30,18 @@ class AppServicePlanTest(BaseTest):
             p = self.load_policy({
                 'name': 'test-azure-appserviceplan',
                 'resource': 'azure.appserviceplan',
+                'filters': [
+                    {'type': 'offhour',
+                     'default_tz': "pt",
+                     'offhour': 18,
+                     'tag': 'schedule'},
+                    {'type': 'onhour',
+                     'default_tz': "pt",
+                     'onhour': 18,
+                     'tag': 'schedule'}],
+                'actions': [
+                    {'type': 'resize-plan',
+                     'size': 'F1'}],
             }, validate=True)
             self.assertTrue(p)
 
