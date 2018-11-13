@@ -69,6 +69,7 @@ setup(
                       "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
+                      "distlib",
                       "requests",
                       "PyJWT",
                       "c7n",
