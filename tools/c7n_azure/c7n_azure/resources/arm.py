@@ -64,12 +64,14 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('untag', RemoveTag)
                 klass.action_registry.register('auto-tag-user', AutoTagUser)
                 klass.action_registry.register('tag-trim', TagTrim)
-                if resource is not 'resourcegroup':
-                    klass.action_registry.register('delete', DeleteAction)
                 klass.filter_registry.register('metric', MetricFilter)
                 klass.filter_registry.register('marked-for-op', TagActionFilter)
                 klass.action_registry.register('mark-for-op', TagDelayedAction)
                 klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
+
+                if resource is not 'resourcegroup':
+                    klass.action_registry.register('delete', DeleteAction)
+
                 if hasattr(klass.resource_type, 'diagnostic_settings_enabled') \
                         and klass.resource_type.diagnostic_settings_enabled:
                     klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
