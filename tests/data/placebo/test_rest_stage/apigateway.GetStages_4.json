@@ -1,0 +1,105 @@
+{
+    "status_code": 200, 
+    "data": {
+        "item": [
+            {
+                "tracingEnabled": false, 
+                "description": "nonprod", 
+                "stageName": "nonprod", 
+                "cacheClusterSize": "0.5", 
+                "cacheClusterEnabled": true, 
+                "cacheClusterStatus": "AVAILABLE", 
+                "deploymentId": "r2pi2v", 
+                "lastUpdatedDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 55, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 13, 
+                    "minute": 43
+                }, 
+                "createdDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 15, 
+                    "minute": 34
+                }, 
+                "methodSettings": {
+                    "*/*": {
+                        "cacheTtlInSeconds": 100, 
+                        "loggingLevel": "INFO", 
+                        "dataTraceEnabled": true, 
+                        "metricsEnabled": false, 
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER", 
+                        "throttlingRateLimit": 1000.0, 
+                        "cacheDataEncrypted": false, 
+                        "cachingEnabled": false, 
+                        "throttlingBurstLimit": 5000, 
+                        "requireAuthorizationForCacheControl": true
+                    }
+                }
+            }, 
+            {
+                "tracingEnabled": false, 
+                "description": "Created by AWS Lambda", 
+                "stageName": "prod", 
+                "cacheClusterEnabled": false, 
+                "cacheClusterStatus": "NOT_AVAILABLE", 
+                "deploymentId": "r2pi2v", 
+                "lastUpdatedDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 20, 
+                    "minute": 26
+                }, 
+                "createdDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 35
+                }, 
+                "methodSettings": {
+                    "*/*": {
+                        "cacheTtlInSeconds": 300, 
+                        "loggingLevel": "INFO", 
+                        "dataTraceEnabled": true, 
+                        "metricsEnabled": false, 
+                        "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER", 
+                        "throttlingRateLimit": 10000.0, 
+                        "cacheDataEncrypted": false, 
+                        "cachingEnabled": false, 
+                        "throttlingBurstLimit": 5000, 
+                        "requireAuthorizationForCacheControl": true
+                    }
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "02ed4cfa-e786-11e8-ab87-078cd7096ea0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "02ed4cfa-e786-11e8-ab87-078cd7096ea0", 
+                "content-length": "1155", 
+                "x-amz-apigw-id": "QUXsjJknoAMEdkw=", 
+                "connection": "keep-alive", 
+                "date": "Tue, 13 Nov 2018 20:52:19 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

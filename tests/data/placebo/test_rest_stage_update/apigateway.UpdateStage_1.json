@@ -1,55 +1,57 @@
 {
-    "status_code": 200,
+    "status_code": 200, 
     "data": {
+        "tracingEnabled": false, 
+        "stageName": "dev", 
         "ResponseMetadata": {
-            "RequestId": "9ca85f6e-fdfe-11e7-a190-a392413faa8a",
-            "HTTPStatusCode": 200,
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d0c8be1c-e78a-11e8-811d-93bc8eabb227", 
             "HTTPHeaders": {
-                "date": "Sat, 20 Jan 2018 16:26:05 GMT",
-                "content-type": "application/json",
-                "content-length": "507",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "9ca85f6e-fdfe-11e7-a190-a392413faa8a"
-            },
-            "RetryAttempts": 0
-        },
-        "deploymentId": "49ijxa",
-        "stageName": "noop",
-        "cacheClusterEnabled": false,
-        "cacheClusterStatus": "NOT_AVAILABLE",
+                "x-amzn-requestid": "d0c8be1c-e78a-11e8-811d-93bc8eabb227", 
+                "content-length": "529", 
+                "x-amz-apigw-id": "QUcu9L6UoAMEcHQ=", 
+                "connection": "keep-alive", 
+                "date": "Tue, 13 Nov 2018 21:26:43 GMT", 
+                "content-type": "application/json"
+            }
+        }, 
+        "cacheClusterEnabled": false, 
+        "cacheClusterStatus": "NOT_AVAILABLE", 
+        "deploymentId": "49ijxa", 
+        "lastUpdatedDate": {
+            "hour": 16, 
+            "__class__": "datetime", 
+            "month": 11, 
+            "second": 42, 
+            "microsecond": 0, 
+            "year": 2018, 
+            "day": 13, 
+            "minute": 26
+        }, 
+        "createdDate": {
+            "hour": 16, 
+            "__class__": "datetime", 
+            "month": 11, 
+            "second": 12, 
+            "microsecond": 0, 
+            "year": 2018, 
+            "day": 13, 
+            "minute": 26
+        }, 
         "methodSettings": {
             "*/*": {
-                "metricsEnabled": false,
-                "loggingLevel": "INFO",
-                "dataTraceEnabled": true,
-                "throttlingBurstLimit": 5000,
-                "throttlingRateLimit": 10000.0,
-                "cachingEnabled": false,
-                "cacheTtlInSeconds": 300,
-                "cacheDataEncrypted": false,
-                "requireAuthorizationForCacheControl": true,
-                "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER"
+                "cacheTtlInSeconds": 300, 
+                "loggingLevel": "INFO", 
+                "dataTraceEnabled": true, 
+                "metricsEnabled": false, 
+                "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER", 
+                "throttlingRateLimit": 10000.0, 
+                "cacheDataEncrypted": false, 
+                "cachingEnabled": false, 
+                "throttlingBurstLimit": 5000, 
+                "requireAuthorizationForCacheControl": true
             }
-        },
-        "createdDate": {
-            "__class__": "datetime",
-            "year": 2017,
-            "month": 1,
-            "day": 22,
-            "hour": 6,
-            "minute": 28,
-            "second": 2,
-            "microsecond": 0
-        },
-        "lastUpdatedDate": {
-            "__class__": "datetime",
-            "year": 2018,
-            "month": 1,
-            "day": 20,
-            "hour": 11,
-            "minute": 26,
-            "second": 5,
-            "microsecond": 0
         }
     }
 }
