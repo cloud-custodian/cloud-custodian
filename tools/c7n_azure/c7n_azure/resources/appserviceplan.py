@@ -80,14 +80,18 @@ class ResizePlan(AzureBaseAction):
                 model.sku = models.SkuDescription()
                 model.sku.tier = ResizePlan.lookup_tier(size)
                 model.sku.capacity = size[1]
-                model.sku.name = size
+                model.sku.name = size + 'cat'
                 model.sku.family = size[0]
                 model.sku.size = size
 
             if 'count' in self.data:
                 model.target_worker_count = self.data.get('count')
 
-            client.app_service_plans.update(plan['resourceGroup'], plan['name'], model)
+            try:
+                client.app_service_plans.update(plan['resourceGroup'], plan['name'], model)
+            except models.DefaultErrorResponseException as e:
+                self.log.error("Failed to resize %s.  Inner exception: %s" % (plan['name'], e.inner_exception))
+                raise e
 
     @staticmethod
     def lookup_tier(size):
