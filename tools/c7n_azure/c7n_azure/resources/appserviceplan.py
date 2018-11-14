@@ -93,6 +93,7 @@ class ResizePlan(AzureBaseAction):
     def lookup_tier(size):
         tiers = {
             'F': 'Free',
+            'B': 'Basic',
             'S': 'Standard',
             'D': 'Shared',
             'P': 'Premium'
