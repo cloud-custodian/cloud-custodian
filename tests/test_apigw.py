@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
 from .common import BaseTest
 
 
@@ -221,10 +223,17 @@ class TestRestStage(BaseTest):
             {
                 "name": "rest-stage-delete",
                 "resource": "rest-stage",
-                "filters": [{"type": "value", "key": "stageName", "value": "testing-skunk-1"}],
+                "filters": [{"type": "value", "key": "stageName", "value": "delete-test"}],
                 "actions": [{"type": "delete"}],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        client = session_factory().client("apigateway")
+        try:
+            stage = client.get_stage(
+                restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
+            )
+            self.fail('found deleted stage: %s' % stage)
+        except ClientError as e:
+            self.assertTrue(e.response['Error']['Code'] == 'NotFoundException')

@@ -262,10 +262,13 @@ class DeleteStage(BaseAction):
     def process(self, resources):
         client = utils.local_session(self.manager.session_factory).client('apigateway')
         for r in resources:
-            self.manager.retry(
-                client.delete_stage,
-                restApiId=r['restApiId'],
-                stageName=r['stageName'])
+            try:
+                self.manager.retry(
+                    client.delete_stage,
+                    restApiId=r['restApiId'],
+                    stageName=r['stageName'])
+            except client.exceptions.NotFoundException:
+                pass
 
 
 @resources.register('rest-resource')
