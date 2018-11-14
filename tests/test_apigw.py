@@ -230,10 +230,8 @@ class TestRestStage(BaseTest):
         )
         resources = p.run()
         client = session_factory().client("apigateway")
-        try:
+        with self.assertRaises(ClientError) as e:
             stage = client.get_stage(
                 restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
             )
-            self.fail('found deleted stage: %s' % stage)
-        except ClientError as e:
-            self.assertTrue(e.response['Error']['Code'] == 'NotFoundException')
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
