@@ -56,14 +56,15 @@ class ResizePlan(AzureBaseAction):
               resource: azure.appserviceplan
               actions:
                - type: resize-plan
-                 size: F1 # F1, D1, S1, S2, S3, P1, P2, P3
+                 size: F1 # F1, B1, B2, B3, D1, S1, S2, S3, P1, P2, P3
                  count: 1
     """
 
     schema = utils.type_schema(
         'resize-plan',
         **{
-            'size': {'type': 'string', 'enum': ['F1', 'D1', 'S1', 'S2', 'S3', 'P1', 'P2', 'P3']},
+            'size': {'type': 'string', 'enum':
+                        ['F1', 'B1', 'B2', 'B3', 'D1', 'S1', 'S2', 'S3', 'P1', 'P2', 'P3']},
             'count': {'type': 'integer'}
         }
     )
