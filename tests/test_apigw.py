@@ -231,7 +231,7 @@ class TestRestStage(BaseTest):
         resources = p.run()
         client = session_factory().client("apigateway")
         with self.assertRaises(ClientError) as e:
-            stage = client.get_stage(
+            client.get_stage(
                 restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
             )
         self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
