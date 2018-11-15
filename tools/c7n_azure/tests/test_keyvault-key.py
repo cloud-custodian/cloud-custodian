@@ -20,7 +20,7 @@ class KeyVaultKeyTest(BaseTest):
     def setUp(self):
         super(KeyVaultKeyTest, self).setUp()
 
-    @arm_template('keyvault-key.json')
+    #@arm_template('keyvault-key.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault-key',
@@ -33,4 +33,4 @@ class KeyVaultKeyTest(BaseTest):
                  'value': 2}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 4)

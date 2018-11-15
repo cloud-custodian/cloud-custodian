@@ -1,0 +1,70 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.7 (Linux-4.18.0-10-generic-x86_64-with-Ubuntu-18.10-cosmic)
+          msrest/0.6.1 msrest_azure/0.5.1 azure-mgmt-keyvault/1.1.0 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXP308mD892H9x5uZweTh9v7nz7MtyfZ7oPtyc7O/Xt7
+        n06y/GByt86bal1P88/rar1q7k7Laj2brpu2mhXZ8u6qri6LWV43d78opnXVVOft+PfKr38yW5ft
+        3Uv8233lbX7Nn380+miZLQi5jwa/b69X+H4QMjUpq2mGwVCzPGvaNT5rs4vmo0e/+Jf8ku//kv8H
+        knd/3gIBAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['293']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Thu, 15 Nov 2018 14:38:17 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [afe45159-4a29-4818-a04f-c9fc4bf4557c]
+      x-ms-ratelimit-remaining-subscription-reads: ['11999']
+      x-ms-request-id: [afe45159-4a29-4818-a04f-c9fc4bf4557c]
+      x-ms-routing-request-id: ['SOUTHCENTRALUS:20181115T143817Z:afe45159-4a29-4818-a04f-c9fc4bf4557c']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.7 (Linux-4.18.0-10-generic-x86_64-with-Ubuntu-18.10-cosmic)
+          msrest/0.6.1 msrest_azure/0.5.1 azure-keyvault/7.0 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://cloudcustodiankeyvault.vault.azure.net/keys?api-version=7.0
+  response:
+    body: {string: '{"value":[{"kid":"https://cloudcustodiankeyvault.vault.azure.net/keys/testcert1","attributes":{"enabled":true,"nbf":1542291808,"exp":1573828408,"created":1542292408,"updated":1542292408,"recoveryLevel":"Purgeable"},"managed":true},{"kid":"https://cloudcustodiankeyvault.vault.azure.net/keys/testkey1","attributes":{"enabled":true,"created":1542284600,"updated":1542284600,"recoveryLevel":"Purgeable"}},{"kid":"https://cloudcustodiankeyvault.vault.azure.net/keys/testkey2","attributes":{"enabled":true,"created":1542284612,"updated":1542284612,"recoveryLevel":"Purgeable"}},{"kid":"https://cloudcustodiankeyvault.vault.azure.net/keys/testkey3","attributes":{"enabled":true,"created":1542284626,"updated":1542284626,"recoveryLevel":"Purgeable"}}],"nextLink":null}'}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['761']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Thu, 15 Nov 2018 14:38:18 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-IIS/10.0]
+      Strict-Transport-Security: [max-age=31536000;includeSubDomains]
+      X-AspNet-Version: [4.0.30319]
+      X-Content-Type-Options: [nosniff]
+      X-Powered-By: [ASP.NET]
+      x-ms-keyvault-network-info: [addr=47.187.26.148;act_addr_fam=InterNetwork;]
+      x-ms-keyvault-region: [eastus]
+      x-ms-keyvault-service-version: [1.1.0.858]
+      x-ms-request-id: [f7ceef15-c959-46e4-8e5e-908b28a2372b]
+    status: {code: 200, message: OK}
+version: 1

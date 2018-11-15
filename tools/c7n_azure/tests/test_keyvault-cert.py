@@ -30,7 +30,7 @@ class KeyVaultCertTest(BaseTest):
                  'key': 'created',
                  'op': 'lt',
                  'value_type': 'age',
-                 'value': 2}],
+                 'value': 4}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
