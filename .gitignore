@@ -8,6 +8,7 @@ lib/
 bin/
 !tools/c7n_azure/c7n_azure/function_binding_resources/bin
 tools/c7n_azure/c7n_azure/function_binding_resources/obj/
+tools/c7n_azure/c7n_azure/cache
 dist/
 man/
 lib64

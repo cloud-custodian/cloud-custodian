@@ -21,7 +21,7 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_policystream",
-    version='0.2.3',
+    version='0.3.0',
     description="Cloud Custodian - Git Commits as Logical Policy Changes",
     classifiers=[
         "Topic :: System :: Systems Administration",

@@ -13,7 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
+from dateutil import zoneinfo
+
 from azure_common import BaseTest, arm_template
+
+from c7n.testing import mock_datetime_now
 
 
 class AppServicePlanTest(BaseTest):
@@ -25,6 +30,18 @@ class AppServicePlanTest(BaseTest):
             p = self.load_policy({
                 'name': 'test-azure-appserviceplan',
                 'resource': 'azure.appserviceplan',
+                'filters': [
+                    {'type': 'offhour',
+                     'default_tz': "pt",
+                     'offhour': 18,
+                     'tag': 'schedule'},
+                    {'type': 'onhour',
+                     'default_tz': "pt",
+                     'onhour': 18,
+                     'tag': 'schedule'}],
+                'actions': [
+                    {'type': 'resize-plan',
+                     'size': 'F1'}],
             }, validate=True)
             self.assertTrue(p)
 
@@ -42,3 +59,58 @@ class AppServicePlanTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('appserviceplan.json')
+    def test_resize_plan(self):
+        p = self.load_policy({
+            'name': 'test-azure-appserviceplan',
+            'resource': 'azure.appserviceplan',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctest-appserviceplan'}],
+            'actions': [
+                {'type': 'resize-plan',
+                 'size': 'F1'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('appserviceplan.json')
+    def test_on_off_hours(self):
+        t = datetime.datetime.now(zoneinfo.gettz("pt"))
+        t = t.replace(year=2018, month=8, day=24, hour=18, minute=30)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy({
+                'name': 'test-azure-vm',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'offhour',
+                     'default_tz': "pt",
+                     'offhour': 18,
+                     'tag': 'schedule'}
+                ],
+            })
+
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+        t = t.replace(year=2018, month=8, day=24, hour=8, minute=30)
+
+        with mock_datetime_now(t, datetime):
+            p = self.load_policy({
+                'name': 'test-azure-vm',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'onhour',
+                     'default_tz': "pt",
+                     'onhour': 8,
+                     'tag': 'schedule'}
+                ],
+            })
+
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
