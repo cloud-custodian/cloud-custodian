@@ -16,14 +16,16 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 from azure.mgmt.policyinsights import PolicyInsightsClient
-from c7n_azure.utils import Math
-from c7n_azure.utils import now
 from dateutil import zoneinfo
 from dateutil.parser import parse
 
+from c7n_azure.utils import Math
+from c7n_azure.utils import now
+from c7n_azure.tags import TagHelper
+
 from c7n.filters import Filter, ValueFilter
 from c7n.filters.core import PolicyValidationError
-from c7n.filters.offhours import Time
+from c7n.filters.offhours import Time, OffHour, OnHour
 from c7n.utils import chunks
 from c7n.utils import type_schema
 
@@ -340,3 +342,29 @@ class PolicyCompliantFilter(Filter):
             return [r for r in resources if r['id'].lower() not in non_compliant]
         else:
             return [r for r in resources if r['id'].lower() in non_compliant]
+
+
+class AzureOffHour(OffHour):
+
+    # Override get_tag_value because Azure stores tags differently from AWS
+    def get_tag_value(self, i):
+        tag_value = TagHelper.get_tag_value(resource=i,
+                                            tag=self.tag_key,
+                                            utf_8=True)
+
+        if tag_value is not False:
+            tag_value = tag_value.lower().strip("'\"")
+        return tag_value
+
+
+class AzureOnHour(OnHour):
+
+    # Override get_tag_value because Azure stores tags differently from AWS
+    def get_tag_value(self, i):
+        tag_value = TagHelper.get_tag_value(resource=i,
+                                            tag=self.tag_key,
+                                            utf_8=True)
+
+        if tag_value is not False:
+            tag_value = tag_value.lower().strip("'\"")
+        return tag_value

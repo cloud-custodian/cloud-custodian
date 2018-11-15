@@ -120,7 +120,7 @@ def setup_parser():
         help="AWS Account Config File Profile to utilize")
     parser.add_argument(
         "--prefix", default="custodian-",
-        help="AWS Account Config File Profile to utilize")
+        help="The Lambda name prefix to use for clean-up")
     parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")

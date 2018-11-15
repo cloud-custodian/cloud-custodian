@@ -37,6 +37,7 @@ ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION = 'CUSTODIAN_DISABLE_SSL_CERT_VERIFI
 """
 Authentication Resource
 """
+RESOURCE_ACTIVE_DIRECTORY = 'https://management.core.windows.net/'
 RESOURCE_STORAGE = 'https://storage.azure.com/'
 
 """
