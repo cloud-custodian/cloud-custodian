@@ -22,6 +22,7 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
+from c7n.tags import universal_augment
 
 
 @resources.register('rest-account')
@@ -178,6 +179,12 @@ class RestStage(query.ChildResourceManager):
         name = id = 'stageName'
         date = 'createdDate'
         dimension = None
+        universal_taggable = True
+        type = None
+
+    def augment(self, resources):
+        return universal_augment(
+            self, super(RestStage, self).augment(resources))
 
 
 @query.sources.register('describe-rest-stage')
