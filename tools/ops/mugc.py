@@ -1,4 +1,4 @@
-# Copyright 2016-2017 Capital One Services, LLC
+# Copyright 2016-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,38 +19,38 @@ import logging
 import sys
 
 from c7n.credentials import SessionFactory
+from c7n.config import Config
 from c7n.policy import load as policy_load
-from c7n import mu, resources
+from c7n import mu
 
 from botocore.exceptions import ClientError
+
 
 log = logging.getLogger('resources')
 
 
-def load_policies(options):
+def load_policies(options, config):
     policies = []
     for f in options.config_files:
-        collection = policy_load(options, f)
+        collection = policy_load(config, f)
         policies.extend(collection.filter(options.policy_filter))
     return policies
 
 
-def resources_gc_prefix(options, policy_collection):
-    """Garbage collect old custodian policies based on prefix.
+def region_gc(options, region, policy_config, policies):
 
-    We attempt to introspect to find the event sources for a policy
-    but without the old configuration this is implicit.
-    """
     session_factory = SessionFactory(
-        options.region, options.profile, options.assume_role)
+        region=region,
+        assume_role=policy_config.assume_role,
+        profile=policy_config.profile,
+        external_id=policy_config.external_id)
 
     manager = mu.LambdaManager(session_factory)
     funcs = list(manager.list_functions(options.prefix))
-
     client = session_factory().client('lambda')
 
     remove = []
-    current_policies = [p.name for p in policy_collection]
+    current_policies = [p.name for p in policies]
     for f in funcs:
         pn = f['FunctionName'].split('-', 1)[1]
         if pn not in current_policies:
@@ -105,6 +105,24 @@ def resources_gc_prefix(options, policy_collection):
         log.info("Removed %s" % n['FunctionName'])
 
 
+def resources_gc_prefix(options, policy_config, policy_collection):
+    """Garbage collect old custodian policies based on prefix.
+
+    We attempt to introspect to find the event sources for a policy
+    but without the old configuration this is implicit.
+    """
+
+    # Classify policies by region
+    policy_regions = {}
+    for p in policy_collection:
+        if p.execution_mode == 'poll':
+            continue
+        policy_regions.setdefault(p.options.region, []).append(p)
+
+    for region, policies in policy_regions:
+        region_gc(options, region, policies)
+
+
 def setup_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("configs", nargs='*', help="Policy configuration file(s)")
@@ -112,8 +130,10 @@ def setup_parser():
         '-c', '--config', dest="config_files", nargs="*", action='append',
         help="Policy configuration files(s)")
     parser.add_argument(
-        '-r', '--region', default=os.environ.get(
-            'AWS_DEFAULT_REGION', 'us-east-1'))
+        '-r', '--region', action='append', dest='regions', metavar='REGION',
+        help="AWS Region to target. Can be used multiple times, also supports `all`",
+        default=[os.environ.get(
+            'AWS_DEFAULT_REGION', 'us-east-1')])
     parser.add_argument('--dryrun', action="store_true", default=False)
     parser.add_argument(
         "--profile", default=os.environ.get('AWS_PROFILE'),
@@ -121,6 +141,8 @@ def setup_parser():
     parser.add_argument(
         "--prefix", default="custodian-",
         help="AWS Account Config File Profile to utilize")
+    parser.add_argument("-p", "--policies", default=None, dest='policy_filter',
+                        help="Only use named/matched policies")
     parser.add_argument(
         "--assume", default=None, dest="assume_role",
         help="Role to assume")
@@ -134,11 +156,6 @@ def main():
     parser = setup_parser()
     options = parser.parse_args()
 
-    options.policy_filter = None
-    options.log_group = None
-    options.external_id = None
-    options.cache_period = 0
-    options.cache = None
     log_level = logging.INFO
     if options.verbose:
         log_level = logging.DEBUG
@@ -152,14 +169,19 @@ def main():
     files.extend(itertools.chain(*options.config_files))
     files.extend(options.configs)
     options.config_files = files
+
     if not files:
         parser.print_help()
         sys.exit(1)
 
-    resources.load_resources()
+    policy_config = Config.empty(
+        regions=options.regions,
+        profile=options.profile,
+        assume_role=options.assume_role)
 
-    policies = load_policies(options)
-    resources_gc_prefix(options, policies)
+    import pdb; pdb.set_trace()
+    policies = load_policies(options, policy_config)
+    resources_gc_prefix(options, policy_config, policies)
 
 
 if __name__ == '__main__':
