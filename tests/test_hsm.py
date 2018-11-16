@@ -20,5 +20,4 @@ class CloudHSMClusterTest(BaseTest):
         id = resources[0]["ClusterId"]
         tags = client.list_tags(ResourceId=id)
         tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
-        print(tag_map)
         self.assertTrue("foo" in tag_map)
