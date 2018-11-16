@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
 from .common import BaseTest
 
 
@@ -214,3 +216,22 @@ class TestRestStage(BaseTest):
             self.assertEqual(m["loggingLevel"], "INFO")
             self.assertEqual(m["dataTraceEnabled"], True)
         self.assertTrue(found)
+
+    def test_rest_stage_delete(self):
+        session_factory = self.replay_flight_data("test_rest_stage_delete")
+        p = self.load_policy(
+            {
+                "name": "rest-stage-delete",
+                "resource": "rest-stage",
+                "filters": [{"type": "value", "key": "stageName", "value": "delete-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        client = session_factory().client("apigateway")
+        with self.assertRaises(ClientError) as e:
+            client.get_stage(
+                restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
+            )
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
