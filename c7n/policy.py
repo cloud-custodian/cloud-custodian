@@ -746,9 +746,12 @@ class Policy(object):
     def get_cache(self):
         return self.resource_manager._cache
 
+    @property
+    def execution_mode(self):
+        return self.data.get('mode', {'type': 'pull'})['type']
+
     def get_execution_mode(self):
-        exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        exec_mode = execution[exec_mode_type]
+        exec_mode = execution[self.execution_mode]
         if exec_mode is None:
             return None
         return exec_mode(self)

@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagList": [
+            {
+                "Key": "foo",
+                "Value": "bar"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8beb7ee1-e928-11e8-9429-d17d579772dc",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Thu, 15 Nov 2018 22:48:19 GMT",
+                "x-amzn-requestid": "8beb7ee1-e928-11e8-9429-d17d579772dc",
+                "content-length": "41",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -57,6 +57,11 @@ class ExecutionContext(object):
         self.output = blob_outputs.select(self.options.output_dir, self)
         self.logs = log_outputs.select(self.options.log_group, self)
 
+        # Always do file/blob storage outputs
+        self.output_logs = None
+        if not isinstance(self.logs, log_outputs['default']):
+            self.output_logs = log_outputs.select(None, self)
+
         # Look for customizations, but fallback to default
         for api_stats_type in (self.policy.provider_name, 'default'):
             if api_stats_type in api_stats_outputs:
@@ -80,6 +85,9 @@ class ExecutionContext(object):
         self.sys_stats.__enter__()
         self.output.__enter__()
         self.logs.__enter__()
+        if self.output_logs:
+            self.output_logs.__enter__()
+
         self.api_stats.__enter__()
         self.tracer.__enter__()
         return self
@@ -94,6 +102,8 @@ class ExecutionContext(object):
         with self.tracer.subsegment('output'):
             self.metrics.flush()
             self.logs.__exit__(exc_type, exc_value, exc_traceback)
+            if self.output_logs:
+                self.output_logs.__exit__(exc_type, exc_value, exc_traceback)
             self.output.__exit__(exc_type, exc_value, exc_traceback)
 
         self.tracer.__exit__()

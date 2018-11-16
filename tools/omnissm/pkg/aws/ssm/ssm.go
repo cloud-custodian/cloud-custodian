@@ -77,7 +77,14 @@ type ResourceTags struct {
 func (s *SSM) AddTagsToResource(ctx context.Context, input *ResourceTags) error {
 	awsTags := make([]*ssm.Tag, 0)
 	for k, v := range input.Tags {
+		v = SanitizeTag(v)
+		if v == "" {
+			continue
+		}
 		awsTags = append(awsTags, &ssm.Tag{Key: aws.String(k), Value: aws.String(v)})
+	}
+	if len(awsTags) == 0 {
+		return nil
 	}
 	s.ssmRate.Wait(ctx)
 	_, err := s.SSMAPI.AddTagsToResourceWithContext(ctx, &ssm.AddTagsToResourceInput{
