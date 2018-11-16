@@ -154,7 +154,7 @@ def setup_parser():
         help="AWS Account Config File Profile to utilize")
     parser.add_argument(
         "--prefix", default="custodian-",
-        help="AWS Account Config File Profile to utilize")
+        help="The Lambda name prefix to use for clean-up")
     parser.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     parser.add_argument(

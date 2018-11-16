@@ -222,7 +222,7 @@ class Session(object):
             version,
             kw.get('developer_key'),
             kw.get('cache_discovery', False),
-            self._http)
+            self._http or _build_http())
 
         return ServiceClient(
             gcp_service=service,
