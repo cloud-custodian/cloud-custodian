@@ -30,7 +30,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 
-log = logging.getLogger('resources')
+log = logging.getLogger('mugc')
 
 
 def load_policies(options, config):
