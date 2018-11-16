@@ -196,7 +196,6 @@ def main():
         profile=options.profile,
         assume_role=options.assume_role)
 
-
     # use cloud provider to initialize policies to get region expansion
     policies = AWS().initialize_policies(
         load_policies(options, policy_config), policy_config)
