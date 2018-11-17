@@ -60,7 +60,7 @@ class ECSCluster(query.QueryResourceManager):
         filter_name = None
 
     def augment(self, resources):
-        super(ECSCluster, self).augment(resources)
+        resources = super(ECSCluster, self).augment(resources)
         ecs_tag_normalize(resources)
         return resources
 
