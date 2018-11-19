@@ -509,7 +509,7 @@ the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS.
 * With no additional arguments, it will render the template specified by the policy the
   message is for, and actually send mail from the local machine as ``c7n-mailer`` would.
   This only works with SES, not SMTP.
-* With the ``-t`` | ``--template-print`` argument, it will log the email addresses that would
+* With the ``-T`` | ``--template-print`` argument, it will log the email addresses that would
   receive mail, and print the rendered message body template to STDOUT.
 * With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
   that would be sent, for each message that would be sent, to STDOUT.
