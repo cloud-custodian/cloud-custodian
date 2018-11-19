@@ -1568,3 +1568,44 @@ class ParameterFilter(ValueFilter):
                     results.append(resource)
                     break
         return results
+
+
+@actions.register('modify-protect')
+class ModifyProtect(BaseAction):
+    """Toggle DeletionProtection flag on RDS instance
+
+    'State' determines whether DeletionProtection should be set to true
+    or false. If 'state' is not specified, default is false.
+    'Immediate" determines whether the modifcation is applied immediately
+    or not. If 'immediate' is not specified, default is false.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: disable-rds-deletion-protection
+                resource: rds
+                filters:
+                  - DeletionProtection: true
+                actions:
+                  - type: modify-protect
+                    state: false
+                    immediate: true
+    """
+
+    schema = type_schema(
+        'modify-protect',
+        state={'type': 'boolean'},
+        immediate={'type': 'boolean'})
+
+    permissions = ('rds:ModifyDBInstance',)
+
+    def process(self, resources):
+        c = local_session(self.manager.session_factory).client('rds')
+
+        for r in resources:
+            c.modify_db_instance(
+                DBInstanceIdentifier=r['DBInstanceIdentifier'],
+                DeletionProtection=self.data.get('state', False),
+                ApplyImmediately=self.data.get('immediate', False))
