@@ -60,16 +60,22 @@ def policy_command(f):
 
         # for a default region for policy loading, we'll expand regions later.
         options.region = ""
-
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
-            except IOError:
+            except IOError as e:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
+            except yaml.YAMLError as e:
+                log.error(
+                    "yaml syntax error loading policy file ({}) error:\n {}".format(
+                        fp, e))
+                errors += 1
+                continue
             except ValueError as e:
-                log.error('problem loading policy file ({})'.format(e.message))
+                log.error('problem loading policy file ({}) error: {}'.format(
+                    fp, e.message))
                 errors += 1
                 continue
 
