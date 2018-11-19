@@ -733,7 +733,6 @@ class RDSTest(BaseTest):
         )
         verify_resources = verify_p.run()
         self.assertEqual(len(verify_resources), 1)
-        self.assertEqual(verify_resources[0]['DeletionProtection'], False)
 
 
 class RDSSnapshotTest(BaseTest):
