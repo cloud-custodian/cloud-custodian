@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+                "clusterName": "Default",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 1,
+                "activeServicesCount": 1,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "Env",
+                        "value": "Dev"
+                    },
+                    {
+                        "key": "Data",
+                        "value": "Magic"
+                    }
+                ]
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "c3f8715f-ecfd-11e8-b37e-41bc383f88d9",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c3f8715f-ecfd-11e8-b37e-41bc383f88d9",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "328",
+                "date": "Tue, 20 Nov 2018 19:52:08 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
