@@ -1575,7 +1575,7 @@ class ModifyDb(BaseAction):
     """Modifies an RDS instance based on specified parameter
     using ModifyDbInstance.
 
-    'Parameter' is a dict with with key value pairs that should be set to
+    'Update' is an array with with key value pairs that should be set to
     the keyword and value you wish to modify.
     'Immediate" determines whether the modification is applied immediately
     or not. If 'immediate' is not specified, default is false.
@@ -1589,27 +1589,81 @@ class ModifyDb(BaseAction):
                 resource: rds
                 filters:
                   - DeletionProtection: true
+                  - PubliclyAccessible: true
                 actions:
                   - type: modify-db
-                    parameter: {'DeletionProtection': false}
+                    update:
+                        - keyword: 'DeletionProtection'
+                            value: false
+                        - keyword: 'PubliclyAccessible'
+                            value: false
                     immediate: true
     """
 
     schema = type_schema(
         'modify-db',
-        parameter={"type": "object"},
-        immediate={'type': 'boolean'},
-        required=('parameter',))
+        immediate={"type": 'boolean'},
+        update={
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'keyword': {'type': 'string', 'enum': [
+                        'AllocatedStorage',
+                        'DBInstanceClass',
+                        'DBSubnetGroupName',
+                        'DBSecurityGroups',
+                        'VpcSecurityGroupIds',
+                        'MasterUserPassword',
+                        'DBParameterGroupName',
+                        'BackupRetentionPeriod',
+                        'PreferredBackupWindow',
+                        'PreferredMaintenanceWindow',
+                        'MultiAZ',
+                        'EngineVersion',
+                        'AllowMajorVersionUpgrade',
+                        'AutoMinorVersionUpgrade',
+                        'LicenseModel',
+                        'Iops',
+                        'OptionGroupName',
+                        'NewDBInstanceIdentifier',
+                        'StorageType',
+                        'TdeCredentialArn',
+                        'TdeCredentialPassword',
+                        'CACertificateIdentifier',
+                        'Domain',
+                        'CopyTagsToSnapshot',
+                        'MonitoringInterval',
+                        'DBPortNumber',
+                        'PubliclyAccessible',
+                        'DomainIAMRoleName',
+                        'PromotionTier',
+                        'EnableIAMDatabaseAuthentication',
+                        'EnablePerformanceInsights',
+                        'PerformanceInsightsKMSKeyId',
+                        'PerformanceInsightsRetentionPeriod',
+                        'CloudwatchLogsExportConfiguration',
+                        'UseDefaultProcessorFeatures',
+                        'DeletionProtection']},
+                    'value': {}
+                },
+            },
+        },
+        required=('update',))
 
     permissions = ('rds:ModifyDBInstance',)
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')
 
+        param = {}
+        param['ApplyImmediately'] = self.data.get('immediate', False)
+
+        for x in self.data.get('update'):
+            param[x['keyword']] = x['value']
+
         for r in resources:
-            param = self.data.get('parameter')
             param['DBInstanceIdentifier'] = r['DBInstanceIdentifier']
-            param['ApplyImmediately'] = self.data.get('immediate', False)
             try:
                 c.modify_db_instance(**param)
             except ClientError as e:

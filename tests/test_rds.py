@@ -722,7 +722,12 @@ class RDSTest(BaseTest):
                 "actions": [
                     {
                         "type": "modify-db",
-                        "parameter": {"DeletionProtection": False},
+                        "update": [
+                            {
+                                "keyword": 'DeletionProtection',
+                                "value": False
+                            }
+                        ],
                         "immediate": True
                     }
                 ],
