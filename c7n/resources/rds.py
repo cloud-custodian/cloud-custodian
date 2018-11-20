@@ -1570,13 +1570,14 @@ class ParameterFilter(ValueFilter):
         return results
 
 
-@actions.register('modify-protect')
-class ModifyProtect(BaseAction):
-    """Toggle DeletionProtection flag on RDS instance
+@actions.register('modify-db')
+class ModifyDb(BaseAction):
+    """Modifies an RDS instance based on specified param and value
+    using ModifyDbInstance.
 
-    'State' determines whether DeletionProtection should be set to true
-    or false. If 'state' is not specified, default is false.
-    'Immediate" determines whether the modifcation is applied immediately
+    'Parameter' determines which field is being modified.
+    'Value' is what the modified field will be set to.
+    'Immediate" determines whether the modification is applied immediately
     or not. If 'immediate' is not specified, default is false.
 
     :example:
@@ -1589,14 +1590,16 @@ class ModifyProtect(BaseAction):
                 filters:
                   - DeletionProtection: true
                 actions:
-                  - type: modify-protect
-                    state: false
+                  - type: modify-db
+                    parameter: DeletionProtection
+                    value: false
                     immediate: true
     """
 
     schema = type_schema(
-        'modify-protect',
-        state={'type': 'boolean'},
+        'modify-db',
+        parameter={},
+        value={},
         immediate={'type': 'boolean'})
 
     permissions = ('rds:ModifyDBInstance',)
@@ -1605,7 +1608,9 @@ class ModifyProtect(BaseAction):
         c = local_session(self.manager.session_factory).client('rds')
 
         for r in resources:
-            c.modify_db_instance(
-                DBInstanceIdentifier=r['DBInstanceIdentifier'],
-                DeletionProtection=self.data.get('state', False),
-                ApplyImmediately=self.data.get('immediate', False))
+            param = {
+                'DBInstanceIdentifier': r['DBInstanceIdentifier'],
+                self.data.get('parameter'): self.data.get('value'),
+                'ApplyImmediately': self.data.get('immediate', False)
+            }
+            c.modify_db_instance(**param)

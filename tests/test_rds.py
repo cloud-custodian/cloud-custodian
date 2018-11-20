@@ -709,14 +709,24 @@ class RDSTest(BaseTest):
 
         self.assertEqual(len(resources), 1, "Resources should be unused")
 
-    def test_rds_modify_protect(self):
-        session_factory = self.replay_flight_data("test_rds_modify_protect")
+    def test_rds_modify_db(self):
+        session_factory = self.replay_flight_data("test_rds_modify_db")
         p = self.load_policy(
             {
-                "name": "rds-deletion-protection",
+                "name": "rds-modify-db",
                 "resource": "rds",
-                "filters": [{"DeletionProtection": True}, {"MasterUsername": "skunktest"}],
-                "actions": [{"type": "modify-protect", "state": False, "immediate": True}],
+                "filters": [
+                    {"DeletionProtection": True},
+                    {"MasterUsername": "testtest"}
+                ],
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "parameter": "DeletionProtection",
+                        "value": False,
+                        "immediate": True
+                    }
+                ],
             },
             session_factory=session_factory,
         )
@@ -725,9 +735,12 @@ class RDSTest(BaseTest):
 
         verify_p = self.load_policy(
             {
-                "name": "rds-verify-deletion-protection",
+                "name": "rds-verify-modify-db",
                 "resource": "rds",
-                "filters": [{"DeletionProtection": False}, {"MasterUsername": "skunktest"}],
+                "filters": [
+                    {"DeletionProtection": False},
+                    {"MasterUsername": "testtest"}
+                ],
             },
             session_factory=session_factory,
         )
