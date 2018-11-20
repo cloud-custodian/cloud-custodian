@@ -99,6 +99,7 @@ class FlowLogFilter(Filter):
            'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
            'set-op': {'enum': ['or', 'and'], 'default': 'or'},
            'status': {'enum': ['active']},
+           'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
 
@@ -120,6 +121,7 @@ class FlowLogFilter(Filter):
         enabled = self.data.get('enabled', False)
         log_group = self.data.get('log-group')
         traffic_type = self.data.get('traffic-type')
+        destination_type = self.data.get('destination-type')
         status = self.data.get('status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
         set_op = self.data.get('set-op', 'or')
@@ -142,6 +144,7 @@ class FlowLogFilter(Filter):
             if enabled:
                 fl_matches = []
                 for fl in flogs:
+                    dest_match = (destination_type is None) or op(fl['LogDestinationType'], destination_type)
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
                     traffic_type_match = (
                         traffic_type is None) or op(
@@ -150,7 +153,7 @@ class FlowLogFilter(Filter):
                     log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
 
                     # combine all conditions to check if flow log matches the spec
-                    fl_match = status_match and traffic_type_match and log_group_match
+                    fl_match = status_match and traffic_type_match and log_group_match and dest_match
                     fl_matches.append(fl_match)
 
                 if set_op == 'or':
