@@ -1572,11 +1572,11 @@ class ParameterFilter(ValueFilter):
 
 @actions.register('modify-db')
 class ModifyDb(BaseAction):
-    """Modifies an RDS instance based on specified param and value
+    """Modifies an RDS instance based on specified parameter
     using ModifyDbInstance.
 
-    'Parameter' determines which field is being modified.
-    'Value' is what the modified field will be set to.
+    'Parameter' is a dict with with key value pairs that should be set to
+    the keyword and value you wish to modify.
     'Immediate" determines whether the modification is applied immediately
     or not. If 'immediate' is not specified, default is false.
 
@@ -1591,16 +1591,15 @@ class ModifyDb(BaseAction):
                   - DeletionProtection: true
                 actions:
                   - type: modify-db
-                    parameter: DeletionProtection
-                    value: false
+                    parameter: {'DeletionProtection': false}
                     immediate: true
     """
 
     schema = type_schema(
         'modify-db',
-        parameter={},
-        value={},
-        immediate={'type': 'boolean'})
+        parameter={"type": "object"},
+        immediate={'type': 'boolean'},
+        required=('parameter',))
 
     permissions = ('rds:ModifyDBInstance',)
 
@@ -1608,9 +1607,12 @@ class ModifyDb(BaseAction):
         c = local_session(self.manager.session_factory).client('rds')
 
         for r in resources:
-            param = {
-                'DBInstanceIdentifier': r['DBInstanceIdentifier'],
-                self.data.get('parameter'): self.data.get('value'),
-                'ApplyImmediately': self.data.get('immediate', False)
-            }
-            c.modify_db_instance(**param)
+            param = self.data.get('parameter')
+            param['DBInstanceIdentifier'] = r['DBInstanceIdentifier']
+            param['ApplyImmediately'] = self.data.get('immediate', False)
+            try:
+                c.modify_db_instance(**param)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'InvalidParameterValue':
+                    log.warning("Exception on modify db instance\n %s", e)
+                    break

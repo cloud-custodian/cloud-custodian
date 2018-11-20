@@ -722,8 +722,7 @@ class RDSTest(BaseTest):
                 "actions": [
                     {
                         "type": "modify-db",
-                        "parameter": "DeletionProtection",
-                        "value": False,
+                        "parameter": {"DeletionProtection": False},
                         "immediate": True
                     }
                 ],
