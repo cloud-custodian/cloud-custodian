@@ -2230,7 +2230,8 @@ class FlowLogsTest(BaseTest):
                 "name": "c7n-create-vpc-flow-logs",
                 "resource": "vpc",
                 "filters": [
-                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": False}
+                    {"tag:Name": "FlowLogTest"},
+                    {"type": "flow-logs", "enabled": False}
                 ],
                 "actions": [
                     {
@@ -2259,8 +2260,11 @@ class FlowLogsTest(BaseTest):
         p = self.load_policy(
             {'name': 'c7n-flow-log-s3',
              'resource': 'vpc',
-             'filters': [{'type': 'flow-logs', 'enabled': True,
-                          'destination-type': 's3', 'delivery-status': 'success'}]},
+             'filters': [{
+                 'type': 'flow-logs',
+                 'enabled': True,
+                 'destination-type': 's3',
+                 'deliver-status': 'success'}]},
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)

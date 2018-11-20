@@ -124,7 +124,7 @@ class FlowLogFilter(Filter):
         traffic_type = self.data.get('traffic-type')
         destination_type = self.data.get('destination-type')
         status = self.data.get('status')
-        delivery_status = self.data.get('delivery-status')
+        delivery_status = self.data.get('deliver-status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
         set_op = self.data.get('set-op', 'or')
 
