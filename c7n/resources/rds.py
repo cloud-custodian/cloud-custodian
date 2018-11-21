@@ -1593,10 +1593,10 @@ class ModifyDb(BaseAction):
                 actions:
                   - type: modify-db
                     update:
-                        - keyword: 'DeletionProtection'
-                            value: false
-                        - keyword: 'PubliclyAccessible'
-                            value: false
+                      - keyword: 'DeletionProtection'
+                        value: false
+                      - keyword: 'PubliclyAccessible'
+                        value: false
                     immediate: true
     """
 
@@ -1667,6 +1667,5 @@ class ModifyDb(BaseAction):
             try:
                 c.modify_db_instance(**param)
             except ClientError as e:
-                if e.response['Error']['Code'] != 'InvalidParameterValue':
-                    log.warning("Exception on modify db instance\n %s", e)
-                    break
+                if e.response['Error']['Code'] != 'DBInstanceNotFound':
+                    raise
