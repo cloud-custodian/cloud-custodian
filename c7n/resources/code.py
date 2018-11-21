@@ -32,7 +32,7 @@ class CodeRepository(QueryResourceManager):
         enum_spec = ('list_repositories', 'repositories', None)
         batch_detail_spec = (
             'batch_get_repositories', 'repositoryNames', 'repositoryName',
-            'repositories')
+            'repositories', None)
         id = 'repositoryId'
         name = 'repositoryName'
         date = 'creationDate'
@@ -81,7 +81,7 @@ class CodeBuildProject(QueryResourceManager):
         service = 'codebuild'
         enum_spec = ('list_projects', 'projects', None)
         batch_detail_spec = (
-            'batch_get_projects', 'names', None, 'projects')
+            'batch_get_projects', 'names', None, 'projects', None)
         name = id = 'name'
         date = 'created'
         dimension = None

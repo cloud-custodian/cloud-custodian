@@ -1047,7 +1047,114 @@ class SetXrayEncryption(BaseAction):
     )
 
     def process(self, resources):
-        client = self.manager.session_factory().client('xray')
+        client = local_session(self.manager.session_factory).client('xray')
         key = self.data.get('key')
         req = {'Type': 'NONE'} if key == 'default' else {'Type': 'KMS', 'KeyId': key}
         client.put_encryption_config(**req)
+
+
+@filters.register('s3-public-block')
+class S3PublicBlock(ValueFilter):
+    """Check for s3 public blocks on an account.
+
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html
+    """
+
+    annotation_key = 'c7n:s3-public-block'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('s3-public-block', rinherit=ValueFilter.schema)
+    permissions = ('s3:GetAccountPublicAccessBlock',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(S3PublicBlock, self).process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('s3control')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_public_access_block(
+                    AccountId=r['account_id']).get('PublicAccessBlockConfiguration', {})
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(S3PublicBlock, self).__call__(r[self.annotation_key])
+
+
+@actions.register('set-s3-public-block')
+class SetS3PublicBlock(BaseAction):
+    """Configure S3 Public Access Block on an account.
+
+    All public access block attributes can be set. If not specified they are merged
+    with the extant configuration.
+
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html
+
+    :example:
+
+    .. yaml:
+
+      policies:
+        - name: restrict-public-buckets
+          resource: aws.account
+          filters:
+            - not:
+               - type: s3-public-block
+                 key: RestrictPublicBuckets
+                 value: true
+          actions:
+            - type: set-s3-public-block
+              RestrictPublicBuckets: true
+
+    """
+    schema = type_schema(
+        'set-s3-public-block',
+        state={'type': 'boolean', 'default': True},
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
+
+    permissions = ('s3:PutAccountPublicAccessBlock', 's33:GetAccountPublicAccessBlock')
+
+    def validate(self):
+        config = self.data.copy()
+        config.pop('type')
+        if config.pop('state', None) is False and config:
+            raise PolicyValidationError(
+                "%s cant set state false with controls specified".format(
+                    self.type))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('s3control')
+        if self.data.get('state', True) is False:
+            for r in resources:
+                client.delete_public_access_block(AccountId=r['account_id'])
+            return
+
+        keys = (
+            'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
+
+        for r in resources:
+            # try to merge with existing configuration if not explicitly set.
+            base = {}
+            if S3PublicBlock.annotation_key in r:
+                base = r[S3PublicBlock.annotation_key]
+            else:
+                try:
+                    base = client.get_public_access_block(AccountId=r['account_id']).get(
+                        'PublicAccessBlockConfiguration')
+                except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                    base = {}
+
+            config = {}
+            for k in keys:
+                if k in self.data:
+                    config[k] = self.data[k]
+                elif k in base:
+                    config[k] = base[k]
+
+            client.put_public_access_block(
+                AccountId=r['account_id'],
+                PublicAccessBlockConfiguration=config)
