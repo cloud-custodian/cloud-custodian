@@ -95,11 +95,11 @@ class ResizePlan(AzureBaseAction):
     @staticmethod
     def get_sku_name(tier):
         tier = tier.upper()
-        if tier == 'F1' or tier == "FREE":
+        if tier == 'F1':
             return 'FREE'
-        elif tier == 'D1' or tier == "SHARED":
+        elif tier == 'D1':
             return 'SHARED'
-        elif tier in ['B1', 'B2', 'B3', 'BASIC']:
+        elif tier in ['B1', 'B2', 'B3']:
             return 'BASIC'
         elif tier in ['S1', 'S2', 'S3']:
             return 'STANDARD'
