@@ -87,6 +87,11 @@ LIFECYCLE_RULE_SCHEMA = {
     'properties': {
         'rulePriority': {'type': 'integer'},
         'description': {'type': 'string'},
+        'action': {
+            'type': 'object',
+            'required': ['type'],
+            'additionalProperties': False,
+            'properties': {'type': {'enum': ['expire']}}},
         'selection': {
             'type': 'object',
             'addtionalProperties': False,
@@ -98,12 +103,7 @@ LIFECYCLE_RULE_SCHEMA = {
                 'countUnit': {'enum': ['hours', 'days']},
                 'countType': {
                     'enum': ['imageCountMoreThan', 'sinceImagePushed']},
-            },
-        'action': {
-            'type': 'object',
-            'required': ['type'],
-            'additionalProperties': False,
-            'properties': {'type': {'enum': ['expire']}}}
+            }
         }
     }
 }
