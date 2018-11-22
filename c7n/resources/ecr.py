@@ -83,21 +83,26 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
 LIFECYCLE_RULE_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['rulePriority',
-                 'action', 'countNumber', 'countType'],
+    'required': ['rulePriority', 'action', 'selection'],
     'properties': {
         'rulePriority': {'type': 'integer'},
         'description': {'type': 'string'},
-        'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
-        'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
-        'countUnit': {'enum': ['hours', 'days']},
-        'countType': {
-            'enum': ['imageCountMoreThan', 'sinceImagePushed']},
+        'selection': {
+            'type': 'object',
+            'addtionalProperties': False,
+            'required': ['countType', 'countUnit'],
+            'properties': {
+                'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
+                'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
+                'countUnit': {'enum': ['hours', 'days']},
+                'countType': {
+                    'enum': ['imageCountMoreThan', 'sinceImagePushed']},
+            },
         'action': {
             'type': 'object',
             'required': ['type'],
             'additionalProperties': False,
-            'properties': {'type': {'enum': ['expire']}}
+            'properties': {'type': {'enum': ['expire']}}}
         }
     }
 }
@@ -109,12 +114,14 @@ def lifecycle_rule_validate(policy, rule):
     #
     # https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lp_evaluation_rules
 
-    if rule['tagStatus'] == 'tagged' and 'tagPrefixList' not in rule:
+    if (rule['selection']['tagStatus'] == 'tagged' and
+        'tagPrefixList' not in rule['selection']):
         raise PolicyValidationError(
             ("{} has invalid lifecycle rule {} tagprefixlist "
              "required for tagStatus: tagged").format(
                  policy.name, rule))
-    if rule['countType'] == 'sinceImagePushed' and 'countUnit' not in rule:
+    if (rule['selection']['countType'] == 'sinceImagePushed' and
+            'countUnit' not in rule['selection']):
         raise PolicyValidationError(
             ("{} has invalid lifecycle rule {} countUnit "
              "required for countType: sinceImagePushed").format(
@@ -124,6 +131,7 @@ def lifecycle_rule_validate(policy, rule):
 @ECR.filter_registry.register('lifecycle-rule')
 class LifecycleRule(Filter):
     """Lifecycle rule filtering
+
     """
     permissions = ('ecr:GetLifecyclePolicy',)
     schema = type_schema(
@@ -147,7 +155,6 @@ class LifecycleRule(Filter):
                 r[self.policy_annotation] = {}
 
         state = self.data.get('state', False)
-
         matchers = []
         for matcher in self.data.get('match', []):
             vf = ValueFilter(matcher)
@@ -157,7 +164,7 @@ class LifecycleRule(Filter):
         results = []
         for r in resources:
             found = False
-            for rule in r.get('rules', []):
+            for rule in r[self.policy_annotation].get('rules', []):
                 found = True
                 for m in matchers:
                     if not m(rule):
@@ -175,26 +182,42 @@ class SetLifecycle(Action):
 
     Note at the moment this does a replacement of extant lifecycle policies.
     """
-    permissions = ('ecr:PutLifecyclePolicy',)
+    permissions = ('ecr:PutLifecyclePolicy', 'ecr:DeleteLifecyclePolicy')
 
     schema = type_schema(
         'set-lifecycle',
-        statements={
+        state={'type': 'boolean'},
+        rules={
             'type': 'array',
             'items': LIFECYCLE_RULE_SCHEMA})
 
     def validate(self):
-        for r in self.statements:
+        if self.data.get('state') is False and 'rules' in self.data:
+            raise PolicyValidationError(
+                "set-lifecycle can't use statements and state: false")
+        elif self.data.get('state', True) and not self.data.get('rules'):
+            raise PolicyValidationError(
+                "set-lifecycle requires rules with state: true")
+        for r in self.data.get('rules', []):
             lifecycle_rule_validate(self.manager.ctx.policy, r)
         return self
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecr')
+        state = self.data.get('state', True)
         for r in resources:
+            if state is False:
+                try:
+                    client.delete_lifecycle_policy(
+                        registryId=r['registryId'],
+                        repositoryName=r['repositoryName'])
+                    continue
+                except client.exceptions.RepositoryPolicyNotFoundException:
+                    pass
             client.put_lifecycle_policy(
                 registryId=r['registryId'],
                 repositoryName=r['repositoryName'],
-                lifecyclePolicyText=json.dumps(self.data['statements']))
+                lifecyclePolicyText=json.dumps({'rules': self.data['rules']}))
 
 
 @ECR.action_registry.register('remove-statements')
