@@ -5,6 +5,8 @@ logger = logging.getLogger('c7n_mailer.utils.email')
 
 
 def is_email(target):
+    if target is None:
+        return False
     if target.startswith('slack://'):
         logger.debug("Slack payload, not an email.")
         return False

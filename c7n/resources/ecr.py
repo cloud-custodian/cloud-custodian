@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 
 import json
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import CrossAccountAccessFilter
+from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.actions import RemovePolicyBase, Action
@@ -104,6 +104,11 @@ LIFECYCLE_RULE_SCHEMA = {
 
 
 def lifecycle_rule_validate(policy, rule):
+    # This is a non exhaustive list of lifecycle validation rules
+    # see this for a more comprehensive list
+    #
+    # https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lp_evaluation_rules
+
     if rule['tagStatus'] == 'tagged' and 'tagPrefixList' not in rule:
         raise PolicyValidationError(
             ("{} has invalid lifecycle rule {} tagprefixlist "
@@ -116,9 +121,60 @@ def lifecycle_rule_validate(policy, rule):
                  policy.name, rule))
 
 
+@ECR.filter_registry.register('lifecycle-rule')
+class LifecycleRule(Filter):
+    """Lifecycle rule filtering
+    """
+    permissions = ('ecr:GetLifecyclePolicy',)
+    schema = type_schema(
+        'lifecycle-rule',
+        state={'type': 'boolean'},
+        match={'type': 'array', 'items': {
+            '$ref': '#/definitions/filters/value'}})
+    policy_annotation = 'c7n:lifecycle-policy'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ecr')
+        for r in resources:
+            if self.policy_annotation in r:
+                continue
+            try:
+                r[self.policy_annotation] = json.loads(
+                    client.get_lifecycle_policy(
+                        repositoryName=r['repositoryName']).get(
+                            'lifecyclePolicyText', ''))
+            except client.exceptions.LifecyclePolicyNotFoundException:
+                r[self.policy_annotation] = {}
+
+        state = self.data.get('state', False)
+
+        matchers = []
+        for matcher in self.data.get('match', []):
+            vf = ValueFilter(matcher)
+            vf.annotate = False
+            matchers.append(vf)
+
+        results = []
+        for r in resources:
+            found = False
+            for rule in r.get('rules', []):
+                found = True
+                for m in matchers:
+                    if not m(rule):
+                        found = False
+            if found and state:
+                results.append(r)
+            if not found and not state:
+                results.append(r)
+        return results
+
+
 @ECR.action_registry.register('set-lifecycle')
 class SetLifecycle(Action):
+    """Set the lifecycle policy for ECR repositories.
 
+    Note at the moment this does a replacement of extant lifecycle policies.
+    """
     permissions = ('ecr:PutLifecyclePolicy',)
 
     schema = type_schema(
@@ -126,6 +182,11 @@ class SetLifecycle(Action):
         statements={
             'type': 'array',
             'items': LIFECYCLE_RULE_SCHEMA})
+
+    def validate(self):
+        for r in self.statements:
+            lifecycle_rule_validate(self.manager.ctx.policy, r)
+        return self
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecr')

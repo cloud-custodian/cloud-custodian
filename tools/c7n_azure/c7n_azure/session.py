@@ -112,6 +112,12 @@ class Session(object):
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
 
+    def get_session_for_resource(self, resource):
+        return Session(
+            subscription_id=self.subscription_id_override,
+            authorization_file=self.authorization_file,
+            resource=resource)
+
     def client(self, client):
         self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
@@ -174,7 +180,8 @@ class Session(object):
             return (ServicePrincipalCredentials(
                 client_id=data['credentials']['client_id'],
                 secret=data['credentials']['secret'],
-                tenant=data['credentials']['tenant']
+                tenant=data['credentials']['tenant'],
+                resource=self.resource_namespace
             ), data['subscription'])
 
     def get_functions_auth_string(self):

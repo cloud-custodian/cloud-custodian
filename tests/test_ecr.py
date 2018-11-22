@@ -170,3 +170,6 @@ class TestECR(BaseTest):
             client.get_repository_policy,
             repositoryName=resources[0]["repositoryArn"],
         )
+
+    def test_ecr_set_lifecycle(self):
+        pass
