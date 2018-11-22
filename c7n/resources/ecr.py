@@ -94,6 +94,7 @@ LIFECYCLE_RULE_SCHEMA = {
             'properties': {
                 'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
                 'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
+                'countNumber': {'type': 'integer'},
                 'countUnit': {'enum': ['hours', 'days']},
                 'countType': {
                     'enum': ['imageCountMoreThan', 'sinceImagePushed']},
