@@ -138,7 +138,10 @@ class LifecycleRule(Filter):
         'lifecycle-rule',
         state={'type': 'boolean'},
         match={'type': 'array', 'items': {
-            '$ref': '#/definitions/filters/value'}})
+            'oneOf': [
+                {'$ref': '#/definitions/filters/value'},
+                {'type': 'object', 'minProperties': 1, 'maxProperties': 1},
+            ]}})
     policy_annotation = 'c7n:lifecycle-policy'
 
     def process(self, resources, event=None):
