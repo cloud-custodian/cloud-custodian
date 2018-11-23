@@ -133,6 +133,22 @@ def lifecycle_rule_validate(policy, rule):
 class LifecycleRule(Filter):
     """Lifecycle rule filtering
 
+    :Example:
+
+    .. code-block:: yaml
+
+       policies:
+        - name: ecr-life
+          resource: aws.ecr
+          filters:
+            - type: lifecycle-rule
+              state: false
+              match:
+                - selection.tagStatus: untagged
+                - action.type: expire
+                - key: selection.countNumber
+                  value: 30
+                  op: less-than
     """
     permissions = ('ecr:GetLifecyclePolicy',)
     schema = type_schema(
@@ -184,7 +200,9 @@ class LifecycleRule(Filter):
 class SetLifecycle(Action):
     """Set the lifecycle policy for ECR repositories.
 
-    Note at the moment this does a replacement of extant lifecycle policies.
+
+    Note at the moment this is limited to set/delete/replacement of
+    lifecycle policies, not merge.
     """
     permissions = ('ecr:PutLifecyclePolicy', 'ecr:DeleteLifecyclePolicy')
 
