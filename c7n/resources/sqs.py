@@ -150,7 +150,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                 results += filter(None, [self.process_resource(client, r)])
             except Exception:
                 self.log.exception(
-                    "Error processing sns:%s", r['QueueUrl'])
+                    "Error processing sqs:%s", r['QueueUrl'])
         return results
 
     def process_resource(self, client, resource):

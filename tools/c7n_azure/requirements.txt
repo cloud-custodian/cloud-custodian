@@ -2,3 +2,4 @@ vcrpy==1.11.0
 vcrpy_unittest
 adal~=1.0.0
 backports.functools_lru_cache
+azure-functions-worker; python_version >= '3.6'

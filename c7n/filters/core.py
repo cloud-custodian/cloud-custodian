@@ -225,6 +225,8 @@ class And(BooleanGroupFilter):
 
         for f in self.filters:
             resources = f.process(resources, events)
+            if not resources:
+                break
 
         if self.manager:
             sweeper.sweep(resources)
@@ -256,6 +258,8 @@ class Not(BooleanGroupFilter):
 
         for f in self.filters:
             resources = f.process(resources, event)
+            if not resources:
+                break
 
         before = set(resource_map.keys())
         after = set([r[resource_type.id] for r in resources])
@@ -409,6 +413,11 @@ class ValueFilter(Filter):
                     if t.get('Key') == tk:
                         r = t.get('Value')
                         break
+            # GCP schema: 'labels': {'key': 'value'}
+            elif 'labels' in i:
+                r = i.get('labels', {}).get(tk, None)
+            # GCP has a secondary form of labels called tags
+            # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
                 r = i.get('tags', {}).get(tk, None)

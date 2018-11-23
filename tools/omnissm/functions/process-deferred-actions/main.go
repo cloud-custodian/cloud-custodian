@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
@@ -55,19 +56,26 @@ func processDeferredActionMessage(ctx context.Context, msg *sqs.Message) error {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
 		if err := omni.SSM.AddTagsToResource(ctx, &resourceTags); err != nil {
+			if awsErr, ok := errors.Cause(err).(awserr.Error); ok {
+				if awsErr.Code() == "InvalidResourceId" {
+					log.Warn().Err(err).Msg("instance no longer exists")
+					return nil
+				}
+			}
 			return err
-		}
-		log.Info().Msg("tags added to resource successfully")
-		entry, err, ok := omni.Registrations.GetByManagedId(ctx, resourceTags.ManagedId)
-		if err != nil {
-			return err
-		}
-		if !ok {
-			return errors.Errorf("registration entry not found: %#v", resourceTags.ManagedId)
-		}
-		entry.IsTagged = 1
-		if err := omni.Registrations.Update(ctx, entry); err != nil {
-			return err
+		} else {
+			log.Info().Msg("tags added to resource successfully")
+			entry, err, ok := omni.Registrations.GetByManagedId(ctx, resourceTags.ManagedId)
+			if err != nil {
+				return err
+			}
+			if !ok {
+				return errors.Errorf("registration entry not found: %#v", resourceTags.ManagedId)
+			}
+			entry.IsTagged = 1
+			if err := omni.Registrations.Update(ctx, entry); err != nil {
+				return err
+			}
 		}
 	case omnissm.RequestActivation:
 		var req omnissm.RegistrationRequest
@@ -109,6 +117,12 @@ func processDeferredActionMessage(ctx context.Context, msg *sqs.Message) error {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
 		if err := omni.SSM.PutInventory(ctx, &inv); err != nil {
+			if awsErr, ok := errors.Cause(err).(awserr.Error); ok {
+				if awsErr.Code() == "InvalidResourceId" {
+					log.Warn().Err(err).Msg("instance no longer exists")
+					return nil
+				}
+			}
 			return err
 		}
 		log.Info().Msg("custom inventory successful")

@@ -24,10 +24,11 @@ from c7n_azure import handler, entry
 
 try:
     import azure.functions as func
-    from azure.functions_worker.bindings.http import HttpRequest
+    from azure.functions_worker.bindings.queue import QueueMessage
 except ImportError:
     pass
 
+max_dequeue_count = 3
 
 def main(input):
     logging.info("Running Azure Cloud Custodian Policy")
@@ -37,24 +38,15 @@ def main(input):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
 
-    event = None
+    events = None
 
-    if type(input) is HttpRequest:
-        event = input.get_json()
-        logging.info(event)
+    if type(input) is QueueMessage:
+        if input.dequeue_count > max_dequeue_count:
+            return
+        events = [input.get_json()]
 
-        # handshake with event grid subscription creation
-        if 'data' in event[0] and 'validationCode' in event[0]['data']:
-            code = event[0]['data']['validationCode']
-            response = {
-                "validationResponse": code
-            }
-            return func.HttpResponse(body=json.dumps(response, indent=2), status_code=200)
+    handler.run(events, context)
 
-    handler.run(event, context)
-
-    if type(input) is HttpRequest:
-        return func.HttpResponse("OK")
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()

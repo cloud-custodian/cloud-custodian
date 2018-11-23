@@ -18,6 +18,18 @@ from azure_common import BaseTest, arm_template
 
 class PolicyCompliance(BaseTest):
 
+    def test_policy_compliance_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-policy-compliance',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'policy-compliant',
+                     'compliant': True}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('vm.json')
     def test_find_by_name(self):
         p = self.load_policy({

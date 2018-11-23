@@ -1,0 +1,497 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/Default/devx",
+                "serviceName": "devx",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+                "loadBalancers": [],
+                "serviceRegistries": [
+                    {
+                        "registryArn": "arn:aws:servicediscovery:us-east-1:644160558196:service/srv-fs2xyntfid3use47"
+                    }
+                ],
+                "status": "ACTIVE",
+                "desiredCount": 1,
+                "runningCount": 0,
+                "pendingCount": 1,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370494121444025",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                        "desiredCount": 1,
+                        "pendingCount": 1,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 2,
+                            "second": 11,
+                            "microsecond": 770000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 2,
+                            "second": 11,
+                            "microsecond": 770000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.2.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-71bda45c"
+                                ],
+                                "securityGroups": [
+                                    "sg-058db041a882cfe5e"
+                                ],
+                                "assignPublicIp": "ENABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "9d5d63f7-9efa-424d-97e8-d7a12dbcdba0",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 49,
+                            "second": 57,
+                            "microsecond": 546000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 9c8035201098472693b0ae23a743fdf1)."
+                    },
+                    {
+                        "id": "a4bb544c-8b90-4090-99c8-c9af6f5b557b",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 39,
+                            "second": 47,
+                            "microsecond": 212000
+                        },
+                        "message": "(service devx) is unable to consistently start tasks successfully. For more information, see the Troubleshooting section of the Amazon ECS Developer Guide."
+                    },
+                    {
+                        "id": "cfd4bf67-f071-4158-9281-dd834d60c557",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 37,
+                            "second": 4,
+                            "microsecond": 982000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 2d2740a67a4347d5be94e4e7d900def2)."
+                    },
+                    {
+                        "id": "cd7bef80-dde6-46af-bf59-03eaf5c0ef89",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 26,
+                            "second": 47,
+                            "microsecond": 939000
+                        },
+                        "message": "(service devx) is unable to consistently start tasks successfully. For more information, see the Troubleshooting section of the Amazon ECS Developer Guide."
+                    },
+                    {
+                        "id": "fc54c5e8-4f31-47b6-ae78-92ed61454ae4",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 24,
+                            "second": 31,
+                            "microsecond": 634000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 92964f37b0ea4635ab898445508943f4)."
+                    },
+                    {
+                        "id": "7871def1-0a4c-4890-8222-a61a3b4d62a8",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 14,
+                            "second": 4,
+                            "microsecond": 87000
+                        },
+                        "message": "(service devx) is unable to consistently start tasks successfully. For more information, see the Troubleshooting section of the Amazon ECS Developer Guide."
+                    },
+                    {
+                        "id": "a93c4c32-f346-46b8-951c-633ca19d1644",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 11,
+                            "second": 23,
+                            "microsecond": 339000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 941933051d1b48409df284e049671651)."
+                    },
+                    {
+                        "id": "c77b6158-867c-463d-bdd7-300f376f8917",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 14,
+                            "minute": 1,
+                            "second": 7,
+                            "microsecond": 276000
+                        },
+                        "message": "(service devx) is unable to consistently start tasks successfully. For more information, see the Troubleshooting section of the Amazon ECS Developer Guide."
+                    },
+                    {
+                        "id": "80b2c406-491f-4fe7-abd0-554d0f884daa",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 58,
+                            "second": 31,
+                            "microsecond": 392000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 2ce07947619545d98f7613f4de599af5)."
+                    },
+                    {
+                        "id": "a79ebc30-a91f-4958-90c4-43ab943c2e65",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 50,
+                            "second": 29,
+                            "microsecond": 980000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 6e79dd3603d943b0b6a949b192ae7b4a)."
+                    },
+                    {
+                        "id": "1f5b9631-f338-4dc0-80d1-992d71e53146",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 43,
+                            "second": 0,
+                            "microsecond": 534000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 2e2a82bf816949c5b733b53d48034583)."
+                    },
+                    {
+                        "id": "3ed74788-dfa0-4bf0-af4c-f96e0cf3dfa2",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 35,
+                            "second": 47,
+                            "microsecond": 571000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task d5df818f6ba147a483b0b2810f7eb9e3)."
+                    },
+                    {
+                        "id": "7e721c71-7bea-44f5-8e0a-a79dfe6b98a8",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 27,
+                            "second": 59,
+                            "microsecond": 183000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 6989514140714f8daf702e395ec97031)."
+                    },
+                    {
+                        "id": "08390f63-7414-4d4b-ae2a-da33bfa6033b",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 20,
+                            "second": 22,
+                            "microsecond": 929000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 7e3d465ec7e244af9c4f3add87fa26b8)."
+                    },
+                    {
+                        "id": "3ef9f20e-2c50-4f41-b2d3-25d53cc75afc",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 12,
+                            "second": 29,
+                            "microsecond": 653000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 9a83f5fa79174aec84cc0b48a3223a33)."
+                    },
+                    {
+                        "id": "c7dfcafb-5b49-4d2d-8e80-6b6dde251e96",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 13,
+                            "minute": 4,
+                            "second": 32,
+                            "microsecond": 233000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task dc1438f8e5e4442f93f2d14a853cc723)."
+                    },
+                    {
+                        "id": "f2e2f589-6f72-4473-8779-c82bb713e570",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 57,
+                            "second": 31,
+                            "microsecond": 839000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 64ff8941881440fb8227a7ac78bbe11c)."
+                    },
+                    {
+                        "id": "fbb893d4-59d6-4b0c-a3a2-0744d5e4d6f9",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 49,
+                            "second": 30,
+                            "microsecond": 779000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task e7c6923b3c53470f8a424dbeb2d500b9)."
+                    },
+                    {
+                        "id": "4baaa47d-0621-4304-9eb2-3fc72799c0b2",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 41,
+                            "second": 44,
+                            "microsecond": 568000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 012cf78f36ee4bd8843b4692d3e697f4)."
+                    },
+                    {
+                        "id": "66a37d8d-c73d-4681-a023-adc075adb1ec",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 33,
+                            "second": 34,
+                            "microsecond": 773000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 98673880ac1d496aa464e959997c1f89)."
+                    },
+                    {
+                        "id": "5cbbd0fe-f942-41f9-a99b-66b01e513546",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 25,
+                            "second": 56,
+                            "microsecond": 577000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 82a466e3639b4f99880a9c1e656a8604)."
+                    },
+                    {
+                        "id": "bb888b14-4b07-4028-9855-0c9445a294d7",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 18,
+                            "second": 16,
+                            "microsecond": 910000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 59345c5e95df43ff835fd74987f65c24)."
+                    },
+                    {
+                        "id": "85a843ae-44c3-43ae-b834-1d4accc7915d",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 15,
+                            "second": 13,
+                            "microsecond": 736000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task db824f669a9148afbc167f438d05ec46)."
+                    },
+                    {
+                        "id": "c35d09ce-85f4-4e39-a096-daed943227ad",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 11,
+                            "second": 49,
+                            "microsecond": 238000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task f77d1d5822c04273a5ba0d009f07ab82)."
+                    },
+                    {
+                        "id": "6001d266-ad50-4075-a16a-5d7564800c2e",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 8,
+                            "second": 25,
+                            "microsecond": 352000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 93b4ae50cfb34b4a94191874604b8396)."
+                    },
+                    {
+                        "id": "dd3207ae-1881-4d18-83f2-4777519b46b2",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 5,
+                            "second": 11,
+                            "microsecond": 424000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task ccd7b4f8398041eca8ef8f1b5588a214)."
+                    },
+                    {
+                        "id": "c0bd879c-26c2-4e84-9beb-3adaa7305a98",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 11,
+                            "day": 20,
+                            "hour": 12,
+                            "minute": 2,
+                            "second": 15,
+                            "microsecond": 17000
+                        },
+                        "message": "(service devx) has started 1 tasks: (task 89f0c3cf1a6e436d88115a7c7f09539e)."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 11,
+                    "day": 20,
+                    "hour": 12,
+                    "minute": 2,
+                    "second": 11,
+                    "microsecond": 770000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-71bda45c"
+                        ],
+                        "securityGroups": [
+                            "sg-058db041a882cfe5e"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "tags": [
+                    {
+                        "key": "Name",
+                        "value": "Dev"
+                    }
+                ],
+                "enableECSManagedTags": true,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "c4511863-ecfd-11e8-a589-e13fabca4688",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c4511863-ecfd-11e8-a589-e13fabca4688",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "6287",
+                "date": "Tue, 20 Nov 2018 19:52:09 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

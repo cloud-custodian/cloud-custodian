@@ -13,6 +13,7 @@
 # limitations under the License.
 import fakeredis
 import logging
+import os
 
 from c7n_mailer.ldap_lookup import LdapLookup, Redis
 from ldap3 import Server, Connection, MOCK_SYNC
@@ -51,12 +52,16 @@ MAILER_CONFIG = {
     'cache_engine': 'sqlite',
     'role': 'arn:aws:iam::xxxx:role/cloudcustodian-mailer',
     'ldap_uid_tags': ['CreatorName', 'Owner'],
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
 }
 
 MAILER_CONFIG_AZURE = {
     'queue_url': 'asq://storageaccount.queue.core.windows.net/queuename',
     'from_address': 'you@youremail.com',
-    'sendgrid_api_key': 'SENDGRID_API_KEY'
+    'sendgrid_api_key': 'SENDGRID_API_KEY',
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
 }
 
 RESOURCE_1 = {
@@ -230,6 +235,57 @@ ASQ_MESSAGE = '''{
          "name":"cckeyvault1",
          "tags":{
 
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
+
+ASQ_MESSAGE_TAG = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "tag:owner"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "tag:owner"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+            "owner":"user@domain.com"
          },
          "resourceGroup":"test_keyvault",
          "location":"southcentralus",

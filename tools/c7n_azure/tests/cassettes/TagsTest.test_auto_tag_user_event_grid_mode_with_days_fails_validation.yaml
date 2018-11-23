@@ -1,0 +1,102 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python/3.6.5 (Darwin-17.7.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          computemanagementclient/4.3.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2018-10-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz4927z+8P5vs7m/Psv297f375wfbk/PdT7cf5Ae7+cOH052D
+        fPbRSF+aZ/XsKqvzl3V1XpQ5va/g6LvLxeviB/jooydZU0x//+Odj+S7X2Lebtqqzi6iLxcL+uJV
+        fp7X+XIafEVfrtaTsmjmeU2ff3SSLatlMc1KgxSej6pzehVffzVZL9v167y+pL/9Fs3bNb7f/XS8
+        sz/e2X7+5nXwNTVvimqJJmXW5k2ryDv0qVHVPC2at9TGx65q3lyvgPJHz4vl+l0AdZkt+JvpFCAv
+        F7//lwzh99/9/bN8Np0dPLj36WRvtr9z/+HDvYfT/N753r38wb2d/cnDAMy0zgmnL1etYvisrhZn
+        oFjYKpvOi+UFGrzKs9l366INGyyyJb0zAwbUyBsDfVcwM9xt1pNmWhfcU3M3yx4ePHywP9m+P9vL
+        tvdnDw+2swcH2fa9g73zew927892HuR367yp1vU0/7yu1qvmLgb6+18u7hLTXRYzourdL4ppXTXV
+        eTs+qRardZvfnREGzd2vQRSH8i8xv3rTM8vaDJDA5t8zn6adgZZrkHDHvoWnP0/AcO/3P3hIsnHw
+        cCfP7n26T3g8pIEfTO7tPdi79+nuebbvU5egdKfpdLFqr7tt3CS9qJbB/NC3G2aIvv25nCP8eQuC
+        +BjbKfJ+/b78YiaNhCemDaaCQ/1Cp+VysX9/8YumF9mD1dvmqnBE+yibLYrlV01emxkEumv622tT
+        QixPquV5cbGuM1CNGtrOqAGNLZuU+cusaa6qena8buf5siUdo23Ps7LJTXuDOr3X5DTjLXNbd1zL
+        vCVQb73BmY/OljSw82wKZfy9X8xz+rM9pS+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2k
+        qtqnron/HX2bL0FIGlLa1utcQeIxuv+ruqAvP5q37ap5dPduMK1NxjN1uRhPymoynlZ1Pr4qlrPq
+        qhkT6nctcyk3WZR5zNDeJFivWxJBdPF6PZ3m+YyQQStp+1GrmtrRxrD7ZVG366z8gsWT5kbal5Vl
+        go+I3O18SoxRZ+XaNGizC48GH51AA1T16SIrSvr4o2lZrWe/53RNoye6LmlMCx8dTP4PTaA7I7Si
+        rSMxAmQ//o2TX/L/AL8nmoQ/CAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Fri, 02 Nov 2018 08:44:59 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [df6307c8-3093-4b8c-bdd5-234b65414e03]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;3984,Microsoft.Compute/LowCostGet30Min;31882']
+      x-ms-ratelimit-remaining-subscription-reads: ['11987']
+      x-ms-request-id: [91e1f6c8-b7ff-43f1-8641-58168bba2e9b]
+      x-ms-routing-request-id: ['WESTUS2:20181102T084459Z:df6307c8-3093-4b8c-bdd5-234b65414e03']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131849759755509736]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python/3.6.5 (Darwin-17.7.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          computemanagementclient/4.3.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2018-10-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz4927z+8P5vs7m/Psv297f375wfbk/PdT7cf5Ae7+cOH052D
+        fPbRSF+aZ/XsKqvzl3V1XpQ5va/g6LvLxeviB/jooydZU0x//+Odj+S7X2Lebtqqzi6iLxcL+uJV
+        fp7X+XIafEVfrtaTsmjmeU2ff3SSLatlMc1KgxSej6pzehVffzVZL9v167y+pL/9Fs3bNb7f/XS8
+        sz/e2X7+5nXwNTVvimqJJmXW5k2ryDv0qVHVPC2at9TGx65q3lyvgPJHz4vl+l0AdZkt+JvpFCAv
+        F7//lwzh99/9/bN8Np0dPLj36WRvtr9z/+HDvYfT/N753r38wb2d/cnDAMy0zgmnL1etYvisrhZn
+        oFjYKpvOi+UFGrzKs9l366INGyyyJb0zAwbUyBsDfVcwM9xt1pNmWhfcU3M3yx4ePHywP9m+P9vL
+        tvdnDw+2swcH2fa9g73zew927892HuR367yp1vU0/7yu1qvmLgb6+18u7hLTXRYzourdL4ppXTXV
+        eTs+qRardZvfnREGzd2vQRSH8i8xv3rTM8vaDJDA5t8zn6adgZZrkHDHvoWnP0/AcO/3P3hIsnHw
+        cCfP7n26T3g8pIEfTO7tPdi79+nuebbvU5egdKfpdLFqr7tt3CS9qJbB/NC3G2aIvv25nCP8eQuC
+        +BjbKfJ+/b78YiaNhCemDaaCQ/1Cp+VysX9/8YumF9mD1dvmqnBE+yibLYrlV01emxkEumv622tT
+        QixPquV5cbGuM1CNGtrOqAGNLZuU+cusaa6qena8buf5siUdo23Ps7LJTXuDOr3X5DTjLXNbd1zL
+        vCVQb73BmY/OljSw82wKZfy9X8xz+rM9pS+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2k
+        qtqnron/HX2bL0FIGlLa1utcQeIxuv+ruqAvP5q37ap5dPduMK1NxjN1uRhPymoynlZ1Pr4qlrPq
+        qhkT6nctcyk3WZR5zNDeJFivWxJBdPF6PZ3m+YyQQStp+1GrmtrRxrD7ZVG366z8gsWT5kbal5Vl
+        go+I3O18SoxRZ+XaNGizC48GH51AA1T16SIrSvr4o2lZrWe/53RNoye6LmlMCx8dTP4PTaA7I7Si
+        rSMxAmQ//o2TX/L/AL8nmoQ/CAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Fri, 02 Nov 2018 08:45:10 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [f6324f31-aac5-481b-8165-ba55f33bd909]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;3983,Microsoft.Compute/LowCostGet30Min;31895']
+      x-ms-ratelimit-remaining-subscription-reads: ['11995']
+      x-ms-request-id: [64d41172-b890-4cd5-beba-5fbf24200a55]
+      x-ms-routing-request-id: ['WESTUS2:20181102T084511Z:f6324f31-aac5-481b-8165-ba55f33bd909']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131849759755509736]
+    status: {code: 200, message: OK}
+version: 1

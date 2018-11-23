@@ -152,7 +152,7 @@ class ChildResourceQuery(ResourceQuery):
         for parent_id in parent_ids:
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
-                client, enum_op, merged_params, path)
+                client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
                 for r in subset:
                     r[self.parent_key] = parent_id
@@ -544,7 +544,7 @@ class ChildResourceManager(QueryResourceManager):
 
 
 def _batch_augment(manager, model, detail_spec, resource_set):
-    detail_op, param_name, param_key, detail_path = detail_spec
+    detail_op, param_name, param_key, detail_path, detail_args = detail_spec
     client = local_session(manager.session_factory).client(
         model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
@@ -554,6 +554,8 @@ def _batch_augment(manager, model, detail_spec, resource_set):
     else:
         args = ()
     kw = {param_name: [param_key and r[param_key] or r for r in resource_set]}
+    if detail_args:
+        kw.update(detail_args)
     response = op(*args, **kw)
     return response[detail_path]
 

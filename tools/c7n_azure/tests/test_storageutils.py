@@ -15,18 +15,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest, arm_template
 from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.session import Session
 
 
 class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()
+        self.session = Session()
         StorageUtilities.get_storage_from_uri.cache_clear()
 
     @arm_template('storage.json')
     def test_get_storage_client_by_uri(self):
         account = self.setup_account()
         url = "https://" + account.name + ".blob.core.windows.net/testcontainer/extrafolder"
-        blob_service, container_name, key_prefix = StorageUtilities.get_blob_client_by_uri(url)
+        blob_service, container_name, key_prefix = \
+            StorageUtilities.get_blob_client_by_uri(url, self.session)
         self.assertIsNotNone(blob_service)
         self.assertEqual(container_name, "testcontainer")
         self.assertEqual(key_prefix, "extrafolder")
@@ -36,7 +39,8 @@ class StorageUtilsTest(BaseTest):
         account = self.setup_account()
         url = "https://" + account.name + \
               ".blob.core.windows.net/testcontainer/extrafolder/foo/bar"
-        blob_service, container_name, key_prefix = StorageUtilities.get_blob_client_by_uri(url)
+        blob_service, container_name, key_prefix = \
+            StorageUtilities.get_blob_client_by_uri(url, self.session)
         self.assertIsNotNone(blob_service)
         self.assertEqual(container_name, "testcontainer")
         self.assertEqual(key_prefix, "extrafolder/foo/bar")
@@ -45,16 +49,24 @@ class StorageUtilsTest(BaseTest):
     def test_get_queue_client_by_uri(self):
         account = self.setup_account()
         url = "https://" + account.name + ".queue.core.windows.net/testcc"
-        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url)
+        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url, self.session)
         self.assertIsNotNone(queue_service)
         self.assertEqual(queue_name, "testcc")
+
+    @arm_template('storage.json')
+    def test_create_queue_from_storage_account(self):
+        account = self.setup_account()
+        queue_name = 'testqueuecc'
+        queue = \
+            StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
+        self.assertTrue(queue)
 
     @arm_template('storage.json')
     def test_cycle_queue_message_by_uri(self):
         account = self.setup_account()
         url = "https://" + account.name + ".queue.core.windows.net/testcyclemessage"
 
-        queue_settings = StorageUtilities.get_queue_client_by_uri(url)
+        queue_settings = StorageUtilities.get_queue_client_by_uri(url, self.session)
         StorageUtilities.put_queue_message(*queue_settings, content=u"hello queue")
 
         # Pull messages, should be 1
@@ -71,19 +83,6 @@ class StorageUtilsTest(BaseTest):
         self.assertEqual(len(messages), 0)
 
     @arm_template('storage.json')
-    def test_get_account_by_name(self):
-        account = self.setup_account()
-        found = StorageUtilities.get_storage_account_by_name(account.name)
-        self.assertEqual(found.id, account.id)
-
-    @arm_template('storage.json')
-    def test_get_account_by_name_not_exists(self):
-        account = self.setup_account()
-        found = StorageUtilities.get_storage_account_by_name(account.name + "break")
-        self.assertIsNone(found)
-
-    @arm_template('storage.json')
-    def test_get_keys(self):
-        account = self.setup_account()
-        keys = StorageUtilities.get_storage_keys(account.id)
-        self.assertEqual(len(keys), 2)
+    def test_get_storage_token(self):
+        token = StorageUtilities.get_storage_token(self.session)
+        self.assertIsNotNone(token.token)

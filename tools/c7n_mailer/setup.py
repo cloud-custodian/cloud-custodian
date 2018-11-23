@@ -26,7 +26,8 @@ requires = [
     "datadog",
     "slackclient",
     "sendgrid",
-    "ldap3"]
+    "ldap3",
+    "redis"]
 
 try:
     from concurrent import futures  # noqa F401
@@ -63,4 +64,5 @@ setup(
         ]
     },
     install_requires=requires,
+    package_data={str(''): [str('msg-templates/*.j2')]},
 )

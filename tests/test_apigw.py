@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
 from .common import BaseTest
 
 
@@ -60,6 +62,33 @@ class TestRestAccount(BaseTest):
 
         after_account, = p.resource_manager._get_account()
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
+
+
+class TestRestApi(BaseTest):
+
+    def test_rest_api_update(self):
+        session_factory = self.replay_flight_data('test_rest_api_update')
+        p = self.load_policy({
+            'name': 'update-api',
+            'resource': 'rest-api',
+            'filters': [
+                {'name': 'testapi'},
+                {'description': 'for demo only'}
+            ],
+            'actions': [{
+                'type': 'update',
+                'patch': [{
+                    'op': 'replace',
+                    'path': '/description',
+                    'value': 'for replacement'}]
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        updated = session_factory().client('apigateway').get_rest_api(
+            restApiId=resources[0]['id'])
+        self.assertEqual(updated['description'], 'for replacement')
 
 
 class TestRestResource(BaseTest):
@@ -187,3 +216,22 @@ class TestRestStage(BaseTest):
             self.assertEqual(m["loggingLevel"], "INFO")
             self.assertEqual(m["dataTraceEnabled"], True)
         self.assertTrue(found)
+
+    def test_rest_stage_delete(self):
+        session_factory = self.replay_flight_data("test_rest_stage_delete")
+        p = self.load_policy(
+            {
+                "name": "rest-stage-delete",
+                "resource": "rest-stage",
+                "filters": [{"type": "value", "key": "stageName", "value": "delete-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        client = session_factory().client("apigateway")
+        with self.assertRaises(ClientError) as e:
+            client.get_stage(
+                restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
+            )
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')

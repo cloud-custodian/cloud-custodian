@@ -20,6 +20,14 @@ class StorageTest(BaseTest):
     def setUp(self):
         super(StorageTest, self).setUp()
 
+    def test_storage_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-storage',
+                'resource': 'azure.storage'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('storage.json')
     def test_value_filter(self):
         p = self.load_policy({

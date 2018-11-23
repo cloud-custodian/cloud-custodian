@@ -228,12 +228,17 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 
 #### Standard Azure Functions Config
 
-| Required? | Key                            | Type             |
-|:---------:|:-------------------------------|:-----------------|
-|           | `function_name`                | string           |
-| &#x2705;  | `function_servicePlanName`     | string           |
-|           | `function_location`            | string           |
-|           | `function_appInsightsLocation` | string           |
+| Required? | Key                            | Type             | Notes                                                                 |
+|:---------:|:-------------------------------|:-----------------|:----------------------------------------------------------------------|
+|           | `function_properties`          | object           | Contains `appInsights`, `storageAccount` and `servicePlan` objects    |
+|           | `appInsights`                  | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `storageAccount`               | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `servicePlan`                  | object           | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties      |
+|           | `name`                         | string           | |
+|           | `location`                     | string           | Default: `west us 2`|
+|           | `resource_group_name`          | string           | Default `cloud-custodian`|
+|           | `skuTier`                      | string           | Default: `Basic` |
+|           | `skuName`                      | string           | Default: `B1`    |
 
 
 
@@ -377,6 +382,9 @@ Requires:
 The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.
 Configuration for this scenario requires only minor changes from AWS deployments.
 
+You will need to grant `Queue Data Contributor` role on the Queue for the identity
+mailer is running under.
+
 The notify action in your policy will reflect transport type `asq` with the URL
 to an Azure Storage Queue.  For example:
 
@@ -423,17 +431,25 @@ where `mailer.yml` may look like:
 queue_url: asq://storage.queue.core.windows.net/custodian
 from_address: foo@mail.com
 sendgrid_api_key: <key>
-function_servicePlanName: mycustodianfunctions
+function_properties:
+  servicePlan:
+    name: 'testmailer1'
+    resourceGroupName: custodianmailer1
+    skuTier: Basic
+    skuName: B1
+    location: WestUS2
 ```
 
 ## Writing an email template
 
 Templates are authored in [jinja2](http://jinja.pocoo.org/docs/dev/templates/).
 Drop a file with the `.j2` extension into the
-[`msg-templates`](./msg-templates) directory, and send a pull request to this
+[`c7n_mailer/msg-templates`](./c7n_mailer/msg-templates) directory, and send a pull request to this
 repo. You can then reference it in the `notify` action as the `template`
 variable by file name minus extension. Templates ending with `.html.j2` are
 sent as HTML-formatted emails, all others are sent as plain text.
+
+You can use `-t` or `--templates` cli argument to pass custom folder with your templates.
 
 The following variables are available when rendering templates:
 
@@ -493,7 +509,7 @@ the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS.
 * With no additional arguments, it will render the template specified by the policy the
   message is for, and actually send mail from the local machine as ``c7n-mailer`` would.
   This only works with SES, not SMTP.
-* With the ``-t`` | ``--template-print`` argument, it will log the email addresses that would
+* With the ``-T`` | ``--template-print`` argument, it will log the email addresses that would
   receive mail, and print the rendered message body template to STDOUT.
 * With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
   that would be sent, for each message that would be sent, to STDOUT.

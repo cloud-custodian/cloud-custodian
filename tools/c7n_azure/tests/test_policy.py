@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
-from c7n_azure.constants import CONST_AZURE_EVENT_TRIGGER_MODE
+from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 
 
@@ -23,47 +23,160 @@ class AzurePolicyModeTest(BaseTest):
     def setUp(self):
         super(AzurePolicyModeTest, self).setUp()
 
-    def test_init_azure_function_mode_with_service_plan_name(self):
+    def test_azure_function_event_mode_schema_validation(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-serverless-mode',
+                'resource': 'azure.vm',
+                'mode':
+                    {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                     'events': ['VmWrite'],
+                     'provision-options': {
+                         'servicePlan': {
+                             'name': 'test-cloud-custodian',
+                             'location': 'eastus',
+                             'resourceGroupName': 'test'},
+                         'storageAccount': {
+                             'name': 'testschemaname'
+                         },
+                         'appInsights': {
+                             'name': 'testschemaname'
+                         }
+                     }}
+            })
+            self.assertTrue(p)
+
+    def test_azure_function_periodic_mode_schema_validation(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-serverless-mode',
+                'resource': 'azure.vm',
+                'mode':
+                    {'type': FUNCTION_TIME_TRIGGER_MODE,
+                     'schedule': '0 * /5 * * * *',
+                     'provision-options': {
+                         'servicePlan': {
+                             'name': 'test-cloud-custodian',
+                             'location': 'eastus',
+                             'resourceGroupName': 'test'},
+                         'storageAccount': {
+                             'name': 'testschemaname'
+                         },
+                         'appInsights': {
+                             'name': 'testschemaname'
+                         }
+                     }}
+            })
+            self.assertTrue(p)
+
+    def test_init_azure_function_mode_with_service_plan(self):
         p = self.load_policy({
             'name': 'test-azure-serverless-mode',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite'],
                  'provision-options': {
-                     'servicePlanName': 'test-cloud-custodian'
+                     'servicePlan': {
+                         'name': 'test-cloud-custodian',
+                         'location': 'eastus',
+                         'resourceGroupName': 'test'}
                  }}
         })
 
         function_mode = AzureFunctionMode(p)
+        params = function_mode.get_function_app_params()
+
         self.assertEqual(function_mode.policy_name, p.data['name'])
-        self.assertEqual(function_mode.webapp_name, function_mode.parameters['name']['value'])
-        self.assertEqual(function_mode.parameters['storageName']['value'], 'testcloudcustodian')
-        self.assertEqual(function_mode.group_name,
-                         p.data['mode']['provision-options']['servicePlanName'])
+
+        self.assertTrue(params.storage_account['name'].startswith('custodian'))
+        self.assertEqual(params.app_insights['name'], 'test-cloud-custodian')
+        self.assertEqual(params.service_plan['name'], "test-cloud-custodian")
+
+        self.assertEqual(params.service_plan['location'], "eastus")
+        self.assertEqual(params.app_insights['location'], "eastus")
+        self.assertEqual(params.storage_account['location'], "eastus")
+
+        self.assertEqual(params.storage_account['resource_group_name'], 'test')
+        self.assertEqual(params.app_insights['resource_group_name'], 'test')
+        self.assertEqual(params.service_plan['resource_group_name'], "test")
+
+        self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
 
     def test_init_azure_function_mode_no_service_plan_name(self):
         p = self.load_policy({
             'name': 'test-azure-serverless-mode',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']}
         })
 
         function_mode = AzureFunctionMode(p)
+        params = function_mode.get_function_app_params()
+
         self.assertEqual(function_mode.policy_name, p.data['name'])
-        self.assertEqual(function_mode.webapp_name, function_mode.parameters['name']['value'])
-        self.assertEqual(function_mode.group_name,
-                         function_mode.parameters['servicePlanName']['value'])
-        self.assertEqual(function_mode.parameters['servicePlanName']['value'], 'cloud-custodian')
+
+        self.assertEqual(params.service_plan['name'], "cloud-custodian")
+        self.assertEqual(params.service_plan['location'], "westus2")
+        self.assertEqual(params.service_plan['resource_group_name'], "cloud-custodian")
+
+        self.assertEqual(params.app_insights['name'], 'cloud-custodian')
+        self.assertEqual(params.app_insights['location'], "westus2")
+        self.assertEqual(params.app_insights['resource_group_name'], 'cloud-custodian')
+
+        self.assertTrue(params.storage_account['name'].startswith('custodian'))
+        self.assertEqual(params.storage_account['location'], "westus2")
+        self.assertEqual(params.storage_account['resource_group_name'], 'cloud-custodian')
+
+        self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
+
+    def test_init_azure_function_mode_with_resource_ids(self):
+
+        ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
+                '/testrg/providers/microsoft.insights/components/testai'
+        sp_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
+                '/testrg/providers/Microsoft.Web/serverFarms/testsp'
+        sa_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
+                '/testrg/providers/Microsoft.Storage/storageAccounts/testsa'
+        p = self.load_policy({
+            'name': 'test-azure-serverless-mode',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite'],
+                 'provision-options': {
+                     'servicePlan': sp_id,
+                     'storageAccount': sa_id,
+                     'appInsights': ai_id
+                 }}
+        })
+
+        function_mode = AzureFunctionMode(p)
+        params = function_mode.get_function_app_params()
+
+        self.assertEqual(function_mode.policy_name, p.data['name'])
+
+        self.assertEqual(params.storage_account['id'], sa_id)
+        self.assertEqual(params.storage_account['name'], 'testsa')
+        self.assertEqual(params.storage_account['resource_group_name'], 'testrg')
+
+        self.assertEqual(params.app_insights['id'], ai_id)
+        self.assertEqual(params.app_insights['name'], 'testai')
+        self.assertEqual(params.app_insights['resource_group_name'], 'testrg')
+
+        self.assertEqual(params.service_plan['id'], sp_id)
+        self.assertEqual(params.service_plan['name'], "testsp")
+        self.assertEqual(params.service_plan['resource_group_name'], "testrg")
+
+        self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
 
     def test_event_mode_is_subscribed_to_event_true(self):
         p = self.load_policy({
             'name': 'test-azure-event',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']},
         })
 
@@ -82,7 +195,7 @@ class AzurePolicyModeTest(BaseTest):
             'name': 'test-azure-event',
             'resource': 'azure.vm',
             'mode':
-                {'type': CONST_AZURE_EVENT_TRIGGER_MODE,
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events': ['VmWrite']},
         })
 

@@ -13,13 +13,20 @@
 # limitations under the License.
 import collections
 import datetime
+import hashlib
 import logging
 import re
-import six
+from builtins import bytes
+from concurrent.futures import as_completed
 
-from azure.graphrbac.models import GetObjectsParameters, AADObject
+import six
+from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
+from azure.mgmt.web.models import NameValuePair
+from c7n_azure import constants
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
+
+from c7n.utils import chunks
 
 
 class ResourceIdParser(object):
@@ -63,6 +70,15 @@ class StringUtils(object):
 
         return False
 
+    @staticmethod
+    def snake_to_camel(string):
+        components = string.split('_')
+        return components[0] + ''.join(x.title() for x in components[1:])
+
+    @staticmethod
+    def naming_hash(string, length=8):
+        return hashlib.sha256(bytes(string, 'utf-8')).hexdigest().lower()[:length]
+
 
 def utcnow():
     """The datetime object for the current time in UTC
@@ -74,6 +90,42 @@ def now(tz=None):
     """The datetime object for the current time in UTC
     """
     return datetime.datetime.now(tz=tz)
+
+
+def azure_name_value_pair(name, value):
+    return NameValuePair(**{'name': name, 'value': value})
+
+
+class ThreadHelper:
+
+    disable_multi_threading = False
+
+    @staticmethod
+    def execute_in_parallel(resources, execution_method, executor_factory, log,
+                            max_workers=constants.DEFAULT_MAX_THREAD_WORKERS,
+                            chunk_size=constants.DEFAULT_CHUNK_SIZE):
+        futures = []
+        results = []
+        exceptions = []
+
+        max_num_workers = 1 if ThreadHelper.disable_multi_threading else max_workers
+
+        with executor_factory(max_workers=max_num_workers) as w:
+            for resource_set in chunks(resources, chunk_size):
+                futures.append(w.submit(execution_method, resource_set))
+
+            for f in as_completed(futures):
+                if f.exception():
+                    log.error(
+                        "Execution failed with error: %s" % f.exception())
+                    exceptions.append(f.exception())
+                    continue
+                else:
+                    result = f.result()
+                    if result:
+                        results.extend(result)
+
+            return results, list(set(exceptions))
 
 
 class Math(object):
@@ -98,7 +150,7 @@ class GraphHelper(object):
             include_directory_object_references=True,
             object_ids=object_ids)
 
-        principal_dics = {object_id: AADObject() for object_id in object_ids}
+        principal_dics = {object_id: DirectoryObject() for object_id in object_ids}
 
         aad_objects = graph_client.objects.get_objects_by_object_ids(object_params)
         try:
@@ -113,11 +165,13 @@ class GraphHelper(object):
 
     @staticmethod
     def get_principal_name(graph_object):
-        if graph_object.user_principal_name:
+        if hasattr(graph_object, 'user_principal_name'):
             return graph_object.user_principal_name
-        elif graph_object.service_principal_names:
+        elif hasattr(graph_object, 'service_principal_names'):
             return graph_object.service_principal_names[0]
-        return graph_object.display_name or ''
+        elif hasattr(graph_object, 'display_name'):
+            return graph_object.display_name
+        return ''
 
 
 class PortsRangeHelper(object):

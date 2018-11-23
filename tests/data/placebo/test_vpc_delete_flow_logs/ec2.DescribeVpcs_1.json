@@ -30,26 +30,58 @@
                 "IsDefault": false
             }, 
             {
-                "VpcId": "vpc-7af45101", 
+                "VpcId": "vpc-f8c6d983", 
                 "InstanceTenancy": "default", 
                 "Tags": [
                     {
-                        "Value": "FlowLogTest", 
+                        "Value": "IpV6", 
                         "Key": "Name"
                     }
                 ], 
                 "CidrBlockAssociationSet": [
                     {
-                        "AssociationId": "vpc-cidr-assoc-7c1eb811", 
-                        "CidrBlock": "10.0.16.0/24", 
+                        "AssociationId": "vpc-cidr-assoc-c9ff12a5", 
+                        "CidrBlock": "10.0.0.0/16", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "Ipv6CidrBlockAssociationSet": [
+                    {
+                        "Ipv6CidrBlock": "2600:1f18:2466:4b00::/56", 
+                        "AssociationId": "vpc-cidr-assoc-caff12a6", 
+                        "Ipv6CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.0.0.0/16", 
+                "IsDefault": false
+            }, 
+            {
+                "VpcId": "vpc-03005fb9b8740263d", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "testing-vpc", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0f6765530d80dc044", 
+                        "CidrBlock": "10.205.0.0/18", 
                         "CidrBlockState": {
                             "State": "associated"
                         }
                     }
                 ], 
                 "State": "available", 
-                "DhcpOptionsId": "dopt-4d4c3035", 
-                "CidrBlock": "10.0.16.0/24", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.205.0.0/18", 
                 "IsDefault": false
             }, 
             {
@@ -57,7 +89,7 @@
                 "InstanceTenancy": "default", 
                 "Tags": [
                     {
-                        "Value": "Default", 
+                        "Value": "FlowLogTest", 
                         "Key": "Name"
                     }
                 ], 
@@ -74,76 +106,18 @@
                 "DhcpOptionsId": "dopt-24ff1940", 
                 "CidrBlock": "172.31.0.0/16", 
                 "IsDefault": true
-            }, 
-            {
-                "VpcId": "vpc-e274f499", 
-                "InstanceTenancy": "default", 
-                "Tags": [
-                    {
-                        "Value": "JunkVPC", 
-                        "Key": "Name"
-                    }
-                ], 
-                "CidrBlockAssociationSet": [
-                    {
-                        "AssociationId": "vpc-cidr-assoc-a96ee0c4", 
-                        "CidrBlock": "10.0.64.0/24", 
-                        "CidrBlockState": {
-                            "State": "associated"
-                        }
-                    }
-                ], 
-                "State": "available", 
-                "DhcpOptionsId": "dopt-24ff1940", 
-                "CidrBlock": "10.0.64.0/24", 
-                "IsDefault": false
-            }, 
-            {
-                "VpcId": "vpc-d2447eaa", 
-                "InstanceTenancy": "default", 
-                "Tags": [
-                    {
-                        "Value": "EC2ContainerService-Default", 
-                        "Key": "aws:cloudformation:stack-name"
-                    }, 
-                    {
-                        "Value": "Containers", 
-                        "Key": "Name"
-                    }, 
-                    {
-                        "Value": "Vpc", 
-                        "Key": "aws:cloudformation:logical-id"
-                    }, 
-                    {
-                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/EC2ContainerService-Default/84d2eff0-f917-11e7-b441-50d5ca632656", 
-                        "Key": "aws:cloudformation:stack-id"
-                    }
-                ], 
-                "CidrBlockAssociationSet": [
-                    {
-                        "AssociationId": "vpc-cidr-assoc-a7aa90cd", 
-                        "CidrBlock": "10.0.0.0/16", 
-                        "CidrBlockState": {
-                            "State": "associated"
-                        }
-                    }
-                ], 
-                "State": "available", 
-                "DhcpOptionsId": "dopt-24ff1940", 
-                "CidrBlock": "10.0.0.0/16", 
-                "IsDefault": false
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "b8dcd905-3abb-45ae-96f1-e4d16b4d41dc", 
+            "RequestId": "163d16db-040b-4ef9-bb7e-f29285bd63f1", 
             "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
+                "date": "Fri, 02 Nov 2018 21:48:53 GMT", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 16 Apr 2018 14:37:27 GMT"
+                "content-length": "4418", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2"
             }
         }
     }

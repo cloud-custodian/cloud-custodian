@@ -21,6 +21,7 @@ import datetime
 import itertools
 import logging
 import os
+import operator
 import shutil
 import sys
 import tempfile
@@ -298,8 +299,6 @@ class ApiStats(DeltaStats):
             self.ctx.session_factory.set_subscribers(())
         self.ctx.metrics.put_metric(
             "ApiCalls", sum(self.api_calls.values()), "Count")
-        self.ctx.policy._write_file(
-            'api-stats.json', utils.dumps(dict(self.api_calls)))
         self.pop_snapshot()
 
     def __call__(self, s):
@@ -357,7 +356,6 @@ class S3Output(DirectoryOutput):
         if exc_type is not None:
             log.exception("Error while executing policy")
         log.debug("Uploading policy logs")
-        self.leave_log()
         self.compress()
         self.transfer = S3Transfer(
             self.ctx.session_factory(assume=False).client('s3'))
@@ -419,8 +417,12 @@ class AWS(object):
             options.regions, policy_collection.resource_types)
 
         for p in policy_collection:
+            if 'aws.' in p.resource_type:
+                _, resource_type = p.resource_type.split('.', 1)
+            else:
+                resource_type = p.resource_type
             available_regions = service_region_map.get(
-                resource_service_map.get(p.resource_type), ())
+                resource_service_map.get(resource_type), ())
 
             # its a global service/endpoint, use user provided region
             # or us-east-1.
@@ -452,7 +454,13 @@ class AWS(object):
                 policies.append(
                     Policy(p.data, options_copy,
                            session_factory=policy_collection.session_factory()))
-        return PolicyCollection(policies, options)
+
+        return PolicyCollection(
+            # order policies by region to minimize local session invalidation.
+            # note relative ordering of policies must be preserved, python sort
+            # is stable.
+            sorted(policies, key=operator.attrgetter('options.region')),
+            options)
 
 
 def get_service_region_map(regions, resource_types):

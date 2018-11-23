@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransformJobName": "Batch-Transform-2018-10-29-15-50-07-888",
+        "TransformJobArn": "arn:aws:sagemaker:us-east-1:644160558196:transform-job/batch-transform-2018-10-29-15-50-07-888",
+        "TransformJobStatus": "InProgress",
+        "ModelName": "kmeans-2018-10-24-18-00-02-250",
+        "TransformInput": {
+            "DataSource": {
+                "S3DataSource": {
+                    "S3DataType": "S3Prefix",
+                    "S3Uri": "s3://c7n-sagemaker-test/kmeans_batch_example/input/valid-data.csv"
+                }
+            },
+            "ContentType": "text/csv",
+            "CompressionType": "None",
+            "SplitType": "Line"
+        },
+        "TransformOutput": {
+            "S3OutputPath": "s3://c7n-sagemaker-test/kmeans_batch_example/output",
+            "AssembleWith": "None",
+            "KmsKeyId": ""
+        },
+        "TransformResources": {
+            "InstanceType": "ml.c4.xlarge",
+            "InstanceCount": 1
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2018,
+            "month": 10,
+            "day": 29,
+            "hour": 11,
+            "minute": 50,
+            "second": 8,
+            "microsecond": 112000
+        },
+        "ResponseMetadata": {
+            "RequestId": "f847d013-747a-4c17-bc21-e2027e92cc8d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f847d013-747a-4c17-bc21-e2027e92cc8d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "704",
+                "date": "Mon, 29 Oct 2018 15:50:47 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

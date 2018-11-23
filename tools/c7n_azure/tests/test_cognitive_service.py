@@ -20,6 +20,14 @@ class CognitiveServiceTest(BaseTest):
     def setUp(self):
         super(CognitiveServiceTest, self).setUp()
 
+    def test_cognitive_service_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-cognitive-service',
+                'resource': 'azure.cognitiveservice'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('cognitive-service.json')
     def test_find_by_name(self):
         p = self.load_policy({

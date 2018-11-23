@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "c1e1c752-e0e2-11e8-b3ad-6dd14cacfd10",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 05 Nov 2018 10:08:35 GMT",
+                "content-type": "application/json",
+                "content-length": "174",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "c1e1c752-e0e2-11e8-b3ad-6dd14cacfd10",
+                "x-amz-apigw-id": "P4h5iJXtIAMEbTQ="
+            },
+            "RetryAttempts": 0
+        },
+        "id": "rtmgxfiay5",
+        "name": "testapi",
+        "description": "for replacement",
+        "createdDate": {
+            "__class__": "datetime",
+            "year": 2017,
+            "month": 4,
+            "day": 5,
+            "hour": 10,
+            "minute": 34,
+            "second": 55,
+            "microsecond": 0
+        },
+        "apiKeySource": "HEADER",
+        "endpointConfiguration": {
+            "types": [
+                "EDGE"
+            ]
+        }
+    }
+}
