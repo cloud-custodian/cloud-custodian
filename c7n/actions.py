@@ -555,7 +555,7 @@ class Notify(BaseNotify):
         message['action'] = self.expand_variables(message)
 
         for batch in utils.chunks(resources, self.batch_size):
-            message['resources'] = batch
+            message['resources'] = self.prepare_resources(batch)
             receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
                 receipt, self.manager.data['name'],
