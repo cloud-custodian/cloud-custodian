@@ -116,7 +116,7 @@ def lifecycle_rule_validate(policy, rule):
     # https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html#lp_evaluation_rules
 
     if (rule['selection']['tagStatus'] == 'tagged' and
-        'tagPrefixList' not in rule['selection']):
+            'tagPrefixList' not in rule['selection']):
         raise PolicyValidationError(
             ("{} has invalid lifecycle rule {} tagprefixlist "
              "required for tagStatus: tagged").format(
