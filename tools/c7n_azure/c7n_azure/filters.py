@@ -16,7 +16,7 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 from azure.mgmt.policyinsights import PolicyInsightsClient
-from dateutil import zoneinfo
+from dateutil import tz as tzutils
 from dateutil.parser import parse
 
 from c7n_azure.utils import Math
@@ -201,7 +201,7 @@ class TagActionFilter(Filter):
             raise PolicyValidationError(
                 "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified '%s' in %s" % (
@@ -216,7 +216,7 @@ class TagActionFilter(Filter):
         self.op = self.data.get('op', 'stop')
         self.skew = self.data.get('skew', 0)
         self.skew_hours = self.data.get('skew_hours', 0)
-        self.tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         return super(TagActionFilter, self).process(resources, event)
 
     def __call__(self, i):

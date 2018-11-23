@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
-from dateutil import zoneinfo
+from dateutil import tz as tzutils
 
 from azure_common import BaseTest, arm_template
 
@@ -80,7 +80,7 @@ class AppServicePlanTest(BaseTest):
 
     @arm_template('appserviceplan.json')
     def test_on_off_hours(self):
-        t = datetime.datetime.now(zoneinfo.gettz("pt"))
+        t = datetime.datetime.now(tzutils.gettz("pt"))
         t = t.replace(year=2018, month=8, day=24, hour=18, minute=30)
 
         with mock_datetime_now(t, datetime):

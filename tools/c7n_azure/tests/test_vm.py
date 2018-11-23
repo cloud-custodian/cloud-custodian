@@ -17,7 +17,7 @@ import datetime
 
 from azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
-from dateutil import zoneinfo
+from dateutil import tz as tzutils
 from mock import patch
 
 from c7n.testing import mock_datetime_now
@@ -270,7 +270,7 @@ class VMTest(BaseTest):
     @arm_template('vm.json')
     def test_on_off_hours(self):
 
-        t = datetime.datetime.now(zoneinfo.gettz("pt"))
+        t = datetime.datetime.now(tzutils.gettz("pt"))
         t = t.replace(year=2018, month=8, day=24, hour=18, minute=30)
 
         with mock_datetime_now(t, datetime):

@@ -25,7 +25,7 @@ from c7n_azure import constants
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import utcnow, ThreadHelper
-from dateutil import zoneinfo
+from dateutil import tz as tzutils
 from msrestazure.azure_exceptions import CloudError
 
 from c7n import utils
@@ -471,7 +471,7 @@ class TagDelayedAction(AzureBaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(TagDelayedAction, self).__init__(data, manager, log_dir)
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutils.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('msg', self.default_template)
@@ -492,7 +492,7 @@ class TagDelayedAction(AzureBaseAction):
                 "mark-for-op specifies invalid op:%s in %s" % (
                     op, self.manager.data))
 
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutils.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise PolicyValidationError(
