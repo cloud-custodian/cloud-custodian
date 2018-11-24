@@ -258,7 +258,7 @@ class Route53DomainTest(BaseTest):
 
 class Route53EnableDNSQueryLoggingTest(BaseTest):
 
-    def test_hostedzone_querylogging(self):
+    def test_hostedzone_set_query_log(self):
         session_factory = self.replay_flight_data(
             'test_route53_enable_query_logging')
         p = self.load_policy({
@@ -267,9 +267,26 @@ class Route53EnableDNSQueryLoggingTest(BaseTest):
             'filters': [
                 {'Config.PrivateZone': False},
                 {'type': 'query-logging-enabled', 'state': False}],
-            'actions': [{'type': 'set-query-logging', 'state': True}]},
-            session_factory=session_factory)
-        self.assertEqual(len(p.run()), 1)
+            'actions': [{
+                'type': 'set-query-logging',
+                'log-group': '/aws/route53/cloudcustodian.io',
+                'state': True,
+                'set-permissions': True}]},
+            session_factory=session_factory, config={'account_id': '644160558196'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('route53')
+        enabled_zones = {
+            c['HostedZoneId']: c for c in
+            client.list_query_logging_configs().get('QueryLoggingConfigs')}
+
+        for r in resources:
+            self.assertTrue(r['Id'].rsplit('/', 1)[-1] in enabled_zones)
+
+    def test_hostedzone_filter_query_log(self):
+        session_factory = self.replay_flight_data(
+            'test_route53_filter_query_logging')
         p = self.load_policy({
             'name': 'query-logging-enabled',
             'resource': 'hostedzone',
@@ -277,4 +294,4 @@ class Route53EnableDNSQueryLoggingTest(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['Id'], "/hostedzone/TESTABCXYZ1234")
+        self.assertEqual(resources[0]['Id'], "/hostedzone/Z20H1474487I0O")

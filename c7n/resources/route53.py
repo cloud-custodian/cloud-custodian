@@ -228,13 +228,19 @@ class Route53DomainRemoveTag(RemoveTag):
 class SetQueryLogging(BaseAction):
     """Enables query logging on a hosted zone.
 
-    **Note you must** create a resource policy in cloud watch logs to
-    allow route53 to push logs to a log group. See
-    https://amzn.to/2wAhBbs for details. One resource policy can cover
-    all log-groups.
+    By default this enables a log group per route53 domain, alternatively
+    a log group name can be specified for a unified log across domains.
+
+    Note this only applicable to public route53 domains, and log groups
+    must be created in us-east-1 region.
+
+    This action can optionally setup the resource permissions needed for
+    route53 to log to cloud watch logs via `set-permissions: true`, else
+    the cloud watch logs resource policy would need to be set separately.
 
     Its recommended to use a separate custodian policy on the log
-    groups to set the log retention period for the zone logs.
+    groups to set the log retention period for the zone logs. See
+    `custodian schema aws.log-group.actions.set-retention`
 
     :example:
 
@@ -264,6 +270,7 @@ class SetQueryLogging(BaseAction):
 
     schema = type_schema(
         'set-query-logging', **{
+            'set-permissions': {'type': 'boolean'},
             'log-group-prefix': {'type': 'string', 'default': '/aws/route53'},
             'log-group': {'type': 'string', 'default': 'auto'},
             'state': {'type': 'boolean'}})
@@ -272,7 +279,7 @@ class SetQueryLogging(BaseAction):
         "Sid": "Route53LogsToCloudWatchLogs",
         "Effect": "Allow",
         "Principal": {"Service": ["route53.amazonaws.com"]},
-        "Action": "logs:PutLogEvents",
+        "Action": ["logs:PutLogEvents", "logs:CreateLogStream"],
         "Resource": None}
 
     def validate(self):
@@ -287,7 +294,23 @@ class SetQueryLogging(BaseAction):
                     "use of query-logging-enabled filter in policy")
         return self
 
+    def get_permissions(self):
+        perms = []
+        if self.data.get('set-permissions'):
+            perms.extend(('logs:GetResourcePolicy', 'logs:PutResourcePolicy'))
+        if self.data.get('state', True):
+            perms.append('route53:CreateQueryLoggingConfig')
+            perms.append('logs:CreateLogGroups')
+            perms.append('logs:DescribeLogGroups')
+            perms.append('tag:GetResources')
+        else:
+            perms.append('route53:DeleteQueryLoggingConfig')
+        return perms
+
     def process(self, resources):
+        if self.manager.config.region != 'us-east-1':
+            self.log.warning("set-query-logging should be only be performed region: us-east-1")
+
         client = local_session(self.manager.session_factory).client('route53')
         state = self.data.get('state', True)
 
@@ -297,7 +320,10 @@ class SetQueryLogging(BaseAction):
 
         for r in resources:
             if not state:
-                client.delete_query_logging_config(Id=r['c7n:log-config']['Id'])
+                try:
+                    client.delete_query_logging_config(Id=r['c7n:log-config']['Id'])
+                except client.exceptions.NoSuchQueryLoggingConfig:
+                    pass
                 continue
             log_arn = "arn:aws:logs:us-east-1:{}:log-group:{}".format(
                 self.manager.account_id, zone_log_names[r['Id']])
@@ -316,11 +342,12 @@ class SetQueryLogging(BaseAction):
 
     def ensure_log_groups(self, group_names):
         log_manager = self.manager.get_resource_manager('log-group')
+        log_manager.config = self.manager.config.copy(region='us-east-1')
 
         if len(group_names) == 1:
             groups = []
             if log_manager.get_resources(list(group_names), augment=False):
-                return
+                groups = [{'logGroupName': g} for g in group_names]
         else:
             common_prefix = os.path.commonprefix(group_names)
             if common_prefix not in ('', '/'):
@@ -331,8 +358,6 @@ class SetQueryLogging(BaseAction):
                     log_manager.get_resources([g]) for g in group_names]))
 
         missing = group_names.difference({g['logGroupName'] for g in groups})
-        if not missing:
-            return
 
         # Logs groups must be created in us-east-1 for route53.
         client = local_session(
@@ -341,27 +366,27 @@ class SetQueryLogging(BaseAction):
         for g in missing:
             client.create_log_group(logGroupName=g)
 
-        # self.ensure_route53_permissions(client, group_names)
+        if self.data.get('set-permissions', False):
+            self.ensure_route53_permissions(client, group_names)
 
     def ensure_route53_permissions(self, client, group_names):
         if self.check_route53_permissions(client, group_names):
             return
-        if self.data.get('log-group') != 'auto':
-            resource = "arn:aws:logs:us-east-1:{}:log-group:{}".format(
+        if self.data.get('log-group', 'auto') != 'auto':
+            p_resource = "arn:aws:logs:us-east-1:{}:log-group:{}:*".format(
                 self.manager.account_id, self.data['log-group'])
         else:
-            resource = "arn:aws:logs:us-east-1:{}:log-group:{}/*".format(
+            p_resource = "arn:aws:logs:us-east-1:{}:log-group:{}/*".format(
                 self.manager.account_id,
                 self.data.get('log-group-prefix', '/aws/route53').rstrip('/'))
+
         statement = dict(self.statement)
-        statement['Resource'] = resource
+        statement['Resource'] = p_resource
+
         client.put_resource_policy(
             policyName='Route53LogWrites',
-            policyDocument=json.dumps({
-                "Version": "2012-10-17",
-                "Statement": [self.statement]
-            })
-        )
+            policyDocument=json.dumps(
+                {"Version": "2012-10-17", "Statement": [statement]}))
 
     def check_route53_permissions(self, client, group_names):
         group_names = set(group_names)
@@ -370,7 +395,7 @@ class SetQueryLogging(BaseAction):
                 if (s['Effect'] == 'Allow' and
                         s['Principal'].get('Service', ['']) == "route53.amazonaws.com"):
                     group_names.difference_update(
-                        fnmatch.filter(group_names, s['Resource']))
+                        fnmatch.filter(group_names, s['Resource'].rsplit(':', 1)[-1]))
                     if not group_names:
                         return True
         return not bool(group_names)
