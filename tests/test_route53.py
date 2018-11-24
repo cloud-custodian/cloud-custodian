@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest
 
+
 class Route53HostedZoneTest(BaseTest):
 
     def test_hostedzone_shield(self):
@@ -253,6 +254,7 @@ class Route53DomainTest(BaseTest):
             "TagList"
         ]
         self.assertEqual(len(tags), 0)
+
 
 class Route53EnableDNSQueryLoggingTest(BaseTest):
 

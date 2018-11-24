@@ -341,7 +341,7 @@ class SetQueryLogging(BaseAction):
         for g in missing:
             client.create_log_group(logGroupName=g)
 
-        #self.ensure_route53_permissions(client, group_names)
+        # self.ensure_route53_permissions(client, group_names)
 
     def ensure_route53_permissions(self, client, group_names):
         if self.check_route53_permissions(client, group_names):
