@@ -154,21 +154,25 @@ class FirehoseEncryptS3Destination(Action):
 
     DEST_MD = {
         'SplunkDestinationDescription': {
+            'update': 'SplunkDestinationUpdate',
             'clear': ['S3BackupMode'],
             'encrypt_path': 'S3DestinationDescription.EncryptionConfiguration',
             'remap': [('S3DestinationDescription', 'S3Update')]
         },
         'ElasticsearchDestinationDescription': {
+            'update': 'ElasticsearchDestinationUpdate',
             'clear': ['S3BackupMode'],
             'encrypt_path': 'S3DestinationDescription.EncryptionConfiguration',
-            'remap': [('S3DestinationDescription', 'S3Update')]
+            'remap': [('S3DestinationDescription', 'S3Update')],
         },
         'ExtendedS3DestinationDescription': {
-            'clear': [],
-            'encrypt_path': 'S3DestinationDescription.EncryptionConfiguration',
-            'remap': ()
+            'update': 'ExtendedS3DestinationUpdate',
+            'clear': ['S3BackupMode'],
+            'encrypt_path': 'EncryptionConfiguration',
+            'remap': []
         },
         'RedshiftDestinationDescription': {
+            'update': 'RedshiftDestinationUpdate',
             'clear': ['S3BackupMode', "ClusterJDBCURL", "CopyCommand", "Username"],
             'encrypt_path': 'S3DestinationDescription.EncryptionConfiguration',
             'remap': [('S3DestinationDescription', 'S3Update')]
@@ -191,21 +195,21 @@ class FirehoseEncryptS3Destination(Action):
                     continue
                 dinfo = d[dtype]
                 for k in dmetadata['clear']:
-                    dinfo.pop(dinfo, None)
+                    dinfo.pop(k, None)
                 if dmetadata['encrypt_path']:
                     encrypt_info = jmespath.search(dmetadata['encrypt_path'], dinfo)
                 else:
                     encrypt_info = dinfo
                 encrypt_info.pop('NoEncryptionConfig', None)
-                encrypt_info['KMSEncryptionConfig'] = {'AWSKMSKeyArn': key}
+                encrypt_info['KMSEncryptionConfig'] = {'AWSKMSKeyARN': key}
 
                 for old_k, new_k in dmetadata['remap']:
                     if old_k in dinfo:
                         dinfo[new_k] = dinfo.pop(old_k)
                 params = dict(DeliveryStreamName=name,
-                              DestionationId=destination_id,
+                              DestinationId=destination_id,
                               CurrentDeliveryStreamVersionId=version)
-                params[dtype] = dinfo
+                params[dmetadata['update']] = dinfo
                 client.update_destination(**params)
 
 

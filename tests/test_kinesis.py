@@ -128,7 +128,6 @@ class Kinesis(BaseTest):
         s = factory().client("firehose").describe_delivery_stream(
             DeliveryStreamName="firehose-s3"
         )['DeliveryStreamDescription']['Destinations'][0]
-        print(s.keys())
         assert 'KMSEncryptionConfig' in s['S3DestinationDescription']['EncryptionConfiguration'].keys()  # noqa: E501
 
     def test_firehose_splunk_encrypt_s3_destination(self):
