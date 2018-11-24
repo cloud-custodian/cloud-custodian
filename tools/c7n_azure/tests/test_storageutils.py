@@ -12,38 +12,77 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
-from c7n_azure.storageutils import StorageUtilities
+from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.session import Session
 
 
 class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()
-
-    def setup_account(self):
-        # Find actual name of storage account provisioned in our test environment
-        s = Session()
-        client = s.client('azure.mgmt.storage.StorageManagementClient')
-        accounts = list(client.storage_accounts.list())
-        matching_account = [a for a in accounts if a.name.startswith("cctstorage")]
-        return matching_account[0]
+        self.session = Session()
+        StorageUtilities.get_storage_from_uri.cache_clear()
 
     @arm_template('storage.json')
-    def test_get_account_by_name(self):
+    def test_get_storage_client_by_uri(self):
         account = self.setup_account()
-        found = StorageUtilities.get_storage_account_by_name(account.name)
-        self.assertEqual(found.id, account.id)
+        url = "https://" + account.name + ".blob.core.windows.net/testcontainer/extrafolder"
+        blob_service, container_name, key_prefix = \
+            StorageUtilities.get_blob_client_by_uri(url, self.session)
+        self.assertIsNotNone(blob_service)
+        self.assertEqual(container_name, "testcontainer")
+        self.assertEqual(key_prefix, "extrafolder")
 
     @arm_template('storage.json')
-    def test_get_account_by_name_not_exists(self):
+    def test_get_storage_client_by_uri_extra_directories(self):
         account = self.setup_account()
-        found = StorageUtilities.get_storage_account_by_name(account.name + "break")
-        self.assertIsNone(found)
+        url = "https://" + account.name + \
+              ".blob.core.windows.net/testcontainer/extrafolder/foo/bar"
+        blob_service, container_name, key_prefix = \
+            StorageUtilities.get_blob_client_by_uri(url, self.session)
+        self.assertIsNotNone(blob_service)
+        self.assertEqual(container_name, "testcontainer")
+        self.assertEqual(key_prefix, "extrafolder/foo/bar")
 
     @arm_template('storage.json')
-    def test_get_keys(self):
+    def test_get_queue_client_by_uri(self):
         account = self.setup_account()
-        keys = StorageUtilities.get_storage_keys(account.id)
-        self.assertEqual(len(keys), 2)
+        url = "https://" + account.name + ".queue.core.windows.net/testcc"
+        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url, self.session)
+        self.assertIsNotNone(queue_service)
+        self.assertEqual(queue_name, "testcc")
 
+    @arm_template('storage.json')
+    def test_create_queue_from_storage_account(self):
+        account = self.setup_account()
+        queue_name = 'testqueuecc'
+        queue = \
+            StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
+        self.assertTrue(queue)
+
+    @arm_template('storage.json')
+    def test_cycle_queue_message_by_uri(self):
+        account = self.setup_account()
+        url = "https://" + account.name + ".queue.core.windows.net/testcyclemessage"
+
+        queue_settings = StorageUtilities.get_queue_client_by_uri(url, self.session)
+        StorageUtilities.put_queue_message(*queue_settings, content=u"hello queue")
+
+        # Pull messages, should be 1
+        messages = StorageUtilities.get_queue_messages(*queue_settings)
+        self.assertEqual(len(messages), 1)
+
+        # Read message and delete it from queue
+        for message in messages:
+            self.assertEqual(message.content, u"hello queue")
+            StorageUtilities.delete_queue_message(*queue_settings, message=message)
+
+        # Pull messages again, should be empty
+        messages = StorageUtilities.get_queue_messages(*queue_settings)
+        self.assertEqual(len(messages), 0)
+
+    @arm_template('storage.json')
+    def test_get_storage_token(self):
+        token = StorageUtilities.get_storage_token(self.session)
+        self.assertIsNotNone(token.token)

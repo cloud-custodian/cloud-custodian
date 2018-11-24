@@ -26,20 +26,18 @@ from c7n.ufuncs import s3crypt
 from .common import BaseTest
 from six.moves.urllib_parse import quote_plus
 
+
 class TestS3Crypt(TestCase):
 
     def setUp(self):
         self.old_dir = os.getcwd()
         os.chdir(tempfile.gettempdir())
-        self.config_data = {
-            'test': 'data',
-            'large': False,
-        }
-        with open('config.json', 'w') as conf:
+        self.config_data = {"test": "data", "large": False}
+        with open("config.json", "w") as conf:
             json.dump(self.config_data, conf)
 
     def tearDown(self):
-        os.remove('config.json')
+        os.remove("config.json")
         os.chdir(self.old_dir)
 
     def test_init(self):
@@ -52,63 +50,67 @@ class TestS3Crypt(TestCase):
 
 
 class TestS3CryptEvent(BaseTest):
-    @mock.patch('sys.stdout', new_callable=io.StringIO)
+
+    @mock.patch("sys.stdout", new_callable=io.StringIO)
     def test_s3_event_simple(self, mock_stdout):
-        self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_encrypt')
-        client = session_factory().client('s3')
-        self.patch(s3crypt, 's3', client)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data("test_s3_encrypt")
+        client = session_factory().client("s3")
+        self.patch(s3crypt, "s3", client)
 
-        event = {'Records': [{
-            's3': {
-                'bucket': {
-                    'name': 'test-bucket'
-                },
-                'object': {
-                    'key': quote_plus('test-key'),
-                    'size': 42
+        event = {
+            "Records": [
+                {
+                    "s3": {
+                        "bucket": {"name": "test-bucket"},
+                        "object": {"key": quote_plus("test-key"), "size": 42},
+                    }
                 }
-            }
-        }]}
+            ]
+        }
         s3crypt.process_event(event, {})
 
-    @mock.patch('sys.stdout', new_callable=io.StringIO)
+    @mock.patch("sys.stdout", new_callable=io.StringIO)
     def test_s3_event_unsafe_key(self, mock_stdout):
-        self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_encrypt')
-        client = session_factory().client('s3')
-        self.patch(s3crypt, 's3', client)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data("test_s3_encrypt")
+        client = session_factory().client("s3")
+        self.patch(s3crypt, "s3", client)
 
-        event = {'Records': [{
-            's3': {
-                'bucket': {
-                    'name': 'test-bucket'
-                },
-                'object': {
-                    'key': quote_plus('/test000/!-_.*\'()/&@:,$=+%2b?;/ /whatever'),
-                    'size': 42
+        event = {
+            "Records": [
+                {
+                    "s3": {
+                        "bucket": {"name": "test-bucket"},
+                        "object": {
+                            "key": quote_plus(
+                                "/test000/!-_.*'()/&@:,$=+%2b?;/ /whatever"
+                            ),
+                            "size": 42,
+                        },
+                    }
                 }
-            }
-        }]}
+            ]
+        }
         s3crypt.process_event(event, {})
 
-    @mock.patch('sys.stdout', new_callable=io.StringIO)
+    @mock.patch("sys.stdout", new_callable=io.StringIO)
     def test_s3_event_version(self, mock_stdout):
-        self.patch(s3, 'S3_AUGMENT_TABLE', [])
-        session_factory = self.replay_flight_data('test_s3_encrypt')
-        client = session_factory().client('s3')
-        self.patch(s3crypt, 's3', client)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data("test_s3_encrypt")
+        client = session_factory().client("s3")
+        self.patch(s3crypt, "s3", client)
 
-        event = {'Records': [{
-            's3': {
-                'bucket': {
-                    'name': 'test-bucket'
-                },
-                'object': {
-                    'key': quote_plus('test-key'),
-                    'size': 42,
-                    'versionId': '99'
+        event = {
+            "Records": [
+                {
+                    "s3": {
+                        "bucket": {"name": "test-bucket"},
+                        "object": {
+                            "key": quote_plus("test-key"), "size": 42, "versionId": "99"
+                        },
+                    }
                 }
-            }
-        }]}
+            ]
+        }
         s3crypt.process_event(event, {})

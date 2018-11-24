@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import partial
+
 from c7n.provider import Provider, clouds
 from c7n.registry import PluginRegistry
-
+from c7n.utils import local_session
 from .session import Session
 
 
@@ -25,13 +27,17 @@ class Azure(Provider):
     resources = PluginRegistry('%s.resources' % resource_prefix)
 
     def initialize(self, options):
+        session = local_session(self.get_session_factory(options))
+        options['account_id'] = session.get_subscription_id()
         return options
 
     def initialize_policies(self, policy_collection, options):
         return policy_collection
 
     def get_session_factory(self, options):
-        return Session
+        return partial(Session,
+                       subscription_id=options.account_id,
+                       authorization_file=options.authorization_file)
 
 
 resources = Azure.resources

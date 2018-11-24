@@ -667,7 +667,7 @@ def load_resources(bucket, prefix, region, account_config, accounts,
     executor = ProcessPoolExecutor
     if debug:
         from c7n.executor import MainThreadExecutor
-        MainThreadExecutor.async = False
+        MainThreadExecutor.c7n_async = False
         executor = MainThreadExecutor
 
     stats = Counter()
@@ -706,6 +706,8 @@ if __name__ == '__main__':
     try:
         cli()
     except Exception:
-        import pdb, traceback, sys
+        import pdb
+        import traceback
+        import sys
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

@@ -3,21 +3,25 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import functools
 import logging
+from os import path
 
 import boto3
 import jsonschema
 from c7n_mailer import deploy, utils
+from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure import deploy as azure_deploy
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from ruamel import yaml
 
 CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
-    'required': ['queue_url', 'role'],
+    'required': ['queue_url'],
     'properties': {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
+        'org_domain': {'type': 'string'},
 
         # Standard Lambda Function Config
         'region': {'type': 'string'},
@@ -32,6 +36,52 @@ CONFIG_SCHEMA = {
         'lambda_description': {'type': 'string'},
         'lambda_tags': {'type': 'object'},
         'lambda_schedule': {'type': 'string'},
+
+        # Azure Function Config
+        'function_properties': {
+            'type': 'object',
+            'appInsights': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'storageAccount': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'servicePlan': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string',
+                            'skuTier': 'string',
+                            'skuName': 'string'}
+                     }
+                ]
+            },
+        },
+        'function_schedule': {'type': 'string'},
+        'function_skuCode': {'type': 'string'},
+        'function_sku': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
@@ -60,6 +110,7 @@ CONFIG_SCHEMA = {
         'datadog_application_key': {'type': 'string'},      # TODO: encrypt with KMS?
         'slack_token': {'type': 'string'},
         'slack_webhook': {'type': 'string'},
+        'sendgrid_api_key': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},
@@ -106,6 +157,8 @@ def get_c7n_mailer_parser():
     parser.add_argument('--debug', action='store_true', help=debug_help_msg)
     max_num_processes_help_msg = 'will run the mailer in parallel, integer of max processes allowed'
     parser.add_argument('--max-num-processes', type=int, help=max_num_processes_help_msg)
+    templates_folder_help_msg = 'message templates folder location'
+    parser.add_argument('-t', '--templates', help=templates_folder_help_msg)
     group = parser.add_mutually_exclusive_group(required=True)
     update_lambda_help_msg = 'packages your c7n_mailer, uploads the zip to aws lambda as a function'
     group.add_argument('--update-lambda', action='store_true', help=update_lambda_help_msg)
@@ -114,36 +167,64 @@ def get_c7n_mailer_parser():
     return parser
 
 
-def run_mailer_in_parallel(mailer_config, aws_session, logger, max_num_processes):
+def run_mailer_in_parallel(processor, max_num_processes):
     max_num_processes = int(max_num_processes)
     if max_num_processes < 1:
         raise Exception
-    sqs_queue_processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
-    sqs_queue_processor.max_num_processes = max_num_processes
-    sqs_queue_processor.run(parallel=True)
+    processor.max_num_processes = max_num_processes
+    processor.run(parallel=True)
+
+
+def is_azure_cloud(mailer_config):
+    return mailer_config.get('queue_url').startswith('asq')
 
 
 def main():
     parser = get_c7n_mailer_parser()
     args = parser.parse_args()
     mailer_config = get_and_validate_mailer_config(args)
-    aws_session = session_factory(mailer_config)
     args_dict = vars(args)
     logger = get_logger(debug=args_dict.get('debug', False))
+
+    module_dir = path.dirname(path.abspath(__file__))
+    default_templates = [path.abspath(path.join(module_dir, 'msg-templates')),
+                         path.abspath(path.join(module_dir, '..', 'msg-templates')),
+                         path.abspath('.')]
+    templates = args_dict.get('templates', None)
+    if templates:
+        default_templates.append(path.abspath(path.expanduser(path.expandvars(templates))))
+
+    mailer_config['templates_folders'] = default_templates
+
     if args_dict.get('update_lambda'):
         if args_dict.get('debug'):
             print('\n** --debug is only supported with --run, not --update-lambda **\n')
             return
         if args_dict.get('max_num_processes'):
-            print('\n** --max-num-processes is only supported with --run, not --update-lambda **\n')
+            print('\n** --max-num-processes is only supported '
+                  'with --run, not --update-lambda **\n')
             return
-        deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
+
+        if is_azure_cloud(mailer_config):
+            azure_deploy.provision(mailer_config)
+        else:
+            deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
+
     if args_dict.get('run'):
         max_num_processes = args_dict.get('max_num_processes')
-        if max_num_processes:
-            run_mailer_in_parallel(mailer_config, aws_session, logger, max_num_processes)
+
+        # Select correct processor
+        if is_azure_cloud(mailer_config):
+            processor = MailerAzureQueueProcessor(mailer_config, logger)
         else:
-            MailerSqsQueueProcessor(mailer_config, aws_session, logger).run()
+            aws_session = session_factory(mailer_config)
+            processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+
+        # Execute
+        if max_num_processes:
+            run_mailer_in_parallel(processor, max_num_processes)
+        else:
+            processor.run()
 
 
 if __name__ == '__main__':

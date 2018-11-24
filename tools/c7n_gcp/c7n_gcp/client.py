@@ -11,19 +11,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Base GCP client which uses the discovery API."""
+"""Base GCP client which uses the discovery API.
+"""
+# modifications (c7n)
+# - flight recorder support
+# - env creds sourcing
+# - various minor bug fixes
+
+# todo:
+# - consider forking googleapiclient to get rid of httplib2
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 import threading
-from googleapiclient import discovery
-import httplib2
-from oauth2client import client
-from ratelimiter import RateLimiter
-from retrying import retry
+import os
 import socket
 import ssl
 
+from googleapiclient import discovery, errors  # NOQA
+from googleapiclient.http import set_user_agent
+from google.auth.credentials import with_scopes_if_required
+import google.oauth2.credentials
+import google_auth_httplib2
+
+import httplib2
+from ratelimiter import RateLimiter
+from retrying import retry
+
 from six.moves import http_client
 from six.moves.urllib.error import URLError
+
+HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
 
 CLOUD_SCOPES = frozenset(['https://www.googleapis.com/auth/cloud-platform'])
 
@@ -69,7 +88,7 @@ def is_retryable_exception(e):
        wait_exponential_max=10000,
        stop_max_attempt_number=5)
 def _create_service_api(credentials, service_name, version, developer_key=None,
-                        cache_discovery=False):
+                        cache_discovery=False, http=None):
     """Builds and returns a cloud API service object.
 
     Args:
@@ -96,31 +115,28 @@ def _create_service_api(credentials, service_name, version, developer_key=None,
         'version': version,
         'developerKey': developer_key,
         'cache_discovery': cache_discovery,
-        'credentials': credentials}
+    }
+
+    if http:
+        discovery_kwargs['http'] = http
+    else:
+        discovery_kwargs['credentials'] = credentials
+
     return discovery.build(**discovery_kwargs)
 
 
-def _set_ua_and_scopes(credentials, sw_name, sw_version):
-    """Set custom Forseti user agent and add cloud scopes on credential object.
-
-    Args:
-        credentials (client.OAuth2Credentials): The credentials object used to
-            authenticate all http requests.
-
-    Returns:
-        client.OAuth2Credentials: The credentials object with the user agent
-            attribute set or updated.
+def _build_http(http=None):
+    """Construct an http client suitable for googleapiclient usage w/ user agent.
     """
-    if isinstance(credentials, client.OAuth2Credentials):
-        credentials.user_agent = (
-            'Python-httplib2/{} (gzip), {}/{}'.format(
-                httplib2.__version__,
-                sw_name,
-                sw_version))
-        if (isinstance(credentials, client.GoogleCredentials) and
-                credentials.create_scoped_required()):
-            credentials = credentials.create_scoped(list(CLOUD_SCOPES))
-    return credentials
+    if not http:
+        http = httplib2.Http(
+            timeout=HTTP_REQUEST_TIMEOUT, ca_certs=HTTPLIB_CA_BUNDLE)
+
+    user_agent = 'Python-httplib2/{} (gzip), {}/{}'.format(
+        httplib2.__version__,
+        'custodian-gcp',
+        '0.1')
+    return set_user_agent(http, user_agent)
 
 
 class Session(object):
@@ -131,6 +147,8 @@ class Session(object):
                  quota_max_calls=None,
                  quota_period=None,
                  use_rate_limiter=False,
+                 http=None,
+                 project_id=None,
                  **kwargs):
         """Constructor.
 
@@ -150,13 +168,16 @@ class Session(object):
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            credentials = client.GoogleCredentials.get_application_default()
-        self._credentials = _set_ua_and_scopes(credentials, 'custodian-gcp', '0.1')
+            credentials, _ = google.auth.default()
+        self._credentials = with_scopes_if_required(credentials, list(CLOUD_SCOPES))
         if use_rate_limiter:
             self._rate_limiter = RateLimiter(max_calls=quota_max_calls,
                                              period=quota_period)
         else:
             self._rate_limiter = None
+        self._http = http
+
+        self.project_id = project_id
 
     def __repr__(self):
         """The object representation.
@@ -164,8 +185,26 @@ class Session(object):
         Returns:
             str: The object representation.
         """
-        return '<GCPSession: name=%s, versions=%s>' % (
-            self.name, self.versions)
+        return '<gcp-session: http=%s>' % (self._http,)
+
+    def get_default_project(self):
+        if self.project_id:
+            return self.project_id
+        for k in ('GOOGLE_PROJECT', 'GCLOUD_PROJECT',
+                  'GOOGLE_CLOUD_PROJECT', 'CLOUDSDK_CORE_PROJECT'):
+            if k in os.environ:
+                return os.environ[k]
+        raise ValueError("No GCP Project ID set - set CLOUDSDK_CORE_PROJECT")
+
+    def get_default_region(self):
+        for k in ('GOOGLE_REGION', 'GCLOUD_REGION', 'CLOUDSDK_COMPUTE_REGION'):
+            if k in os.environ:
+                return os.environ[k]
+
+    def get_default_zone(self):
+        for k in ('GOOGLE_ZONE', 'GCLOUD_ZONE', 'CLOUDSDK_COMPUTE_ZONE'):
+            if k in os.environ:
+                return os.environ[k]
 
     def client(self, service_name, version, component, **kw):
         """Safely initialize a repository class to a property.
@@ -177,20 +216,21 @@ class Session(object):
         Returns:
             object: An instance of repository_class.
         """
-
         service = _create_service_api(
             self._credentials,
             service_name,
             version,
             kw.get('developer_key'),
-            kw.get('cache_discovery', False))
+            kw.get('cache_discovery', False),
+            self._http or _build_http())
 
         return ServiceClient(
             gcp_service=service,
             component=component,
             credentials=self._credentials,
             rate_limiter=self._rate_limiter,
-            use_cached_http=self._use_cached_http)
+            use_cached_http=self._use_cached_http,
+            http=self._http)
 
 
 # pylint: disable=too-many-instance-attributes, too-many-arguments
@@ -201,7 +241,7 @@ class ServiceClient(object):
                  num_retries=NUM_HTTP_RETRIES, key_field='project',
                  entity_field=None, list_key_field=None, get_key_field=None,
                  max_results_field='maxResults', search_query_field='query',
-                 rate_limiter=None, use_cached_http=True):
+                 rate_limiter=None, use_cached_http=True, http=None):
         """Constructor.
 
         Args:
@@ -237,8 +277,9 @@ class ServiceClient(object):
         if component:
             component_api = gcp_service
             for c in component.split('.'):
-                component_api = getattr(component_api, c)
-            self._component = component_api()
+                component_api = getattr(component_api, c)()
+
+            self._component = component_api
 
         self._entity_field = entity_field
         self._num_retries = num_retries
@@ -256,6 +297,7 @@ class ServiceClient(object):
 
         self._use_cached_http = use_cached_http
         self._local = LOCAL_THREAD
+        self._http_replay = http
 
     @property
     def http(self):
@@ -266,12 +308,22 @@ class ServiceClient(object):
         """
         if self._use_cached_http and hasattr(self._local, 'http'):
             return self._local.http
-
-        http = httplib2.Http(timeout=HTTP_REQUEST_TIMEOUT)
-        self._credentials.authorize(http=http)
+        if self._http_replay is not None:
+            # httplib2 instance is not thread safe
+            http = self._http_replay
+        else:
+            http = _build_http()
+        authorized_http = google_auth_httplib2.AuthorizedHttp(
+            self._credentials, http=http)
         if self._use_cached_http:
-            self._local.http = http
-        return http
+            self._local.http = authorized_http
+        return authorized_http
+
+    def get_http(self):
+        """Return an http instance sans credentials"""
+        if self._http_replay:
+            return self._http_replay
+        return _build_http()
 
     def _build_request(self, verb, verb_arguments):
         """Builds HttpRequest object.
@@ -289,7 +341,7 @@ class ServiceClient(object):
         # Since we initially build our kwargs as a dictionary where one of the
         # keys is a variable (target), we need to convert keys to strings,
         # even though the variable in question is of type str.
-        method_args = {str(k): v for k, v in verb_arguments.iteritems()}
+        method_args = {str(k): v for k, v in verb_arguments.items()}
         return method(**method_args)
 
     def _build_next_request(self, verb, prior_request, prior_response):

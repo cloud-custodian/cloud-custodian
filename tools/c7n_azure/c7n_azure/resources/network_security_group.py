@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.provider import resources
+import uuid
+
 from c7n.actions import BaseAction
-from c7n.filters import Filter
+from c7n.filters import Filter, FilterValidationError
+from c7n.filters.core import PolicyValidationError
 from c7n.utils import type_schema
+
+from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.utils import StringUtils, PortsRangeHelper
+
+from msrestazure.azure_exceptions import CloudError
 
 
 @resources.register('networksecuritygroup')
@@ -24,7 +31,7 @@ class NetworkSecurityGroup(ArmResourceManager):
     class resource_type(object):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
-        enum_spec = ('network_security_groups', 'list_all')
+        enum_spec = ('network_security_groups', 'list_all', None)
         id = 'id'
         name = 'name'
         default_report_fields = (
@@ -34,207 +41,206 @@ class NetworkSecurityGroup(ArmResourceManager):
         )
 
 
-class SecurityRuleFilter(Filter):
-    """
-    Filter on Security Rules within a Network Security Group
-    """
-    perm_attrs = set((
-        'IpProtocol', 'FromPort', 'ToPort'))
+DIRECTION = 'direction'
+PORTS = 'ports'
+MATCH = 'match'
+EXCEPT_PORTS = 'exceptPorts'
+IP_PROTOCOL = 'ipProtocol'
+ACCESS = 'access'
 
-    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts'))
-    attrs = perm_attrs.union(filter_attrs)
-    attrs.add('match-operator')
+ALLOW_OPERATION = 'Allow'
+DENY_OPERATION = 'Deny'
+
+PRIORITY_STEP = 10
+
+
+class NetworkSecurityGroupFilter(Filter):
+    """
+    Filter Network Security Groups using opened/closed ports configuration
+    """
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'type': {'enum': []},
+            MATCH: {'type': 'string', 'enum': ['all', 'any']},
+            PORTS: {'type': 'string'},
+            EXCEPT_PORTS: {'type': 'string'},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
+            ACCESS: {'type': 'string', 'enum': [ALLOW_OPERATION, DENY_OPERATION]},
+        },
+        'required': ['type', ACCESS]
+    }
 
     def validate(self):
         # Check that variable values are valid
-        if self.data.get('FromPort') and self.data.get('ToPort') and \
-                self.data.get('FromPort') > self.data.get('ToPort'):
-            raise ValueError('FromPort should be lower than ToPort')
-        if (
-                (self.data.get('FromPort') or self.data.get('ToPort')) and
-                (self.data.get('Ports') or self.data.get('OnlyPorts'))
-        ) or (self.data.get('Ports') and self.data.get('OnlyPorts')):
-            raise ValueError(
-                'Invalid port parameters. Choose port range (FromPort and/or ToPort) '
-                'or specify specific ports (Ports or OnlyPorts)')
+
+        if PORTS in self.data:
+            if not PortsRangeHelper.validate_ports_string(self.data[PORTS]):
+                raise FilterValidationError("ports string has wrong format.")
+
+        if EXCEPT_PORTS in self.data:
+            if not PortsRangeHelper.validate_ports_string(self.data[EXCEPT_PORTS]):
+                raise FilterValidationError("exceptPorts string has wrong format.")
+        return True
 
     def process(self, network_security_groups, event=None):
-
         # Get variables
-        self.ip_protocol = self.data.get('IpProtocol')
-        self.from_port = self.data.get('FromPort')
-        self.to_port = self.data.get('ToPort')
-        self.ports = self.data.get('Ports')
-        self.only_ports = self.data.get('OnlyPorts')
-        self.match_op = self.data.get('match-operator', 'and') == 'and' and all or any
+        self.ip_protocol = self.data.get(IP_PROTOCOL, '*')
+        self.IsAllowed = StringUtils.equal(self.data.get(ACCESS), ALLOW_OPERATION)
+        self.match = self.data.get(MATCH, 'all')
 
-        """
-        For each Network Security Group, set the 'securityRules' property to contain
-        only rules where there is a match, as defined in 'is_match'
-        """
-        for nsg in network_security_groups:
-            nsg['properties']['securityRules'] = \
-                [rule for rule in nsg['properties']['securityRules']
-                 if self.is_match(rule)]
-        """
-        Set network_security_groups to include only those that still have 'securityRules'
-        after the filtering has taken place
-        """
-        network_security_groups = \
-            [nsg for nsg in network_security_groups if len(nsg['properties']['securityRules']) > 0]
-        return network_security_groups
+        # Calculate ports from the settings:
+        #   If ports not specified -- assuming the entire range
+        #   If except_ports not specifed -- nothing
+        ports_set = PortsRangeHelper.get_ports_set_from_string(self.data.get(PORTS, '0-65535'))
+        except_set = PortsRangeHelper.get_ports_set_from_string(self.data.get(EXCEPT_PORTS, ''))
+        self.ports = ports_set.difference(except_set)
 
-    """
-    Check to see if range given matches range as defined by policy, return boolean
-    """
-    def is_range_match(self, dest_port_range):
-        # destination port range is coming from Azure, existing rules, not policy input
-        if len(dest_port_range) > 2:
-            raise ValueError('Invalid range')
+        nsgs = [nsg for nsg in network_security_groups if self._check_nsg(nsg)]
+        return nsgs
 
-        # FromPort is specified, should be above FromPort
-        if self.from_port:
-            for port in dest_port_range:
-                if port < self.from_port:
-                    return False
-        # ToPort is specified, should be below ToPort
-        if self.to_port:
-            for port in dest_port_range:
-                if port > self.to_port:
-                    return False
-        # OnlyPorts is specified, anything NOT included in OnlyPorts should return True
-        if self.only_ports:
-            for op in self.only_ports:
-                if len(dest_port_range) > 1:
-                    if dest_port_range[0] <= op >= dest_port_range[1]:
-                        return False
-                else:
-                    if dest_port_range[0] == op:
-                        return False
-        # Ports is specified, only those included in Ports should return true
-        elif self.ports:
-            if len(dest_port_range) > 1:
-                # self.ports needs to have ALL ports in range (inclusive) to match
-                range_set = set(range(dest_port_range[0], dest_port_range[1] + 1))
-                ports_set = set(self.ports)
-                return range_set.issubset(ports_set)
+    def _check_nsg(self, nsg):
+        nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol)
+
+        num_allow_ports = len([p for p in self.ports if nsg_ports.get(p)])
+        num_deny_ports = len(self.ports) - num_allow_ports
+
+        if self.match == 'all':
+            if self.IsAllowed:
+                return num_deny_ports == 0
             else:
-                return dest_port_range[0] in self.ports
-        return True
-
-    """
-    Check to see if port ranges defined in security rule match range as defined by policy
-    """
-    def is_ranges_match(self, security_rule):
-        if 'destinationPortRange' in security_rule['properties']:
-            dest_port_ranges = \
-                [self.get_port_range(security_rule['properties']['destinationPortRange'])]
-        else:
-            dest_port_ranges = \
-                [self.get_port_range(range_str) for range_str
-                 in security_rule['properties']['destinationPortRanges']]
-        for range in dest_port_ranges:
-            if not self.is_range_match(range):
-                return False
-        return True
-
-    def get_port_range(self, range_str):
-        return [int(item) for item in range_str.split('-')]
-
-    """
-    Determine if SecurityRule matches criteria as entered in policy
-
-    Currently supporting filters:
-        Ports - Specific Ports to target
-        OnlyPorts - Ports to IGNORE
-        FromPort - Lower bound of port range (inclusive)
-        ToPort - Upper bound of port range (inclusive)
-        IpProtocol - TCP/UDP protocol
-    """
-    def is_match(self, security_rule):
-        if self.direction_key != security_rule['properties']['direction']:
-            return False
-        ranges_match = self.is_ranges_match(security_rule)
-        protocol_match = (self.ip_protocol is None) or \
-                         (self.ip_protocol == security_rule['properties']['protocol'])
-        return self.match_op([ranges_match, protocol_match])
+                return num_allow_ports == 0
+        if self.match == 'any':
+            if self.IsAllowed:
+                return num_allow_ports > 0
+            else:
+                return num_deny_ports > 0
 
 
 @NetworkSecurityGroup.filter_registry.register('ingress')
-class IngressFilter(SecurityRuleFilter):
+class IngressFilter(NetworkSecurityGroupFilter):
     direction_key = 'Inbound'
-
-    schema = {
-        'type': 'object',
-        'properties': {
-            'type': {'enum': ['ingress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-            'FromPort': {'type': 'integer'},
-            'ToPort': {'type': 'integer'},
-            'IpProtocol': {'type': 'string', 'enum': ['TCP', 'UDP']}
-        },
-        'required': ['type']
-    }
+    schema = type_schema('ingress', rinherit=NetworkSecurityGroupFilter.schema)
 
 
 @NetworkSecurityGroup.filter_registry.register('egress')
-class EgressFilter(SecurityRuleFilter):
+class EgressFilter(NetworkSecurityGroupFilter):
     direction_key = 'Outbound'
+    schema = type_schema('egress', rinherit=NetworkSecurityGroupFilter.schema)
+
+
+class NetworkSecurityGroupPortsAction(BaseAction):
+    """
+    Action to perform on Network Security Groups
+    """
 
     schema = {
         'type': 'object',
-        # 'additionalProperties': True,
         'properties': {
-            'type': {'enum': ['egress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-            'FromPort': {'type': 'integer'},
-            'ToPort': {'type': 'integer'},
-            'IpProtocol': {'type': 'string', 'enum': ['TCP', 'UDP']}
-            # 'SelfReference': {'type': 'boolean'}
+            'type': {'enum': []},
+            PORTS: {'type': 'string'},
+            EXCEPT_PORTS: {'type': 'string'},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
+            DIRECTION: {'type': 'string', 'enum': ['Inbound', 'Outbound']}
         },
-        'required': ['type']}
+        'required': ['type', DIRECTION]
+    }
 
+    def validate(self):
+        # Check that variable values are valid
 
-class RulesAction(BaseAction):
-    """
-    Action to perform on SecurityRules within a Network Security Group
-    """
+        if PORTS in self.data:
+            if not PortsRangeHelper.validate_ports_string(self.data[PORTS]):
+                raise PolicyValidationError("ports string has wrong format.")
+
+        if EXCEPT_PORTS in self.data:
+            if not PortsRangeHelper.validate_ports_string(self.data[EXCEPT_PORTS]):
+                raise PolicyValidationError("exceptPorts string has wrong format.")
+        return True
+
+    def _build_ports_strings(self, nsg, direction_key, ip_protocol):
+        nsg_ports = PortsRangeHelper.build_ports_dict(nsg, direction_key, ip_protocol)
+
+        IsAllowed = StringUtils.equal(self.access_action, ALLOW_OPERATION)
+
+        # Find ports with different access level from NSG and this action
+        diff_ports = sorted([p for p in self.action_ports if nsg_ports.get(p, False) != IsAllowed])
+
+        return PortsRangeHelper.get_ports_strings_from_list(diff_ports)
 
     def process(self, network_security_groups):
+
+        ip_protocol = self.data.get(IP_PROTOCOL, '*')
+        direction = self.data[DIRECTION]
+        # Build a list of ports described in the action.
+        ports = PortsRangeHelper.get_ports_set_from_string(self.data.get(PORTS, '0-65535'))
+        except_ports = PortsRangeHelper.get_ports_set_from_string(self.data.get(EXCEPT_PORTS, ''))
+        self.action_ports = ports.difference(except_ports)
 
         for nsg in network_security_groups:
             nsg_name = nsg['name']
             resource_group = nsg['resourceGroup']
-            for rule in nsg['properties']['securityRules']:
-                self.manager.log.info("Updating access to '%s' for security rule "
-                                      "'%s' in resource group '%s'",
-                                      self.access_action, rule['name'], resource_group)
-                rule['properties']['access'] = self.access_action
+
+            # Get list of ports to Deny or Allow access to.
+            ports = self._build_ports_strings(nsg, direction, ip_protocol)
+            if not ports:
+                # If its empty, it means NSG already blocks/allows access to all ports,
+                # no need to change.
+                self.manager.log.info("Network security group %s satisfies provided "
+                                      "ports configuration, no actions scheduled.", nsg_name)
+                continue
+
+            rules = nsg['properties']['securityRules']
+            rules = sorted(rules, key=lambda k: k['properties']['priority'])
+            rules = [r for r in rules
+                     if StringUtils.equal(r['properties']['direction'], direction)]
+            lowest_priority = rules[0]['properties']['priority'] if len(rules) > 0 else 4096
+
+            # Create new top-priority rule to allow/block ports from the action.
+            rule_name = 'c7n-policy-' + str(uuid.uuid1())
+            new_rule = {
+                'name': rule_name,
+                'properties': {
+                    'access': self.access_action,
+                    'destinationAddressPrefix': '*',
+                    'destinationPortRanges': ports,
+                    'direction': self.data[DIRECTION],
+                    'priority': lowest_priority - PRIORITY_STEP,
+                    'protocol': ip_protocol,
+                    'sourceAddressPrefix': '*',
+                    'sourcePortRange': '*',
+                }
+            }
+            self.manager.log.info("NSG %s. Creating new rule to %s access for ports %s",
+                                  nsg_name, self.access_action, ports)
+
+            try:
                 self.manager.get_client().security_rules.create_or_update(
                     resource_group,
                     nsg_name,
-                    rule['name'],
-                    rule
+                    rule_name,
+                    new_rule
                 )
+            except CloudError as e:
+                self.manager.log.error('Failed to create or update security rule for %s NSG.',
+                                       nsg_name)
+                self.manager.log.error(e)
 
 
 @NetworkSecurityGroup.action_registry.register('close')
-class CloseRules(RulesAction):
+class CloseRules(NetworkSecurityGroupPortsAction):
     """
     Deny access to Security Rule
     """
-    schema = type_schema('close')
-    access_action = 'Deny'
+    schema = type_schema('close', rinherit=NetworkSecurityGroupPortsAction.schema)
+    access_action = DENY_OPERATION
 
 
 @NetworkSecurityGroup.action_registry.register('open')
-class OpenRules(RulesAction):
+class OpenRules(NetworkSecurityGroupPortsAction):
     """
     Allow access to Security Rule
     """
-    schema = type_schema('open')
-    access_action = 'Allow'
+    schema = type_schema('open', rinherit=NetworkSecurityGroupPortsAction.schema)
+    access_action = ALLOW_OPERATION

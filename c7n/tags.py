@@ -24,23 +24,19 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import itertools
+import time
 
 from c7n.actions import BaseAction as Action, AutoTagUser
-from c7n.filters import Filter, OPERATORS, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
-
-universal_tag_retry = utils.get_retry((
-    'Throttled',
-    'RequestLimitExceeded',
-    'Client.RequestLimitExceeded'
-))
 
 
 def register_ec2_tags(filters, actions):
@@ -84,8 +80,12 @@ def universal_augment(self, resources):
     if not resources:
         return resources
 
+    # For global resources, tags don't populate in the get_resources call
+    # unless the call is being made to us-east-1
+    region = getattr(self.resource_type, 'global_resource', None) and 'us-east-1' or self.region
+
     client = utils.local_session(
-        self.session_factory).client('resourcegroupstaggingapi')
+        self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 
     paginator = client.get_paginator('get_resources')
     resource_type = getattr(self.get_model(), 'resource_type', None)
@@ -167,6 +167,7 @@ class TagTrim(Action):
         'tag-trim',
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
+    schema_alias = True
 
     permissions = ('ec2:DeleteTags',)
 
@@ -263,18 +264,21 @@ class TagActionFilter(Filter):
         skew={'type': 'number', 'minimum': 0},
         skew_hours={'type': 'number', 'minimum': 0},
         op={'type': 'string'})
+    schema_alias = True
 
     current_date = None
 
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
-            raise FilterValidationError("Invalid marked-for-op op:%s" % op)
+            raise PolicyValidationError(
+                "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
-            raise FilterValidationError(
-                "Invalid timezone specified '%s'" % self.data.get('tz'))
+            raise PolicyValidationError(
+                "Invalid timezone specified '%s' in %s" % (
+                    self.data.get('tz'), self.manager.data))
         return self
 
     def __call__(self, i):
@@ -282,7 +286,7 @@ class TagActionFilter(Filter):
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         v = None
         for n in i.get('Tags', ()):
@@ -340,6 +344,7 @@ class TagCountFilter(Filter):
         'tag-count',
         count={'type': 'integer', 'minimum': 0},
         op={'enum': list(OPERATORS.keys())})
+    schema_alias = True
 
     def __call__(self, i):
         count = self.data.get('count', 10)
@@ -365,13 +370,14 @@ class Tag(Action):
         value={'type': 'string'},
         tag={'type': 'string'},
     )
-
+    schema_alias = True
     permissions = ('ec2:CreateTags',)
 
     def validate(self):
         if self.data.get('key') and self.data.get('tag'):
-            raise FilterValidationError(
-                "Can't specify both key and tag, choose one")
+            raise PolicyValidationError(
+                "Can't specify both key and tag, choose one in %s" % (
+                    self.manager.data,))
         return self
 
     def process(self, resources):
@@ -466,6 +472,7 @@ class RenameTag(Action):
         'rename-tag',
         old_key={'type': 'string'},
         new_key={'type': 'string'})
+    schema_alias = True
 
     permissions = ('ec2:CreateTags', 'ec2:DeleteTags')
 
@@ -556,21 +563,21 @@ class TagDelayedAction(Action):
     The optional 'tz' parameter can be used to adjust the clock to align
     with a given timezone. The default value is 'utc'.
 
+    If neither 'days' nor 'hours' is specified, Cloud Custodian will default
+    to marking the resource for action 4 days in the future.
+
     .. code-block :: yaml
 
       - policies:
-        - name: ec2-stop-marked
+        - name: ec2-mark-for-stop-in-future
           resource: ec2
           filters:
-            - type: marked-for-op
-              # The default tag used is custodian_status
-              # but that is configurable
-              tag: custodian_status
-              op: stop
-              # Another optional tag is skew
-              tz: utc
+            - type: value
+              key: Name
+              value: instance-to-stop-in-four-days
           actions:
-            - stop
+            - type: mark-for-op
+              op: stop
     """
 
     schema = utils.type_schema(
@@ -581,6 +588,7 @@ class TagDelayedAction(Action):
         hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
         op={'type': 'string'})
+    schema_alias = True
 
     permissions = ('ec2:CreateTags',)
 
@@ -592,19 +600,21 @@ class TagDelayedAction(Action):
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
-            raise FilterValidationError(
-                "mark-for-op specifies invalid op:%s" % op)
+            raise PolicyValidationError(
+                "mark-for-op specifies invalid op:%s in %s" % (
+                    op, self.manager.data))
 
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
-            raise FilterValidationError(
-                "Invalid timezone specified %s" % self.tz)
+            raise PolicyValidationError(
+                "Invalid timezone specified %s in %s" % (
+                    self.tz, self.manager.data))
         return self
 
     def generate_timestamp(self, days, hours):
         n = datetime.now(tz=self.tz)
-        if days == hours == 0:
+        if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
         action_date = (n + timedelta(days=days, hours=hours))
@@ -616,7 +626,7 @@ class TagDelayedAction(Action):
         return action_date_string
 
     def process(self, resources):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
@@ -693,6 +703,7 @@ class NormalizeTag(Action):
 
     """
 
+    schema_alias = True
     schema = utils.type_schema(
         'normalize-tag',
         key={'type': 'string'},
@@ -818,19 +829,8 @@ class UniversalTag(Tag):
 
         arns = self.manager.get_arns(resource_set)
 
-        response = universal_tag_retry(
-            client.tag_resources,
-            ResourceARNList=arns,
-            Tags=tags)
-
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+        return universal_retry(
+            client.tag_resources, ResourceARNList=arns, Tags=tags)
 
 
 class UniversalUntag(RemoveTag):
@@ -844,22 +844,9 @@ class UniversalUntag(RemoveTag):
     def process_resource_set(self, resource_set, tag_keys):
         client = utils.local_session(
             self.manager.session_factory).client('resourcegroupstaggingapi')
-
         arns = self.manager.get_arns(resource_set)
-
-        response = universal_tag_retry(
-            client.untag_resources,
-            ResourceARNList=arns,
-            TagKeys=tag_keys)
-
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+        return universal_retry(
+            client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
 
 
 class UniversalTagDelayedAction(TagDelayedAction):
@@ -888,7 +875,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     permissions = ('resourcegroupstaggingapi:TagResources',)
 
     def process(self, resources):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         self.id_key = self.manager.get_model().id
 
@@ -923,17 +910,45 @@ class UniversalTagDelayedAction(TagDelayedAction):
             self.manager.session_factory).client('resourcegroupstaggingapi')
 
         arns = self.manager.get_arns(resource_set)
+        return universal_retry(
+            client.tag_resources, ResourceARNList=arns, Tags=tags)
 
-        response = universal_tag_retry(
-            client.tag_resources,
-            ResourceARNList=arns,
-            Tags=tags)
 
-        for f in response.get('FailedResourcesMap', ()):
-            raise Exception("Resource:{} ".format(f) +
-                            "ErrorCode:{} ".format(
-                            response['FailedResourcesMap'][f]['ErrorCode']) +
-                            "StatusCode:{} ".format(
-                            response['FailedResourcesMap'][f]['StatusCode']) +
-                            "ErrorMessage:{}".format(
-                            response['FailedResourcesMap'][f]['ErrorMessage']))
+def universal_retry(method, ResourceARNList, **kw):
+    """Retry support for resourcegroup tagging apis.
+
+    The resource group tagging api typically returns a 200 status code
+    with embedded resource specific errors. To enable resource specific
+    retry on throttles, we extract those, perform backoff w/ jitter and
+    continue. Other errors are immediately raised.
+
+    We do not aggregate unified resource responses across retries, only the
+    last successful response is returned for a subset of the resources if
+    a retry is performed.
+    """
+    max_attempts = 6
+
+    for idx, delay in enumerate(
+            utils.backoff_delays(1.5, 2 ** 8, jitter=True)):
+        response = method(ResourceARNList=ResourceARNList, **kw)
+        failures = response.get('FailedResourcesMap', {})
+        if not failures:
+            return response
+
+        errors = {}
+        throttles = set()
+
+        for f_arn in failures:
+            if failures[f_arn]['ErrorCode'] == 'ThrottlingException':
+                throttles.add(f_arn)
+            else:
+                errors[f_arn] = failures[f_arn]['ErrorCode']
+
+        if errors:
+            raise Exception("Resource Tag Errors %s" % (errors))
+
+        if idx == max_attempts - 1:
+            raise Exception("Resource Tag Throttled %s" % (", ".join(throttles)))
+
+        time.sleep(delay)
+        ResourceARNList = list(throttles)

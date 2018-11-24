@@ -57,12 +57,12 @@ from concurrent.futures import as_completed
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
-    OPERATORS, FilterValidationError)
+    OPERATORS)
 
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
@@ -78,8 +78,6 @@ log = logging.getLogger('custodian.rds')
 
 filters = FilterRegistry('rds.filters')
 actions = ActionRegistry('rds.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('rds')
@@ -569,8 +567,9 @@ class Delete(BaseAction):
     def validate(self):
         if self.data.get('skip-snapshot', False) and self.data.get(
                 'copy-restore-info'):
-            raise FilterValidationError(
-                "skip-snapshot cannot be specified with copy-restore-info")
+            raise PolicyValidationError(
+                "skip-snapshot cannot be specified with copy-restore-info on %s" % (
+                    self.manager.data,))
         return self
 
     def process(self, dbs):
@@ -1092,8 +1091,9 @@ class RestoreInstance(BaseAction):
                 found = True
         if not found:
             # do we really need this...
-            raise FilterValidationError(
-                "must filter by latest to use restore action")
+            raise PolicyValidationError(
+                "must filter by latest to use restore action %s" % (
+                    self.manager.data,))
         return self
 
     def process(self, resources):
@@ -1246,9 +1246,9 @@ class RegionCopySnapshot(BaseAction):
 
     def validate(self):
         if self.data.get('target_region') and self.manager.data.get('mode'):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "cross region snapshot may require waiting for "
-                "longer then lambda runtime allows")
+                "longer then lambda runtime allows %s" % (self.manager.data,))
         return self
 
     def process(self, resources):

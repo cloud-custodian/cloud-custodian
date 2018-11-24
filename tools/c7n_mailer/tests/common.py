@@ -13,10 +13,12 @@
 # limitations under the License.
 import fakeredis
 import logging
+import os
 
 from c7n_mailer.ldap_lookup import LdapLookup, Redis
 from ldap3 import Server, Connection, MOCK_SYNC
 from ldap3.strategy import mockBase
+
 logger = logging.getLogger('custodian.mailer')
 
 PETER = (
@@ -50,6 +52,16 @@ MAILER_CONFIG = {
     'cache_engine': 'sqlite',
     'role': 'arn:aws:iam::xxxx:role/cloudcustodian-mailer',
     'ldap_uid_tags': ['CreatorName', 'Owner'],
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
+}
+
+MAILER_CONFIG_AZURE = {
+    'queue_url': 'asq://storageaccount.queue.core.windows.net/queuename',
+    'from_address': 'you@youremail.com',
+    'sendgrid_api_key': 'SENDGRID_API_KEY',
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
 }
 
 RESOURCE_1 = {
@@ -157,8 +169,8 @@ SQS_MESSAGE_3 = {
     'account_id': '000000000000',
     'region': 'us-east-1',
     'action': {
-            'type': 'notify',
-            'to': ['datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size']
+        'type': 'notify',
+        'to': ['datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size']
     },
     'policy': {
         'filters': [{'Attachments': []}, {'tag:maid_status': 'absent'}],
@@ -181,12 +193,118 @@ SQS_MESSAGE_3 = {
     'resources': [RESOURCE_2]
 }
 
+ASQ_MESSAGE = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "user@domain.com"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "user@domain.com"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
+
+ASQ_MESSAGE_TAG = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "tag:owner"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "tag:owner"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+            "owner":"user@domain.com"
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
+
 
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
 
 _safe_rdn = mockBase.safe_rdn
+
+
 def safe_rdn(*a, **kw):
-    return [(k, mockBase.to_raw(v)) for k,v in _safe_rdn(*a, **kw)]
+    return [(k, mockBase.to_raw(v)) for k, v in _safe_rdn(*a, **kw)]
+
+
 mockBase.safe_rdn = safe_rdn
 
 
@@ -220,20 +338,20 @@ def get_ldap_lookup(cache_engine=None, uid_regex=None):
             'dn': 'CN=Michael Bolton,cn=users,dc=initech,dc=com',
             'mail': 'michael_bolton@initech.com',
             'manager': 'CN=Milton,cn=users,dc=initech,dc=com',
-            'displayName':'Michael Bolton'
+            'displayName': 'Michael Bolton'
         }
         milton = {
             'uid': '123456',
             'dn': 'CN=Milton,cn=users,dc=initech,dc=com',
             'mail': 'milton@initech.com',
             'manager': 'CN=cthulhu,cn=users,dc=initech,dc=com',
-            'displayName':'Milton'
+            'displayName': 'Milton'
         }
         bob_porter = {
             'dn': 'CN=Bob Porter,cn=users,dc=initech,dc=com',
             'mail': 'bob_porter@initech.com',
             'manager': 'CN=Bob Slydell,cn=users,dc=initech,dc=com',
-            'displayName':'Bob Porter'
+            'displayName': 'Bob Porter'
         }
         ldap_lookup.base_dn = 'cn=users,dc=initech,dc=com'
         ldap_lookup.uid_key = 'uid'

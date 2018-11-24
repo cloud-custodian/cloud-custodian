@@ -13,12 +13,11 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
-from .core import Filter, ValueFilter, FilterValidationError
+from .core import Filter, ValueFilter
 from .related import RelatedResourceFilter
-
-import jmespath
 
 
 class SecurityGroupFilter(RelatedResourceFilter):
@@ -27,6 +26,7 @@ class SecurityGroupFilter(RelatedResourceFilter):
         'security-group', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']}})
+    schema_alias = True
 
     RelatedResource = "c7n.resources.vpc.SecurityGroup"
     AnnotationKey = "matched-security-groups"
@@ -38,6 +38,7 @@ class SubnetFilter(RelatedResourceFilter):
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']}})
+    schema_alias = True
 
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
@@ -69,6 +70,24 @@ class NetworkLocation(Filter):
     and `security-group` filters suffice. but say for example you wanted to
     verify that an ec2 instance was only using subnets and security groups
     with a given tag value, and that tag was not present on the resource.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-mismatched-sg-remove
+            resource: ec2
+            filters:
+              - type: network-location
+                compare: ["resource","security-group"]
+                key: "tag:TEAM_NAME"
+                ignore:
+                  - "tag:TEAM_NAME": Enterprise
+            actions:
+              - type: modify-security-groups
+                remove: network-location
+                isolation-group: sg-xxxxxxxx
     """
 
     schema = type_schema(
@@ -105,11 +124,14 @@ class NetworkLocation(Filter):
     def validate(self):
         rfilters = self.manager.filter_registry.keys()
         if 'subnet' not in rfilters:
-            raise FilterValidationError(
-                "network-location requires resource subnet filter availability")
+            raise PolicyValidationError(
+                "network-location requires resource subnet filter availability on %s" % (
+                    self.manager.data))
+
         if 'security-group' not in rfilters:
-            raise FilterValidationError(
-                "network-location requires resource security-group filter availability")
+            raise PolicyValidationError(
+                "network-location requires resource security-group filter availability on %s" % (
+                    self.manager.data))
         return self
 
     def process(self, resources, event=None):
@@ -151,7 +173,7 @@ class NetworkLocation(Filter):
             found = False
             for i in ignores:
                 for k, v in i.items():
-                    if jmespath.search(k, r) == v:
+                    if self.vf.get_resource_value(k, r) == v:
                         found = True
                 if found is True:
                     break
@@ -162,7 +184,7 @@ class NetworkLocation(Filter):
 
     def process_resource(self, r, resource_sgs, resource_subnets, key):
         evaluation = []
-        if 'subnet' in self.compare:
+        if 'subnet' in self.compare and resource_subnets:
             subnet_values = {
                 rsub[self.subnet_model.id]: self.subnet.get_resource_value(key, rsub)
                 for rsub in resource_subnets}
@@ -178,7 +200,7 @@ class NetworkLocation(Filter):
                     'reason': 'SubnetLocationCardinality',
                     'subnets': subnet_values})
 
-        if 'security-group' in self.compare:
+        if 'security-group' in self.compare and resource_sgs:
             sg_values = {
                 rsg[self.sg_model.id]: self.sg.get_resource_value(key, rsg)
                 for rsg in resource_sgs}
@@ -207,16 +229,25 @@ class NetworkLocation(Filter):
                 evaluation.append({
                     'reason': 'ResourceLocationAbsent',
                     'resource': r_value})
-            elif 'security-group' in self.compare and r_value not in sg_space:
+            elif 'security-group' in self.compare and resource_sgs and r_value not in sg_space:
                 evaluation.append({
                     'reason': 'ResourceLocationMismatch',
                     'resource': r_value,
                     'security-groups': sg_values})
-            elif 'subnet' in self.compare and r_value not in subnet_space:
+            elif 'subnet' in self.compare and resource_subnets and r_value not in subnet_space:
                 evaluation.append({
                     'reason': 'ResourceLocationMismatch',
                     'resource': r_value,
                     'subnet': subnet_values})
+            if 'security-group' in self.compare and resource_sgs:
+                mismatched_sgs = {sg_id: sg_value
+                                for sg_id, sg_value in sg_values.items()
+                                if sg_value != r_value}
+                if mismatched_sgs:
+                    evaluation.append({
+                        'reason': 'SecurityGroupMismatch',
+                        'resource': r_value,
+                        'security-groups': mismatched_sgs})
 
         if evaluation and self.match == 'not-equal':
             r['c7n:NetworkLocation'] = evaluation

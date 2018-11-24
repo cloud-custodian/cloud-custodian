@@ -18,14 +18,14 @@ import logging
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
 from c7n.utils import (
     local_session, get_retry, chunks, type_schema, snapshot_identifier)
-from c7n.filters.vpc import SecurityGroupFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 
 
 filters = FilterRegistry('dynamodb-table.filters')
@@ -229,8 +229,7 @@ class DeleteTable(BaseAction, StatusFilter):
     schema = type_schema('delete')
     permissions = ("dynamodb:DeleteTable",)
 
-    def delete_table(self, table_set):
-        client = local_session(self.manager.session_factory).client('dynamodb')
+    def delete_table(self, client, table_set):
         for t in table_set:
             client.delete_table(TableName=t['TableName'])
 
@@ -241,10 +240,11 @@ class DeleteTable(BaseAction, StatusFilter):
             return
 
         futures = []
+        client = local_session(self.manager.session_factory).client('dynamodb')
 
         with self.executor_factory(max_workers=2) as w:
             for table_set in chunks(resources, 20):
-                futures.append(w.submit(self.delete_table, table_set))
+                futures.append(w.submit(self.delete_table, client, table_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -396,9 +396,11 @@ class DeleteBackup(BaseAction, StatusFilter):
               - name: dynamodb-delete-backup
                 resource: dynamodb-backup
                 filters:
-                  - type: age
-                    days: 28
-                    op: ge
+                  - type: value
+                    key: BackupCreationDateTime
+                    op: greater-than
+                    value_type: age
+                    value: 28
                 actions:
                   - type: delete
     """
@@ -426,7 +428,7 @@ class DeleteBackup(BaseAction, StatusFilter):
                     BackupArn=t['BackupArn'])
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                    self.log.warning("Could not complete DynamoDB backup table:%s", t)
+                    self.log.warning("Could not complete DynamoDB backup deletion for table:%s", t)
                     continue
                 raise
 
@@ -504,20 +506,15 @@ def _dax_cluster_tags(tables, session_factory, executor_factory, retry, log):
         try:
             tags = retry(
                 client.list_tags, ResourceName=r['ClusterArn'])['Tags']
-        except ClientError as e:
-            if e.response['Error']['Code'] in (
-                    'ClusterNotFoundFault',
-                    'InvalidARNFault',
-                    'InvalidClusterStateFault'):
-                log.warning('Exception collecting tags for %s: \n%s' % (
-                    r['ClusterName'], e))
-            else:
-                raise
+        except (client.exceptions.ClusterNotFoundFault,
+                client.exceptions.InvalidARNFault,
+                client.exceptions.InvalidClusterStateFault):
+            return None
         r['Tags'] = tags
         return r
 
     with executor_factory(max_workers=2) as w:
-        return list(w.map(process_tags, tables))
+        return filter(None, list(w.map(process_tags, tables)))
 
 
 @DynamoDbAccelerator.filter_registry.register('security-group')
@@ -551,15 +548,10 @@ class DaxTagging(Tag):
         for r in resources:
             try:
                 client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidClusterStateFault',
-                        'InvalidARNFault'):
-                    self.log.warning('Exception tagging %s: \n%s' % (
-                        r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception tagging %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('remove-tag')
@@ -587,16 +579,11 @@ class DaxRemoveTagging(RemoveTag):
             try:
                 client.untag_resource(
                     ResourceName=r['ClusterArn'], TagKeys=tag_keys)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidARNFault',
-                        'InvalidClusterStateFault',
-                        'TagNotFoundFault'):
-                    self.log.warning('Exception removing tags on %s: \n%s' % (
-                        r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.TagNotFoundFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception removing tags on %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('mark-for-op')
@@ -627,15 +614,10 @@ class DaxMarkForOp(TagDelayedAction):
         for r in resources:
             try:
                 client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidARNFault',
-                        'InvalidClusterStateFault'):
-                    self.log.warning(
-                        'Exception marking %s: \n%s' % (r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception marking %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('delete')
@@ -662,11 +644,102 @@ class DaxDeleteCluster(BaseAction):
         for r in resources:
             try:
                 client.delete_cluster(ClusterName=r['ClusterName'])
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'ClusterNotFoundFault',
-                        'InvalidClusterStateFault'):
-                    self.log.warning('Exception marking %s: \n%s' % (
-                        r['ClusterName'], e))
-                    continue
-                raise
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidARNFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning('Exception marking %s: \n%s', r['ClusterName'], e)
+
+
+@DynamoDbAccelerator.action_registry.register('update-cluster')
+class DaxUpdateCluster(BaseAction):
+    """Updates a DAX cluster configuration
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: dax-update-cluster
+            resource: dax
+            filters:
+              - ParameterGroup.ParameterGroupName: 'default.dax1.0'
+            actions:
+              - type: update-cluster
+                ParameterGroupName: 'testparamgroup'
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['update-cluster']},
+            'Description': {'type': 'string'},
+            'PreferredMaintenanceWindow': {'type': 'string'},
+            'NotificationTopicArn': {'type': 'string'},
+            'NotificationTopicStatus': {'type': 'string'},
+            'ParameterGroupName': {'type': 'string'}
+        }
+    }
+    permissions = ('dax:UpdateCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dax')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            params['ClusterName'] = r['ClusterName']
+            try:
+                client.update_cluster(**params)
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidClusterStateFault) as e:
+                self.log.warning(
+                    'Exception updating dax cluster %s: \n%s',
+                    r['ClusterName'], e)
+
+
+@DynamoDbAccelerator.action_registry.register('modify-security-groups')
+class DaxModifySecurityGroup(ModifyVpcSecurityGroupsAction):
+
+    permissions = ('dax:UpdateCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dax')
+        groups = super(DaxModifySecurityGroup, self).get_groups(
+            resources, metadata_key='SecurityGroupIdentifier')
+
+        for idx, r in enumerate(resources):
+            client.update_cluster(
+                ClusterName=r['ClusterName'],
+                SecurityGroupIds=groups[idx])
+
+
+@DynamoDbAccelerator.filter_registry.register('subnet')
+class DaxSubnetFilter(SubnetFilter):
+    """Filters DAX clusters based on their associated subnet group
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dax-no-auto-public
+            resource: dax
+            filters:
+              - type: subnet
+                key: MapPublicIpOnLaunch
+                value: False
+    """
+    RelatedIdsExpression = ""
+
+    def get_related_ids(self, resources):
+        group_ids = set()
+        for r in resources:
+            group_ids.update(
+                [s['SubnetIdentifier'] for s in
+                 self.groups[r['SubnetGroup']]['Subnets']])
+        return group_ids
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dax')
+        subnet_groups = client.describe_subnet_groups()['SubnetGroups']
+        self.groups = {s['SubnetGroupName']: s for s in subnet_groups}
+        return super(DaxSubnetFilter, self).process(resources)

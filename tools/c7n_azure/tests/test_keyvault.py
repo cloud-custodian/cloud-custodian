@@ -12,12 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
+from c7n_azure.resources.key_vault import WhiteListFilter
 
 
 class KeyVaultTest(BaseTest):
     def setUp(self):
         super(KeyVaultTest, self).setUp()
+
+    def test_key_vault_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-key-vault',
+                'resource': 'azure.keyvault',
+                'filters': [
+                    {'type': 'whitelist',
+                     'key': 'test'}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
 
     @arm_template('keyvault.json')
     def test_find_by_name(self):
@@ -34,4 +48,27 @@ class KeyVaultTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_compare_permissions(self):
+        p1 = {"keys": ['get'], "secrets": ['get'], "certificates": ['get']}
+        p2 = {"keys": ['Get', 'List'], "secrets": ['Get', 'List'], "certificates": ['Get', 'List']}
+        self.assertTrue(WhiteListFilter.compare_permissions(p1, p2))
 
+        p1 = {"keys": ['delete']}
+        p2 = {"keys": ['Get', 'List'], "secrets": ['Get', 'List'], "certificates": ['Get', 'List']}
+        self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))
+
+        p1 = {"secrets": ['delete']}
+        p2 = {"keys": ['Get', 'List'], "secrets": ['Get', 'List'], "certificates": ['Get', 'List']}
+        self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))
+
+        p1 = {"certificates": ['delete']}
+        p2 = {"keys": ['Get', 'List'], "secrets": ['Get', 'List'], "certificates": ['Get', 'List']}
+        self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))
+
+        p1 = {}
+        p2 = {"keys": ['Get', 'List'], "secrets": ['Get', 'List'], "certificates": ['Get', 'List']}
+        self.assertTrue(WhiteListFilter.compare_permissions(p1, p2))
+
+        p1 = {"keys": ['get'], "secrets": ['get'], "certificates": ['get']}
+        p2 = {}
+        self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))

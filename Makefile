@@ -1,32 +1,18 @@
 
 install:
-	python -m virtualenv --python python2.7 .
+	python3 -m venv .
 	. bin/activate && pip install -r requirements-dev.txt
 	. bin/activate && pip install -e .
-
-coverage:
-	rm -Rf .coverage
-	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --with-coverage --cover-html --cover-package=c7n --cover-html-dir=coverage --processes=-1 --cover-inclusive tests  --process-timeout=64
+	. bin/activate && pip install -r tools/c7n_mailer/requirements.txt
+	. bin/activate && pip install -r tools/c7n_azure/requirements.txt
+	. bin/activate && pip install -r tools/c7n_gcp/requirements.txt
+	. bin/activate && pip install -r tools/c7n_kube/requirements.txt
 
 test:
 	./bin/tox -e py27
 
 test3:
-	./bin/tox -e py36
-
-nose-tests:
-	AWS_DEFAULT_REGION=us-east-1 AWS_ACCESS_KEY_ID=foo AWS_SECRET_ACCESS_KEY=bar C7N_VALIDATE=true nosetests -s -v --processes=-1 --process-timeout=300 tests
-
-ttest:
-	AWS_DEFAULT_REGION=us-east-1 nosetests -s --with-timer --process-timeout=300 tests
-
-depcache:
-	mkdir -p deps
-	python -m virtualenv --python python2.7 dep-download
-	dep-download/bin/pip install -d deps -r requirements.txt
-	tar cvf custodian-deps.tgz deps
-	rm -Rf dep-download
-	rm -Rf deps
+	./bin/tox -e py37
 
 ftest:
 	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
@@ -45,7 +31,7 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 lint:
-	flake8 c7n tools
+	flake8 c7n tools tests
 
 clean:
 	rm -rf .tox .Python bin include lib pip-selfcheck.json

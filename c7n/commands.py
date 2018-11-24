@@ -60,16 +60,22 @@ def policy_command(f):
 
         # for a default region for policy loading, we'll expand regions later.
         options.region = ""
-
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
-            except IOError:
+            except IOError as e:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
+            except yaml.YAMLError as e:
+                log.error(
+                    "yaml syntax error loading policy file ({}) error:\n {}".format(
+                        fp, e))
+                errors += 1
+                continue
             except ValueError as e:
-                log.error('problem loading policy file ({})'.format(e.message))
+                log.error('problem loading policy file ({}) error: {}'.format(
+                    fp, e.message))
                 errors += 1
                 continue
 
@@ -122,6 +128,11 @@ def policy_command(f):
                 if count > 1:
                     log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)
+
+        # Variable expansion and non schema validation (not optional)
+        for p in policies:
+            p.expand_variables(p.get_variables())
+            p.validate()
 
         return f(options, list(policies))
 
@@ -261,6 +272,8 @@ def logs(options, policies):
         sys.exit(1)
 
     policy = policies.pop()
+    # initialize policy execution context for access to outputs
+    policy.ctx.initialize()
 
     for e in policy.get_logs(options.start, options.end):
         print("%s: %s" % (

@@ -22,8 +22,9 @@ import jmespath
 from botocore.exceptions import ClientError as BotoClientError
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    DefaultVpcBase, Filter, FilterValidationError, ValueFilter)
+    DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
@@ -98,6 +99,8 @@ class FlowLogFilter(Filter):
            'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
            'set-op': {'enum': ['or', 'and'], 'default': 'or'},
            'status': {'enum': ['active']},
+           'deliver-status': {'enum': ['success', 'failure']},
+           'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
 
@@ -119,7 +122,9 @@ class FlowLogFilter(Filter):
         enabled = self.data.get('enabled', False)
         log_group = self.data.get('log-group')
         traffic_type = self.data.get('traffic-type')
+        destination_type = self.data.get('destination-type')
         status = self.data.get('status')
+        delivery_status = self.data.get('deliver-status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
         set_op = self.data.get('set-op', 'or')
 
@@ -141,7 +146,11 @@ class FlowLogFilter(Filter):
             if enabled:
                 fl_matches = []
                 for fl in flogs:
+                    dest_match = (destination_type is None) or op(
+                        fl['LogDestinationType'], destination_type)
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
+                    delivery_status_match = (delivery_status is None) or op(
+                        fl['DeliverLogsStatus'], delivery_status.upper())
                     traffic_type_match = (
                         traffic_type is None) or op(
                         fl['TrafficType'],
@@ -149,7 +158,8 @@ class FlowLogFilter(Filter):
                     log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
 
                     # combine all conditions to check if flow log matches the spec
-                    fl_match = status_match and traffic_type_match and log_group_match
+                    fl_match = (status_match and traffic_type_match and
+                                log_group_match and dest_match and delivery_status_match)
                     fl_matches.append(fl_match)
 
                 if set_op == 'or':
@@ -280,7 +290,7 @@ class DhcpOptionsFilter(Filter):
 
     def validate(self):
         if not any([self.data.get(k) for k in self.option_keys]):
-            raise ValueError("one of %s required" % (self.option_keys,))
+            raise PolicyValidationError("one of %s required" % (self.option_keys,))
         return self
 
     def process(self, resources, event=None):
@@ -493,7 +503,7 @@ class SecurityGroupApplyPatch(BaseAction):
         diff_filters = [n for n in self.manager.filters if isinstance(
             n, SecurityGroupDiffFilter)]
         if not len(diff_filters):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "resource patching requires diff filter")
         return self
 
@@ -844,12 +854,26 @@ class SGPermission(Filter):
           op: in
           value: x.y.z
 
+    `Cidr` can match ipv4 rules and `CidrV6` can match ipv6 rules.  In
+    this example we are blocking global inbound connections to SSH or
+    RDP.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        Ports: [22, 3389]
+        Cidr:
+          values:
+            - "0.0.0.0/0"
+            - "::/0"
+          op: in
+
     """
 
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'Ports', 'OnlyPorts', 'SelfReference'))
+    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
@@ -857,7 +881,8 @@ class SGPermission(Filter):
         delta = set(self.data.keys()).difference(self.attrs)
         delta.remove('type')
         if delta:
-            raise FilterValidationError("Unknown keys %s" % ", ".join(delta))
+            raise PolicyValidationError("Unknown keys %s on %s" % (
+                ", ".join(delta), self.manager.data))
         return self
 
     def process(self, resources, event=None):
@@ -891,26 +916,41 @@ class SGPermission(Filter):
                     only_found = True
             if self.only_ports and not only_found:
                 found = found is None or found and True or False
+            if self.only_ports and only_found:
+                found = False
+        return found
+
+    def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
+        found = None
+        ip_perms = perm.get(range_type, [])
+        if not ip_perms:
+            return False
+
+        match_range = self.data[cidr_key]
+        match_range['key'] = cidr_type
+
+        vf = ValueFilter(match_range)
+        vf.annotate = False
+
+        for ip_range in ip_perms:
+            found = vf(ip_range)
+            if found:
+                break
+            else:
+                found = False
         return found
 
     def process_cidrs(self, perm):
-        found = None
+        found_v6 = found_v4 = None
+        if 'CidrV6' in self.data:
+            found_v6 = self._process_cidr('CidrV6', 'CidrIpv6', 'Ipv6Ranges', perm)
         if 'Cidr' in self.data:
-            ip_perms = perm.get('IpRanges', [])
-            if not ip_perms:
-                return False
-
-            match_range = self.data['Cidr']
-            match_range['key'] = 'CidrIp'
-            vf = ValueFilter(match_range)
-            vf.annotate = False
-            for ip_range in ip_perms:
-                found = vf(ip_range)
-                if found:
-                    break
-                else:
-                    found = False
-        return found
+            found_v4 = self._process_cidr('Cidr', 'CidrIp', 'IpRanges', perm)
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
+        cidr_match = [k for k in (found_v6, found_v4) if k is not None]
+        if not cidr_match:
+            return None
+        return match_op(cidr_match)
 
     def process_self_reference(self, perm, sg_id):
         found = None
@@ -1357,6 +1397,8 @@ class MissingRoute(Filter):
             for k in ('AccepterVpcInfo', 'RequesterVpcInfo'):
                 if r[k]['OwnerId'] != self.manager.config.account_id:
                     continue
+                if r[k].get('Region') and r['k']['Region'] != self.manager.config.region:
+                    continue
                 if r[k]['VpcId'] not in routed_vpcs[r['VpcPeeringConnectionId']]:
                     results.append(r)
                     break
@@ -1461,7 +1503,7 @@ class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ec2'
-        type = 'network-addr'
+        type = 'eip-allocation'
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
@@ -1479,7 +1521,7 @@ class NetworkAddress(query.QueryResourceManager):
                 self.get_model().service,
                 region=self.config.region,
                 account_id=self.account_id,
-                resource_type='eip-allocation',
+                resource_type=self.resource_type.type,
                 separator='/')
         return self._generate_arn
 
@@ -1722,8 +1764,12 @@ class CreateFlowLogs(BaseAction):
             'state': {'type': 'boolean'},
             'DeliverLogsPermissionArn': {'type': 'string'},
             'LogGroupName': {'type': 'string'},
-            'TrafficType': {'type': 'string',
-                            'enum': ['ACCEPT', 'REJECT', 'ALL']}
+            'LogDestination': {'type': 'string'},
+            'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
+            'TrafficType': {
+                'type': 'string',
+                'enum': ['ACCEPT', 'REJECT', 'ALL']
+            }
         }
     }
 
@@ -1737,17 +1783,21 @@ class CreateFlowLogs(BaseAction):
         self.state = self.data.get('state', True)
         if self.state:
             if not self.data.get('DeliverLogsPermissionArn'):
-                raise ValueError('DeliverLogsPermissionArn required when '
-                                 'creating flow-logs')
-            if not self.data.get('LogGroupName'):
-                raise ValueError('LogGroupName required when '
-                                 'creating flow-logs')
+                raise PolicyValidationError(
+                    'DeliverLogsPermissionArn required when '
+                    'creating flow-logs on %s' % (self.manager.data,))
+            if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
+                raise PolicyValidationError(
+                    'Either LogGroupName or LogDestination required')
+            if (self.data.get('LogDestinationType') == 's3' and
+               not self.data.get('LogDestination')):
+                raise PolicyValidationError(
+                    'LogDestination required when LogDestinationType is s3')
         return self
 
     def delete_flow_logs(self, client, rids):
         flow_logs = client.describe_flow_logs(
             Filters=[{'Name': 'resource-id', 'Values': rids}])['FlowLogs']
-
         try:
             results = client.delete_flow_logs(
                 FlowLogIds=[f['FlowLogId'] for f in flow_logs])

@@ -17,11 +17,14 @@ from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('kinesis')
 class KinesisStream(QueryResourceManager):
+    retry = staticmethod(
+        get_retry((
+            'LimitExceededException',)))
 
     class resource_type(object):
         service = 'kinesis'
@@ -39,6 +42,31 @@ class KinesisStream(QueryResourceManager):
     def augment(self, resources):
         return universal_augment(
             self, super(KinesisStream, self).augment(resources))
+
+
+@KinesisStream.action_registry.register('encrypt')
+class Encrypt(Action):
+
+    schema = type_schema('encrypt',
+                         key={'type': 'string'},
+                         required=('key',))
+
+    permissions = ("kinesis:UpdateStream",)
+
+    def process(self, resources):
+        # get KeyId
+        key = "alias/" + self.data.get('key')
+        self.key_id = local_session(self.manager.session_factory).client(
+            'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
+        client = local_session(self.manager.session_factory).client('kinesis')
+        for r in resources:
+            if not r['StreamStatus'] == 'ACTIVE':
+                continue
+            client.start_stream_encryption(
+                StreamName=r['StreamName'],
+                EncryptionType='KMS',
+                KeyId=self.key_id
+            )
 
 
 @KinesisStream.action_registry.register('delete')

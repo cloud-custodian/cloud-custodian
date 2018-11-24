@@ -1,5 +1,5 @@
 argparse>=1.2.1
-setuptools-scm==1.15.7
+setuptools-scm==2.1.0
 arrow>=0.8.0
 boto3>=1.4.1
 botocore>=1.4.65
@@ -27,4 +27,4 @@ Werkzeug>=0.11.11
 wsgiref==0.1.2
 procname==0.3
 msgpack-python>=0.4.8
-lz4==0.23.1
+lz4==2.0.2

@@ -13,11 +13,11 @@
 # limitations under the License.
 import smtplib
 from email.mime.text import MIMEText
-from email.utils import parseaddr
 from itertools import chain
 import six
 
 from .ldap_lookup import LdapLookup
+from c7n_mailer.utils_email import is_email
 from .utils import (
     format_struct, get_message_subject, get_resource_tag_targets,
     get_rendered_jinja, kms_decrypt)
@@ -71,10 +71,10 @@ PRIORITIES = {
 class EmailDelivery(object):
 
     def __init__(self, config, session, logger):
-        self.config      = config
-        self.logger      = logger
-        self.session     = session
-        self.aws_ses     = session.client('ses', region_name=config.get('ses_region'))
+        self.config = config
+        self.logger = logger
+        self.session = session
+        self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
         self.ldap_lookup = self.get_ldap_connection()
 
     def get_ldap_connection(self):
@@ -98,15 +98,31 @@ class EmailDelivery(object):
     def get_valid_emails_from_list(self, targets):
         emails = []
         for target in targets:
-            if self.target_is_email(target):
+            if is_email(target):
                 emails.append(target)
         return emails
 
     def get_event_owner_email(self, targets, event):
-        if 'event-owner' in targets and self.config.get('ldap_uri', False):
+        if 'event-owner' in targets:
             aws_username = self.get_aws_username_from_event(event)
             if aws_username:
-                return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
+                # is using SSO, the target might already be an email
+                if is_email(aws_username):
+                    return [aws_username]
+                # if the LDAP config is set, lookup in ldap
+                elif self.config.get('ldap_uri', False):
+                    return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
+                # the org_domain setting is configured, append the org_domain
+                # to the username from AWS
+                elif self.config.get('org_domain', False):
+                    org_domain = self.config.get('org_domain', False)
+                    self.logger.info('adding email %s to targets.', aws_username + '@' + org_domain)
+                    return [aws_username + '@' + org_domain]
+                else:
+                    self.logger.warning('unable to lookup owner email. \
+                            Please configure LDAP or org_domain')
+            else:
+                self.logger.info('no aws username in event')
         return []
 
     def get_ldap_emails_from_resource(self, sqs_message, resource):
@@ -231,18 +247,9 @@ class EmailDelivery(object):
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
         return to_addrs_to_mimetext_map
 
-    def target_is_email(self, target):
-        if target.startswith('slack://'):
-            self.logger.debug("Slack payload, skipping email.")
-            return False
-        if parseaddr(target)[1] and '@' in target and '.' in target:
-            return True
-        else:
-            return False
-
     def send_smtp_email(self, smtp_server, message, to_addrs):
         smtp_port = int(self.config.get('smtp_port', 25))
-        smtp_ssl  = bool(self.config.get('smtp_ssl', True))
+        smtp_ssl = bool(self.config.get('smtp_ssl', True))
         smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
         if smtp_ssl:
             smtp_connection.starttls()
@@ -256,20 +263,21 @@ class EmailDelivery(object):
 
     def get_mimetext_message(self, sqs_message, resources, to_addrs):
         body = get_rendered_jinja(
-            to_addrs, sqs_message, resources, self.logger, 'template', 'default')
+            to_addrs, sqs_message, resources, self.logger,
+            'template', 'default', self.config['templates_folders'])
         if not body:
             return None
         email_format = sqs_message['action'].get('template_format', None)
         if not email_format:
             email_format = sqs_message['action'].get(
                 'template', 'default').endswith('html') and 'html' or 'plain'
-        subject            = get_message_subject(sqs_message)
-        from_addr          = sqs_message['action'].get('from', self.config['from_address'])
-        message            = MIMEText(body, email_format)
-        message['From']    = from_addr
-        message['To']      = ', '.join(to_addrs)
+        subject = get_message_subject(sqs_message)
+        from_addr = sqs_message['action'].get('from', self.config['from_address'])
+        message = MIMEText(body, email_format, 'utf-8')
+        message['From'] = from_addr
+        message['To'] = ', '.join(to_addrs)
         message['Subject'] = subject
-        priority_header    = sqs_message['action'].get('priority_header', None)
+        priority_header = sqs_message['action'].get('priority_header', None)
         if priority_header and self.priority_header_is_valid(
             sqs_message['action']['priority_header']
         ):

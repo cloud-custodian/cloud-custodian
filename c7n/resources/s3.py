@@ -53,14 +53,15 @@ import six
 
 from botocore.client import Config
 from botocore.exceptions import ClientError
-from botocore.vendored.requests.exceptions import SSLError
 
 from collections import defaultdict
 from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
+from urllib3.exceptions import SSLError
 
 from c7n.actions import (
     ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
@@ -98,10 +99,6 @@ class S3(query.QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-
-    def __init__(self, ctx, data):
-        super(S3, self).__init__(ctx, data)
-        self.log_dir = ctx.log_dir
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -436,15 +433,23 @@ def assemble_bucket(item):
                 methods.append((m, k, default, select))
                 continue
             else:
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    b.setdefault('c7n:DeniedMethods', []).append(m)
                 log.warning(
                     "Bucket:%s unable to invoke method:%s error:%s ",
                     b['Name'], m, e.response['Error']['Message'])
-                # We don't bail out, continue processing if we can.
+                # For auth failures, we don't bail out, continue processing if we can.
                 # Note this can lead to missing data, but in general is cleaner than
-                # failing hard.
-                continue
+                # failing hard, due to the common use of locked down s3 bucket policies
+                # that may cause issues fetching information across a fleet of buckets.
+
+                # This does mean s3 policies depending on augments should check denied
+                # methods annotation, generally though lacking get access to an augment means
+                # they won't have write access either.
+
+                # For other error types we raise and bail policy execution.
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    b.setdefault('c7n:DeniedMethods', []).append(m)
+                    continue
+                raise
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
@@ -483,6 +488,17 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
         # to refetch against current to guard against any staleness in
         # our cached representation across multiple policies or concurrent
         # modifications.
+
+        if 'get_bucket_tagging' in bucket.get('c7n:DeniedMethods', []):
+            # avoid the additional API call if we already know that it's going
+            # to result in AccessDenied. The chances that the resource's perms
+            # would have changed between fetching the resource and acting on it
+            # here are pretty low-- so the check here should suffice.
+            log.warning(
+                "Unable to get new set of bucket tags needed to modify tags,"
+                "skipping tag action for bucket: %s" % bucket["Name"])
+            continue
+
         try:
             bucket['Tags'] = client.get_bucket_tagging(
                 Bucket=bucket['Name']).get('TagSet', [])
@@ -493,9 +509,7 @@ def modify_bucket_tags(session_factory, buckets, add_tags=(), remove_tags=()):
 
         new_tags = {t['Key']: t['Value'] for t in add_tags}
         for t in bucket.get('Tags', ()):
-            if (t['Key'] not in new_tags and
-                    not t['Key'].startswith('aws') and
-                    t['Key'] not in remove_tags):
+            if (t['Key'] not in new_tags and t['Key'] not in remove_tags):
                 new_tags[t['Key']] = t['Value']
         tag_set = [{'Key': k, 'Value': v} for k, v in new_tags.items()]
 
@@ -646,7 +660,7 @@ class GlobalGrantsFilter(Filter):
         permissions={
             'type': 'array', 'items': {
                 'type': 'string', 'enum': [
-                    'READ', 'WRITE', 'WRITE_ACP', 'READ', 'READ_ACP']}})
+                    'READ', 'WRITE', 'WRITE_ACP', 'READ_ACP', 'FULL_CONTROL']}})
 
     GLOBAL_ALL = "http://acs.amazonaws.com/groups/global/AllUsers"
     AUTH_ALL = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
@@ -1170,26 +1184,33 @@ class ToggleVersioning(BucketActionBase):
         enabled={'type': 'boolean'})
     permissions = ("s3:PutBucketVersioning",)
 
+    def process_versioning(self, resource, state):
+        client = bucket_client(
+            local_session(self.manager.session_factory), resource)
+        try:
+            client.put_bucket_versioning(
+                Bucket=resource['Name'],
+                VersioningConfiguration={
+                    'Status': state})
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'AccessDenied':
+                log.error(
+                    "Unable to put bucket versioning on bucket %s: %s" % resource['Name'], e)
+                raise
+            log.warning(
+                "Access Denied Bucket:%s while put bucket versioning" % resource['Name'])
+
     # mfa delete enablement looks like it needs the serial and a current token.
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-
         for r in resources:
-            client = bucket_client(
-                local_session(self.manager.session_factory), r)
             if 'Versioning' not in r or not r['Versioning']:
                 r['Versioning'] = {'Status': 'Suspended'}
             if enabled and (
                     r['Versioning']['Status'] == 'Suspended'):
-                client.put_bucket_versioning(
-                    Bucket=r['Name'],
-                    VersioningConfiguration={
-                        'Status': 'Enabled'})
-                continue
+                self.process_versioning(r, 'Enabled')
             if not enabled and r['Versioning']['Status'] == 'Enabled':
-                client.put_bucket_versioning(
-                    Bucket=r['Name'],
-                    VersioningConfiguration={'Status': 'Suspended'})
+                self.process_versioning(r, 'Suspended')
 
 
 @actions.register('toggle-logging')
@@ -1225,7 +1246,9 @@ class ToggleLogging(BucketActionBase):
     def validate(self):
         if self.data.get('enabled', True):
             if not self.data.get('target_bucket'):
-                raise ValueError("target_bucket must be specified")
+                raise PolicyValidationError(
+                    "target_bucket must be specified on %s" % (
+                        self.manager.data,))
         return self
 
     def process(self, resources):
@@ -1304,9 +1327,9 @@ class AttachLambdaEncrypt(BucketActionBase):
     def validate(self):
         if (not getattr(self.manager.config, 'dryrun', True) and
                 not self.data.get('role', self.manager.config.assume_role)):
-            raise ValueError(
+            raise PolicyValidationError(
                 "attach-encrypt: role must be specified either "
-                "via assume or in config")
+                "via assume or in config on %s" % (self.manager.data,))
 
         return self
 
@@ -1574,10 +1597,10 @@ class ScanBucket(BucketActionBase):
         return results
 
     def write_denied_buckets_file(self):
-        if self.denied_buckets and self.manager.log_dir:
+        if self.denied_buckets and self.manager.ctx.log_dir:
             with open(
                     os.path.join(
-                        self.manager.log_dir, 'denied.json'), 'w') as fh:
+                        self.manager.ctx.log_dir, 'denied.json'), 'w') as fh:
                 json.dump(list(self.denied_buckets), fh, indent=2)
             self.denied_buckets = set()
 
@@ -1595,7 +1618,7 @@ class ScanBucket(BucketActionBase):
         p = s3.get_paginator(
             self.get_bucket_op(b, 'iterator')).paginate(Bucket=b['Name'])
 
-        with BucketScanLog(self.manager.log_dir, b['Name']) as key_log:
+        with BucketScanLog(self.manager.ctx.log_dir, b['Name']) as key_log:
             with self.executor_factory(max_workers=10) as w:
                 try:
                     return self._process_bucket(b, p, key_log, w)
@@ -2752,18 +2775,25 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 region: us-east-1
                 filters:
                   - type: bucket-encryption
+                    state: True
                     crypto: AES256
               - name: s3-bucket-encryption-KMS
                 resource: s3
                 region: us-east-1
                 filters
                   - type: bucket-encryption
+                    state: True
                     crypto: aws:kms
                     key: alias/some/alias/key
-
+              - name: s3-bucket-encryption-off
+                resource: s3
+                region: us-east-1
+                filters
+                  - type: bucket-encryption
+                    state: False
     """
     schema = type_schema('bucket-encryption',
-                         required=['crypto'],
+                         state={'type': 'boolean'},
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
                          key={'type': 'string'})
 
@@ -2795,9 +2825,16 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             if e.response['Error']['Code'] != 'ServerSideEncryptionConfigurationNotFoundError':
                 raise
 
-        for sse in rules:
-            if self.filter_bucket(b, sse):
-                return True
+        # default `state` to True as previous impl assumed state == True
+        # to preserve backwards compatibility
+        if self.data.get('state', True):
+            for sse in rules:
+                return self.filter_bucket(b, sse)
+            return False
+        else:
+            for sse in rules:
+                return not self.filter_bucket(b, sse)
+            return True
 
     def filter_bucket(self, b, sse):
         allowed = ['AES256', 'aws:kms']

@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IamInstanceProfileAssociations": [
+            {
+                "InstanceId": "i-06305b4b9f5e3f8b8", 
+                "State": "associated", 
+                "AssociationId": "iip-assoc-064944afb6d8735a3", 
+                "IamInstanceProfile": {
+                    "Id": "AIPAJJOHXXHTHDZB5BVFE", 
+                    "Arn": "arn:aws:iam::644160558196:instance-profile/ecsInstanceRole"
+                }
+            }, 
+            {
+                "InstanceId": "i-0aef5d5ffb60c8615", 
+                "State": "associating", 
+                "AssociationId": "iip-assoc-029e2b5bd902df18e", 
+                "IamInstanceProfile": {
+                    "Id": "AIPAJJOHXXHTHDZB5BVFE", 
+                    "Arn": "arn:aws:iam::644160558196:instance-profile/ecsInstanceRole"
+                }
+            }, 
+            {
+                "InstanceId": "i-01b7ee380879d3fd8", 
+                "State": "associating", 
+                "AssociationId": "iip-assoc-0499952a50fbcbbae", 
+                "IamInstanceProfile": {
+                    "Id": "AIPAJJOHXXHTHDZB5BVFE", 
+                    "Arn": "arn:aws:iam::644160558196:instance-profile/ecsInstanceRole"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d1c50e86-e8dd-4dcf-a65c-94420ec0bc65", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 06 Jul 2018 10:20:21 GMT"
+            }
+        }
+    }
+}
