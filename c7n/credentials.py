@@ -55,6 +55,9 @@ class SessionFactory(object):
             session = Session(
                 region_name=region or self.region, profile_name=self.profile)
 
+        return self.update(session)
+
+    def update(self, session):
         session._session.user_agent_name = self.user_agent_name
         session._session.user_agent_version = version
 
