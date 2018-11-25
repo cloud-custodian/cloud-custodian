@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CopyObjectResult": {
+            "LastModified": {
+                "hour": 0, 
+                "__class__": "datetime", 
+                "month": 5, 
+                "second": 7, 
+                "microsecond": 0, 
+                "year": 2017, 
+                "day": 29, 
+                "minute": 35
+            }, 
+            "ETag": "\"a4659bde8db0b6aebd57e6424768939f\""
+        }, 
+        "SSEKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/5fd9f6d6-4294-4926-8719-1e85695e2ad6", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "g4QZyF+z749G5ltyyg9ITX3FvKmWIe647QxJyqrmiInmFZcKnMS3oteOb47qx9QhgSJIuAWzNLc=", 
+            "RequestId": "BA042CC5FD0CF037", 
+            "HTTPHeaders": {
+                "content-length": "234", 
+                "x-amz-id-2": "g4QZyF+z749G5ltyyg9ITX3FvKmWIe647QxJyqrmiInmFZcKnMS3oteOb47qx9QhgSJIuAWzNLc=", 
+                "server": "AmazonS3", 
+                "x-amz-server-side-encryption-aws-kms-key-id": "arn:aws:kms:us-east-1:644160558196:key/5fd9f6d6-4294-4926-8719-1e85695e2ad6", 
+                "x-amz-request-id": "BA042CC5FD0CF037", 
+                "date": "Mon, 29 May 2017 00:35:07 GMT", 
+                "x-amz-server-side-encryption": "aws:kms", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "ServerSideEncryption": "aws:kms"
+    }
+}

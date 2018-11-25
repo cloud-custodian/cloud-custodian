@@ -1,0 +1,65 @@
+{
+    "status_code": 200, 
+    "data": {
+        "BackupDescription": {
+            "SourceTableFeatureDetails": {}, 
+            "BackupDetails": {
+                "BackupCreationDateTime": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 47, 
+                    "microsecond": 822000, 
+                    "year": 2018, 
+                    "day": 22, 
+                    "minute": 42
+                }, 
+                "BackupSizeBytes": 0, 
+                "BackupArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup/backup/01516646567822-18efc104", 
+                "BackupStatus": "AVAILABLE", 
+                "BackupName": "custom-c7n-dynamodb-backup-2018-01-22-13-42"
+            }, 
+            "SourceTableDetails": {
+                "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup", 
+                "ProvisionedThroughput": {
+                    "WriteCapacityUnits": 5, 
+                    "ReadCapacityUnits": 5
+                }, 
+                "TableSizeBytes": 0, 
+                "TableName": "c7n-dynamodb-backup", 
+                "TableId": "d4f0100b-96ea-4429-8cf4-53cce61719dd", 
+                "KeySchema": [
+                    {
+                        "KeyType": "HASH", 
+                        "AttributeName": "test"
+                    }
+                ], 
+                "ItemCount": 0, 
+                "TableCreationDateTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 40, 
+                    "microsecond": 237000, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 56
+                }
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "AKGR92LDE2S2A24IVRUE5RCI8VVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "AKGR92LDE2S2A24IVRUE5RCI8VVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "717", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "2462566762", 
+                "date": "Mon, 22 Jan 2018 18:42:48 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}

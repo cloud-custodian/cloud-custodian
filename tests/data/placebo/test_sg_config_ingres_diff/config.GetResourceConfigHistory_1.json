@@ -1,0 +1,54 @@
+{
+    "status_code": 200, 
+    "data": {
+        "configurationItems": [
+            {
+                "configurationItemCaptureTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 34, 
+                    "microsecond": 276000, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 38
+                }, 
+                "relationships": [
+                    {
+                        "resourceType": "AWS::EC2::VPC", 
+                        "resourceId": "vpc-5f6c9936", 
+                        "relationshipName": "Is contained in Vpc"
+                    }
+                ], 
+                "availabilityZone": "Not Applicable", 
+                "awsRegion": "us-east-2", 
+                "tags": {
+                    "Name": "Test"
+                }, 
+                "resourceType": "AWS::EC2::SecurityGroup", 
+                "resourceId": "sg-65229a0c", 
+                "configurationStateId": "1485477514276", 
+                "relatedEvents": [], 
+                "arn": "arn:aws:ec2:us-east-2:644160558196:security-group/sg-65229a0c", 
+                "version": "1.2", 
+                "configurationItemMD5Hash": "ae7f7f054782c2b244cfcec4adb6874d", 
+                "supplementaryConfiguration": {}, 
+                "configuration": "{\"ownerId\":\"644160558196\",\"groupName\":\"Test\",\"groupId\":\"sg-65229a0c\",\"description\":\"Test\",\"ipPermissions\":[{\"ipProtocol\":\"tcp\",\"fromPort\":0,\"toPort\":0,\"userIdGroupPairs\":[{\"userId\":\"644160558196\",\"groupName\":null,\"groupId\":\"sg-aa6c90c3\",\"vpcId\":null,\"vpcPeeringConnectionId\":null,\"peeringStatus\":null}],\"ipRanges\":[],\"prefixListIds\":[]}],\"ipPermissionsEgress\":[{\"ipProtocol\":\"-1\",\"fromPort\":null,\"toPort\":null,\"userIdGroupPairs\":[],\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[]}],\"vpcId\":\"vpc-5f6c9936\",\"tags\":[{\"key\":\"Name\",\"value\":\"Test\"}]}", 
+                "configurationItemStatus": "ResourceDiscovered", 
+                "accountId": "644160558196"
+            }
+        ], 
+        "nextToken": "eyJlbmNyeXB0ZWREYXRhIjpbLTI3LC03MCw4OCwtNjMsLTEyNCwtOTMsLTY4LC0xNywtMjIsLTEwMiw5NCw3Niw0NCwyNCw3MSwxMjIsNjMsOCwtOTYsLTcxLC0yNSwxMDYsLTI3LDc0LDM0LC0xMjQsMTA1LDEyNiwtOTYsLTEyNSwtMTEwLDU2LC0xNiwyNSwtMTA3LDM0LDM5LDg0LC0yNSwtODQsNTMsNTMsODIsLTExLC01MSw5MSwtMjgsLTEwMywtMyw2NiwtODgsMTA0LC0xMDQsLTU4LC01OSwxMTEsMTMsMTE5LDE3LDEwNCwtNzAsLTQxLDkxLDEyNSw3NywxMTQsLTEyNCwtNywyNCwtMTgsNDUsNjUsMTEyLC03NCwtNzYsODUsNzgsMTAzLC0xMDcsODQsLTkxLDMxLC01NSwtMTIyLC04MCwtOTMsNCwtOTYsLTUsLTM5LDE0LDEwNywyNywtNywxMTksLTM0LC0zOCwxMDYsLTY5LC0xMTMsMzksLTExMSwzMSwtMzUsLTcwLDQ0LC0zMywzNiwtOTAsNjgsMTUsMTIyLC0xMjEsLTY5LDgsNDksOTcsLTgwLDU4LDEwMCwtOTYsLTgwLC02OCwxMDAsLTE4LDMzLC0yMCwtNDcsMjAsNjcsLTYzLDEyMiwxMiw2NiwtMzIsMTIwLC02NCw2MCwtMTA5LDU5LC02LC0xMDUsLTQ2LC0xMDksLTgsLTExMSwtNjgsOTMsLTM5LDEzLDYxLC05NywtMTE1LC0xNiwtNDgsLTEwNCwtNCwtODYsMjksNCwtOTYsLTEyMSwxNiwtMTYsMjMsLTg3XSwibWF0ZXJpYWxTZXRTZXJpYWxOdW1iZXIiOjEsIml2UGFyYW1ldGVyU3BlYyI6eyJpdiI6WzM0LDI4LDI0LDQyLC0xLDUsLTQ5LC04LDk5LDU0LDQwLDcxLDEyNSwtMTI4LC01NiwtNjNdfX0=", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a95e55e4-e42a-11e6-87bb-01e2d61721c1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a95e55e4-e42a-11e6-87bb-01e2d61721c1", 
+                "date": "Fri, 27 Jan 2017 00:50:56 GMT", 
+                "content-length": "2303", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

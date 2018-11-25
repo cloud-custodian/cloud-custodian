@@ -1,0 +1,124 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Vpcs": [
+            {
+                "VpcId": "vpc-f1516b97", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestVPC", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "tagfanncyvalue", 
+                        "Key": "tagfancykey"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-98ba93f0", 
+                        "CidrBlock": "10.0.42.0/24", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.0.42.0/24", 
+                "IsDefault": false
+            }, 
+            {
+                "VpcId": "vpc-f8c6d983", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "IpV6", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-c9ff12a5", 
+                        "CidrBlock": "10.0.0.0/16", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "Ipv6CidrBlockAssociationSet": [
+                    {
+                        "Ipv6CidrBlock": "2600:1f18:2466:4b00::/56", 
+                        "AssociationId": "vpc-cidr-assoc-caff12a6", 
+                        "Ipv6CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.0.0.0/16", 
+                "IsDefault": false
+            }, 
+            {
+                "VpcId": "vpc-03005fb9b8740263d", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "testing-vpc", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0f6765530d80dc044", 
+                        "CidrBlock": "10.205.0.0/18", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.205.0.0/18", 
+                "IsDefault": false
+            }, 
+            {
+                "VpcId": "vpc-d2d616b5", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "FlowLogTest", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-33669f5a", 
+                        "CidrBlock": "172.31.0.0/16", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "172.31.0.0/16", 
+                "IsDefault": true
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "163d16db-040b-4ef9-bb7e-f29285bd63f1", 
+            "HTTPHeaders": {
+                "date": "Fri, 02 Nov 2018 21:48:53 GMT", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "content-length": "4418", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2"
+            }
+        }
+    }
+}

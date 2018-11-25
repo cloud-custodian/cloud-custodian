@@ -45,7 +45,9 @@
         "InstanceType": "InstanceType-2",
         "LaunchTime": "LaunchTime-2",
         "Tags": [],
-        "IgnoredField": "IgnoredValue"
+        "IgnoredField": "IgnoredValue",
+	"policy": "policy-name",
+	"region": "us-east-1"
       },
       "duplicate": {
         "CustodianDate": "2015-12-20",
@@ -100,6 +102,17 @@
         "LaunchTime-2",
         "",
         ""
+      ],
+      "minimal_multipolicy": [
+        "2015-12-22",
+        "InstanceId-2",
+        "",
+        "InstanceType-2",
+        "LaunchTime-2",
+        "",
+        "",
+	"us-east-1",
+	"policy-name"
       ],
       "full_custom": [
         "2015-12-23",

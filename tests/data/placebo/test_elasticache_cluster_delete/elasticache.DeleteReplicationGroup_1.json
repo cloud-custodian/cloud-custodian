@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ReplicationGroup": {
+            "Status": "deleting", 
+            "Description": " ", 
+            "ReplicationGroupId": "myec", 
+            "SnapshotRetentionLimit": 1, 
+            "AutomaticFailover": "enabled", 
+            "SnapshotWindow": "08:00-09:00", 
+            "SnapshottingClusterId": "myec-002", 
+            "PendingModifiedValues": {}
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "50f1bb62-588a-11e7-b153-c5c265cfa31c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "50f1bb62-588a-11e7-b153-c5c265cfa31c", 
+                "date": "Sat, 24 Jun 2017 03:07:54 GMT", 
+                "content-length": "718", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

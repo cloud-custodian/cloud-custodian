@@ -1,0 +1,54 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancers": [
+            {
+                "VpcId": "vpc-4a9ff72e", 
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/test-alb/ff1789434bfa3896", 
+                "State": {
+                    "Code": "active"
+                }, 
+                "DNSName": "test-alb.us-east-1.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-f9cc4d9f"
+                ], 
+                "LoadBalancerName": "test-alb", 
+                "CreatedTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 20, 
+                    "microsecond": 10000, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 52
+                }, 
+                "Scheme": "internal", 
+                "Type": "application", 
+                "CanonicalHostedZoneId": "Z1H1FL5HABSF5", 
+                "AvailabilityZones": [
+                    {
+                        "SubnetId": "subnet-15452171", 
+                        "ZoneName": "us-east-1a"
+                    }, 
+                    {
+                        "SubnetId": "subnet-5fb47507", 
+                        "ZoneName": "us-east-1c"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "de4574a5-8653-11e6-b76c-c5e64157571b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "de4574a5-8653-11e6-b76c-c5e64157571b", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2484", 
+                "content-type": "text/xml", 
+                "date": "Mon, 01 Oct 2018 20:32:13 GMT"
+            }
+        }
+    }
+}

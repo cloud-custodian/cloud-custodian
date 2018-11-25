@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "MemoryUtilization",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 1,
+                    "day": 2,
+                    "hour": 0,
+                    "minute": 14,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Average": 0.6347449581732727,
+                "Unit": "Percent"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "34a04417-fa52-11e7-917a-f7a6d7e3d98b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "34a04417-fa52-11e7-917a-f7a6d7e3d98b",
+                "content-type": "text/xml",
+                "content-length": "515",
+                "date": "Tue, 16 Jan 2018 00:14:23 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

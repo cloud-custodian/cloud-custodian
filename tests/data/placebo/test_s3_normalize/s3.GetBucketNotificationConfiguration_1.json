@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "ugFTQpU4fGg9B8gvtstSwm0Qhtz0+xzmAj1d/90u8TtkC8WVOVBvBbeELcA7HaF2iMnsvdvj5eA=", 
+            "RequestId": "9ECFAF8A3CA939B4", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "ugFTQpU4fGg9B8gvtstSwm0Qhtz0+xzmAj1d/90u8TtkC8WVOVBvBbeELcA7HaF2iMnsvdvj5eA=", 
+                "date": "Thu, 10 Aug 2017 14:12:42 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "9ECFAF8A3CA939B4", 
+                "server": "AmazonS3"
+            }
+        }, 
+        "TopicConfigurations": [
+            {
+                "Filter": {
+                    "Key": {
+                        "FilterRules": [
+                            {
+                                "Name": "Prefix", 
+                                "Value": "s3-logs/"
+                            }
+                        ]
+                    }
+                }, 
+                "Id": "custodian-test-data-23", 
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:custodian-test-data-23", 
+                "Events": [
+                    "s3:ObjectCreated:*"
+                ]
+            }
+        ]
+    }
+}

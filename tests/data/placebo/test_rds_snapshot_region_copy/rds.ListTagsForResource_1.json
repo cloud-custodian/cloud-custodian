@@ -4,11 +4,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "b8767635-ccef-11e6-845f-c54dae0acb3d", 
+            "RequestId": "ba7f65f8-ccef-11e6-9a46-9d0c42779d4a", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "b8767635-ccef-11e6-845f-c54dae0acb3d", 
-                "date": "Wed, 28 Dec 2016 11:21:03 GMT", 
-                "content-length": "556", 
+                "x-amzn-requestid": "ba7f65f8-ccef-11e6-9a46-9d0c42779d4a", 
+                "date": "Wed, 28 Dec 2016 11:21:07 GMT", 
+                "content-length": "647", 
                 "content-type": "text/xml"
             }
         }, 
@@ -16,6 +16,10 @@
             {
                 "Value": "mgmt-portal", 
                 "Key": "app"
+            }, 
+            {
+                "Value": "us-east-1", 
+                "Key": "migrated_from"
             }, 
             {
                 "Value": "other", 

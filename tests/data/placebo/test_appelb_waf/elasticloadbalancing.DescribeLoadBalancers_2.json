@@ -1,0 +1,55 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancers": [
+            {
+                "IpAddressType": "ipv4", 
+                "VpcId": "vpc-d2d616b5", 
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/testing/1e0e18b15fe2aefa", 
+                "State": {
+                    "Code": "active"
+                }, 
+                "DNSName": "testing-1299752078.us-east-1.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-3839ec4b", 
+                    "sg-6c7fa917"
+                ], 
+                "LoadBalancerName": "testing", 
+                "CreatedTime": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 32, 
+                    "microsecond": 180000, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 43
+                }, 
+                "Scheme": "internet-facing", 
+                "Type": "application", 
+                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K", 
+                "AvailabilityZones": [
+                    {
+                        "SubnetId": "subnet-3a334610", 
+                        "ZoneName": "us-east-1d"
+                    }, 
+                    {
+                        "SubnetId": "subnet-914763e7", 
+                        "ZoneName": "us-east-1a"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "29cba088-a9cd-11e7-be0b-9db3cc061128", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "29cba088-a9cd-11e7-be0b-9db3cc061128", 
+                "date": "Thu, 05 Oct 2017 13:00:28 GMT", 
+                "content-length": "1436", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

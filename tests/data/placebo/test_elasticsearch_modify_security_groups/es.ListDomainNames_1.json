@@ -1,0 +1,24 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "da6a3259-fbb3-11e7-85d7-e3b87a97d97f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "da6a3259-fbb3-11e7-85d7-e3b87a97d97f", 
+                "date": "Wed, 17 Jan 2018 18:25:53 GMT", 
+                "content-length": "70", 
+                "content-type": "application/json"
+            }
+        }, 
+        "DomainNames": [
+            {
+                "DomainName": "manual"
+            }, 
+            {
+                "DomainName": "c7n-sg-test"
+            }
+        ]
+    }
+}

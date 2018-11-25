@@ -4,22 +4,22 @@
         "VaultList": [
             {
                 "SizeInBytes": 0, 
-                "VaultARN": "arn:aws:glacier:us-west-2:644160558196:vaults/c7n-cross-check", 
-                "CreationDate": "2016-06-26T16:48:47.469Z", 
+                "VaultARN": "arn:aws:glacier:us-east-1:644160558196:vaults/c7n-cross-check", 
+                "CreationDate": "2017-05-12T00:15:34.699Z", 
                 "VaultName": "c7n-cross-check", 
-                "NumberOfArchives": 0
-            }, 
-            {
-                "SizeInBytes": 0, 
-                "VaultARN": "arn:aws:glacier:us-west-2:644160558196:vaults/testing", 
-                "CreationDate": "2016-06-26T16:44:42.351Z", 
-                "VaultName": "testing", 
                 "NumberOfArchives": 0
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "LV2q-BkQsj8bZhvgHll6kgOEx6-5XQIMfAwzO8Iqx-dKHuc"
+            "RequestId": "jILmIaxQBiYo-6eDa2546kmzpZHtnUQq4kSG1FV4ZJwM_GU", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "jILmIaxQBiYo-6eDa2546kmzpZHtnUQq4kSG1FV4ZJwM_GU", 
+                "date": "Fri, 12 May 2017 00:15:34 GMT", 
+                "content-length": "240", 
+                "content-type": "application/json"
+            }
         }
     }
 }

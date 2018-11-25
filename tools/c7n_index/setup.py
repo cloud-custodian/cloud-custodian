@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,6 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'c7n-indexer = c7n_indexer.metrics:cli']},
-    install_requires=["c7n", "click", "influxdb"],
+            'c7n-indexer = c7n_index.metrics:cli']},
+    install_requires=["c7n", "click", "influxdb", "elasticsearch"],
 )

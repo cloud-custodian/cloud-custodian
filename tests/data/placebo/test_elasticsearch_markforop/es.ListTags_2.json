@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f7c1b324-d517-11e7-8f39-3758e481c5a9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f7c1b324-d517-11e7-8f39-3758e481c5a9", 
+                "date": "Wed, 29 Nov 2017 15:14:17 GMT", 
+                "content-length": "103", 
+                "content-type": "application/json"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "Resource does not meet policy: delete@2017/11/30", 
+                "Key": "es_custodian_cleanup"
+            }
+        ]
+    }
+}

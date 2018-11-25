@@ -66,4 +66,8 @@ The S3 bucket and prefix can be specified via parameters::
 Reports
 -------
 
-CSV reports can be generated with the ``report`` subcommand.
+CSV or text-based reports can be generated with the ``report`` subcommand.
+
+Reporting is used to list information gathered during previous calls to the ``run``
+subcommand.  If your goal is to find out what resources match on a policy use ``run``
+along with the ``--dryrun`` option.

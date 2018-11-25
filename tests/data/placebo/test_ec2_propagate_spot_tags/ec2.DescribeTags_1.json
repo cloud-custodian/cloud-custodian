@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Action",
+                "ResourceId": "i-01e9579f02f70c5ab",
+                "ResourceType": "instance",
+                "Value": "Resource does not meet policy: stop@2018/03/22"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "d9a013de-4820-450b-940a-0757fbc35880",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 29 Mar 2018 09:12:50 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

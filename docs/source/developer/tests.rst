@@ -10,13 +10,13 @@ Unit tests can be run with:
 
 .. code-block:: bash
 
-   $ make test
+   $ tox
 
 Coverage reports can be generated and viewed with the following:
 
 .. code-block:: bash
 
-   $ make coverage
+   (py27) $ make coverage
 
    # Open the reports in a browser
 
@@ -26,14 +26,25 @@ Coverage reports can be generated and viewed with the following:
    # on gnomeish linux
    $ gnome-open coverage/index.html
 
+Linting can be run with:
+
+.. code-block:: bash
+
+  $ make lint
+
+
 Decorating tests
 ~~~~~~~~~~~~~~~~
 
 The ``functional`` decorator marks tests that don't require any pre-existing
 AWS context, and can therefore be run cleanly against live AWS.
 
-Writing Placebo Tests
-~~~~~~~~~~~~~~~~~~~~~
+Writing Placebo Tests for AWS Resources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note: These instructions are only for recording data in AWS. For Azure, GCP, or
+other cloud providers, see the corresponding documentation for information on how
+to record data there.
 
 The `Placebo <http://placebo.readthedocs.io/en/latest/>`_ library is used to
 record and replay AWS responses so that tests can run locally, and in a fraction
@@ -69,7 +80,13 @@ example:
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
-Now run this test.  This may take a little while as the test is contacting AWS.
+Now run this test using the following command to generate the placebo data:
+
+  .. code-block:: shell
+
+    $ nosetests -s -v tests/path/to/test.py
+
+This may take a little while as the test is contacting AWS.
 All responses are stored in the placebo dir, and can be viewed when the test is
 finished.  It is not necessary to inspect these files, but they can be helpful
 if the test is not behaving how you expect.
@@ -99,3 +116,16 @@ When the test is completed, change to using `replay_flight_data`:
 Now when the test is run it will use the data previously recorded and will not
 contact AWS.  When committing your test, don't forget to include the 
 `tests/data/placebo/test_example` directory!
+
+Note: if it's necessary to delay CLI calls due to delays in the time it takes
+for an attribute on a resource to be reflected in an API call or any other reason,
+use ``self.recording`` to only sleep when recording json like so:
+
+  .. code-block:: python
+
+    import time
+
+    ...
+
+    if self.recording:
+      time.sleep(10)

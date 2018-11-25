@@ -1,0 +1,42 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0bf94229-6439-489e-91df-174897daa64a", 
+            "HTTPHeaders": {
+                "date": "Mon, 29 Jan 2018 15:22:27 GMT", 
+                "x-amzn-requestid": "0bf94229-6439-489e-91df-174897daa64a", 
+                "content-length": "362", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "EndpointConfigName": "c7n-endpoint-config", 
+        "CreationTime": {
+            "hour": 9, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 23, 
+            "microsecond": 717000, 
+            "year": 2018, 
+            "day": 29, 
+            "minute": 45
+        }, 
+        "EndpointName": "c7n-endpoint", 
+        "EndpointArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint/c7n-endpoint", 
+        "LastModifiedTime": {
+            "hour": 9, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 40, 
+            "microsecond": 81000, 
+            "year": 2018, 
+            "day": 29, 
+            "minute": 56
+        }, 
+        "EndpointStatus": "Failed", 
+        "FailureReason": " The primary container for production variant variant-name-1 did not pass the ping health check."
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CopyObjectResult": {
+            "LastModified": {
+                "hour": 16, 
+                "__class__": "datetime", 
+                "month": 2, 
+                "second": 26, 
+                "microsecond": 0, 
+                "year": 2018, 
+                "day": 7, 
+                "minute": 34
+            }, 
+            "ETag": "\"b8a9f715dbb64fd5c56e7783c6820a61\""
+        }, 
+        "VersionId": "QOzI1nfIQxQ1XGBBWhKuO1eO1DP9qtsY", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "M8xj5uJUY7eBaVSIdiW43eJAqpPSrxRtQX/6M709GO8BTrXhMIIto0vqwKZB5rIZcHVGIb/Jkbw=", 
+            "RequestId": "AEC8A34539F86FE9", 
+            "HTTPHeaders": {
+                "content-length": "234", 
+                "x-amz-id-2": "M8xj5uJUY7eBaVSIdiW43eJAqpPSrxRtQX/6M709GO8BTrXhMIIto0vqwKZB5rIZcHVGIb/Jkbw=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "AEC8A34539F86FE9", 
+                "date": "Wed, 07 Feb 2018 16:34:26 GMT", 
+                "x-amz-version-id": "QOzI1nfIQxQ1XGBBWhKuO1eO1DP9qtsY", 
+                "x-amz-server-side-encryption": "AES256", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "ServerSideEncryption": "AES256"
+    }
+}

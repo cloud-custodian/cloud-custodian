@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 from datetime import datetime, timedelta
 
-
+from botocore.exceptions import ClientError
 import boto3
 import json
 import logging
@@ -70,7 +70,7 @@ def bucket_info(c, bucket):
 def main():
 
     logging.basicConfig(level=logging.INFO)
-    results = {'buckets':[]}
+    results = {'buckets': []}
     size_count = obj_count = 0.0
     s = boto3.Session()
     s3 = s.client('s3')
@@ -88,7 +88,7 @@ def main():
             # special case per https://goo.gl/iXdpnl
             elif bucket_region == "EU":
                 bucket_region = "eu-west-1"
-        except:
+        except ClientError:
             # We don't have permission to the bucket, try us-east-1
             bucket_region = "us-east-1"
 

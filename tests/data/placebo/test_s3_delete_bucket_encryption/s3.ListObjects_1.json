@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-delete-bucket-encryption-aes256", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "OR5eASOPIcbHvM4ZH24m+9bVVoaSnSdx3Qzu7IwlWLg0Bw/zgUMno2wbO08kRQFR16/8rSyjjZw=", 
+            "RequestId": "E4A070B22E98E7C2", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "OR5eASOPIcbHvM4ZH24m+9bVVoaSnSdx3Qzu7IwlWLg0Bw/zgUMno2wbO08kRQFR16/8rSyjjZw=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E4A070B22E98E7C2", 
+                "date": "Wed, 15 Nov 2017 16:15:28 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

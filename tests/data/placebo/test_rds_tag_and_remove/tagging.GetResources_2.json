@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:test-03", 
+                "Tags": [
+                    {
+                        "Value": "postgres", 
+                        "Key": "Platform"
+                    }, 
+                    {
+                        "Value": "Resource does not meet policy: delete@2017/09/16", 
+                        "Key": "custodian_next"
+                    }, 
+                    {
+                        "Value": "production", 
+                        "Key": "workload-type"
+                    }, 
+                    {
+                        "Value": "hello world", 
+                        "Key": "xyz"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "776fb13b-9a27-11e7-b934-eda53fa8229c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "776fb13b-9a27-11e7-b934-eda53fa8229c", 
+                "date": "Fri, 15 Sep 2017 15:06:35 GMT", 
+                "content-length": "325", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

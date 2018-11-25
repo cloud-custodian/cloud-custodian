@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-1ac6a253", 
+                "Tags": [
+                    {
+                        "Value": "Somewhere", 
+                        "Key": "Name"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "08dcc5ce-84db-11e7-b46b-65cbb499c1b9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "08dcc5ce-84db-11e7-b46b-65cbb499c1b9", 
+                "date": "Sat, 19 Aug 2017 12:36:33 GMT", 
+                "content-length": "184", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

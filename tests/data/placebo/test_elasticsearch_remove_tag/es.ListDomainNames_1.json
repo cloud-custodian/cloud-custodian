@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4500d02b-d515-11e7-a8bf-13a0b36337cb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4500d02b-d515-11e7-a8bf-13a0b36337cb", 
+                "date": "Wed, 29 Nov 2017 14:54:58 GMT", 
+                "content-length": "43", 
+                "content-type": "application/json"
+            }
+        }, 
+        "DomainNames": [
+            {
+                "DomainName": "c7n-test"
+            }
+        ]
+    }
+}

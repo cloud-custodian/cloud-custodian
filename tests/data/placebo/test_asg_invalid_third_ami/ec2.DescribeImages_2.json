@@ -1,0 +1,119 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Images": [
+            {
+                "VirtualizationType": "hvm", 
+                "Description": "Amazon Linux AMI 2016.09.1.20170119 x86_64 HVM GP2", 
+                "Hypervisor": "xen", 
+                "ImageOwnerAlias": "amazon", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-0b33d91d", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": true, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 8, 
+                            "SnapshotId": "snap-037f1f9e6c8ea4d65"
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "amazon/amzn-ami-hvm-2016.09.1.20170119-x86_64-gp2", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "137112412989", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2017-01-20T23:39:56.000Z", 
+                "Public": true, 
+                "ImageType": "machine", 
+                "Name": "amzn-ami-hvm-2016.09.1.20170119-x86_64-gp2"
+            }, 
+            {
+                "VirtualizationType": "hvm", 
+                "Description": "Amazon Linux AMI 2016.09.0.20161028 x86_64 HVM GP2", 
+                "Hypervisor": "xen", 
+                "ImageOwnerAlias": "amazon", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-b73b63a0", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": true, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 8, 
+                            "SnapshotId": "snap-fe8a3c04"
+                        }
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "amazon/amzn-ami-hvm-2016.09.0.20161028-x86_64-gp2", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "137112412989", 
+                "RootDeviceName": "/dev/xvda", 
+                "CreationDate": "2016-10-29T00:49:47.000Z", 
+                "Public": true, 
+                "ImageType": "machine", 
+                "Name": "amzn-ami-hvm-2016.09.0.20161028-x86_64-gp2"
+            }, 
+            {
+                "VirtualizationType": "hvm", 
+                "Description": "Canonical, Ubuntu, 16.04 LTS, amd64 xenial image build on 2017-07-21", 
+                "Hypervisor": "xen", 
+                "EnaSupport": true, 
+                "SriovNetSupport": "simple", 
+                "ImageId": "ami-cd0f5cb6", 
+                "State": "available", 
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1", 
+                        "Ebs": {
+                            "Encrypted": false, 
+                            "DeleteOnTermination": true, 
+                            "VolumeType": "gp2", 
+                            "VolumeSize": 8, 
+                            "SnapshotId": "snap-0cfc17b071e696816"
+                        }
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdb", 
+                        "VirtualName": "ephemeral0"
+                    }, 
+                    {
+                        "DeviceName": "/dev/sdc", 
+                        "VirtualName": "ephemeral1"
+                    }
+                ], 
+                "Architecture": "x86_64", 
+                "ImageLocation": "099720109477/ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20170721", 
+                "RootDeviceType": "ebs", 
+                "OwnerId": "099720109477", 
+                "RootDeviceName": "/dev/sda1", 
+                "CreationDate": "2017-07-24T20:26:59.000Z", 
+                "Public": true, 
+                "ImageType": "machine", 
+                "Name": "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20170721"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "58a0b952-6aac-49bf-81a3-67387b00fbf7", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 31 Oct 2017 08:45:31 GMT"
+            }
+        }
+    }
+}

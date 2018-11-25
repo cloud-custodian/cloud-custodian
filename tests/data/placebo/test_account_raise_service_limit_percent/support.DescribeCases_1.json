@@ -1,0 +1,148 @@
+{
+    "status_code": 200, 
+    "data": {
+        "cases": [
+            {
+                "status": "unassigned", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Please raise the below account limit(s); \n \nIncrease VPCs by 1 in us-east-1 \n\t Current Limit: 5\n\t Current Usage: 3\n\t Set New Limit to: 6\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2017-ef050551e62ec0ee", 
+                            "timeCreated": "2017-09-13T20:34:40.000Z", 
+                            "submittedBy": "christo.adikary@capitalone.com (IAM)"
+                        }
+                    ]
+                }, 
+                "ccEmailAddresses": [
+                    "kapil.thangavelu@capitalone.com"
+                ], 
+                "timeCreated": "2017-09-13T20:34:39.000Z", 
+                "caseId": "case-644160558196-muen-2017-ef050551e62ec0ee", 
+                "severityCode": "normal", 
+                "language": "en", 
+                "categoryCode": "general-guidance", 
+                "serviceCode": "amazon-virtual-private-cloud", 
+                "submittedBy": "mandeep.bal@capitalone.com", 
+                "displayId": "4401624751", 
+                "subject": "Programmatic test 644160558196 VPC in us-east-1"
+            }, 
+            {
+                "status": "unassigned", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Please raise the below account limit(s); \n \nIncrease VPCs by 1 in us-west-2 \n\t Current Limit: 5\n\t Current Usage: 2\n\t Set New Limit to: 6\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2017-831fbbac8ecb136e", 
+                            "timeCreated": "2017-09-13T21:19:40.000Z", 
+                            "submittedBy": "christo.adikary@capitalone.com (IAM)"
+                        }
+                    ]
+                }, 
+                "ccEmailAddresses": [
+                    "kapil.thangavelu@capitalone.com"
+                ], 
+                "timeCreated": "2017-09-13T21:19:40.000Z", 
+                "caseId": "case-644160558196-muen-2017-831fbbac8ecb136e", 
+                "severityCode": "normal", 
+                "language": "en", 
+                "categoryCode": "general-guidance", 
+                "serviceCode": "amazon-virtual-private-cloud", 
+                "submittedBy": "mandeep.bal@capitalone.com", 
+                "displayId": "4401523721", 
+                "subject": "Programmatic test PLEASE IGNORE 644160558196 VPC in us-west-2"
+            }, 
+            {
+                "status": "unassigned", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Please raise the below account limit(s); \n \nIncrease VPCs by 1 in us-west-2 \n\t Current Limit: 5\n\t Current Usage: 2\n\t Set New Limit to: 6\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2017-6b8d0ac383e799a0", 
+                            "timeCreated": "2017-09-13T21:29:07.000Z", 
+                            "submittedBy": "christo.adikary@capitalone.com (IAM)"
+                        }
+                    ]
+                }, 
+                "ccEmailAddresses": [
+                    "kapil.thangavelu@capitalone.com"
+                ], 
+                "timeCreated": "2017-09-13T21:29:07.000Z", 
+                "caseId": "case-644160558196-muen-2017-6b8d0ac383e799a0", 
+                "severityCode": "normal", 
+                "language": "en", 
+                "categoryCode": "general-guidance", 
+                "serviceCode": "amazon-virtual-private-cloud", 
+                "submittedBy": "mandeep.bal@capitalone.com", 
+                "displayId": "4402155951", 
+                "subject": "Programmatic test-PLEASE IGNORE 644160558196 VPC in us-west-2"
+            }, 
+            {
+                "status": "unassigned", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Please raise the below account limit(s); \n \nIncrease DB parameter groups by 5 in us-east-1 \n\t Current Limit: 50\n\t Current Usage: 4\n\t Set New Limit to: 55\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2017-623459dbaf23ec2d", 
+                            "timeCreated": "2017-09-13T21:43:27.000Z", 
+                            "submittedBy": "christo.adikary@capitalone.com (IAM)"
+                        }
+                    ]
+                }, 
+                "ccEmailAddresses": [
+                    "kapil.thangavelu@capitalone.com"
+                ], 
+                "timeCreated": "2017-09-13T21:43:27.000Z", 
+                "caseId": "case-644160558196-muen-2017-623459dbaf23ec2d", 
+                "severityCode": "normal", 
+                "language": "en", 
+                "categoryCode": "general-guidance", 
+                "serviceCode": "amazon-relational-database-service-aurora", 
+                "submittedBy": "mandeep.bal@capitalone.com", 
+                "displayId": "4401737831", 
+                "subject": "Programmatic test--PLEASE IGNORE 644160558196 RDS in us-east-1"
+            }, 
+            {
+                "status": "unassigned", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Please raise the below account limit(s); \n \nIncrease VPCs by 1 in us-east-1 \n\t Current Limit: 5\n\t Current Usage: 3\n\t Set New Limit to: 6\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-644160558196-muen-2017-cad1fe57f28b2bd3", 
+                            "timeCreated": "2017-09-13T21:43:27.000Z", 
+                            "submittedBy": "christo.adikary@capitalone.com (IAM)"
+                        }
+                    ]
+                }, 
+                "ccEmailAddresses": [
+                    "kapil.thangavelu@capitalone.com"
+                ], 
+                "timeCreated": "2017-09-13T21:43:27.000Z", 
+                "caseId": "case-644160558196-muen-2017-cad1fe57f28b2bd3", 
+                "severityCode": "normal", 
+                "language": "en", 
+                "categoryCode": "general-guidance", 
+                "serviceCode": "amazon-virtual-private-cloud", 
+                "submittedBy": "mandeep.bal@capitalone.com", 
+                "displayId": "4401924551", 
+                "subject": "Programmatic test--PLEASE IGNORE 644160558196 VPC in us-east-1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "94b1cc84-98cc-11e7-bb08-61bb2664b228", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "94b1cc84-98cc-11e7-bb08-61bb2664b228", 
+                "date": "Wed, 13 Sep 2017 21:43:28 GMT", 
+                "content-length": "4194", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

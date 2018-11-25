@@ -1,7 +1,7 @@
 {
     "status_code": 200, 
     "data": {
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-policy-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}}]}", 
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-policy-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}},{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"arn:aws:iam::644160558196:root\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-policy-test/*\"}]}", 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "HostId": "jL1IZT8BmFaliIyAn7834ng9hk11JPgxBLJYNMg2IPtcu8A6MVtzs/Yz6FMO5IVe4exEBQIGvGg=", 

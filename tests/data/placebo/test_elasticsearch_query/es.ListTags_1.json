@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "40a36990-477b-11e7-af14-5b416669625e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "40a36990-477b-11e7-af14-5b416669625e", 
+                "date": "Fri, 02 Jun 2017 10:07:14 GMT", 
+                "content-length": "41", 
+                "content-type": "application/json"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "Dev", 
+                "Key": "Env"
+            }
+        ]
+    }
+}

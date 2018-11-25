@@ -3,28 +3,32 @@
     "data": {
         "Functions": [
             {
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }, 
                 "Version": "$LATEST", 
-                "CodeSha256": "ON+chrGiGWzSQ7aKTowqe/GuLSB8q+Z4md9gcjUyzGI=", 
-                "FunctionName": "custodian-ec2-compliance", 
+                "CodeSha256": "chNnUPxGj+HExuI3bQg1fHnWMMwr4bXVIevpyp/zWns=", 
+                "FunctionName": "custodian-ec2-auto-tag-user", 
                 "MemorySize": 512, 
-                "CodeSize": 491641, 
-                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-compliance", 
+                "RevisionId": "d38ce6ea-b323-4b84-853d-cc75d16cff78", 
+                "CodeSize": 1037994, 
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-auto-tag-user", 
                 "Handler": "custodian_policy.run", 
                 "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
                 "Timeout": 60, 
-                "LastModified": "2016-08-27T16:20:15.856+0000", 
+                "LastModified": "2017-05-26T12:15:26.160+0000", 
                 "Runtime": "python2.7", 
-                "Description": "a policy to stop all others"
+                "Description": "cloud-custodian lambda policy"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "019f00be-84ea-11e6-af99-75fd5454cb56", 
+            "RequestId": "c6f9273e-1190-11e8-9167-0f343d6908d9", 
             "HTTPHeaders": {
-                "date": "Tue, 27 Sep 2016 19:38:46 GMT", 
-                "x-amzn-requestid": "019f00be-84ea-11e6-af99-75fd5454cb56", 
-                "content-length": "565", 
+                "date": "Wed, 14 Feb 2018 14:10:14 GMT", 
+                "x-amzn-requestid": "c6f9273e-1190-11e8-9167-0f343d6908d9", 
+                "content-length": "24875", 
                 "content-type": "application/json", 
                 "connection": "keep-alive"
             }

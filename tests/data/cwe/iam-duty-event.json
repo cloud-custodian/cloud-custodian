@@ -1,0 +1,81 @@
+{
+    "account": "101010101111",
+    "region": "us-east-1",
+    "detail": {
+        "description": "API GeneratedFindingAPIName was invoked from a Tor exit node IP address 198.51.100.0.",
+        "resource": {
+            "resourceType": "AccessKey",
+            "accessKeyDetails": {
+                "userName": "GeneratedFindingUserName",
+                "userType": "IAMUser",
+                "principalId": "GeneratedFindingPrincipalId",
+                "accessKeyId": "GeneratedFindingAccessKeyId"
+            }
+        },
+        "severity": 5,
+        "service": {
+            "count": 1,
+            "additionalInfo": {
+                "sample": true,
+                "unusual": {
+                    "isps": "amazon.com"
+                },
+                "threatListName": "GeneratedFindingCustomerListName"
+            },
+            "archived": false,
+            "resourceRole": "TARGET",
+            "eventFirstSeen": "2017-12-08T15:32:49Z",
+            "detectorId": "c0b018e3eb2130078632d999e41d4f02",
+            "action": {
+                "actionType": "AWS_API_CALL",
+                "awsApiCallAction": {
+                    "serviceName": "GeneratedFindingAPIServiceName",
+                    "remoteIpDetails": {
+                        "organization": {
+                            "org": "GeneratedFindingORG",
+                            "isp": "GeneratedFindingISP",
+                            "asn": -1,
+                            "asnOrg": "GeneratedFindingASNOrg"
+                        },
+                        "ipAddressV4": "198.51.100.0",
+                        "city": {
+                            "cityName": "GeneratedFindingCityName"
+                        },
+                        "geoLocation": {
+                            "lat": 0,
+                            "lon": 0
+                        },
+                        "country": {
+                            "countryName": "United States"
+                        }
+                    },
+                    "api": "GeneratedFindingAPIName",
+                    "affectedResources": {
+                        "AWS::EC2::Instance": "i-99999999",
+                        "AWS::CloudTrail::Trail": "GeneratedFindingTrailName"
+                    },
+                    "callerType": "Remote IP"
+                }
+            },
+            "serviceName": "guardduty",
+            "eventLastSeen": "2017-12-08T15:32:49Z"
+        },
+        "title": "API GeneratedFindingAPIName was invoked from a Tor exit node.",
+        "region": "us-east-1",
+        "partition": "aws",
+        "createdAt": "2017-12-08T15:32:49.862Z",
+        "updatedAt": "2017-12-08T15:32:49.862Z",
+        "schemaVersion": "2.0",
+        "type": "UnauthorizedAccess:IAMUser/TorIPCaller",
+        "id": "36b01b60fc22bb4edb19d62d9899e953",
+        "arn": "arn:aws:guardduty:us-east-1:883606788610:detector/883606788610/finding/36b01b60fc22bb4edb19d62d9899e953",
+        "accountId": "883606788610"
+    },
+    "detail-type": "GuardDuty Finding",
+    "source": "aws.guardduty",
+    "version": "0",
+    "time": "1970-01-01T00:00:00Z",
+    "debug": true,
+    "id": "805320a1-2f09-4237-64fc-f3f136e41a69",
+    "resources": []
+}

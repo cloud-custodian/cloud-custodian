@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 """
 Lambda entry point
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import base64
 import boto3
 import json
 import os
@@ -23,16 +23,12 @@ import os
 from .sqs_queue_processor import MailerSqsQueueProcessor
 
 
-def config_setup(session):
+def config_setup(config=None):
     task_dir = os.environ.get('LAMBDA_TASK_ROOT')
     os.environ['PYTHONPATH'] = "%s:%s" % (task_dir, os.environ.get('PYTHONPATH', ''))
-    with open(os.path.join(task_dir, 'config.json')) as fh:
-        config = json.load(fh)
-    if config['ldap_bind_password']:
-        kms = session.client('kms')
-        config['ldap_bind_password'] = kms.decrypt(
-            CiphertextBlob=base64.b64decode(config['ldap_bind_password']))[
-                'Plaintext']
+    if not config:
+        with open(os.path.join(task_dir, 'config.json')) as fh:
+            config = json.load(fh)
     if 'http_proxy' in config:
         os.environ['http_proxy'] = config['http_proxy']
     if 'https_proxy' in config:
@@ -40,11 +36,13 @@ def config_setup(session):
     return config
 
 
-def start_c7n_mailer(event, context, logger):
+def start_c7n_mailer(logger, config=None, parallel=False):
     try:
         session = boto3.Session()
-        config = config_setup(session)
+        if not config:
+            config = config_setup()
+        logger.info('c7n_mailer starting...')
         mailer_sqs_queue_processor = MailerSqsQueueProcessor(config, session, logger)
-        mailer_sqs_queue_processor.run()
+        mailer_sqs_queue_processor.run(parallel)
     except Exception as e:
         logger.exception("Error starting mailer MailerSqsQueueProcessor(). \n Error: %s \n" % (e))

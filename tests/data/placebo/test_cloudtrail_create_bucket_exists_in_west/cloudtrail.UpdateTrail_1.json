@@ -1,0 +1,24 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IncludeGlobalServiceEvents": true, 
+        "Name": "nosetest", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9869e665-ed81-11e6-9205-e16fedb50da3", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9869e665-ed81-11e6-9205-e16fedb50da3", 
+                "date": "Tue, 07 Feb 2017 22:05:53 GMT", 
+                "content-length": "250", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/nosetest", 
+        "LogFileValidationEnabled": false, 
+        "SnsTopicARN": "", 
+        "IsMultiRegionTrail": true, 
+        "S3BucketName": "nosetest-bucket", 
+        "SnsTopicName": ""
+    }
+}

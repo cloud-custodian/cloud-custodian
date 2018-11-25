@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "BackupSummaries": [
+            {
+                "TableName": "omnissm-registrations",
+                "TableId": "9d9d6b94-8ee4-4fc6-bd1d-7ad29d7ce0ad",
+                "TableArn": "arn:aws:dynamodb:us-east-2:644160558196:table/omnissm-registrations",
+                "BackupArn": "arn:aws:dynamodb:us-east-2:644160558196:table/omnissm-registrations/backup/01524841533037-4b25e487",
+                "BackupName": "registrations-backup",
+                "BackupCreationDateTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 27,
+                    "hour": 11,
+                    "minute": 5,
+                    "second": 33,
+                    "microsecond": 37000
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupSizeBytes": 901
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "D6R45K3P5R8LH270M1218KU6UJVV4KQNSO5AEMVJF66Q9ASUAAJG",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Fri, 27 Apr 2018 15:06:21 GMT",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "429",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "D6R45K3P5R8LH270M1218KU6UJVV4KQNSO5AEMVJF66Q9ASUAAJG",
+                "x-amz-crc32": "4025972726"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,2466 +1,2466 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Marker": "c3Fsc2VydmVyLWV4CjEyLjAwLjQ0MjIuMC52MQ==", 
+        "Marker": "c3Fsc2VydmVyLWV4CjEyLjAwLjQ0MjIuMC52MQ==",
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "0659caf4-a112-11e6-b2b8-a3658daa110d", 
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "0659caf4-a112-11e6-b2b8-a3658daa110d",
             "HTTPHeaders": {
-                "x-amzn-requestid": "0659caf4-a112-11e6-b2b8-a3658daa110d", 
-                "vary": "Accept-Encoding", 
-                "content-length": "112216", 
-                "content-type": "text/xml", 
+                "x-amzn-requestid": "0659caf4-a112-11e6-b2b8-a3658daa110d",
+                "vary": "Accept-Encoding",
+                "content-length": "112216",
+                "content-type": "text/xml",
                 "date": "Wed, 02 Nov 2016 15:35:47 GMT"
             }
-        }, 
+        },
         "DBEngineVersions": [
             {
-                "Engine": "mariadb", 
-                "DBParameterGroupFamily": "mariadb10.0", 
-                "DBEngineDescription": "MariaDB Community Edition", 
-                "EngineVersion": "10.0.17", 
-                "DBEngineVersionDescription": "MySQL 10.0.17", 
+                "Engine": "mariadb",
+                "DBParameterGroupFamily": "mariadb10.0",
+                "DBEngineDescription": "MariaDB Community Edition",
+                "EngineVersion": "10.0.17",
+                "DBEngineVersionDescription": "MySQL 10.0.17",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mariadb", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mariadb",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "10.0.24"
-                    }, 
+                    },
                     {
-                        "Engine": "mariadb", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mariadb",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "10.1.14"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mariadb", 
-                "DBParameterGroupFamily": "mariadb10.0", 
-                "DBEngineDescription": "MariaDB Community Edition", 
-                "EngineVersion": "10.0.24", 
-                "DBEngineVersionDescription": "MariaDB 10.0.24", 
+                "Engine": "mariadb",
+                "DBParameterGroupFamily": "mariadb10.0",
+                "DBEngineDescription": "MariaDB Community Edition",
+                "EngineVersion": "10.0.24",
+                "DBEngineVersionDescription": "MariaDB 10.0.24",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mariadb", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mariadb",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "10.1.14"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mariadb", 
-                "DBParameterGroupFamily": "mariadb10.1", 
-                "DBEngineDescription": "MariaDB Community Edition", 
-                "EngineVersion": "10.1.14", 
-                "DBEngineVersionDescription": "MariaDB 10.1.14", 
+                "Engine": "mariadb",
+                "DBParameterGroupFamily": "mariadb10.1",
+                "DBEngineDescription": "MariaDB Community Edition",
+                "EngineVersion": "10.1.14",
+                "DBEngineVersionDescription": "MariaDB 10.1.14",
                 "ValidUpgradeTarget": []
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.5", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.5.40", 
-                "DBEngineVersionDescription": "MySQL 5.5.40", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.5",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.5.40",
+                "DBEngineVersionDescription": "MySQL 5.5.40",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.40a"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.40b"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.42"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.46"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.5", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.5.40a", 
-                "DBEngineVersionDescription": "MySQL 5.5.40a", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.5",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.5.40a",
+                "DBEngineVersionDescription": "MySQL 5.5.40a",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.40b"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.42"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.46"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.5", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.5.40b", 
-                "DBEngineVersionDescription": "MySQL 5.5.40b", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.5",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.5.40b",
+                "DBEngineVersionDescription": "MySQL 5.5.40b",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.42"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.46"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.5", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.5.41", 
-                "DBEngineVersionDescription": "MySQL 5.5.41", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.5",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.5.41",
+                "DBEngineVersionDescription": "MySQL 5.5.41",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.42"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.46"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.5", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.5.42", 
-                "DBEngineVersionDescription": "MySQL 5.5.42", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.5",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.5.42",
+                "DBEngineVersionDescription": "MySQL 5.5.42",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.5.46"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.5", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.5.46", 
-                "DBEngineVersionDescription": "MySQL 5.5.46", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.5",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.5.46",
+                "DBEngineVersionDescription": "MySQL 5.5.46",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.19a", 
-                "DBEngineVersionDescription": "MySQL 5.6.19a", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.19a",
+                "DBEngineVersionDescription": "MySQL 5.6.19a",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.19b"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.21"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.21b"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.23"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.19b", 
-                "DBEngineVersionDescription": "MySQL 5.6.19b", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.19b",
+                "DBEngineVersionDescription": "MySQL 5.6.19b",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.21b"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.23"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.21", 
-                "DBEngineVersionDescription": "MySQL 5.6.21", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.21",
+                "DBEngineVersionDescription": "MySQL 5.6.21",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.21b"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.23"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.21b", 
-                "DBEngineVersionDescription": "MySQL 5.6.21b", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.21b",
+                "DBEngineVersionDescription": "MySQL 5.6.21b",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.23"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.22", 
-                "DBEngineVersionDescription": "MySQL 5.6.22", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.22",
+                "DBEngineVersionDescription": "MySQL 5.6.22",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.23"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.23", 
-                "DBEngineVersionDescription": "MySQL 5.6.23", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.23",
+                "DBEngineVersionDescription": "MySQL 5.6.23",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.27"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.27", 
-                "DBEngineVersionDescription": "MySQL 5.6.27", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.27",
+                "DBEngineVersionDescription": "MySQL 5.6.27",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.6.29"
-                    }, 
+                    },
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.6", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.6.29", 
-                "DBEngineVersionDescription": "MySQL 5.6.29", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.6",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.6.29",
+                "DBEngineVersionDescription": "MySQL 5.6.29",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.7", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.7.10", 
-                "DBEngineVersionDescription": "MySQL 5.7.10", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.7",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.7.10",
+                "DBEngineVersionDescription": "MySQL 5.7.10",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "mysql", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "mysql",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "5.7.11"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "mysql", 
-                "DBParameterGroupFamily": "mysql5.7", 
-                "DBEngineDescription": "MySQL Community Edition", 
-                "EngineVersion": "5.7.11", 
-                "DBEngineVersionDescription": "MySQL 5.7.11", 
+                "Engine": "mysql",
+                "DBParameterGroupFamily": "mysql5.7",
+                "DBEngineDescription": "MySQL Community Edition",
+                "EngineVersion": "5.7.11",
+                "DBEngineVersionDescription": "MySQL 5.7.11",
                 "ValidUpgradeTarget": []
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v1", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v1",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v1"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v3",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v3"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v4",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v4"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v5",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v5"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v6", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v6",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v6"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v7", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v7",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v7"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v8", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v8",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v8"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-11.2", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "11.2.0.4.v9", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "11.2.0.4.v9",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v9"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.1.v1", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.1.v1",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v1"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.1.v2", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.1.v2",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v2"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.1.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.1.v3",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v3"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.1.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.1.v4",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v4"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.1.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.1.v5",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v5"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.1.v6", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.1.v6",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v6"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.2.v1", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.2.v1", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.2.v1",
+                "DBEngineVersionDescription": "Oracle 12.1.0.2.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-ee", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-ee",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v2"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-ee", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-ee",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-ee", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-ee",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-ee", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-ee",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.2.v2", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.2.v2",
                 "DBEngineVersionDescription": "Oracle 12.1.0.2.v2"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.2.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.2.v3",
                 "DBEngineVersionDescription": "Oracle 12.1.0.2.v3"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.2.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.2.v4",
                 "DBEngineVersionDescription": "Oracle 12.1.0.2.v4"
-            }, 
+            },
             {
-                "Engine": "oracle-ee", 
-                "DBParameterGroupFamily": "oracle-ee-12.1", 
+                "Engine": "oracle-ee",
+                "DBParameterGroupFamily": "oracle-ee-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Enterprise Edition", 
-                "EngineVersion": "12.1.0.2.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Enterprise Edition",
+                "EngineVersion": "12.1.0.2.v5",
                 "DBEngineVersionDescription": "Oracle 12.1.0.2.v5"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v1", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v1",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v1"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v3",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v3"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v4",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v4"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v5",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v5"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v6", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v6",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v6"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v7", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v7",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v7"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v8", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v8",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v8"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-11.2", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "11.2.0.4.v9", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "11.2.0.4.v9",
                 "DBEngineVersionDescription": "Oracle 11.2.0.4.v9"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-12.1", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "12.1.0.1.v1", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "12.1.0.1.v1",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v1"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-12.1", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "12.1.0.1.v2", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "12.1.0.1.v2",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v2"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-12.1", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "12.1.0.1.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "12.1.0.1.v3",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v3"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-12.1", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "12.1.0.1.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "12.1.0.1.v4",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v4"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-12.1", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "12.1.0.1.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "12.1.0.1.v5",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v5"
-            }, 
+            },
             {
-                "Engine": "oracle-se", 
-                "DBParameterGroupFamily": "oracle-se-12.1", 
+                "Engine": "oracle-se",
+                "DBParameterGroupFamily": "oracle-se-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition", 
-                "EngineVersion": "12.1.0.1.v6", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition",
+                "EngineVersion": "12.1.0.1.v6",
                 "DBEngineVersionDescription": "Oracle 12.1.0.1.v6"
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v1", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v1", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v1",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v5"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v7"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v8"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v9"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v3", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v3",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v3",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v5"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v7"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v8"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v9"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v4", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v4",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v4",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v5"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v7"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v8"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v9"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v5", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v5",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v5",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v7"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v8"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v9"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v6", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v6", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v6",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v6",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v7"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v8"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v9"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v7", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v7", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v7",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v7",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v8"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v9"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v8", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v8", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v8",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v8",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.2.0.4.v9"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-11.2", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-11.2",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "11.2.0.4.v9", 
-                "DBEngineVersionDescription": "Oracle 11.2.0.4.v9", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "11.2.0.4.v9",
+                "DBEngineVersionDescription": "Oracle 11.2.0.4.v9",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-12.1", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "12.1.0.1.v1", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.1.v1", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "12.1.0.1.v1",
+                "DBEngineVersionDescription": "Oracle 12.1.0.1.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v2"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v5"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v2"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-12.1", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "12.1.0.1.v2", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.1.v2", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "12.1.0.1.v2",
+                "DBEngineVersionDescription": "Oracle 12.1.0.1.v2",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v5"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v2"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-12.1", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "12.1.0.1.v3", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.1.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "12.1.0.1.v3",
+                "DBEngineVersionDescription": "Oracle 12.1.0.1.v3",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v5"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v2"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-12.1", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "12.1.0.1.v4", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.1.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "12.1.0.1.v4",
+                "DBEngineVersionDescription": "Oracle 12.1.0.1.v4",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v5"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-12.1", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "12.1.0.1.v5", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.1.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "12.1.0.1.v5",
+                "DBEngineVersionDescription": "Oracle 12.1.0.1.v5",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se1", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se1",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.1.v6"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se1", 
-                "DBParameterGroupFamily": "oracle-se1-12.1", 
+                "Engine": "oracle-se1",
+                "DBParameterGroupFamily": "oracle-se1-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition One", 
-                "EngineVersion": "12.1.0.1.v6", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.1.v6", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition One",
+                "EngineVersion": "12.1.0.1.v6",
+                "DBEngineVersionDescription": "Oracle 12.1.0.1.v6",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se2", 
-                "DBParameterGroupFamily": "oracle-se2-12.1", 
+                "Engine": "oracle-se2",
+                "DBParameterGroupFamily": "oracle-se2-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition Two", 
-                "EngineVersion": "12.1.0.2.v2", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.2.v2", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition Two",
+                "EngineVersion": "12.1.0.2.v2",
+                "DBEngineVersionDescription": "Oracle 12.1.0.2.v2",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v3"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se2", 
-                "DBParameterGroupFamily": "oracle-se2-12.1", 
+                "Engine": "oracle-se2",
+                "DBParameterGroupFamily": "oracle-se2-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition Two", 
-                "EngineVersion": "12.1.0.2.v3", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.2.v3", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition Two",
+                "EngineVersion": "12.1.0.2.v3",
+                "DBEngineVersionDescription": "Oracle 12.1.0.2.v3",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v4"
-                    }, 
+                    },
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se2", 
-                "DBParameterGroupFamily": "oracle-se2-12.1", 
+                "Engine": "oracle-se2",
+                "DBParameterGroupFamily": "oracle-se2-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition Two", 
-                "EngineVersion": "12.1.0.2.v4", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.2.v4", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition Two",
+                "EngineVersion": "12.1.0.2.v4",
+                "DBEngineVersionDescription": "Oracle 12.1.0.2.v4",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "oracle-se2", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "oracle-se2",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.1.0.2.v5"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "oracle-se2", 
-                "DBParameterGroupFamily": "oracle-se2-12.1", 
+                "Engine": "oracle-se2",
+                "DBParameterGroupFamily": "oracle-se2-12.1",
                 "DefaultCharacterSet": {
-                    "CharacterSetName": "AL32UTF8", 
+                    "CharacterSetName": "AL32UTF8",
                     "CharacterSetDescription": "Unicode 5.0 UTF-8 Universal character set"
-                }, 
-                "DBEngineDescription": "Oracle Database Standard Edition Two", 
-                "EngineVersion": "12.1.0.2.v5", 
-                "DBEngineVersionDescription": "Oracle 12.1.0.2.v5", 
+                },
+                "DBEngineDescription": "Oracle Database Standard Edition Two",
+                "EngineVersion": "12.1.0.2.v5",
+                "DBEngineVersionDescription": "Oracle 12.1.0.2.v5",
                 "ValidUpgradeTarget": []
-            }, 
+            },
             {
-                "Engine": "aurora", 
-                "DBParameterGroupFamily": "aurora5.6", 
-                "DBEngineDescription": "Aurora", 
-                "EngineVersion": "5.6.10a", 
-                "DBEngineVersionDescription": "Aurora-5.6.10a.24.26", 
+                "Engine": "aurora",
+                "DBParameterGroupFamily": "aurora5.6",
+                "DBEngineDescription": "Aurora",
+                "EngineVersion": "5.6.10a",
+                "DBEngineVersionDescription": "Aurora-5.6.10a.24.26",
                 "ValidUpgradeTarget": []
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.1", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.1-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.1",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.1-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.2"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.3"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.6"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.3.10"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.12"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.1"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.4"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.2", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.2-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.2",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.2-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.3"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.6"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.3.10"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.12"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.1"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.4"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.3", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.3-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.3",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.3-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.6"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.3.10"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.12"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.1"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.4"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.5", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.5-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.5",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.5-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.6"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.3.10"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.12"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.1"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.4"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.6", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.6-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.6",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.6-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.3.10"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.12"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.1"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.4"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.9", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.9-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.9",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.9-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.3.10"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.12"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.4"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.10", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.10-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.10",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.10-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.12"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.12", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.12-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.12",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.12-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.3.14"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.3", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.3.14", 
-                "DBEngineVersionDescription": "PostgreSQL 9.3.14-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.3",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.3.14",
+                "DBEngineVersionDescription": "PostgreSQL 9.3.14-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.4", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.4.1", 
-                "DBEngineVersionDescription": "PostgreSQL 9.4.1-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.4",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.4.1",
+                "DBEngineVersionDescription": "PostgreSQL 9.4.1-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.4"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.4.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.2"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.4"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.4", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.4.4", 
-                "DBEngineVersionDescription": "PostgreSQL 9.4.4-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.4",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.4.4",
+                "DBEngineVersionDescription": "PostgreSQL 9.4.4-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": true, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": true,
                         "EngineVersion": "9.4.5"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.2"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.4"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.4", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.4.5", 
-                "DBEngineVersionDescription": "PostgreSQL 9.4.5-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.4",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.4.5",
+                "DBEngineVersionDescription": "PostgreSQL 9.4.5-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.7"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.2"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.4"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.4", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.4.7", 
-                "DBEngineVersionDescription": "PostgreSQL 9.4.7-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.4",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.4.7",
+                "DBEngineVersionDescription": "PostgreSQL 9.4.7-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.4.9"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.2"
-                    }, 
+                    },
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.4"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.4", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.4.9", 
-                "DBEngineVersionDescription": "PostgreSQL 9.4.9-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.4",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.4.9",
+                "DBEngineVersionDescription": "PostgreSQL 9.4.9-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.4"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.5", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.5.2", 
-                "DBEngineVersionDescription": "PostgreSQL 9.5.2-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.5",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.5.2",
+                "DBEngineVersionDescription": "PostgreSQL 9.5.2-R1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "postgres", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "postgres",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "9.5.4"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "postgres", 
-                "DBParameterGroupFamily": "postgres9.5", 
-                "DBEngineDescription": "PostgreSQL", 
-                "EngineVersion": "9.5.4", 
-                "DBEngineVersionDescription": "PostgreSQL 9.5.4-R1", 
+                "Engine": "postgres",
+                "DBParameterGroupFamily": "postgres9.5",
+                "DBEngineDescription": "PostgreSQL",
+                "EngineVersion": "9.5.4",
+                "DBEngineVersionDescription": "PostgreSQL 9.5.4-R1",
                 "ValidUpgradeTarget": []
-            }, 
+            },
             {
-                "Engine": "sqlserver-ee", 
-                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.2789.0.v1", 
-                "DBParameterGroupFamily": "sqlserver-ee-10.5", 
-                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition", 
+                "Engine": "sqlserver-ee",
+                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.2789.0.v1",
+                "DBParameterGroupFamily": "sqlserver-ee-10.5",
+                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition",
                 "EngineVersion": "10.50.2789.0.v1"
-            }, 
+            },
             {
-                "Engine": "sqlserver-ee", 
-                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.6000.34.v1", 
-                "DBParameterGroupFamily": "sqlserver-ee-10.5", 
-                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition", 
+                "Engine": "sqlserver-ee",
+                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.6000.34.v1",
+                "DBParameterGroupFamily": "sqlserver-ee-10.5",
+                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition",
                 "EngineVersion": "10.50.6000.34.v1"
-            }, 
+            },
             {
-                "Engine": "sqlserver-ee", 
-                "DBEngineVersionDescription": "SQL Server 10.50.6529.0.v1", 
-                "DBParameterGroupFamily": "sqlserver-ee-10.5", 
-                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition", 
+                "Engine": "sqlserver-ee",
+                "DBEngineVersionDescription": "SQL Server 10.50.6529.0.v1",
+                "DBParameterGroupFamily": "sqlserver-ee-10.5",
+                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition",
                 "EngineVersion": "10.50.6529.0.v1"
-            }, 
+            },
             {
-                "Engine": "sqlserver-ee", 
-                "DBEngineVersionDescription": "SQL Server 2012 11.00.2100.60.v1", 
-                "DBParameterGroupFamily": "sqlserver-ee-11.0", 
-                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition", 
+                "Engine": "sqlserver-ee",
+                "DBEngineVersionDescription": "SQL Server 2012 11.00.2100.60.v1",
+                "DBParameterGroupFamily": "sqlserver-ee-11.0",
+                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition",
                 "EngineVersion": "11.00.2100.60.v1"
-            }, 
+            },
             {
-                "Engine": "sqlserver-ee", 
-                "DBEngineVersionDescription": "SQL Server 2012 11.00.5058.0.v1", 
-                "DBParameterGroupFamily": "sqlserver-ee-11.0", 
-                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition", 
+                "Engine": "sqlserver-ee",
+                "DBEngineVersionDescription": "SQL Server 2012 11.00.5058.0.v1",
+                "DBParameterGroupFamily": "sqlserver-ee-11.0",
+                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition",
                 "EngineVersion": "11.00.5058.0.v1"
-            }, 
+            },
             {
-                "Engine": "sqlserver-ee", 
-                "DBEngineVersionDescription": "SQL Server 11.00.6020.0.v1", 
-                "DBParameterGroupFamily": "sqlserver-ee-11.0", 
-                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition", 
+                "Engine": "sqlserver-ee",
+                "DBEngineVersionDescription": "SQL Server 11.00.6020.0.v1",
+                "DBParameterGroupFamily": "sqlserver-ee-11.0",
+                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition",
                 "EngineVersion": "11.00.6020.0.v1"
-            }, 
+            },
             {
-                "Engine": "sqlserver-ee", 
-                "DBParameterGroupFamily": "sqlserver-ee-12.0", 
-                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition", 
-                "EngineVersion": "12.00.5000.0.v1", 
-                "DBEngineVersionDescription": "SQL Server 2014 12.00.5000.0.v1", 
+                "Engine": "sqlserver-ee",
+                "DBParameterGroupFamily": "sqlserver-ee-12.0",
+                "DBEngineDescription": "Microsoft SQL Server Enterprise Edition",
+                "EngineVersion": "12.00.5000.0.v1",
+                "DBEngineVersionDescription": "SQL Server 2014 12.00.5000.0.v1",
                 "ValidUpgradeTarget": []
-            }, 
+            },
             {
-                "Engine": "sqlserver-ex", 
-                "DBParameterGroupFamily": "sqlserver-ex-10.5", 
-                "DBEngineDescription": "Microsoft SQL Server Express Edition", 
-                "EngineVersion": "10.50.2789.0.v1", 
-                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.2789.0.v1", 
+                "Engine": "sqlserver-ex",
+                "DBParameterGroupFamily": "sqlserver-ex-10.5",
+                "DBEngineDescription": "Microsoft SQL Server Express Edition",
+                "EngineVersion": "10.50.2789.0.v1",
+                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.2789.0.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "10.50.6529.0.v1"
-                    }, 
+                    },
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.00.6020.0.v1"
-                    }, 
+                    },
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.00.5000.0.v1"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "sqlserver-ex", 
-                "DBParameterGroupFamily": "sqlserver-ex-10.5", 
-                "DBEngineDescription": "Microsoft SQL Server Express Edition", 
-                "EngineVersion": "10.50.6000.34.v1", 
-                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.6000.34.v1", 
+                "Engine": "sqlserver-ex",
+                "DBParameterGroupFamily": "sqlserver-ex-10.5",
+                "DBEngineDescription": "Microsoft SQL Server Express Edition",
+                "EngineVersion": "10.50.6000.34.v1",
+                "DBEngineVersionDescription": "SQL Server 2008 R2 10.50.6000.34.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "10.50.6529.0.v1"
-                    }, 
+                    },
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.00.6020.0.v1"
-                    }, 
+                    },
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.00.5000.0.v1"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "sqlserver-ex", 
-                "DBParameterGroupFamily": "sqlserver-ex-10.5", 
-                "DBEngineDescription": "Microsoft SQL Server Express Edition", 
-                "EngineVersion": "10.50.6529.0.v1", 
-                "DBEngineVersionDescription": "SQL Server 10.50.6529.0.v1", 
+                "Engine": "sqlserver-ex",
+                "DBParameterGroupFamily": "sqlserver-ex-10.5",
+                "DBEngineDescription": "Microsoft SQL Server Express Edition",
+                "EngineVersion": "10.50.6529.0.v1",
+                "DBEngineVersionDescription": "SQL Server 10.50.6529.0.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.00.6020.0.v1"
-                    }, 
+                    },
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.00.5000.0.v1"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "sqlserver-ex", 
-                "DBParameterGroupFamily": "sqlserver-ex-11.0", 
-                "DBEngineDescription": "Microsoft SQL Server Express Edition", 
-                "EngineVersion": "11.00.2100.60.v1", 
-                "DBEngineVersionDescription": "SQL Server 2012 11.00.2100.60.v1", 
+                "Engine": "sqlserver-ex",
+                "DBParameterGroupFamily": "sqlserver-ex-11.0",
+                "DBEngineDescription": "Microsoft SQL Server Express Edition",
+                "EngineVersion": "11.00.2100.60.v1",
+                "DBEngineVersionDescription": "SQL Server 2012 11.00.2100.60.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.00.6020.0.v1"
-                    }, 
+                    },
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.00.5000.0.v1"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "sqlserver-ex", 
-                "DBParameterGroupFamily": "sqlserver-ex-11.0", 
-                "DBEngineDescription": "Microsoft SQL Server Express Edition", 
-                "EngineVersion": "11.00.5058.0.v1", 
-                "DBEngineVersionDescription": "SQL Server 2012 11.00.5058.0.v1", 
+                "Engine": "sqlserver-ex",
+                "DBParameterGroupFamily": "sqlserver-ex-11.0",
+                "DBEngineDescription": "Microsoft SQL Server Express Edition",
+                "EngineVersion": "11.00.5058.0.v1",
+                "DBEngineVersionDescription": "SQL Server 2012 11.00.5058.0.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": false, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": false,
+                        "AutoUpgrade": false,
                         "EngineVersion": "11.00.6020.0.v1"
-                    }, 
+                    },
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.00.5000.0.v1"
                     }
                 ]
-            }, 
+            },
             {
-                "Engine": "sqlserver-ex", 
-                "DBParameterGroupFamily": "sqlserver-ex-11.0", 
-                "DBEngineDescription": "Microsoft SQL Server Express Edition", 
-                "EngineVersion": "11.00.6020.0.v1", 
-                "DBEngineVersionDescription": "SQL Server 11.00.6020.0.v1", 
+                "Engine": "sqlserver-ex",
+                "DBParameterGroupFamily": "sqlserver-ex-11.0",
+                "DBEngineDescription": "Microsoft SQL Server Express Edition",
+                "EngineVersion": "11.00.6020.0.v1",
+                "DBEngineVersionDescription": "SQL Server 11.00.6020.0.v1",
                 "ValidUpgradeTarget": [
                     {
-                        "Engine": "sqlserver-ex", 
-                        "IsMajorVersionUpgrade": true, 
-                        "AutoUpgrade": false, 
+                        "Engine": "sqlserver-ex",
+                        "IsMajorVersionUpgrade": true,
+                        "AutoUpgrade": false,
                         "EngineVersion": "12.00.5000.0.v1"
                     }
                 ]

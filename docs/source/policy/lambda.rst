@@ -176,3 +176,65 @@ EC2 instance with the ``Custodian`` tag, and stops it according to your policy.
 
 Congratulations! You have now installed your policy to run under Config rather
 than from your command line.
+
+
+Execution Options
+#################
+
+When running in Lambda you may want policy execution to run using particular 
+options corresponding to those passed to the custodian CLI.
+
+Execution in lambda comes with a default set of configuration which is 
+different from the defaults you might set when running through the command line:
+
+- Metrics are enabled
+- Output dir is set to a random /tmp/ directory
+- Caching of AWS resource state is disabled
+- Account ID is automatically set with info from sts
+- Region is automatically set to the region of the lambda (using the 
+  AWS_DEFAULT_REGION environment variable in lambda)
+
+When you want to override these settings, you must set 'execution-options' with
+one of the following keys:
+
+- region
+- cache
+- profile
+- account_id
+- assume_role
+- log_group
+- metrics_enabled
+- output_dir
+- cache_period
+- dryrun
+
+One useful thing we can do with these options is to make a policy execute in a 
+different account using assume_role. A policy definition for this looks like:
+
+.. code-block:: yaml
+
+    policies:
+      - name: my-first-policy-cross-account
+        mode:
+            type: periodic
+            schedule: "rate(1 day)"
+            role: arn:aws:iam::123456789012:role/lambda-role
+            execution-options:
+              assume_role: arn:aws:iam::210987654321:role/target-role
+              metrics_enabled: false
+        resource: ec2
+        filters:
+          - "tag:Custodian": present
+        actions:
+          - stop
+
+A couple of things to note here: 
+
+#. Metrics are pushed using the assumed role which may or may not be desired
+#. The mode must be periodic as there are restrictions on where policy 
+   executions can run according to the mode:
+
+   :Config: May run in a different region but not cross-account
+   :Event: Only run in the same region and account
+   :Periodic: May run in a different region and different account
+

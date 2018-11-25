@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "QueueUrls": [
+            "https://queue.amazonaws.com/644160558196/dead-letter-queue"
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6d2a0b9c-979e-5f52-a61a-5962c1e33d92", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6d2a0b9c-979e-5f52-a61a-5962c1e33d92", 
+                "content-length": "325", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 14 Feb 2018 15:22:37 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

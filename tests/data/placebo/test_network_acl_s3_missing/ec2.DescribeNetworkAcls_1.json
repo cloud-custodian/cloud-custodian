@@ -4,36 +4,36 @@
         "NetworkAcls": [
             {
                 "Associations": [], 
-                "NetworkAclId": "acl-a0772fc7", 
-                "VpcId": "vpc-ea9cf38d", 
+                "NetworkAclId": "acl-6c9db915", 
+                "VpcId": "vpc-cc5ae4b5", 
                 "Tags": [], 
                 "Entries": [
                     {
-                        "CidrBlock": "0.0.0.0/0", 
                         "RuleNumber": 100, 
                         "Protocol": "-1", 
                         "Egress": true, 
+                        "CidrBlock": "0.0.0.0/0", 
                         "RuleAction": "allow"
                     }, 
                     {
-                        "CidrBlock": "0.0.0.0/0", 
                         "RuleNumber": 32767, 
                         "Protocol": "-1", 
                         "Egress": true, 
+                        "CidrBlock": "0.0.0.0/0", 
                         "RuleAction": "deny"
                     }, 
                     {
-                        "CidrBlock": "0.0.0.0/0", 
                         "RuleNumber": 100, 
                         "Protocol": "-1", 
                         "Egress": false, 
+                        "CidrBlock": "0.0.0.0/0", 
                         "RuleAction": "allow"
                     }, 
                     {
-                        "CidrBlock": "0.0.0.0/0", 
                         "RuleNumber": 32767, 
                         "Protocol": "-1", 
                         "Egress": false, 
+                        "CidrBlock": "0.0.0.0/0", 
                         "RuleAction": "deny"
                     }
                 ], 
@@ -43,13 +43,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "d4a0331d-1e72-491d-8d6e-421b88639bf1", 
+            "RequestId": "625b1092-d441-44fe-94c0-a82860ab12f1", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sun, 26 Feb 2017 17:18:07 GMT"
+                "date": "Mon, 26 Jun 2017 18:49:42 GMT"
             }
         }
     }

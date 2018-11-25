@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) msrest/0.6.1 msrest_azure/0.5.0
+          networkmanagementclient/2.2.1 Azure-SDK-For-Python]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/eastus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-06-01
+  response:
+    body: {string: '{"error":{"code":"AuthorizationFailed","message":"The client ''9330bac4-fce1-452f-b25c-b7294e335449''
+        with object id ''9330bac4-fce1-452f-b25c-b7294e335449'' does not have authorization
+        to perform action ''Microsoft.Network/locations/operations/read'' over scope
+        ''/subscriptions/2a6b40d9-16cb-4676-8609-d5a1df110803''."}}'}
+    headers:
+      Cache-Control: [no-cache]
+      Connection: [close]
+      Content-Length: ['314']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 22 Oct 2018 16:57:26 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [88154f2c-0d26-493a-85cd-3419dca20b6a]
+      x-ms-failure-cause: [gateway]
+      x-ms-request-id: [88154f2c-0d26-493a-85cd-3419dca20b6a]
+      x-ms-routing-request-id: ['WESTUS2:20181022T165727Z:88154f2c-0d26-493a-85cd-3419dca20b6a']
+    status: {code: 403, message: Forbidden}
+version: 1

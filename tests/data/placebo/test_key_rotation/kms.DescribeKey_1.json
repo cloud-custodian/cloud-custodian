@@ -2,33 +2,33 @@
     "status_code": 200, 
     "data": {
         "KeyMetadata": {
-            "KeyId": "1ec621db-4406-4cb9-8e85-812386071791", 
-            "Description": "Default master key that protects my RDS database volumes when no other key is defined", 
+            "Origin": "AWS_KMS", 
+            "KeyId": "ffb1402c-040a-4b1f-b1e5-9918a0238aa7", 
+            "Description": "d1", 
+            "KeyManager": "CUSTOMER", 
             "Enabled": true, 
             "KeyUsage": "ENCRYPT_DECRYPT", 
             "KeyState": "Enabled", 
             "CreationDate": {
-                "hour": 14, 
+                "hour": 15, 
                 "__class__": "datetime", 
-                "month": 7, 
-                "second": 15, 
-                "microsecond": 831000, 
-                "year": 2016, 
-                "day": 28, 
-                "minute": 35
+                "month": 1, 
+                "second": 19, 
+                "microsecond": 13000, 
+                "year": 2018, 
+                "day": 30, 
+                "minute": 44
             }, 
-            "Arn": "arn:aws:kms:us-west-2:644160558196:key/1ec621db-4406-4cb9-8e85-812386071791", 
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/ffb1402c-040a-4b1f-b1e5-9918a0238aa7", 
             "AWSAccountId": "644160558196"
         }, 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "4cea5889-5506-11e6-8f68-5b596c7d84d9", 
+            "RequestId": "24f8a546-06a7-11e8-ba23-d1734408c8cd", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "4cea5889-5506-11e6-8f68-5b596c7d84d9", 
-                "content-length": "377", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Thu, 28 Jul 2016 21:00:23 GMT", 
+                "x-amzn-requestid": "24f8a546-06a7-11e8-ba23-d1734408c8cd", 
+                "content-length": "337", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }

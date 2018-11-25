@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:myec-001", 
+                "Tags": [
+                    {
+                        "Value": "tagval", 
+                        "Key": "tagkey"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:myec-002", 
+                "Tags": [
+                    {
+                        "Value": "tagval2", 
+                        "Key": "tagkey2"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:myec-003", 
+                "Tags": [
+                    {
+                        "Value": "tagval3", 
+                        "Key": "tagkey3"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e6427191-5888-11e7-bd6f-430f707d4198", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e6427191-5888-11e7-bd6f-430f707d4198", 
+                "date": "Sat, 24 Jun 2017 02:57:45 GMT", 
+                "content-length": "400", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

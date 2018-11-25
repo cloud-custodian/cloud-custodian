@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,12 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import time
-import logging
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from c7n.manager import resources
+import logging
+import time
+
+import six
+
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
     local_session, type_schema, get_retry)
@@ -42,17 +47,20 @@ class EMRCluster(QueryResourceManager):
         enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'
         id = 'Id'
-        dimension = 'ClusterId'
         date = "Status.Timeline.CreationDateTime"
         filter_name = None
+        dimension = None
 
     action_registry = actions
     filter_registry = filters
-    retry = staticmethod(get_retry(('Throttled',)))
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def __init__(self, ctx, data):
         super(EMRCluster, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'ClusterStates': [
+                    'running', 'bootstrapping', 'waiting']}]))
 
     @classmethod
     def get_permissions(cls):
@@ -112,13 +120,21 @@ class EMRCluster(QueryResourceManager):
         return result
 
 
+@EMRCluster.filter_registry.register('metrics')
+class EMRMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        # Job flow id is legacy name for cluster id
+        return [{'Name': 'JobFlowId', 'Value': resource['Id']}]
+
+
 @actions.register('mark-for-op')
 class TagDelayedAction(TagDelayedAction):
     """Action to specify an action to occur at a later date
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-mark-for-op
@@ -135,12 +151,13 @@ class TagDelayedAction(TagDelayedAction):
 
     permission = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(
             self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
 
 
 @actions.register('tag')
@@ -149,7 +166,7 @@ class TagTable(Tag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-tag-table
@@ -164,11 +181,12 @@ class TagTable(Tag):
 
     permissions = ('elasticmapreduce:AddTags',)
     batch_size = 1
+    retry = staticmethod(get_retry(('ThrottlingException',)))
 
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
-            client.add_tags(ResourceId=r['Id'], Tags=tags)
+            self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
 
 
 @actions.register('remove-tag')
@@ -177,7 +195,7 @@ class UntagTable(RemoveTag):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-remove-tag
@@ -210,7 +228,7 @@ class Terminate(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: emr-terminate
@@ -248,7 +266,7 @@ class QueryFilter(object):
         results = []
         for d in data:
             if not isinstance(d, dict):
-                raise ValueError(
+                raise PolicyValidationError(
                     "EMR Query Filter Invalid structure %s" % d)
             results.append(cls(d).validate())
         return results
@@ -259,19 +277,19 @@ class QueryFilter(object):
         self.value = None
 
     def validate(self):
-        if not len(self.data.keys()) == 1:
-            raise ValueError(
+        if not len(list(self.data.keys())) == 1:
+            raise PolicyValidationError(
                 "EMR Query Filter Invalid %s" % self.data)
-        self.key = self.data.keys()[0]
-        self.value = self.data.values()[0]
+        self.key = list(self.data.keys())[0]
+        self.value = list(self.data.values())[0]
 
         if self.key not in EMR_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
-            raise ValueError(
+            raise PolicyValidationError(
                 "EMR Query Filter invalid filter name %s" % (self.data))
 
         if self.value is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EMR Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)
@@ -279,7 +297,7 @@ class QueryFilter(object):
 
     def query(self):
         value = self.value
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, six.string_types):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}

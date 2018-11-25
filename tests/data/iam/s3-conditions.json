@@ -1,0 +1,48 @@
+[
+  {
+    "Id": "SourceArnLikeValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "ArnLike": {
+            "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+          },
+          "StringEquals": {
+            "aws:sourceVpc": "vpc-12345678"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceArnLikeInValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "ArnLike": {
+            "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+          },
+          "StringEquals": {
+            "aws:sourceVpc": "vpc-55252554"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  }
+]

@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VolumeModification": {
+            "TargetSize": 64, 
+            "TargetVolumeType": "io1", 
+            "ModificationState": "modifying", 
+            "VolumeId": "vol-0073dcd216489ea1b", 
+            "TargetIops": 500, 
+            "StartTime": {
+                "hour": 10, 
+                "__class__": "datetime", 
+                "month": 7, 
+                "second": 19, 
+                "microsecond": 638000, 
+                "year": 2017, 
+                "day": 11, 
+                "minute": 21
+            }, 
+            "Progress": 0, 
+            "OriginalVolumeType": "gp2", 
+            "OriginalIops": 100, 
+            "OriginalSize": 32
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7e76eacd-cefb-4808-a602-5ffb58a83e6c", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 11 Jul 2017 10:21:18 GMT"
+            }
+        }
+    }
+}

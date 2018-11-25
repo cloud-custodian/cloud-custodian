@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ServerSideEncryptionConfiguration": {
+            "Rules": [
+                {
+                    "ApplyServerSideEncryptionByDefault": {
+                        "SSEAlgorithm": "aws:kms"
+                    }
+                }
+            ]
+        }, 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "w4hO1yfvGMS/n1g9VssvqwqCYYpanNRZX1LoAkxgNFBB7Frwex+inhPCdIrbYD+/Qg3Ylc+XFuU=", 
+            "RequestId": "C232F5C8B017F7AC", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "w4hO1yfvGMS/n1g9VssvqwqCYYpanNRZX1LoAkxgNFBB7Frwex+inhPCdIrbYD+/Qg3Ylc+XFuU=", 
+                "date": "Wed, 15 Nov 2017 16:16:16 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "C232F5C8B017F7AC", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

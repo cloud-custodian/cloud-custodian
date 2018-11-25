@@ -1,0 +1,38 @@
+{
+    "version": "1.2",
+    "accountId": "644160558196",
+    "configurationItemCaptureTime": "2017-11-09T12:35:43.639000-05:00",
+    "configurationItemStatus": "ResourceDiscovered",
+    "configurationStateId": "1510248943639",
+    "configurationItemMD5Hash": "983bfae2b42b2835c96a322ff7d88b56",
+    "arn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/Migration-QAEAST-ELB/6b0fe08b851e2aa",
+    "resourceType": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    "resourceId": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/Migration-QAEAST-ELB/6b0fe08b851e2aa",
+    "resourceName": "Migration-QAEAST-ELB",
+    "awsRegion": "us-east-1",
+    "availabilityZone": "Multiple Availability Zones",
+    "resourceCreationTime": "2017-11-09T12:32:40.200000-05:00",
+    "tags": {
+	"App": "ARTIFACTPLATFORM",
+	"Env": "QA",
+	"Name": "Artifactory ELB",
+	"OwnerContact": "me@example.com",
+	"TeamName": "Frogger"
+    },
+    "relatedEvents": [{
+      "resourceType": "AWS::EC2::Subnet",
+      "resourceId": "subnet-ac333ccc",
+      "relationshipName": "Is attached to Subnet"
+    },
+    {
+      "resourceType": "AWS::EC2::VPC",
+      "resourceId": "vpc-bbaaeb9",
+      "relationshipName": "Is contained in Vpc"
+    }
+  ],
+  "configuration": "{\"loadBalancerArn\":\"arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/Migration-QAEAST-ELB/6b0fe08b851e2aa\",\"dNSName\":\"internal-Migration-QAEAST-ELB-91111.us-east-1.elb.amazonaws.com\",\"canonicalHostedZoneId\":\"Z11SXDOTRQ7ABC\",\"createdTime\":\"2017-11-09T17:32:40.200Z\",\"loadBalancerName\":\"Migration-QAEAST-ELB\",\"scheme\":\"internal\",\"vpcId\":\"vpc-bbaaeb9\",\"state\":{\"code\":\"active\",\"reason\":null},\"type\":\"application\",\"availabilityZones\":[{\"zoneName\":\"us-east-1b\",\"subnetId\":\"subnet-93111aaa\",\"loadBalancerAddresses\":[]},{\"zoneName\":\"us-east-1d\",\"subnetId\":\"subnet-95222bbb\",\"loadBalancerAddresses\":[]},{\"zoneName\":\"us-east-1a\",\"subnetId\":\"subnet-ac333ccc\",\"loadBalancerAddresses\":[]}],\"securityGroups\":[\"sg-111222333\",\"sg-333444555\",\"sg-666777888\",\"sg-aaacccddd\"],\"ipAddressType\":\"ipv4\"}",
+  "supplementaryConfiguration": {
+    "LoadBalancerAttributes": "[{\"key\":\"access_logs.s3.enabled\",\"value\":\"true\"},{\"key\":\"access_logs.s3.prefix\",\"value\":\"ARTIFACTPLATFORM\"},{\"key\":\"idle_timeout.timeout_seconds\",\"value\":\"300\"},{\"key\":\"access_logs.s3.bucket\",\"value\":\"elb-access-logs-us-east-1\"},{\"key\":\"deletion_protection.enabled\",\"value\":\"false\"}]",
+    "Tags": "[{\"key\":\"App\",\"value\":\"ARTIFACTPLATFORM\"},{\"key\":\"OwnerContact\",\"value\":\"me@example.com\"},{\"key\":\"TeamName\",\"value\":\"Frogger\"},{\"key\":\"Env\",\"value\":\"QA\"},{\"key\":\"Name\",\"value\":\"Artifact ELB\"}]"
+  }
+}

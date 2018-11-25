@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "NetworkInterfaceId": "eni-532fe48f", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a4018f1e-8c96-48db-a149-3859a52bb4ce", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 17:31:10 GMT", 
+                "x-amzn-requestid": "a4018f1e-8c96-48db-a149-3859a52bb4ce", 
+                "content-length": "610", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "NotebookInstanceStatus": "InService", 
+        "Url": "c7n-ni-test.notebook.us-east-1.sagemaker.aws", 
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
+        "NotebookInstanceName": "c7n-ni-test", 
+        "CreationTime": {
+            "hour": 10, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 51, 
+            "microsecond": 486000, 
+            "year": 2018, 
+            "day": 18, 
+            "minute": 59
+        }, 
+        "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/c7n-ni-test", 
+        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49", 
+        "SecurityGroups": [
+            "sg-6c7fa917"
+        ], 
+        "SubnetId": "subnet-efbcccb7", 
+        "LastModifiedTime": {
+            "hour": 11, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 16, 
+            "microsecond": 543000, 
+            "year": 2018, 
+            "day": 18, 
+            "minute": 5
+        }, 
+        "InstanceType": "ml.t2.medium"
+    }
+}

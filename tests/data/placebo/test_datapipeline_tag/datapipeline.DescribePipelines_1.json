@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e4f0a895-d492-11e7-b1c5-edcc08620081", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e4f0a895-d492-11e7-b1c5-edcc08620081", 
+                "date": "Tue, 28 Nov 2017 23:21:42 GMT", 
+                "content-length": "1230", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "pipelineDescriptionList": [
+            {
+                "fields": [
+                    {
+                        "stringValue": "AIDATHISISTHEAWSUSER1", 
+                        "key": "pipelineCreator"
+                    }, 
+                    {
+                        "stringValue": "2017-11-28T23:21:40", 
+                        "key": "@creationTime"
+                    }, 
+                    {
+                        "stringValue": "PipelineTagTest", 
+                        "key": "name"
+                    }, 
+                    {
+                        "stringValue": "PIPELINE", 
+                        "key": "@sphere"
+                    }, 
+                    {
+                        "stringValue": "df-0881198RSZJ5SK6MJDH", 
+                        "key": "@id"
+                    }, 
+                    {
+                        "stringValue": "PENDING", 
+                        "key": "@pipelineState"
+                    }, 
+                    {
+                        "stringValue": "123456789012", 
+                        "key": "@accountId"
+                    }, 
+                    {
+                        "stringValue": "PipelineTagTest1", 
+                        "key": "uniqueId"
+                    }, 
+                    {
+                        "stringValue": "AIDATHISISTHEAWSUSER1", 
+                        "key": "@userId"
+                    }
+                ], 
+                "pipelineId": "df-0881198RSZJ5SK6MJDH", 
+                "name": "PipelineTagTest", 
+                "tags": []
+            }
+        ]
+    }
+}

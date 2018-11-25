@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "71e07cc5-4072-48cc-9848-64ca676c8579", 
+            "HTTPHeaders": {
+                "date": "Mon, 29 Jan 2018 15:19:08 GMT", 
+                "x-amzn-requestid": "71e07cc5-4072-48cc-9848-64ca676c8579", 
+                "content-length": "56", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "expired-value", 
+                "Key": "expired-tag"
+            }
+        ]
+    }
+}

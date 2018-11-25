@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d98b27ad-be17-11e7-a343-7d848f086ed9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d98b27ad-be17-11e7-a343-7d848f086ed9", 
+                "date": "Tue, 31 Oct 2017 08:45:29 GMT", 
+                "content-length": "662", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test1target/05aed671d733ae95", 
+                "Tags": []
+            }, 
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test2target/d25fe039e7171dcb", 
+                "Tags": []
+            }
+        ]
+    }
+}

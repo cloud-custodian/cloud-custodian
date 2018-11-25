@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "808c512b-5ab1-11e7-b8e9-43ddd4290ee1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "808c512b-5ab1-11e7-b8e9-43ddd4290ee1", 
+                "date": "Mon, 26 Jun 2017 20:53:26 GMT", 
+                "content-length": "485", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:297650311398:loadbalancer/app/alb1/5170373bc122f100", 
+                "Tags": []
+            }
+        ]
+    }
+}

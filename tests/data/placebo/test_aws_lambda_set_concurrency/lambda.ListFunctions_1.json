@@ -1,0 +1,57 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }, 
+                "Version": "$LATEST", 
+                "CodeSha256": "5sFjAF4J+TcRvn8y5vjdJfhHhBOz8n+ULMPFfJvIFx4=", 
+                "FunctionName": "custodian-stop-night-asg", 
+                "MemorySize": 512, 
+                "CodeSize": 1033678, 
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:custodian-stop-night-asg", 
+                "Handler": "custodian_policy.run", 
+                "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+                "Timeout": 60, 
+                "LastModified": "2017-05-26T06:50:03.585+0000", 
+                "Runtime": "python2.7", 
+                "Description": "cloud-custodian lambda policy"
+            }, 
+            {
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }, 
+                "Version": "$LATEST", 
+                "CodeSha256": "8M2BSmxZu6Z8+V8ywJPG+JoRlAhYjSmoauKd8DqMZrY=", 
+                "FunctionName": "envcheck", 
+                "VpcConfig": {
+                    "SubnetIds": [], 
+                    "SecurityGroupIds": []
+                }, 
+                "MemorySize": 128, 
+                "CodeSize": 260, 
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:envcheck", 
+                "Handler": "lambda_function.lambda_handler", 
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution", 
+                "Timeout": 3, 
+                "LastModified": "2016-12-24T13:51:31.006+0000", 
+                "Runtime": "python2.7", 
+                "Description": ""
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7b1f483f-1263-11e8-9772-311cb0163833", 
+            "HTTPHeaders": {
+                "date": "Thu, 15 Feb 2018 15:18:31 GMT", 
+                "x-amzn-requestid": "7b1f483f-1263-11e8-9772-311cb0163833", 
+                "content-length": "1326", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

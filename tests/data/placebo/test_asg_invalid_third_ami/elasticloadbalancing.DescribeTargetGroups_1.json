@@ -1,0 +1,59 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d9683634-be17-11e7-ad79-774d9b254ac0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d9683634-be17-11e7-ad79-774d9b254ac0", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2216", 
+                "content-type": "text/xml", 
+                "date": "Tue, 31 Oct 2017 08:45:29 GMT"
+            }
+        }, 
+        "TargetGroups": [
+            {
+                "HealthCheckPath": "/", 
+                "HealthCheckIntervalSeconds": 30, 
+                "VpcId": "vpc-d2d616b5", 
+                "Protocol": "HTTP", 
+                "HealthCheckTimeoutSeconds": 5, 
+                "TargetType": "instance", 
+                "HealthCheckProtocol": "HTTP", 
+                "LoadBalancerArns": [
+                    "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/testing/1e0e18b15fe2aefa"
+                ], 
+                "UnhealthyThresholdCount": 2, 
+                "HealthyThresholdCount": 5, 
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test1target/05aed671d733ae95", 
+                "Matcher": {
+                    "HttpCode": "200"
+                }, 
+                "HealthCheckPort": "traffic-port", 
+                "Port": 80, 
+                "TargetGroupName": "test1target"
+            }, 
+            {
+                "HealthCheckPath": "/", 
+                "HealthCheckIntervalSeconds": 30, 
+                "VpcId": "vpc-d2d616b5", 
+                "Protocol": "HTTP", 
+                "HealthCheckTimeoutSeconds": 5, 
+                "TargetType": "instance", 
+                "HealthCheckProtocol": "HTTP", 
+                "LoadBalancerArns": [], 
+                "UnhealthyThresholdCount": 2, 
+                "HealthyThresholdCount": 5, 
+                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test2target/d25fe039e7171dcb", 
+                "Matcher": {
+                    "HttpCode": "200"
+                }, 
+                "HealthCheckPort": "traffic-port", 
+                "Port": 8080, 
+                "TargetGroupName": "test2target"
+            }
+        ]
+    }
+}

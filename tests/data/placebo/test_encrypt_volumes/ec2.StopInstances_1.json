@@ -3,7 +3,7 @@
     "data": {
         "StoppingInstances": [
             {
-                "InstanceId": "i-9432cb49", 
+                "InstanceId": "i-0aaaaec4b77188b69", 
                 "CurrentState": {
                     "Code": 64, 
                     "Name": "stopping"
@@ -15,8 +15,16 @@
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "ee37ee1a-46f8-4e15-9083-3a0ff58c68f9"
+            "RequestId": "292f2c94-e084-4f37-a7ef-540e36314ead", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 08 Jun 2017 18:17:38 GMT"
+            }
         }
     }
 }

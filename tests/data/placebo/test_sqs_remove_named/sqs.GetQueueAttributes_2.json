@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789012:root\"},\"Action\":\"sqs:Subscribe\"}]}"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ed825b59-3b81-5a0f-8691-09635ac1f0e7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ed825b59-3b81-5a0f-8691-09635ac1f0e7", 
+                "content-length": "612", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Tue, 19 Sep 2017 00:04:16 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

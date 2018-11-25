@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Name": "custodian-enable-bucket-encryption-aes256", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "xAI1rMD5m8c5VzCs2Gt4+cnh5sU5g/NqJDiaYYrVXDmnNn2PY6TmdCxL3qjcpPg3Eq36vQ+CMT4=", 
+            "RequestId": "F5349E8D45B693D9", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "xAI1rMD5m8c5VzCs2Gt4+cnh5sU5g/NqJDiaYYrVXDmnNn2PY6TmdCxL3qjcpPg3Eq36vQ+CMT4=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "F5349E8D45B693D9", 
+                "date": "Wed, 15 Nov 2017 16:15:50 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DirectoryArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AfdC26H6mEavsfJv5geWp9c", 
+        "AppliedSchemaArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AfdC26H6mEavsfJv5geWp9c/schema/gooseberry/1", 
+        "ObjectIdentifier": "AQH3Qtuh-phGr7Hyb-YHlqfX7MQvOPlER6ePtgQpDwq1Zg", 
+        "Name": "c7n-test", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "866ef0d2-4776-11e7-a547-59a2768c283b, 866ef0d2-4776-11e7-a547-59a2768c283b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "866ef0d2-4776-11e7-a547-59a2768c283b, 866ef0d2-4776-11e7-a547-59a2768c283b", 
+                "date": "Fri, 02 Jun 2017 09:33:24 GMT", 
+                "content-length": "305", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

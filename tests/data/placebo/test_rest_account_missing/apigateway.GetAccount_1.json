@@ -1,0 +1,22 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "52e76b2a-158d-11e8-b548-edb9fb9a94be", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "52e76b2a-158d-11e8-b548-edb9fb9a94be", 
+                "content-length": "52", 
+                "connection": "keep-alive", 
+                "date": "Mon, 19 Feb 2018 15:55:36 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "NotFoundException"
+            }
+        }, 
+        "Error": {
+            "Message": "Invalid Customer identifier specified", 
+            "Code": "NotFoundException"
+        }
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Vpcs": [
+            {
+                "VpcId": "vpc-02d5867a", 
+                "InstanceTenancy": "default", 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-e0efbf8a", 
+                        "CidrBlock": "10.4.0.0/16", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.4.0.0/16", 
+                "IsDefault": false
+            }, 
+            {
+                "VpcId": "vpc-d2d616b5", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "Default", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-33669f5a", 
+                        "CidrBlock": "172.31.0.0/16", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "172.31.0.0/16", 
+                "IsDefault": true
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "332804d7-8bad-4d6e-991f-8cec871b67f3", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Wed, 27 Dec 2017 15:36:09 GMT"
+            }
+        }
+    }
+}

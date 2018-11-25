@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBClusterParameterGroups": [
+            {
+                "DBClusterParameterGroupName": "default.aurora5.6", 
+                "DBParameterGroupFamily": "aurora5.6", 
+                "Description": "Default cluster parameter group for aurora5.6", 
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:cluster-pg:default.aurora5.6"
+            }, 
+            {
+                "DBClusterParameterGroupName": "pgc-orig", 
+                "DBParameterGroupFamily": "aurora5.6", 
+                "Description": "test", 
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-east-1:644160558196:cluster-pg:pgc-orig"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2162b1f2-606c-11e7-b69b-2771dfce4d4a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2162b1f2-606c-11e7-b69b-2771dfce4d4a", 
+                "date": "Tue, 04 Jul 2017 03:51:58 GMT", 
+                "content-length": "1188", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

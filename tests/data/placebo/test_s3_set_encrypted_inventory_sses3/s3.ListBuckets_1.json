@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "jnelson11", 
+            "ID": "cb8b9d465982cf7cc480d18ccfe6fd8e017a49374af0d4f5e764ab65a3773e8f"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 35
+                }, 
+                "Name": "custodian-inventory-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "x2YzlDTTkg6vVJFBL323/1VhuP+1s/IxyDKVWHrnSKY+SRrGZM0JhM9eWGBOeKar0r0n2h0+KnE=", 
+            "RequestId": "639A263A9744045C", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "x2YzlDTTkg6vVJFBL323/1VhuP+1s/IxyDKVWHrnSKY+SRrGZM0JhM9eWGBOeKar0r0n2h0+KnE=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "639A263A9744045C", 
+                "date": "Tue, 14 Nov 2017 19:35:59 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

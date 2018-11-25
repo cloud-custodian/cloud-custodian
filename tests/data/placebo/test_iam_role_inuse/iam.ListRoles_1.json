@@ -1,69 +1,37 @@
 {
-    "status_code": 200,
+    "status_code": 200, 
     "data": {
         "ResponseMetadata": {
-            "RetryAttempts": 0,
-            "HTTPStatusCode": 200,
-            "RequestId": "01498da7-84ea-11e6-8e5f-8be775b3b69a",
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c6a4ec95-1190-11e8-9c33-d19e3966347b", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "01498da7-84ea-11e6-8e5f-8be775b3b69a",
-                "date": "Tue, 27 Sep 2016 19:38:45 GMT",
-                "content-length": "4194",
-                "content-type": "text/xml"
+                "x-amzn-requestid": "c6a4ec95-1190-11e8-9c33-d19e3966347b", 
+                "vary": "Accept-Encoding", 
+                "content-length": "47478", 
+                "content-type": "text/xml", 
+                "date": "Wed, 14 Feb 2018 14:10:14 GMT"
             }
-        },
-        "IsTruncated": false,
+        }, 
+        "IsTruncated": false, 
         "Roles": [
             {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Sid%22%3A%22%22%2C%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22config.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAJUQKESVQ5AAKMZYH4",
+                "Description": "SageMaker execution role created from the SageMaker AWS Management Console.",
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22sagemaker.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+                "RoleId": "AROAI5BIHC4SP5ZVKBANK",
                 "CreateDate": {
-                    "hour": 10,
+                    "hour": 17,
                     "__class__": "datetime",
-                    "month": 7,
-                    "second": 12,
+                    "month": 1,
+                    "second": 49,
                     "microsecond": 0,
-                    "year": 2016,
-                    "day": 24,
-                    "minute": 38
+                    "year": 2018,
+                    "day": 8,
+                    "minute": 23
                 },
-                "RoleName": "config-role-us-east-1",
+                "RoleName": "AmazonSageMaker-ExecutionRole-20180108T122369",
                 "Path": "/service-role/",
-                "Arn": "arn:aws:iam::644160558196:role/service-role/config-role-us-east-1"
-            },
-            {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Sid%22%3A%22%22%2C%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22config.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAIA6IINYISYTIWLA2S",
-                "CreateDate": {
-                    "hour": 10,
-                    "__class__": "datetime",
-                    "month": 7,
-                    "second": 6,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 24,
-                    "minute": 39
-                },
-                "RoleName": "config-role-us-west-1",
-                "Path": "/service-role/",
-                "Arn": "arn:aws:iam::644160558196:role/service-role/config-role-us-west-1"
-            },
-            {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Sid%22%3A%22%22%2C%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22config.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAIF4EPYR5G232FVL52",
-                "CreateDate": {
-                    "hour": 10,
-                    "__class__": "datetime",
-                    "month": 7,
-                    "second": 6,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 24,
-                    "minute": 41
-                },
-                "RoleName": "config-role-us-west-2",
-                "Path": "/service-role/",
-                "Arn": "arn:aws:iam::644160558196:role/service-role/config-role-us-west-2"
+                "Arn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369"
             },
             {
                 "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
@@ -83,38 +51,21 @@
                 "Arn": "arn:aws:iam::644160558196:role/custodian-mu"
             },
             {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAIDZBE5CMRCNENDQD2",
-                "CreateDate": {
-                    "hour": 12,
-                    "__class__": "datetime",
-                    "month": 6,
-                    "second": 5,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 26,
-                    "minute": 11
-                },
-                "RoleName": "lambda_basic_execution",
-                "Path": "/",
-                "Arn": "arn:aws:iam::644160558196:role/lambda_basic_execution"
-            },
-            {
                 "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAJ4VMUPRSWMMW6EQIY",
+                "RoleId": "AROAJVFVDALUIEJPNG236",
                 "CreateDate": {
-                    "hour": 1,
+                    "hour": 14,
                     "__class__": "datetime",
-                    "month": 9,
-                    "second": 56,
+                    "month": 12,
+                    "second": 2,
                     "microsecond": 0,
                     "year": 2016,
-                    "day": 23,
-                    "minute": 56
+                    "day": 19,
+                    "minute": 46
                 },
-                "RoleName": "mandeep",
+                "RoleName": "ecsInstanceRole",
                 "Path": "/",
-                "Arn": "arn:aws:iam::644160558196:role/mandeep"
+                "Arn": "arn:aws:iam::644160558196:role/ecsInstanceRole"
             },
             {
                 "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
@@ -132,40 +83,6 @@
                 "RoleName": "root_joshua",
                 "Path": "/",
                 "Arn": "arn:aws:iam::644160558196:role/root_joshua"
-            },
-            {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAIYSSSIEWDYBRVPH2B",
-                "CreateDate": {
-                    "hour": 18,
-                    "__class__": "datetime",
-                    "month": 9,
-                    "second": 46,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 26,
-                    "minute": 25
-                },
-                "RoleName": "used_in_ecs",
-                "Path": "/",
-                "Arn": "arn:aws:iam::644160558196:role/used_in_ecs"
-            },
-            {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAIYSSSIEWDYBRVPH2C",
-                "CreateDate": {
-                    "hour": 18,
-                    "__class__": "datetime",
-                    "month": 9,
-                    "second": 46,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 26,
-                    "minute": 25
-                },
-                "RoleName": "not_used_in_ecs",
-                "Path": "/",
-                "Arn": "arn:aws:iam::644160558196:role/not_used_in_ecs"
             }
         ]
     }

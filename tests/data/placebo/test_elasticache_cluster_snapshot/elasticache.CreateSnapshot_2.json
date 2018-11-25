@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Snapshot": {
+            "Engine": "redis", 
+            "CacheParameterGroupName": "default.redis3.2", 
+            "VpcId": "vpc-f1516b97", 
+            "CacheClusterId": "myec-001", 
+            "SnapshotRetentionLimit": 0, 
+            "NumCacheNodes": 1, 
+            "SnapshotName": "backup-myec-001-2017-06-23", 
+            "CacheClusterCreateTime": {
+                "hour": 2, 
+                "__class__": "datetime", 
+                "month": 6, 
+                "second": 21, 
+                "microsecond": 311000, 
+                "year": 2017, 
+                "day": 24, 
+                "minute": 3
+            }, 
+            "AutoMinorVersionUpgrade": true, 
+            "PreferredAvailabilityZone": "us-east-1d", 
+            "SnapshotStatus": "creating", 
+            "SnapshotSource": "manual", 
+            "SnapshotWindow": "08:00-09:00", 
+            "EngineVersion": "3.2.4", 
+            "NodeSnapshots": [
+                {
+                    "CacheSize": "", 
+                    "CacheNodeId": "0001", 
+                    "CacheNodeCreateTime": {
+                        "hour": 2, 
+                        "__class__": "datetime", 
+                        "month": 6, 
+                        "second": 21, 
+                        "microsecond": 311000, 
+                        "year": 2017, 
+                        "day": 24, 
+                        "minute": 3
+                    }
+                }
+            ], 
+            "CacheSubnetGroupName": "msg", 
+            "Port": 6379, 
+            "PreferredMaintenanceWindow": "fri:10:00-fri:11:00", 
+            "CacheNodeType": "cache.r3.large"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "982429a2-5889-11e7-9878-17c2c2d54675", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "982429a2-5889-11e7-9878-17c2c2d54675", 
+                "date": "Sat, 24 Jun 2017 03:02:43 GMT", 
+                "content-length": "1491", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

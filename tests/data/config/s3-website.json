@@ -1,0 +1,31 @@
+{
+    "configurationItemCaptureTime": "2017-08-11T05:43:30.809000-04:00",
+    "resourceCreationTime": "2017-08-11T05:30:14-04:00",
+    "availabilityZone": "Regional",
+    "awsRegion": "us-east-1",
+    "tags": {},
+    "resourceType": "AWS::S3::Bucket",
+    "resourceId": "testing-99",
+    "configurationStateId": "1502444610809",
+    "relatedEvents": [
+	"0d2355e4-8f0c-448e-91a6-c01b995452ea"
+    ],
+    "relationships": [],
+    "arn": "arn:aws:s3:::testing-99",
+    "version": "1.2",
+    "configurationItemMD5Hash": "fa8df39e3b328084ac9c4efedb282349",
+    "supplementaryConfiguration": {
+	"BucketAccelerateConfiguration": "{\"status\":null}",
+	"BucketVersioningConfiguration": "{\"status\":\"Off\",\"isMfaDeleteEnabled\":null}",
+	"BucketWebsiteConfiguration": "{\"indexDocumentSuffix\":\"index.html\",\"errorDocument\":null,\"redirectAllRequestsTo\":null,\"routingRules\":[{\"condition\":{\"keyPrefixEquals\":\"docs/\",\"httpErrorCodeReturnedEquals\":\"404\"},\"redirect\":{\"protocol\":null,\"hostName\":null,\"replaceKeyPrefixWith\":null,\"replaceKeyWith\":\"error.html\",\"httpRedirectCode\":null}}]}",
+	"AccessControlList": "\"{\\\"grantSet\\\":null,\\\"grantList\\\":[{\\\"grantee\\\":{\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\",\\\"displayName\\\":\\\"mandeep.bal\\\"},\\\"permission\\\":\\\"FullControl\\\"},{\\\"grantee\\\":\\\"AllUsers\\\",\\\"permission\\\":\\\"Read\\\"}],\\\"owner\\\":{\\\"displayName\\\":\\\"mandeep.bal\\\",\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\"},\\\"isRequesterCharged\\\":false}\"",
+	"BucketLoggingConfiguration": "{\"destinationBucketName\":null,\"logFilePrefix\":null}",
+	"BucketPolicy": "{\"policyText\":null}",
+	"BucketNotificationConfiguration": "{\"configurations\":{}}",
+	"IsRequesterPaysEnabled": "false"
+    },
+    "resourceName": "testing-99",
+    "configuration": "{\"name\":\"testing-99\",\"owner\":{\"displayName\":\"mandeep.bal\",\"id\":\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\"},\"creationDate\":\"2017-08-11T09:30:14.000Z\"}",
+    "configurationItemStatus": "OK",
+    "accountId": "644160558196"
+}

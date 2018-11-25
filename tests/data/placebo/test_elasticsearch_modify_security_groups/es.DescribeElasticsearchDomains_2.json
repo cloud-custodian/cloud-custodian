@@ -1,0 +1,64 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainStatusList": [
+            {
+                "ElasticsearchClusterConfig": {
+                    "DedicatedMasterEnabled": false, 
+                    "InstanceCount": 1, 
+                    "ZoneAwarenessEnabled": false, 
+                    "InstanceType": "t2.small.elasticsearch"
+                }, 
+                "DomainId": "644160558196/c7n-sg-test", 
+                "AdvancedOptions": {
+                    "rest.action.multi.allow_explicit_index": "true"
+                }, 
+                "VPCOptions": {
+                    "SubnetIds": [
+                        "subnet-3a334610"
+                    ], 
+                    "VPCId": "vpc-d2d616b5", 
+                    "SecurityGroupIds": [
+                        "sg-6c7fa917", 
+                        "sg-9a5386e9"
+                    ], 
+                    "AvailabilityZones": [
+                        "us-east-1d"
+                    ]
+                }, 
+                "Created": true, 
+                "Deleted": false, 
+                "DomainName": "c7n-sg-test", 
+                "EBSOptions": {
+                    "VolumeSize": 10, 
+                    "VolumeType": "gp2", 
+                    "EBSEnabled": true
+                }, 
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                }, 
+                "ElasticsearchVersion": "6.0", 
+                "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/c7n-sg-test/*\"}]}", 
+                "Processing": true, 
+                "Endpoints": {
+                    "vpc": "vpc-c7n-sg-test-c2aoizsz6tzjktl3mb4mgzpqee.us-east-1.es.amazonaws.com"
+                }, 
+                "EncryptionAtRestOptions": {
+                    "Enabled": false
+                }, 
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/c7n-sg-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "dca1375e-fbb3-11e7-b7e3-97d432566e78", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "dca1375e-fbb3-11e7-b7e3-97d432566e78", 
+                "date": "Wed, 17 Jan 2018 18:25:57 GMT", 
+                "content-length": "1190", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

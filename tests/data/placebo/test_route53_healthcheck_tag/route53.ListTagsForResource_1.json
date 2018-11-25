@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceTagSet": {
+            "ResourceType": "healthcheck", 
+            "ResourceId": "9359372c-3845-4998-8cb4-f617ed711376", 
+            "Tags": [
+                {
+                    "Value": "xyz", 
+                    "Key": "abc"
+                }, 
+                {
+                    "Value": "testhealthcheck", 
+                    "Key": "Name"
+                }
+            ]
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "430c8fd1-368b-11e7-b634-115b92c7b912", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "430c8fd1-368b-11e7-b634-115b92c7b912", 
+                "date": "Thu, 11 May 2017 20:49:00 GMT", 
+                "content-length": "381", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

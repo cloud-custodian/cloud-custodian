@@ -1,0 +1,68 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Cluster": {
+            "Status": "modifying", 
+            "SubnetGroup": "c7n-dax-subnet-group", 
+            "NodeType": "dax.t2.small", 
+            "ClusterName": "c7n-dax", 
+            "ActiveNodes": 1, 
+            "TotalNodes": 1, 
+            "IamRoleArn": "arn:aws:iam::644160558196:role/service-role/C7N-DAXtoDynamoDB-Role", 
+            "SecurityGroups": [
+                {
+                    "Status": "adding", 
+                    "SecurityGroupIdentifier": "sg-72916c3b"
+                }, 
+                {
+                    "Status": "removing", 
+                    "SecurityGroupIdentifier": "sg-4b9ada34"
+                }
+            ], 
+            "ClusterArn": "arn:aws:dax:us-east-1:644160558196:cache/c7n-dax", 
+            "Nodes": [
+                {
+                    "Endpoint": {
+                        "Port": 8111, 
+                        "Address": "c7n-dax-a.qgcgte.0001.dax.use1.cache.amazonaws.com"
+                    }, 
+                    "NodeStatus": "available", 
+                    "ParameterGroupStatus": "in-sync", 
+                    "NodeId": "c7n-dax-a", 
+                    "AvailabilityZone": "us-east-1c", 
+                    "NodeCreateTime": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 5, 
+                        "second": 21, 
+                        "microsecond": 834000, 
+                        "year": 2018, 
+                        "day": 14, 
+                        "minute": 4
+                    }
+                }
+            ], 
+            "ClusterDiscoveryEndpoint": {
+                "Port": 8111, 
+                "Address": "c7n-dax.qgcgte.clustercfg.dax.use1.cache.amazonaws.com"
+            }, 
+            "ParameterGroup": {
+                "NodeIdsToReboot": [], 
+                "ParameterGroupName": "default.dax1.0", 
+                "ParameterApplyStatus": "in-sync"
+            }, 
+            "PreferredMaintenanceWindow": "wed:05:30-wed:06:30"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7c32a9b0-5782-11e8-8d38-2b6f8936bddb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7c32a9b0-5782-11e8-8d38-2b6f8936bddb", 
+                "date": "Mon, 14 May 2018 14:24:17 GMT", 
+                "content-length": "954", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

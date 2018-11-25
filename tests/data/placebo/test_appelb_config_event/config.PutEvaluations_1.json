@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "FailedEvaluations": [],
+        "ResponseMetadata": {
+            "RequestId": "46fadbcf-b806-11e8-bcd8-a5874065ffe6",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "46fadbcf-b806-11e8-bcd8-a5874065ffe6",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "24",
+                "date": "Fri, 14 Sep 2018 10:09:32 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

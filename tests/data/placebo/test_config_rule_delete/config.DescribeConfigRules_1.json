@@ -1,0 +1,84 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleState": "ACTIVE", 
+                "Description": "cloud-custodian lambda policy", 
+                "ConfigRuleName": "custodian-bucket-tags", 
+                "ConfigRuleArn": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-y67kde", 
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA", 
+                    "SourceIdentifier": "arn:aws:lambda:us-east-2:644160558196:function:custodian-bucket-tags", 
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config", 
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                }, 
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::S3::Bucket"
+                    ]
+                }, 
+                "ConfigRuleId": "config-rule-y67kde"
+            }, 
+            {
+                "ConfigRuleState": "ACTIVE", 
+                "Description": "cloud-custodian lambda policy", 
+                "ConfigRuleName": "custodian-bucket-ver-tags", 
+                "ConfigRuleArn": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-emfxvp", 
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA", 
+                    "SourceIdentifier": "arn:aws:lambda:us-east-2:644160558196:function:custodian-bucket-ver-tags", 
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config", 
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                }, 
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::S3::Bucket"
+                    ]
+                }, 
+                "ConfigRuleId": "config-rule-emfxvp"
+            }, 
+            {
+                "ConfigRuleState": "ACTIVE", 
+                "Description": "cloud-custodian lambda policy", 
+                "ConfigRuleName": "custodian-db-tags", 
+                "ConfigRuleArn": "arn:aws:config:us-east-2:644160558196:config-rule/config-rule-whifsj", 
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA", 
+                    "SourceIdentifier": "arn:aws:lambda:us-east-2:644160558196:function:custodian-db-tags", 
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config", 
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                }, 
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::RDS::DBInstance"
+                    ]
+                }, 
+                "ConfigRuleId": "config-rule-whifsj"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0cf50dbd-13d8-11e8-8757-5facac197d02", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0cf50dbd-13d8-11e8-8757-5facac197d02", 
+                "date": "Sat, 17 Feb 2018 11:45:28 GMT", 
+                "content-length": "1579", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

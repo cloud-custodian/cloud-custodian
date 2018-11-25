@@ -1,40 +1,28 @@
 {
     "status_code": 200,
     "data": {
+        "ResponseMetadata": {
+            "RequestId": "47D32013FF16CE2C",
+            "HostId": "TUoORNPt4HgX+5AJ/Os8prL7LXW0GKeC0Qn962RiPl1psh5CL/dZ/TO2zNnR3TrHFFPoqT3SlQY=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "TUoORNPt4HgX+5AJ/Os8prL7LXW0GKeC0Qn962RiPl1psh5CL/dZ/TO2zNnR3TrHFFPoqT3SlQY=",
+                "x-amz-request-id": "47D32013FF16CE2C",
+                "date": "Wed, 28 Mar 2018 10:45:19 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
         "TagSet": [
             {
-                "Value": "CMDBEnvironment",
-                "Key": "ENVTEST"
+                "Key": "env",
+                "Value": "dev"
             },
             {
-                "Value": "ASV",
-                "Key": "ASVTEST"
-            },
-            {
-                "Value": "OwnerContact",
-                "Key": "AutomatedTester"
-            },
-            {
-                "Value": "mark-test",
-                "Key": "testtag"
-            },
-            {
-                "Value": "Resource does not meet policy: delete@YYYY/MM/DD",
-                "Key": "maid_status"
+                "Key": "maid_status",
+                "Value": "blarg"
             }
-        ],
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200,
-            "RetryAttempts": 0,
-            "HostId": "djM9fww+ngKM1mj3hEgKVN0uceZIfkPfNf8W9j39POr38RQbpD6PlWt/4mD/cpDvRCLirDbVQz0=",
-            "RequestId": "086E85625A85B53D",
-            "HTTPHeaders": {
-                "x-amz-id-2": "djM9fww+ngKM1mj3hEgKVN0uceZIfkPfNf8W9j39POr38RQbpD6PlWt/4mD/cpDvRCLirDbVQz0=",
-                "date": "Thu, 08 Sep 2016 22:38:55 GMT",
-                "transfer-encoding": "chunked",
-                "x-amz-request-id": "086E85625A85B53D",
-                "server": "AmazonS3"
-            }
-        }
+        ]
     }
 }

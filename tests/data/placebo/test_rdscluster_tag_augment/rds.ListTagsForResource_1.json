@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fb11fe91-5c32-11e7-887a-3bb31b4e417f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fb11fe91-5c32-11e7-887a-3bb31b4e417f", 
+                "date": "Wed, 28 Jun 2017 18:52:48 GMT", 
+                "content-length": "384", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "cbar", 
+                "Key": "cfoo"
+            }
+        ]
+    }
+}

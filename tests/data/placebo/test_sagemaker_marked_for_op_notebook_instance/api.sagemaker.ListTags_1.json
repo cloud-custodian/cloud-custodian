@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "16821d5a-edf9-41ee-a8c2-8d93d6b2f279", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Jan 2018 17:27:31 GMT", 
+                "x-amzn-requestid": "16821d5a-edf9-41ee-a8c2-8d93d6b2f279", 
+                "content-length": "95", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Tags": [
+            {
+                "Value": "Resource does not meet policy: stop@2018/01/19", 
+                "Key": "custodian_cleanup"
+            }
+        ]
+    }
+}

@@ -1,0 +1,136 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ETag": "E38SRS4YTU0YP1", 
+        "DistributionConfig": {
+            "Comment": "", 
+            "CacheBehaviors": {
+                "Quantity": 0
+            }, 
+            "IsIPV6Enabled": true, 
+            "Logging": {
+                "Bucket": "", 
+                "Prefix": "", 
+                "Enabled": false, 
+                "IncludeCookies": false
+            }, 
+            "WebACLId": "", 
+            "Origins": {
+                "Items": [
+                    {
+                        "OriginPath": "/customer", 
+                        "CustomOriginConfig": {
+                            "OriginSslProtocols": {
+                                "Items": [
+                                    "TLSv1", 
+                                    "TLSv1.1", 
+                                    "TLSv1.2"
+                                ], 
+                                "Quantity": 3
+                            }, 
+                            "OriginProtocolPolicy": "http-only", 
+                            "OriginReadTimeout": 30, 
+                            "HTTPPort": 80, 
+                            "HTTPSPort": 443, 
+                            "OriginKeepaliveTimeout": 5
+                        }, 
+                        "CustomHeaders": {
+                            "Quantity": 0
+                        }, 
+                        "Id": "Custom-custom.com/customer", 
+                        "DomainName": "custom.com"
+                    }, 
+                    {
+                        "S3OriginConfig": {
+                            "OriginAccessIdentity": ""
+                        }, 
+                        "OriginPath": "/distribution", 
+                        "CustomHeaders": {
+                            "Quantity": 0
+                        }, 
+                        "Id": "S3-c7n-cloudfront-test/distribution", 
+                        "DomainName": "c7n-cloudfront-test.s3.amazonaws.com"
+                    }
+                ], 
+                "Quantity": 2
+            }, 
+            "DefaultRootObject": "", 
+            "PriceClass": "PriceClass_All", 
+            "Enabled": false, 
+            "DefaultCacheBehavior": {
+                "TrustedSigners": {
+                    "Enabled": false, 
+                    "Quantity": 0
+                }, 
+                "LambdaFunctionAssociations": {
+                    "Quantity": 0
+                }, 
+                "TargetOriginId": "S3-c7n-cloudfront-test/distribution", 
+                "ViewerProtocolPolicy": "allow-all", 
+                "ForwardedValues": {
+                    "Headers": {
+                        "Quantity": 0
+                    }, 
+                    "Cookies": {
+                        "Forward": "none"
+                    }, 
+                    "QueryStringCacheKeys": {
+                        "Quantity": 0
+                    }, 
+                    "QueryString": false
+                }, 
+                "MaxTTL": 31536000, 
+                "SmoothStreaming": false, 
+                "DefaultTTL": 86400, 
+                "AllowedMethods": {
+                    "Items": [
+                        "HEAD", 
+                        "GET"
+                    ], 
+                    "CachedMethods": {
+                        "Items": [
+                            "HEAD", 
+                            "GET"
+                        ], 
+                        "Quantity": 2
+                    }, 
+                    "Quantity": 2
+                }, 
+                "MinTTL": 0, 
+                "Compress": false
+            }, 
+            "CallerReference": "0.438098291625", 
+            "ViewerCertificate": {
+                "CloudFrontDefaultCertificate": true, 
+                "MinimumProtocolVersion": "SSLv3", 
+                "CertificateSource": "cloudfront"
+            }, 
+            "CustomErrorResponses": {
+                "Quantity": 0
+            }, 
+            "HttpVersion": "http2", 
+            "Restrictions": {
+                "GeoRestriction": {
+                    "RestrictionType": "none", 
+                    "Quantity": 0
+                }
+            }, 
+            "Aliases": {
+                "Quantity": 0
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c9c71ab6-587b-11e7-a340-25b0f9deb814", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c9c71ab6-587b-11e7-a340-25b0f9deb814", 
+                "content-length": "2820", 
+                "vary": "Accept-Encoding", 
+                "etag": "E38SRS4YTU0YP1", 
+                "date": "Sat, 24 Jun 2017 01:23:54 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

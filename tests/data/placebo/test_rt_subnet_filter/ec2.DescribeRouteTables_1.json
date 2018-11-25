@@ -1,0 +1,158 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4d9c5973-7813-4021-869d-55865f8bc1eb", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sat, 19 Aug 2017 00:53:51 GMT"
+            }
+        }, 
+        "RouteTables": [
+            {
+                "Associations": [
+                    {
+                        "RouteTableAssociationId": "rtbassoc-379e3d5c", 
+                        "Main": true, 
+                        "RouteTableId": "rtb-309e3d5b"
+                    }
+                ], 
+                "RouteTableId": "rtb-309e3d5b", 
+                "VpcId": "vpc-399e3d52", 
+                "PropagatingVgws": [], 
+                "Tags": [], 
+                "Routes": [
+                    {
+                        "GatewayId": "local", 
+                        "DestinationCidrBlock": "172.31.0.0/16", 
+                        "State": "active", 
+                        "Origin": "CreateRouteTable"
+                    }, 
+                    {
+                        "GatewayId": "igw-3d9e3d56", 
+                        "DestinationCidrBlock": "0.0.0.0/0", 
+                        "State": "active", 
+                        "Origin": "CreateRoute"
+                    }
+                ]
+            }, 
+            {
+                "Associations": [
+                    {
+                        "RouteTableAssociationId": "rtbassoc-e1839e84", 
+                        "Main": true, 
+                        "RouteTableId": "rtb-0d91a368"
+                    }
+                ], 
+                "RouteTableId": "rtb-0d91a368", 
+                "VpcId": "vpc-1cc8e779", 
+                "PropagatingVgws": [], 
+                "Tags": [], 
+                "Routes": [
+                    {
+                        "GatewayId": "local", 
+                        "DestinationCidrBlock": "10.0.0.0/16", 
+                        "State": "active", 
+                        "Origin": "CreateRouteTable"
+                    }
+                ]
+            }, 
+            {
+                "Associations": [
+                    {
+                        "SubnetId": "subnet-3766a96e", 
+                        "RouteTableAssociationId": "rtbassoc-3d4cc758", 
+                        "Main": false, 
+                        "RouteTableId": "rtb-e888328d"
+                    }, 
+                    {
+                        "RouteTableAssociationId": "rtbassoc-324cc757", 
+                        "Main": true, 
+                        "RouteTableId": "rtb-e888328d"
+                    }
+                ], 
+                "RouteTableId": "rtb-e888328d", 
+                "VpcId": "vpc-cb3e8cae", 
+                "PropagatingVgws": [], 
+                "Tags": [], 
+                "Routes": [
+                    {
+                        "Origin": "CreateRoute", 
+                        "DestinationCidrBlock": "10.244.1.0/24", 
+                        "NetworkInterfaceId": "eni-961cc8ce", 
+                        "State": "blackhole"
+                    }, 
+                    {
+                        "Origin": "CreateRoute", 
+                        "DestinationCidrBlock": "10.244.2.0/24", 
+                        "NetworkInterfaceId": "eni-a91cc8f1", 
+                        "State": "blackhole"
+                    }, 
+                    {
+                        "Origin": "CreateRoute", 
+                        "DestinationCidrBlock": "10.244.3.0/24", 
+                        "NetworkInterfaceId": "eni-4a1dc912", 
+                        "State": "blackhole"
+                    }, 
+                    {
+                        "Origin": "CreateRoute", 
+                        "DestinationCidrBlock": "10.244.4.0/24", 
+                        "NetworkInterfaceId": "eni-6a1dc932", 
+                        "State": "blackhole"
+                    }, 
+                    {
+                        "GatewayId": "local", 
+                        "DestinationCidrBlock": "172.20.0.0/16", 
+                        "State": "active", 
+                        "Origin": "CreateRouteTable"
+                    }, 
+                    {
+                        "GatewayId": "igw-5bce113e", 
+                        "DestinationCidrBlock": "0.0.0.0/0", 
+                        "State": "active", 
+                        "Origin": "CreateRoute"
+                    }
+                ]
+            }, 
+            {
+                "Associations": [
+                    {
+                        "SubnetId": "subnet-d5fecdb0", 
+                        "RouteTableAssociationId": "rtbassoc-e2839e87", 
+                        "Main": false, 
+                        "RouteTableId": "rtb-0c91a369"
+                    }
+                ], 
+                "RouteTableId": "rtb-0c91a369", 
+                "VpcId": "vpc-1cc8e779", 
+                "PropagatingVgws": [], 
+                "Tags": [], 
+                "Routes": [
+                    {
+                        "GatewayId": "local", 
+                        "DestinationCidrBlock": "10.0.0.0/16", 
+                        "State": "active", 
+                        "Origin": "CreateRouteTable"
+                    }, 
+                    {
+                        "GatewayId": "igw-e74b2b82", 
+                        "DestinationCidrBlock": "0.0.0.0/0", 
+                        "State": "active", 
+                        "Origin": "CreateRoute"
+                    }, 
+                    {
+                        "GatewayId": "vpce-73de3e1a", 
+                        "Origin": "CreateRoute", 
+                        "State": "active", 
+                        "DestinationPrefixListId": "pl-68a54001"
+                    }
+                ]
+            }
+        ]
+    }
+}

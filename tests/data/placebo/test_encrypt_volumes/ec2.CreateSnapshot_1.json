@@ -3,25 +3,33 @@
     "data": {
         "Description": "maid transient snapshot for encryption", 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a4eb8dc0-5f38-4fe2-9634-87c43e85590f"
+            "RequestId": "b4f4c742-2a09-4057-ab77-e07ce178632a", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 08 Jun 2017 18:18:55 GMT"
+            }
         }, 
         "Encrypted": false, 
-        "VolumeId": "vol-fdd1f844", 
+        "VolumeId": "vol-0f53c81b92b4ecfce", 
         "State": "pending", 
         "VolumeSize": 8, 
         "Progress": "", 
         "StartTime": {
-            "hour": 11, 
+            "hour": 18, 
             "__class__": "datetime", 
-            "month": 5, 
-            "second": 7, 
+            "month": 6, 
+            "second": 56, 
             "microsecond": 0, 
-            "year": 2016, 
+            "year": 2017, 
             "day": 8, 
-            "minute": 9
+            "minute": 18
         }, 
-        "SnapshotId": "snap-c8965395", 
-        "OwnerId": "619193117841"
+        "SnapshotId": "snap-09ab186abf23129b6", 
+        "OwnerId": "185106417252"
     }
 }

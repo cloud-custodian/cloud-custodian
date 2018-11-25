@@ -1,0 +1,110 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainStatusList": [
+            {
+                "ElasticsearchClusterConfig": {
+                    "DedicatedMasterEnabled": false, 
+                    "InstanceCount": 1, 
+                    "ZoneAwarenessEnabled": false, 
+                    "InstanceType": "m4.large.elasticsearch"
+                }, 
+                "DomainId": "644160558196/manual", 
+                "AdvancedOptions": {
+                    "rest.action.multi.allow_explicit_index": "true"
+                }, 
+                "VPCOptions": {
+                    "SubnetIds": [
+                        "subnet-71bda45c"
+                    ], 
+                    "VPCId": "vpc-f1516b97", 
+                    "SecurityGroupIds": [
+                        "sg-4b9ada34"
+                    ], 
+                    "AvailabilityZones": [
+                        "us-east-1d"
+                    ]
+                }, 
+                "Created": true, 
+                "Deleted": true, 
+                "DomainName": "manual", 
+                "EBSOptions": {
+                    "VolumeSize": 10, 
+                    "VolumeType": "gp2", 
+                    "EBSEnabled": true
+                }, 
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                }, 
+                "ElasticsearchVersion": "6.0", 
+                "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/manual/*\"}]}", 
+                "Processing": true, 
+                "Endpoints": {
+                    "vpc": "vpc-manual-3pa4tdedyptdpwmkr6m6zrcjwi.us-east-1.es.amazonaws.com"
+                }, 
+                "EncryptionAtRestOptions": {
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/6917a312-adce-4bbc-8202-958f2db490fa", 
+                    "Enabled": true
+                }, 
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/manual"
+            }, 
+            {
+                "ElasticsearchClusterConfig": {
+                    "DedicatedMasterEnabled": false, 
+                    "InstanceCount": 1, 
+                    "ZoneAwarenessEnabled": false, 
+                    "InstanceType": "t2.small.elasticsearch"
+                }, 
+                "DomainId": "644160558196/c7n-sg-test", 
+                "AdvancedOptions": {
+                    "rest.action.multi.allow_explicit_index": "true"
+                }, 
+                "VPCOptions": {
+                    "SubnetIds": [
+                        "subnet-3a334610"
+                    ], 
+                    "VPCId": "vpc-d2d616b5", 
+                    "SecurityGroupIds": [
+                        "sg-3839ec4b", 
+                        "sg-6c7fa917"
+                    ], 
+                    "AvailabilityZones": [
+                        "us-east-1d"
+                    ]
+                }, 
+                "Created": true, 
+                "Deleted": false, 
+                "DomainName": "c7n-sg-test", 
+                "EBSOptions": {
+                    "VolumeSize": 10, 
+                    "VolumeType": "gp2", 
+                    "EBSEnabled": true
+                }, 
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                }, 
+                "ElasticsearchVersion": "6.0", 
+                "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/c7n-sg-test/*\"}]}", 
+                "Processing": true, 
+                "Endpoints": {
+                    "vpc": "vpc-c7n-sg-test-c2aoizsz6tzjktl3mb4mgzpqee.us-east-1.es.amazonaws.com"
+                }, 
+                "EncryptionAtRestOptions": {
+                    "Enabled": false
+                }, 
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/c7n-sg-test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "dab2d425-fbb3-11e7-85d7-e3b87a97d97f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "dab2d425-fbb3-11e7-85d7-e3b87a97d97f", 
+                "date": "Wed, 17 Jan 2018 18:25:54 GMT", 
+                "content-length": "2419", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ee67b3ad-63c5-11e7-9b06-b9c5de7faed8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ee67b3ad-63c5-11e7-9b06-b9c5de7faed8", 
+                "date": "Sat, 08 Jul 2017 10:12:20 GMT", 
+                "content-length": "588", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false, 
+        "Groups": [
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 16
+                }, 
+                "GroupId": "AGPAIYBGVXZBRQ3LRZOPS", 
+                "Arn": "arn:aws:iam::114002464496:group/QATester", 
+                "GroupName": "QATester"
+            }
+        ]
+    }
+}

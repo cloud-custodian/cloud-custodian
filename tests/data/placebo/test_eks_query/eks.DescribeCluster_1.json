@@ -1,0 +1,51 @@
+{
+    "status_code": 200, 
+    "data": {
+        "cluster": {
+            "status": "ACTIVE", 
+            "endpoint": "https://79AAF73516079C082A720941891409BB.yl4.us-east-1.eks.amazonaws.com", 
+            "name": "dev", 
+            "certificateAuthority": {
+                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRFNE1EWXhNVEUwTkRnd05Gb1hEVEk0TURZd09ERTBORGd3TkZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBS080ClhLYVc2QXAxYTFIdVQxQmg4dlpyUTUwUnBVRzFrQU5SbXlGQVBxUzhKNmZBYjN6SzJIN0hoeGtwTHowdEdIQjkKY0dMcUZuL2JTNDRNQUtqSTJ2Wjk4Qko3RGhHYzVRSG5IeUR0Z29qbXBvTmV4YURGQmJ3UExia0YwTjNwTTI2Vgo3cEN1cEFkL2xBaTgydUdaMDFPQVc3U1VLRHgzZkRyTlVBaWFVY0hBY3lGVjVobmR1Y0VZVWNoRVpsdE1td2tMCndFMUY2cEpmakVkTWNhcTFsMkhTUVlNTW1teXk5K1h0ZVcxdEFVT296R2pmN1BrN2JHcHdiQ2ZvbVJEWFd2QkcKMEhia2JzOFprSGZic2R5Q05Zdi91QnFTaDJoVUhtSDlOaHpzQkdJUXpvVGd2RUdaYzFTRkJ4c09OcFVwUUxXbgpvTi9hRXY2QjJ0anUrbFpGbnhVQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFDMVltSG04T2N5UURCTmtFczRlYnhNWXQ1MmgKSWNWUmtSQzAwUGZRcllEblkyZEo2dzV6OEUyOEN6R0JEdzduRGZJNlZOd201ci9TSmYxdnB6TGplMVdPYks1RAoxL1NyY3Mvc293cFVVTWowRVdZTkRuYnVlYk8wNmFCUDc2Wi9LZG1FWHZDU1FLTzJIbW92d1hpSDNIOGVJQmxZCkpWVCszTU5HaksyQ0RncjZ3MEdRSG5oU0o0Y01DYlpZUmZ1VWxFTmkvOXNCMk9yOHNlRWFUMHV1N1czN1BBMkUKZWlsdVZ0RCtmL055VEVYVllqeXpDQ21XZmV3aEhvSTFtRitoaEVKeXRmRlZHVlJZVUlXQm9qeWhrSHJRR3FWWApRdVc0SFdVUE9INUh4S0VxdTBPWW42aEZkVXFYbUY3T3JpNWRwODBUZ1ZHS0oxam9xZGZGUGsyYVZzUT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+            }, 
+            "roleArn": "arn:aws:iam::644160558196:role/EKS-signaldancer-ServiceR-AWSServiceRoleForAmazonE-69A4RAE40IF6", 
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-3a334610", 
+                    "subnet-efbcccb7", 
+                    "subnet-914763e7"
+                ], 
+                "vpcId": "vpc-d2d616b5", 
+                "securityGroupIds": [
+                    "sg-b796a2c0"
+                ]
+            }, 
+            "version": "1.10", 
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/dev", 
+            "createdAt": {
+                "hour": 7, 
+                "__class__": "datetime", 
+                "month": 6, 
+                "second": 49, 
+                "microsecond": 25000, 
+                "year": 2018, 
+                "day": 11, 
+                "minute": 41
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e1e098f9-6d89-11e8-9bc5-cd25f48c2281", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e1e098f9-6d89-11e8-9bc5-cd25f48c2281", 
+                "content-length": "1914", 
+                "x-amz-apigw-id": "IUuoSG1yIAMFteQ=", 
+                "x-amzn-trace-id": "Root=1-5b1e9168-4e2c940057bebf804ca7bf80", 
+                "connection": "keep-alive", 
+                "date": "Mon, 11 Jun 2018 15:12:40 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

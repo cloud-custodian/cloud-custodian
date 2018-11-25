@@ -1,0 +1,56 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Table": {
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-test", 
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "test", 
+                    "AttributeType": "S"
+                }
+            ], 
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0, 
+                "WriteCapacityUnits": 5, 
+                "ReadCapacityUnits": 5
+            }, 
+            "TableSizeBytes": 0, 
+            "TableName": "c7n-test", 
+            "TableStatus": "ACTIVE", 
+            "TableId": "192b379a-ecc4-4bd9-8619-916aa281b3e7", 
+            "LatestStreamLabel": "2018-02-22T01:55:48.707", 
+            "KeySchema": [
+                {
+                    "KeyType": "HASH", 
+                    "AttributeName": "test"
+                }
+            ], 
+            "ItemCount": 0, 
+            "CreationDateTime": {
+                "hour": 9, 
+                "__class__": "datetime", 
+                "month": 2, 
+                "second": 11, 
+                "microsecond": 50000, 
+                "year": 2018, 
+                "day": 16, 
+                "minute": 7
+            }, 
+            "LatestStreamArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-test/stream/2018-02-22T01:55:48.707"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "39B2452BR22T8HFSPA9IU9RIHNVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "39B2452BR22T8HFSPA9IU9RIHNVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "618", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "2457654017", 
+                "date": "Thu, 22 Feb 2018 01:58:38 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}

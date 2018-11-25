@@ -14,7 +14,7 @@ from docutils.statemachine import ViewList
 from docutils.parsers.rst.directives import unchanged
 
 from sphinx.errors import SphinxError
-from sphinx.util.compat import Directive
+from sphinx.directives import Directive
 from sphinx.util.nodes import nested_parse_with_titles
 
 from .templates import TEMPLATE_C7N_SCHEMA

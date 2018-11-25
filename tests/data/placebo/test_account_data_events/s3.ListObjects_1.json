@@ -1,0 +1,48 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "skunk-trails-test-us-east-1", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "FFcnbaWe++saKD3foZDOKOQ7/zehOVa7dUDkRk42uqIcyrYDmJ/uUUyy3W/BpUUtI2AaBdclqA8=", 
+            "RequestId": "09181FEED2344BF4", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "FFcnbaWe++saKD3foZDOKOQ7/zehOVa7dUDkRk42uqIcyrYDmJ/uUUyy3W/BpUUtI2AaBdclqA8=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "09181FEED2344BF4", 
+                "date": "Thu, 02 Nov 2017 04:45:04 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false, 
+        "Contents": [
+            {
+                "LastModified": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 45
+                }, 
+                "ETag": "\"d41d8cd98f00b204e9800998ecf8427e\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "DataEvents/AWSLogs/644160558196/", 
+                "Owner": {
+                    "DisplayName": "aws_cloudtrail_us-east-1", 
+                    "ID": "65e03a8a45a3aaaa881ada217702e0ad77152fe0196a8a14c44aa3bc4f11d2ae"
+                }, 
+                "Size": 0
+            }
+        ]
+    }
+}

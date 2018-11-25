@@ -1,0 +1,98 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TrainingJobName": "c7n-job-2018-01-12-18-23-33", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ef8c797e-f5ab-4db2-b59f-dbf9cf36484c", 
+            "HTTPHeaders": {
+                "date": "Mon, 12 Feb 2018 14:20:42 GMT", 
+                "x-amzn-requestid": "ef8c797e-f5ab-4db2-b59f-dbf9cf36484c", 
+                "content-length": "2181", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "TrainingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/c7n-job-2018-01-12-18-23-33", 
+        "InputDataConfig": [
+            {
+                "CompressionType": "None", 
+                "ChannelName": "train", 
+                "DataSource": {
+                    "S3DataSource": {
+                        "S3DataType": "S3Prefix", 
+                        "S3DataDistributionType": "FullyReplicated", 
+                        "S3Uri": "s3://c7n-sm-test/kmeans_highlevel_example/data"
+                    }
+                }, 
+                "RecordWrapperType": "None"
+            }
+        ], 
+        "AlgorithmSpecification": {
+            "TrainingInputMode": "File", 
+            "TrainingImage": "382416733822.dkr.ecr.us-east-1.amazonaws.com/kmeans:latest"
+        }, 
+        "HyperParameters": {
+            "feature_dim": "784", 
+            "mini_batch_size": "500", 
+            "k": "10"
+        }, 
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
+        "CreationTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 33, 
+            "microsecond": 406000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 23
+        }, 
+        "TrainingJobStatus": "Failed", 
+        "OutputDataConfig": {
+            "KmsKeyId": "", 
+            "S3OutputPath": "s3://c7n-sm-test/kmeans_example/output"
+        }, 
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 3600
+        }, 
+        "ResourceConfig": {
+            "VolumeSizeInGB": 50, 
+            "InstanceCount": 2, 
+            "InstanceType": "ml.c4.8xlarge"
+        }, 
+        "TrainingEndTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 1, 
+            "microsecond": 498000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 30
+        }, 
+        "LastModifiedTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 1, 
+            "microsecond": 708000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 30
+        }, 
+        "SecondaryStatus": "Failed", 
+        "TrainingStartTime": {
+            "hour": 13, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 36, 
+            "microsecond": 138000, 
+            "year": 2018, 
+            "day": 12, 
+            "minute": 27
+        }, 
+        "FailureReason": "ClientError: Unable to read input data. (caused by MXNetError)\n\nCaused by: [18:29:59] /opt/brazil-pkg-cache/packages/AIAlgorithmsCppLibs/AIAlgorithmsCppLibs-1.0.21.46/RHEL5_64/generic-flavor/src/data_iter/src/channel.cpp:40: (Input Error) Unable to read input data: [18:29:59] /opt/brazil-pkg-cache/packages/AIAlgorithmsMXNet/AIAlgorithmsMXNet-0.1x.5.35/RHEL5_64/generic-flavor/src/dmlc-core/src/io/input_split_base.cc:24: Check failed: files_[i].size % align_bytes == 0 file do not align by 4 bytes\n\nStack trace returned 10 entries:\n[bt] (0) /opt/amazon/lib/libaialgsdataiter.so(_ZN4dmlc15LogMessageFatalD2Ev+0x29) [0x7f123034ac49]\n[bt] (1) /opt/amazon/lib/libmxnet.so(_ZN4dmlc2io14InputSplitBase4InitEPNS0_10FileSystemEPKcmb+0x193) [0x7f1229caa673]\n[bt] (2) /opt/amazon/lib/libmxnet.so(_ZN4dmlc10InputSplit6CreateEPKcS2_jjS2_bimb+0xe2e) [0x7f1229c74a5e]\n[bt] (3) /opt/amazon/lib/libaialgsdataiter.so(_ZN6aialgs2io17FileChannelReaderC1ERKSs+0x87) [0x7f12303646a7]\n[bt] (4) /opt/amazon/lib/libaialgsdataiter.so(_ZN6aialgs"
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "kit_ewbank", 
+            "ID": "5c3342eb7cd29edd4cd7aaf3ce543d7acb9e1a6db40a9879f188b7c7e6b275e0"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 34
+                }, 
+                "Name": "custodian-encrypt-test-versioning"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "m9SWEPN3++G5XSAHx809Ol5Rm6JZCwhKu00zy8AvBXEHZUgVkonBHSdVPOWXflUJj2VF1RPu0qw=", 
+            "RequestId": "28103D82909615F7", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "m9SWEPN3++G5XSAHx809Ol5Rm6JZCwhKu00zy8AvBXEHZUgVkonBHSdVPOWXflUJj2VF1RPu0qw=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "28103D82909615F7", 
+                "date": "Wed, 07 Feb 2018 16:34:23 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

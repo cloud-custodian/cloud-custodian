@@ -3,56 +3,57 @@
     "data": {
         "Snapshot": {
             "Engine": "redis", 
-            "CacheParameterGroupName": "default.redis2.8", 
-            "VpcId": "vpc-4a9ff72e", 
-            "CacheClusterId": "redis-rg-1-003", 
+            "CacheParameterGroupName": "default.redis3.2", 
+            "VpcId": "vpc-f1516b97", 
+            "CacheClusterId": "myec-003", 
             "SnapshotRetentionLimit": 0, 
             "NumCacheNodes": 1, 
-            "SnapshotName": "test-snapshot-1", 
+            "SnapshotName": "backup-myec-003-2017-06-23", 
             "CacheClusterCreateTime": {
-                "hour": 14, 
+                "hour": 2, 
                 "__class__": "datetime", 
-                "month": 9, 
-                "second": 54, 
-                "microsecond": 436000, 
-                "year": 2016, 
-                "day": 7, 
-                "minute": 46
+                "month": 6, 
+                "second": 48, 
+                "microsecond": 301000, 
+                "year": 2017, 
+                "day": 24, 
+                "minute": 7
             }, 
             "AutoMinorVersionUpgrade": true, 
-            "PreferredAvailabilityZone": "us-west-2c", 
+            "PreferredAvailabilityZone": "us-east-1d", 
             "SnapshotStatus": "creating", 
             "SnapshotSource": "manual", 
-            "SnapshotWindow": "06:00-07:00", 
-            "EngineVersion": "2.8.24", 
+            "SnapshotWindow": "08:00-09:00", 
+            "EngineVersion": "3.2.4", 
             "NodeSnapshots": [
                 {
                     "CacheSize": "", 
                     "CacheNodeId": "0001", 
                     "CacheNodeCreateTime": {
-                        "hour": 14, 
+                        "hour": 2, 
                         "__class__": "datetime", 
-                        "month": 9, 
-                        "second": 54, 
-                        "microsecond": 436000, 
-                        "year": 2016, 
-                        "day": 7, 
-                        "minute": 46
+                        "month": 6, 
+                        "second": 48, 
+                        "microsecond": 301000, 
+                        "year": 2017, 
+                        "day": 24, 
+                        "minute": 7
                     }
                 }
             ], 
-            "CacheSubnetGroupName": "elasticache-subnet-group-1", 
+            "CacheSubnetGroupName": "msg", 
             "Port": 6379, 
-            "PreferredMaintenanceWindow": "sun:07:30-sun:08:30", 
-            "CacheNodeType": "cache.m3.medium"
+            "PreferredMaintenanceWindow": "fri:10:00-fri:11:00", 
+            "CacheNodeType": "cache.r3.large"
         }, 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "8ba7815d-7521-11e6-a6f3-c1eb89d96391", 
+            "RequestId": "981b5001-5889-11e7-9878-17c2c2d54675", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "8ba7815d-7521-11e6-a6f3-c1eb89d96391", 
-                "date": "Wed, 07 Sep 2016 17:36:01 GMT", 
-                "content-length": "1511", 
+                "x-amzn-requestid": "981b5001-5889-11e7-9878-17c2c2d54675", 
+                "date": "Sat, 24 Jun 2017 03:02:43 GMT", 
+                "content-length": "1491", 
                 "content-type": "text/xml"
             }
         }

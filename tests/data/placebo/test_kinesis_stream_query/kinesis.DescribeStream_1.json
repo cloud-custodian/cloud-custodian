@@ -4,48 +4,71 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "cb9bdd14-e00e-d3fc-9b2f-0c505aea6073", 
+            "RequestId": "c3aec702-b616-2110-91a7-cce52cff42a0", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "cb9bdd14-e00e-d3fc-9b2f-0c505aea6073", 
-                "content-length": "811", 
-                "x-amz-id-2": "XHKqr2hANVUMsQcIl4hUw+GTNgwJJPGgrQD3UJm8/iTBKJq5X1L/YpqcPOGSfU5oNTSg5YyKJJb1Nl74Ny7VPiu4OQFobyWXj8dkokOj3ZI=", 
+                "x-amzn-requestid": "c3aec702-b616-2110-91a7-cce52cff42a0", 
+                "content-length": "1330", 
+                "x-amz-id-2": "YOHZ0WV8i85W1yCOkizbqwtEiRsGmzRyzqX6VkhdBY2PAraPUXVn9PU41lsD9OtQh3f3lAH97N0HIyoZbrPQWwPNHUQmM53CtHXxKDk1n+E=", 
                 "server": "Apache-Coyote/1.1", 
-                "date": "Sun, 27 Nov 2016 12:18:11 GMT", 
+                "date": "Sat, 12 Aug 2017 13:59:03 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
         "StreamDescription": {
             "HasMoreShards": false, 
             "RetentionPeriodHours": 24, 
-            "StreamName": "sock-drawer", 
+            "StreamName": "test-yes-encrypt", 
             "Shards": [
                 {
                     "ShardId": "shardId-000000000000", 
                     "HashKeyRange": {
-                        "EndingHashKey": "170141183460469231731687303715884105727", 
+                        "EndingHashKey": "340282366920938463463374607431768211455", 
                         "StartingHashKey": "0"
                     }, 
                     "SequenceNumberRange": {
-                        "StartingSequenceNumber": "49568027013051417042124392152163093257658725395469434882"
+                        "EndingSequenceNumber": "49575281968561928803165895440748552507745700754017484802", 
+                        "StartingSequenceNumber": "49575217660694676254955779315723496596016722889129590786"
                     }
                 }, 
                 {
                     "ShardId": "shardId-000000000001", 
                     "HashKeyRange": {
+                        "EndingHashKey": "170141183460469231731687303715884105727", 
+                        "StartingHashKey": "0"
+                    }, 
+                    "ParentShardId": "shardId-000000000000", 
+                    "SequenceNumberRange": {
+                        "StartingSequenceNumber": "49575983704159775761412860620312271510700092505888653330"
+                    }
+                }, 
+                {
+                    "ShardId": "shardId-000000000002", 
+                    "HashKeyRange": {
                         "EndingHashKey": "340282366920938463463374607431768211455", 
                         "StartingHashKey": "170141183460469231731687303715884105728"
                     }, 
+                    "ParentShardId": "shardId-000000000000", 
                     "SequenceNumberRange": {
-                        "StartingSequenceNumber": "49568027013073717787322922775304628975931373756975415314"
+                        "StartingSequenceNumber": "49575983704182076506611391243453807228972740867394633762"
                     }
                 }
             ], 
-            "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/sock-drawer", 
+            "StreamARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt", 
             "EnhancedMonitoring": [
                 {
                     "ShardLevelMetrics": []
                 }
             ], 
+            "StreamCreationTimestamp": {
+                "hour": 13, 
+                "__class__": "datetime", 
+                "month": 7, 
+                "second": 44, 
+                "microsecond": 0, 
+                "year": 2017, 
+                "day": 18, 
+                "minute": 34
+            }, 
             "StreamStatus": "ACTIVE"
         }
     }

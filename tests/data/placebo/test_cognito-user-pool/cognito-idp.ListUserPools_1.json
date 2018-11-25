@@ -1,0 +1,69 @@
+{
+    "status_code": 200, 
+    "data": {
+        "UserPools": [
+            {
+                "CreationDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 26, 
+                    "microsecond": 155000, 
+                    "year": 2017, 
+                    "day": 8, 
+                    "minute": 13
+                }, 
+                "LastModifiedDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 26, 
+                    "microsecond": 155000, 
+                    "year": 2017, 
+                    "day": 8, 
+                    "minute": 13
+                }, 
+                "LambdaConfig": {}, 
+                "Id": "us-east-1_W6ST8sYH6", 
+                "Name": "origin_userpool_MOBILEHUB_1667653900"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 7, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 54, 
+                    "microsecond": 416000, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 11
+                }, 
+                "LastModifiedDate": {
+                    "hour": 7, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 19, 
+                    "microsecond": 389000, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 12
+                }, 
+                "LambdaConfig": {}, 
+                "Id": "us-east-1_xzq8X91on", 
+                "Name": "c7nusers"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a71a2b81-7f54-11e7-b9c9-a584e55a17f8", 
+            "HTTPHeaders": {
+                "date": "Sat, 12 Aug 2017 11:52:01 GMT", 
+                "x-amzn-requestid": "a71a2b81-7f54-11e7-b9c9-a584e55a17f8", 
+                "content-length": "309", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+
+  ApiGw:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "sphere11"
+      Description: "The volume goes to 11"
+      FailOnWarnings: true
+
+  ApiGwInvokePermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:invokeFunction"
+      Principal: "apigateway.amazonaws.com"
+      FunctionName:
+        Ref: ApiFunction
+      SourceArn:
+        "Fn::Join":
+           - ""
+           - ["arn:aws:execute-api:",
+              {"Ref": "AWS::Region"},
+              ":",
+              {"Ref": "AWS::AccountId"},
+              ":",
+              {"Ref": "ApiGw"},
+              "/*"]
+
+  ApiStage:
+    Type: "AWS::ApiGateway::Stage"
+    Properties:
+      StageName: latest
+      RestApiId:
+        Ref: ApiGw
+      DeploymentId:
+        Ref: ApiDeployment
+      MethodSettings:
+        - DataTraceEnabled: true
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          ResourcePath: "/*"
+
+  ApiDeployment:
+    Type: "AWS::ApiGateway::Deployment"
+    DependsOn: [RootMethod, AnyMethod]
+    Properties:
+      RestApiId:
+        Ref: ApiGw
+      # Per cfn deployment documentation...
+      StageName: "noop"
+
+  AnyResource:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      RestApiId:
+        Ref: "ApiGw"
+      ParentId:
+        Fn::GetAtt:
+          - "ApiGw"
+          - "RootResourceId"
+      PathPart: "{proxy+}"
+
+  AnyMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: "AWS_IAM"
+      HttpMethod: "ANY"
+      RestApiId:
+        Ref: "ApiGw"
+      ResourceId:
+        Ref: "AnyResource"
+      MethodResponses: []
+      Integration:
+        PassthroughBehavior: "NEVER"
+        IntegrationHttpMethod: "POST"
+        CacheNamespace: "none"
+        CacheKeyParameters: []
+        IntegrationResponses: []
+        Type: "AWS_PROXY"
+        Uri:
+          Fn::Join:
+            - ""
+            - ["arn:aws:apigateway:",
+                {"Ref": "AWS::Region"},
+                ":lambda:path",
+                "/2015-03-31/functions/",
+                {"Fn::GetAtt": ["ApiFunction", "Arn"]},
+                "/invocations"]
+
+  RootMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: "AWS_IAM"
+      HttpMethod: "ANY"
+      RestApiId:
+        Ref: "ApiGw"
+      ResourceId:
+        Fn::GetAtt:
+          - "ApiGw"
+          - "RootResourceId"
+      MethodResponses: []
+      Integration:
+        PassthroughBehavior: "NEVER"
+        IntegrationHttpMethod: "POST"
+        CacheNamespace: "none"
+        CacheKeyParameters: []
+        IntegrationResponses: []
+        Type: "AWS_PROXY"
+        Uri:
+          Fn::Join:
+            - ""
+            - ["arn:aws:apigateway:",
+                Ref: "AWS::Region",
+                ":lambda:path",
+                "/2015-03-31/functions/",
+                "Fn::GetAtt": ["ApiFunction", "Arn"],
+                "/invocations"]
+
+  ApiFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Description: "The volume goes to 11"
+      Timeout: 120
+      Handler: handler.lambda_handler
+      Runtime: python2.7
+      CodeUri: ../stage
+      Role: "arn:aws:iam::644160558196:role/custodian-mu"
+      Events:
+        Timer:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)
+
+Outputs:
+  Function:
+    Description: Lambda Name
+    Value: !Ref ApiFunction
+  Url:
+    Description: Api Url
+    Value: !Sub "https://${ApiGw}.execute-api.${AWS::Region}.amazonaws.com/${ApiStage}"
+  Gateway:
+    Description: API Gateway Name
+    Value: !Ref ApiGw

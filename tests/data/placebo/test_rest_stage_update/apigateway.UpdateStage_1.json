@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "9ca85f6e-fdfe-11e7-a190-a392413faa8a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 20 Jan 2018 16:26:05 GMT",
+                "content-type": "application/json",
+                "content-length": "507",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "9ca85f6e-fdfe-11e7-a190-a392413faa8a"
+            },
+            "RetryAttempts": 0
+        },
+        "deploymentId": "49ijxa",
+        "stageName": "noop",
+        "cacheClusterEnabled": false,
+        "cacheClusterStatus": "NOT_AVAILABLE",
+        "methodSettings": {
+            "*/*": {
+                "metricsEnabled": false,
+                "loggingLevel": "INFO",
+                "dataTraceEnabled": true,
+                "throttlingBurstLimit": 5000,
+                "throttlingRateLimit": 10000.0,
+                "cachingEnabled": false,
+                "cacheTtlInSeconds": 300,
+                "cacheDataEncrypted": false,
+                "requireAuthorizationForCacheControl": true,
+                "unauthorizedCacheControlHeaderStrategy": "SUCCEED_WITH_RESPONSE_HEADER"
+            }
+        },
+        "createdDate": {
+            "__class__": "datetime",
+            "year": 2017,
+            "month": 1,
+            "day": 22,
+            "hour": 6,
+            "minute": 28,
+            "second": 2,
+            "microsecond": 0
+        },
+        "lastUpdatedDate": {
+            "__class__": "datetime",
+            "year": 2018,
+            "month": 1,
+            "day": 20,
+            "hour": 11,
+            "minute": 26,
+            "second": 5,
+            "microsecond": 0
+        }
+    }
+}

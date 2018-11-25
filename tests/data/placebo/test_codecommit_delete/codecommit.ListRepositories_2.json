@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "repositories": [
+            {
+                "repositoryName": "test-delete-codecommit2", 
+                "repositoryId": "5adbf477-56a3-4799-9e53-23b5d379b3c8"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cdedc674-c953-11e7-96d5-914a90de92a8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cdedc674-c953-11e7-96d5-914a90de92a8", 
+                "date": "Tue, 14 Nov 2017 15:52:23 GMT", 
+                "content-length": "117", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

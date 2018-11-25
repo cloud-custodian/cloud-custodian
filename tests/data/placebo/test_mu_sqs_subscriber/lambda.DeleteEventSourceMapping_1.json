@@ -1,0 +1,33 @@
+{
+    "status_code": 202,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b07d6c75-7ba5-11e8-a26a-8376f837b330",
+            "HTTPStatusCode": 202,
+            "HTTPHeaders": {
+                "date": "Fri, 29 Jun 2018 14:06:59 GMT",
+                "content-type": "application/json",
+                "content-length": "327",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b07d6c75-7ba5-11e8-a26a-8376f837b330"
+            },
+            "RetryAttempts": 0
+        },
+        "UUID": "90282713-22c8-4931-8847-ad391732994e",
+        "BatchSize": 10,
+        "EventSourceArn": "arn:aws:sqs:us-east-1:644160558196:my-dev-test-3",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-hello-sqs",
+        "LastModified": {
+            "__class__": "datetime",
+            "year": 2018,
+            "month": 6,
+            "day": 29,
+            "hour": 10,
+            "minute": 6,
+            "second": 59,
+            "microsecond": 619000
+        },
+        "State": "Deleting",
+        "StateTransitionReason": "USER_INITIATED"
+    }
+}

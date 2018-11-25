@@ -1,0 +1,297 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainConfig": {
+            "ElasticsearchClusterConfig": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 5, 
+                    "UpdateDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 12, 
+                        "microsecond": 727000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 50
+                    }
+                }, 
+                "Options": {
+                    "DedicatedMasterEnabled": false, 
+                    "InstanceCount": 1, 
+                    "ZoneAwarenessEnabled": false, 
+                    "InstanceType": "t2.small.elasticsearch"
+                }
+            }, 
+            "VPCOptions": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Processing", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 14, 
+                    "UpdateDate": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 57, 
+                        "microsecond": 142000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 25
+                    }
+                }, 
+                "Options": {
+                    "SubnetIds": [
+                        "subnet-3a334610"
+                    ], 
+                    "VPCId": "vpc-d2d616b5", 
+                    "SecurityGroupIds": [
+                        "sg-6c7fa917", 
+                        "sg-9a5386e9"
+                    ], 
+                    "AvailabilityZones": [
+                        "us-east-1d"
+                    ]
+                }
+            }, 
+            "EBSOptions": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 5, 
+                    "UpdateDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 12, 
+                        "microsecond": 727000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 50
+                    }
+                }, 
+                "Options": {
+                    "VolumeSize": 10, 
+                    "VolumeType": "gp2", 
+                    "EBSEnabled": true
+                }
+            }, 
+            "SnapshotOptions": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 5, 
+                    "UpdateDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 12, 
+                        "microsecond": 727000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 50
+                    }
+                }, 
+                "Options": {
+                    "AutomatedSnapshotStartHour": 0
+                }
+            }, 
+            "ElasticsearchVersion": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 5, 
+                    "UpdateDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 12, 
+                        "microsecond": 727000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 50
+                    }
+                }, 
+                "Options": "6.0"
+            }, 
+            "LogPublishingOptions": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 57, 
+                        "microsecond": 305000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 25
+                    }, 
+                    "UpdateVersion": 14, 
+                    "UpdateDate": {
+                        "hour": 13, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 57, 
+                        "microsecond": 305000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 25
+                    }
+                }, 
+                "Options": {}
+            }, 
+            "AdvancedOptions": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 5, 
+                    "UpdateDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 12, 
+                        "microsecond": 727000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 50
+                    }
+                }, 
+                "Options": {
+                    "rest.action.multi.allow_explicit_index": "true"
+                }
+            }, 
+            "EncryptionAtRestOptions": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 5, 
+                    "UpdateDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 12, 
+                        "microsecond": 727000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 50
+                    }
+                }, 
+                "Options": {
+                    "Enabled": false
+                }
+            }, 
+            "AccessPolicies": {
+                "Status": {
+                    "PendingDeletion": false, 
+                    "State": "Active", 
+                    "CreationDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 8, 
+                        "microsecond": 324000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 38
+                    }, 
+                    "UpdateVersion": 5, 
+                    "UpdateDate": {
+                        "hour": 10, 
+                        "__class__": "datetime", 
+                        "month": 1, 
+                        "second": 12, 
+                        "microsecond": 727000, 
+                        "year": 2018, 
+                        "day": 17, 
+                        "minute": 50
+                    }
+                }, 
+                "Options": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/c7n-sg-test/*\"}]}"
+            }
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "dc0da944-fbb3-11e7-9a3b-25447577ec27", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "dc0da944-fbb3-11e7-9a3b-25447577ec27", 
+                "date": "Wed, 17 Jan 2018 18:25:56 GMT", 
+                "content-length": "2201", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

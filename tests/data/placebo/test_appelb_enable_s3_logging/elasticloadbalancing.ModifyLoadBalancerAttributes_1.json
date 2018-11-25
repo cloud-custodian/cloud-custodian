@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": [
+            {
+                "Value": "true", 
+                "Key": "access_logs.s3.enabled"
+            }, 
+            {
+                "Value": "elbv2logtest", 
+                "Key": "access_logs.s3.bucket"
+            }, 
+            {
+                "Value": "50", 
+                "Key": "idle_timeout.timeout_seconds"
+            }, 
+            {
+                "Value": "gah5", 
+                "Key": "access_logs.s3.prefix"
+            }, 
+            {
+                "Value": "true", 
+                "Key": "deletion_protection.enabled"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "80a7a133-5ab1-11e7-a46e-5f679de48413", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "80a7a133-5ab1-11e7-a46e-5f679de48413", 
+                "date": "Mon, 26 Jun 2017 20:53:26 GMT", 
+                "content-length": "886", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

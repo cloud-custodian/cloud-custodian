@@ -3,34 +3,35 @@
     "data": {
         "FlowLogs": [
             {
-                "ResourceId": "vpc-4a9ff72e", 
+                "ResourceId": "vpc-d2d616b5", 
                 "CreationTime": {
-                    "hour": 23, 
+                    "hour": 8, 
                     "__class__": "datetime", 
-                    "month": 2, 
-                    "second": 52, 
+                    "month": 5, 
+                    "second": 56, 
                     "microsecond": 0, 
                     "year": 2017, 
-                    "day": 18, 
-                    "minute": 17
+                    "day": 16, 
+                    "minute": 52
                 }, 
-                "LogGroupName": "/aws/lambda/myIOTFunction", 
+                "LogGroupName": "flow-logs", 
                 "TrafficType": "ALL", 
                 "FlowLogStatus": "ACTIVE", 
-                "FlowLogId": "fl-84d63aed", 
-                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole"
+                "FlowLogId": "fl-a41befcd", 
+                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/CloudCustodianRole", 
+                "DeliverLogsErrorMessage": "Access error"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "2bb11182-8edf-4f73-a61c-84598d337e63", 
+            "RequestId": "775085c6-a7bc-4925-b877-03ff1a8e4b70", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 18 Feb 2017 23:37:34 GMT"
+                "date": "Mon, 26 Jun 2017 18:27:39 GMT"
             }
         }
     }

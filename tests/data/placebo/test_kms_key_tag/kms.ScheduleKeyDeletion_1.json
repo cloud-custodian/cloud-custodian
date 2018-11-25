@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyId": "arn:aws:kms:us-east-1:644160558196:key/7179c356-0a8f-465d-897a-0d95391ad50b", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3592fafc-06cc-11e8-994f-799fd07bbc53", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3592fafc-06cc-11e8-994f-799fd07bbc53", 
+                "content-length": "113", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "DeletionDate": {
+            "hour": 19, 
+            "__class__": "datetime", 
+            "month": 2, 
+            "second": 0, 
+            "microsecond": 0, 
+            "year": 2018, 
+            "day": 7, 
+            "minute": 0
+        }
+    }
+}

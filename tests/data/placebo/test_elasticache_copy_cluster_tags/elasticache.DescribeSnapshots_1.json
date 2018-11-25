@@ -4,11 +4,11 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "0bf4a5d5-cd4c-11e6-ac59-75619cc9ad68", 
+            "RequestId": "e573fde4-5888-11e7-8cda-9d11a1876a7b", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "0bf4a5d5-cd4c-11e6-ac59-75619cc9ad68", 
-                "date": "Wed, 28 Dec 2016 22:21:57 GMT", 
-                "content-length": "1679", 
+                "x-amzn-requestid": "e573fde4-5888-11e7-8cda-9d11a1876a7b", 
+                "date": "Sat, 24 Jun 2017 02:57:44 GMT", 
+                "content-length": "1665", 
                 "content-type": "text/xml"
             }
         }, 
@@ -16,56 +16,56 @@
             {
                 "Engine": "redis", 
                 "CacheParameterGroupName": "default.redis3.2", 
-                "VpcId": "vpc-e026fb84", 
-                "CacheClusterId": "test-tags", 
+                "VpcId": "vpc-f1516b97", 
+                "CacheClusterId": "myec-001", 
                 "SnapshotRetentionLimit": 0, 
                 "NumCacheNodes": 1, 
-                "SnapshotName": "test-tags-backup", 
+                "SnapshotName": "myec-backup", 
                 "CacheClusterCreateTime": {
-                    "hour": 21, 
+                    "hour": 2, 
                     "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 23, 
-                    "microsecond": 3000, 
-                    "year": 2016, 
-                    "day": 27, 
-                    "minute": 10
+                    "month": 6, 
+                    "second": 21, 
+                    "microsecond": 311000, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 3
                 }, 
                 "AutoMinorVersionUpgrade": true, 
-                "PreferredAvailabilityZone": "us-west-2a", 
+                "PreferredAvailabilityZone": "us-east-1d", 
                 "SnapshotStatus": "available", 
                 "SnapshotSource": "manual", 
-                "SnapshotWindow": "11:00-12:00", 
+                "SnapshotWindow": "08:00-09:00", 
                 "EngineVersion": "3.2.4", 
                 "NodeSnapshots": [
                     {
-                        "CacheSize": "3 MB", 
+                        "CacheSize": "4 MB", 
                         "SnapshotCreateTime": {
-                            "hour": 22, 
+                            "hour": 2, 
                             "__class__": "datetime", 
-                            "month": 12, 
-                            "second": 1, 
+                            "month": 6, 
+                            "second": 25, 
                             "microsecond": 0, 
-                            "year": 2016, 
-                            "day": 28, 
-                            "minute": 12
+                            "year": 2017, 
+                            "day": 24, 
+                            "minute": 30
                         }, 
                         "CacheNodeId": "0001", 
                         "CacheNodeCreateTime": {
-                            "hour": 21, 
+                            "hour": 2, 
                             "__class__": "datetime", 
-                            "month": 12, 
-                            "second": 23, 
-                            "microsecond": 3000, 
-                            "year": 2016, 
-                            "day": 27, 
-                            "minute": 10
+                            "month": 6, 
+                            "second": 21, 
+                            "microsecond": 311000, 
+                            "year": 2017, 
+                            "day": 24, 
+                            "minute": 3
                         }
                     }
                 ], 
-                "CacheSubnetGroupName": "test-subnet", 
+                "CacheSubnetGroupName": "msg", 
                 "Port": 6379, 
-                "PreferredMaintenanceWindow": "mon:09:00-mon:10:00", 
+                "PreferredMaintenanceWindow": "fri:10:00-fri:11:00", 
                 "CacheNodeType": "cache.r3.large"
             }
         ]
