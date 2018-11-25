@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Sid\":\"sns-topic-preexisting-custodian-attach-encrypt-test\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:function:c7n-s3-encrypt\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sns.amazonaws.com\"},\"Action\":[\"lambda:InvokeFunction\"],\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:sns:us-east-1:644160558196:preexisting-custodian-attach-encrypt-test\"}}}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "d244c3c0-0bd9-11e7-b681-03ac90a0e430", 
+            "HTTPHeaders": {
+                "date": "Sat, 18 Mar 2017 12:53:01 GMT", 
+                "x-amzn-requestid": "d244c3c0-0bd9-11e7-b681-03ac90a0e430", 
+                "content-length": "399", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

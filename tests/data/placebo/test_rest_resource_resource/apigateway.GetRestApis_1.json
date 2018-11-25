@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "42031eda-ff95-11e7-a372-3fc0eeca9a36",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 22 Jan 2018 16:56:58 GMT",
+                "content-type": "application/json",
+                "content-length": "364",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "42031eda-ff95-11e7-a372-3fc0eeca9a36"
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "5xhc1cnb7h",
+                "name": "sphere11",
+                "description": "The volume goes to 11",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 1,
+                    "day": 22,
+                    "hour": 6,
+                    "minute": 27,
+                    "second": 33,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                }
+            },
+            {
+                "id": "rtmgxfiay5",
+                "name": "testapi",
+                "description": "for demo only",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 4,
+                    "day": 5,
+                    "hour": 10,
+                    "minute": 34,
+                    "second": 55,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,146 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.3 (Linux-4.9.93-linuxkit-aufs-x86_64-with-centos-7.5.1804-Core)
+          requests/2.19.1 msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-storage/2.0.0
+          Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182748?api-version=2018-02-01
+  response:
+    body: {string: '{"error":{"code":"ResourceNotFound","message":"The Resource ''Microsoft.Storage/storageAccounts/custodianaccount47182748''
+        under resource group ''custodian-test-deployment-units'' was not found."}}'}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['193']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 17 Oct 2018 19:07:06 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [a156bb10-3d48-4de7-8ae2-f6d172fb2206]
+      x-ms-failure-cause: [gateway]
+      x-ms-request-id: [a156bb10-3d48-4de7-8ae2-f6d172fb2206]
+      x-ms-routing-request-id: ['WESTUS2:20181017T190706Z:a156bb10-3d48-4de7-8ae2-f6d172fb2206']
+    status: {code: 404, message: Not Found}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.3 (Linux-4.9.93-linuxkit-aufs-x86_64-with-centos-7.5.1804-Core)
+          requests/2.19.1 msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-storage/2.0.0
+          Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182748?api-version=2018-02-01
+  response:
+    body: {string: '{"error":{"code":"ResourceNotFound","message":"The Resource ''Microsoft.Storage/storageAccounts/custodianaccount47182748''
+        under resource group ''custodian-test-deployment-units'' was not found."}}'}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['193']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 17 Oct 2018 19:07:06 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [2ec9675e-614e-420d-8a10-6eabc394c69f]
+      x-ms-failure-cause: [gateway]
+      x-ms-request-id: [2ec9675e-614e-420d-8a10-6eabc394c69f]
+      x-ms-routing-request-id: ['WESTUS2:20181017T190706Z:2ec9675e-614e-420d-8a10-6eabc394c69f']
+    status: {code: 404, message: Not Found}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.3 (Linux-4.9.93-linuxkit-aufs-x86_64-with-centos-7.5.1804-Core)
+          requests/2.19.1 msrest/0.5.4 msrest_azure/0.5.0 resourcemanagementclient/2.0.0
+          Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR8Xs
+        o0cf3W3Wk2ZaF6u2qJbN3Sx7ePDwwf5k+/5sL9venz082M4eHGTb9w72zu892L0/23mQ363zplrX
+        0/zzulqvmrvTddNWsyJbbrd5027P8lVZXS/yZbu9XhZt89Hoo2W2yKmvmxuW1TQDItT4ipqsmz36
+        sM0umo8e/eKP8BJ9wT9GHz3NFxX99d2qftukxxdZsfxd6dMvl/l38/wtffHlZV7TB79ona/Rd9Gk
+        V9S0WF78rh/9ktFHq7pa5XVb5AyZ/rosGuqXvn7dZi1eeL2eTvN8ls8++iW/5P8B8ApXXCwBAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['341']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 17 Oct 2018 19:07:06 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [5ba1dc39-6c96-49c1-8cc7-77df4b726ecf]
+      x-ms-ratelimit-remaining-subscription-reads: ['11999']
+      x-ms-request-id: [5ba1dc39-6c96-49c1-8cc7-77df4b726ecf]
+      x-ms-routing-request-id: ['WESTUS2:20181017T190706Z:5ba1dc39-6c96-49c1-8cc7-77df4b726ecf']
+    status: {code: 200, message: OK}
+- request:
+    body: mock_body
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['75']
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.3 (Linux-4.9.93-linuxkit-aufs-x86_64-with-centos-7.5.1804-Core)
+          requests/2.19.1 msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-storage/2.0.0
+          Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: PUT
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182748?api-version=2018-02-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR83b
+        9UePfvFHy2yRf/Too9dttpxl9ez3f/7q9Uejj9oir71PP/olo4/eFssZf1TV2UVObQr8ebdZT5pp
+        Xazaolo2d7Ps4cHDB/uT7fuzvWx7f/bwYDt7cJBt3zvYO7/3YPf+bOdBfrfOm2pdT/PP62q9au5O
+        101bzYpsud3mTbs9y1dldb3Il+32elm0zd1VXV0Ws7xu7n5RTOuqqc7bsWJxl97Ez+PptFovqa2F
+        lckn+w92D/Ye7B8QujrQDS3a6xVa3NgLNS2raYYRU/MrQnrd7NGHbXbREEmJVoTyKq+JiPj7o2Xe
+        XlX12+NpyX9OrldZQ799dPyDdZ2/zuvLYkoNRx9dFnW7zsoX0vzVuqRPH33v+0TplffHLD/P1mV7
+        PNX+j8uyusIENevVqqrb5tttu2re1Nn5eTH9cllef/ToPCubfPRRvpzW1zxRQKMxHdPv50VJI//F
+        1CKblDnNa1uv6YUya9pT+ehNwdTb29k92N7d2d598Gb34aOdB/S/8d7+3sHOvYc/BRwmZTX5BgAR
+        pLf59WvmEmrcmxF0RTS+LBoaTLG8ID5t0fD1ejrN8xl1PPpoWuc8RRs63P10/1Oa/J+i1qu6WGT1
+        9elytqoKzDENQgbz0Rz0fHR3kLfGaDeeVnU+viIZqa6aMc34XQL6i9b5Gn3fCIEbRkG0INptQHDD
+        KAiZ3JshoF0EAJOaifM8xvQNkX7dfHn+UtrQd9llVpTA5qNf8kv+H/fQWyhnBAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json]
+      Date: ['Wed, 17 Oct 2018 19:07:08 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: ['Microsoft-Azure-Storage-Resource-Provider/1.0,Microsoft-HTTPAPI/2.0
+          Microsoft-HTTPAPI/2.0']
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [149dfd37-311c-4e24-9bb6-0c3a693fa8e7]
+      x-ms-ratelimit-remaining-subscription-reads: ['11997']
+      x-ms-request-id: [c09ae3fb-5225-4acc-857f-69603f009674]
+      x-ms-routing-request-id: ['WESTUS2:20181017T190724Z:149dfd37-311c-4e24-9bb6-0c3a693fa8e7']
+    status: {code: 200, message: OK}
+version: 1

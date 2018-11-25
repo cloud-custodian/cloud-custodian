@@ -22,12 +22,15 @@ subnets:
 security_groups:
   - sg-abbdaaf3
   - sg-bbd3erfa
-
+# Dead Letter Config is optional
+dead_letter_config:
+  TargetArn: arn:aws:sqs:us-east-1:0911411411411:my-dead-letter-queue
 
 ## Mailer Infrastructure Config
 
 # memcached for caching ldap lookups
-cache: "c7n-somewhere.out.there.cache.amazonaws.com"
+cache_engine: redis
+redis_host: "c7n-somewhere.out.there.cache.amazonaws.com"
 
 # ldap server for resolving users
 ldap_uri: "ldap://your_active_directory"
@@ -40,3 +43,9 @@ ldap_bind_password: "base64_encoded_ciphertext_password"
 # For sending to sns topics we need to assume back into the target account
 cross_accounts:
   '991119991111': 'arn:aws:iam::991119991111:role/MyDeliveryRole'
+
+# if your usernames match email addresses
+# you can set an org domain here which is appended to the username
+# to send to
+org_domain: example.com
+

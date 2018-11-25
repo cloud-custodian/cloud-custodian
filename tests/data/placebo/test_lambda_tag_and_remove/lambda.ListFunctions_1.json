@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "d0ed812f-251f-11e8-90e4-c5853296b6f0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sun, 11 Mar 2018 11:32:01 GMT",
+                "content-type": "application/json",
+                "content-length": "620",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d0ed812f-251f-11e8-90e4-c5853296b6f0"
+            },
+            "RetryAttempts": 0
+        },
+        "Functions": [
+            {
+                "FunctionName": "CloudCustodian",
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:CloudCustodian",
+                "Runtime": "go1.x",
+                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
+                "Handler": "hello",
+                "CodeSize": 1395524,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2018-03-11T11:31:11.206+0000",
+                "CodeSha256": "k1Tv8J0D/hD4MBVvk0xbwJHIrmd/AKjzJ4E2xVjMfdc=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }
+            }
+        ]
+    }
+}

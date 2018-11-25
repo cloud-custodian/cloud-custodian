@@ -1,0 +1,99 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBClusters": [
+            {
+                "MasterUsername": "c7ntest", 
+                "ReaderEndpoint": "c7ntest.cluster-ro-c4afdoxtvswa.us-east-2.rds.amazonaws.com", 
+                "ReadReplicaIdentifiers": [], 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-8b788fe2"
+                    }
+                ], 
+                "HostedZoneId": "Z2XHWR1WZ565X2", 
+                "Status": "available", 
+                "MultiAZ": true, 
+                "LatestRestorableTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 1, 
+                    "microsecond": 326000, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 34
+                }, 
+                "PreferredBackupWindow": "09:10-09:40", 
+                "DBSubnetGroup": "default", 
+                "AllocatedStorage": 1, 
+                "BackupRetentionPeriod": 1, 
+                "PreferredMaintenanceWindow": "sat:03:02-sat:03:32", 
+                "Engine": "aurora", 
+                "Endpoint": "c7ntest.cluster-c4afdoxtvswa.us-east-2.rds.amazonaws.com", 
+                "AssociatedRoles": [], 
+                "EarliestRestorableTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 43, 
+                    "microsecond": 758000, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 22
+                }, 
+                "IAMDatabaseAuthenticationEnabled": false, 
+                "ClusterCreateTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 44, 
+                    "microsecond": 906000, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 21
+                }, 
+                "EngineVersion": "5.6.10a", 
+                "DBClusterIdentifier": "c7ntest", 
+                "DbClusterResourceId": "cluster-R5WF6NWSEGLSIKCJCXV65ANRUE", 
+                "DBClusterMembers": [
+                    {
+                        "IsClusterWriter": true, 
+                        "DBClusterParameterGroupStatus": "in-sync", 
+                        "PromotionTier": 1, 
+                        "DBInstanceIdentifier": "c7ntest"
+                    }, 
+                    {
+                        "IsClusterWriter": false, 
+                        "DBClusterParameterGroupStatus": "in-sync", 
+                        "PromotionTier": 1, 
+                        "DBInstanceIdentifier": "c7ntest-us-east-2b"
+                    }
+                ], 
+                "DBClusterArn": "arn:aws:rds:us-east-2:123456789012:cluster:c7ntest", 
+                "StorageEncrypted": false, 
+                "DatabaseName": "c7ntest", 
+                "DBClusterParameterGroup": "default.aurora5.6", 
+                "AvailabilityZones": [
+                    "us-east-2a", 
+                    "us-east-2b", 
+                    "us-east-2c"
+                ], 
+                "Port": 3306
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c4d2978e-6bce-11e7-8bc1-657a32d20107", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c4d2978e-6bce-11e7-8bc1-657a32d20107", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3030", 
+                "content-type": "text/xml", 
+                "date": "Tue, 18 Jul 2017 15:35:46 GMT"
+            }
+        }
+    }
+}

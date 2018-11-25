@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-west-2:644160558196:db:test", 
+                "Tags": [
+                    {
+                        "Value": "test", 
+                        "Key": "Owner"
+                    }, 
+                    {
+                        "Value": "Minor engine upgrade available: upgrade@2017/10/18", 
+                        "Key": "custodian_upgrade"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "eea5431b-9a18-11e7-ae1c-8122d42db697", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "eea5431b-9a18-11e7-ae1c-8122d42db697", 
+                "date": "Fri, 15 Sep 2017 13:22:32 GMT", 
+                "content-length": "239", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

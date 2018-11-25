@@ -6,51 +6,48 @@
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
                         "IpRanges": [
                             {
                                 "CidrIp": "0.0.0.0/0"
                             }
                         ], 
                         "UserIdGroupPairs": [], 
-                        "PrefixListIds": []
+                        "Ipv6Ranges": []
                     }
                 ], 
-                "Description": "default VPC security group", 
-                "Tags": [
-                    {
-                        "Value": "Private", 
-                        "Key": "NetworkLocation"
-                    }
-                ], 
+                "Description": "AutoScaling-Security-Group-1 (2017-02-25 00:13:20.344-05:00)", 
                 "IpPermissions": [
                     {
-                        "IpProtocol": "-1", 
-                        "IpRanges": [], 
-                        "UserIdGroupPairs": [
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
                             {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-aa6c90c3"
+                                "CidrIp": "0.0.0.0/0"
                             }
                         ], 
-                        "PrefixListIds": []
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
                     }
                 ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-5f6c9936", 
+                "GroupName": "AutoScaling-Security-Group-1", 
+                "VpcId": "vpc-d2d616b5", 
                 "OwnerId": "644160558196", 
-                "GroupId": "sg-aa6c90c3"
+                "GroupId": "sg-0b3d3377"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "1f7b3100-d335-4211-a87d-935eab040262", 
+            "RequestId": "b2cebfef-3595-4482-a96b-e2a85fbb92a1", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sun, 06 Nov 2016 17:00:06 GMT"
+                "date": "Tue, 27 Jun 2017 18:29:27 GMT"
             }
         }
     }

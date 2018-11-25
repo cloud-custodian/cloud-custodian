@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """A cloudwatch log subscriber that records error messages into getsentry.com
 
 Features
@@ -52,6 +51,7 @@ OrgMode
    to sentry projects
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
 import base64
@@ -61,7 +61,6 @@ import json
 import logging
 import os
 import time
-import urlparse
 import uuid
 import zlib
 
@@ -71,6 +70,9 @@ from botocore.exceptions import ClientError
 from botocore.vendored import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
+from six.moves.urllib.parse import urlparse
+
+from c7n.config import Bag
 
 sqs = logs = config = None
 
@@ -101,7 +103,7 @@ def process_log_event(event, context):
     # Grab the actual error log payload
     serialized = event['awslogs'].pop('data')
     data = json.loads(zlib.decompress(
-        base64.b64decode(serialized), 16+zlib.MAX_WBITS))
+        base64.b64decode(serialized), 16 + zlib.MAX_WBITS))
     msg = get_sentry_message(config, data)
     if msg is None:
         return
@@ -151,7 +153,7 @@ def process_log_group(config):
     event_count = 0
     log.debug("Querying log events with %s", params)
     for p in paginator.paginate(**params):
-        #log.debug("Searched streams\n %s", ", ".join(
+        # log.debug("Searched streams\n %s", ", ".join(
         #    [s['logStreamName'] for s in p['searchedLogStreams']]))
         for e in p['events']:
             event_count += 1
@@ -169,7 +171,7 @@ def process_log_group(config):
 
 def send_sentry_message(sentry_dsn, msg):
     # reversed from raven.base along with raven docs
-    parsed = urlparse.urlparse(sentry_dsn)
+    parsed = urlparse(sentry_dsn)
     key, secret = parsed.netloc.split('@')[0].split(':')
     project_id = parsed.path.strip('/')
     msg['project'] = project_id
@@ -180,7 +182,7 @@ def send_sentry_message(sentry_dsn, msg):
     auth_header_keys = [
         ('sentry_timestamp', time.time()),
         ('sentry_client', client),
-        ('sentry_version', '7'), # try 7?
+        ('sentry_version', '7'),  # try 7?
         ('sentry_key', key),
         ('sentry_secret', secret)]
     auth_header = "Sentry %s" % ', '.join(
@@ -223,7 +225,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
         _, level, logger, msg_frag = [s.strip() for s in error_msg[
             error_msg.find(','):].split('-', 3)]
         error_msg = " - ".join([level, logger, msg_frag])
-    except:
+    except Exception:
         level, logger = 'ERROR', None
 
     for f in reversed(error['stacktrace']['frames']):
@@ -250,7 +252,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
     sentry_msg = {
         'event_id': uuid.uuid4().hex,
         'timestamp': datetime.fromtimestamp(
-            data['logEvents'][0]['timestamp']/1000).isoformat(),
+            data['logEvents'][0]['timestamp'] / 1000).isoformat(),
         'user': {
             'id': config['account_id'],
             'username': config['account_name']},
@@ -271,7 +273,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
         sentry_msg['breadcrumbs'] = [
             {'category': 'policy',
              'message': e['message'],
-             'timestamp': e['timestamp']/1000} for e in breadcrumbs]
+             'timestamp': e['timestamp'] / 1000} for e in breadcrumbs]
     return sentry_msg
 
 
@@ -283,12 +285,12 @@ def parse_traceback(msg, site_path="site-packages", in_app_prefix="c7n"):
     """
 
     data = {}
-    lines = filter(None, msg.split('\n'))
+    lines = list(filter(None, msg.split('\n')))
     data['frames'] = []
     err_ctx = None
 
     for l in lines[1:-1]:
-        l = l.strip()
+        l = l.strip() # noqa E741
         if l.startswith('Traceback'):
             continue
         elif l.startswith('File'):
@@ -317,7 +319,7 @@ def parse_traceback(msg, site_path="site-packages", in_app_prefix="c7n"):
         'stacktrace': data}
 
 
-def get_function(session_factory, name, handler, role,
+def get_function(session_factory, name, handler, runtime, role,
                  log_groups,
                  project, account_name, account_id,
                  sentry_dsn,
@@ -333,7 +335,7 @@ def get_function(session_factory, name, handler, role,
     config = dict(
         name=name,
         handler=handler,
-        runtime='python2.7',
+        runtime=runtime,
         memory_size=512,
         timeout=15,
         role=role,
@@ -360,7 +362,7 @@ def get_function(session_factory, name, handler, role,
 
 
 def orgreplay(options):
-    from common import Bag, get_accounts
+    from .common import get_accounts
     accounts = get_accounts(options)
 
     auth_headers = {'Authorization': 'Bearer %s' % options.sentry_token}
@@ -368,7 +370,7 @@ def orgreplay(options):
     sget = partial(requests.get, headers=auth_headers)
     spost = partial(requests.post, headers=auth_headers)
 
-    dsn = urlparse.urlparse(options.sentry_dsn)
+    dsn = urlparse(options.sentry_dsn)
     endpoint = "%s://%s/api/0/" % (
         dsn.scheme,
         "@" in dsn.netloc and dsn.netloc.rsplit('@', 1)[1] or dsn.netloc)
@@ -393,7 +395,7 @@ def orgreplay(options):
             log.info("creating account project %s", a['name'])
             spost(endpoint + "teams/%s/%s/projects/" % (
                 options.sentry_org, team_name),
-                  json={'name': a['name']})
+                json={'name': a['name']})
 
         bagger = partial(
             Bag,
@@ -429,7 +431,6 @@ def orgreplay(options):
 
     return [process_account(a) for a in accounts]
 
-
     with ThreadPoolExecutor(max_workers=3) as w:
         futures = {}
         for a in accounts:
@@ -441,7 +442,7 @@ def orgreplay(options):
 
 
 def deploy(options):
-    from common import get_accounts
+    from .common import get_accounts
     for account in get_accounts(options):
         for region_name in options.regions:
             for fname, config in account['config_files'].items():
@@ -453,7 +454,9 @@ def deploy(options):
 
 def deploy_one(region_name, account, policy, sentry_dsn):
     from c7n.mu import LambdaManager
-    session_factory = lambda: boto3.Session(region_name=region_name)
+
+    def session_factory():
+        return boto3.Session(region_name=region_name)
     log_group_name = '/aws/lambda/custodian-{}'.format(policy['name'])
     arn = 'arn:aws:logs:{}:{}:log-group:{}:*'.format(
         region_name, account['account_id'], log_group_name)
@@ -461,6 +464,7 @@ def deploy_one(region_name, account, policy, sentry_dsn):
         session_factory=session_factory,
         name='cloud-custodian-sentry',
         handler='handler.process_log_event',
+        runtime=account.get('runtime', 'python2.7'),
         role=account['role'],
         log_groups=[{'logGroupName': log_group_name, 'arn': arn}],
         project=None,
@@ -474,17 +478,18 @@ def deploy_one(region_name, account, policy, sentry_dsn):
 
 
 def setup_parser():
-    from common import setup_parser as common_parser
+    from .common import setup_parser as common_parser
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', default=False, action="store_true")
-    subs = parser.add_subparsers()
+    subs = parser.add_subparsers(dest='command')
+    subs.required = True
 
     cmd_orgreplay = subs.add_parser('orgreplay')
     common_parser(cmd_orgreplay)
     cmd_orgreplay.set_defaults(command=orgreplay)
     cmd_orgreplay.add_argument('--profile')
-    #cmd_orgreplay.add_argument('--role')
+    # cmd_orgreplay.add_argument('--role')
     cmd_orgreplay.add_argument('--start')
     cmd_orgreplay.add_argument('--end')
     cmd_orgreplay.add_argument('--sentry-org', default="c7n")
@@ -520,9 +525,9 @@ if __name__ == '__main__':
 
     try:
         main()
-    except SystemExit, KeyboardInterrupt:
+    except (SystemExit, KeyboardInterrupt):
         raise
-    except:
+    except Exception:
         import traceback, sys, pdb
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

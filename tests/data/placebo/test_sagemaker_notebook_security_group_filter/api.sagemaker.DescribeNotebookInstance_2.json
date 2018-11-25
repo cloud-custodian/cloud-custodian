@@ -1,0 +1,43 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fbc898b0-772e-4488-8f5e-41b41c1e9be4", 
+            "HTTPHeaders": {
+                "date": "Thu, 10 May 2018 15:23:11 GMT", 
+                "x-amzn-requestid": "fbc898b0-772e-4488-8f5e-41b41c1e9be4", 
+                "content-length": "438", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "NotebookInstanceStatus": "InService", 
+        "Url": "kapil-playground.notebook.us-east-1.sagemaker.aws", 
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369", 
+        "NotebookInstanceName": "kapil-playground", 
+        "CreationTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 55, 
+            "microsecond": 143000, 
+            "year": 2018, 
+            "day": 26, 
+            "minute": 19
+        }, 
+        "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:644160558196:notebook-instance/kapil-playground", 
+        "LastModifiedTime": {
+            "hour": 14, 
+            "__class__": "datetime", 
+            "month": 1, 
+            "second": 35, 
+            "microsecond": 138000, 
+            "year": 2018, 
+            "day": 26, 
+            "minute": 24
+        }, 
+        "InstanceType": "ml.t2.medium"
+    }
+}

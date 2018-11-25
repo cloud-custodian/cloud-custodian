@@ -1,0 +1,24 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 404, 
+            "RetryAttempts": 0, 
+            "HostId": "kc8s8cBBhlLygeQ/9s12GN48YcnqmP8VASn0HeqQJbxMFW8ao0TH2bWWZ7SsnGTotHx6f72PkRw=", 
+            "RequestId": "BE697604AD64CBB0", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "kc8s8cBBhlLygeQ/9s12GN48YcnqmP8VASn0HeqQJbxMFW8ao0TH2bWWZ7SsnGTotHx6f72PkRw=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "BE697604AD64CBB0", 
+                "date": "Wed, 15 Nov 2017 16:15:29 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "The server side encryption configuration was not found", 
+            "Code": "ServerSideEncryptionConfigurationNotFoundError", 
+            "BucketName": "custodian-enable-bucket-encryption-aes256"
+        }
+    }
+}

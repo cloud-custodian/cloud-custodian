@@ -14,7 +14,7 @@ from docutils.statemachine import ViewList
 from docutils.parsers.rst.directives import unchanged
 
 from sphinx.errors import SphinxError
-from sphinx.util.compat import Directive
+from sphinx.directives import Directive
 from sphinx.util.nodes import nested_parse_with_titles
 
 from .templates import TEMPLATE_C7N_SCHEMA
@@ -63,14 +63,20 @@ class C7nSchemaDirective(Directive):
         try:
             module = importlib.import_module(module_name)
         except ImportError:
-            raise SphinxError("Unable to generate reference docs for %s, couldn't import module '%s'" % (model_name, module_name))
+            raise SphinxError(
+                "Unable to generate reference docs for %s, couldn't import module '%s'" %
+                (model_name, module_name))
 
         model = getattr(module, model_name, None)
         if model is None:
-            raise SphinxError("Unable to generate reference docs for %s, no model '%s' in %s" % (model_name, model_name, module_name))
+            raise SphinxError(
+                "Unable to generate reference docs for %s, no model '%s' in %s" %
+                (model_name, model_name, module_name))
 
         if not hasattr(model, 'schema'):
-            raise SphinxError("Unable to generate reference docs for %s, model '%s' does not have a 'schema' attribute" % (model_name, model_name))
+            raise SphinxError(
+                "Unable to generate reference docs for %s, model '%s' does not\
+                 have a 'schema' attribute" % (model_name, model_name))
 
         schema = reformat_schema(model)
 

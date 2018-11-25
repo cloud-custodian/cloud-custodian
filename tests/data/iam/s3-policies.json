@@ -1,0 +1,287 @@
+[
+  {
+    "Id": "PrincipalInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Principal": {
+          "AWS": [
+            "arn:aws:iam::123456789012:root",
+            "arn:aws:iam::234567890123:root"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Id": "PrincipalValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        }
+      }
+    ]
+  },
+  {
+    "Id": "SourceArnLikeValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "ArnLike": {
+            "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceArnLikeInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "ArnLike": {
+            "aws:SourceArn": "arn:aws:sns:us-east-1:234567890123"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceArnEqualsValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "ArnEquals": {
+            "aws:sourcearn": "arn:aws:sns:us-east-1:123456789012:topic-name"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceArnEqualsInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "ArnEquals": {
+            "aws:sourcearn": "arn:aws:sns:us-east-1:234567890123:topic-name"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceVpcEqualsValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:sourceVpc": "vpc-12345678"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceVpcEqualsInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:sourceVpc": "vpc-01234567"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceVpceEqualsValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:sourceVpce": "vpce-12345678"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceVpceEqualsInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "StringEquals": {
+            "aws:sourceVpce": "vpce-01234567"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "ForAllValuesValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "ForAllValues:StringEquals": {
+            "s3:PutObject": [
+              "server-side-encryption", "body"]
+          }
+        },
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        }
+      }
+    ]
+  },
+  {
+    "Id": "ForAllValuesInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "ForAllValues:StringEquals": {
+            "s3:PutObject": [
+              "server-side-encryption", "body"]
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "ForAnyValuesValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "ForAnyValues:StringEquals": {
+            "s3:PutObject": [
+              "server-side-encryption", "body"]
+          }
+        },
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        }
+      }
+    ]
+  },
+  {
+    "Id": "ForAnyValuesInvalid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-invalid/*",
+        "Condition": {
+          "ForAnyValues:StringEquals": {
+            "s3:PutObject": [
+              "server-side-encryption", "body"]
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  }
+]

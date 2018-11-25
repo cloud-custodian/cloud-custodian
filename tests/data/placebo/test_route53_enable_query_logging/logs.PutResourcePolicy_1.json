@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourcePolicy": {
+            "policyName": "Route53LogWrites",
+            "policyDocument": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Sid\": \"Route53LogsToCloudWatchLogs\", \"Effect\": \"Allow\", \"Principal\": {\"Service\": [\"route53.amazonaws.com\"]}, \"Action\": [\"logs:PutLogEvents\", \"logs:CreateLogStream\"], \"Resource\": \"arn:aws:logs:us-east-1:644160558196:log-group:/aws/route53/cloudcustodian.io:*\"}]}",
+            "lastUpdatedTime": 1543088936623
+        },
+        "ResponseMetadata": {
+            "RequestId": "fab76524-f021-11e8-8954-1bd3e938d6d2",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fab76524-f021-11e8-8954-1bd3e938d6d2",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "437",
+                "date": "Sat, 24 Nov 2018 19:48:56 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

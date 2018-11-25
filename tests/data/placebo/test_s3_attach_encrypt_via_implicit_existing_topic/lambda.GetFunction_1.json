@@ -1,0 +1,22 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "ea3bdebd-0a21-11e7-967a-835e56cc92d1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ea3bdebd-0a21-11e7-967a-835e56cc92d1", 
+                "content-length": "109", 
+                "connection": "keep-alive", 
+                "date": "Thu, 16 Mar 2017 08:24:03 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "ResourceNotFoundException"
+            }
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:c7n-s3-encrypt", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

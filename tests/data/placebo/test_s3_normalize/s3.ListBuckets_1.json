@@ -1,0 +1,77 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 18
+                }, 
+                "Name": "custodian-skunk-billing"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "Name": "custodian-skunk-trails"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 31, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 12
+                }, 
+                "Name": "custodian-test-data-23"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "L2sYLY6/oloyEI/tucLPOGTMMTg4xy2nydc2ioKfChs7bXzvbArY3FS6TXS7mYEfJnQeVuTNj9A=", 
+            "RequestId": "15CEC08DE163DE3B", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "L2sYLY6/oloyEI/tucLPOGTMMTg4xy2nydc2ioKfChs7bXzvbArY3FS6TXS7mYEfJnQeVuTNj9A=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "15CEC08DE163DE3B", 
+                "date": "Thu, 10 Aug 2017 14:12:42 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

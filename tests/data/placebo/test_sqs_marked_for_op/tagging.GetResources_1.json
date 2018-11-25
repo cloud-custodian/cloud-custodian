@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:test-sqs",
+                "Tags": [
+                    {
+                        "Key": "tag-for-op",
+                        "Value": "Resource does not meet policy: delete@2017/11/01"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "656f0ea5-41ab-11e8-9463-09f6da80cac3",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "656f0ea5-41ab-11e8-9463-09f6da80cac3",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "200",
+                "date": "Mon, 16 Apr 2018 19:21:42 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

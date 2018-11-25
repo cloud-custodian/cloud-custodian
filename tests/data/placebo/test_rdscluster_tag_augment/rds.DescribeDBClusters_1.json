@@ -1,0 +1,92 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBClusters": [
+            {
+                "MasterUsername": "root", 
+                "ReaderEndpoint": "scot-test-cluster.cluster-ro-cz6wy8cci3uf.us-east-1.rds.amazonaws.com", 
+                "ReadReplicaIdentifiers": [], 
+                "VpcSecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "VpcSecurityGroupId": "sg-0b3d3377"
+                    }
+                ], 
+                "HostedZoneId": "Z2R2ITUGPM61AM", 
+                "Status": "available", 
+                "MultiAZ": false, 
+                "LatestRestorableTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 25, 
+                    "microsecond": 874000, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 47
+                }, 
+                "PreferredBackupWindow": "09:45-10:15", 
+                "DBSubnetGroup": "default", 
+                "AllocatedStorage": 1, 
+                "BackupRetentionPeriod": 1, 
+                "PreferredMaintenanceWindow": "sat:05:57-sat:06:27", 
+                "Engine": "aurora", 
+                "Endpoint": "scot-test-cluster.cluster-cz6wy8cci3uf.us-east-1.rds.amazonaws.com", 
+                "EarliestRestorableTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 5, 
+                    "microsecond": 774000, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 14
+                }, 
+                "IAMDatabaseAuthenticationEnabled": false, 
+                "ClusterCreateTime": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 25, 
+                    "microsecond": 714000, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 13
+                }, 
+                "EngineVersion": "5.6.10a", 
+                "DBClusterIdentifier": "scot-test-cluster", 
+                "DbClusterResourceId": "cluster-AHBKTFUVCNNCCPXFWMQNBEX7GA", 
+                "DBClusterMembers": [
+                    {
+                        "IsClusterWriter": true, 
+                        "DBClusterParameterGroupStatus": "in-sync", 
+                        "PromotionTier": 1, 
+                        "DBInstanceIdentifier": "scot-test"
+                    }
+                ], 
+                "DBClusterArn": "arn:aws:rds:us-east-1:644160558196:cluster:scot-test-cluster", 
+                "StorageEncrypted": false, 
+                "AssociatedRoles": [], 
+                "DBClusterParameterGroup": "default.aurora5.6", 
+                "AvailabilityZones": [
+                    "us-east-1a", 
+                    "us-east-1b", 
+                    "us-east-1e"
+                ], 
+                "Port": 3306
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fadda864-5c32-11e7-9765-039fb83f1357", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fadda864-5c32-11e7-9765-039fb83f1357", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2711", 
+                "content-type": "text/xml", 
+                "date": "Wed, 28 Jun 2017 18:52:47 GMT"
+            }
+        }
+    }
+}

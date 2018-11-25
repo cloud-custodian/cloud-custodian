@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "d1c03ad2-251f-11e8-83f1-e9d81611c3ab",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sun, 11 Mar 2018 11:32:02 GMT",
+                "content-type": "application/json",
+                "content-length": "25",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d1c03ad2-251f-11e8-83f1-e9d81611c3ab"
+            },
+            "RetryAttempts": 0
+        },
+        "Tags": {
+            "xyz": "abcdef"
+        }
+    }
+}

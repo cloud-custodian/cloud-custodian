@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Location": "/skunk-trails-test-us-east-1", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "eHtUYMSYsoo8SU0Zmb6aIxxYvGpw34+1xMOl0Tx/qjJddHnA6GFE4YvMCeJ2FAxyup2UsnrujA8=", 
+            "RequestId": "58F09FE0E0DB4195", 
+            "HTTPHeaders": {
+                "content-length": "0", 
+                "x-amz-id-2": "eHtUYMSYsoo8SU0Zmb6aIxxYvGpw34+1xMOl0Tx/qjJddHnA6GFE4YvMCeJ2FAxyup2UsnrujA8=", 
+                "server": "AmazonS3", 
+                "x-amz-request-id": "58F09FE0E0DB4195", 
+                "location": "/skunk-trails-test-us-east-1", 
+                "date": "Thu, 02 Nov 2017 04:45:05 GMT"
+            }
+        }
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:kinesis:us-east-1:644160558196:stream/test-yes-encrypt", 
+                "Tags": [
+                    {
+                        "Value": "home", 
+                        "Key": "Origin"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6684080e-7f66-11e7-832b-9b00bfea7ed6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6684080e-7f66-11e7-832b-9b00bfea7ed6", 
+                "date": "Sat, 12 Aug 2017 13:59:03 GMT", 
+                "content-length": "171", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

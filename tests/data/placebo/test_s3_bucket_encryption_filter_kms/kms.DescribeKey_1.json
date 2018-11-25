@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyMetadata": {
+            "Origin": "AWS_KMS", 
+            "KeyId": "079a6f7d-5f8a-4da1-a465-30aa099b9688", 
+            "Description": "Default master key that protects my S3 objects when no other key is defined", 
+            "KeyManager": "AWS", 
+            "Enabled": true, 
+            "KeyUsage": "ENCRYPT_DECRYPT", 
+            "KeyState": "Enabled", 
+            "CreationDate": {
+                "hour": 10, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 9, 
+                "microsecond": 25000, 
+                "year": 2017, 
+                "day": 21, 
+                "minute": 35
+            }, 
+            "Arn": "arn:aws:kms:us-east-1:108891588060:key/079a6f7d-5f8a-4da1-a465-30aa099b9688", 
+            "AWSAccountId": "108891588060"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b5f0a391-ced2-11e7-888f-9d643296b3e3", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b5f0a391-ced2-11e7-888f-9d643296b3e3", 
+                "content-length": "405", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrl": "https://queue.amazonaws.com/644160558196/test-sqs",
+        "ResponseMetadata": {
+            "RequestId": "ae135060-acb4-5878-b2d8-032e555399e5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Mon, 16 Apr 2018 19:21:11 GMT",
+                "content-type": "text/xml",
+                "content-length": "320",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "ae135060-acb4-5878-b2d8-032e555399e5"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

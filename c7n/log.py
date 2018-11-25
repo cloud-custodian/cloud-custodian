@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ std logging does default lock acquisition around handler emit).
 also uses a single thread for all outbound. Background thread
 uses a separate session.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import boto3
-from botocore.exceptions import ClientError
+from c7n.exceptions import ClientError
 
 import itertools
 import logging
@@ -71,7 +71,7 @@ class CloudWatchLogHandler(logging.Handler):
         super(CloudWatchLogHandler, self).__init__()
         self.log_group = log_group
         self.log_stream = log_stream
-        self.session_factory = session_factory or boto3.Session
+        self.session_factory = session_factory
         self.transport = None
         self.queue = Queue.Queue()
         self.threads = []

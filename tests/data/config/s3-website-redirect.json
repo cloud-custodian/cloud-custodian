@@ -1,0 +1,34 @@
+{
+    "version": "1.2",
+    "accountId": "644160558196",
+    "configurationItemCaptureTime": "2017-06-14T00:57:03.508000-04:00",
+    "configurationItemStatus": "ResourceDiscovered",
+    "configurationStateId": "1497416223508",
+    "configurationItemMD5Hash": "40d02f979d083aac58aa0ef1adf0e365",
+    "arn": "arn:aws:s3:::partnerships-lossmit-dev",
+    "resourceType": "AWS::S3::Bucket",
+    "resourceId": "analysis-dev",
+    "resourceName": "analysis-dev",
+    "awsRegion": "us-east-1",
+    "availabilityZone": "Regional",
+    "resourceCreationTime": "2017-01-31T07:59:21-05:00",
+    "tags": {
+	"App": "ANALYSIS",
+	"Environment": "QA",
+	"OwnerContact": "me@example.com"
+    },
+    "relatedEvents": [],
+    "relationships": [],
+    "configuration": "{\"name\":\"analysis-dev\",\"owner\":{\"displayName\":\"aws-example\",\"id\":\"b08aa2c849dbcbab5000111aaancc0002334123123123123123123\"},\"creationDate\":\"2017-01-31T12:59:21.000Z\"}",
+    "supplementaryConfiguration": {
+	"AccessControlList": "\"{\\\"grantSet\\\":null,\\\"grantList\\\":[{\\\"grantee\\\":{\\\"id\\\":\\\"b08aa2c849dbcbab5000111aaancc0002334123123123123123123\\\",\\\"displayName\\\":\\\"aws-example\\\"},\\\"permission\\\":\\\"FullControl\\\"}],\\\"owner\\\":{\\\"displayName\\\":\\\"aws-example\\\",\\\"id\\\":\\\"b08aa2c849dbcbab5000111aaancc0002334123123123123123123\\\"},\\\"isRequesterCharged\\\":false}\"",
+	"BucketAccelerateConfiguration": "{\"status\":null}",
+	"BucketLoggingConfiguration": "{\"destinationBucketName\":null,\"logFilePrefix\":null}",
+	"BucketNotificationConfiguration": "{\"configurations\":{\"5bbcd52e-b630-4b46-b458-99bc04537d78\":{\"type\":\"LambdaConfiguration\",\"functionARN\":\"arn:aws:lambda:us-east-1:644160558196:function:fNotification\",\"events\":[\"s3:ObjectCreated:*\"],\"objectPrefixes\":[],\"filter\":{\"s3KeyFilter\":{\"filterRules\":[{\"name\":\"Prefix\",\"value\":\"Source\"},{\"name\":\"Suffix\",\"value\":\"txt\"}]}}}}}",
+	"BucketPolicy": "{\"policyText\":\"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"RequiredEncryptedPutObject\\\",\\\"Effect\\\":\\\"Deny\\\",\\\"Principal\\\":\\\"*\\\",\\\"Action\\\":\\\"s3:PutObject\\\",\\\"Resource\\\":\\\"arn:aws:s3:::analysis-dev/*\\\",\\\"Condition\\\":{\\\"StringNotEquals\\\":{\\\"s3:x-amz-server-side-encryption\\\":[\\\"AES256\\\",\\\"aws:kms\\\"]}}}]}\"}",
+	"BucketTaggingConfiguration": "{\"tagSets\":[{\"tags\":{\"OwnerContact\":\"me@example.com\",\"App\":\"ANALYSIS\",\"Environment\":\"QA\"}}]}",
+	"BucketVersioningConfiguration": "{\"status\":\"Off\",\"isMfaDeleteEnabled\":null}",
+	"BucketWebsiteConfiguration": "{\"indexDocumentSuffix\":null,\"errorDocument\":null,\"redirectAllRequestsTo\":{\"protocol\":\"https\",\"hostName\":\"www.google.com/\",\"replaceKeyPrefixWith\":null,\"replaceKeyWith\":null,\"httpRedirectCode\":null},\"routingRules\":[]}",
+	"IsRequesterPaysEnabled": "false"
+    }
+}

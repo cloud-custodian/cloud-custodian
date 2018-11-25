@@ -1,0 +1,117 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-2:644160558196:cluster:megacache-0001-001", 
+                "Tags": [
+                    {
+                        "Value": "MegaCache", 
+                        "Key": "App"
+                    }, 
+                    {
+                        "Value": "Dev", 
+                        "Key": "Env"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-2:644160558196:cluster:megacache-0001-002", 
+                "Tags": [
+                    {
+                        "Value": "MegaCache", 
+                        "Key": "App"
+                    }, 
+                    {
+                        "Value": "Dev", 
+                        "Key": "Env"
+                    }, 
+                    {
+                        "Value": "Dev", 
+                        "Key": "Origin"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-2:644160558196:cluster:megacache-0001-003", 
+                "Tags": [
+                    {
+                        "Value": "MegaCache", 
+                        "Key": "App"
+                    }, 
+                    {
+                        "Value": "Blue", 
+                        "Key": "Color"
+                    }, 
+                    {
+                        "Value": "Dev", 
+                        "Key": "Env"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-2:644160558196:cluster:megacache-0002-001", 
+                "Tags": [
+                    {
+                        "Value": "MegaCache", 
+                        "Key": "App"
+                    }, 
+                    {
+                        "Value": "Dev", 
+                        "Key": "Env"
+                    }, 
+                    {
+                        "Value": "3", 
+                        "Key": "Zone"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-2:644160558196:cluster:megacache-0002-002", 
+                "Tags": [
+                    {
+                        "Value": "MegaCache", 
+                        "Key": "App"
+                    }, 
+                    {
+                        "Value": "Dev", 
+                        "Key": "Env"
+                    }, 
+                    {
+                        "Value": "1", 
+                        "Key": "Zone"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-2:644160558196:cluster:megacache-0002-003", 
+                "Tags": [
+                    {
+                        "Value": "MegaCache", 
+                        "Key": "App"
+                    }, 
+                    {
+                        "Value": "Dev", 
+                        "Key": "Env"
+                    }, 
+                    {
+                        "Value": "12", 
+                        "Key": "Zone"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2d238f22-5079-11e8-9d05-41469817b695", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2d238f22-5079-11e8-9d05-41469817b695", 
+                "date": "Sat, 05 May 2018 15:30:01 GMT", 
+                "content-length": "1147", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

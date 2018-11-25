@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8b7a3e58-a9d2-11e7-826f-518bd679fab1", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8b7a3e58-a9d2-11e7-826f-518bd679fab1", 
+                "date": "Thu, 05 Oct 2017 13:38:59 GMT", 
+                "content-length": "78", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Subscription": {
+            "StartTime": {
+                "hour": 9, 
+                "__class__": "datetime", 
+                "month": 10, 
+                "second": 0, 
+                "microsecond": 0, 
+                "year": 2017, 
+                "day": 5, 
+                "minute": 39
+            }, 
+            "TimeCommitmentInSeconds": 31622400
+        }
+    }
+}

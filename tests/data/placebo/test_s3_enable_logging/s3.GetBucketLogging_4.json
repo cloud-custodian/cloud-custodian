@@ -1,17 +1,22 @@
 {
     "status_code": 200, 
     "data": {
+        "LoggingEnabled": {
+            "TargetPrefix": "custodian-skunk-works/superduper-and-magic", 
+            "TargetBucket": "superduper-and-magic"
+        }, 
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
             "RetryAttempts": 0, 
-            "HostId": "o2ve4IIGZh+mzbE3C4jaBdLPz1lacT8FiXsgcvYB3KFPi7EMvqbtN7Q46oiXEydPFB1eptT6Crg=", 
-            "RequestId": "AFDE6908D3AF92CB", 
+            "HostId": "3UTfvwAhJwq+QXKEhbCfsS4VWMVt99BWvOiFNRYjtMztXAH2GE2w/Yj1g1SVFO6HJAPdgKYU54Y=", 
+            "RequestId": "25B3F49C3CFAAD03", 
             "HTTPHeaders": {
-                "x-amz-id-2": "o2ve4IIGZh+mzbE3C4jaBdLPz1lacT8FiXsgcvYB3KFPi7EMvqbtN7Q46oiXEydPFB1eptT6Crg=", 
-                "date": "Tue, 04 Oct 2016 15:25:36 GMT", 
+                "x-amz-id-2": "3UTfvwAhJwq+QXKEhbCfsS4VWMVt99BWvOiFNRYjtMztXAH2GE2w/Yj1g1SVFO6HJAPdgKYU54Y=", 
+                "server": "AmazonS3", 
                 "transfer-encoding": "chunked", 
-                "x-amz-request-id": "AFDE6908D3AF92CB", 
-                "server": "AmazonS3"
+                "x-amz-request-id": "25B3F49C3CFAAD03", 
+                "date": "Thu, 18 Jan 2018 09:46:26 GMT", 
+                "content-type": "application/xml"
             }
         }
     }

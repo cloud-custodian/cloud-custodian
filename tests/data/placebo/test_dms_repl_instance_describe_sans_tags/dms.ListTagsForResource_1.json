@@ -1,0 +1,21 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "66b72d1e-be24-11e7-89b8-5b94ccffd854", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "66b72d1e-be24-11e7-89b8-5b94ccffd854", 
+                "date": "Tue, 31 Oct 2017 10:15:20 GMT", 
+                "content-length": "173", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "Could not find a ReplicationInstance matching the resource name: arn:aws:dms:us-east-1:644160558196:rep:replication-instance-1", 
+            "Code": "ResourceNotFoundFault"
+        }
+    }
+}

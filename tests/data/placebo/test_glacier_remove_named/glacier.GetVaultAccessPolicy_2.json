@@ -1,0 +1,20 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "rNUyMgHrgkRRnX7MvAl8Ge5PW6ep-Ji8ZyUJw7KoivfCSbs", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "rNUyMgHrgkRRnX7MvAl8Ge5PW6ep-Ji8ZyUJw7KoivfCSbs", 
+                "date": "Sat, 16 Sep 2017 19:15:15 GMT", 
+                "content-length": "125", 
+                "content-type": "application/json"
+            }
+        }, 
+        "Error": {
+            "Message": "No vault access policy is set for: test-glacier-remove-named", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test-inactive", 
+        "ResourceTags": [
+            {
+                "Value": "c7n-eb-tag-test-inactive", 
+                "Key": "elasticbeanstalk:environment-name"
+            }, 
+            {
+                "Value": "fooValue", 
+                "Key": "fookey"
+            }, 
+            {
+                "Value": "e-pmpgbxpgsc", 
+                "Key": "elasticbeanstalk:environment-id"
+            }, 
+            {
+                "Value": "c7n-eb-tag-test-inactive", 
+                "Key": "Name"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9bd02922-d9e8-11e7-9ef7-4f4edeb23b1f", 
+            "HTTPHeaders": {
+                "date": "Tue, 05 Dec 2017 18:17:52 GMT", 
+                "x-amzn-requestid": "9bd02922-d9e8-11e7-9ef7-4f4edeb23b1f", 
+                "content-length": "900", 
+                "content-type": "text/xml", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

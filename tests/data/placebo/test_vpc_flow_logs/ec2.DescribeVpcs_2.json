@@ -3,18 +3,18 @@
     "data": {
         "Vpcs": [
             {
-                "VpcId": "vpc-d0e386b7", 
+                "VpcId": "vpc-3065db49", 
                 "InstanceTenancy": "default", 
                 "State": "available", 
-                "DhcpOptionsId": "dopt-78ab4f1c", 
+                "DhcpOptionsId": "dopt-24ff1940", 
                 "CidrBlock": "10.4.0.0/16", 
                 "IsDefault": false
             }, 
             {
-                "VpcId": "vpc-4a9ff72e", 
+                "VpcId": "vpc-d2d616b5", 
                 "InstanceTenancy": "default", 
                 "State": "available", 
-                "DhcpOptionsId": "dopt-78ab4f1c", 
+                "DhcpOptionsId": "dopt-24ff1940", 
                 "CidrBlock": "172.31.0.0/16", 
                 "IsDefault": true
             }
@@ -22,13 +22,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c38715be-9490-4cf0-b42a-4977c07023c7", 
+            "RequestId": "9f8c0cd6-45a0-4d9d-8b85-572b2006ff6d", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sat, 18 Feb 2017 23:37:35 GMT"
+                "date": "Mon, 26 Jun 2017 18:27:40 GMT"
             }
         }
     }

@@ -1,0 +1,70 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "cckeyvault1",
+            "apiVersion": "2016-10-01",
+            "location": "southcentralus",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                },
+                "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                "accessPolicies": [
+                    {
+                        "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                        "objectId": "de4152e3-335e-41b5-9b56-f8f2e043e3ee",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "certificates": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "ManageContacts",
+                                "ManageIssuers",
+                                "GetIssuers",
+                                "ListIssuers",
+                                "SetIssuers",
+                                "DeleteIssuers"
+                            ]
+                        }
+                    }
+                ],
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false
+            },
+            "dependsOn": []
+        }
+    ]
+}

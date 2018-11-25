@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "691ba8bc-c956-11e7-ba4e-51771f7b574f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "691ba8bc-c956-11e7-ba4e-51771f7b574f", 
+                "date": "Tue, 14 Nov 2017 16:11:01 GMT", 
+                "content-length": "70", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "projects": [
+            "test-delete-codebuild", 
+            "test-delete-codebuild2", 
+            "test"
+        ]
+    }
+}

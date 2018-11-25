@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "policyText": "{\n  \"Version\" : \"2008-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"WhatIsIt\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : [ \"ecr:Get*\", \"ecr:Batch*\" ]\n  } ]\n}", 
+        "repositoryName": "test-xyz", 
+        "registryId": "644160558196", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "19ad8355-92e4-11e7-b0d7-07a0454bb90a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "19ad8355-92e4-11e7-b0d7-07a0454bb90a", 
+                "content-length": "277", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 06 Sep 2017 09:16:43 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

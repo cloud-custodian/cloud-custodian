@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TargetHealthDescriptions": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d97c0c18-be17-11e7-95df-6d927c0562e4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d97c0c18-be17-11e7-95df-6d927c0562e4", 
+                "date": "Tue, 31 Oct 2017 08:45:29 GMT", 
+                "content-length": "331", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

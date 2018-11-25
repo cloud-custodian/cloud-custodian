@@ -1,0 +1,54 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "G6072x0KT1aqTsk2rrK/JtlB9DBXy1od9yrVhJCAc1vVKOaWxUMwz2DNTscMMLrpofQD2XYGwag=", 
+            "RequestId": "A2468F163C3CE279", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "G6072x0KT1aqTsk2rrK/JtlB9DBXy1od9yrVhJCAc1vVKOaWxUMwz2DNTscMMLrpofQD2XYGwag=", 
+                "date": "Thu, 16 Mar 2017 08:24:25 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "A2468F163C3CE279", 
+                "server": "AmazonS3"
+            }
+        }, 
+        "TopicConfigurations": [
+            {
+                "Filter": {
+                    "Key": {
+                        "FilterRules": [
+                            {
+                                "Name": "Suffix", 
+                                "Value": ".jpg"
+                            }
+                        ]
+                    }
+                }, 
+                "Id": "YTMxMzRlMWMtNGU2Mi00NjVkLWFmNGUtZWJhNjhhZWZjNjQ5", 
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:existing-custodian-attach-encrypt-test-jpg", 
+                "Events": [
+                    "s3:ObjectCreated:*"
+                ]
+            }, 
+            {
+                "Filter": {
+                    "Key": {
+                        "FilterRules": [
+                            {
+                                "Name": "Suffix", 
+                                "Value": ".txt"
+                            }
+                        ]
+                    }
+                }, 
+                "Id": "ZjZhMTAwMjgtZGIyNS00YTY5LThmY2EtOWZiM2IxYzcyZWYw", 
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:existing-custodian-attach-encrypt-test-txt", 
+                "Events": [
+                    "s3:ObjectCreated:*"
+                ]
+            }
+        ]
+    }
+}

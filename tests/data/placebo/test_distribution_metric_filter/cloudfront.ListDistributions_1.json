@@ -5,7 +5,7 @@
             "Marker": "", 
             "Items": [
                 {
-                    "Status": "Deployed", 
+                    "Status": "InProgress", 
                     "CacheBehaviors": {
                         "Quantity": 0
                     }, 
@@ -31,9 +31,9 @@
                         ], 
                         "Quantity": 1
                     }, 
-                    "DomainName": "d1k7b41j4nj6pa.cloudfront.net", 
+                    "DomainName": "d32plmcrnvwzrd.cloudfront.net", 
                     "WebACLId": "", 
-                    "PriceClass": "PriceClass_100", 
+                    "PriceClass": "PriceClass_All", 
                     "Enabled": true, 
                     "DefaultCacheBehavior": {
                         "TrustedSigners": {
@@ -44,7 +44,7 @@
                             "Quantity": 0
                         }, 
                         "TargetOriginId": "S3-c7n-cloudfront-test/distribution", 
-                        "ViewerProtocolPolicy": "https-only", 
+                        "ViewerProtocolPolicy": "allow-all", 
                         "ForwardedValues": {
                             "Headers": {
                                 "Quantity": 0
@@ -77,6 +77,7 @@
                         "MinTTL": 0, 
                         "Compress": false
                     }, 
+                    "IsIPV6Enabled": true, 
                     "Comment": "", 
                     "ViewerCertificate": {
                         "CloudFrontDefaultCertificate": true, 
@@ -87,17 +88,18 @@
                         "Quantity": 0
                     }, 
                     "LastModifiedTime": {
-                        "hour": 17, 
+                        "hour": 1, 
                         "__class__": "datetime", 
-                        "month": 12, 
-                        "second": 1, 
-                        "microsecond": 572000, 
-                        "year": 2016, 
-                        "day": 14, 
-                        "minute": 45
+                        "month": 6, 
+                        "second": 29, 
+                        "microsecond": 985000, 
+                        "year": 2017, 
+                        "day": 24, 
+                        "minute": 16
                     }, 
-                    "Id": "E1KG3VRTI12R7P", 
-                    "ARN": "arn:aws:cloudfront::185106417252:distribution/E1KG3VRTI12R7P", 
+                    "HttpVersion": "HTTP2", 
+                    "Id": "E2VHZ76UVAJYSC", 
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E2VHZ76UVAJYSC", 
                     "Aliases": {
                         "Quantity": 0
                     }
@@ -110,13 +112,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "f8adaa2c-c228-11e6-8aca-477e3dfe8294", 
+            "RequestId": "269d6475-587b-11e7-b4a7-c574d8ad6722", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "f8adaa2c-c228-11e6-8aca-477e3dfe8294", 
+                "x-amzn-requestid": "269d6475-587b-11e7-b4a7-c574d8ad6722", 
                 "vary": "Accept-Encoding", 
-                "content-length": "2346", 
+                "content-length": "2414", 
                 "content-type": "text/xml", 
-                "date": "Wed, 14 Dec 2016 18:13:10 GMT"
+                "date": "Sat, 24 Jun 2017 01:19:20 GMT"
             }
         }
     }

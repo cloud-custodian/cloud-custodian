@@ -2,8 +2,16 @@
     "status_code": 200, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "429f1dd2-aad5-47ef-b11a-315af3bd0789"
+            "RequestId": "d6f346e5-13c6-4dd2-9154-644ae98442c2", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 08 Jun 2017 18:23:17 GMT"
+            }
         }, 
         "Snapshots": [
             {
@@ -15,23 +23,23 @@
                     }
                 ], 
                 "Encrypted": true, 
-                "VolumeId": "vol-f4976c8e", 
-                "KmsKeyId": "arn:aws:kms:us-west-2:619193117841:key/00d9c89e-13ee-4758-9167-41de13b5bb68", 
+                "VolumeId": "vol-ffffffff", 
+                "KmsKeyId": "arn:aws:kms:us-east-1:185106417252:key/3cc8863f-09dd-45cd-90cf-d6149710582e", 
                 "State": "completed", 
                 "VolumeSize": 8, 
                 "Progress": "100%", 
                 "StartTime": {
-                    "hour": 11, 
+                    "hour": 18, 
                     "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 24, 
+                    "month": 6, 
+                    "second": 58, 
                     "microsecond": 0, 
-                    "year": 2016, 
+                    "year": 2017, 
                     "day": 8, 
-                    "minute": 10
+                    "minute": 19
                 }, 
-                "SnapshotId": "snap-ee6f74be", 
-                "OwnerId": "619193117841"
+                "SnapshotId": "snap-0bd2772f3c7cafa62", 
+                "OwnerId": "185106417252"
             }
         ]
     }

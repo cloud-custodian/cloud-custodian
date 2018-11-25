@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/Default"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "0611a237-fa61-11e7-8826-211d9210d618",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 02:00:27 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "70",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "0611a237-fa61-11e7-8826-211d9210d618"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

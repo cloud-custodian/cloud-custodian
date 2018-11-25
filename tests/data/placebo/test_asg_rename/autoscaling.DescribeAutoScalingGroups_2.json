@@ -3,85 +3,69 @@
     "data": {
         "AutoScalingGroups": [
             {
-                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:74979cda-27ca-4e8d-a3e9-a562d37794d6:autoScalingGroupName/CustodianASG", 
-                "HealthCheckGracePeriod": 300, 
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:c3ba9110-56ea-412e-a6ec-aaec45330901:autoScalingGroupName/scot-asg-test", 
+                "TargetGroupARNs": [], 
                 "SuspendedProcesses": [], 
-                "DesiredCapacity": 3, 
+                "DesiredCapacity": 1, 
                 "Tags": [
                     {
                         "ResourceType": "auto-scaling-group", 
-                        "ResourceId": "CustodianASG", 
-                        "PropagateAtLaunch": true, 
-                        "Value": "GetSome", 
-                        "Key": "CustomerId"
-                    }, 
-                    {
-                        "ResourceType": "auto-scaling-group", 
-                        "ResourceId": "CustodianASG", 
+                        "ResourceId": "scot-asg-test", 
                         "PropagateAtLaunch": true, 
                         "Value": "ubuntu", 
-                        "Key": "Linux"
+                        "Key": "Platform"
                     }
                 ], 
                 "EnabledMetrics": [], 
                 "LoadBalancerNames": [], 
-                "AutoScalingGroupName": "CustodianASG", 
+                "AutoScalingGroupName": "scot-asg-test", 
                 "DefaultCooldown": 300, 
-                "MinSize": 3, 
+                "MinSize": 1, 
                 "Instances": [
                     {
                         "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2a", 
-                        "InstanceId": "i-9206fe54", 
+                        "AvailabilityZone": "us-east-1d", 
+                        "InstanceId": "i-04ec879cd823dc92a", 
                         "HealthStatus": "Healthy", 
                         "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
-                    }, 
-                    {
-                        "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2b", 
-                        "InstanceId": "i-7b5241a3", 
-                        "HealthStatus": "Healthy", 
-                        "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
-                    }, 
-                    {
-                        "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2c", 
-                        "InstanceId": "i-242dd4f9", 
-                        "HealthStatus": "Healthy", 
-                        "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
+                        "LaunchConfigurationName": "scot-test2"
                     }
                 ], 
-                "MaxSize": 3, 
-                "VPCZoneIdentifier": "subnet-3f9e3d54,subnet-389e3d53,subnet-3e9e3d55", 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-3a334610", 
+                "HealthCheckGracePeriod": 300, 
                 "TerminationPolicies": [
                     "Default"
                 ], 
-                "LaunchConfigurationName": "CustodianASGTest", 
+                "LaunchConfigurationName": "scot-test2", 
                 "CreatedTime": {
-                    "hour": 12, 
+                    "hour": 19, 
                     "__class__": "datetime", 
                     "month": 5, 
-                    "second": 45, 
-                    "microsecond": 395000, 
-                    "year": 2016, 
-                    "day": 8, 
-                    "minute": 12
+                    "second": 10, 
+                    "microsecond": 961000, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 9
                 }, 
                 "AvailabilityZones": [
-                    "us-west-2c", 
-                    "us-west-2b", 
-                    "us-west-2a"
+                    "us-east-1d"
                 ], 
                 "HealthCheckType": "EC2", 
                 "NewInstancesProtectedFromScaleIn": false
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "d80f15e0-1521-11e6-b9d7-7388f3279394"
+            "RequestId": "5c2d0a07-30ec-11e7-a5de-2db2aeef4956", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5c2d0a07-30ec-11e7-a5de-2db2aeef4956", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2218", 
+                "content-type": "text/xml", 
+                "date": "Thu, 04 May 2017 17:08:57 GMT"
+            }
         }
     }
 }

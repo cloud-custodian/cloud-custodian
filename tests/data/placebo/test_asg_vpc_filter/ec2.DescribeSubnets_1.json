@@ -3,19 +3,29 @@
     "data": {
         "Subnets": [
             {
-                "VpcId": "vpc-399e3d52", 
-                "CidrBlock": "172.31.16.0/20", 
-                "MapPublicIpOnLaunch": true, 
+                "AvailabilityZone": "us-east-1d", 
+                "AvailableIpAddressCount": 4087, 
                 "DefaultForAz": true, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-d2d616b5", 
                 "State": "available", 
-                "AvailabilityZone": "us-west-2b", 
-                "SubnetId": "subnet-3f9e3d54", 
-                "AvailableIpAddressCount": 4087
+                "MapPublicIpOnLaunch": true, 
+                "SubnetId": "subnet-3a334610", 
+                "CidrBlock": "172.31.48.0/20", 
+                "AssignIpv6AddressOnCreation": false
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "7e56bd93-a06c-46ba-ba25-2cfbe6b36cdd"
+            "RequestId": "2d321a65-5e42-4f11-b4af-925a3540d7dc", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 27 Jun 2017 18:14:52 GMT"
+            }
         }
     }
 }

@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "repositories": [
+            {
+                "repositoryName": "test-delete-codecommit", 
+                "repositoryId": "3fadfc19-ad40-4cab-a211-a6b34269bfad"
+            }, 
+            {
+                "repositoryName": "test-delete-codecommit2", 
+                "repositoryId": "5adbf477-56a3-4799-9e53-23b5d379b3c8"
+            }, 
+            {
+                "repositoryName": "test-delete-codecommit3", 
+                "repositoryId": "18ea7aa4-b4a1-48d7-a438-3428f6fdcbd1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cd535b15-c953-11e7-96d5-914a90de92a8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cd535b15-c953-11e7-96d5-914a90de92a8", 
+                "date": "Tue, 14 Nov 2017 15:52:22 GMT", 
+                "content-length": "314", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

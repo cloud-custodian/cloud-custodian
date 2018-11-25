@@ -1,0 +1,48 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Directories": [
+            {
+                "State": "ENABLED", 
+                "CreationDateTime": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 24, 
+                    "microsecond": 607000, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 33
+                }, 
+                "Name": "c7n-test", 
+                "DirectoryArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AfdC26H6mEavsfJv5geWp9c"
+            }, 
+            {
+                "State": "DELETED", 
+                "CreationDateTime": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 2, 
+                    "microsecond": 423000, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 31
+                }, 
+                "Name": "c7n-test", 
+                "DirectoryArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AXS9kb-7LU_Bmtho8G_FOQU"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8690aa18-4776-11e7-acd7-6fd31128be04, 8690aa18-4776-11e7-acd7-6fd31128be04", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8690aa18-4776-11e7-acd7-6fd31128be04, 8690aa18-4776-11e7-acd7-6fd31128be04", 
+                "date": "Fri, 02 Jun 2017 09:33:24 GMT", 
+                "content-length": "376", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

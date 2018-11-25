@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Targets": [
+            {
+                "Id": "Id632311503923", 
+                "Arn": "arn:aws:events:us-east-2:519413311747:event-bus/default"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0c41c502-212a-11e8-abe7-dbc213c8fee7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0c41c502-212a-11e8-abe7-dbc213c8fee7", 
+                "date": "Tue, 06 Mar 2018 10:35:10 GMT", 
+                "content-length": "101", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

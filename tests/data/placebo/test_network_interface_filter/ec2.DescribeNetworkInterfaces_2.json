@@ -2,43 +2,45 @@
     "status_code": 200, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "7c81b6c2-eda9-46a6-b7f7-6b5ad22f6b75", 
+            "RequestId": "7ac263ca-d71e-4928-8e08-6e68d4d31744", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Fri, 16 Dec 2016 22:06:12 GMT"
+                "date": "Tue, 27 Jun 2017 15:38:07 GMT"
             }
         }, 
         "NetworkInterfaces": [
             {
                 "Status": "available", 
-                "MacAddress": "06:06:48:36:49:e8", 
+                "MacAddress": "02:54:b7:8e:05:ac", 
                 "SourceDestCheck": true, 
-                "VpcId": "vpc-885c83ee", 
+                "AvailabilityZone": "us-east-1c", 
                 "Description": "", 
-                "NetworkInterfaceId": "eni-3439c3dc", 
+                "NetworkInterfaceId": "eni-d834cdcf", 
                 "PrivateIpAddresses": [
                     {
                         "Primary": true, 
-                        "PrivateIpAddress": "10.4.8.223"
+                        "PrivateIpAddress": "10.4.8.179"
                     }
                 ], 
                 "RequesterManaged": false, 
+                "SubnetId": "subnet-55061130", 
+                "VpcId": "vpc-c3c27aba", 
+                "RequesterId": "AIDAIYEUEZZQWE5TZHHAE", 
                 "Groups": [
                     {
                         "GroupName": "quarantine-group", 
-                        "GroupId": "sg-6d4b6010"
+                        "GroupId": "sg-019e2b70"
                     }
                 ], 
-                "AvailabilityZone": "us-east-1e", 
-                "RequesterId": "AIDAINLXB4P6J26AKFUC6", 
-                "SubnetId": "subnet-ed02abd1", 
+                "Ipv6Addresses": [], 
                 "OwnerId": "644160558196", 
                 "TagSet": [], 
-                "PrivateIpAddress": "10.4.8.223"
+                "PrivateIpAddress": "10.4.8.179"
             }
         ]
     }

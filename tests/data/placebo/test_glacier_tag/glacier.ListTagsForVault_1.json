@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2RWDx4DWCabALIxWy-RVf-yXhPaRQyegrBuhuv2pV8O1its", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2RWDx4DWCabALIxWy-RVf-yXhPaRQyegrBuhuv2pV8O1its", 
+                "date": "Fri, 12 May 2017 00:43:03 GMT", 
+                "content-length": "22", 
+                "content-type": "application/json"
+            }
+        }, 
+        "Tags": {
+            "abc": "xyz"
+        }
+    }
+}

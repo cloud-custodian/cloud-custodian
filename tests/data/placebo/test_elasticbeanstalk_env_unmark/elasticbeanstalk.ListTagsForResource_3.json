@@ -1,0 +1,40 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceArn": "arn:aws:elasticbeanstalk:us-east-1:012345678901:environment/re-jenkins/c7n-eb-tag-test-inactive", 
+        "ResourceTags": [
+            {
+                "Value": "c7n-eb-tag-test-inactive", 
+                "Key": "elasticbeanstalk:environment-name"
+            }, 
+            {
+                "Value": "fooValue", 
+                "Key": "fookey"
+            }, 
+            {
+                "Value": "e-pmpgbxpgsc", 
+                "Key": "elasticbeanstalk:environment-id"
+            }, 
+            {
+                "Value": "Resource does not meet policy: terminate@2017/12/12", 
+                "Key": "c7n-eb-tag-test"
+            }, 
+            {
+                "Value": "c7n-eb-tag-test-inactive", 
+                "Key": "Name"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a500c967-d9f0-11e7-b53c-d9b731bbe892", 
+            "HTTPHeaders": {
+                "date": "Tue, 05 Dec 2017 19:15:23 GMT", 
+                "x-amzn-requestid": "a500c967-d9f0-11e7-b53c-d9b731bbe892", 
+                "content-length": "1041", 
+                "content-type": "text/xml", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

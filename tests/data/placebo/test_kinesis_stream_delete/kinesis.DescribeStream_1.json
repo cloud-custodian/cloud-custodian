@@ -4,13 +4,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "ef4a2612-547f-f68d-bffe-f7f258bb0518", 
+            "RequestId": "da712176-7c8c-9817-8878-2c27b42cfde5", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "ef4a2612-547f-f68d-bffe-f7f258bb0518", 
-                "content-length": "811", 
-                "x-amz-id-2": "Tx1Vr+Skd/K3foYUzMXjbU8nYhngFLInicbjEp2AyTxOlDeqW35CsB3s/o1Z/+SUHp0HmK93vyrdgycARTZXlcG3uTlLKNxEYvIOvIOhvDY=", 
+                "x-amzn-requestid": "da712176-7c8c-9817-8878-2c27b42cfde5", 
+                "content-length": "557", 
+                "x-amz-id-2": "06AHhU8LB0t7Fe5/FEpjt53U3dpYCqMT4zUYxxfz6SCR3EoNrRd6HVjAgFaIdWltUhBQHpNa5jZIs+lA7+JdYi9ocBVKnOVm", 
                 "server": "Apache-Coyote/1.1", 
-                "date": "Sun, 27 Nov 2016 12:20:48 GMT", 
+                "date": "Sat, 12 Aug 2017 14:05:04 GMT", 
                 "content-type": "application/x-amz-json-1.1"
             }
         }, 
@@ -22,21 +22,11 @@
                 {
                     "ShardId": "shardId-000000000000", 
                     "HashKeyRange": {
-                        "EndingHashKey": "170141183460469231731687303715884105727", 
+                        "EndingHashKey": "340282366920938463463374607431768211455", 
                         "StartingHashKey": "0"
                     }, 
                     "SequenceNumberRange": {
-                        "StartingSequenceNumber": "49568027013051417042124392152163093257658725395469434882"
-                    }
-                }, 
-                {
-                    "ShardId": "shardId-000000000001", 
-                    "HashKeyRange": {
-                        "EndingHashKey": "340282366920938463463374607431768211455", 
-                        "StartingHashKey": "170141183460469231731687303715884105728"
-                    }, 
-                    "SequenceNumberRange": {
-                        "StartingSequenceNumber": "49568027013073717787322922775304628975931373756975415314"
+                        "StartingSequenceNumber": "49575983792626831963983842622784465898296159642543194114"
                     }
                 }
             ], 
@@ -46,6 +36,16 @@
                     "ShardLevelMetrics": []
                 }
             ], 
+            "StreamCreationTimestamp": {
+                "hour": 10, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 43, 
+                "microsecond": 0, 
+                "year": 2017, 
+                "day": 12, 
+                "minute": 0
+            }, 
             "StreamStatus": "ACTIVE"
         }
     }

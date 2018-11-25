@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "profiles_cctestcdnprofile_name": {
+            "defaultValue": "cctestcdnprofile",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourcegroups/tabarlow/providers/Microsoft.Cdn/profiles/cctestcdnprofile'.",
+            "type": "Microsoft.Cdn/profiles",
+            "sku": {
+                "name": "Standard_Microsoft"
+            },
+            "name": "[parameters('profiles_cctestcdnprofile_name')]",
+            "apiVersion": "2016-04-02",
+            "location": "CentralUs",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "resourceState": "Active"
+            },
+            "dependsOn": []
+        }
+    ]
+}

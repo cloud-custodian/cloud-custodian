@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "QueueUrl": "https://queue.amazonaws.com/123456789012/c7n-test-q", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3221c814-7fa7-5164-bafc-9a9a349c34bb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3221c814-7fa7-5164-bafc-9a9a349c34bb", 
+                "content-length": "322", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Tue, 21 Nov 2017 15:40:45 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

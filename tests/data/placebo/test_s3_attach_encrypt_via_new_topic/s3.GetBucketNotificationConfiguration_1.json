@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "7YsvFHtTZf3FqfaQquDkG/IEizgbOr7qF/hPsxoiIWqnMm9TxONQ/BcYc8lemBtNljXbBXlB0+U=", 
+            "RequestId": "C235D015CA5A5A83", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "7YsvFHtTZf3FqfaQquDkG/IEizgbOr7qF/hPsxoiIWqnMm9TxONQ/BcYc8lemBtNljXbBXlB0+U=", 
+                "date": "Thu, 16 Mar 2017 08:20:49 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "C235D015CA5A5A83", 
+                "server": "AmazonS3"
+            }
+        }, 
+        "TopicConfigurations": [
+            {
+                "Id": "YzZjMzI3OGQtMzE4MC00YmI4LTlkNDEtOTM2MDVkZTE0OGI2", 
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:custodian-attach-encrypt-test", 
+                "Events": [
+                    "s3:ObjectCreated:*"
+                ]
+            }
+        ]
+    }
+}

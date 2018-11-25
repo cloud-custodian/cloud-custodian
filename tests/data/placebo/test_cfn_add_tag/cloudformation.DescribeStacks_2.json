@@ -1,0 +1,54 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:385131497716:stack/Account-Subnets/d9f8c6c0-bff2-11e7-8cf0-50fae988d8d2", 
+                "Description": "Subnet Generator", 
+                "Tags": [
+                    {
+                        "Value": "DesiredValue", 
+                        "Key": "DesiredTag"
+                    }
+                ], 
+                "EnableTerminationProtection": false, 
+                "CreationTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 41, 
+                    "microsecond": 849000, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 25
+                }, 
+                "StackName": "Account-Subnets", 
+                "NotificationARNs": [], 
+                "StackStatus": "UPDATE_IN_PROGRESS", 
+                "LastUpdatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 34, 
+                    "microsecond": 930000, 
+                    "year": 2018, 
+                    "day": 27, 
+                    "minute": 31
+                }, 
+                "DisableRollback": false, 
+                "RollbackConfiguration": {}
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "71613e06-1bec-11e8-a836-3bd4f7d48e4c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "71613e06-1bec-11e8-a836-3bd4f7d48e4c", 
+                "date": "Tue, 27 Feb 2018 18:31:35 GMT", 
+                "content-length": "1183", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

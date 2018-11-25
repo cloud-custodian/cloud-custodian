@@ -1,0 +1,21 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "88268283-b414-11e7-bd64-7d523ade9cf4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "88268283-b414-11e7-bd64-7d523ade9cf4", 
+                "date": "Wed, 18 Oct 2017 14:56:32 GMT", 
+                "content-length": "284", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Error": {
+            "Message": "Cannot find Login Profile for User alice", 
+            "Code": "NoSuchEntity", 
+            "Type": "Sender"
+        }
+    }
+}

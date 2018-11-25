@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "9bea3e08-e073-11e7-a0bf-4b6d4d720422", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9bea3e08-e073-11e7-a0bf-4b6d4d720422", 
+                "date": "Thu, 14 Dec 2017 02:07:59 GMT", 
+                "content-length": "165", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "ReplicationInstance1 description", 
+                "Key": "description"
+            }, 
+            {
+                "Value": "Resource does not meet policy: delete@2017/12/15", 
+                "Key": "custodian_cleanup"
+            }
+        ]
+    }
+}

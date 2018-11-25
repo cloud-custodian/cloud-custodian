@@ -3,46 +3,56 @@
     "data": {
         "Subnets": [
             {
-                "VpcId": "vpc-4a9ff72e", 
-                "CidrBlock": "172.31.16.0/20", 
-                "MapPublicIpOnLaunch": true, 
-                "DefaultForAz": true, 
+                "AvailabilityZone": "us-east-1d", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestSubnetD", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AvailableIpAddressCount": 24, 
+                "DefaultForAz": false, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-f1516b97", 
                 "State": "available", 
-                "AvailabilityZone": "us-west-2a", 
-                "SubnetId": "subnet-15452171", 
-                "AvailableIpAddressCount": 4087
+                "MapPublicIpOnLaunch": false, 
+                "SubnetId": "subnet-71bda45c", 
+                "CidrBlock": "10.0.42.96/27", 
+                "AssignIpv6AddressOnCreation": false
             }, 
             {
-                "VpcId": "vpc-4a9ff72e", 
-                "CidrBlock": "172.31.32.0/20", 
-                "MapPublicIpOnLaunch": true, 
-                "DefaultForAz": true, 
+                "AvailabilityZone": "us-east-1a", 
+                "Tags": [
+                    {
+                        "Value": "Public", 
+                        "Key": "NetworkLocation"
+                    }, 
+                    {
+                        "Value": "FancyTestSubnetPublic", 
+                        "Key": "Name"
+                    }
+                ], 
+                "AvailableIpAddressCount": 26, 
+                "DefaultForAz": false, 
+                "Ipv6CidrBlockAssociationSet": [], 
+                "VpcId": "vpc-f1516b97", 
                 "State": "available", 
-                "AvailabilityZone": "us-west-2b", 
-                "SubnetId": "subnet-63c97615", 
-                "AvailableIpAddressCount": 4090
-            }, 
-            {
-                "VpcId": "vpc-4a9ff72e", 
-                "CidrBlock": "172.31.0.0/20", 
-                "MapPublicIpOnLaunch": true, 
-                "DefaultForAz": true, 
-                "State": "available", 
-                "AvailabilityZone": "us-west-2c", 
-                "SubnetId": "subnet-5fb47507", 
-                "AvailableIpAddressCount": 4090
+                "MapPublicIpOnLaunch": false, 
+                "SubnetId": "subnet-ecfb30a4", 
+                "CidrBlock": "10.0.42.0/27", 
+                "AssignIpv6AddressOnCreation": false
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "bb87b921-b3d0-4de0-9720-663869512df3", 
+            "RequestId": "68e3f54b-69a1-437b-9db1-82c3752e899a", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Sun, 06 Nov 2016 21:46:46 GMT"
+                "date": "Sat, 24 Jun 2017 02:20:53 GMT"
             }
         }
     }

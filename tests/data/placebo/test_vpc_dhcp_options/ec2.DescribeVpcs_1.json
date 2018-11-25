@@ -1,0 +1,69 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Vpcs": [
+            {
+                "VpcId": "vpc-f1516b97", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "FancyTestVPC", 
+                        "Key": "Name"
+                    }, 
+                    {
+                        "Value": "tagfanncyvalue", 
+                        "Key": "tagfancykey"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-98ba93f0", 
+                        "CidrBlock": "10.0.42.0/24", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-24ff1940", 
+                "CidrBlock": "10.0.42.0/24", 
+                "IsDefault": false
+            }, 
+            {
+                "VpcId": "vpc-7af45101", 
+                "InstanceTenancy": "default", 
+                "Tags": [
+                    {
+                        "Value": "DhcpOptionsVPC", 
+                        "Key": "Name"
+                    }
+                ], 
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-7c1eb811", 
+                        "CidrBlock": "10.0.16.0/24", 
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ], 
+                "State": "available", 
+                "DhcpOptionsId": "dopt-4d4c3035", 
+                "CidrBlock": "10.0.16.0/24", 
+                "IsDefault": false
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "595e1716-2d0e-4731-8d88-37fa6d357622", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Tue, 20 Mar 2018 03:03:59 GMT"
+            }
+        }
+    }
+}

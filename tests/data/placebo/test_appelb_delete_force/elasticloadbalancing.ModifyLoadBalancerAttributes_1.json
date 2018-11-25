@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": [
+            {
+                "Value": "false", 
+                "Key": "deletion_protection.enabled"
+            }, 
+            {
+                "Value": "false", 
+                "Key": "access_logs.s3.enabled"
+            }, 
+            {
+                "Value": "60", 
+                "Key": "idle_timeout.timeout_seconds"
+            }, 
+            {
+                "Value": "", 
+                "Key": "access_logs.s3.prefix"
+            }, 
+            {
+                "Value": "", 
+                "Key": "access_logs.s3.bucket"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f1ccd158-3048-11e7-a957-7faee8dd9f9f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f1ccd158-3048-11e7-a957-7faee8dd9f9f", 
+                "date": "Wed, 03 May 2017 21:39:10 GMT", 
+                "content-length": "858", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

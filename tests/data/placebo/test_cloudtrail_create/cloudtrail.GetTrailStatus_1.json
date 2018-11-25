@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "98512e41-ed81-11e6-9205-e16fedb50da3", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "98512e41-ed81-11e6-9205-e16fedb50da3", 
+                "date": "Tue, 07 Feb 2017 22:05:53 GMT", 
+                "content-length": "209", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "LatestDeliveryAttemptTime": "", 
+        "LatestNotificationAttemptSucceeded": "", 
+        "LatestDeliveryAttemptSucceeded": "", 
+        "IsLogging": false, 
+        "TimeLoggingStarted": "", 
+        "LatestNotificationAttemptTime": "", 
+        "TimeLoggingStopped": ""
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"DefaultRoot\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:user/AlfredMarcGamulo\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"Public\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  } ]\n}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "13f7932f-06cb-11e8-ba91-93d7f3df746b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "13f7932f-06cb-11e8-ba91-93d7f3df746b", 
+                "content-length": "669", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

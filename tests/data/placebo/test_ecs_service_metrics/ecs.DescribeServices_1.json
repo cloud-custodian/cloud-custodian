@@ -1,0 +1,221 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/home-web",
+                "serviceName": "home-web",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+                "loadBalancers": [],
+                "status": "ACTIVE",
+                "desiredCount": 2,
+                "runningCount": 2,
+                "pendingCount": 0,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 50
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370520926505959",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                        "desiredCount": 2,
+                        "pendingCount": 0,
+                        "runningCount": 2,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 14,
+                            "hour": 6,
+                            "minute": 11,
+                            "second": 9,
+                            "microsecond": 848000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 14,
+                            "hour": 6,
+                            "minute": 11,
+                            "second": 9,
+                            "microsecond": 848000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.0.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-1c37ab41",
+                                    "subnet-22e1162d"
+                                ],
+                                "securityGroups": [
+                                    "sg-cd2954b9"
+                                ],
+                                "assignPublicIp": "ENABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "de1aa29b-e170-44a2-9c21-e5a84c3884d9",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 15,
+                            "hour": 18,
+                            "minute": 14,
+                            "second": 15,
+                            "microsecond": 800000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "8f5ef7a7-30a6-4b80-924a-e13dd6007c64",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 15,
+                            "hour": 12,
+                            "minute": 14,
+                            "second": 15,
+                            "microsecond": 509000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "533669d0-aa92-455d-96f5-0855b537be79",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 15,
+                            "hour": 6,
+                            "minute": 14,
+                            "second": 10,
+                            "microsecond": 590000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "7df4521a-61da-4b6f-bf1f-81343d8e3854",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 15,
+                            "hour": 0,
+                            "minute": 13,
+                            "second": 42,
+                            "microsecond": 666000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "452657bd-9508-4fa8-97cd-8f23e8d31ec2",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 14,
+                            "hour": 18,
+                            "minute": 13,
+                            "second": 36,
+                            "microsecond": 937000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "a87a56a3-89f1-401d-947b-a23d6fa910b5",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 14,
+                            "hour": 12,
+                            "minute": 13,
+                            "second": 23,
+                            "microsecond": 158000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "2313d853-c2c5-4e54-ae5e-ac41db84f14a",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 14,
+                            "hour": 6,
+                            "minute": 13,
+                            "second": 20,
+                            "microsecond": 303000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "914d4c1e-c16c-457c-8157-964946477a67",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 1,
+                            "day": 14,
+                            "hour": 6,
+                            "minute": 11,
+                            "second": 13,
+                            "microsecond": 870000
+                        },
+                        "message": "(service home-web) has started 2 tasks: (task 6eac50ed-89fa-4c46-8444-422239a95904) (task bd9cd14d-5a3e-4535-9d32-1eda980468ce)."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 1,
+                    "day": 14,
+                    "hour": 6,
+                    "minute": 11,
+                    "second": 9,
+                    "microsecond": 848000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-1c37ab41",
+                            "subnet-22e1162d"
+                        ],
+                        "securityGroups": [
+                            "sg-cd2954b9"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                }
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "3475ffec-fa52-11e7-bc92-7706daa6f341",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 00:14:23 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "2466",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "3475ffec-fa52-11e7-bc92-7706daa6f341"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

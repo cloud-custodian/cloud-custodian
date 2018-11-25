@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-2:644160558196:snapshot:zero-bytes", 
+                "Tags": [
+                    {
+                        "Value": "MegaCache", 
+                        "Key": "App"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2ccb8436-5079-11e8-8b32-43aec20c9601", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2ccb8436-5079-11e8-8b32-43aec20c9601", 
+                "date": "Sat, 05 May 2018 15:30:00 GMT", 
+                "content-length": "173", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

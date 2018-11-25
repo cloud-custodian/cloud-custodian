@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/default", 
+            "arn:aws:ecs:us-east-1:644160558196:cluster/Default"
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b57e225f-14d2-11e8-8293-e7069de79de4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b57e225f-14d2-11e8-8293-e7069de79de4", 
+                "content-length": "123", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Sun, 18 Feb 2018 17:39:45 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

@@ -1,0 +1,94 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBInstance": {
+            "PubliclyAccessible": true, 
+            "MasterUsername": "eric", 
+            "MonitoringInterval": 0, 
+            "LicenseModel": "general-public-license", 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-f9cc4d9f"
+                }
+            ], 
+            "CopyTagsToSnapshot": false, 
+            "OptionGroupMemberships": [
+                {
+                    "Status": "in-sync", 
+                    "OptionGroupName": "default:mariadb-10-0"
+                }
+            ], 
+            "PendingModifiedValues": {
+                "MasterUserPassword": "****"
+            }, 
+            "Engine": "mariadb", 
+            "MultiAZ": false, 
+            "DBSecurityGroups": [], 
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.mariadb10.0", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ], 
+            "AutoMinorVersionUpgrade": true, 
+            "PreferredBackupWindow": "12:41-13:11", 
+            "DBSubnetGroup": {
+                "Subnets": [
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-15452171", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-west-2a"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-63c97615", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-west-2b"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-5fb47507", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-west-2c"
+                        }
+                    }
+                ], 
+                "DBSubnetGroupName": "default", 
+                "VpcId": "vpc-4a9ff72e", 
+                "DBSubnetGroupDescription": "default", 
+                "SubnetGroupStatus": "Complete"
+            }, 
+            "ReadReplicaDBInstanceIdentifiers": [], 
+            "AllocatedStorage": 5, 
+            "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f", 
+            "BackupRetentionPeriod": 0, 
+            "PreferredMaintenanceWindow": "wed:09:24-wed:09:54", 
+            "DBInstanceStatus": "creating", 
+            "EngineVersion": "10.0.24", 
+            "DomainMemberships": [], 
+            "StorageType": "gp2", 
+            "DbiResourceId": "db-LM6AURZI53JHTTNKNL5GLMKCNM", 
+            "CACertificateIdentifier": "rds-ca-2015", 
+            "StorageEncrypted": false, 
+            "DBInstanceClass": "db.r3.large", 
+            "DbInstancePort": 0, 
+            "DBInstanceIdentifier": "test-f4ec4778-e377-4b1f-b970-b7b3a6d46e7f"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "543705a4-203f-11e7-823b-2f98338c9e98", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "543705a4-203f-11e7-823b-2f98338c9e98", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3705", 
+                "content-type": "text/xml", 
+                "date": "Thu, 13 Apr 2017 11:50:05 GMT"
+            }
+        }
+    }
+}

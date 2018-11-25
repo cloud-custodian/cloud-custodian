@@ -1,0 +1,68 @@
+{
+    "status_code": 200, 
+    "data": {
+        "repositories": [
+            {
+                "registryId": "644160558196", 
+                "repositoryName": "empty", 
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/empty", 
+                "createdAt": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 21
+                }, 
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/empty"
+            }, 
+            {
+                "registryId": "644160558196", 
+                "repositoryName": "test-abc", 
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/test-abc", 
+                "createdAt": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 0
+                }, 
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/test-abc"
+            }, 
+            {
+                "registryId": "644160558196", 
+                "repositoryName": "test-xyz", 
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/test-xyz", 
+                "createdAt": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 16
+                }, 
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/test-xyz"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "19750f22-92e4-11e7-b0d7-07a0454bb90a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "19750f22-92e4-11e7-b0d7-07a0454bb90a", 
+                "content-length": "693", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 06 Sep 2017 09:16:43 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

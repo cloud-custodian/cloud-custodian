@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "93bca321-251e-11e8-901e-abf55cd89478",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sun, 11 Mar 2018 11:23:09 GMT",
+                "content-type": "application/json",
+                "content-length": "519",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "93bca321-251e-11e8-901e-abf55cd89478"
+            },
+            "RetryAttempts": 0
+        },
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"PublicInvoke\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-2:644160558196:function:func-b\"},{\"Sid\":\"SharedInvoke\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::185106417252:root\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-2:644160558196:function:func-b\"}]}"
+    }
+}

@@ -1,0 +1,60 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TableDescription": {
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-test", 
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "test", 
+                    "AttributeType": "S"
+                }
+            ], 
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0, 
+                "WriteCapacityUnits": 5, 
+                "ReadCapacityUnits": 5
+            }, 
+            "TableSizeBytes": 0, 
+            "TableName": "c7n-test", 
+            "TableStatus": "UPDATING", 
+            "StreamSpecification": {
+                "StreamViewType": "NEW_IMAGE", 
+                "StreamEnabled": true
+            }, 
+            "TableId": "192b379a-ecc4-4bd9-8619-916aa281b3e7", 
+            "LatestStreamLabel": "2018-02-22T01:58:39.942", 
+            "KeySchema": [
+                {
+                    "KeyType": "HASH", 
+                    "AttributeName": "test"
+                }
+            ], 
+            "ItemCount": 0, 
+            "CreationDateTime": {
+                "hour": 9, 
+                "__class__": "datetime", 
+                "month": 2, 
+                "second": 11, 
+                "microsecond": 50000, 
+                "year": 2018, 
+                "day": 16, 
+                "minute": 7
+            }, 
+            "LatestStreamArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-test/stream/2018-02-22T01:58:39.942"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "432QD2T2JABRP6311L1NALP1JVVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "432QD2T2JABRP6311L1NALP1JVVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "705", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "x-amz-crc32": "2264310254", 
+                "date": "Thu, 22 Feb 2018 01:58:39 GMT", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}

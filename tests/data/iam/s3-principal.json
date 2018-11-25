@@ -1,0 +1,123 @@
+[
+  {
+    "Id": "SourceArnLikeValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Condition": {
+          "ArnLike": {
+            "aws:SourceArn": "arn:aws:sns:us-east-1:123456789012"
+          }
+        },
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceArnLikeValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Principal": "*"
+      }
+    ]
+  },
+  {
+    "Id": "SourceArnLikeValid",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1510843305330",
+        "Action": [
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::cross-account-valid/*",
+        "Principal": {
+          "AWS": "arn:aws:iam::123456789012:root"
+        }
+      }
+    ]
+  },
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "RequiredEncryptedPutObject",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::not-hot-dog/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": [
+                        "AES256",
+                        "aws:kms"
+                    ]
+                }
+            }
+        }
+    ]
+    },
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "RequiredEncryptedPutObject",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:PutObject",
+              "Resource": "arn:aws:s3:::hotdog/*",
+              "Condition": {
+                  "StringEquals": {
+                      "aws:sourceVpc": "vpc-1234564646"
+                  },
+                  "StringNotEquals": {
+                      "s3:x-amz-server-side-encryption": [
+                          "AES256",
+                          "aws:kms"
+                      ]
+                  }
+              }
+          }
+      ]
+    },
+  {
+    "Id": "AWSPrincipalAWSEveryoneOnly",
+    "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "PutHotDog",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": [
+                  "arn:aws:iam::1231231234:root",
+                  "arn:aws:iam::1122334455:root"
+                ]
+              },
+              "Action": "s3:GetObject",
+              "Resource": "arn:aws:s3:::hotdog/*",
+              "Condition": {
+                  "StringEquals": {
+                      "aws:sourceVpc": "vpc-1234564646"
+                  },
+                  "StringNotEquals": {
+                      "aws:sourceVpc": "vpc-1111111"
+                  }
+              }
+          }
+      ]
+  }
+]

@@ -2,8 +2,15 @@
     "status_code": 400, 
     "data": {
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 400, 
-            "RequestId": "40b01a89-395c-436b-b65e-8a5751ff7237"
+            "RequestId": "e50eb730-e7a7-44b7-876c-374e1d27bdc4", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Tue, 27 Jun 2017 18:54:47 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
         }, 
         "Error": {
             "Message": "The internetGateway ID 'igw-5bce113f' does not exist", 

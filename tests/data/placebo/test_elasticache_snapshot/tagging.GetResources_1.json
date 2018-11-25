@@ -1,0 +1,55 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:snapshot:backup-myec-001-2017-06-23", 
+                "Tags": [
+                    {
+                        "Value": "1", 
+                        "Key": "tagnew1"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:snapshot:backup-myec-002-2017-06-23", 
+                "Tags": [
+                    {
+                        "Value": "2", 
+                        "Key": "tagnew2"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:snapshot:backup-myec-003-2017-06-23", 
+                "Tags": [
+                    {
+                        "Value": "3", 
+                        "Key": "tagnew3"
+                    }
+                ]
+            }, 
+            {
+                "ResourceARN": "arn:aws:elasticache:us-east-1:644160558196:snapshot:final-myec-2017-06-23", 
+                "Tags": [
+                    {
+                        "Value": "1", 
+                        "Key": "tagnew1"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e8335a66-588a-11e7-9eea-6fe6870458f4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e8335a66-588a-11e7-9eea-6fe6870458f4", 
+                "date": "Sat, 24 Jun 2017 03:12:08 GMT", 
+                "content-length": "588", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

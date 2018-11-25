@@ -10,57 +10,124 @@
                     "ParameterApplyStatus": "in-sync"
                 }, 
                 "SnapshotRetentionLimit": 0, 
-                "CacheClusterId": "test-tags", 
+                "CacheClusterId": "myec-001", 
                 "CacheSecurityGroups": [], 
                 "NumCacheNodes": 1, 
-                "SnapshotWindow": "11:00-12:00", 
+                "SnapshotWindow": "08:00-09:00", 
                 "CacheClusterCreateTime": {
-                    "hour": 21, 
+                    "hour": 2, 
                     "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 23, 
-                    "microsecond": 3000, 
-                    "year": 2016, 
-                    "day": 27, 
-                    "minute": 10
+                    "month": 6, 
+                    "second": 21, 
+                    "microsecond": 311000, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 3
                 }, 
+                "ReplicationGroupId": "myec", 
                 "AutoMinorVersionUpgrade": true, 
                 "CacheClusterStatus": "available", 
-                "PreferredAvailabilityZone": "us-west-2a", 
+                "PreferredAvailabilityZone": "us-east-1d", 
                 "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
                 "SecurityGroups": [
                     {
                         "Status": "active", 
-                        "SecurityGroupId": "sg-4ad9862d"
-                    }, 
-                    {
-                        "Status": "active", 
-                        "SecurityGroupId": "sg-bf8ab6d8"
-                    }, 
-                    {
-                        "Status": "active", 
-                        "SecurityGroupId": "sg-4d18ad2b"
-                    }, 
-                    {
-                        "Status": "active", 
-                        "SecurityGroupId": "sg-58f2cf3f"
+                        "SecurityGroupId": "sg-4b9ada34"
                     }
                 ], 
-                "CacheSubnetGroupName": "test-subnet", 
+                "CacheSubnetGroupName": "msg", 
                 "EngineVersion": "3.2.4", 
                 "PendingModifiedValues": {}, 
-                "PreferredMaintenanceWindow": "mon:09:00-mon:10:00", 
+                "PreferredMaintenanceWindow": "fri:10:00-fri:11:00", 
+                "CacheNodeType": "cache.r3.large"
+            }, 
+            {
+                "Engine": "redis", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2", 
+                    "ParameterApplyStatus": "in-sync"
+                }, 
+                "SnapshotRetentionLimit": 1, 
+                "CacheClusterId": "myec-002", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "SnapshotWindow": "08:00-09:00", 
+                "CacheClusterCreateTime": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 45, 
+                    "microsecond": 233000, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 7
+                }, 
+                "ReplicationGroupId": "myec", 
+                "AutoMinorVersionUpgrade": true, 
+                "CacheClusterStatus": "available", 
+                "PreferredAvailabilityZone": "us-east-1d", 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-4b9ada34"
+                    }
+                ], 
+                "CacheSubnetGroupName": "msg", 
+                "EngineVersion": "3.2.4", 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "fri:10:00-fri:11:00", 
+                "CacheNodeType": "cache.r3.large"
+            }, 
+            {
+                "Engine": "redis", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2", 
+                    "ParameterApplyStatus": "in-sync"
+                }, 
+                "SnapshotRetentionLimit": 0, 
+                "CacheClusterId": "myec-003", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "SnapshotWindow": "08:00-09:00", 
+                "CacheClusterCreateTime": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 48, 
+                    "microsecond": 301000, 
+                    "year": 2017, 
+                    "day": 24, 
+                    "minute": 7
+                }, 
+                "ReplicationGroupId": "myec", 
+                "AutoMinorVersionUpgrade": true, 
+                "CacheClusterStatus": "available", 
+                "PreferredAvailabilityZone": "us-east-1d", 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-4b9ada34"
+                    }
+                ], 
+                "CacheSubnetGroupName": "msg", 
+                "EngineVersion": "3.2.4", 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "fri:10:00-fri:11:00", 
                 "CacheNodeType": "cache.r3.large"
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "bd2dc27e-cd4c-11e6-92de-714cb0653961", 
+            "RequestId": "e5f64d4c-5888-11e7-b8d0-d1728127622b", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "bd2dc27e-cd4c-11e6-92de-714cb0653961", 
-                "date": "Wed, 28 Dec 2016 22:26:55 GMT", 
-                "content-length": "2156", 
+                "x-amzn-requestid": "e5f64d4c-5888-11e7-b8d0-d1728127622b", 
+                "date": "Sat, 24 Jun 2017 02:57:45 GMT", 
+                "content-length": "4727", 
                 "content-type": "text/xml"
             }
         }

@@ -1,0 +1,29 @@
+{
+    "status_code": 201, 
+    "data": {
+        "CodeSha256": "10cSeyuOv/0QFpeKw9ZsIeCDOCLryBhULrGE/KiT13E=", 
+        "FunctionName": "c7n-s3-encrypt", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "ea670d5d-0a21-11e7-bbcd-350d373cb9f3", 
+            "HTTPHeaders": {
+                "date": "Thu, 16 Mar 2017 08:24:09 GMT", 
+                "x-amzn-requestid": "ea670d5d-0a21-11e7-bbcd-350d373cb9f3", 
+                "content-length": "513", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "CodeSize": 2445300, 
+        "MemorySize": 256, 
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-s3-encrypt", 
+        "Version": "120", 
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+        "Timeout": 30, 
+        "LastModified": "2017-03-16T08:24:09.145+0000", 
+        "Handler": "s3crypt.process_sns_event", 
+        "Runtime": "python2.7", 
+        "Description": "Custodian S3 Key Encrypt"
+    }
+}

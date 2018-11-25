@@ -66,6 +66,7 @@ Now, run Custodian:
 
     AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. custodian.yml
 
+Note: If you already have AWS credentials configured for AWS CLI or SDK access, then you may omit providing them on the command line. 
 If successful, you should see output similar to the following on the command line::
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: ec2 region:us-east-1 c7n:0.8.21.2
@@ -96,7 +97,7 @@ as well, either on the command line or in an environment variable:
 
 .. code-block:: bash
 
-    AWS_DEFAULT_REGION=us-west-1
+  $ AWS_DEFAULT_REGION=us-west-1
 
 
 The policy is validated automatically when you run it, but you can also
@@ -124,6 +125,9 @@ Run ``custodian -h`` to see a list of available commands.
 Run ``custodian schema`` to see the complete list of AWS resources against
 which you can run policies. To invoke command-line help with more information
 about policy schema details, run ``custodian schema -h``.
+
+Run ``custodian schema <cloud-provider>`` to see the available resources for a specific
+cloud provider: ``custodian schema aws``
 
 Run ``custodian schema <resource>`` to see the available :ref:`filters and
 actions <policy>` for each resource.
@@ -186,7 +190,7 @@ You can generate metrics by specifying the boolean metrics flag::
 
 You can also upload Cloud Custodian logs to CloudWatch logs::
 
-  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> <policyfile>.yml
+  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
 
 And you can output logs and resource records to S3::
 

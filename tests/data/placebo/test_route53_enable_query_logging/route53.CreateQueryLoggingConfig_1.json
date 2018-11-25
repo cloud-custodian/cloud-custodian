@@ -1,0 +1,23 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "fac6809f-f021-11e8-b0ad-0376cd81fd64",
+            "HTTPStatusCode": 201,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fac6809f-f021-11e8-b0ad-0376cd81fd64",
+                "location": "https://route53.amazonaws.com/2013-04-01/queryloggingconfig/e5d4a92e-b8ee-437f-81c4-df7c8495ebfb",
+                "content-type": "text/xml",
+                "content-length": "405",
+                "date": "Sat, 24 Nov 2018 19:48:55 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "Location": "https://route53.amazonaws.com/2013-04-01/queryloggingconfig/e5d4a92e-b8ee-437f-81c4-df7c8495ebfb",
+        "QueryLoggingConfig": {
+            "Id": "e5d4a92e-b8ee-437f-81c4-df7c8495ebfb",
+            "HostedZoneId": "Z20H1474487I0O",
+            "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/route53/cloudcustodian.io"
+        }
+    }
+}

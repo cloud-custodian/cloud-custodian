@@ -1,0 +1,31 @@
+        {
+            "configurationItemCaptureTime": 1502617462.927, 
+            "resourceCreationTime": 1502443814.0, 
+            "availabilityZone": "Regional", 
+            "awsRegion": "us-east-1", 
+            "tags": {}, 
+            "resourceType": "AWS::S3::Bucket", 
+            "resourceId": "testing-99", 
+            "configurationStateId": "1502617462927", 
+            "relatedEvents": [
+                "e02a5b01-cde0-43b0-873f-831004edede3"
+            ], 
+            "relationships": [], 
+            "arn": "arn:aws:s3:::testing-99", 
+            "version": "1.2", 
+            "configurationItemMD5Hash": "943ebe6fa5808c9073923fdefcbdc978", 
+            "supplementaryConfiguration": {
+                "BucketAccelerateConfiguration": "{\"status\":null}", 
+                "BucketVersioningConfiguration": "{\"status\":\"Suspended\",\"isMfaDeleteEnabled\":null}", 
+                "AccessControlList": "\"{\\\"grantSet\\\":null,\\\"grantList\\\":[{\\\"grantee\\\":{\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\",\\\"displayName\\\":\\\"mandeep.bal\\\"},\\\"permission\\\":\\\"FullControl\\\"},{\\\"grantee\\\":\\\"AllUsers\\\",\\\"permission\\\":\\\"Read\\\"}],\\\"owner\\\":{\\\"displayName\\\":\\\"mandeep.bal\\\",\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\"},\\\"isRequesterCharged\\\":false}\"", 
+                "BucketLoggingConfiguration": "{\"destinationBucketName\":null,\"logFilePrefix\":null}", 
+                "IsRequesterPaysEnabled": "false", 
+                "BucketNotificationConfiguration": "{\"configurations\":{\"OGQ5OTAyNjYtYjBmNy00ZTkwLWFiMjUtZjE4ODBmYTgwNTE0\":{\"type\":\"QueueConfiguration\",\"queueARN\":\"arn:aws:sqs:us-east-1:644160558196:test-queue\",\"events\":[\"s3:ObjectCreated:*\"],\"objectPrefixes\":[],\"filter\":{\"s3KeyFilter\":{\"filterRules\":[{\"name\":\"Prefix\",\"value\":\"images/\"}]}}},\"ZDAzZDViMTUtNGU3MS00ZWIwLWI0MzgtOTZiMWQ3ZWNkZDY1\":{\"type\":\"LambdaConfiguration\",\"functionARN\":\"arn:aws:lambda:us-east-1:644160558196:function:lambdaenv\",\"events\":[\"s3:ObjectRemoved:Delete\"],\"objectPrefixes\":[],\"filter\":{\"s3KeyFilter\":{\"filterRules\":[{\"name\":\"Prefix\",\"value\":\"void/\"}]}}},\"rabbit\":{\"type\":\"TopicConfiguration\",\"topicARN\":\"arn:aws:sns:us-east-1:644160558196:custodian-test-data-22\",\"events\":[\"s3:ReducedRedundancyLostObject\",\"s3:ObjectCreated:CompleteMultipartUpload\"],\"objectPrefixes\":[],\"filter\":{\"s3KeyFilter\":{\"filterRules\":[{\"name\":\"Prefix\",\"value\":\"oids/\"}]}}}}}", 
+                "BucketLifecycleConfiguration": "{\"rules\":[{\"id\":\"Docs\",\"prefix\":null,\"status\":\"Enabled\",\"filter\":{\"predicate\":{\"type\":\"LifecycleAndOperator\",\"operands\":[{\"type\":\"LifecyclePrefixPredicate\",\"prefix\":\"docs/\"},{\"type\":\"LifecycleTagPredicate\",\"tag\":{\"key\":\"Workflow\",\"value\":\"Archive\"}},{\"type\":\"LifecycleTagPredicate\",\"tag\":{\"key\":\"State\",\"value\":\"Complete\"}}]}},\"expirationInDays\":-1,\"expiredObjectDeleteMarker\":false,\"noncurrentVersionExpirationInDays\":545,\"expirationDate\":null,\"transitions\":[{\"days\":30,\"date\":null,\"storageClass\":\"STANDARD_IA\"}],\"noncurrentVersionTransitions\":[{\"days\":180,\"storageClass\":\"GLACIER\"}],\"abortIncompleteMultipartUpload\":null}]}", 
+                "BucketPolicy": "{\"policyText\":null}"
+            }, 
+            "resourceName": "testing-99", 
+            "configuration": "{\"name\":\"testing-99\",\"owner\":{\"displayName\":\"mandeep.bal\",\"id\":\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\"},\"creationDate\":\"2017-08-11T09:30:14.000Z\"}", 
+            "configurationItemStatus": "OK", 
+            "accountId": "644160558196"
+        }

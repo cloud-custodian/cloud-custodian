@@ -1,0 +1,98 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0f73856f-c95d-11e7-af23-613c345b2053", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0f73856f-c95d-11e7-af23-613c345b2053", 
+                "date": "Tue, 14 Nov 2017 16:58:38 GMT", 
+                "content-length": "1171", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "pipelineDescriptionList": [
+            {
+                "fields": [
+                    {
+                        "stringValue": "2017-11-14T16:58:20", 
+                        "key": "@lastActivationTime"
+                    }, 
+                    {
+                        "stringValue": "2017-11-30T16:58:00", 
+                        "key": "@nextRunTime"
+                    }, 
+                    {
+                        "stringValue": "2017-11-14T16:58:18", 
+                        "key": "@creationTime"
+                    }, 
+                    {
+                        "stringValue": "placebo", 
+                        "key": "description"
+                    }, 
+                    {
+                        "stringValue": "2017-11-14T16:58:38", 
+                        "key": "@deletionRequestTime"
+                    }, 
+                    {
+                        "stringValue": "PIPELINE", 
+                        "key": "@sphere"
+                    }, 
+                    {
+                        "stringValue": "2017-11-30T16:58:00", 
+                        "key": "@scheduledStartTime"
+                    }, 
+                    {
+                        "stringValue": "2019-02-28T16:58:00", 
+                        "key": "@scheduledEndTime"
+                    }, 
+                    {
+                        "stringValue": "AIDAJTZQ3BYFEGBSY4N5E", 
+                        "key": "pipelineCreator"
+                    }, 
+                    {
+                        "stringValue": "1", 
+                        "key": "@version"
+                    }, 
+                    {
+                        "stringValue": "test-delete-pipeline", 
+                        "key": "name"
+                    }, 
+                    {
+                        "stringValue": "df-07685871HDLCFQ0YDZDX", 
+                        "key": "@id"
+                    }, 
+                    {
+                        "stringValue": "DELETING", 
+                        "key": "@pipelineState"
+                    }, 
+                    {
+                        "stringValue": "644160558196", 
+                        "key": "@accountId"
+                    }, 
+                    {
+                        "stringValue": "0B3214B1-EFD6-4D87-9363-9F8882F1F8E2", 
+                        "key": "uniqueId"
+                    }, 
+                    {
+                        "stringValue": "AIDAJTZQ3BYFEGBSY4N5E", 
+                        "key": "@userId"
+                    }, 
+                    {
+                        "stringValue": "15 months", 
+                        "key": "@scheduledPeriod"
+                    }, 
+                    {
+                        "stringValue": "2017-11-14T16:58:20", 
+                        "key": "@firstActivationTime"
+                    }
+                ], 
+                "pipelineId": "df-07685871HDLCFQ0YDZDX", 
+                "name": "test-delete-pipeline", 
+                "tags": [], 
+                "description": "placebo"
+            }
+        ]
+    }
+}

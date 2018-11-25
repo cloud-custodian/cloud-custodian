@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudfront::644160558196:distribution/E2VHZ76UVAJYSC", 
+                "Tags": [
+                    {
+                        "Value": "456", 
+                        "Key": "123"
+                    }, 
+                    {
+                        "Value": "def", 
+                        "Key": "abc"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6e3db912-587b-11e7-992f-c7e25da019df", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6e3db912-587b-11e7-992f-c7e25da019df", 
+                "date": "Sat, 24 Jun 2017 01:21:21 GMT", 
+                "content-length": "193", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

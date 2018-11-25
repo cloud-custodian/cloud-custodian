@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ def s3_rename(output_dir, old, new, sse_kms_key_id):
 
         if page.get('Contents') is None:
             raise ArgumentError('Key {} does not exist in bucket {}'.format(
-                    old, bucket))
+                old, bucket))
 
         # Loop through the old objects copying and deleting
         for obj in page.get('Contents'):

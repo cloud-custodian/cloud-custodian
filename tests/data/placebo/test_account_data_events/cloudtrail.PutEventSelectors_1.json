@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EventSelectors": [
+            {
+                "IncludeManagementEvents": false, 
+                "DataResources": [
+                    {
+                        "Values": [
+                            "arn:aws:s3:::"
+                        ], 
+                        "Type": "AWS::S3::Object"
+                    }
+                ], 
+                "ReadWriteType": "All"
+            }
+        ], 
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents-test2", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "06149f6f-fff7-428f-9974-5591ce4fa369", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "06149f6f-fff7-428f-9974-5591ce4fa369", 
+                "date": "Thu, 02 Nov 2017 04:45:01 GMT", 
+                "content-length": "229", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

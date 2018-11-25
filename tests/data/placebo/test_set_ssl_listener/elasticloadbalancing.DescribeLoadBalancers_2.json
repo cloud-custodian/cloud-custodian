@@ -1,0 +1,92 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancerDescriptions": [
+            {
+                "Subnets": [
+                    "subnet-0712332d", 
+                    "subnet-be9373e5"
+                ], 
+                "CanonicalHostedZoneNameID": "Z35SXDOTRQ7X7K", 
+                "VPCId": "vpc-c91196ae", 
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 80, 
+                            "SSLCertificateId": "arn:aws:acm:us-east-1:644160558196:certificate/81b1b219-86ca-4b5d-bc0b-86989f2b08bc",
+                            "LoadBalancerPort": 443, 
+                            "Protocol": "HTTPS", 
+                            "InstanceProtocol": "HTTP"
+                        }, 
+                        "PolicyNames": [
+                            "AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333", 
+                            "testpolicy-1493768308000"
+                        ]
+                    }
+                ], 
+                "HealthCheck": {
+                    "HealthyThreshold": 10, 
+                    "Interval": 30, 
+                    "Target": "HTTP:80/index.html", 
+                    "Timeout": 5, 
+                    "UnhealthyThreshold": 2
+                }, 
+                "BackendServerDescriptions": [], 
+                "Instances": [], 
+                "DNSName": "internal-test-elb-566502660.us-east-1.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-82666cfd"
+                ], 
+                "Policies": {
+                    "LBCookieStickinessPolicies": [
+                        {
+                            "PolicyName": "AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333", 
+                            "CookieExpirationPeriod": 60
+                        }
+                    ], 
+                    "AppCookieStickinessPolicies": [], 
+                    "OtherPolicies": [
+                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493750072627", 
+                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493749918192", 
+                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493750282783", 
+                        "ELBSecurityPolicy-2016-08", 
+                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493748007026", 
+                        "testpolicy-1493768308000"
+                    ]
+                }, 
+                "LoadBalancerName": "test-elb", 
+                "CreatedTime": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 2, 
+                    "microsecond": 890000, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 0
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1b", 
+                    "us-east-1d"
+                ], 
+                "Scheme": "internal", 
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "644160558196",
+                    "GroupName": "ElasticMapReduce-Master-Private"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d2cbf129-2f66-11e7-b5ed-e9b066b80f64", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d2cbf129-2f66-11e7-b5ed-e9b066b80f64", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3124", 
+                "content-type": "text/xml", 
+                "date": "Tue, 02 May 2017 18:40:32 GMT"
+            }
+        }
+    }
+}

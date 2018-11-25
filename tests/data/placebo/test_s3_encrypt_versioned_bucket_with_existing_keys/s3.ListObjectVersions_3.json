@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-encrypt-test-versioning", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "LzZqmIg2F/7idX43+nEMc2zBB+Bm+5M56/iQaH5/SkDWrLJssargr9nnl0qPUgaqcNeaI/vjCeg=", 
+            "RequestId": "322EDF269FE7F6AE", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "LzZqmIg2F/7idX43+nEMc2zBB+Bm+5M56/iQaH5/SkDWrLJssargr9nnl0qPUgaqcNeaI/vjCeg=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "322EDF269FE7F6AE", 
+                "date": "Wed, 07 Feb 2018 16:34:26 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "Versions": [
+            {
+                "LastModified": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 25, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 34
+                }, 
+                "VersionId": "EH_vStLvfkMfYZFRBQy3EhW1Ki.bpzrp", 
+                "ETag": "\"35d6d33467aae9a2e3dccb4b6b027878\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "data1.txt", 
+                "Owner": {
+                    "DisplayName": "kit_ewbank", 
+                    "ID": "5c3342eb7cd29edd4cd7aaf3ce543d7acb9e1a6db40a9879f188b7c7e6b275e0"
+                }, 
+                "IsLatest": true, 
+                "Size": 5
+            }, 
+            {
+                "LastModified": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 34
+                }, 
+                "VersionId": "QOzI1nfIQxQ1XGBBWhKuO1eO1DP9qtsY", 
+                "ETag": "\"b8a9f715dbb64fd5c56e7783c6820a61\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "data2.txt", 
+                "Owner": {
+                    "DisplayName": "kit_ewbank", 
+                    "ID": "5c3342eb7cd29edd4cd7aaf3ce543d7acb9e1a6db40a9879f188b7c7e6b275e0"
+                }, 
+                "IsLatest": true, 
+                "Size": 3
+            }
+        ], 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "KeyMarker": "", 
+        "IsTruncated": false, 
+        "VersionIdMarker": ""
+    }
+}

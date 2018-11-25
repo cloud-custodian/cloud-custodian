@@ -1,63 +1,38 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Owner": {
-            "DisplayName": "mandeep.bal", 
-            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
-        }, 
+        "ResponseMetadata": {
+            "RequestId": "6D98497201F4BF9F",
+            "HostId": "5b3kqR1n4lilEbFFYQpSdm/DMBH6QNc+/P62ZcnO6oTo+PaL8XR+3QtjhokUA2XDf6VoopKIl60=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "5b3kqR1n4lilEbFFYQpSdm/DMBH6QNc+/P62ZcnO6oTo+PaL8XR+3QtjhokUA2XDf6VoopKIl60=",
+                "x-amz-request-id": "6D98497201F4BF9F",
+                "date": "Wed, 28 Mar 2018 10:37:06 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
         "Buckets": [
             {
+                "Name": "custodian-tagger",
                 "CreationDate": {
-                    "hour": 10, 
-                    "__class__": "datetime", 
-                    "month": 7, 
-                    "second": 14, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 24, 
-                    "minute": 38
-                }, 
-                "Name": "config-bucket-644160558196"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 8, 
-                    "__class__": "datetime", 
-                    "month": 7, 
-                    "second": 21, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 24, 
-                    "minute": 50
-                }, 
-                "Name": "custodian-skunk-trails"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 7, 
-                    "second": 51, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 24, 
-                    "minute": 36
-                }, 
-                "Name": "custodian-tagger"
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 3,
+                    "day": 28,
+                    "hour": 10,
+                    "minute": 37,
+                    "second": 4,
+                    "microsecond": 0
+                }
             }
-        ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "HostId": "W59yDmr/YiMM/XwwSVX4w4U8XgALu6D+B4JAPWC1ii3fT+eo10u/tINXEeQWkaId1RdxA2XVeiw=", 
-            "RequestId": "F98F9BDA8AE99868", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "W59yDmr/YiMM/XwwSVX4w4U8XgALu6D+B4JAPWC1ii3fT+eo10u/tINXEeQWkaId1RdxA2XVeiw=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "F98F9BDA8AE99868", 
-                "date": "Sun, 24 Jul 2016 17:36:52 GMT", 
-                "content-type": "application/xml"
-            }
+        ],
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
         }
     }
 }

@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "voltio11", 
+            "ID": "284338e43c2e44ee905129e951168205bd004de76b005f19e33871d614d73c6b"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 7
+                }, 
+                "Name": "c7n-bucket-without-encryption"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "MAlyD4yE3W7tPYSp+SH/4OoXLlq1vR5okpXdcLCFU9dyboKGqG8cXftwbkv4w97b/WMPzdb0mmU=", 
+            "RequestId": "E0D8D75BFEDEB345", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "MAlyD4yE3W7tPYSp+SH/4OoXLlq1vR5okpXdcLCFU9dyboKGqG8cXftwbkv4w97b/WMPzdb0mmU=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "E0D8D75BFEDEB345", 
+                "date": "Fri, 17 Nov 2017 20:07:09 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,91 @@
+{
+  "status_code": 200,
+  "data": {
+    "AutoScalingGroups": [
+      {
+        "AutoScalingGroupName": "marked",
+        "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-1:123456789012:autoScalingGroup:11d5f55c-66b5-498a-82a3-c3c87801f58e:autoScalingGroupName/marked",
+        "LaunchConfigurationName": "spottest",
+        "MinSize": 1,
+        "MaxSize": 1,
+        "DesiredCapacity": 1,
+        "DefaultCooldown": 300,
+        "AvailabilityZones": [
+          "us-west-1a",
+          "us-west-1b"
+        ],
+        "LoadBalancerNames": [],
+        "TargetGroupARNs": [],
+        "HealthCheckType": "EC2",
+        "HealthCheckGracePeriod": 300,
+        "Instances": [
+          {
+            "InstanceId": "i-093f47f7bd590e7a5",
+            "AvailabilityZone": "us-west-1a",
+            "LifecycleState": "InService",
+            "HealthStatus": "Healthy",
+            "LaunchConfigurationName": "spottest",
+            "ProtectedFromScaleIn": false
+          }
+        ],
+        "CreatedTime": "2018-05-03T01:46:06.864000+00:00",
+        "SuspendedProcesses": [],
+        "VPCZoneIdentifier": "subnet-f7ee3590,subnet-a7dd34fc",
+        "EnabledMetrics": [],
+        "Tags": [
+          {
+            "ResourceId": "marked",
+            "ResourceType": "auto-scaling-group",
+            "Key": "maid_status",
+            "Value": "AutoScaleGroup does not meet org policy: delete@2018/05/01 0246 UTC",
+            "PropagateAtLaunch": true
+          }
+        ],
+        "TerminationPolicies": [
+          "Default"
+        ],
+        "NewInstancesProtectedFromScaleIn": false
+      },
+      {
+        "AutoScalingGroupName": "not_marked",
+        "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-1:123456789012:autoScalingGroup:b1d7fa70-f757-4fdb-bb0d-9d125337e6c8:autoScalingGroupName/not_marked",
+        "LaunchConfigurationName": "spottest",
+        "MinSize": 1,
+        "MaxSize": 1,
+        "DesiredCapacity": 1,
+        "DefaultCooldown": 300,
+        "AvailabilityZones": [
+          "us-west-1a",
+          "us-west-1b"
+        ],
+        "LoadBalancerNames": [],
+        "TargetGroupARNs": [],
+        "HealthCheckType": "EC2",
+        "HealthCheckGracePeriod": 300,
+        "Instances": [
+          {
+            "InstanceId": "i-07e83ec38ff679686",
+            "AvailabilityZone": "us-west-1b",
+            "LifecycleState": "InService",
+            "HealthStatus": "Healthy",
+            "LaunchConfigurationName": "spottest",
+            "ProtectedFromScaleIn": false
+          }
+        ],
+        "CreatedTime": "2018-05-03T01:45:46.259000+00:00",
+        "SuspendedProcesses": [],
+        "VPCZoneIdentifier": "subnet-f7ee3590,subnet-a7dd34fc",
+        "EnabledMetrics": [],
+        "Tags": [],
+        "TerminationPolicies": [
+          "Default"
+        ],
+        "NewInstancesProtectedFromScaleIn": false
+      }
+    ],
+    "ResponseMetadata": {
+      "RequestId": "f08f794b-4e73-11e8-94c9-85996aab7948",
+      "HTTPStatusCode": 200
+    }
+  }
+}

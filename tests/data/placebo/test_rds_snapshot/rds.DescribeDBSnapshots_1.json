@@ -1,0 +1,99 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "70f1043d-ee33-4371-8dd8-9de421159080", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "70f1043d-ee33-4371-8dd8-9de421159080", 
+                "vary": "Accept-Encoding", 
+                "content-length": "2658", 
+                "content-type": "text/xml", 
+                "date": "Mon, 11 Dec 2017 19:11:32 GMT"
+            }
+        }, 
+        "DBSnapshots": [
+            {
+                "Engine": "mysql", 
+                "SnapshotCreateTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 27, 
+                    "microsecond": 365000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 10
+                }, 
+                "AvailabilityZone": "us-east-1e", 
+                "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:backup-c7n-snapshot-test-2017-12-11-14-09", 
+                "PercentProgress": 100, 
+                "MasterUsername": "user", 
+                "Encrypted": false, 
+                "LicenseModel": "general-public-license", 
+                "StorageType": "gp2", 
+                "Status": "available", 
+                "VpcId": "vpc-d2d616b5", 
+                "DBSnapshotIdentifier": "backup-c7n-snapshot-test-2017-12-11-14-09", 
+                "InstanceCreateTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 23, 
+                    "microsecond": 983000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 1
+                }, 
+                "OptionGroupName": "default:mysql-5-6", 
+                "AllocatedStorage": 20, 
+                "EngineVersion": "5.6.37", 
+                "SnapshotType": "manual", 
+                "IAMDatabaseAuthenticationEnabled": false, 
+                "Port": 3306, 
+                "DBInstanceIdentifier": "c7n-snapshot-test"
+            }, 
+            {
+                "Engine": "mysql", 
+                "SnapshotCreateTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 42, 
+                    "microsecond": 217000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 4
+                }, 
+                "AvailabilityZone": "us-east-1e", 
+                "DBSnapshotArn": "arn:aws:rds:us-east-1:644160558196:snapshot:rds:c7n-snapshot-test-2017-12-11-19-01", 
+                "PercentProgress": 100, 
+                "MasterUsername": "user", 
+                "Encrypted": false, 
+                "LicenseModel": "general-public-license", 
+                "StorageType": "gp2", 
+                "Status": "available", 
+                "VpcId": "vpc-d2d616b5", 
+                "DBSnapshotIdentifier": "rds:c7n-snapshot-test-2017-12-11-19-01", 
+                "InstanceCreateTime": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 23, 
+                    "microsecond": 983000, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 1
+                }, 
+                "OptionGroupName": "default:mysql-5-6", 
+                "AllocatedStorage": 20, 
+                "EngineVersion": "5.6.37", 
+                "SnapshotType": "automated", 
+                "IAMDatabaseAuthenticationEnabled": false, 
+                "Port": 3306, 
+                "DBInstanceIdentifier": "c7n-snapshot-test"
+            }
+        ]
+    }
+}

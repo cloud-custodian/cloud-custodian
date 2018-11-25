@@ -1,0 +1,894 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/operationresults/eyJqb2JJZCI6IlJFU09VUkNFR1JPVVBERUxFVElPTkpPQi1URVNUOjVGRU1QVFlSRy1TT1VUSENFTlRSQUxVUyIsImpvYkxvY2F0aW9uIjoic291dGhjZW50cmFsdXMifQ?api-version=2017-05-10
+  response:
+    body: {string: '{"error":{"code":"OperationNotFound","message":"The async operation
+        ''eyJqb2JJZCI6IlJFU09VUkNFR1JPVVBERUxFVElPTkpPQi1URVNUOjVGRU1QVFlSRy1TT1VUSENFTlRSQUxVUyIsImpvYkxvY2F0aW9uIjoic291dGhjZW50cmFsdXMifQ''
+        could not be found."}}'}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['223']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:14 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [f90fa361-a4b7-4790-9973-aa86d9c1afc3]
+      x-ms-failure-cause: [gateway]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [f90fa361-a4b7-4790-9973-aa86d9c1afc3]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205415Z:f90fa361-a4b7-4790-9973-aa86d9c1afc3']
+    status: {code: 404, message: Not Found}
+- request:
+    body: '{"location": "West US 2"}'
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['25']
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: PUT
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test?api-version=2017-05-10
+  response:
+    body: {string: '{"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test","name":"cloud-custodian-test","location":"westus2","properties":{"provisioningState":"Succeeded"}}'}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['194']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:14 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [dbbc4b4e-9d87-41fc-97f2-7bc862a9b55c]
+      x-ms-ratelimit-remaining-subscription-writes: ['1199']
+      x-ms-request-id: [dbbc4b4e-9d87-41fc-97f2-7bc862a9b55c]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205415Z:dbbc4b4e-9d87-41fc-97f2-7bc862a9b55c']
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test?api-version=2017-05-10
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR8Xs
+        o0cf3W3Wk2ZaF6u2qJbN3Sx7ePDwwf5k+/5sL9venz082M4eHGTb9w72zu892L0/23mQ363zplrX
+        0/zzulqvmrvTslrPtqfrpq1mRbbcbvOm/Wj00TJb5NTBwLdlNc3QJbW4ok/WzR59uKqrVV63Rd58
+        9OgX46/LoqE2xfLidZu1gPZ6PZ3m+SyfffRLfsn/A87rFNDCAAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['267']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:14 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [c20f479f-1061-484a-a356-07797f7751c3]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [c20f479f-1061-484a-a356-07797f7751c3]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205415Z:c20f479f-1061-484a-a356-07797f7751c3']
+    status: {code: 200, message: OK}
+- request:
+    body: '{"properties": {"template": {"parameters": {"name": {"type": "string"},
+      "storageName": {"type": "string"}, "location": {"type": "string"}, "appInsightsLocation":
+      {"type": "string"}, "sku": {"type": "string"}, "skuCode": {"type": "string"},
+      "workerSize": {"type": "string"}}, "resources": [{"apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Storage/storageAccounts", "name": "[parameters(''storageName'')]",
+      "location": "[parameters(''location'')]", "properties": {"accountType": "Standard_LRS"}},
+      {"apiVersion": "2016-09-01", "name": "[parameters(''name'')]", "type": "Microsoft.Web/serverfarms",
+      "location": "[parameters(''location'')]", "properties": {"name": "[parameters(''name'')]",
+      "workerSizeId": "[parameters(''workerSize'')]", "reserved": true, "numberOfWorkers":
+      "1", "hostingEnvironment": ""}, "sku": {"Tier": "[parameters(''sku'')]", "Name":
+      "[parameters(''skuCode'')]"}, "kind": "linux"}, {"apiVersion": "2015-05-01",
+      "name": "[parameters(''name'')]", "type": "microsoft.insights/components", "location":
+      "[parameters(''appInsightsLocation'')]", "tags": {"[concat(''hidden-link:'',
+      resourceGroup().id, ''/providers/Microsoft.Web/sites/'', parameters(''name''))]":
+      "Resource"}, "properties": {"ApplicationId": "[parameters(''name'')]", "Request_Source":
+      "IbizaWebAppExtensionCreate"}}, {"name": "[parameters(''name'')]", "type": "Microsoft.Web/sites",
+      "dependsOn": ["[concat(''Microsoft.Web/serverfarms/'', parameters(''name''))]",
+      "[resourceId(''Microsoft.Storage/storageAccounts'', parameters(''storageName''))]",
+      "[resourceId(''microsoft.insights/components/'', parameters(''name''))]"], "properties":
+      {"siteConfig": {"appSettings": [{"name": "AzureWebJobsDashboard", "value": "[concat(''DefaultEndpointsProtocol=https;AccountName='',parameters(''storageName''),'';AccountKey='',listKeys(resourceId(''Microsoft.Storage/storageAccounts'',
+      parameters(''storageName'')), ''2015-05-01-preview'').key1)]"}, {"name": "AzureWebJobsStorage",
+      "value": "[concat(''DefaultEndpointsProtocol=https;AccountName='',parameters(''storageName''),'';AccountKey='',listKeys(resourceId(''Microsoft.Storage/storageAccounts'',
+      parameters(''storageName'')), ''2015-05-01-preview'').key1)]"}, {"name": "FUNCTIONS_EXTENSION_VERSION",
+      "value": "beta"}, {"name": "FUNCTIONS_WORKER_RUNTIME", "value": "python"}, {"name":
+      "APPINSIGHTS_INSTRUMENTATIONKEY", "value": "[reference(resourceId(''microsoft.insights/components/'',
+      parameters(''name'')), ''2015-05-01'').InstrumentationKey]"}], "alwaysOn": true,
+      "appCommandLine": "", "linuxFxVersion": "DOCKER|microsoft/azure-functions-python3.6:dev-nightly"},
+      "name": "[parameters(''name'')]", "clientAffinityEnabled": false, "serverFarmId":
+      "[resourceId(''Microsoft.Web/serverfarms'', parameters(''name''))]", "hostingEnvironment":
+      ""}, "apiVersion": "2016-03-01", "kind": "functionapp,linux", "location": "[parameters(''location'')]"}],
+      "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+      "contentVersion": "1.0.0.0"}, "parameters": {"name": {"value": "cloud-custodian-test"},
+      "storageName": {"value": "cloudcustodiantest"}, "location": {"value": "westus2"},
+      "appInsightsLocation": {"value": "westus2"}, "sku": {"value": "Standard"}, "workerSize":
+      {"value": "0"}, "skuCode": {"value": "S1"}}, "mode": "Incremental"}}'
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['3221']
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: PUT
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test/providers/Microsoft.Resources/deployments/cloud-custodian-test?api-version=2017-05-10
+  response:
+    body: {string: '{"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test/providers/Microsoft.Resources/deployments/cloud-custodian-test","name":"cloud-custodian-test","properties":{"templateHash":"3042924493284285950","parameters":{"name":{"type":"String","value":"cloud-custodian-test"},"storageName":{"type":"String","value":"cloudcustodiantest"},"location":{"type":"String","value":"westus2"},"appInsightsLocation":{"type":"String","value":"westus2"},"sku":{"type":"String","value":"Standard"},"skuCode":{"type":"String","value":"S1"},"workerSize":{"type":"String","value":"0"}},"mode":"Incremental","provisioningState":"Accepted","timestamp":"2018-06-20T20:54:17.1315148Z","duration":"PT0.4632306S","correlationId":"310e5180-7537-4582-ab9c-1917dac60b40","providers":[{"namespace":"Microsoft.Storage","resourceTypes":[{"resourceType":"storageAccounts","locations":["westus2"]}]},{"namespace":"Microsoft.Web","resourceTypes":[{"resourceType":"serverfarms","locations":["westus2"]},{"resourceType":"sites","locations":["westus2"]}]},{"namespace":"microsoft.insights","resourceTypes":[{"resourceType":"components","locations":["westus2"]}]}],"dependencies":[{"dependsOn":[{"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test/providers/Microsoft.Web/serverfarms/cloud-custodian-test","resourceType":"Microsoft.Web/serverfarms","resourceName":"cloud-custodian-test"},{"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest","resourceType":"Microsoft.Storage/storageAccounts","resourceName":"cloudcustodiantest"},{"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test/providers/microsoft.insights/components/cloud-custodian-test","resourceType":"microsoft.insights/components","resourceName":"cloud-custodian-test"},{"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest","resourceType":"Microsoft.Storage/storageAccounts","resourceName":"cloudcustodiantest","actionName":"listKeys","apiVersion":"2015-05-01-preview"},{"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test/providers/microsoft.insights/components/cloud-custodian-test","resourceType":"microsoft.insights/components","resourceName":"cloud-custodian-test","apiVersion":"2015-05-01"}],"id":"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/cloud-custodian-test/providers/Microsoft.Web/sites/cloud-custodian-test","resourceType":"Microsoft.Web/sites","resourceName":"cloud-custodian-test"}]}}'}
+    headers:
+      Azure-AsyncOperation: ['https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourcegroups/cloud-custodian-test/providers/Microsoft.Resources/deployments/cloud-custodian-test/operationStatuses/08586720788288093460?api-version=2017-05-10']
+      Cache-Control: [no-cache]
+      Content-Length: ['2718']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:16 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [310e5180-7537-4582-ab9c-1917dac60b40]
+      x-ms-ratelimit-remaining-subscription-writes: ['1199']
+      x-ms-request-id: [310e5180-7537-4582-ab9c-1917dac60b40]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205417Z:310e5180-7537-4582-ab9c-1917dac60b40']
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 networkmanagementclient/1.7.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2017-11-01
+  response:
+    body: {string: "{\r\n  \"error\": {\r\n    \"message\": \"Operation 4e2ca804-ad28-486d-88ed-99606bbd7861\
+        \ not found.\",\r\n    \"details\": []\r\n  }\r\n}"}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['119']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:27 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [1c457baa-b1d7-43a3-a354-b90b4fb93c8c]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [d9c536a2-2489-46bf-b0b6-59aec920a591]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205427Z:1c457baa-b1d7-43a3-a354-b90b4fb93c8c']
+    status: {code: 404, message: Not Found}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 networkmanagementclient/1.7.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2017-11-01
+  response:
+    body: {string: "{\r\n  \"error\": {\r\n    \"message\": \"Operation 706b121c-ffa4-4f1c-9a86-a8741ae34a3f\
+        \ not found.\",\r\n    \"details\": []\r\n  }\r\n}"}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['119']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:27 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [08c030af-85af-4ee2-8fdc-cb865e330aaa]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [2686d985-8dd7-49af-adc8-dc2442a02c97]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205428Z:08c030af-85af-4ee2-8fdc-cb865e330aaa']
+    status: {code: 404, message: Not Found}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UdNm9Xtm2KRf/Qo/WhvZ/dge+f+9u7+m72dR7sPH+3vjR/s7e7v3Hv4yc7Oo52dj0b8Ur6cbXrl
+        4YPdew8P7gevUD/tusEbr9fTaZ7P8pl+s8wE0mSaPdzLdu9tP7z38NPt/Xx3dzs7/3S2vf9gZ2c3
+        y6cPz3cffvQbJ7/k/wEN4IrhuAAAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:34 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [1822ecd0-2cec-4583-9676-0454d5913f20]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/GetOperation3Min;14999,Microsoft.Compute/GetOperation30Min;29992']
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [25819d83-cb5a-451d-83f3-99fb8f8c46f0]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205434Z:1822ecd0-2cec-4583-9676-0454d5913f20']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz48e7t/bfXBv9un2/fv5wfb+9OFse3J/+un2eba3d//T+/fv
+        HUzPPxrpS/Osnl1ldf6yrs6LMqf3FRx9d7l4XfwAH330JGuK6e9/vPORfPdLzNtNW9XZRfTlYkFf
+        vMrP8zpfToOv6MvVelIWzTyv6fOPTrJltSymWWmQwvNRdU6v4uuvJutlu36d15f0t9+iebvG97uf
+        jnf2xzvbz9+8Dr6m5k1RLdGkzNq8aRV5hz41qpqnRfOW2vjYVc2b6xVQ/uh5sVy/C6AuswV/M50C
+        5OXi9/+SIfz+u7//we49omw++/TeebZ/cP/+5CC7f34v35tkk/t7u/emAZhpnRNOX65axfBZXS3O
+        QLGwVTadF8sLNHiVZ7Pv1kUbNlhkS3pnBgyokTcG+k7n5ng6rYiAZkSv22w5ozn//Z+/CshFLxTM
+        PXeb9aSZ1gWj1tzNsocHDx/sT7bvz/ay7f3Zw4Pt7MFBtn3vYO/83oPd+7OdB/ndOm+qdT3NP6+r
+        9aq5C8r8/peLu8Sll8WMpuHuF8W0rprqvB2fVIvVus3vzgjl5u7XoKJD2U0jIQ944NbPn9Ag7u2Y
+        b1ybj2ZZm6ETiMz3zKdph2jlGtOxY9/C059zdLb3+2cPdx4+yGfT8+zTT/fPz/cPpgf5Af3vwezB
+        3s7OvWCmCEp3yk8Xq/a628ZN+Itq2YWwYbbp2/edb3rl53LG8ectaOhj7CYTTzjluzt799y3v8T8
+        +n35xbxJoh3TVVNBsX6hE3252L+/+EXTi+zB6m1zVTi6fZTNFsXyqyavDU9gNGv622tTQmmcVMvz
+        4mJdZyAqNbSdUQNCPJuU+cusaa6qena8buf5siUNqG3Ps7LJTXuDOr3X5MRDLfNvd1zLvCVQb73B
+        mY/OljSw82wKU/G9X8xT/rM94y+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2kqtqnron/
+        HX2bL0FIGlLa1utcQeIx0vBVXdCXH83bdtU8uns3mNYm45m6XIwnZTUZT6s6H18Vy1l11YwJ9buW
+        95SbLMo8ZtgWElWSL9LJ1MXr9XSa5zNCBq2k7UetSqGjjZGGy6Ju11n5BQs8zY20LyvLBB8Rudv5
+        lBijzsq1adBmFx4NPnp53c4rIi8ZN3rjrP0ukbvxEcB0fyMS/ub09Zvf/ye/iM73wJisrCvuRmTs
+        x79x8kv+H9GRFunPCAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:33 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [b867a94d-6d3f-45db-982a-19a04d1e8181]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;4199,Microsoft.Compute/LowCostGet30Min;33590']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [ed432986-dd6d-4e15-bbd8-ca50a2c642d1]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205434Z:b867a94d-6d3f-45db-982a-19a04d1e8181']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UdNm9Xtm2KRf/Qo/WhvZ/dge+f+9u79N7v3Hu3vP9q9N955cPDpwcO9T3Z2Hu3sfDTil/LlbNMr
+        e/f2H977dDd4hfpp1w3eeL2eTvN8ls/0m2UmkD7dzT49f7C/t/1gP7+3vX+ePdzO8nsPt/eyTz+d
+        HOzv36d/P/qNk1/y/wBkjS44uAAAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:38 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [7f92d9ff-4db7-401e-a113-65bece75945d]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/GetOperation3Min;14998,Microsoft.Compute/GetOperation30Min;29991']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [d077282d-8ae2-4ab0-b163-0ed1f965b5c1]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205439Z:7f92d9ff-4db7-401e-a113-65bece75945d']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UdNm9Xtm2KRf/Qo/WhvZ/dge+f+9u79N7v3Hu3vP9p7MN6/d3B/9/69T3Z2Hu3sfDTil/LlbNMr
+        9z+9d39v/yB4hfpp1w3eeL2eTvN8ls/0m2UmkHaz/NOdhwc72w/uPdjf3n/44NPtbP/e7na2s/vw
+        Qf7g04f3Ps0++o2TX/L/AIxd4fG4AAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:39 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [5533cd90-cf74-4726-9df1-c225b73420a1]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/GetOperation3Min;14997,Microsoft.Compute/GetOperation30Min;29990']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [b3e86fc3-3708-4931-83b6-30a0b2becd24]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205439Z:5533cd90-cf74-4726-9df1-c225b73420a1']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz48e7t/bfXBv9un2/fv5wfb+9OFse3J/+un2eba3d//T+/fv
+        HUzPPxrpS/Osnl1ldf6yrs6LMqf3FRx9d7l4XfwAH330JGuK6e9/vPORfPdLzNtNW9XZRfTlYkFf
+        vMrP8zpfToOv6MvVelIWzTyv6fOPTrJltSymWWmQwvNRdU6v4uuvJutlu36d15f0t9+iebvG97uf
+        jnf2xzvbz9+8Dr6m5k1RLdGkzNq8aRV5hz41qpqnRfOW2vjYVc2b6xVQ/uh5sVy/C6AuswV/M50C
+        5OXi9/+SIfz+u7//we49omw++/TeebZ/cP/+5CC7f34v35tkk/t7u/emAZhpnRNOX65axfBZXS3O
+        QLGwVTadF8sLNHiVZ7Pv1kUbNlhkS3pnBgyokTcG+k7n5ng6rYiAZkSv22w5ozn//Z+/CshFLxTM
+        PXeb9aSZ1gWj1tzNsocHDx/sT7bvz/ay7f3Zw4Pt7MFBtn3vYO/83oPd+7OdB/ndOm+qdT3NP6+r
+        9aq5C8r8/peLu8Sll8WMpuHuF8W0rprqvB2fVIvVus3vzgjl5u7XoKJD2U0jIQ944NbPn9Ag7u2Y
+        b1ybj2ZZm6ETiMz3zKdph2jlGtOxY9/C059zdLb3+2cPdx4+yGfT8+zTT/fPz/cPpgf5Af3vwezB
+        3s7OvWCmCEp3yk8Xq/a628ZN+Itq2YWwYbbp2/edb3rl53LG8ectaOhj7CYTTzjluzt799y3v8T8
+        +n35xbxJoh3TVVNBsX6hE3252L+/+EXTi+zB6m1zVTi6fZTNFsXyqyavDU9gNGv622tTQmmcVMvz
+        4mJdZyAqNbSdUQNCPJuU+cusaa6qena8buf5siUNqG3Ps7LJTXuDOr3X5MRDLfNvd1zLvCVQb73B
+        mY/OljSw82wKU/G9X8xT/rM94y+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2kqtqnron/
+        HX2bL0FIGlLa1utcQeIx0vBVXdCXH83bdtU8uns3mNYm45m6XIwnZTUZT6s6H18Vy1l11YwJ9buW
+        95SbLMo8ZtgWElWSL9LJ1MXr9XSa5zNCBq2k7UetSqGjjZGGy6Ju11n5BQs8zY20LyvLBB8Rudv5
+        lBijzsq1adBmFx4NPnp53c4rIi8ZN3rjrP0ukbvxEcB0fyMS/ub09Zvf/ye/iM73wJisrCvuRmTs
+        x79x8kv+H9GRFunPCAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:39 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [52fffa35-4c7f-4300-9eda-50455ffca7e5]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;4197,Microsoft.Compute/LowCostGet30Min;33588']
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [acdf7151-e17e-427c-a21e-2716402eb9ef]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205439Z:52fffa35-4c7f-4300-9eda-50455ffca7e5']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UdNm9Xtm2KRf/Qo/WhvZ/dge+f+9u79N7v3Hu3vP7r3YHxv7+H+/U8ffrKz82hn56MRv5QvZ5te
+        ub9/sLe7dz94hfpp1w3eeL2eTvN8ls/0m2UmkPLJp3uz+5/ubn96QPD272fZ9uRg9/72zv5s7+Fk
+        Mtn/dGf20W+c/JL/B/BviPC4AAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:39 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [cc5e3aae-a0bb-43ed-9cb7-1a108601c9d2]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/GetOperation3Min;14996,Microsoft.Compute/GetOperation30Min;29989']
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [86574eb9-200b-4da7-8c00-4a2011ed6e46]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205440Z:cc5e3aae-a0bb-43ed-9cb7-1a108601c9d2']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UdNm9Xtm2KRf/Qo/WhvZ/dge+f+9u79N7v3Hu3ff7S7P/70/sGDB5/uf7Kz82hn56MRv5QvZ5te
+        eXBw78HBg/AV6qddN3jj9Xo6zfNZPtNvlplA2n04+fTT+7P97Xxynm/v5wcPtw/ynWw737mfP7h3
+        n97ZyT/6jZNf8v8Awti6h7gAAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:41 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [722886de-4871-4c1f-9845-9abb6f003db4]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/GetOperation3Min;14995,Microsoft.Compute/GetOperation30Min;29988']
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [bec5896f-6a52-4e7f-a05e-d8d4faeb3172]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205442Z:722886de-4871-4c1f-9845-9abb6f003db4']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UdNm9Xtm2KRf/Qo/WhvZ/dge+f+9u79N7v3Hu3ff7R3f3zvwYOD+w8+2dl5tLPz0YjfyZezTW/s
+        HzzYu3fvIHiFumnXDd54vZ5O83yWz/SbZSaQ7j2cZA8/zbLtWT452N7f259uT/KHD7d3pg+nO/cP
+        prO9LP/oN05+yf8Dd03JqrcAAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:42 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [a778d235-9689-42c8-9664-010c08a08518]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/GetOperation3Min;14994,Microsoft.Compute/GetOperation30Min;29987']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [99c97584-daaa-4767-9cd7-c26a1505cdc2]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205443Z:a778d235-9689-42c8-9664-010c08a08518']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UdNm9Xtm2KRf/Qo/WhvZ/dge+f+9u79N7v3Hu3ff3Tvwfj+p/c/Pfj04JOdnUc7Ox+N+KV8Odv0
+        yqcPdx7sPrgfvEL9tOsGb7xeT6d5Pstn+s0yE0jn+7sPZgef7m3v7kz3t/fvP/h0e5LNsu2Hk3w2
+        /XQ3O3/46f5Hv3HyS/4fhJgTlbgAAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:42 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [d06571f8-21da-4002-bbb3-95cff56950c9]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/GetOperation3Min;14993,Microsoft.Compute/GetOperation30Min;29986']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [0c5cde41-b059-471a-b410-bbe598f38151]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205443Z:d06571f8-21da-4002-bbb3-95cff56950c9']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test/providers/Microsoft.Resources/deployments/cloud-custodian-test/operationStatuses/08586720788288093460?api-version=2017-05-10
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR02b
+        tevmo0cfvVovl8Xy4qNf8v8Aicy9SRQAAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['140']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:46 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [01e46d56-3bd8-4440-848b-82892b258a1c]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [01e46d56-3bd8-4440-848b-82892b258a1c]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205447Z:01e46d56-3bd8-4440-848b-82892b258a1c']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz48e7t/bfXBv9un2/fv5wfb+9OFse3J/+un2eba3d//T+/fv
+        HUzPPxrpS/Osnl1ldf6yrs6LMqf3FRx9d7l4XfwAH330JGuK6e9/vPORfPdLzNtNW9XZRfTlYkFf
+        vMrP8zpfToOv6MvVelIWzTyv6fOPTrJltSymWWmQwvNRdU6v4uuvJutlu36d15f0t9+iebvG97uf
+        jnf2xzvbz9+8Dr6m5k1RLdGkzNq8aRV5hz41qpqnRfOW2vjYVc2b6xVQ/uh5sVy/C6AuswV/M50C
+        5OXi9/+SIfz+u7//we49omw++/TeebZ/cP/+5CC7f34v35tkk/t7u/emAZhpnRNOX65axfBZXS3O
+        QLGwVTadF8sLNHiVZ7Pv1kUbNlhkS3pnBgyokTcG+k7n5ng6rYiAZkSv22w5ozn//Z+/CshFLxTM
+        PXeb9aSZ1gWj1tzNsocHDx/sT7bvz/ay7f3Zw4Pt7MFBtn3vYO/83oPd+7OdB/ndOm+qdT3NP6+r
+        9aq5C8r8/peLu8Sll8WMpuHuF8W0rprqvB2fVIvVus3vzgjl5u7XoKJD2U0jIQ944NbPn9Ag7u2Y
+        b1ybj2ZZm6ETiMz3zKdph2jlGtOxY9/C059zdLb3+2cPdx4+yGfT8+zTT/fPz/cPpgf5Af3vwezB
+        3s7OvWCmCEp3yk8Xq/a628ZN+Itq2YWwYbbp2/edb3rl53LG8ectaOhj7CYTTzjluzt799y3v8T8
+        +n35xbxJoh3TVVNBsX6hE3252L+/+EXTi+zB6m1zVTi6fZTNFsXyqyavDU9gNGv622tTQmmcVMvz
+        4mJdZyAqNbSdUQNCPJuU+cusaa6qena8buf5siUNqG3Ps7LJTXuDOr3X5MRDLfNvd1zLvCVQb73B
+        mY/OljSw82wKU/G9X8xT/rM94y+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2kqtqnron/
+        HX2bL0FIGlLa1utcQeIx0vBVXdCXH83bdtU8uns3mNYm45m6XIwnZTUZT6s6H18Vy1l11YwJ9buW
+        95SbLMo8ZtgWElWSL9LJ1MXr9XSa5zNCBq2k7UetSqGjjZGGy6Ju11n5BQs8zY20LyvLBB8Rudv5
+        lBijzsq1adBmFx4NPnp53c4rIi8ZN3rjrP0ukbvxEcB0fyMS/ub09Zvf/ye/iM73wJisrCvuRmTs
+        x79x8kv+H9GRFunPCAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:51 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [3af1565f-daeb-48da-a9a9-20420598f73c]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;4196,Microsoft.Compute/LowCostGet30Min;33587']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [0ce72c93-bd7e-4934-8252-94f29bd75343]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205451Z:3af1565f-daeb-48da-a9a9-20420598f73c']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz48e7t/bfXBv9un2/fv5wfb+9OFse3J/+un2eba3d//T+/fv
+        HUzPPxrpS/Osnl1ldf6yrs6LMqf3FRx9d7l4XfwAH330JGuK6e9/vPORfPdLzNtNW9XZRfTlYkFf
+        vMrP8zpfToOv6MvVelIWzTyv6fOPTrJltSymWWmQwvNRdU6v4uuvJutlu36d15f0t9+iebvG97uf
+        jnf2xzvbz9+8Dr6m5k1RLdGkzNq8aRV5hz41qpqnRfOW2vjYVc2b6xVQ/uh5sVy/C6AuswV/M50C
+        5OXi9/+SIfz+u7//we49omw++/TeebZ/cP/+5CC7f34v35tkk/t7u/emAZhpnRNOX65axfBZXS3O
+        QLGwVTadF8sLNHiVZ7Pv1kUbNlhkS3pnBgyokTcG+k7n5ng6rYiAZkSv22w5ozn//Z+/CshFLxTM
+        PXeb9aSZ1gWj1tzNsocHDx/sT7bvz/ay7f3Zw4Pt7MFBtn3vYO/83oPd+7OdB/ndOm+qdT3NP6+r
+        9aq5C8r8/peLu8Sll8WMpuHuF8W0rprqvB2fVIvVus3vzgjl5u7XoKJD2U0jIQ944NbPn9Ag7u2Y
+        b1ybj2ZZm6ETiMz3zKdph2jlGtOxY9/C059zdLb3+2cPdx4+yGfT8+zTT/fPz/cPpgf5Af3vwezB
+        3s7OvWCmCEp3yk8Xq/a628ZN+Itq2YWwYbbp2/edb3rl53LG8ectaOhj7CYTTzjluzt799y3v8T8
+        +n35xbxJoh3TVVNBsX6hE3252L+/+EXTi+zB6m1zVTi6fZTNFsXyqyavDU9gNGv622tTQmmcVMvz
+        4mJdZyAqNbSdUQNCPJuU+cusaa6qena8buf5siUNqG3Ps7LJTXuDOr3X5MRDLfNvd1zLvCVQb73B
+        mY/OljSw82wKU/G9X8xT/rM94y+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2kqtqnron/
+        HX2bL0FIGlLa1utcQeIx0vBVXdCXH83bdtU8uns3mNYm45m6XIwnZTUZT6s6H18Vy1l11YwJ9buW
+        95SbLMo8ZtgWElWSL9LJ1MXr9XSa5zNCBq2k7UetSqGjjZGGy6Ju11n5BQs8zY20LyvLBB8Rudv5
+        lBijzsq1adBmFx4NPnp53c4rIi8ZN3rjrP0ukbvxEcB0fyMS/ub09Zvf/ye/iM73wJisrCvuRmTs
+        x79x8kv+H9GRFunPCAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:51 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [78e5920a-1003-4147-8e43-03433df785a8]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;4195,Microsoft.Compute/LowCostGet30Min;33586']
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [b386a791-cd4e-4da9-86a0-5dbdcbbf2f54]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205451Z:78e5920a-1003-4147-8e43-03433df785a8']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2018-04-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xb5yk
+        6UerulrldVvkzUePUv6IPrxcnM3oz48e7t/bfXBv9un2/fv5wfb+9OFse3J/+un2eba3d//T+/fv
+        HUzPPxrpS/Osnl1ldf6yrs6LMqf3FRx9d7l4XfwAH330JGuK6e9/vPORfPdLzNtNW9XZRfTlYkFf
+        vMrP8zpfToOv6MvVelIWzTyv6fOPTrJltSymWWmQwvNRdU6v4uuvJutlu36d15f0t9+iebvG97uf
+        jnf2xzvbz9+8Dr6m5k1RLdGkzNq8aRV5hz41qpqnRfOW2vjYVc2b6xVQ/uh5sVy/C6AuswV/M50C
+        5OXi9/+SIfz+u7//we49omw++/TeebZ/cP/+5CC7f34v35tkk/t7u/emAZhpnRNOX65axfBZXS3O
+        QLGwVTadF8sLNHiVZ7Pv1kUbNlhkS3pnBgyokTcG+k7n5ng6rYiAZkSv22w5ozn//Z+/CshFLxTM
+        PXeb9aSZ1gWj1tzNsocHDx/sT7bvz/ay7f3Zw4Pt7MFBtn3vYO/83oPd+7OdB/ndOm+qdT3NP6+r
+        9aq5C8r8/peLu8Sll8WMpuHuF8W0rprqvB2fVIvVus3vzgjl5u7XoKJD2U0jIQ944NbPn9Ag7u2Y
+        b1ybj2ZZm6ETiMz3zKdph2jlGtOxY9/C059zdLb3+2cPdx4+yGfT8+zTT/fPz/cPpgf5Af3vwezB
+        3s7OvWCmCEp3yk8Xq/a628ZN+Itq2YWwYbbp2/edb3rl53LG8ectaOhj7CYTTzjluzt799y3v8T8
+        +n35xbxJoh3TVVNBsX6hE3252L+/+EXTi+zB6m1zVTi6fZTNFsXyqyavDU9gNGv622tTQmmcVMvz
+        4mJdZyAqNbSdUQNCPJuU+cusaa6qena8buf5siUNqG3Ps7LJTXuDOr3X5MRDLfNvd1zLvCVQb73B
+        mY/OljSw82wKU/G9X8xT/rM94y+k57s9DO4urn/yixfF9KNf8n2L+azILpZVQ8OPTs2kqtqnron/
+        HX2bL0FIGlLa1utcQeIx0vBVXdCXH83bdtU8uns3mNYm45m6XIwnZTUZT6s6H18Vy1l11YwJ9buW
+        95SbLMo8ZtgWElWSL9LJ1MXr9XSa5zNCBq2k7UetSqGjjZGGy6Ju11n5BQs8zY20LyvLBB8Rudv5
+        lBijzsq1adBmFx4NPnp53c4rIi8ZN3rjrP0ukbvxEcB0fyMS/ub09Zvf/ye/iM73wJisrCvuRmTs
+        x79x8kv+H9GRFunPCAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:54:50 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0, Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [53a22109-d088-4adc-9e83-49466d482d9d]
+      x-ms-ratelimit-remaining-resource: ['Microsoft.Compute/LowCostGet3Min;4193,Microsoft.Compute/LowCostGet30Min;33584']
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [f4d5faef-72b1-42ab-815b-7a5f6f1a4313]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205451Z:53a22109-d088-4adc-9e83-49466d482d9d']
+      x-ms-served-by: [5bf72e87-b853-4001-bd50-8d9de6e6ce78_131710911430200005]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test/providers/Microsoft.Resources/deployments/cloud-custodian-test/operationStatuses/08586720788288093460?api-version=2017-05-10
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR02b
+        tevmo0cfvV5Pp3k+y2cf/ZL/ByCIe+QWAAAA
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['141']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:55:17 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [036427b9-8505-428c-a00f-cc66754f0652]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [036427b9-8505-428c-a00f-cc66754f0652]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205517Z:036427b9-8505-428c-a00f-cc66754f0652']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test/providers/Microsoft.Resources/deployments/cloud-custodian-test?api-version=2017-05-10
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR8Xs
+        o0cf3W3Wk2ZaF6u2qJbN3Sx7ePDwwf5k+/5sL9venz082M4eHGTb9w72zu892L0/23mQ363zplrX
+        0/zzulqvmrvTslrPtqfrpq1mRbbcbvOmvbuqq8tiltfN3S+KaV011Xk7fqXvNXdn+aqsrhf5so2/
+        /tHoo2W2yAm/gW8J/Cqv2yJvPnr0iz9q88WqzNr821kzp3fu7ezvPdzb3394b+9gf+/g/sP7O3gl
+        qwlkSyjhFQFPr16v6OdHr9u6WF5Qq8usXOODaL+/ZPQR/V1nF/mL7Bav27fNy2U1zUDnTW9eUdt1
+        s4fm2Wp1tmyKi3nbPH+/N5u3600tX7fZcpbVM216Us3o0w3Nd9Hwqqrf5vXr4gf00XDbnY9+CbVd
+        MMSPzpbTOscsZyU1oTm7LBoaBL1BGLRo8Xo9neb5LJ/R922xoBFkixV9vreze7C98+n23s6bvZ1H
+        9+8/2t0ff7q7s7d7/+CnqOlsXSs5Pnr55v6D8cP93Yf3dj99TV9Nq7rOiRno2zMw+L3dnfz+7sHO
+        9oP79x5s798/2NvOJg+n27sPdx/MsumnO5N95g4gB3796NH3hDuaVTYFio5/X8vcU2sjAW+ICvKG
+        /wm9RBOPpsfTabUmJqdXzNyjuZ2q7/+S7/+S0VB3380n9J4PGO/2u8rry7w+z+rFhm6ok+5rBXHl
+        8Av8io/XwuJVKE/Syz5MAOj1Mq0Wq2pJHIDWg119n2Y0X+XLWb6cskgTIPmg+ZLmmP76oesqIv5d
+        j7LRF2lIBrwOd/B9r6moDtEQXYAg+g99qMrWd6khfhqeFQD2fbzujaI34AEo3iv+wEOwP8Rh99n4
+        ruPR6MveCHTQG2F4zf0Bd4H+EId84xwJAPs+XvdGoYO+EYr3ij/wLthsioFqi7Jo2t8rv8a72ar4
+        ScKWvqPPSf3f396h/+1ur+r8ssivfpgE2zi/0ZcJf9OFkmsjDK+5EmIA6ABRPoLG/CERw807qzRY
+        jegrhK0BrCSIvOk12jRwDK9at6t1a13GH6YV2Dh30Zd/mNzpyDogiALAvo/Xf27w42l3NjD64s8h
+        ZmDI6CvEf7/kl/w/heeJcCANAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['932']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 20 Jun 2018 20:55:17 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [a1717e6a-b6e0-4be9-a4a5-22cf4f18443a]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [a1717e6a-b6e0-4be9-a4a5-22cf4f18443a]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205517Z:a1717e6a-b6e0-4be9-a4a5-22cf4f18443a']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['0']
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
+          msrest/0.5.0 msrest_azure/0.4.32 resourcemanagementclient/1.2.2 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: DELETE
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test?api-version=2017-05-10
+  response:
+    body: {string: ''}
+    headers:
+      Cache-Control: [no-cache]
+      Content-Length: ['0']
+      Date: ['Wed, 20 Jun 2018 20:55:17 GMT']
+      Expires: ['-1']
+      Location: ['https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/operationresults/eyJqb2JJZCI6IlJFU09VUkNFR1JPVVBERUxFVElPTkpPQi1DTE9VRDoyRENVU1RPRElBTjoyRFRFU1QtV0VTVFVTMiIsImpvYkxvY2F0aW9uIjoid2VzdHVzMiJ9?api-version=2017-05-10']
+      Pragma: [no-cache]
+      Retry-After: ['15']
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [cc1e8640-adf8-4a71-8108-24bde038286d]
+      x-ms-ratelimit-remaining-subscription-deletes: ['14999']
+      x-ms-request-id: [cc1e8640-adf8-4a71-8108-24bde038286d]
+      x-ms-routing-request-id: ['WESTUS2:20180620T205517Z:cc1e8640-adf8-4a71-8108-24bde038286d']
+    status: {code: 202, message: Accepted}
+version: 1

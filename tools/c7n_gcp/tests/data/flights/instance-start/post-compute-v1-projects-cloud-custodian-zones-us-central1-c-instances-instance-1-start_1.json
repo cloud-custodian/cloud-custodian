@@ -1,0 +1,33 @@
+{
+  "headers": {
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "date": "Thu, 08 Nov 2018 10:04:44 GMT",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "691",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "7037452715874170068",
+    "name": "operation-1541671482827-57a245d1820f9-2973d419-0ab6aceb",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c",
+    "operationType": "start",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/instance-1",
+    "targetId": "991745007860431209",
+    "status": "PENDING",
+    "user": "kapilt@gmail.com",
+    "progress": 0,
+    "insertTime": "2018-11-08T02:04:44.145-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/operations/operation-1541671482827-57a245d1820f9-2973d419-0ab6aceb"
+  }
+}

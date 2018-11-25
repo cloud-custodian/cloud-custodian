@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "76271bc4-e3d5-5734-86d1-49f2d18a5d20", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "76271bc4-e3d5-5734-86d1-49f2d18a5d20", 
+                "date": "Fri, 15 Sep 2017 19:55:11 GMT", 
+                "content-length": "331", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TopicArn": "arn:aws:sns:us-east-1:644160558196:bucket-notification-test"
+    }
+}

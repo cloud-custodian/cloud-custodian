@@ -1,0 +1,67 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DirectoryDescriptions": [
+            {
+                "AccessUrl": "d-90672a7419.awsapps.com", 
+                "DirectoryId": "d-90672a7419", 
+                "SsoEnabled": false, 
+                "Name": "c7n.directory", 
+                "DesiredNumberOfDomainControllers": 0, 
+                "DnsIpAddrs": [
+                    "172.31.57.49", 
+                    "172.31.3.30"
+                ], 
+                "VpcSettings": {
+                    "SubnetIds": [
+                        "subnet-3a334610", 
+                        "subnet-914763e7"
+                    ], 
+                    "VpcId": "vpc-d2d616b5", 
+                    "AvailabilityZones": [
+                        "us-east-1a", 
+                        "us-east-1d"
+                    ], 
+                    "SecurityGroupId": "sg-8e9268fa"
+                }, 
+                "StageLastUpdatedDateTime": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 4, 
+                    "microsecond": 523000, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 33
+                }, 
+                "Alias": "d-90672a7419", 
+                "LaunchTime": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 56, 
+                    "microsecond": 970000, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 29
+                }, 
+                "Description": "Test Directory", 
+                "ShortName": "c7n-directory", 
+                "Stage": "Active", 
+                "Type": "SimpleAD", 
+                "Size": "Small"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "44ab446a-ecb5-11e7-a800-b1eef477628b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "44ab446a-ecb5-11e7-a800-b1eef477628b", 
+                "date": "Fri, 29 Dec 2017 16:28:14 GMT", 
+                "content-length": "594", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

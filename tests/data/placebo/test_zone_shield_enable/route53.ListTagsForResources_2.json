@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceTagSets": [
+            {
+                "ResourceType": "hostedzone", 
+                "ResourceId": "XXXXURLYV5DGGG", 
+                "Tags": [
+                    {
+                        "Value": "PLATFORM", 
+                        "Key": "App"
+                    }, 
+                    {
+                        "Value": "Me",
+                        "Key": "Owner"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b7abf400-a9d4-11e7-af24-f58116d3b369", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b7abf400-a9d4-11e7-af24-f58116d3b369", 
+                "date": "Thu, 05 Oct 2017 13:54:33 GMT", 
+                "content-length": "1488", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

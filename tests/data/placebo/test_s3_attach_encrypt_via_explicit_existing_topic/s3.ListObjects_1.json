@@ -1,0 +1,48 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-attach-encrypt-test", 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "g6OSFMdNpTiVU/zeQKZHcHYNWwJZV+KSPVNhWAudplZ5f16cS8F211AGAQBbgH5KUaYO0gRJVE8=", 
+            "RequestId": "572F2AA1F2A91C43", 
+            "HTTPHeaders": {
+                "x-amz-bucket-region": "us-east-1", 
+                "x-amz-id-2": "g6OSFMdNpTiVU/zeQKZHcHYNWwJZV+KSPVNhWAudplZ5f16cS8F211AGAQBbgH5KUaYO0gRJVE8=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "572F2AA1F2A91C43", 
+                "date": "Sat, 18 Mar 2017 12:53:47 GMT", 
+                "content-type": "application/xml"
+            }
+        }, 
+        "MaxKeys": 1000, 
+        "Prefix": "", 
+        "Marker": "", 
+        "EncodingType": "url", 
+        "IsTruncated": false, 
+        "Contents": [
+            {
+                "LastModified": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 18, 
+                    "minute": 53
+                }, 
+                "ETag": "\"5eb63bbbe01eeed093cb22bb8f5acdc3\"", 
+                "StorageClass": "STANDARD", 
+                "Key": "hello-world.txt", 
+                "Owner": {
+                    "DisplayName": "mandeep.bal", 
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+                }, 
+                "Size": 11
+            }
+        ]
+    }
+}

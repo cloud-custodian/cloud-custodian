@@ -1,0 +1,34 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "193b3a28-92e4-11e7-ad9e-43ea23b810d9", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "193b3a28-92e4-11e7-ad9e-43ea23b810d9", 
+                "content-length": "243", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 06 Sep 2017 09:16:43 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "repository": {
+            "registryId": "644160558196", 
+            "repositoryName": "test-xyz", 
+            "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/test-xyz", 
+            "createdAt": {
+                "hour": 5, 
+                "__class__": "datetime", 
+                "month": 9, 
+                "second": 43, 
+                "microsecond": 0, 
+                "year": 2017, 
+                "day": 6, 
+                "minute": 16
+            }, 
+            "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/test-xyz"
+        }
+    }
+}

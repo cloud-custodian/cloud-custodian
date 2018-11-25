@@ -1,0 +1,90 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Buckets": [
+            {
+                "CreationDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 38
+                }, 
+                "Name": "config-bucket-644160558196"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 35
+                }, 
+                "Name": "custodian-encrypt-test"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 38, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 14
+                }, 
+                "Name": "custodian-log-archive"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 6, 
+                    "minute": 18
+                }, 
+                "Name": "custodian-skunk-billing"
+            }, 
+            {
+                "CreationDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 50
+                }, 
+                "Name": "custodian-skunk-trails"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "cOJDFQT1lNQckL2YSWFBPk8YTadxtply+h1uyWhEebfBto0L/N+gAPUfXZeIJsbQLHag7uhZgX4=", 
+            "RequestId": "486811724217F1A8", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "cOJDFQT1lNQckL2YSWFBPk8YTadxtply+h1uyWhEebfBto0L/N+gAPUfXZeIJsbQLHag7uhZgX4=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "486811724217F1A8", 
+                "date": "Mon, 29 May 2017 00:35:06 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

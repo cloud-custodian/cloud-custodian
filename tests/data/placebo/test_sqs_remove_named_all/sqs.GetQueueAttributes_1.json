@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Attributes": {
+            "ApproximateNumberOfMessagesNotVisible": "0", 
+            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"arn:aws:sqs:us-east-1:644160558196:a/SQSDefaultPolicy\",\"Statement\":[{\"Sid\":\"Sid1511968458112\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SQS:DeleteMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:a\"}]}", 
+            "MessageRetentionPeriod": "345600", 
+            "ApproximateNumberOfMessagesDelayed": "0", 
+            "MaximumMessageSize": "262144", 
+            "CreatedTimestamp": "1511968431", 
+            "ApproximateNumberOfMessages": "0", 
+            "ReceiveMessageWaitTimeSeconds": "0", 
+            "DelaySeconds": "0", 
+            "VisibilityTimeout": "30", 
+            "LastModifiedTimestamp": "1511968458", 
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:a"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f92e3684-2d03-5579-8f59-641cf61edbe2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f92e3684-2d03-5579-8f59-641cf61edbe2", 
+                "content-length": "1600", 
+                "server": "Server", 
+                "connection": "keep-alive", 
+                "date": "Wed, 29 Nov 2017 15:57:17 GMT", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

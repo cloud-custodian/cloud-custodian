@@ -1,0 +1,38 @@
+{
+    "version": "1.2",
+    "accountId": "644160558196",
+    "configurationItemCaptureTime": "2017-06-14T01:39:07.454000-04:00",
+    "configurationItemStatus": "ResourceDiscovered",
+    "configurationStateId": "1497418747454",
+    "configurationItemMD5Hash": "b15227ff0a9542b95573e2551213f207",
+    "arn": "arn:aws:s3:::storage-dev",
+    "resourceType": "AWS::S3::Bucket",
+    "resourceId": "storage-dev",
+    "resourceName": "storage-dev",
+    "awsRegion": "us-east-1",
+    "availabilityZone": "Regional",
+    "resourceCreationTime": "2017-02-16T16:17:05-05:00",
+    "tags": {
+	"App": "StorageDev",
+	"CMDBEnvironment": "dev",
+	"Environment": "dev",
+	"OwnerContact": "me@example.com",
+	"aws:cloudformation:logical-id": "UserDataBucket",
+	"aws:cloudformation:stack-id": "arn:aws:cloudformation:us-east-1:644160558196:stack/storage-dev/3cdd9720-f48d-11e6-a02a-503f23fb11fe",
+	"aws:cloudformation:stack-name": "storage-dev"
+    },
+    "relatedEvents": [],
+    "relationships": [],
+    "configuration": "{\"name\":\"storage-dev\",\"owner\":{\"displayName\":\"aws-example\",\"id\":\"c7bb704ac09\"},\"creationDate\":\"2017-02-16T21:17:05.000Z\"}",
+    "supplementaryConfiguration": {
+	"AccessControlList": "\"{\\\"grantSet\\\":null,\\\"grantList\\\":[{\\\"grantee\\\":{\\\"id\\\":\\\"c7bb704ac09\\\",\\\"displayName\\\":\\\"aws-example\\\"},\\\"permission\\\":\\\"FullControl\\\"}],\\\"owner\\\":{\\\"displayName\\\":\\\"aws-example\\\",\\\"id\\\":\\\"c7bb704ac09\\\"},\\\"isRequesterCharged\\\":false}\"",
+	"BucketAccelerateConfiguration": "{\"status\":null}",
+	"BucketLifecycleConfiguration": "{\"rules\":[{\"id\":\"RemoveAbortedUploads\",\"prefix\":null,\"status\":\"Enabled\",\"filter\":{\"predicate\":null},\"expirationInDays\":1,\"expiredObjectDeleteMarker\":false,\"noncurrentVersionExpirationInDays\":-1,\"expirationDate\":null,\"transitions\":null,\"noncurrentVersionTransitions\":null,\"abortIncompleteMultipartUpload\":{\"daysAfterInitiation\":1}},{\"id\":\"RemoveDeleteMarkers\",\"prefix\":null,\"status\":\"Enabled\",\"filter\":{\"predicate\":null},\"expirationInDays\":-1,\"expiredObjectDeleteMarker\":true,\"noncurrentVersionExpirationInDays\":10,\"expirationDate\":null,\"transitions\":null,\"noncurrentVersionTransitions\":null,\"abortIncompleteMultipartUpload\":null},{\"id\":\"RemoveDeleteTagged\",\"prefix\":null,\"status\":\"Enabled\",\"filter\":{\"predicate\":{\"type\":\"LifecycleTagPredicate\",\"tag\":{\"key\":\"ACTION\",\"value\":\"PURGE\"}}},\"expirationInDays\":1,\"expiredObjectDeleteMarker\":false,\"noncurrentVersionExpirationInDays\":-1,\"expirationDate\":null,\"transitions\":null,\"noncurrentVersionTransitions\":null,\"abortIncompleteMultipartUpload\":null}]}",
+	"BucketLoggingConfiguration": "{\"destinationBucketName\":null,\"logFilePrefix\":null}",
+	"BucketNotificationConfiguration": "{\"configurations\":{}}",
+	"BucketPolicy": "{\"policyText\":\"{\\\"Version\\\":\\\"2008-10-17\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"DenyUnEncryptedObjectUploads\\\",\\\"Effect\\\":\\\"Deny\\\",\\\"Principal\\\":\\\"*\\\",\\\"Action\\\":\\\"s3:PutObject\\\",\\\"Resource\\\":\\\"arn:aws:s3:::storage-dev/*\\\",\\\"Condition\\\":{\\\"StringNotEquals\\\":{\\\"s3:x-amz-server-side-encryption\\\":\\\"AES256\\\"}}},{\\\"Sid\\\":\\\"RequiredEncryptedPutObject\\\",\\\"Effect\\\":\\\"Deny\\\",\\\"Principal\\\":\\\"*\\\",\\\"Action\\\":\\\"s3:PutObject\\\",\\\"Resource\\\":\\\"arn:aws:s3:::storage-dev/*\\\",\\\"Condition\\\":{\\\"StringNotEquals\\\":{\\\"s3:x-amz-server-side-encryption\\\":[\\\"AES256\\\",\\\"aws:kms\\\"]}}}]}\"}",
+	"BucketTaggingConfiguration": "{\"tagSets\":[{\"tags\":{\"aws:cloudformation:stack-name\":\"storage-dev\",\"App\":\"StorageDev\",\"aws:cloudformation:stack-id\":\"arn:aws:cloudformation:us-east-1:644160558196:stack/storage-dev/3cdd9720-f48d-11e6-a02a-503f23fb11fe\",\"OwnerContact\":\"me@example.com\",\"Environment\":\"dev\",\"aws:cloudformation:logical-id\":\"UserDataBucket\",\"CMDBEnvironment\":\"dev\"}}]}",
+	"BucketVersioningConfiguration": "{\"status\":\"Enabled\",\"isMfaDeleteEnabled\":null}",
+	"IsRequesterPaysEnabled": "false"
+    }
+}

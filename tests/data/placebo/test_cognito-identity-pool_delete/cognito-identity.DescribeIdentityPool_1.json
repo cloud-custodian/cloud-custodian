@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IdentityPoolId": "us-east-1:7af6af21-0a2b-49fb-98e6-07d8a39a3f7a", 
+        "AllowUnauthenticatedIdentities": true, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a409d737-c959-11e7-8dc9-dd3cd2f0fc77", 
+            "HTTPHeaders": {
+                "date": "Tue, 14 Nov 2017 16:34:09 GMT", 
+                "x-amzn-requestid": "a409d737-c959-11e7-8dc9-dd3cd2f0fc77", 
+                "content-length": "327", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "CognitoIdentityProviders": [
+            {
+                "ServerSideTokenCheck": false, 
+                "ClientId": "5jmrjnl6tk8akcovt907fudooc", 
+                "ProviderName": "cognito-idp.us-east-1.amazonaws.com/us-east-1_W6ST8sYH6"
+            }
+        ], 
+        "IdentityPoolName": "origin_MOBILEHUB_1667653900"
+    }
+}

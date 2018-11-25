@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2015-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,30 +11,44 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from collections import Counter
 import logging
 import itertools
 import json
+import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from dateutil.parser import parse as parse_date
 
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, FilterValidationError, OPERATORS)
+    ANNOTATION_KEY, OPERATORS)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager
 from c7n.utils import (
-    local_session, set_annotation, chunks, type_schema, worker, camelResource)
+    camelResource,
+    chunks,
+    get_retry,
+    local_session,
+    set_annotation,
+    type_schema,
+    worker,
+)
 from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
 
 filters = FilterRegistry('ebs.filters')
 actions = ActionRegistry('ebs.actions')
+
 
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
@@ -43,7 +57,7 @@ class Snapshot(QueryResourceManager):
         service = 'ec2'
         type = 'snapshot'
         enum_spec = (
-            'describe_snapshots', 'Snapshots', {'OwnerIds': ['self']})
+            'describe_snapshots', 'Snapshots', None)
         detail_spec = None
         id = 'SnapshotId'
         filter_name = 'SnapshotIds'
@@ -64,6 +78,12 @@ class Snapshot(QueryResourceManager):
     filter_registry = FilterRegistry('ebs-snapshot.filters')
     action_registry = ActionRegistry('ebs-snapshot.actions')
 
+    def resources(self, query=None):
+        query = query or {}
+        if query.get('OwnerIds') is None:
+            query['OwnerIds'] = ['self']
+        return super(Snapshot, self).resources(query=query)
+
 
 @Snapshot.filter_registry.register('age')
 class SnapshotAge(AgeFilter):
@@ -73,7 +93,7 @@ class SnapshotAge(AgeFilter):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ebs-snapshots-week-old
@@ -87,15 +107,15 @@ class SnapshotAge(AgeFilter):
     schema = type_schema(
         'age',
         days={'type': 'number'},
-        op={'type': 'string', 'enum': OPERATORS.keys()})
+        op={'type': 'string', 'enum': list(OPERATORS.keys())})
     date_attribute = 'StartTime'
 
 
 def _filter_ami_snapshots(self, snapshots):
     if not self.data.get('value', True):
         return snapshots
-    #try using cache first to get a listing of all AMI snapshots and compares resources to the list
-    #This will populate the cache.
+    # try using cache first to get a listing of all AMI snapshots and compares resources to the list
+    # This will populate the cache.
     amis = self.manager.get_resource_manager('ami').resources()
     ami_snaps = []
     for i in amis:
@@ -117,11 +137,12 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
         results = []
+        client = local_session(self.manager.session_factory).client('ec2')
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for resource_set in chunks(resources, 50):
                 futures.append(w.submit(
-                    self.process_resource_set, resource_set))
+                    self.process_resource_set, client, resource_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -131,8 +152,7 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
                 results.extend(f.result())
         return results
 
-    def process_resource_set(self, resource_set):
-        client = local_session(self.manager.session_factory).client('ec2')
+    def process_resource_set(self, client, resource_set):
         results = []
         for r in resource_set:
             attrs = self.manager.retry(
@@ -150,22 +170,41 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
-    """Filter to remove snapshots of AMIs from results
+    """
+    Filter to remove snapshots of AMIs from results
 
     This filter is 'true' by default.
 
     :example:
 
-        .. code-block: yaml
+    implicit with no parameters, 'true' by default
+
+    .. code-block:: yaml
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
                     op: ge
-                  - skip-ami-snapshots: true
+                  - skip-ami-snapshots
+
+    :example:
+
+    explicit with parameter
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-snapshots
+                resource: ebs-snapshot
+                filters:
+                  - type: age
+                    days: 28
+                    op: ge
+                  - type: skip-ami-snapshots
+                    value: false
 
     """
 
@@ -173,12 +212,6 @@ class SnapshotSkipAmiSnapshots(Filter):
 
     def get_permissions(self):
         return AMI(self.manager.ctx, {}).get_permissions()
-
-    def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
 
     def process(self, snapshots, event=None):
         resources = _filter_ami_snapshots(self, snapshots)
@@ -191,11 +224,11 @@ class SnapshotDelete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-stale-snapshots
-                resource: ebs-snapshots
+                resource: ebs-snapshot
                 filters:
                   - type: age
                     days: 28
@@ -206,24 +239,25 @@ class SnapshotDelete(BaseAction):
 
     schema = type_schema(
         'delete', **{'skip-ami-snapshots': {'type': 'boolean'}})
-    permissions = ('ec2.DeleteSnapshot',)
+    permissions = ('ec2:DeleteSnapshot',)
 
     def process(self, snapshots):
-        self.image_snapshots = snaps = set()
-         # Be careful re image snapshots, we do this by default
+        self.image_snapshots = set()
+        # Be careful re image snapshots, we do this by default
         # to keep things safe by default, albeit we'd get an error
         # if we did try to delete something associated to an image.
         pre = len(snapshots)
-        snapshots = filter(None, _filter_ami_snapshots(self, snapshots))
+        snapshots = list(filter(None, _filter_ami_snapshots(self, snapshots)))
         post = len(snapshots)
         log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
-                 post, pre-post)
+                 post, pre - post)
 
+        client = local_session(self.manager.session_factory).client('ec2')
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
-                    w.submit(self.process_snapshot_set, snapshot_set))
+                    w.submit(self.process_snapshot_set, client, snapshot_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -232,15 +266,17 @@ class SnapshotDelete(BaseAction):
         return snapshots
 
     @worker
-    def process_snapshot_set(self, snapshots_set):
-        c = local_session(self.manager.session_factory).client('ec2')
+    def process_snapshot_set(self, client, snapshots_set):
+        retry = get_retry((
+            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+
         for s in snapshots_set:
             if s['SnapshotId'] in self.image_snapshots:
                 continue
             try:
-                c.delete_snapshot(
-                    SnapshotId=s['SnapshotId'],
-                    DryRun=self.manager.config.dryrun)
+                retry(client.delete_snapshot,
+                      SnapshotId=s['SnapshotId'],
+                      DryRun=self.manager.config.dryrun)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidSnapshot.NotFound":
                     continue
@@ -255,7 +291,7 @@ class CopySnapshot(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: copy-snapshot-east-west
@@ -267,7 +303,7 @@ class CopySnapshot(BaseAction):
                 actions:
                   - type: copy
                     target_region: us-west-2
-                    target_key: *target_kms_key*
+                    target_key: target_kms_key
                     encrypted: true
     """
 
@@ -284,8 +320,9 @@ class CopySnapshot(BaseAction):
         if self.data.get('encrypted', True):
             key = self.data.get('target_key')
             if not key:
-                raise FilterValidationError(
-                    "Encrypted snapshot copy requires kms key")
+                raise PolicyValidationError(
+                    "Encrypted snapshot copy requires kms key on %s" % (
+                        self.manager.data,))
         return self
 
     def process(self, resources):
@@ -362,13 +399,50 @@ class EBS(QueryResourceManager):
     action_registry = actions
 
 
+@EBS.action_registry.register('detach')
+class VolumeDetach(BaseAction):
+
+    """
+    Detach an EBS volume from an Instance.
+
+    If 'Force' Param is True, then we'll do a forceful detach
+    of the Volume. The default value for 'Force' is False.
+
+     :example:
+
+     .. code-block:: yaml
+
+             policies:
+               - name: instance-ebs-volumes
+                 resource: ebs
+                 filters:
+                   VolumeId :  volumeid
+                 actions:
+                   - detach
+
+
+    """
+
+    schema = type_schema('detach', force={'type': 'boolean'})
+    permissions = ('ec2:DetachVolume',)
+
+    def process(self, volumes, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vol in volumes:
+            for attachment in vol.get('Attachments', []):
+                client.detach_volume(InstanceId=attachment['InstanceId'],
+                                VolumeId=attachment['VolumeId'],
+                                Force=self.data.get('force', False))
+
+
 @filters.register('instance')
 class AttachedInstanceFilter(ValueFilter):
     """Filter volumes based on filtering on their attached instance
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: instance-ebs-volumes
@@ -388,7 +462,7 @@ class AttachedInstanceFilter(ValueFilter):
         self.log.debug('Filtered from %d volumes to %d attached volumes' % (
             original_count, len(resources)))
         self.instance_map = self.get_instance_mapping(resources)
-        return filter(self, resources)
+        return list(filter(self, resources))
 
     def __call__(self, r):
         instance = self.instance_map[r['Attachments'][0]['InstanceId']]
@@ -435,7 +509,7 @@ class FaultTolerantSnapshots(Filter):
     def pull_check_results(self):
         result = set()
         client = local_session(self.manager.session_factory).client('support')
-        response = client.refresh_trusted_advisor_check(checkId=self.check_id)
+        client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
         for r in results['flaggedResources']:
@@ -472,27 +546,27 @@ class HealthFilter(HealthEventFilter):
         if not resources:
             return resources
 
-        client = local_session(self.manager.session_factory).client('health')
-        f = self.get_filter()
+        client = local_session(self.manager.session_factory).client(
+            'health', region_name='us-east-1')
+        f = self.get_filter_parameters()
         resource_map = {}
 
         paginator = client.get_paginator('describe_events')
         events = list(itertools.chain(
             *[p['events']for p in paginator.paginate(filter=f)]))
-        entities = []
-        self.process_event(events, entities)
+        entities = self.process_event(client, events)
 
         event_map = {e['arn']: e for e in events}
+        config = local_session(self.manager.session_factory).client('config')
         for e in entities:
             rid = e['entityValue']
             if not resource_map.get(rid):
-                resource_map[rid] = self.load_resource(rid)
+                resource_map[rid] = self.load_resource(config, rid)
             resource_map[rid].setdefault(
                 'c7n:HealthEvent', []).append(event_map[e['eventArn']])
-        return resource_map.values()
+        return list(resource_map.values())
 
-    def load_resource(self, rid):
-        config = local_session(self.manager.session_factory).client('config')
+    def load_resource(self, config, rid):
         resources_histories = config.get_resource_config_history(
             resourceType='AWS::EC2::Volume',
             resourceId=rid,
@@ -518,7 +592,7 @@ class CopyInstanceTags(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: ebs-copy-instance-tags
@@ -543,40 +617,52 @@ class CopyInstanceTags(BaseAction):
         return perms
 
     def process(self, volumes):
+        vol_count = len(volumes)
         volumes = [v for v in volumes if v['Attachments']]
+        if len(volumes) != vol_count:
+            self.log.warning(
+                "ebs copy tags action implicitly filtered from %d to %d",
+                vol_count, len(volumes))
+        self.initialize(volumes)
+        client = local_session(self.manager.session_factory).client('ec2')
         with self.executor_factory(max_workers=10) as w:
             futures = []
-            for volume_set in chunks(reversed(volumes), size=100):
+            for instance_set in chunks(sorted(
+                    self.instance_map.keys(), reverse=True), size=100):
                 futures.append(
-                    w.submit(self.process_volume_set, volume_set))
-
+                    w.submit(self.process_instance_set, client, instance_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
                         "Exception copying instance tags \n %s" % (
                             f.exception()))
 
-    def process_volume_set(self, volume_set):
+    def initialize(self, volumes):
         instance_vol_map = {}
-        for v in volume_set:
+        for v in volumes:
             instance_vol_map.setdefault(
                 v['Attachments'][0]['InstanceId'], []).append(v)
-
         instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys())}
+                list(instance_vol_map.keys()))}
+        self.instance_vol_map = instance_vol_map
+        self.instance_map = instance_map
 
-        for i in instance_vol_map:
+    def process_instance_set(self, client, instance_ids):
+        for i in instance_ids:
             try:
                 self.process_instance_volumes(
-                    instance_map[i], instance_vol_map[i])
+                    client,
+                    self.instance_map[i],
+                    self.instance_vol_map[i])
             except Exception as e:
                 self.log.exception(
-                    "Error copying instance tags to volumes \n %s" % e)
+                    "Error copy instance:%s tags to volumes: %s \n %s",
+                    i, ",".join([v['VolumeId'] for v in self.instance_vol_map[i]]),
+                    e)
 
-    def process_instance_volumes(self, instance, volumes):
-        client = local_session(self.manager.session_factory).client('ec2')
+    def process_instance_volumes(self, client, instance, volumes):
         for v in volumes:
             copy_tags = self.get_volume_tags(v, instance, v['Attachments'][0])
             if not copy_tags:
@@ -648,13 +734,16 @@ class EncryptInstanceVolumes(BaseAction):
        - Delete transient snapshots
        - Detach Unencrypted Volume
        - Attach Encrypted Volume
+       - Set DeleteOnTermination instance attribute equal to source volume
     - For each volume
        - Delete unencrypted volume
     - Start Instance (if originally running)
+    - For each newly encrypted volume
+       - Delete transient tags
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: encrypt-unencrypted-ebs
@@ -681,7 +770,9 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DescribeSnapshots',
         'ec2:DescribeVolumes',
         'ec2:StopInstances',
-        'ec2:StartInstances')
+        'ec2:StartInstances',
+        'ec2:ModifyInstanceAttribute',
+        'ec2:DeleteTags')
 
     def validate(self):
         key = self.data.get('key')
@@ -711,13 +802,16 @@ class EncryptInstanceVolumes(BaseAction):
         self.instance_map = {
             i['InstanceId']: i for i in
             self.manager.get_resource_manager('ec2').get_resources(
-                instance_vol_map.keys(), cache=False)}
+                list(instance_vol_map.keys()), cache=False)}
 
-        with self.executor_factory(max_workers=10) as w:
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        with self.executor_factory(max_workers=3) as w:
             futures = {}
             for instance_id, vol_set in instance_vol_map.items():
                 futures[w.submit(
-                    self.process_volume, instance_id, vol_set)] = instance_id
+                    self.process_volume, client,
+                    instance_id, vol_set)] = instance_id
 
             for f in as_completed(futures):
                 if f.exception():
@@ -727,7 +821,7 @@ class EncryptInstanceVolumes(BaseAction):
                             instance_id, instance_vol_map[instance_id],
                             f.exception()))
 
-    def process_volume(self, instance_id, vol_set):
+    def process_volume(self, client, instance_id, vol_set):
         """Encrypt attached unencrypted ebs volumes
 
         vol_set corresponds to all the unencrypted volumes on a given instance.
@@ -736,17 +830,15 @@ class EncryptInstanceVolumes(BaseAction):
         if self.verbose:
             self.log.debug("Using encryption key: %s" % key_id)
 
-        client = local_session(self.manager.session_factory).client('ec2')
-
         # Only stop and start the instance if it was running.
-        instance_running = self.stop_instance(instance_id)
+        instance_running = self.stop_instance(client, instance_id)
         if instance_running is None:
             return
 
         # Create all the volumes before patching the instance.
         paired = []
         for v in vol_set:
-            vol_id = self.create_encrypted_volume(v, key_id, instance_id)
+            vol_id = self.create_encrypted_volume(client, v, key_id, instance_id)
             paired.append((v, vol_id))
 
         # Next detach and reattach
@@ -754,10 +846,25 @@ class EncryptInstanceVolumes(BaseAction):
             client.detach_volume(
                 InstanceId=instance_id, VolumeId=v['VolumeId'])
             # 5/8/2016 The detach isn't immediately consistent
-            self.data.get('delay', 15)
+            time.sleep(self.data.get('delay', 15))
             client.attach_volume(
                 InstanceId=instance_id, VolumeId=vol_id,
                 Device=v['Attachments'][0]['Device'])
+
+            # Set DeleteOnTermination attribute the same as source volume
+            if v['Attachments'][0]['DeleteOnTermination']:
+                client.modify_instance_attribute(
+                    InstanceId=instance_id,
+                    BlockDeviceMappings=[
+                        {
+                            'DeviceName': v['Attachments'][0]['Device'],
+                            'Ebs': {
+                                'VolumeId': vol_id,
+                                'DeleteOnTermination': True
+                            }
+                        }
+                    ]
+                )
 
         if instance_running:
             client.start_instances(InstanceIds=[instance_id])
@@ -769,8 +876,18 @@ class EncryptInstanceVolumes(BaseAction):
         for v in vol_set:
             client.delete_volume(VolumeId=v['VolumeId'])
 
-    def stop_instance(self, instance_id):
-        client = local_session(self.manager.session_factory).client('ec2')
+        # Clean-up transient tags on newly created encrypted volume.
+        for v, vol_id in paired:
+            client.delete_tags(
+                Resources=[vol_id],
+                Tags=[
+                    {'Key': 'maid-crypt-remediation'},
+                    {'Key': 'maid-origin-volume'},
+                    {'Key': 'maid-instance-device'}
+                ]
+            )
+
+    def stop_instance(self, client, instance_id):
         instance_state = self.instance_map[instance_id]['State']['Name']
         if instance_state in ('shutting-down', 'terminated'):
             self.log.debug('Skipping terminating instance: %s' % instance_id)
@@ -781,9 +898,8 @@ class EncryptInstanceVolumes(BaseAction):
             return True
         return False
 
-    def create_encrypted_volume(self, v, key_id, instance_id):
+    def create_encrypted_volume(self, ec2, v, key_id, instance_id):
         # Create a current snapshot
-        ec2 = local_session(self.manager.session_factory).client('ec2')
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
             Description="maid transient snapshot for encryption",)
@@ -883,6 +999,34 @@ class EncryptInstanceVolumes(BaseAction):
                 self.log.debug("Instance: %s stopped" % instance_id)
 
 
+@actions.register('snapshot')
+class CreateSnapshot(BaseAction):
+    """Snapshot an EBS volume
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: snapshot-volumes
+                resource: ebs
+                filters:
+                  - Attachments: []
+                  - State: available
+                actions:
+                  - snapshot
+    """
+    permissions = ('ec2:CreateSnapshot',)
+    schema = type_schema('snapshot')
+
+    def process(self, volumes):
+        client = local_session(self.manager.session_factory).client('ec2')
+        retry = get_retry(['Throttled'], max_attempts=5)
+        for vol in volumes:
+            vol_id = vol['VolumeId']
+            retry(client.create_snapshot, VolumeId=vol_id)
+
+
 @actions.register('delete')
 class Delete(BaseAction):
     """Delete an ebs volume.
@@ -893,7 +1037,7 @@ class Delete(BaseAction):
 
     :example:
 
-        .. code-block: yaml
+    .. code-block:: yaml
 
             policies:
               - name: delete-unattached-volumes
@@ -909,11 +1053,20 @@ class Delete(BaseAction):
         'ec2:DetachVolume', 'ec2:DeleteVolume', 'ec2:DescribeVolumes')
 
     def process(self, volumes):
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_volume, volumes))
-
-    def process_volume(self, volume):
         client = local_session(self.manager.session_factory).client('ec2')
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for v in volumes:
+                futures[
+                    w.submit(self.process_volume, client, v)] = v
+            for f in as_completed(futures):
+                v = futures[f]
+                if f.exception():
+                    self.log.error(
+                        "Error processing volume:%s error:%s",
+                        v['VolumeId'], f.exception())
+
+    def process_volume(self, client, volume):
         try:
             if self.data.get('force') and len(volume['Attachments']):
                 client.detach_volume(VolumeId=volume['VolumeId'], Force=True)
@@ -925,3 +1078,211 @@ class Delete(BaseAction):
             if e.response['Error']['Code'] == "InvalidVolume.NotFound":
                 return
             raise
+
+
+@filters.register('modifyable')
+class ModifyableVolume(Filter):
+    """Check if an ebs volume is modifyable online.
+
+    Considerations - https://goo.gl/CBhfqV
+
+    Consideration Summary
+      - only current instance types are supported (one exception m3.medium)
+        Current Generation Instances (2017-2) https://goo.gl/iuNjPZ
+
+      - older magnetic volume types are not supported
+      - shrinking volumes is not supported
+      - must wait at least 6hrs between modifications to the same volume.
+      - volumes must have been attached after nov 1st, 2016.
+
+    See `custodian schema ebs.actions.modify` for examples.
+    """
+
+    schema = type_schema('modifyable')
+
+    older_generation = set((
+        'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge',
+        'c1.medium', 'c1.xlarge', 'cc2.8xlarge',
+        'm2.xlarge', 'm2.2xlarge', 'm2.4xlarge', 'cr1.8xlarge',
+        'hi1.4xlarge', 'hs1.8xlarge', 'cg1.4xlarge', 't1.micro',
+        # two legs good, not all current gen work either.
+        'm3.large', 'm3.xlarge', 'm3.2xlarge'
+    ))
+
+    permissions = ("ec2:DescribeInstances",)
+
+    def process(self, resources, event=None):
+        results = []
+        filtered = []
+        attached = []
+        stats = Counter()
+        marker_date = parse_date('2016-11-01T00:00:00+00:00')
+
+        # Filter volumes
+        for r in resources:
+            # unsupported type
+            if r['VolumeType'] == 'standard':
+                stats['vol-type'] += 1
+                filtered.append(r['VolumeId'])
+                continue
+
+            # unattached are easy
+            if not r.get('Attachments'):
+                results.append(r)
+                continue
+
+            # check for attachment date older then supported date
+            if r['Attachments'][0]['AttachTime'] < marker_date:
+                stats['attach-time'] += 1
+                filtered.append(r['VolumeId'])
+                continue
+
+            attached.append(r)
+
+        # Filter volumes attached to unsupported instance types
+        ec2 = self.manager.get_resource_manager('ec2')
+        instance_map = {}
+        for v in attached:
+            instance_map.setdefault(
+                v['Attachments'][0]['InstanceId'], []).append(v)
+
+        instances = ec2.get_resources(list(instance_map.keys()))
+        for i in instances:
+            if i['InstanceType'] in self.older_generation:
+                stats['instance-type'] += len(instance_map[i['InstanceId']])
+                filtered.extend([v['VolumeId'] for v in instance_map.pop(i['InstanceId'])])
+            else:
+                results.extend(instance_map.pop(i['InstanceId']))
+
+        # Filter volumes that are currently under modification
+        client = local_session(self.manager.session_factory).client('ec2')
+        modifying = set()
+        for vol_set in chunks(list(results), 200):
+            vol_ids = [v['VolumeId'] for v in vol_set]
+            mutating = client.describe_volumes_modifications(
+                Filters=[
+                    {'Name': 'volume-id',
+                     'Values': vol_ids},
+                    {'Name': 'modification-state',
+                     'Values': ['modifying', 'optimizing', 'failed']}])
+            for vm in mutating.get('VolumesModifications', ()):
+                stats['vol-mutation'] += 1
+                filtered.append(vm['VolumeId'])
+                modifying.add(vm['VolumeId'])
+
+        self.log.debug(
+            "filtered %d of %d volumes due to %s",
+            len(filtered), len(resources), sorted(stats.items()))
+
+        return [r for r in results if r['VolumeId'] not in modifying]
+
+
+@actions.register('modify')
+class ModifyVolume(BaseAction):
+    """Modify an ebs volume online.
+
+    **Note this action requires use of modifyable filter**
+
+    Intro Blog & Use Cases - https://goo.gl/E3u4Ue
+    Docs - https://goo.gl/DJM4T0
+    Considerations - https://goo.gl/CBhfqV
+
+    :example:
+
+      Find under utilized provisioned iops volumes older than a week
+      and change their type.
+
+    .. code-block:: yaml
+
+           policies:
+            - name: ebs-remove-piops
+              resource: ebs
+              filters:
+               - type: value
+                 key: CreateDate
+                 value_type: age
+                 value: 7
+                 op: greater-than
+               - VolumeType: io1
+               - type: metrics
+                 name: VolumeConsumedReadWriteOps
+                 statistics: Maximum
+                 value: 100
+                 op: less-than
+                 days: 7
+               - modifyable
+              actions:
+               - type: modify
+                 volume-type: gp1
+
+    `iops-percent` and `size-percent` can be used to modify
+    respectively iops on io1 volumes and volume size.
+
+    When converting to io1, `iops-percent` is used to set the iops
+    allocation for the new volume against the extant value for the old
+    volume.
+
+    :example:
+
+      Double storage and quadruple iops for all io1 volumes.
+
+    .. code-block:: yaml
+
+           policies:
+            - name: ebs-remove-piops
+              resource: ebs
+              filters:
+                - VolumeType: io1
+                - modifyable
+              actions:
+                - type: modify
+                  size-percent: 200
+                  iops-percent: 400
+
+
+    **Note** resizing down aka shrinking requires OS and FS support
+    and potentially additional preparation, else data-loss may occur.
+    To prevent accidents, shrinking must be explicitly enabled by also
+    setting `shrink: true` on the action.
+    """
+
+    schema = type_schema(
+        'modify',
+        **{'volume-type': {'enum': ['io1', 'gp2', 'st1', 'sc1']},
+           'shrink': False,
+           'size-percent': {'type': 'number'},
+           'iops-percent': {'type': 'number'}})
+
+    # assumptions as its the closest i can find.
+    permissions = ("ec2:ModifyVolumeAttribute",)
+
+    def validate(self):
+        if 'modifyable' not in self.manager.data.get('filters', ()):
+            raise PolicyValidationError(
+                "modify action requires modifyable filter in policy")
+        if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
+            raise PolicyValidationError((
+                "shrinking volumes requires os/fs support "
+                "or data-loss may ensue, use `shrink: true` to override"))
+        return self
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for resource_set in chunks(resources, 50):
+            self.process_resource_set(client, resource_set)
+
+    def process_resource_set(self, client, resource_set):
+        vtype = self.data.get('volume-type')
+        psize = self.data.get('size-percent')
+        piops = self.data.get('iops-percent')
+
+        for r in resource_set:
+            params = {'VolumeId': r['VolumeId']}
+            if piops and ('io1' in (vtype, r['VolumeType'])):
+                # default here if we're changing to io1
+                params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
+            if psize:
+                params['Size'] = max(int(r['Size'] * psize / 100.0), 1)
+            if vtype:
+                params['VolumeType'] = vtype
+            self.manager.retry(client.modify_volume, **params)

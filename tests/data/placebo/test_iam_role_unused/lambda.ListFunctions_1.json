@@ -3,28 +3,32 @@
     "data": {
         "Functions": [
             {
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }, 
                 "Version": "$LATEST", 
-                "CodeSha256": "ON+chrGiGWzSQ7aKTowqe/GuLSB8q+Z4md9gcjUyzGI=", 
-                "FunctionName": "custodian-ec2-compliance", 
-                "MemorySize": 512, 
-                "CodeSize": 491641, 
-                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-compliance", 
-                "Handler": "custodian_policy.run", 
+                "CodeSha256": "QYDlWejakU9/FbvkVnWvASojTxa9lDVbavV5XfCxMC8=", 
+                "FunctionName": "guard-duty-archiver-EnhancedEventArchiver-RUML739UKXP0", 
+                "MemorySize": 128, 
+                "RevisionId": "236f8b45-dd7c-4559-a616-033cba696a05", 
+                "CodeSize": 769, 
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:guard-duty-archiver-EnhancedEventArchiver-RUML739UKXP0", 
+                "Handler": "archiver.handler", 
                 "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
-                "Timeout": 60, 
-                "LastModified": "2016-08-27T16:20:15.856+0000", 
+                "Timeout": 3, 
+                "LastModified": "2018-01-31T17:47:02.456+0000", 
                 "Runtime": "python2.7", 
-                "Description": "a policy to stop all others"
+                "Description": ""
             }
         ], 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "01cb8e7a-84ea-11e6-9b54-87f3e06997c2", 
+            "RequestId": "cd0d651a-1190-11e8-a803-778970a0543b", 
             "HTTPHeaders": {
-                "date": "Tue, 27 Sep 2016 19:38:46 GMT", 
-                "x-amzn-requestid": "01cb8e7a-84ea-11e6-9b54-87f3e06997c2", 
-                "content-length": "565", 
+                "date": "Wed, 14 Feb 2018 14:10:24 GMT", 
+                "x-amzn-requestid": "cd0d651a-1190-11e8-a803-778970a0543b", 
+                "content-length": "24875", 
                 "content-type": "application/json", 
                 "connection": "keep-alive"
             }

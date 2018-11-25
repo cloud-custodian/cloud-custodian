@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "VpcId": "vpc-d2d616b5", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b904b496-a360-4973-b30f-6a2ccc6ddcb8", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 22 Dec 2017 16:16:41 GMT"
+            }
+        }, 
+        "EnableDnsSupport": {
+            "Value": true
+        }
+    }
+}

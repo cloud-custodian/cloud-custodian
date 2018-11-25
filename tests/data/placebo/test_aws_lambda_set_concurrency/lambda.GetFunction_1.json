@@ -1,0 +1,41 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Concurrency": {
+            "ReservedConcurrentExecutions": 10
+        }, 
+        "Code": {
+            "RepositoryType": "S3", 
+            "Location": "https://awslambda-us-east-2-tasks.s3.us-east-2.amazonaws.com/snapshots/644160558196/custodian-stop-night-asg-1bd1a3bd-7ffd-43a4-b6ca-db8c34b17324?X-Amz-Security-Token=FQoDYXdzEJD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDOiJuqueSYPOcKAW0SK3A0ROmiq6rdxYV7PMmZiy4PBHmkvmqen9B1eI6jDpXunokosS%2FG68l%2BCMwlL%2FpC62%2FcEqsVRZvbpCVQyYTAksJ9wmft9sWNTAcIwZzoembVFnnjk%2FlDIrFha%2F2yzNcjTldueFU1mUKruAtfkqYcvLWUOfdxWQgIj3Fnml2VCwQDVCWYxUmOUcqcGUtQyB49bHV5a6O%2BfGLCChD%2F48TSt1CnLP81ghkMIQRNlgUjZOGHmAcjq507P8%2B1Iet6zb8hgy%2Fsz7jKniujV7dvRtSytWuPbtzELLgoWBlBgo66Es7f03XZeqYcS83hIcYgkhvNqMGeFK0Ypj%2FVRAHvZdcOQ6xBPxJsJwST4IuUoBXr0Bq72POTM078lqO8zshlUlU7fICX4KHDIMuQoHlGbyzwKMd3FF5Yw26ogsxP5jLViYeYxl73lovV7WK85J6ZQJwjadqIo4b6CTGCwAeTRO9Pg9oCy0P4L3EL51YqlKmQyCfEirGE8dUgqNorVzgLPotsqCbmcbRQq9%2Bg7PgYU0CDOgM7r6tNEv0l4mCb%2Bxhn3HwncIx71IrSlgAVxD5%2Bto3v4ClwEFxiAUBRAojsKW1AU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20180215T151831Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAIQLG6BOTOA5LY44Q%2F20180215%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=4ed5e12e36df153a0c5299465f3e772e80af5b890b4f5d2577055c396139a5ab"
+        }, 
+        "Configuration": {
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            }, 
+            "Version": "$LATEST", 
+            "CodeSha256": "5sFjAF4J+TcRvn8y5vjdJfhHhBOz8n+ULMPFfJvIFx4=", 
+            "FunctionName": "custodian-stop-night-asg", 
+            "MemorySize": 512, 
+            "CodeSize": 1033678, 
+            "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:custodian-stop-night-asg", 
+            "Handler": "custodian_policy.run", 
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+            "Timeout": 60, 
+            "LastModified": "2017-05-26T06:50:03.585+0000", 
+            "Runtime": "python2.7", 
+            "Description": "cloud-custodian lambda policy"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7b6838af-1263-11e8-8229-a1114f107aea", 
+            "HTTPHeaders": {
+                "date": "Thu, 15 Feb 2018 15:18:31 GMT", 
+                "x-amzn-requestid": "7b6838af-1263-11e8-8229-a1114f107aea", 
+                "content-length": "1893", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

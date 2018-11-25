@@ -1,0 +1,92 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2cb4a0ae-5079-11e8-8aae-d99659c87397", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2cb4a0ae-5079-11e8-8aae-d99659c87397", 
+                "date": "Sat, 05 May 2018 15:30:00 GMT", 
+                "content-length": "2171", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "Snapshots": [
+            {
+                "Engine": "redis", 
+                "CacheParameterGroupName": "default.redis3.2.cluster.on", 
+                "VpcId": "vpc-5f6c9936", 
+                "NodeSnapshots": [
+                    {
+                        "SnapshotCreateTime": {
+                            "hour": 14, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 40, 
+                            "microsecond": 0, 
+                            "year": 2018, 
+                            "day": 5, 
+                            "minute": 32
+                        }, 
+                        "CacheNodeId": "0001", 
+                        "CacheClusterId": "megacache-0001-003", 
+                        "NodeGroupId": "0001", 
+                        "CacheNodeCreateTime": {
+                            "hour": 14, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 56, 
+                            "microsecond": 591000, 
+                            "year": 2018, 
+                            "day": 5, 
+                            "minute": 5
+                        }, 
+                        "CacheSize": "5 MB"
+                    }, 
+                    {
+                        "SnapshotCreateTime": {
+                            "hour": 14, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 40, 
+                            "microsecond": 0, 
+                            "year": 2018, 
+                            "day": 5, 
+                            "minute": 32
+                        }, 
+                        "CacheNodeId": "0001", 
+                        "CacheClusterId": "megacache-0002-003", 
+                        "NodeGroupId": "0002", 
+                        "CacheNodeCreateTime": {
+                            "hour": 14, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 56, 
+                            "microsecond": 591000, 
+                            "year": 2018, 
+                            "day": 5, 
+                            "minute": 5
+                        }, 
+                        "CacheSize": "5 MB"
+                    }
+                ], 
+                "NumNodeGroups": 2, 
+                "SnapshotName": "zero-bytes", 
+                "ReplicationGroupId": "megacache", 
+                "AutoMinorVersionUpgrade": true, 
+                "SnapshotRetentionLimit": 1, 
+                "AutomaticFailover": "enabled", 
+                "SnapshotStatus": "available", 
+                "SnapshotSource": "manual", 
+                "SnapshotWindow": "01:30-02:30", 
+                "EngineVersion": "3.2.10", 
+                "CacheSubnetGroupName": "cache-net-group", 
+                "ReplicationGroupDescription": " ", 
+                "Port": 6379, 
+                "PreferredMaintenanceWindow": "sat:05:30-sat:06:30", 
+                "CacheNodeType": "cache.t2.medium"
+            }
+        ]
+    }
+}

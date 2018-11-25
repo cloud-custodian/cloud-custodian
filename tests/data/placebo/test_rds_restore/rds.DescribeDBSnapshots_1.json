@@ -1,0 +1,59 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "fce4dcf6-4191-11e7-94f6-2369bd255e2c", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fce4dcf6-4191-11e7-94f6-2369bd255e2c", 
+                "date": "Thu, 25 May 2017 21:34:52 GMT", 
+                "content-length": "1549", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "DBSnapshots": [
+            {
+                "Engine": "postgres", 
+                "SnapshotCreateTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 18, 
+                    "microsecond": 478000, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 52
+                }, 
+                "AvailabilityZone": "us-east-2b", 
+                "DBSnapshotArn": "arn:aws:rds:us-east-2:644160558196:snapshot:final-mxtest-2017-05-25", 
+                "PercentProgress": 100, 
+                "MasterUsername": "mxtester", 
+                "Encrypted": true, 
+                "LicenseModel": "postgresql-license", 
+                "StorageType": "gp2", 
+                "Status": "available", 
+                "VpcId": "vpc-5f6c9936", 
+                "DBSnapshotIdentifier": "final-mxtest-2017-05-25", 
+                "InstanceCreateTime": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 52, 
+                    "microsecond": 162000, 
+                    "year": 2016, 
+                    "day": 22, 
+                    "minute": 14
+                }, 
+                "OptionGroupName": "default:postgres-9-5", 
+                "AllocatedStorage": 5, 
+                "EngineVersion": "9.5.4", 
+                "SnapshotType": "manual", 
+                "KmsKeyId": "arn:aws:kms:us-east-2:644160558196:key/38343899-6a22-4365-8777-3224dc078cab", 
+                "IAMDatabaseAuthenticationEnabled": false, 
+                "Port": 5432, 
+                "DBInstanceIdentifier": "mxtest"
+            }
+        ]
+    }
+}

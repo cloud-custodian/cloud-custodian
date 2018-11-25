@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Listeners": [
+            {
+                "Protocol": "HTTP", 
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:targetgroup/test-target/6bc632a2d5dabaac", 
+                        "Type": "forward"
+                    }
+                ], 
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/test-alb/28710532987600ac", 
+                "Port": 80, 
+                "ListenerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:listener/app/test-alb/28710532987600ac/c3e840dcd6d774c6"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4b644abf-3045-11e7-80de-8b12b83d5aca", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4b644abf-3045-11e7-80de-8b12b83d5aca", 
+                "date": "Wed, 03 May 2017 21:13:02 GMT", 
+                "content-length": "939", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

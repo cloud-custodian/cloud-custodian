@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2016-2017 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,56 +14,35 @@
 """
 Lambda entry point
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import base64
 import boto3
-import getpass
 import json
-import logging
 import os
 
-
-logging.root.setLevel(logging.DEBUG)
-logging.getLogger('botocore').setLevel(logging.WARNING)
-
-log = logging.getLogger('custodian.mailer')
+from .sqs_queue_processor import MailerSqsQueueProcessor
 
 
-def bootstrap():
-    log.debug("Initializing")
+def config_setup(config=None):
     task_dir = os.environ.get('LAMBDA_TASK_ROOT')
     os.environ['PYTHONPATH'] = "%s:%s" % (task_dir, os.environ.get('PYTHONPATH', ''))
-    with open(os.path.join(task_dir, 'config.json')) as fh:
-        config = json.load(fh)
-    if config['ldap_bind_password']:
-        kms = session.client('kms')
-        config['ldap_bind_password'] = kms.decrypt(
-            CiphertextBlob=base64.b64decode(config['ldap_bind_password']))[
-                'Plaintext']
+    if not config:
+        with open(os.path.join(task_dir, 'config.json')) as fh:
+            config = json.load(fh)
     if 'http_proxy' in config:
         os.environ['http_proxy'] = config['http_proxy']
     if 'https_proxy' in config:
         os.environ['https_proxy'] = config['https_proxy']
     return config
 
-session = boto3.Session()
-config = bootstrap()
 
-
-def run(event, context):
+def start_c7n_mailer(logger, config=None, parallel=False):
     try:
-        from markupsafe import Markup
-        from jinja2 import utils
-        from .worker import Worker
-        from .processor import Processor
+        session = boto3.Session()
+        if not config:
+            config = config_setup()
+        logger.info('c7n_mailer starting...')
+        mailer_sqs_queue_processor = MailerSqsQueueProcessor(config, session, logger)
+        mailer_sqs_queue_processor.run(parallel)
     except Exception as e:
-        log.exception("import failed %s", e)
-
-    try:
-        log.info("Worker Run")
-        w = Worker(config, context, session)
-        w.run()
-    except:
-        log.exception("Error processing worker \n DebugEnv: %s \n User: %s \n" % (
-            os.environ['PYTHONPATH'],
-            getpass.getuser()))
+        logger.exception("Error starting mailer MailerSqsQueueProcessor(). \n Error: %s \n" % (e))

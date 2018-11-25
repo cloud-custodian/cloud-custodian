@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+                "clusterName": "Default",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 6,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 2,
+                "statistics": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "207f5f8e-fa52-11e7-97b1-a15c3b5fa876",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 00:13:49 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "260",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "207f5f8e-fa52-11e7-97b1-a15c3b5fa876"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

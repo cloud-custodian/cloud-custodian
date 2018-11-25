@@ -1,0 +1,46 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Owner": {
+            "DisplayName": "mandeep.bal", 
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }, 
+        "Grants": [
+            {
+                "Grantee": {
+                    "Type": "Group", 
+                    "URI": "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
+                }, 
+                "Permission": "READ"
+            }, 
+            {
+                "Grantee": {
+                    "Type": "Group", 
+                    "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery"
+                }, 
+                "Permission": "WRITE"
+            }, 
+            {
+                "Grantee": {
+                    "Type": "Group", 
+                    "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery"
+                }, 
+                "Permission": "READ_ACP"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "vGDU+tOREJukkGjVjzbmEZgSv3sOEafhr1xydSjBMi6dRFYdFrJePpmKzF5oznsQlgK9VkbFvkY=", 
+            "RequestId": "10ADF1321CB3AC43", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "vGDU+tOREJukkGjVjzbmEZgSv3sOEafhr1xydSjBMi6dRFYdFrJePpmKzF5oznsQlgK9VkbFvkY=", 
+                "server": "AmazonS3", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "10ADF1321CB3AC43", 
+                "date": "Thu, 10 Aug 2017 14:12:42 GMT", 
+                "content-type": "application/xml"
+            }
+        }
+    }
+}

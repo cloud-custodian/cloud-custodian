@@ -1,0 +1,134 @@
+{
+    "status_code": 200,
+    "data": {
+        "service": {
+            "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/web",
+            "serviceName": "web",
+            "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+            "loadBalancers": [],
+            "status": "DRAINING",
+            "desiredCount": 0,
+            "runningCount": 2,
+            "pendingCount": 0,
+            "launchType": "FARGATE",
+            "platformVersion": "LATEST",
+            "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+            "deploymentConfiguration": {
+                "maximumPercent": 200,
+                "minimumHealthyPercent": 50
+            },
+            "deployments": [
+                {
+                    "id": "ecs-svc/9223370520793432755",
+                    "status": "PRIMARY",
+                    "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                    "desiredCount": 0,
+                    "pendingCount": 0,
+                    "runningCount": 2,
+                    "createdAt": {
+                        "__class__": "datetime",
+                        "year": 2018,
+                        "month": 1,
+                        "day": 15,
+                        "hour": 19,
+                        "minute": 9,
+                        "second": 3,
+                        "microsecond": 10000
+                    },
+                    "updatedAt": {
+                        "__class__": "datetime",
+                        "year": 2018,
+                        "month": 1,
+                        "day": 15,
+                        "hour": 19,
+                        "minute": 13,
+                        "second": 50,
+                        "microsecond": 804000
+                    },
+                    "launchType": "FARGATE",
+                    "platformVersion": "1.0.0",
+                    "networkConfiguration": {
+                        "awsvpcConfiguration": {
+                            "subnets": [
+                                "subnet-1c37ab41",
+                                "subnet-22e1162d"
+                            ],
+                            "securityGroups": [
+                                "sg-3593d041"
+                            ],
+                            "assignPublicIp": "ENABLED"
+                        }
+                    }
+                }
+            ],
+            "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+            "events": [
+                {
+                    "id": "bd9ac4a0-7bbc-4d1a-a026-efb1a6c46ba7",
+                    "createdAt": {
+                        "__class__": "datetime",
+                        "year": 2018,
+                        "month": 1,
+                        "day": 15,
+                        "hour": 19,
+                        "minute": 11,
+                        "second": 0,
+                        "microsecond": 52000
+                    },
+                    "message": "(service web) has reached a steady state."
+                },
+                {
+                    "id": "19620033-1417-4d5c-8572-1bd02e98393a",
+                    "createdAt": {
+                        "__class__": "datetime",
+                        "year": 2018,
+                        "month": 1,
+                        "day": 15,
+                        "hour": 19,
+                        "minute": 9,
+                        "second": 8,
+                        "microsecond": 83000
+                    },
+                    "message": "(service web) has started 2 tasks: (task ca8ae385-ca0e-4649-9e43-ce31fc3a113a) (task 021dad30-b803-4883-af3f-bdb9de49cd05)."
+                }
+            ],
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 9,
+                "second": 3,
+                "microsecond": 10000
+            },
+            "placementConstraints": [],
+            "placementStrategy": [],
+            "networkConfiguration": {
+                "awsvpcConfiguration": {
+                    "subnets": [
+                        "subnet-1c37ab41",
+                        "subnet-22e1162d"
+                    ],
+                    "securityGroups": [
+                        "sg-3593d041"
+                    ],
+                    "assignPublicIp": "ENABLED"
+                }
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "2129f6b4-fa52-11e7-b120-bdca8dfd59b4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 00:13:50 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1629",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "2129f6b4-fa52-11e7-b120-bdca8dfd59b4"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

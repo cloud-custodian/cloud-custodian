@@ -1,0 +1,28 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TagSet": [
+            {
+                "Value": "rabbit", 
+                "Key": "rudolph"
+            }, 
+            {
+                "Value": "tyre", 
+                "Key": "platform"
+            }
+        ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HostId": "lQdGnZ3oAYD+gfIO3e7nE749MfhhzZLpd6LcHRE7+ZsZMGoSEu7Bo58GcMJXaDwYs/hOLaHoNeA=", 
+            "RequestId": "08C5BCF1373F3590", 
+            "HTTPHeaders": {
+                "x-amz-id-2": "lQdGnZ3oAYD+gfIO3e7nE749MfhhzZLpd6LcHRE7+ZsZMGoSEu7Bo58GcMJXaDwYs/hOLaHoNeA=", 
+                "date": "Thu, 10 Aug 2017 14:12:42 GMT", 
+                "transfer-encoding": "chunked", 
+                "x-amz-request-id": "08C5BCF1373F3590", 
+                "server": "AmazonS3"
+            }
+        }
+    }
+}

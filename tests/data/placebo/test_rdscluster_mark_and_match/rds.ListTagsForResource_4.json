@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "675e924e-6bd0-11e7-a4f7-696ce6484d55", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "675e924e-6bd0-11e7-a4f7-696ce6484d55", 
+                "date": "Tue, 18 Jul 2017 15:47:28 GMT", 
+                "content-length": "438", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "Resource does not meet policy: delete@2017/07/19", 
+                "Key": "custodian_next"
+            }
+        ]
+    }
+}

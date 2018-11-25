@@ -1,0 +1,62 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancers": [
+            {
+                "IpAddressType": "ipv4", 
+                "VpcId": "vpc-d2d616b5", 
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/test-alb/28710532987600ac", 
+                "State": {
+                    "Code": "active"
+                }, 
+                "DNSName": "test-alb-1578757125.us-east-1.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-6c7fa917"
+                ], 
+                "LoadBalancerName": "test-alb", 
+                "CreatedTime": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 33, 
+                    "microsecond": 370000, 
+                    "year": 2017, 
+                    "day": 3, 
+                    "minute": 48
+                }, 
+                "Scheme": "internet-facing", 
+                "Type": "application", 
+                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K", 
+                "AvailabilityZones": [
+                    {
+                        "SubnetId": "subnet-3a334610", 
+                        "ZoneName": "us-east-1d"
+                    }, 
+                    {
+                        "SubnetId": "subnet-914763e7", 
+                        "ZoneName": "us-east-1a"
+                    }, 
+                    {
+                        "SubnetId": "subnet-e3b194de", 
+                        "ZoneName": "us-east-1e"
+                    }, 
+                    {
+                        "SubnetId": "subnet-efbcccb7", 
+                        "ZoneName": "us-east-1b"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f0749494-3048-11e7-83cf-e5a35971dbbf", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f0749494-3048-11e7-83cf-e5a35971dbbf", 
+                "date": "Wed, 03 May 2017 21:39:08 GMT", 
+                "content-length": "1664", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

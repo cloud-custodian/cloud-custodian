@@ -1,0 +1,270 @@
+{
+    "status_code": 200, 
+    "data": {
+        "CacheClusters": [
+            {
+                "CacheClusterId": "megacache-0001-001", 
+                "ReplicationGroupId": "megacache", 
+                "CacheClusterStatus": "available", 
+                "SnapshotRetentionLimit": 0, 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "CacheNodeType": "cache.t2.medium", 
+                "TransitEncryptionEnabled": false, 
+                "Engine": "redis", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "AutoMinorVersionUpgrade": true, 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-aa6c90c3"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "sat:05:30-sat:06:30", 
+                "CacheSubnetGroupName": "cache-net-group", 
+                "AuthTokenEnabled": false, 
+                "AtRestEncryptionEnabled": false, 
+                "EngineVersion": "3.2.10", 
+                "CacheClusterCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 591000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 5
+                }, 
+                "PreferredAvailabilityZone": "us-east-2b", 
+                "SnapshotWindow": "01:30-02:30", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2.cluster.on", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            }, 
+            {
+                "CacheClusterId": "megacache-0001-002", 
+                "ReplicationGroupId": "megacache", 
+                "CacheClusterStatus": "available", 
+                "SnapshotRetentionLimit": 0, 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "CacheNodeType": "cache.t2.medium", 
+                "TransitEncryptionEnabled": false, 
+                "Engine": "redis", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "AutoMinorVersionUpgrade": true, 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-aa6c90c3"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "sat:05:30-sat:06:30", 
+                "CacheSubnetGroupName": "cache-net-group", 
+                "AuthTokenEnabled": false, 
+                "AtRestEncryptionEnabled": false, 
+                "EngineVersion": "3.2.10", 
+                "CacheClusterCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 591000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 5
+                }, 
+                "PreferredAvailabilityZone": "us-east-2a", 
+                "SnapshotWindow": "01:30-02:30", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2.cluster.on", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            }, 
+            {
+                "CacheClusterId": "megacache-0001-003", 
+                "ReplicationGroupId": "megacache", 
+                "CacheClusterStatus": "available", 
+                "SnapshotRetentionLimit": 0, 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "CacheNodeType": "cache.t2.medium", 
+                "TransitEncryptionEnabled": false, 
+                "Engine": "redis", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "AutoMinorVersionUpgrade": true, 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-aa6c90c3"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "sat:05:30-sat:06:30", 
+                "CacheSubnetGroupName": "cache-net-group", 
+                "AuthTokenEnabled": false, 
+                "AtRestEncryptionEnabled": false, 
+                "EngineVersion": "3.2.10", 
+                "CacheClusterCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 591000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 5
+                }, 
+                "PreferredAvailabilityZone": "us-east-2b", 
+                "SnapshotWindow": "01:30-02:30", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2.cluster.on", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            }, 
+            {
+                "CacheClusterId": "megacache-0002-001", 
+                "ReplicationGroupId": "megacache", 
+                "CacheClusterStatus": "available", 
+                "SnapshotRetentionLimit": 0, 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "CacheNodeType": "cache.t2.medium", 
+                "TransitEncryptionEnabled": false, 
+                "Engine": "redis", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "AutoMinorVersionUpgrade": true, 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-aa6c90c3"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "sat:05:30-sat:06:30", 
+                "CacheSubnetGroupName": "cache-net-group", 
+                "AuthTokenEnabled": false, 
+                "AtRestEncryptionEnabled": false, 
+                "EngineVersion": "3.2.10", 
+                "CacheClusterCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 591000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 5
+                }, 
+                "PreferredAvailabilityZone": "us-east-2a", 
+                "SnapshotWindow": "01:30-02:30", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2.cluster.on", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            }, 
+            {
+                "CacheClusterId": "megacache-0002-002", 
+                "ReplicationGroupId": "megacache", 
+                "CacheClusterStatus": "available", 
+                "SnapshotRetentionLimit": 0, 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "CacheNodeType": "cache.t2.medium", 
+                "TransitEncryptionEnabled": false, 
+                "Engine": "redis", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "AutoMinorVersionUpgrade": true, 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-aa6c90c3"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "sat:05:30-sat:06:30", 
+                "CacheSubnetGroupName": "cache-net-group", 
+                "AuthTokenEnabled": false, 
+                "AtRestEncryptionEnabled": false, 
+                "EngineVersion": "3.2.10", 
+                "CacheClusterCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 591000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 5
+                }, 
+                "PreferredAvailabilityZone": "us-east-2b", 
+                "SnapshotWindow": "01:30-02:30", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2.cluster.on", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            }, 
+            {
+                "CacheClusterId": "megacache-0002-003", 
+                "ReplicationGroupId": "megacache", 
+                "CacheClusterStatus": "available", 
+                "SnapshotRetentionLimit": 0, 
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:", 
+                "CacheNodeType": "cache.t2.medium", 
+                "TransitEncryptionEnabled": false, 
+                "Engine": "redis", 
+                "CacheSecurityGroups": [], 
+                "NumCacheNodes": 1, 
+                "AutoMinorVersionUpgrade": true, 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupId": "sg-aa6c90c3"
+                    }
+                ], 
+                "PendingModifiedValues": {}, 
+                "PreferredMaintenanceWindow": "sat:05:30-sat:06:30", 
+                "CacheSubnetGroupName": "cache-net-group", 
+                "AuthTokenEnabled": false, 
+                "AtRestEncryptionEnabled": false, 
+                "EngineVersion": "3.2.10", 
+                "CacheClusterCreateTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 56, 
+                    "microsecond": 591000, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 5
+                }, 
+                "PreferredAvailabilityZone": "us-east-2b", 
+                "SnapshotWindow": "01:30-02:30", 
+                "CacheParameterGroup": {
+                    "CacheNodeIdsToReboot": [], 
+                    "CacheParameterGroupName": "default.redis3.2.cluster.on", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2cdaed2c-5079-11e8-a0d2-c9ad4b264331", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2cdaed2c-5079-11e8-a0d2-c9ad4b264331", 
+                "date": "Sat, 05 May 2018 15:30:00 GMT", 
+                "content-length": "10457", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

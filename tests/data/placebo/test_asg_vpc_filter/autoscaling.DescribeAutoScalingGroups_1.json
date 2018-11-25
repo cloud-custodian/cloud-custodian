@@ -3,78 +3,60 @@
     "data": {
         "AutoScalingGroups": [
             {
-                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:74979cda-27ca-4e8d-a3e9-a562d37794d6:autoScalingGroupName/CustodianASG", 
-                "HealthCheckGracePeriod": 300, 
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:314bd7a9-7bcb-462e-984b-5bbf32e9a4a7:autoScalingGroupName/asg-test-name", 
+                "TargetGroupARNs": [], 
                 "SuspendedProcesses": [], 
-                "DesiredCapacity": 3, 
-                "Tags": [
-                    {
-                        "ResourceType": "auto-scaling-group", 
-                        "ResourceId": "CustodianASG", 
-                        "PropagateAtLaunch": true, 
-                        "Value": "ubuntu", 
-                        "Key": "Platform"
-                    }
-                ], 
+                "DesiredCapacity": 1, 
+                "Tags": [], 
                 "EnabledMetrics": [], 
                 "LoadBalancerNames": [], 
-                "AutoScalingGroupName": "CustodianASG", 
+                "AutoScalingGroupName": "asg-test-name", 
                 "DefaultCooldown": 300, 
-                "MinSize": 3, 
+                "MinSize": 1, 
                 "Instances": [
                     {
                         "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2a", 
-                        "InstanceId": "i-9206fe54", 
+                        "AvailabilityZone": "us-east-1d", 
+                        "InstanceId": "i-069de1afdc473fd7d", 
                         "HealthStatus": "Healthy", 
                         "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
-                    }, 
-                    {
-                        "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2b", 
-                        "InstanceId": "i-7b5241a3", 
-                        "HealthStatus": "Healthy", 
-                        "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
-                    }, 
-                    {
-                        "ProtectedFromScaleIn": false, 
-                        "AvailabilityZone": "us-west-2c", 
-                        "InstanceId": "i-242dd4f9", 
-                        "HealthStatus": "Healthy", 
-                        "LifecycleState": "InService", 
-                        "LaunchConfigurationName": "CustodianASGTest"
+                        "LaunchConfigurationName": "foo-bar"
                     }
                 ], 
-                "MaxSize": 3, 
-                "VPCZoneIdentifier": "subnet-3f9e3d54,subnet-389e3d53,subnet-3e9e3d55", 
+                "MaxSize": 1, 
+                "VPCZoneIdentifier": "subnet-3a334610", 
+                "HealthCheckGracePeriod": 300, 
                 "TerminationPolicies": [
                     "Default"
                 ], 
-                "LaunchConfigurationName": "CustodianASGTest", 
+                "LaunchConfigurationName": "foo-bar", 
                 "CreatedTime": {
-                    "hour": 12, 
+                    "hour": 18, 
                     "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 45, 
-                    "microsecond": 395000, 
-                    "year": 2016, 
-                    "day": 8, 
-                    "minute": 12
+                    "month": 6, 
+                    "second": 7, 
+                    "microsecond": 986000, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 10
                 }, 
                 "AvailabilityZones": [
-                    "us-west-2c", 
-                    "us-west-2b", 
-                    "us-west-2a"
+                    "us-east-1d"
                 ], 
                 "HealthCheckType": "EC2", 
                 "NewInstancesProtectedFromScaleIn": false
             }
         ], 
         "ResponseMetadata": {
+            "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "f2ce8d92-1518-11e6-9db7-cd3658c30c1a"
+            "RequestId": "83cf568e-5b64-11e7-a9f6-33b7f4fef7ac", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "83cf568e-5b64-11e7-a9f6-33b7f4fef7ac", 
+                "date": "Tue, 27 Jun 2017 18:14:52 GMT", 
+                "content-length": "1927", 
+                "content-type": "text/xml"
+            }
         }
     }
 }

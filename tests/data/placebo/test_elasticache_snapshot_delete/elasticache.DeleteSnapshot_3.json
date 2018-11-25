@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Snapshot": {
+            "Engine": "redis", 
+            "CacheParameterGroupName": "default.redis3.2", 
+            "VpcId": "vpc-f1516b97", 
+            "CacheClusterId": "myec-002", 
+            "SnapshotRetentionLimit": 1, 
+            "NumCacheNodes": 1, 
+            "SnapshotName": "backup-myec-002-2017-06-23", 
+            "CacheClusterCreateTime": {
+                "hour": 2, 
+                "__class__": "datetime", 
+                "month": 6, 
+                "second": 45, 
+                "microsecond": 233000, 
+                "year": 2017, 
+                "day": 24, 
+                "minute": 7
+            }, 
+            "AutoMinorVersionUpgrade": true, 
+            "PreferredAvailabilityZone": "us-east-1d", 
+            "SnapshotStatus": "deleting", 
+            "SnapshotSource": "manual", 
+            "SnapshotWindow": "08:00-09:00", 
+            "EngineVersion": "3.2.4", 
+            "NodeSnapshots": [
+                {
+                    "CacheSize": "4 MB", 
+                    "SnapshotCreateTime": {
+                        "hour": 3, 
+                        "__class__": "datetime", 
+                        "month": 6, 
+                        "second": 27, 
+                        "microsecond": 0, 
+                        "year": 2017, 
+                        "day": 24, 
+                        "minute": 4
+                    }, 
+                    "CacheNodeId": "0001", 
+                    "CacheNodeCreateTime": {
+                        "hour": 2, 
+                        "__class__": "datetime", 
+                        "month": 6, 
+                        "second": 45, 
+                        "microsecond": 233000, 
+                        "year": 2017, 
+                        "day": 24, 
+                        "minute": 7
+                    }
+                }
+            ], 
+            "CacheSubnetGroupName": "msg", 
+            "Port": 6379, 
+            "PreferredMaintenanceWindow": "fri:10:00-fri:11:00", 
+            "CacheNodeType": "cache.r3.large"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "3e3246c3-588b-11e7-89d4-5bd7dac5022b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3e3246c3-588b-11e7-89d4-5bd7dac5022b", 
+                "date": "Sat, 24 Jun 2017 03:14:32 GMT", 
+                "content-length": "1578", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Models": [
+            {
+                "CreationTime": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 42, 
+                    "microsecond": 511000, 
+                    "year": 2018, 
+                    "day": 17, 
+                    "minute": 11
+                }, 
+                "ModelName": "tmp-123", 
+                "ModelArn": "arn:aws:sagemaker:us-east-1:644160558196:model/tmp-123"
+            }, 
+            {
+                "CreationTime": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 46, 
+                    "microsecond": 835000, 
+                    "year": 2018, 
+                    "day": 17, 
+                    "minute": 54
+                }, 
+                "ModelName": "tmp-for-test-a", 
+                "ModelArn": "arn:aws:sagemaker:us-east-1:644160558196:model/tmp-for-test-a"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4401e9e4-cc83-4e42-80ab-f369dad6e9c5", 
+            "HTTPHeaders": {
+                "date": "Wed, 17 Jan 2018 20:12:11 GMT", 
+                "x-amzn-requestid": "4401e9e4-cc83-4e42-80ab-f369dad6e9c5", 
+                "content-length": "274", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

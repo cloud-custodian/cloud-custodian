@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "hasMoreResults": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "e495685d-d492-11e7-b4af-496584dcee7b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e495685d-d492-11e7-b4af-496584dcee7b", 
+                "date": "Tue, 28 Nov 2017 23:21:41 GMT", 
+                "content-length": "150", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "pipelineIdList": [
+            {
+                "id": "df-0881198RSZJ5SK6MJDH", 
+                "name": "PipelineTagTest"
+            }
+        ]
+    }
+}

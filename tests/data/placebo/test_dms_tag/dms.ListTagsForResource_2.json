@@ -1,0 +1,26 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "220b3f1e-e04f-11e7-8990-6340e2b86e99", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "220b3f1e-e04f-11e7-8990-6340e2b86e99", 
+                "date": "Wed, 13 Dec 2017 21:46:53 GMT", 
+                "content-length": "124", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "RequiredValue", 
+                "Key": "RequiredTag"
+            }, 
+            {
+                "Value": "ReplicationInstance1 description", 
+                "Key": "description"
+            }
+        ]
+    }
+}

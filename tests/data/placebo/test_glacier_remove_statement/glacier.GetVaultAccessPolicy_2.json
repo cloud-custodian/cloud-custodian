@@ -1,0 +1,19 @@
+{
+    "status_code": 200, 
+    "data": {
+        "policy": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"glacier:AddTagsToVault\",\"Resource\":\"arn:aws:glacier:us-east-1:123456789012:vaults/test-glacier-remove-statement\"}]}"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c5IsO8ZVSwzLFhFL8JTqb18fmHfIk2VKUEdepHVGChhKw88", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c5IsO8ZVSwzLFhFL8JTqb18fmHfIk2VKUEdepHVGChhKw88", 
+                "date": "Tue, 19 Sep 2017 02:11:46 GMT", 
+                "content-length": "267", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

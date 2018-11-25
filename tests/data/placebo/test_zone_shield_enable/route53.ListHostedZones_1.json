@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "HostedZones": [
+            {
+                "ResourceRecordSetCount": 12, 
+                "CallerReference": "D4507AE8-8060-D0B4-XXXX-B7353DCF3EVV", 
+                "Config": {
+                    "PrivateZone": false
+                }, 
+                "Id": "/hostedzone/XXXXURLYV5DGGG", 
+                "Name": "invitro.cloud."
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "b7809efa-a9d4-11e7-8453-e15117599e76", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b7809efa-a9d4-11e7-8453-e15117599e76", 
+                "date": "Thu, 05 Oct 2017 13:54:33 GMT", 
+                "content-length": "1283", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "MaxItems": "100"
+    }
+}
