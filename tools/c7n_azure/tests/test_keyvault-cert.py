@@ -20,7 +20,6 @@ class KeyVaultCertTest(BaseTest):
     def setUp(self):
         super(KeyVaultCertTest, self).setUp()
 
-    @arm_template('keyvault-cert.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault-certificate',
