@@ -14,6 +14,7 @@
 
 import time
 from gcp_common import BaseTest
+from googleapiclient.errors import HttpError
 
 
 class SqlInstanceTest(BaseTest):
@@ -54,19 +55,9 @@ class SqlInstanceTest(BaseTest):
 
     def test_delete_instance(self):
         project_id = 'cloud-custodian'
-        instance_name = 'brenttest-12'
+        instance_name = 'brenttest-5'
         factory = self.replay_flight_data('sqlinstance-terminate', project_id=project_id)
 
-        # Before Delete Resource Count
-        p = self.load_policy(
-            {'name': 'iterm',
-             'resource': 'gcp.sql-instance'},
-            session_factory=factory)
-        resources = p.run()
-        beforeDeleteCount = len(resources)
-        self.assertEqual(beforeDeleteCount, 2)
-
-        # After Delete Resource Count
         p = self.load_policy(
             {'name': 'sqliterm',
              'resource': 'gcp.sql-instance',
@@ -78,9 +69,10 @@ class SqlInstanceTest(BaseTest):
         if self.recording:
             time.sleep(1)
         client = p.resource_manager.get_client()
-        result = client.execute_query(
-            'list', {'project': project_id})
-        afterDeleteCount = len(result["items"])
-        self.assertEqual(afterDeleteCount, 1)
-        # Check to see if number of resources is 1 less than before delete
-        self.assertEqual(beforeDeleteCount - afterDeleteCount, 1)
+        try:
+            result = client.execute_query(
+                'get', {'project': project_id,
+                        'instance': instance_name})
+            self.fail('found deleted instance: %s' % result)
+        except HttpError as e:
+            self.assertTrue("does not exist" in str(e))
