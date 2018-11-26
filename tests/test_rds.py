@@ -737,19 +737,9 @@ class RDSTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        verify_p = self.load_policy(
-            {
-                "name": "rds-verify-modify-db",
-                "resource": "rds",
-                "filters": [
-                    {"DeletionProtection": False},
-                    {"MasterUsername": "testtest"}
-                ],
-            },
-            session_factory=session_factory,
-        )
-        verify_resources = verify_p.run()
-        self.assertEqual(len(verify_resources), 1)
+        client = session_factory().client("rds")
+        db_info = client.describe_db_instances(DBInstanceIdentifier="testtest")
+        self.assertFalse(db_info["DBInstances"][0]["DeletionProtection"])
 
 
 class RDSSnapshotTest(BaseTest):

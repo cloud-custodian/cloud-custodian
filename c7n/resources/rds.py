@@ -1655,16 +1655,18 @@ class ModifyDb(BaseAction):
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')
-
         param = {}
-        param['ApplyImmediately'] = self.data.get('immediate', False)
 
-        for x in self.data.get('update'):
-            param[x['property']] = x['value']
+        for property in self.data.get('update'):
+            param[property['property']] = property['value']
 
         for r in resources:
+            if all([r[property] == value for property, value in param.items()]):
+                continue
+            param['ApplyImmediately'] = self.data.get('immediate', False)
             param['DBInstanceIdentifier'] = r['DBInstanceIdentifier']
             try:
                 c.modify_db_instance(**param)
+                del param['ApplyImmediately']
             except c.exceptions.DBInstanceNotFoundFault:
                 raise
