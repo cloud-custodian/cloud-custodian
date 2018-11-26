@@ -14,6 +14,8 @@
 
 from azure.graphrbac import GraphRbacManagementClient
 from azure.keyvault import KeyVaultClient
+from azure.keyvault.models import KeyVaultErrorException
+from azure.keyvault import KeyVaultId
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
 from c7n.filters import Filter
@@ -139,23 +141,27 @@ class KeyVaultKey(ArmResourceManager):
             vault_url = 'https://' + ritem["name"] + "." + RESOURCE_KEYVAULT_BASEURL
             try:
                 vkeys = self.keyvault_client.get_keys(vault_url)
-                for vkey in vkeys:
-                    keyname = vkey.kid.split("/")[-1:]
-                    keyname = keyname[0]
+            except KeyVaultErrorException as e:
+                print(dir(e))
+                print(e.message)
+                #self.log.error(e.message + ' on keyvault: ' + ritem["id"])
+                import pdb
+                pdb.set_trace()
+                #for vkey in vkeys:
+                #    keyname = KeyVaultId.parse_key_id(vkey.kid).name
+                #    keyname = vkey.kid.split("/")[-1:]
+                #    keyname = keyname[0]
 
-                    r.append({'kid': vkey.kid,
-                              'keyname': keyname,
-                              'keyvault': {'id': ritem["id"],
-                                           'name': ritem["name"],
-                                           'location': ritem["location"],
-                                           'tags': ritem["tags"]},
-                              'enabled': vkey.attributes.enabled,
-                              'created': vkey.attributes.created,
-                              'updated': vkey.attributes.updated,
-                              'tags': vkey.tags})
-
-            except Exception as e:
-                self.log.error(e.message + ' on keyvault: ' + ritem["id"])
+                #    r.append({'kid': vkey.kid,
+                #              'keyname': keyname,
+                #              'keyvault': {'id': ritem["id"],
+                #                           'name': ritem["name"],
+                #                           'location': ritem["location"],
+                #                           'tags': ritem["tags"]},
+                #              'enabled': vkey.attributes.enabled,
+                #              'created': vkey.attributes.created,
+                #              'updated': vkey.attributes.updated,
+                #              'tags': vkey.tags})
                 pass
 
         return r
@@ -193,7 +199,7 @@ class KeyVaultCert(ArmResourceManager):
                               'updated': vcert.attributes.updated,
                               'tags': vcert.tags})
 
-            except Exception as e:
+            except KeyVaultErrorException as e:
                 self.log.error(e.message + ' on keyvault: ' + ritem["id"])
                 pass
 

@@ -22,11 +22,7 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-<<<<<<< HEAD
-import pdb
-=======
 from c7n.tags import universal_augment
->>>>>>> master
 
 
 @resources.register('rest-account')

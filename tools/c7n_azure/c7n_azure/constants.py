@@ -9,8 +9,6 @@ FUNCTION_TIME_TRIGGER_MODE = 'azure-periodic'
 FUNCTION_KEY_URL = 'hostruntime/admin/host/systemkeys/_master?api-version=2018-02-01'
 
 """
-<<<<<<< HEAD
-=======
 Event Grid Mode
 """
 EVENT_GRID_USER_NAME_JMES_PATH = \
@@ -19,7 +17,6 @@ EVENT_GRID_SP_NAME_JMES_PATH = 'data.claims.appid'
 EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH = 'data.authorization.evidence.principalType'
 
 """
->>>>>>> master
 Environment Variables
 """
 ENV_TENANT_ID = 'AZURE_TENANT_ID'
@@ -40,15 +37,13 @@ ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION = 'CUSTODIAN_DISABLE_SSL_CERT_VERIFI
 """
 Authentication Resource
 """
-<<<<<<< HEAD
 RESOURCE_STORAGE = 'https://storage.azure.com/'
-=======
 RESOURCE_ACTIVE_DIRECTORY = 'https://management.core.windows.net/'
 RESOURCE_STORAGE = 'https://storage.azure.com/'
+RESOURCE_KEYVAULT_BASEURL = 'vault.azure.net'
 
 """
 Threading Variable
 """
 DEFAULT_MAX_THREAD_WORKERS = 3
 DEFAULT_CHUNK_SIZE = 20
->>>>>>> master
