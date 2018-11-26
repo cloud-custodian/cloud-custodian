@@ -56,7 +56,6 @@ METRIC_UNITS = [
 ]
 
 
-
 class PutMetric(BaseAction):
     """Action to put metrics based on an expression into CloudWatch metrics
 
@@ -170,4 +169,3 @@ def register_action_put_metric(registry, _):
 
 
 resources.subscribe(resources.EVENT_FINAL, register_action_put_metric)
-

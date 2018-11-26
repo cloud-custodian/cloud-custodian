@@ -81,4 +81,3 @@ def register_action_invoke_lambda(registry, _):
 
 
 resources.subscribe(resources.EVENT_FINAL, register_action_invoke_lambda)
-

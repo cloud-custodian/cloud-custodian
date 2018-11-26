@@ -106,5 +106,3 @@ BaseAction = Action
 class EventAction(BaseAction):
     """Actions which receive lambda event if present
     """
-
-

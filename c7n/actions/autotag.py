@@ -137,4 +137,4 @@ def register_action_tag_user(registry, _):
             klass.action_registry.register('auto-tag-user', AutoTagUser)
 
 
-resources.subscribe(resources.EVENT_FINAL, register_action_tag_user)            
+resources.subscribe(resources.EVENT_FINAL, register_action_tag_user)
