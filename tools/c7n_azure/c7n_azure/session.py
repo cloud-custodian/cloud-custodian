@@ -18,17 +18,23 @@ import logging
 import os
 
 import jwt
-from azure.cli.core._profile import Profile
-from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
-from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
+from azure.common.credentials import (BasicTokenAuthentication,
+                                      ServicePrincipalCredentials)
+
 from c7n_azure import constants
+from c7n_azure.constants import RESOURCE_ACTIVE_DIRECTORY
 from c7n_azure.utils import ResourceIdParser, StringUtils
+
+try:
+    from azure.cli.core._profile import Profile
+except Exception:
+    Profile = None
 
 
 class Session(object):
 
     def __init__(self, subscription_id=None, authorization_file=None,
-                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id):
+                 resource=RESOURCE_ACTIVE_DIRECTORY):
         """
         :param subscription_id: If provided overrides environment variables.
 

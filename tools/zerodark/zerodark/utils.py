@@ -16,7 +16,7 @@
 from datetime import datetime
 from dateutil.parser import parse as date_parse
 from dateutil.tz import tzutc
-from dateutil import zoneinfo
+from dateutil import tz as tzutils
 
 import functools
 import humanize
@@ -34,7 +34,7 @@ human_size = functools.partial(humanize.naturalsize, gnu=True)
 
 
 def get_dates(start, end, tz):
-    mytz = tz and zoneinfo.gettz(tz) or tzutc()
+    mytz = tz and tzutils.gettz(tz) or tzutc()
     start = date_parse(start).replace(tzinfo=mytz)
     if end:
         end = date_parse(end).replace(tzinfo=mytz)

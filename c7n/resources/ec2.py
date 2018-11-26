@@ -691,8 +691,11 @@ class UserData(ValueFilter):
     annotation = 'c7n:user-data'
     permissions = ('ec2:DescribeInstanceAttribute',)
 
-    def process(self, resources, event=None):
+    def __init__(self, data, manager):
+        super(UserData, self).__init__(data, manager)
         self.data['key'] = '"c7n:user-data"'
+
+    def process(self, resources, event=None):
         client = utils.local_session(self.manager.session_factory).client('ec2')
         results = []
         with self.executor_factory(max_workers=3) as w:

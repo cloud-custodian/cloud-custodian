@@ -1,0 +1,71 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "742a7504-923c-42c2-997b-f4fdc93e3b43", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "742a7504-923c-42c2-997b-f4fdc93e3b43", 
+                "x-amz-id-2": "ATheZNYuo1npTHs5ygPYuCtK+2F5WTNNjERyklXhj7ZCK10FuULaybasmxC/xxdbmUvisC0CRtaxaGgbHL0eM9gn5wq+w131", 
+                "content-length": "1065", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Wed, 15 Aug 2018 09:40:17 GMT"
+            }
+        }, 
+        "DeliveryStreamDescription": {
+            "DeliveryStreamType": "DirectPut", 
+            "HasMoreDestinations": false, 
+            "VersionId": "1", 
+            "CreateTimestamp": {
+                "hour": 5, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 17, 
+                "microsecond": 694000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 40
+            }, 
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:123456789:deliverystream/firehose-s3", 
+            "DeliveryStreamStatus": "ACTIVE", 
+            "DeliveryStreamName": "firehose-s3", 
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-000000000001", 
+                    "ExtendedS3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                        "BufferingHints": {
+                            "IntervalInSeconds": 300, 
+                            "SizeInMBs": 5
+                        }, 
+                        "EncryptionConfiguration": {
+                            "NoEncryptionConfig": "NoEncryption"
+                        }, 
+                        "CompressionFormat": "UNCOMPRESSED", 
+                        "S3BackupMode": "Disabled", 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }, 
+                        "BucketARN": "arn:aws:s3:::this-bucket"
+                    }, 
+                    "S3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                        "BufferingHints": {
+                            "IntervalInSeconds": 300, 
+                            "SizeInMBs": 5
+                        }, 
+                        "EncryptionConfiguration": {
+                            "NoEncryptionConfig": "NoEncryption"
+                        }, 
+                        "CompressionFormat": "UNCOMPRESSED", 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }, 
+                        "BucketARN": "arn:aws:s3:::this-bucket"
+                    }
+                }
+            ]
+        }
+    }
+}

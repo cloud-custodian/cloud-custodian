@@ -100,6 +100,7 @@ def specific_error(error):
         for idx, v in enumerate(error.validator_value):
             if v['$ref'].rsplit('/', 2)[1].endswith(r):
                 found = idx
+                break
         if found is not None:
             # error context is a flat list of all validation
             # failures, we have to index back to the policy
@@ -114,8 +115,9 @@ def specific_error(error):
     if t is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if '$ref' in v and v['$ref'].endswith(t):
+            if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
                 found = idx
+                break
         if found is not None:
             # Try to walk back an element/type ref to the specific
             # error

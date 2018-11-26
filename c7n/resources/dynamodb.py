@@ -396,9 +396,11 @@ class DeleteBackup(BaseAction, StatusFilter):
               - name: dynamodb-delete-backup
                 resource: dynamodb-backup
                 filters:
-                  - type: age
-                    days: 28
-                    op: ge
+                  - type: value
+                    key: BackupCreationDateTime
+                    op: greater-than
+                    value_type: age
+                    value: 28
                 actions:
                   - type: delete
     """
@@ -426,7 +428,7 @@ class DeleteBackup(BaseAction, StatusFilter):
                     BackupArn=t['BackupArn'])
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                    self.log.warning("Could not complete DynamoDB backup table:%s", t)
+                    self.log.warning("Could not complete DynamoDB backup deletion for table:%s", t)
                     continue
                 raise
 

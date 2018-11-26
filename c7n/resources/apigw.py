@@ -22,6 +22,7 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
+from c7n.tags import universal_augment
 
 
 @resources.register('rest-account')
@@ -178,6 +179,12 @@ class RestStage(query.ChildResourceManager):
         name = id = 'stageName'
         date = 'createdDate'
         dimension = None
+        universal_taggable = True
+        type = None
+
+    def augment(self, resources):
+        return universal_augment(
+            self, super(RestStage, self).augment(resources))
 
 
 @query.sources.register('describe-rest-stage')
@@ -238,6 +245,37 @@ class UpdateStage(BaseAction):
                 restApiId=r['restApiId'],
                 stageName=r['stageName'],
                 patchOperations=self.data['patch'])
+
+
+@RestStage.action_registry.register('delete')
+class DeleteStage(BaseAction):
+    """Delete an api stage
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: delete-rest-stage
+            resource: rest-stage
+            filters:
+              - methodSettings."*/*".cachingEnabled: true
+            actions:
+              - type: delete
+    """
+    permissions = ('apigateway:Delete',)
+    schema = utils.type_schema('delete')
+
+    def process(self, resources):
+        client = utils.local_session(self.manager.session_factory).client('apigateway')
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_stage,
+                    restApiId=r['restApiId'],
+                    stageName=r['stageName'])
+            except client.exceptions.NotFoundException:
+                pass
 
 
 @resources.register('rest-resource')

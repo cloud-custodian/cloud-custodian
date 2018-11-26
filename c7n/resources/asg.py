@@ -851,6 +851,10 @@ class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
     batch_size = 50
     annotation = 'c7n:user-data'
 
+    def __init__(self, data, manager):
+        super(UserDataFilter, self).__init__(data, manager)
+        self.data['key'] = '"c7n:user-data"'
+
     def get_permissions(self):
         return self.manager.get_resource_manager('asg').get_permissions()
 

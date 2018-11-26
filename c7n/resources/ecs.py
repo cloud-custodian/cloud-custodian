@@ -22,6 +22,30 @@ from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
 
 
+def ecs_tag_normalize(resources):
+    """normalize tag format on ecs resources to match common aws format."""
+    for r in resources:
+        if 'tags' in r:
+            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in r['tags']]
+            r.pop('tags')
+
+
+NEW_ARN_STYLE = ('container-instance', 'service', 'task')
+
+
+def ecs_taggable(model, r):
+    # Tag support requires new arn format
+    # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html
+    #
+    # New arn format details
+    # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-resource-ids.html
+    #
+    path_parts = r[model.id].rsplit(':', 1)[-1].split('/')
+    if path_parts[0] not in NEW_ARN_STYLE:
+        return True
+    return len(path_parts) > 2
+
+
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
 
@@ -29,11 +53,16 @@ class ECSCluster(query.QueryResourceManager):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
-            'describe_clusters', 'clusters', None, 'clusters')
+            'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         id = "clusterArn"
         dimension = None
         filter_name = None
+
+    def augment(self, resources):
+        resources = super(ECSCluster, self).augment(resources)
+        ecs_tag_normalize(resources)
+        return resources
 
 
 @ECSCluster.filter_registry.register('metrics')
@@ -96,7 +125,9 @@ class ECSServiceDescribeSource(ECSClusterResourceDescribeSource):
             results.extend(
                 client.describe_services(
                     cluster=cluster_id,
+                    include=['TAGS'],
                     services=service_set).get('services', []))
+        ecs_tag_normalize(results)
         return results
 
 
@@ -225,7 +256,9 @@ class ECSTaskDescribeSource(ECSClusterResourceDescribeSource):
                 self.manager.retry(
                     client.describe_tasks,
                     cluster=cluster_id,
+                    include=['TAGS'],
                     tasks=task_set).get('tasks', []))
+        ecs_tag_normalize(results)
         return results
 
 
@@ -381,8 +414,10 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
     def process_cluster_resources(self, client, cluster_id, container_instances):
         results = []
         for service_set in chunks(container_instances, self.manager.chunk_size):
-            r = client.describe_container_instances(cluster=cluster_id,
-                    containerInstances=container_instances).get('containerInstances', [])
+            r = client.describe_container_instances(
+                cluster=cluster_id,
+                include=['TAGS'],
+                containerInstances=container_instances).get('containerInstances', [])
             # Many Container Instance API calls require the cluster_id, adding as a
             # custodian specific key in the resource
             for i in r:

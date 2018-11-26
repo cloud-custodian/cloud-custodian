@@ -2230,7 +2230,8 @@ class FlowLogsTest(BaseTest):
                 "name": "c7n-create-vpc-flow-logs",
                 "resource": "vpc",
                 "filters": [
-                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": False}
+                    {"tag:Name": "FlowLogTest"},
+                    {"type": "flow-logs", "enabled": False}
                 ],
                 "actions": [
                     {
@@ -2253,6 +2254,22 @@ class FlowLogsTest(BaseTest):
             "FlowLogs"
         ]
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
+
+    def test_vpc_flow_log_destination(self):
+        session_factory = self.replay_flight_data('test_vpc_flow_filter_destination')
+        p = self.load_policy(
+            {'name': 'c7n-flow-log-s3',
+             'resource': 'vpc',
+             'filters': [{
+                 'type': 'flow-logs',
+                 'enabled': True,
+                 'destination-type': 's3',
+                 'deliver-status': 'success'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:flow-logs'][0]['LogDestination'],
+                         'arn:aws:s3:::c7n-vpc-flow-logs')
 
     def test_vpc_set_flow_logs_s3(self):
         session_factory = self.replay_flight_data("test_vpc_set_flow_logs_s3")

@@ -93,12 +93,7 @@ def load_file(path, format=None, vars=None):
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
-            try:
-                return yaml_load(contents)
-            except yaml.YAMLError as e:
-                log.error('Error while loading yaml file %s', path)
-                log.error('Skipping this file.  Error message below:\n%s', e)
-                return None
+            return yaml_load(contents)
         elif format == 'json':
             return loads(contents)
 

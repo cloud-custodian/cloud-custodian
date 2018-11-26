@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "fae1a95b-f021-11e8-8b62-c7b4382bf2e5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fae1a95b-f021-11e8-8b62-c7b4382bf2e5",
+                "content-type": "text/xml",
+                "content-length": "446",
+                "date": "Sat, 24 Nov 2018 19:48:56 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "QueryLoggingConfigs": [
+            {
+                "Id": "e5d4a92e-b8ee-437f-81c4-df7c8495ebfb",
+                "HostedZoneId": "Z20H1474487I0O",
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/route53/cloudcustodian.io"
+            }
+        ]
+    }
+}
