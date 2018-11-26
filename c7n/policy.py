@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime
-from dateutil import tz, parser
+from dateutil import parser, tz as tzutil
 import json
 import fnmatch
 import itertools
@@ -717,7 +717,7 @@ class Policy(object):
 
     @property
     def tz(self):
-        return tz.gettz(self.data.get('tz', 'UTC'))
+        return tzutil.gettz(self.data.get('tz', 'UTC'))
 
     @property
     def start(self):
@@ -746,9 +746,12 @@ class Policy(object):
     def get_cache(self):
         return self.resource_manager._cache
 
+    @property
+    def execution_mode(self):
+        return self.data.get('mode', {'type': 'pull'})['type']
+
     def get_execution_mode(self):
-        exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        exec_mode = execution[exec_mode_type]
+        exec_mode = execution[self.execution_mode]
         if exec_mode is None:
             return None
         return exec_mode(self)
@@ -903,11 +906,11 @@ class Policy(object):
 
         if policy_tz:
             try:
-                p_tz = tz.gettz(policy_tz)
+                p_tz = tzutil.gettz(policy_tz)
             except Exception as e:
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
-            if not isinstance(p_tz, tz.tzfile):
+            if not isinstance(p_tz, tzutil.tzfile):
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
 

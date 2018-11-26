@@ -17,12 +17,18 @@ import re
 
 from c7n_azure import constants
 from c7n_azure.session import Session
+from c7n_azure.utils import ThreadHelper
 from mock import patch
 from vcr_unittest import VCRTestCase
 
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
+
+import msrest.polling
+from msrest.serialization import Model
+from msrest.service_client import ServiceClient
+from msrest.pipeline import ClientRawResponse
 
 load_resources()
 
@@ -55,6 +61,11 @@ class AzureVCRBaseTest(VCRTestCase):
         myvcr = super(VCRTestCase, self)._get_vcr(**kwargs)
         myvcr.register_matcher('azurematcher', self.azure_matcher)
         myvcr.match_on = ['azurematcher']
+
+        # Block recording when using fake token (tox runs)
+        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
+            myvcr.record_mode = 'none'
+
         return myvcr
 
     def azure_matcher(self, r1, r2):
@@ -97,6 +108,18 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     """ Azure base testing class.
     """
 
+    def setUp(self):
+        super(BaseTest, self).setUp()
+        ThreadHelper.disable_multi_threading = True
+
+        # Patch Poller with constructor that always disables polling
+        self.lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_test_init)
+        self.lro_patch.start()
+
+    def tearDown(self):
+        super(BaseTest, self).tearDown()
+        self.lro_patch.stop()
+
     @staticmethod
     def setup_account():
         # Find actual name of storage account provisioned in our test environment
@@ -115,6 +138,26 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                               constants.ENV_CLIENT_ID: '',
                               constants.ENV_CLIENT_SECRET: ''
                           }, clear=True)
+
+    @staticmethod
+    def lro_test_init(self, client, initial_response, deserialization_callback, polling_method):
+        self._client = client if isinstance(client, ServiceClient) else client._client
+        self._response = initial_response.response if \
+            isinstance(initial_response, ClientRawResponse) else \
+            initial_response
+        self._callbacks = []  # type: List[Callable]
+        self._polling_method = msrest.polling.NoPolling()
+
+        if isinstance(deserialization_callback, type) and \
+                issubclass(deserialization_callback, Model):
+            deserialization_callback = deserialization_callback.deserialize
+
+        # Might raise a CloudError
+        self._polling_method.initialize(self._client, self._response, deserialization_callback)
+
+        self._thread = None
+        self._done = None
+        self._exception = None
 
 
 def arm_template(template):

@@ -20,9 +20,13 @@ This example is the same structure as the default one.
 
     .. code-block:: sh
 
-        custodian run -s azure://mystorage.blob.core.windows.net/logs/{policy}/{now:%Y/%m/%d/%H/} mypolicy.yml
+        custodian run -s azure://mystorage.blob.core.windows.net/logs/{policy_name}/{now:%Y/%m/%d/%H/} mypolicy.yml
 
 Use `{account_id}` for Subscription ID.
 
-Custodian will use your current credentials to discover the storage account and
-load the storage account keys.  The account must be in your current subscription.
+
+Authentication to Storage
+-------------------------
+
+The account working with storage will require `Blob Data Contributor` on either the storage account
+or a higher scope.

@@ -413,7 +413,8 @@ class DirectoryOutput(object):
     def get_output_vars(self):
         data = {
             'account_id': self.ctx.options.account_id,
-            'policy': self.ctx.policy.name,
+            'region': self.ctx.options.region,
+            'policy_name': self.ctx.policy.name,
             'now': datetime.utcnow(),
             'uuid': str(uuid.uuid4())}
         return data

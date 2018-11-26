@@ -18,17 +18,23 @@ import logging
 import os
 
 import jwt
-from azure.cli.core._profile import Profile
-from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
-from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
+from azure.common.credentials import (BasicTokenAuthentication,
+                                      ServicePrincipalCredentials)
+
 from c7n_azure import constants
+from c7n_azure.constants import RESOURCE_ACTIVE_DIRECTORY
 from c7n_azure.utils import ResourceIdParser, StringUtils
+
+try:
+    from azure.cli.core._profile import Profile
+except Exception:
+    Profile = None
 
 
 class Session(object):
 
     def __init__(self, subscription_id=None, authorization_file=None,
-                 resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id):
+                 resource=RESOURCE_ACTIVE_DIRECTORY):
         """
         :param subscription_id: If provided overrides environment variables.
 
@@ -112,6 +118,12 @@ class Session(object):
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
 
+    def get_session_for_resource(self, resource):
+        return Session(
+            subscription_id=self.subscription_id_override,
+            authorization_file=self.authorization_file,
+            resource=resource)
+
     def client(self, client):
         self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
@@ -174,7 +186,8 @@ class Session(object):
             return (ServicePrincipalCredentials(
                 client_id=data['credentials']['client_id'],
                 secret=data['credentials']['secret'],
-                tenant=data['credentials']['tenant']
+                tenant=data['credentials']['tenant'],
+                resource=self.resource_namespace
             ), data['subscription'])
 
     def get_functions_auth_string(self):

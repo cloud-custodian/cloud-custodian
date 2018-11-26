@@ -14,10 +14,25 @@
 
 package ssm
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // IsManagedInstance tests whether the provided EC2 instance identifier is
 // managed.
 func IsManagedInstance(s string) bool {
 	return strings.HasPrefix(s, "mi-")
+}
+
+// original Java regexp for a valid tag: ^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$
+var invalidTagRegexp = regexp.MustCompile(`[^a-zA-Z0-9\s_.:/=+\-@]`)
+
+func SanitizeTag(t string) string {
+	// special case of key: value# comment is this
+	if i := strings.Index(t, "#"); i != -1 {
+		t = t[:i]
+	}
+	t = strings.TrimSpace(t)
+	return invalidTagRegexp.ReplaceAllString(t, "")
 }

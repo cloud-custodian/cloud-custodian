@@ -16,12 +16,13 @@ import datetime
 import hashlib
 import logging
 import re
+from builtins import bytes
 from concurrent.futures import as_completed
 
 import six
 from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
 from azure.mgmt.web.models import NameValuePair
-from builtins import bytes
+from c7n_azure import constants
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
@@ -97,26 +98,34 @@ def azure_name_value_pair(name, value):
 
 class ThreadHelper:
 
+    disable_multi_threading = False
+
     @staticmethod
-    def execute_in_parallel(resources, execution_method, executor_factory,
-                            log, max_workers=3, chunk_size=20):
+    def execute_in_parallel(resources, execution_method, executor_factory, log,
+                            max_workers=constants.DEFAULT_MAX_THREAD_WORKERS,
+                            chunk_size=constants.DEFAULT_CHUNK_SIZE):
         futures = []
         results = []
-        with executor_factory(max_workers=max_workers) as w:
+        exceptions = []
+
+        max_num_workers = 1 if ThreadHelper.disable_multi_threading else max_workers
+
+        with executor_factory(max_workers=max_num_workers) as w:
             for resource_set in chunks(resources, chunk_size):
                 futures.append(w.submit(execution_method, resource_set))
 
             for f in as_completed(futures):
                 if f.exception():
-                    log.warning(
+                    log.error(
                         "Execution failed with error: %s" % f.exception())
+                    exceptions.append(f.exception())
                     continue
                 else:
                     result = f.result()
                     if result:
                         results.extend(result)
 
-            return results
+            return results, list(set(exceptions))
 
 
 class Math(object):

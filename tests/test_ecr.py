@@ -33,6 +33,64 @@ class TestECR(BaseTest):
         client.create_repository(repositoryName=name)
         self.addCleanup(client.delete_repository, repositoryName=name)
 
+    def test_ecr_lifecycle_policy(self):
+        session_factory = self.replay_flight_data('test_ecr_lifecycle_update')
+        rule = {
+            "rulePriority": 1,
+            "description": "Expire images older than 14 days",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "sinceImagePushed",
+                "countUnit": "days",
+                "countNumber": 14
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+        p = self.load_policy({
+            'name': 'ecr-update',
+            'resource': 'aws.ecr',
+            'filters': [
+                {'repositoryName': 'c7n'},
+                {'type': 'lifecycle-rule',
+                 'state': False}],
+            'actions': [{
+                'type': 'set-lifecycle',
+                'rules': [rule]}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ecr')
+        policy = json.loads(
+            client.get_lifecycle_policy(
+                repositoryName='c7n')['lifecyclePolicyText'])
+        self.assertEqual(policy, {'rules': [rule]})
+
+    def test_ecr_lifecycle_delete(self):
+        session_factory = self.replay_flight_data('test_ecr_lifecycle_delete')
+        p = self.load_policy({
+            'name': 'ecr-update',
+            'resource': 'aws.ecr',
+            'filters': [
+                {'repositoryName': 'c7n'},
+                {'type': 'lifecycle-rule',
+                 'state': True,
+                 'match': [
+                     {'action.type': 'expire'},
+                     {'selection.tagStatus': 'untagged'}]}],
+            'actions': [{
+                'type': 'set-lifecycle',
+                'state': False}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ecr')
+        self.assertRaises(
+            client.exceptions.ClientError,
+            client.get_lifecycle_policy,
+            repositoryName='c7n')
+
     @functional
     def test_ecr_no_policy(self):
         # running against a registry with no policy causes no issues.
@@ -160,3 +218,6 @@ class TestECR(BaseTest):
             client.get_repository_policy,
             repositoryName=resources[0]["repositoryArn"],
         )
+
+    def test_ecr_set_lifecycle(self):
+        pass

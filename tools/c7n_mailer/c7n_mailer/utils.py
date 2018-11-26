@@ -25,7 +25,7 @@ from dateutil.tz import gettz, tzutc
 from ruamel import yaml
 
 
-def get_jinja_env():
+def get_jinja_env(template_folders):
     env = jinja2.Environment(trim_blocks=True, autoescape=False)
     env.filters['yaml_safe'] = yaml.safe_dump
     env.filters['date_time_format'] = date_time_format
@@ -35,21 +35,14 @@ def get_jinja_env():
     env.globals['format_struct'] = format_struct
     env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
-    env.loader = jinja2.FileSystemLoader(
-        [
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)),
-                    '..',
-                    'msg-templates')), os.path.abspath('/')
-        ]
-    )
+    env.loader = jinja2.FileSystemLoader(template_folders)
     return env
 
 
 def get_rendered_jinja(
-        target, sqs_message, resources, logger, specified_template, default_template):
-    env = get_jinja_env()
+        target, sqs_message, resources, logger,
+        specified_template, default_template, template_folders):
+    env = get_jinja_env(template_folders)
     mail_template = sqs_message['action'].get(specified_template, default_template)
     if not os.path.isabs(mail_template):
         mail_template = '%s.j2' % mail_template

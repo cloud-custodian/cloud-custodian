@@ -179,13 +179,21 @@ class Filter(object):
         return list(filter(self, resources))
 
 
-class Or(Filter):
+class BooleanGroupFilter(Filter):
 
     def __init__(self, data, registry, manager):
-        super(Or, self).__init__(data)
+        super(BooleanGroupFilter, self).__init__(data)
         self.registry = registry
         self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
+
+    def validate(self):
+        for f in self.filters:
+            f.validate()
+        return self
+
+
+class Or(BooleanGroupFilter):
 
     def process(self, resources, event=None):
         if self.manager:
@@ -209,13 +217,7 @@ class Or(Filter):
         return [resource_map[r_id] for r_id in results]
 
 
-class And(Filter):
-
-    def __init__(self, data, registry, manager):
-        super(And, self).__init__(data)
-        self.registry = registry
-        self.filters = registry.parse(list(self.data.values())[0], manager)
-        self.manager = manager
+class And(BooleanGroupFilter):
 
     def process(self, resources, events=None):
         if self.manager:
@@ -223,6 +225,8 @@ class And(Filter):
 
         for f in self.filters:
             resources = f.process(resources, events)
+            if not resources:
+                break
 
         if self.manager:
             sweeper.sweep(resources)
@@ -230,13 +234,7 @@ class And(Filter):
         return resources
 
 
-class Not(Filter):
-
-    def __init__(self, data, registry, manager):
-        super(Not, self).__init__(data)
-        self.registry = registry
-        self.filters = registry.parse(list(self.data.values())[0], manager)
-        self.manager = manager
+class Not(BooleanGroupFilter):
 
     def process(self, resources, event=None):
         if self.manager:
@@ -260,6 +258,8 @@ class Not(Filter):
 
         for f in self.filters:
             resources = f.process(resources, event)
+            if not resources:
+                break
 
         before = set(resource_map.keys())
         after = set([r[resource_type.id] for r in resources])
@@ -413,6 +413,11 @@ class ValueFilter(Filter):
                     if t.get('Key') == tk:
                         r = t.get('Value')
                         break
+            # GCP schema: 'labels': {'key': 'value'}
+            elif 'labels' in i:
+                r = i.get('labels', {}).get(tk, None)
+            # GCP has a secondary form of labels called tags
+            # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
                 r = i.get('tags', {}).get(tk, None)

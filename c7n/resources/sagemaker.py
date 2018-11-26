@@ -107,6 +107,55 @@ class SagemakerJob(QueryResourceManager):
             return list(filter(None, w.map(_augment, jobs)))
 
 
+@resources.register('sagemaker-transform-job')
+class SagemakerTransformJob(QueryResourceManager):
+
+    class resource_type(object):
+        type = 'None'
+        service = 'sagemaker'
+        enum_spec = ('list_transform_jobs', 'TransformJobSummaries', None)
+        detail_spec = (
+            'describe_transform_job', 'TransformJobName', 'TransformJobName', None)
+        id = 'TransformJobArn'
+        name = 'TransformJobName'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = 'TransformJobArn'
+
+    permissions = (
+        'sagemaker:ListTransformJobs', 'sagemaker:DescribeTransformJobs',
+        'sagemaker:ListTags')
+
+    def __init__(self, ctx, data):
+        super(SagemakerTransformJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerTransformJob, self).resources(query=query)
+
+    def augment(self, jobs):
+        client = local_session(self.session_factory).client('sagemaker')
+
+        def _augment(j):
+            tags = self.retry(client.list_tags,
+                ResourceArn=j['TransformJobArn'])['Tags']
+            j['Tags'] = tags
+            return j
+
+        jobs = super(SagemakerTransformJob, self).augment(jobs)
+        for j in jobs:
+            _augment(j)
+        return jobs
+
+
 class QueryFilter(object):
 
     JOB_FILTERS = ('StatusEquals', 'NameContains',)
@@ -118,11 +167,11 @@ class QueryFilter(object):
         for d in data:
             if not isinstance(d, dict):
                 raise PolicyValidationError(
-                    "Training-Job Query Filter Invalid structure %s" % d)
+                    "Job Query Filter Invalid structure %s" % d)
             for k, v in d.items():
                 if isinstance(v, list):
                     raise ValueError(
-                        'Training-job query filter invalid structure %s' % v)
+                        'Job query filter invalid structure %s' % v)
             query = cls(d).validate().query()
             if query['Name'] in names:
                 # Cannot filter multiple times on the same key
@@ -145,18 +194,18 @@ class QueryFilter(object):
     def validate(self):
         if not len(list(self.data.keys())) == 1:
             raise PolicyValidationError(
-                "Training-Job Query Filter Invalid %s" % self.data)
+                "Job Query Filter Invalid %s" % self.data)
         self.key = list(self.data.keys())[0]
         self.value = list(self.data.values())[0]
 
         if self.key not in self.JOB_FILTERS and not self.key.startswith('tag:'):
             raise PolicyValidationError(
-                "Training-Job Query Filter invalid filter name %s" % (
+                "Job Query Filter invalid filter name %s" % (
                     self.data))
 
         if self.value is None:
             raise PolicyValidationError(
-                "Training-Job Query Filters must have a value, use tag-key"
+                "Job Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)
         return self
@@ -293,6 +342,7 @@ class StateTransitionFilter(object):
 @SagemakerEndpointConfig.action_registry.register('tag')
 @NotebookInstance.action_registry.register('tag')
 @SagemakerJob.action_registry.register('tag')
+@SagemakerTransformJob.action_registry.register('tag')
 @Model.action_registry.register('tag')
 class TagNotebookInstance(Tag):
     """Action to create tag(s) on a SageMaker resource
@@ -356,6 +406,7 @@ class TagNotebookInstance(Tag):
 @SagemakerEndpointConfig.action_registry.register('remove-tag')
 @NotebookInstance.action_registry.register('remove-tag')
 @SagemakerJob.action_registry.register('remove-tag')
+@SagemakerTransformJob.action_registry.register('remove-tag')
 @Model.action_registry.register('remove-tag')
 class RemoveTagNotebookInstance(RemoveTag):
     """Remove tag(s) from SageMaker resources
@@ -693,5 +744,34 @@ class SagemakerEndpointConfigDelete(BaseAction):
             try:
                 client.delete_endpoint_config(
                     EndpointConfigName=e['EndpointConfigName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerTransformJob.action_registry.register('stop')
+class SagemakerTransformJobStop(BaseAction):
+    """Stops a SageMaker Transform job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-ml-job
+            resource: sagemaker-transform-job
+            filters:
+              - TransformJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopTransformJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_transform_job(TransformJobName=j['TransformJobName'])
             except client.exceptions.ResourceNotFound:
                 pass

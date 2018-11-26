@@ -1123,7 +1123,7 @@ class UserDelete(BaseAction):
         - name: iam-only-whitelisted-users
           resource: iam-user
           filters:
-            - type: username
+            - type: value
               key: UserName
               op: not-in
               value:
@@ -1136,7 +1136,7 @@ class UserDelete(BaseAction):
         - name: iam-only-whitelisted-users
           resource: iam-user
           filters:
-            - type: username
+            - type: value
               key: Arn
               op: not-in
               value:
