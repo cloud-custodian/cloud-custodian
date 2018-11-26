@@ -139,30 +139,29 @@ class KeyVaultKey(ArmResourceManager):
         for ritem in resources:
 
             vault_url = 'https://' + ritem["name"] + "." + RESOURCE_KEYVAULT_BASEURL
-            try:
-                vkeys = self.keyvault_client.get_keys(vault_url)
-            except KeyVaultErrorException as e:
-                print(dir(e))
-                print(e.message)
-                #self.log.error(e.message + ' on keyvault: ' + ritem["id"])
-                import pdb
-                pdb.set_trace()
-                #for vkey in vkeys:
-                #    keyname = KeyVaultId.parse_key_id(vkey.kid).name
-                #    keyname = vkey.kid.split("/")[-1:]
-                #    keyname = keyname[0]
 
-                #    r.append({'kid': vkey.kid,
-                #              'keyname': keyname,
-                #              'keyvault': {'id': ritem["id"],
-                #                           'name': ritem["name"],
-                #                           'location': ritem["location"],
-                #                           'tags': ritem["tags"]},
-                #              'enabled': vkey.attributes.enabled,
-                #              'created': vkey.attributes.created,
-                #              'updated': vkey.attributes.updated,
-                #              'tags': vkey.tags})
-                pass
+            vkeys = self.keyvault_client.get_keys(vault_url)
+
+            try:
+                for vkey in vkeys:
+                    keyname = KeyVaultId.parse_key_id(vkey.kid).name
+                    r.append({'kid': vkey.kid,
+                              'keyname': keyname,
+                              'keyvault': {'id': ritem["id"],
+                                           'name': ritem["name"],
+                                           'location': ritem["location"],
+                                           'tags': ritem["tags"]},
+                              'enabled': vkey.attributes.enabled,
+                              'created': vkey.attributes.created,
+                              'updated': vkey.attributes.updated,
+                              'tags': vkey.tags})
+            except KeyVaultErrorException as e:
+                if not e.response.status_code == 403:
+                    self.log.error(e.message + ' on keyvault: ' + ritem["id"])
+                    raise
+                else:
+                    self.log.error(e.message + ' on keyvault: ' + ritem["id"])
+                    pass
 
         return r
 
@@ -182,12 +181,12 @@ class KeyVaultCert(ArmResourceManager):
 
         for ritem in resources:
             vault_url = 'https://' + ritem["name"] + "." + RESOURCE_KEYVAULT_BASEURL
-            try:
-                vcerts = self.keyvault_client.get_certificates(vault_url)
-                for vcert in vcerts:
-                    certname = vcert.id.split("/")[-1:]
-                    certname = certname[0]
+            vcerts = self.keyvault_client.get_certificates(vault_url)
 
+            try:
+
+                for vcert in vcerts:
+                    certname = KeyVaultId.parse_certificate_id(vcert.id).name
                     r.append({'id': vcert.id,
                               'certificate_name': certname,
                               'keyvault': {'id': ritem["id"],
@@ -200,7 +199,11 @@ class KeyVaultCert(ArmResourceManager):
                               'tags': vcert.tags})
 
             except KeyVaultErrorException as e:
-                self.log.error(e.message + ' on keyvault: ' + ritem["id"])
-                pass
+                if not e.response.status_code == 403:
+                    self.log.error(e.message + ' on keyvault: ' + ritem["id"])
+                    raise
+                else:
+                    self.log.error(e.message + ' on keyvault: ' + ritem["id"])
+                    pass
 
         return r
