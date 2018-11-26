@@ -724,7 +724,7 @@ class RDSTest(BaseTest):
                         "type": "modify-db",
                         "update": [
                             {
-                                "keyword": 'DeletionProtection',
+                                "property": 'DeletionProtection',
                                 "value": False
                             }
                         ],

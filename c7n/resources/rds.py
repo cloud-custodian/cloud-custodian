@@ -1576,7 +1576,7 @@ class ModifyDb(BaseAction):
     using ModifyDbInstance.
 
     'Update' is an array with with key value pairs that should be set to
-    the keyword and value you wish to modify.
+    the property and value you wish to modify.
     'Immediate" determines whether the modification is applied immediately
     or not. If 'immediate' is not specified, default is false.
 
@@ -1593,9 +1593,9 @@ class ModifyDb(BaseAction):
                 actions:
                   - type: modify-db
                     update:
-                      - keyword: 'DeletionProtection'
+                      - property: 'DeletionProtection'
                         value: false
-                      - keyword: 'PubliclyAccessible'
+                      - property: 'PubliclyAccessible'
                         value: false
                     immediate: true
     """
@@ -1608,7 +1608,7 @@ class ModifyDb(BaseAction):
             'items': {
                 'type': 'object',
                 'properties': {
-                    'keyword': {'type': 'string', 'enum': [
+                    'property': {'type': 'string', 'enum': [
                         'AllocatedStorage',
                         'DBInstanceClass',
                         'DBSubnetGroupName',
@@ -1660,12 +1660,11 @@ class ModifyDb(BaseAction):
         param['ApplyImmediately'] = self.data.get('immediate', False)
 
         for x in self.data.get('update'):
-            param[x['keyword']] = x['value']
+            param[x['property']] = x['value']
 
         for r in resources:
             param['DBInstanceIdentifier'] = r['DBInstanceIdentifier']
             try:
                 c.modify_db_instance(**param)
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'DBInstanceNotFound':
-                    raise
+            except c.exceptions.DBInstanceNotFoundFault:
+                raise
