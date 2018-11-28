@@ -5,21 +5,16 @@ import hashlib
 import jmespath
 import json
 
-#Only needed during debug cycle
-import logging
-
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema, local_session, chunks
 
-#from c7n.resources.ecs import TaskDefinition, Service, Task
+from c7n.resources.ecs import TaskDefinition, Service, Task
 from c7n.resources.ec2 import EC2
 from c7n.resources.rds import RDS
 from c7n.resources.s3 import S3, get_region
 from c7n.resources.iam import User, UserAccessKey
 from c7n.version import version
-
-
 
 FindingTypes = {
     'Software and Configuration Checks': [
@@ -28,31 +23,31 @@ FindingTypes = {
         'AWS Security Best Practices',
         'AWS Security Best Practices/Network Reachability',
         'Industry and Regulatory Standards',
-            'Industry and Regulatory Standards/CIS Host Hardening Benchmarks',
-            'Industry and Regulatory Standards/CIS AWS Foundations Benchmark',
-            'Industry and Regulatory Standards/PCI-DSS Controls',
-            'Industry and Regulatory Standards/Cloud Security Alliance Controls',
-            'Industry and Regulatory Standards/ISO 90001 Controls',
-            'Industry and Regulatory Standards/ISO 27001 Controls',
-            'Industry and Regulatory Standards/ISO 27017 Controls',
-            'Industry and Regulatory Standards/ISO 27018 Controls',
-            'Industry and Regulatory Standards/SOC 1',
-            'Industry and Regulatory Standards/SOC 2',
-            'Industry and Regulatory Standards/HIPAA Controls (USA)',
-            'Industry and Regulatory Standards/NIST 800-53 Controls (USA)',
-            'Industry and Regulatory Standards/NIST CSF Controls (USA)',
-            'Industry and Regulatory Standards/IRAP Controls (Australia)',
-            'Industry and Regulatory Standards/K-ISMS Controls (Korea)',
-            'Industry and Regulatory Standards/MTCS Controls (Singapore)',
-            'Industry and Regulatory Standards/FISC Controls (Japan)',
-            'Industry and Regulatory Standards/My Number Act Controls (Japan)',
-            'Industry and Regulatory Standards/ENS Controls (Spain)',
-            'Industry and Regulatory Standards/Cyber Essentials Plus Controls (UK)',
-            'Industry and Regulatory Standards/G-Cloud Controls (UK)',
-            'Industry and Regulatory Standards/C5 Controls (Germany)',
-            'Industry and Regulatory Standards/IT-Grundschutz Controls (Germany)',
-            'Industry and Regulatory Standards/GDPR Controls (Europe)',
-            'Industry and Regulatory Standards/TISAX Controls (Europe)'
+        'Industry and Regulatory Standards/CIS Host Hardening Benchmarks',
+        'Industry and Regulatory Standards/CIS AWS Foundations Benchmark',
+        'Industry and Regulatory Standards/PCI-DSS Controls',
+        'Industry and Regulatory Standards/Cloud Security Alliance Controls',
+        'Industry and Regulatory Standards/ISO 90001 Controls',
+        'Industry and Regulatory Standards/ISO 27001 Controls',
+        'Industry and Regulatory Standards/ISO 27017 Controls',
+        'Industry and Regulatory Standards/ISO 27018 Controls',
+        'Industry and Regulatory Standards/SOC 1',
+        'Industry and Regulatory Standards/SOC 2',
+        'Industry and Regulatory Standards/HIPAA Controls (USA)',
+        'Industry and Regulatory Standards/NIST 800-53 Controls (USA)',
+        'Industry and Regulatory Standards/NIST CSF Controls (USA)',
+        'Industry and Regulatory Standards/IRAP Controls (Australia)',
+        'Industry and Regulatory Standards/K-ISMS Controls (Korea)',
+        'Industry and Regulatory Standards/MTCS Controls (Singapore)',
+        'Industry and Regulatory Standards/FISC Controls (Japan)',
+        'Industry and Regulatory Standards/My Number Act Controls (Japan)',
+        'Industry and Regulatory Standards/ENS Controls (Spain)',
+        'Industry and Regulatory Standards/Cyber Essentials Plus Controls (UK)',
+        'Industry and Regulatory Standards/G-Cloud Controls (UK)',
+        'Industry and Regulatory Standards/C5 Controls (Germany)',
+        'Industry and Regulatory Standards/IT-Grundschutz Controls (Germany)',
+        'Industry and Regulatory Standards/GDPR Controls (Europe)',
+        'Industry and Regulatory Standards/TISAX Controls (Europe)'
         ],
     'TTPs': [
         'Initial Access',
@@ -82,8 +77,6 @@ def build_vocabulary():
         for q in quals:
             vocab.append("{}/{}".format(ns, q))
     return vocab
-
-
 
 
 def filter_empty(d):
