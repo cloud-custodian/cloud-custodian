@@ -112,6 +112,8 @@ class PostFinding(BaseAction):
     FindingVersion = "2018-10-08"
     ProductName = "default"
 
+    permissions = ('securityhub:BatchImportFindings',)
+
     schema = type_schema(
         "post-finding",
         required=["types", "severity_normalized", "severity"],
