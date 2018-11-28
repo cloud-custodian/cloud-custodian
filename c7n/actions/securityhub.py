@@ -9,12 +9,15 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema, local_session, chunks
 
-from c7n.resources.ecs import TaskDefinition, Service, Task
 from c7n.resources.ec2 import EC2
+from c7n.resources.vpc import Vpc, SecurityGroup, Subnet
+from c7n.resources.ebs import EBS
 from c7n.resources.rds import RDS
 from c7n.resources.s3 import S3, get_region
-from c7n.resources.iam import User, UserAccessKey
+from c7n.resources.iam import User, UserAccessKey, Role, InstanceProfile, Policy
+from c7n.resources.account import Account
 from c7n.version import version
+from c7n.resources.ami import AMI
 
 FindingTypes = {
     'Software and Configuration Checks': [
@@ -70,14 +73,12 @@ FindingTypes = {
         ]
 }
 
-
 def build_vocabulary():
     vocab = []
     for ns, quals in FindingTypes.items():
         for q in quals:
             vocab.append("{}/{}".format(ns, q))
     return vocab
-
 
 def filter_empty(d):
     for k, v in list(d.items()):
@@ -109,7 +110,9 @@ class PostFinding(BaseAction):
             'type': 'array',
             'items': {
                 'type': 'string', 'enum': build_vocabulary()}},
-        compliance_status = {'type': 'string', 'enum': ['PASSED','WARNING','FAILED', 'NOT_AVAILABLE'] }
+        compliance_status = {
+            'type': 'string', 
+            'enum': ['PASSED','WARNING','FAILED', 'NOT_AVAILABLE'] }
         )
 
     def process(self, resources, event=None):
@@ -227,8 +230,6 @@ class BucketFinding(PostFinding):
         }
         if 'DisplayName' in r['Acl']['Owner']:
             resource['Details']['AwsS3Bucket']['OwnerName'] = r['Acl']['Owner']['DisplayName']
-        #if 'c7n:MatchedFilters' in r:
-        #    resource['Details']['AwsS3Bucket']['c7n:MatchFilters'] = r['c7n:MatchedFilters']
 
         return filter_empty(resource)
 
@@ -242,15 +243,12 @@ class InstanceFinding(PostFinding):
             'ImageId': r['ImageId'],
             'IpV4Addresses': jmespath.search(
                 'NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress', r),
-            # ipv6 todo
             'KeyName': r.get('KeyName'),
             'VpcId': r['VpcId'],
             'SubnetId': r['SubnetId'],
-            # is this value always set?
             'LaunchedAt': r['LaunchTime'].isoformat(),
             }
-        #if 'c7n:MatchedFilters' in r:
-        #    details['c7n:MatchFilters'] = r['c7n:MatchedFilters']
+
         if 'IamInstanceProfile' in r:
             details['IamInstanceProfileArn'] = r['IamInstanceProfile']['Arn']
 
@@ -271,36 +269,151 @@ class InstanceFinding(PostFinding):
 
 
 @User.action_registry.register('post-finding')
-class AccessKeyFinding(PostFinding):
-
-    def validate(self):
-        """IAM User finding only considered valid w/ access key context"""
-        if not any(filter(
-                lambda x: isinstance(x, UserAccessKey),
-                self.manager.filters)):
-            raise PolicyValidationError(
-                "IAM User Access Key finding requires access key filter")
-        return self
+class UserFinding(PostFinding):
 
     def format_resource(self, r):
-        details = {
-            'UserName': 'arn:aws::{}:user/{}'.format(        
-                    self.manager.config.account_id,
-                    r['c7n:AccessKeys'][0]['UserName']),
-            
-            'Status': r['c7n:AccessKeys'][0]['Status'],
-            'CreatedAt': r['c7n:AccessKeys'][0]['CreateDate'].isoformat()
-            }
-        #if 'c7n:MatchedFilters' in r:
-        #    details['c7n:MatchFilters'] = r['c7n:MatchedFilters']
-
-        accesskey = {
-            'Type': 'AwsIamAccessKey',
-            'Id': r['c7n:AccessKeys'][0]['AccessKeyId'],
-            'Region': self.manager.config.region,
-            'Details': {'AwsIamAccessKey': filter_empty(details)}}
         
-        return filter_empty(accesskey)
+        if any(filter(
+                lambda x: isinstance(x, UserAccessKey),
+                self.manager.filters)):
+            details = {
+                'UserName': 'arn:aws::{}:user/{}'.format(        
+                        self.manager.config.account_id,
+                        r['c7n:AccessKeys'][0]['UserName']),
+                
+                'Status': r['c7n:AccessKeys'][0]['Status'],
+                'CreatedAt': r['c7n:AccessKeys'][0]['CreateDate'].isoformat()
+                }
+
+            accesskey = {
+                'Type': 'AwsIamAccessKey',
+                'Id': r['c7n:AccessKeys'][0]['AccessKeyId'],
+                'Region': self.manager.config.region,
+                'Details': {'AwsIamAccessKey': filter_empty(details)}}
+            
+            return filter_empty(accesskey)
+        else:
+            details = {
+                'CreateDate': r['CreateDate'].isoformat(),
+                'UserId': r['UserId']
+            }
+            if 'c7n:MatchedFilters' in r:
+                details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+            
+            user = {
+                'Type': 'Other',
+                'Id': r['Arn'],
+                'Region': self.manager.config.region,
+                'Details': {'Other': details}
+            }
+            tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+            if tags:
+                user['Tags'] = tags 
+            return user
+
+
+@Role.action_registry.register('post-finding')
+class RoleFinding(PostFinding):
+
+    def format_resource(self, r):
+        
+        details = {
+            'RoleName': r['RoleName'],
+            'RoleId': r['RoleId'],
+            'CreateDate': r['CreateDate'].isoformat()
+        }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        if 'Description' in r:  
+            details['Description'] = r['Description']
+            
+        role = {
+            'Type': 'Other',
+            'Id': r['Arn'],
+            'Region': self.manager.config.region,
+            'Details': {'Other': details}
+        }
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            role['Tags'] = tags 
+        return role
+   
+            
+@InstanceProfile.action_registry.register('post-finding')
+class InstanceProfileFinding(PostFinding):
+
+    def format_resource(self, r):
+
+        details = {
+            'InstanceProfileName': r['InstanceProfileName'],
+            'InstanceProfileId': r['InstanceProfileId'],
+            'CreateDate': r['CreateDate'].isoformat()
+        }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        if 'Description' in r:  
+            details['Description'] = r['Description']
+            
+        resource = {
+            'Type': 'Other',
+            'Id': r['Arn'],
+            'Region': self.manager.config.region,
+            'Details': {'Other': details}
+        }
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            resource['Tags'] = tags 
+        return resource
+      
+            
+@Policy.action_registry.register('post-finding')
+class PolicyFinding(PostFinding):
+
+    def format_resource(self, r):
+
+        details = {
+            'PolicyName': r['PolicyName'],
+            'PolicyId': r['PolicyId'],
+            'DefaultVersionId': r['DefaultVersionId'],
+            'CreateDate': r['CreateDate'].isoformat(),
+            'UpdateDate': r['UpdateDate'].isoformat()
+        }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        if 'Description' in r:  
+            details['Description'] = r['Description']
+            
+        resource = {
+            'Type': 'Other',
+            'Id': r['Arn'],
+            'Region': self.manager.config.region,
+            'Details': {'Other': details}
+        }
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            resource['Tags'] = tags 
+        return resource
+    
+            
+@Account.action_registry.register('post-finding')
+class AccountFinding(PostFinding):
+
+    def format_resource(self, r):
+
+        details = {
+            'account_name': r['account_name'],
+        }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+            
+        resource = {
+            'Type': 'Other',
+            'Id': r['account_id'],
+            'Region': self.manager.config.region,
+            'Details': {'Other': details}
+        }
+        return resource
+        
 
 class ContainerFinding(PostFinding):
 
@@ -335,3 +448,142 @@ class DbInstanceFinding(PostFinding):
         if tags:
             instance['Tags'] = tags 
         return instance
+
+
+@SecurityGroup.action_registry.register('post-finding')
+class SecurityGroupFinding(PostFinding):
+
+    def format_resource(self, r):
+        details = {
+            'VpcId': r['VpcId'],
+            'GroupName': r['GroupName'],            
+            'OwnerId': r['OwnerId']
+            }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        
+        sg = {
+            'Type': 'Other',
+            'Id': 'arn:aws:ec2:{}:{}:security-group/{}'.format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r['GroupId']),
+            'Region': self.manager.config.region,
+            'Details': {'Other': filter_empty(details)}
+        }
+        
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            sg['Tags'] = tags
+        return filter_empty(sg)
+       
+        
+@Vpc.action_registry.register('post-finding')
+class VpcFinding(PostFinding):
+
+    def format_resource(self, r):
+        details = {
+            'CidrBlock': r['CidrBlock'],
+            'DhpcOptionsId': r['DhcpOptionsId']
+            }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        
+        resource = {
+            'Type': 'Other',
+            'Id': 'arn:aws:ec2:{}:{}:vpc/{}'.format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r['VpcId']),
+            'Region': self.manager.config.region,
+            'Details': {'Other': filter_empty(details)}
+        }
+        
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            resource['Tags'] = tags
+        return filter_empty(resource)
+      
+        
+@Subnet.action_registry.register('post-finding')
+class SubnetFinding(PostFinding):
+
+    def format_resource(self, r):
+        details = {
+            'CidrBlock': r['CidrBlock'],
+            'AvailabilityZone': r['AvailabilityZone'],
+            'VpcId': r['VpcId'],
+            'MapPublicIpOnLaunch': str(r['MapPublicIpOnLaunch'])
+            }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        
+        resource = {
+            'Type': 'Other',
+            'Id': 'arn:aws:ec2:{}:{}:subnet/{}'.format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r['SubnetId']),
+            'Region': self.manager.config.region,
+            'Details': {'Other': filter_empty(details)}
+        }
+        
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            resource['Tags'] = tags
+        return filter_empty(resource)
+        
+        
+@EBS.action_registry.register('post-finding')
+class VolumeFinding(PostFinding):
+
+    def format_resource(self, r):
+        details = {
+            'Encrypted': str(r['Encrypted']),
+            'State': r['State'],
+            'CreateTime': r['CreateTime'].isoformat(),
+            'Size': str(r['Size'])
+            }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        if 'InstanceId' in r:
+            details['AttachedInstanceId'] = r['Attachments'][0]['InstanceId']
+        
+        resource = {
+            'Type': 'Other',
+            'Id':  'arn:aws:ec2:{}:{}:volume/{}'.format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r['VolumeId']),
+            'Region': self.manager.config.region,
+            'Details': {'Other': filter_empty(details)}
+        }
+        
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            resource['Tags'] = tags
+        return filter_empty(resource)
+
+
+@AMI.action_registry.register('post-finding')
+class AmiFinding(PostFinding):
+
+    def format_resource(self, r):
+        details = {
+            }
+        if 'c7n:MatchedFilters' in r:
+            details['c7n:MatchedFilters'] = json.dumps(r['c7n:MatchedFilters'])
+        
+        resource = {
+            'Type': 'Other',
+            'Id':  'arn:aws:ec2:{}:image/{}'.format(
+                self.manager.config.region,
+                r['ImageId']),
+            'Region': self.manager.config.region,
+            'Details': {'Other': filter_empty(details)}
+        }
+        
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            resource['Tags'] = tags
+        return filter_empty(resource)
