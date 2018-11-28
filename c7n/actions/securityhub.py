@@ -114,7 +114,7 @@ class PostFinding(BaseAction):
 
     schema = type_schema(
         "post-finding",
-        required=["types", "severity_normalized"],
+        required=["types", "severity_normalized", "severity"],
         severity={"type": "number"},
         severity_normalized={"type": "number", "min": 0, "max": 100},
         confidence={"type": "number", "min": 0, "max": 100},
@@ -134,7 +134,6 @@ class PostFinding(BaseAction):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client("securityhub")
-
         for resource_set in chunks(resources, 10):
             finding = self.get_finding(resource_set)
             client.batch_import_findings(Findings=[finding])
@@ -174,9 +173,9 @@ class PostFinding(BaseAction):
         }
 
         severity = {}
-        if self.data.get("severity"):
+        if self.data.get("severity") is not None:
             severity["Product"] = self.data["severity"]
-        if self.data.get("severity_normalized"):
+        if self.data.get("severity_normalized") is not None:
             severity["Normalized"] = self.data["severity_normalized"]
         if severity:
             finding["Severity"] = severity
@@ -268,8 +267,7 @@ class InstanceFinding(PostFinding):
             "Id": "arn:aws:{}:{}:instance/{}".format(
                 self.manager.config.region,
                 self.manager.config.account_id,
-                r["InstanceId"],
-            ),
+                r["InstanceId"]),
             "Region": self.manager.config.region,
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
             "Details": {"AwsEc2Instance": details},
@@ -281,6 +279,7 @@ class InstanceFinding(PostFinding):
 
 @User.action_registry.register("post-finding")
 class UserFinding(PostFinding):
+
     def format_resource(self, r):
 
         if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.filters)):
