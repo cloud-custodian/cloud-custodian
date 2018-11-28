@@ -20,5 +20,3 @@ from .metric import PutMetric
 from .network import ModifyVpcSecurityGroupsAction
 from .notify import BaseNotify, Notify
 from .policy import RemovePolicyBase, ModifyPolicyBase
-
-import securityhub
