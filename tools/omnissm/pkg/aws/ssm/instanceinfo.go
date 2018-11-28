@@ -18,14 +18,16 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
+	"github.com/aws/amazon-ssm-agent/agent/appconfig"
 	"github.com/pkg/errors"
 )
 
-const (
+var (
 	// The default path for Agent Registration State on Linux.
-	DefaultLinuxSSMRegistrationPath = "/var/lib/amazon/ssm/registration"
+	DefaultSSMRegistrationPath = filepath.Join(appconfig.DefaultDataStorePath, "registration")
 )
 
 func ReadRegistrationFile(path string) (id string, err error) {
