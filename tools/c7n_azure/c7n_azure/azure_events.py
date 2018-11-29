@@ -145,8 +145,9 @@ class AzureEvents(object):
 
 class AzureEventSubscription(object):
 
-    @classmethod
-    def create(cls, destination, name, session=None, event_filter=None):
+    @staticmethod
+    def create(destination, name, session=None, event_filter=None):
+
         s = session or local_session(Session)
         event_filter = event_filter or EventSubscriptionFilter()
 

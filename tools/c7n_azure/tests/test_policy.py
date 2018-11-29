@@ -17,6 +17,12 @@ from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
+from mock import mock
+
+
+# Mock of Azure StorageAccount class
+class MockStorageAccount(object):
+    id = 1
 
 
 class AzurePolicyModeTest(BaseTest):
@@ -132,7 +138,6 @@ class AzurePolicyModeTest(BaseTest):
         self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
 
     def test_init_azure_function_mode_with_resource_ids(self):
-
         ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
                 '/testrg/providers/microsoft.insights/components/testai'
         sp_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
@@ -207,3 +212,54 @@ class AzurePolicyModeTest(BaseTest):
         }
         event_mode = AzureEventGridMode(p)
         self.assertFalse(event_mode._is_subscribed_to_event(event, subscribed_events))
+
+    def test_event_grid_mode_creates_advanced_filtered_subscription(self):
+        p = self.load_policy({
+            'name': 'test-azure-event',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
+        })
+
+        with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
+            storage_account = MockStorageAccount()
+            event_mode = AzureEventGridMode(p)
+            event_mode._create_event_subscription(storage_account, 'some_queue', None)
+
+            name, args, kwargs = mock_create.mock_calls[0]
+
+            # verify the advanced filter created
+            event_filter = args[3].advanced_filters[0]
+            self.assertEqual(event_filter.key, 'Data.OperationName')
+            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
+            self.assertEqual(event_filter.operator_type, 'StringIn')
+
+    def test_event_grid_mode_creates_advanced_filtered_subscription_with_multiple_events(self):
+        p = self.load_policy({
+            'name': 'test-azure-event',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events':
+                     ['VmWrite',
+                        {
+                            'resourceProvider': 'Microsoft.Resources/subscriptions/resourceGroups',
+                            'event': 'write'
+                        }]},
+        })
+
+        with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
+            storage_account = MockStorageAccount()
+            event_mode = AzureEventGridMode(p)
+            event_mode._create_event_subscription(storage_account, 'some_queue', None)
+
+            name, args, kwargs = mock_create.mock_calls[0]
+
+            # verify the advanced filter created
+            event_filter = args[3].advanced_filters[0]
+            self.assertEqual(event_filter.key, 'Data.OperationName')
+            self.assertEqual(event_filter.values,
+                             ['Microsoft.Compute/virtualMachines/write',
+                              'Microsoft.Resources/subscriptions/resourceGroups/write'])
+            self.assertEqual(event_filter.operator_type, 'StringIn')
