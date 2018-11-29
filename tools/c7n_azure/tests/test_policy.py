@@ -13,15 +13,14 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from collections import namedtuple
-
 from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 from c7n_azure.session import Session
-from c7n_azure.storage_utils import StorageUtilities
-from mock import patch, mock
+from mock import mock
+
+from c7n.utils import local_session
 
 
 class AzurePolicyModeTest(BaseTest):
@@ -221,20 +220,19 @@ class AzurePolicyModeTest(BaseTest):
                  'events': ['VmWrite']},
         })
 
-        Account = namedtuple('mockStorage', ['id'])
-        account = Account(id=1)
+        with mock.patch(self._get_storage_account_namespace()) as storage_account:
+            storage_account.id = 1
+            with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
+                event_mode = AzureEventGridMode(p)
+                event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-        with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
-            event_mode = AzureEventGridMode(p)
-            event_mode._create_event_subscription(account, 'some_queue', None)
+                name, args, kwargs = mock_create.mock_calls[0]
 
-            name, args, kwargs = mock_create.mock_calls[0]
-
-            # verify the advanced filter created
-            event_filter = args[3].advanced_filters[0]
-            self.assertEqual(event_filter.key, 'Data.OperationName')
-            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
-            self.assertEqual(event_filter.operator_type, 'StringIn')
+                # verify the advanced filter created
+                event_filter = args[3].advanced_filters[0]
+                self.assertEqual(event_filter.key, 'Data.OperationName')
+                self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
+                self.assertEqual(event_filter.operator_type, 'StringIn')
 
     def test_event_grid_mode_creates_advanced_filtered_subscription_with_multiple_events(self):
         p = self.load_policy({
@@ -249,18 +247,25 @@ class AzurePolicyModeTest(BaseTest):
                             }]},
         })
 
-        Account = namedtuple('mockStorage', ['id'])
-        account = Account(id=1)
+        print(self._get_storage_account_namespace())
 
-        with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
-            event_mode = AzureEventGridMode(p)
-            event_mode._create_event_subscription(account, 'some_queue', None)
+        with mock.patch(self._get_storage_account_namespace()) as storage_account:
+            storage_account.id = 1
+            with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
+                event_mode = AzureEventGridMode(p)
+                event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-            name, args, kwargs = mock_create.mock_calls[0]
+                name, args, kwargs = mock_create.mock_calls[0]
 
-            # verify the advanced filter created
-            event_filter = args[3].advanced_filters[0]
-            self.assertEqual(event_filter.key, 'Data.OperationName')
-            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write',
-                                                   'Microsoft.Resources/subscriptions/resourceGroups/write'])
-            self.assertEqual(event_filter.operator_type, 'StringIn')
+                # verify the advanced filter created
+                event_filter = args[3].advanced_filters[0]
+                self.assertEqual(event_filter.key, 'Data.OperationName')
+                self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write',
+                                                       'Microsoft.Resources/subscriptions/resourceGroups/write'])
+                self.assertEqual(event_filter.operator_type, 'StringIn')
+
+    @staticmethod
+    def _get_storage_account_namespace():
+        client = local_session(Session) \
+            .client('azure.mgmt.storage.StorageManagementClient')
+        return 'azure.mgmt.storage.v' + client.DEFAULT_API_VERSION.replace('-', '_') + '.models.StorageAccount'
