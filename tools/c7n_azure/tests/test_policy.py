@@ -23,6 +23,11 @@ from mock import mock
 from c7n.utils import local_session
 
 
+# Mock of Azure StorageAccount class
+class MockStorageAccount(object):
+    id = 1
+
+
 class AzurePolicyModeTest(BaseTest):
     def setUp(self):
         super(AzurePolicyModeTest, self).setUp()
@@ -220,19 +225,18 @@ class AzurePolicyModeTest(BaseTest):
                  'events': ['VmWrite']},
         })
 
-        with mock.patch(self._get_storage_account_namespace()) as storage_account:
-            storage_account.id = 1
-            with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
-                event_mode = AzureEventGridMode(p)
-                event_mode._create_event_subscription(storage_account, 'some_queue', None)
+        with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
+            storage_account = MockStorageAccount()
+            event_mode = AzureEventGridMode(p)
+            event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-                name, args, kwargs = mock_create.mock_calls[0]
+            name, args, kwargs = mock_create.mock_calls[0]
 
-                # verify the advanced filter created
-                event_filter = args[3].advanced_filters[0]
-                self.assertEqual(event_filter.key, 'Data.OperationName')
-                self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
-                self.assertEqual(event_filter.operator_type, 'StringIn')
+            # verify the advanced filter created
+            event_filter = args[3].advanced_filters[0]
+            self.assertEqual(event_filter.key, 'Data.OperationName')
+            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
+            self.assertEqual(event_filter.operator_type, 'StringIn')
 
     def test_event_grid_mode_creates_advanced_filtered_subscription_with_multiple_events(self):
         p = self.load_policy({
@@ -247,25 +251,16 @@ class AzurePolicyModeTest(BaseTest):
                             }]},
         })
 
-        print(self._get_storage_account_namespace())
+        with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
+            storage_account = MockStorageAccount()
+            event_mode = AzureEventGridMode(p)
+            event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
-        with mock.patch(self._get_storage_account_namespace()) as storage_account:
-            storage_account.id = 1
-            with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
-                event_mode = AzureEventGridMode(p)
-                event_mode._create_event_subscription(storage_account, 'some_queue', None)
+            name, args, kwargs = mock_create.mock_calls[0]
 
-                name, args, kwargs = mock_create.mock_calls[0]
-
-                # verify the advanced filter created
-                event_filter = args[3].advanced_filters[0]
-                self.assertEqual(event_filter.key, 'Data.OperationName')
-                self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write',
-                                                       'Microsoft.Resources/subscriptions/resourceGroups/write'])
-                self.assertEqual(event_filter.operator_type, 'StringIn')
-
-    @staticmethod
-    def _get_storage_account_namespace():
-        client = local_session(Session) \
-            .client('azure.mgmt.storage.StorageManagementClient')
-        return 'azure.mgmt.storage.v' + client.DEFAULT_API_VERSION.replace('-', '_') + '.models.StorageAccount'
+            # verify the advanced filter created
+            event_filter = args[3].advanced_filters[0]
+            self.assertEqual(event_filter.key, 'Data.OperationName')
+            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write',
+                                                   'Microsoft.Resources/subscriptions/resourceGroups/write'])
+            self.assertEqual(event_filter.operator_type, 'StringIn')
