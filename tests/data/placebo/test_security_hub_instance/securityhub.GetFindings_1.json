@@ -23,7 +23,7 @@
                 "GeneratorId": "ec2-finding",
                 "AwsAccountId": "644160558196",
                 "Types": [
-                    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+                    "Software and Configuration Checks/AWS Security Best Practices"
                 ],
                 "CreatedAt": "2018-11-28T23:26:17.728987+00:00",
                 "UpdatedAt": "2018-11-28T23:26:17.728987+00:00",

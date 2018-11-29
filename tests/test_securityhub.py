@@ -86,7 +86,7 @@ class SecurityHubTest(BaseTest):
                         "severity": 10,
                         "severity_normalized": 10,
                         "types": [
-                            "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+                            "Software and Configuration Checks/AWS Security Best Practices"
                         ],
                     }
                 ],
