@@ -3,9 +3,16 @@
 Authentication
 ==============
 
-The plugin supports three distinct authentication types, including Azure CLI integration, service principal,
-and raw tokens.
+The plugin supports four distinct authentication types, including Azure CLI integration, service principal,
+MSI, and raw tokens.
 
+
+Azure CLI
+---------
+
+If none of the below environment variables are set, Custodian will attempt to pull credentials and the default
+subscription from Azure CLI.  This requires that you have run :code:`az login` and selected your subscription in
+Azure CLI first.
 
 Service Principal
 -----------------
@@ -77,3 +84,23 @@ For fake test authentication environment variables should be configured as shown
     AZURE_SUBSCRIPTION_ID=ea42f556-5106-4743-99b0-c129bfa71a47
 
 You will also find this configuration in tox.ini.
+
+Managed Service Identity
+------------------------
+
+Learn about MSI in the
+`Azure Documentation <https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview>`_.
+
+If `AZURE_USE_MSI` is set to any value, Custodian will attempt to use MSI.
+
+If `AZURE_CLIENT_ID` is not set, Custodian will use the System Identity.
+
+If `AZURE_CLIENT_ID` is set, Custodian will use the User Identity which matches the client id.
+
+You must set `AZURE_SUBSCRIPTION_ID` as with the other authentication types.
+
+.. code-block:: bash
+
+    AZURE_USE_MSI=1
+    AZURE_SUBSCRIPTION_ID=subscriptionId
+    AZURE_CLIENT_ID=clientId
