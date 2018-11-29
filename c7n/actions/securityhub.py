@@ -116,9 +116,9 @@ class PostFinding(BaseAction):
 
     schema = type_schema(
         "post-finding",
-        required=["types", "severity_normalized", "severity"],
-        severity={"type": "number"},
-        severity_normalized={"type": "number", "min": 0, "max": 100},
+        required=["types"],
+        severity={"type": "number", 'default': 0},
+        severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
         recommendation={"type": "string"},
@@ -174,7 +174,7 @@ class PostFinding(BaseAction):
             "RecordState": "ACTIVE",
         }
 
-        severity = {}
+        severity = {'Product': 0, 'Normalized': 0}
         if self.data.get("severity") is not None:
             severity["Product"] = self.data["severity"]
         if self.data.get("severity_normalized") is not None:
@@ -229,17 +229,17 @@ class PostFinding(BaseAction):
 @S3.action_registry.register("post-finding")
 class BucketFinding(PostFinding):
     def format_resource(self, r):
+        owner = r.get("Acl", {}).get("Owner", {})
         resource = {
             "Type": "AwsS3Bucket",
             "Id": "arn:aws:::{}".format(r["Name"]),
             "Region": get_region(r),
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
-            "Details": {"AwsS3Bucket": {"OwnerId": r["Acl"]["Owner"]["ID"]}},
+            "Details": {"AwsS3Bucket": {"OwnerId": owner.get('ID', 'Unknown')}}
         }
-        if "DisplayName" in r["Acl"]["Owner"]:
-            resource["Details"]["AwsS3Bucket"]["OwnerName"] = r["Acl"]["Owner"][
-                "DisplayName"
-            ]
+
+        if "DisplayName" in owner:
+            resource["Details"]["AwsS3Bucket"]["OwnerName"] = owner['DisplayName']
 
         return filter_empty(resource)
 
