@@ -22,13 +22,7 @@ from .core import BaseAction
 from c7n.utils import type_schema, local_session, chunks
 
 from c7n.resources.ec2 import EC2
-from c7n.resources.vpc import Vpc, SecurityGroup, Subnet
-from c7n.resources.ebs import EBS
-from c7n.resources.rds import RDS
 from c7n.resources.s3 import S3, get_region
-from c7n.resources.iam import User, UserAccessKey, Role, InstanceProfile, Policy
-from c7n.resources.account import Account
-from c7n.resources.ami import AMI
 from c7n.version import version
 
 
