@@ -23,8 +23,8 @@ setup(
         'console_scripts': [
             'custodian = c7n.cli:main']},
     install_requires=[
-        "boto3>=1.9.47",
-        "botocore>=1.12.47",
+        "boto3>=1.9.54",
+        "botocore>=1.12.54",
         "pyyaml",
         "jsonschema",
         "jsonpatch>=1.21",
