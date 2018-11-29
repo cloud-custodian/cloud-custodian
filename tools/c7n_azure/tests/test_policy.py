@@ -17,10 +17,7 @@ from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
-from c7n_azure.session import Session
 from mock import mock
-
-from c7n.utils import local_session
 
 
 # Mock of Azure StorageAccount class
@@ -244,11 +241,12 @@ class AzurePolicyModeTest(BaseTest):
             'resource': 'azure.vm',
             'mode':
                 {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite',
-                            {
-                                'resourceProvider': 'Microsoft.Resources/subscriptions/resourceGroups',
-                                'event': 'write'
-                            }]},
+                 'events':
+                     ['VmWrite',
+                        {
+                            'resourceProvider': 'Microsoft.Resources/subscriptions/resourceGroups',
+                            'event': 'write'
+                        }]},
         })
 
         with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
@@ -261,6 +259,7 @@ class AzurePolicyModeTest(BaseTest):
             # verify the advanced filter created
             event_filter = args[3].advanced_filters[0]
             self.assertEqual(event_filter.key, 'Data.OperationName')
-            self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write',
-                                                   'Microsoft.Resources/subscriptions/resourceGroups/write'])
+            self.assertEqual(event_filter.values,
+                             ['Microsoft.Compute/virtualMachines/write',
+                              'Microsoft.Resources/subscriptions/resourceGroups/write'])
             self.assertEqual(event_filter.operator_type, 'StringIn')
