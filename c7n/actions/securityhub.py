@@ -23,6 +23,7 @@ from c7n.utils import type_schema, local_session, chunks
 
 from c7n.resources.ec2 import EC2
 from c7n.resources.s3 import S3, get_region
+from c7n.resources.iam import User, UserAccessKey
 from c7n.version import version
 
 
@@ -271,3 +272,37 @@ class InstanceFinding(PostFinding):
 
         instance = filter_empty(instance)
         return instance
+
+
+@User.action_registry.register("post-finding")
+class UserFinding(PostFinding):
+    def format_resource(self, r):
+        if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.filters)):
+            details = {
+                "UserName": "arn:aws::{}:user/{}".format(
+                    self.manager.config.account_id, r["c7n:AccessKeys"][0]["UserName"]
+                ),
+                "Status": r["c7n:AccessKeys"][0]["Status"],
+                "CreatedAt": r["c7n:AccessKeys"][0]["CreateDate"].isoformat(),
+            }
+            accesskey = {
+                "Type": "AwsIamAccessKey",
+                "Id": r["c7n:AccessKeys"][0]["AccessKeyId"],
+                "Region": self.manager.config.region,
+                "Details": {"AwsIamAccessKey": filter_empty(details)},
+            }
+            return filter_empty(accesskey)
+        else:
+            details = {"CreateDate": r["CreateDate"].isoformat(), "UserId": r["UserId"]}
+            if "c7n:MatchedFilters" in r:
+                details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
+            user = {
+                "Type": "Other",
+                "Id": r["Arn"],
+                "Region": self.manager.config.region,
+                "Details": {"Other": details},
+            }
+            tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
+            if tags:
+                user["Tags"] = tags
+            return user
