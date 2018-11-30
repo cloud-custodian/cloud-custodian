@@ -13,16 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from azure.mgmt.storage.models import StorageAccount
 from azure_common import BaseTest
 from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 from mock import mock
-
-
-# Mock of Azure StorageAccount class
-class MockStorageAccount(object):
-    id = 1
 
 
 class AzurePolicyModeTest(BaseTest):
@@ -223,7 +219,7 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
-            storage_account = MockStorageAccount()
+            storage_account = StorageAccount(id=1, location='westus')
             event_mode = AzureEventGridMode(p)
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
@@ -250,7 +246,7 @@ class AzurePolicyModeTest(BaseTest):
         })
 
         with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
-            storage_account = MockStorageAccount()
+            storage_account = StorageAccount(id=1, location='westus')
             event_mode = AzureEventGridMode(p)
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
