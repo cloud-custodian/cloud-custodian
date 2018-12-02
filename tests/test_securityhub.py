@@ -131,10 +131,9 @@ class SecurityHubTest(BaseTest):
             },
         )
 
-
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")
-        #factory = self.record_flight_data("test_security_hub_iam_user")
+        # factory = self.record_flight_data("test_security_hub_iam_user")
 
         policy = self.load_policy(
             {
@@ -174,14 +173,14 @@ class SecurityHubTest(BaseTest):
         self.assertEqual(
             findings[0]["Resources"][0],
             {
-                        "Region": "us-east-1", 
-                        "Type": "Other", 
-                        "Id": "arn:aws:iam::101010101111:user/developer", 
-                        "Details": {
-                            "Other": {
-                                "CreateDate": "2016-09-10T15:45:42+00:00", 
-                                "UserId": "AIDAJYFPV7WUG3EV7MIIO"
-                            }
-                        }
+                "Region": "us-east-1",
+                "Type": "Other",
+                "Id": "arn:aws:iam::101010101111:user/developer",
+                "Details": {
+                    "Other": {
+                        "CreateDate": "2016-09-10T15:45:42+00:00",
+                        "UserId": "AIDAJYFPV7WUG3EV7MIIO"
                     }
+                }
+            }
         )
