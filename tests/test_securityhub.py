@@ -227,14 +227,14 @@ class SecurityHubTest(BaseTest):
         self.assertEqual(
             findings[0]["Resources"][0],
             {
-                "Region": "us-east-1", 
-                "Type": "Other", 
-                "Id": "arn:aws:iam::101010101111:role/app1", 
+                "Region": "us-east-1",
+                "Type": "Other",
+                "Id": "arn:aws:iam::101010101111:role/app1",
                 "Details": {
                     "Other": {
-                        "RoleName": "app1", 
-                        "CreateDate": "2017-11-18T22:29:22+00:00", 
-                        "c7n:MatchFilters": "[\"tag:CostCenter\", \"tag:Project\"]", 
+                        "RoleName": "app1",
+                        "CreateDate": "2017-11-18T22:29:22+00:00",
+                        "c7n:MatchedFilters": "[\"tag:CostCenter\", \"tag:Project\"]",
                         "RoleId": "AROAIV5QVPWUHSYPBTURM"
                     }
                 }
