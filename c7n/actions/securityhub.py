@@ -23,7 +23,7 @@ from c7n.utils import type_schema, local_session, chunks
 
 from c7n.resources.ec2 import EC2
 from c7n.resources.s3 import S3, get_region
-from c7n.resources.iam import User, UserAccessKey, Role
+from c7n.resources.iam import User, UserAccessKey, Role, InstanceProfile
 from c7n.version import version
 
 
@@ -330,3 +330,27 @@ class RoleFinding(PostFinding):
         if tags:
             role["Tags"] = tags
         return role
+
+
+@InstanceProfile.action_registry.register("post-finding")
+class InstanceProfileFinding(PostFinding):
+    def format_resource(self, r):
+        details = {
+            "InstanceProfileName": r["InstanceProfileName"],
+            "InstanceProfileId": r["InstanceProfileId"],
+            "CreateDate": r["CreateDate"].isoformat(),
+        }
+        if "c7n:MatchedFilters" in r:
+            details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
+        if "Description" in r:
+            details["Description"] = r["Description"]
+        resource = {
+            "Type": "Other",
+            "Id": r["Arn"],
+            "Region": self.manager.config.region,
+            "Details": {"Other": details},
+        }
+        tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
+        if tags:
+            resource["Tags"] = tags
+        return resource
