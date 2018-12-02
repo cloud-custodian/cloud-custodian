@@ -240,3 +240,59 @@ class SecurityHubTest(BaseTest):
                 }
             }
         )
+        
+    def test_iam_profile(self):
+        factory = self.replay_flight_data("test_security_hub_iam_profile")
+        # factory = self.record_flight_data("test_security_hub_iam_profile")
+
+        policy = self.load_policy(
+            {
+                "name": "iam-profile-finding",
+                "resource": "iam-profile",
+                "filters": [{"type": "value", "key": "InstanceProfileName", "value": "CloudCustodian"}],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "ResourceId": [
+                    {
+                        "Value": "arn:aws:iam::101010101111:instance-profile/CloudCustodian",
+                        "Comparison": "EQUALS",
+                    }
+                ]
+            }
+        ).get("Findings")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(
+            findings[0]["Resources"][0],
+      {
+                        "Region": "us-east-1", 
+                        "Type": "Other", 
+                        "Id": "arn:aws:iam::101010101111:instance-profile/CloudCustodian", 
+                        "Details": {
+                            "Other": {
+                                "InstanceProfileId": "AIPAJO63EBUVI2SO6IJFI", 
+                                "CreateDate": "2018-08-19T22:32:30+00:00", 
+                                "InstanceProfileName": "CloudCustodian", 
+                                "c7n:MatchedFilters": "[\"InstanceProfileName\"]"
+                            }
+                        }
+                    }
+        )
