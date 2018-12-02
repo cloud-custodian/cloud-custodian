@@ -22,6 +22,7 @@ requires = [
     "Jinja2",
     "boto3",
     "jsonschema",
+    "python-dateutil>=2.6",
     "ruamel.yaml==0.15.42",
     "datadog",
     "slackclient",

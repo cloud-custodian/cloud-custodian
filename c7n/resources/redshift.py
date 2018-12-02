@@ -850,7 +850,7 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
     schema = type_schema('revoke-access')
 
     def validate(self):
-        for f in self.manager.filters:
+        for f in self.manager.iter_filters():
             if isinstance(f, RedshiftSnapshotCrossAccount):
                 return self
         raise PolicyValidationError(

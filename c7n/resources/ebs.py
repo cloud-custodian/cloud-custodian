@@ -775,11 +775,6 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DeleteTags')
 
     def validate(self):
-        key = self.data.get('key')
-        if not key:
-            raise ValueError(
-                "action:encrypt-instance-volume "
-                "requires kms keyid/alias specified")
         self.verbose = self.data.get('verbose', False)
         return self
 
