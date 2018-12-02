@@ -24,6 +24,7 @@ from c7n.utils import type_schema, local_session, chunks
 from c7n.resources.ec2 import EC2
 from c7n.resources.s3 import S3, get_region
 from c7n.resources.iam import User, UserAccessKey, Role, InstanceProfile, Policy
+from c7n.resources.account import Account
 from c7n.version import version
 
 
@@ -379,4 +380,19 @@ class PolicyFinding(PostFinding):
         tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
         if tags:
             resource["Tags"] = tags
+        return resource
+
+
+@Account.action_registry.register("post-finding")
+class AccountFinding(PostFinding):
+    def format_resource(self, r):
+        details = {"account_name": r["account_name"]}
+        if "c7n:MatchedFilters" in r:
+            details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
+        resource = {
+            "Type": "Other",
+            "Id": r["account_id"],
+            "Region": self.manager.config.region,
+            "Details": {"Other": details},
+        }
         return resource
