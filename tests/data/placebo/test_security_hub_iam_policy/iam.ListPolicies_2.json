@@ -1,0 +1,3021 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Marker": "AA+9tRHwWl7ush4lte9oDomieRBY1SmPe5jFAEG9hIFg4e8Eeb8jvM8VOrqo7K1QHWweGhGZIn0QT7LDrHzOL0O3nsbnutSAHFmm69nfOkjuWw==", 
+        "IsTruncated": true, 
+        "Policies": [
+            {
+                "PolicyName": "AWSStorageGatewayReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIFKCTUVOPD5NICXJK", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSStorageGatewayReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }
+            }, 
+            {
+                "PolicyName": "Billing", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 10, 
+                    "minute": 33
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIFTHXT6FFMIRT7ZEA", 
+                "DefaultVersionId": "v2", 
+                "Path": "/job-function/", 
+                "Arn": "arn:aws:iam::aws:policy/job-function/Billing", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 6, 
+                    "minute": 46
+                }
+            }, 
+            {
+                "PolicyName": "QuickSightAccessForS3StorageManagementAnalyticsReadOnly", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 38, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 12, 
+                    "minute": 18
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIFWG3L3WDMR4I7ZJW", 
+                "DefaultVersionId": "v3", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/QuickSightAccessForS3StorageManagementAnalyticsReadOnly", 
+                "UpdateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 21, 
+                    "minute": 2
+                }
+            }, 
+            {
+                "PolicyName": "AmazonEC2ContainerRegistryReadOnly", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 21, 
+                    "minute": 4
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIFYZPA37OOHVIH7KQ", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 11, 
+                    "minute": 8
+                }
+            }, 
+            {
+                "PolicyName": "AWSRoboMakerFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 28
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIG7WQVUX3AGSKGBAO", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSRoboMakerFullAccess", 
+                "UpdateDate": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 28
+                }
+            }, 
+            {
+                "PolicyName": "AmazonElasticMapReduceforEC2Role", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIGALS5RCDLZLB3PGS", 
+                "DefaultVersionId": "v3", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforEC2Role", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 57
+                }
+            }, 
+            {
+                "PolicyName": "DatabaseAdministrator", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 10, 
+                    "minute": 25
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIGBMAW4VUQKOQNVT6", 
+                "DefaultVersionId": "v1", 
+                "Path": "/job-function/", 
+                "Arn": "arn:aws:iam::aws:policy/job-function/DatabaseAdministrator", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 10, 
+                    "minute": 25
+                }
+            }, 
+            {
+                "PolicyName": "AmazonRedshiftReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIGD46KSON64QBSEZM", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonRedshiftReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "AmazonEC2ReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIGDT4SV4GSETWTBZK", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "CloudWatchAgentServerPolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 6
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIGOPKN7KRDAKTLG4I", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy", 
+                "UpdateDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 6
+                }
+            }, 
+            {
+                "PolicyName": "AWSXrayReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 1, 
+                    "minute": 27
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIH4OFXWPS6ZX6OPGQ", 
+                "DefaultVersionId": "v3", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSXrayReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 20, 
+                    "minute": 6
+                }
+            }, 
+            {
+                "PolicyName": "AWSElasticBeanstalkEnhancedHealth", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 8, 
+                    "minute": 17
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIH5EFJNMOGUUTKLFE", 
+                "DefaultVersionId": "v4", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 12
+                }
+            }, 
+            {
+                "PolicyName": "WellArchitectedConsoleFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 29, 
+                    "minute": 19
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIH6HSBHM3VSYC5SKA", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/WellArchitectedConsoleFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 29, 
+                    "minute": 19
+                }
+            }, 
+            {
+                "PolicyName": "AmazonElasticMapReduceReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIHP6NH2S6GYFCOINC", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonElasticMapReduceReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 19, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 22, 
+                    "minute": 0
+                }
+            }, 
+            {
+                "PolicyName": "AWSDirectoryServiceReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIHWYO6WSDNCG64M2W", 
+                "DefaultVersionId": "v4", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSDirectoryServiceReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 25, 
+                    "minute": 54
+                }
+            }, 
+            {
+                "PolicyName": "AWSSSOMasterAccountAdministrator", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 27, 
+                    "minute": 36
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIHXAQZIS3GOYIETUC", 
+                "DefaultVersionId": "v3", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSSSOMasterAccountAdministrator", 
+                "UpdateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 17, 
+                    "minute": 41
+                }
+            }, 
+            {
+                "PolicyName": "AmazonGuardDutyServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 12
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIHZREZOWNSSA6FWQO", 
+                "DefaultVersionId": "v1", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AmazonGuardDutyServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 12
+                }
+            }, 
+            {
+                "PolicyName": "AmazonVPCReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 17, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIICZJNOJN36GTG6CM", 
+                "DefaultVersionId": "v6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonVPCReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 34
+                }
+            }, 
+            {
+                "PolicyName": "AWSElasticBeanstalkServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 13, 
+                    "minute": 46
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIID62QSI3OSIPQXTM", 
+                "DefaultVersionId": "v5", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSElasticBeanstalkServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 6
+                }
+            }, 
+            {
+                "PolicyName": "ServerMigrationServiceLaunchRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 53
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIIIAAMVUCBR2OLXZO", 
+                "DefaultVersionId": "v1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/ServerMigrationServiceLaunchRole", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 53
+                }
+            }, 
+            {
+                "PolicyName": "AWSCodeDeployRoleForECS", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 27, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIIL3KXEKRGEN2HFIO", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS", 
+                "UpdateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 27, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "CloudWatchEventsReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 14, 
+                    "minute": 27
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIILJPXXA6F7GYLYBS", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/CloudWatchEventsReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 25
+                }
+            }, 
+            {
+                "PolicyName": "AWSLambdaReplicator", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 23, 
+                    "minute": 53
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIIQFXZNNLL3E2HKTG", 
+                "DefaultVersionId": "v3", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSLambdaReplicator", 
+                "UpdateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 8, 
+                    "minute": 17
+                }
+            }, 
+            {
+                "PolicyName": "AmazonAPIGatewayInvokeFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 36
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIIWAX2NOOQJ4AIEQ6", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 12, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 36
+                }
+            }, 
+            {
+                "PolicyName": "AWSSSOServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 36
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIJ52KSWOD4GI54XP2", 
+                "DefaultVersionId": "v4", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 29, 
+                    "minute": 17
+                }
+            }, 
+            {
+                "PolicyName": "AWSLicenseManagerMasterAccountRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 3
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIJE2NOZW2BDEHYUH2", 
+                "DefaultVersionId": "v1", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSLicenseManagerMasterAccountRolePolicy", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 3
+                }
+            }, 
+            {
+                "PolicyName": "AmazonKinesisAnalyticsReadOnly", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 16
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIJIEXZAFUK43U7ARK", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonKinesisAnalyticsReadOnly", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 16
+                }
+            }, 
+            {
+                "PolicyName": "AmazonMobileAnalyticsFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIJIKLU2IJ7WJ6DZFG", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonMobileAnalyticsFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "AWSMobileHub_FullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 5, 
+                    "minute": 56
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIJLU43R6AGRBK76DM", 
+                "DefaultVersionId": "v13", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSMobileHub_FullAccess", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 5, 
+                    "minute": 44
+                }
+            }, 
+            {
+                "PolicyName": "AmazonAPIGatewayPushToCloudWatchLogs", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 11, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIK4GFO7HLKYN64ASK", 
+                "DefaultVersionId": "v1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 11, 
+                    "minute": 41
+                }
+            }, 
+            {
+                "PolicyName": "AWSDataPipelineRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIKCP6XS3ESGF4GLO2", 
+                "DefaultVersionId": "v6", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AWSDataPipelineRole", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 28, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 22, 
+                    "minute": 43
+                }
+            }, 
+            {
+                "PolicyName": "CloudWatchFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIKEABORKUXN6DEAZU", 
+                "DefaultVersionId": "v3", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/CloudWatchFullAccess", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 10
+                }
+            }, 
+            {
+                "PolicyName": "AWSDeepLensLambdaFunctionAccessPolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 47
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIKIEE4PRM54V4G3ZG", 
+                "DefaultVersionId": "v3", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSDeepLensLambdaFunctionAccessPolicy", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 2, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 29, 
+                    "minute": 8
+                }
+            }, 
+            {
+                "PolicyName": "AmazonGuardDutyFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 31
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIKUTKSN4KC63VDQUM", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonGuardDutyFullAccess", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 28, 
+                    "minute": 31
+                }
+            }, 
+            {
+                "PolicyName": "AmazonRDSDirectoryServiceAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 2
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIL4KBY57XWMYUHKUU", 
+                "DefaultVersionId": "v1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonRDSDirectoryServiceAccess", 
+                "UpdateDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 26, 
+                    "minute": 2
+                }
+            }, 
+            {
+                "PolicyName": "AWSCodePipelineReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 43
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILFKZXIBOTNC5TO2Q", 
+                "DefaultVersionId": "v6", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCodePipelineReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 2, 
+                    "minute": 25
+                }
+            }, 
+            {
+                "PolicyName": "ReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 48, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILL3HVNFSB6DCOWYQ", 
+                "DefaultVersionId": "v43", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/ReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 13, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 8, 
+                    "minute": 20
+                }
+            }, 
+            {
+                "PolicyName": "AWSAppSyncInvokeFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 20, 
+                    "minute": 21
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILMPWRRZN27MPE3VM", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSAppSyncInvokeFullAccess", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 20, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 20, 
+                    "minute": 21
+                }
+            }, 
+            {
+                "PolicyName": "AmazonMachineLearningBatchPredictionsAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 19, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 12
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILOI4HTQSFTF3GQSC", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonMachineLearningBatchPredictionsAccess", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 19, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 12
+                }
+            }, 
+            {
+                "PolicyName": "AlexaForBusinessFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 47
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILUT3JGG7WRIMVNH2", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AlexaForBusinessFullAccess", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 25, 
+                    "minute": 53
+                }
+            }, 
+            {
+                "PolicyName": "AWSEC2SpotFleetServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 23, 
+                    "minute": 13
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILWCVTZD57EMYWMBO", 
+                "DefaultVersionId": "v3", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSEC2SpotFleetServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 4
+                }
+            }, 
+            {
+                "PolicyName": "AmazonRekognitionReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 14, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 58
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILWSUHXUY4ES43SA4", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonRekognitionReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 28
+                }
+            }, 
+            {
+                "PolicyName": "AWSCodeDeployReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 19, 
+                    "minute": 21
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAILZHHKCKB4NE7XOIQ", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCodeDeployReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 19, 
+                    "minute": 21
+                }
+            }, 
+            {
+                "PolicyName": "CloudSearchFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIM6OOWKQ7L7VBOZOC", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/CloudSearchFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }
+            }, 
+            {
+                "PolicyName": "AWSLicenseManagerServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 2
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIM7JPETWHTYNBQSZE", 
+                "DefaultVersionId": "v1", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSLicenseManagerServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 2
+                }
+            }, 
+            {
+                "PolicyName": "AWSCloudHSMFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIMBQYQZM7F63DA2UU", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCloudHSMFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }
+            }, 
+            {
+                "PolicyName": "AmazonEC2SpotFleetAutoscaleRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 19, 
+                    "minute": 27
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIMFFRMIOBGDP2TAVE", 
+                "DefaultVersionId": "v2", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetAutoscaleRole", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 24
+                }
+            }, 
+            {
+                "PolicyName": "AWSElasticLoadBalancingServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 4, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 19
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIMHWGGSRHLOQUICJQ", 
+                "DefaultVersionId": "v2", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSElasticLoadBalancingServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 14, 
+                    "minute": 18
+                }
+            }, 
+            {
+                "PolicyName": "AWSCodeBuildDeveloperAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 1, 
+                    "minute": 2
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIMKTMR34XSBQW45HS", 
+                "DefaultVersionId": "v4", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 15, 
+                    "minute": 32
+                }
+            }, 
+            {
+                "PolicyName": "ElastiCacheServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 4, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 50
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIML5LIBUZBVCSF7PI", 
+                "DefaultVersionId": "v1", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/ElastiCacheServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 4, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 50
+                }
+            }, 
+            {
+                "PolicyName": "AWSGlueServiceNotebookRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 37
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIMRC6VZUHJYCTKWFI", 
+                "DefaultVersionId": "v2", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 8
+                }
+            }, 
+            {
+                "PolicyName": "AmazonEC2SpotFleetRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 18, 
+                    "minute": 28
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIMRTKHWK7ESSNETSW", 
+                "DefaultVersionId": "v4", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 10, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 7, 
+                    "minute": 14
+                }
+            }, 
+            {
+                "PolicyName": "AWSDataPipeline_PowerUser", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 16
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIMXGLVY6DVR24VTYS", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSDataPipeline_PowerUser", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 17, 
+                    "minute": 49
+                }
+            }, 
+            {
+                "PolicyName": "AWSCodeStarServiceRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 20
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIN6D4M2KD3NBOC4M4", 
+                "DefaultVersionId": "v8", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AWSCodeStarServiceRole", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 4, 
+                    "minute": 28
+                }
+            }, 
+            {
+                "PolicyName": "AmazonTranscribeFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 4, 
+                    "minute": 6
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAINAV45F5NT5RMFO7K", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonTranscribeFullAccess", 
+                "UpdateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 16, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 4, 
+                    "minute": 6
+                }
+            }, 
+            {
+                "PolicyName": "AWSDirectoryServiceFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAINAW5ANUWTH3R4ANI", 
+                "DefaultVersionId": "v3", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSDirectoryServiceFullAccess", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 25, 
+                    "minute": 53
+                }
+            }, 
+            {
+                "PolicyName": "AmazonFreeRTOSOTAUpdate", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 27, 
+                    "minute": 43
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAINC2TXHAYDOK3SWMU", 
+                "DefaultVersionId": "v1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonFreeRTOSOTAUpdate", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 27, 
+                    "minute": 43
+                }
+            }, 
+            {
+                "PolicyName": "AmazonDynamoDBFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 11, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAINUGF2JSOSUY76KYA", 
+                "DefaultVersionId": "v8", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 6, 
+                    "minute": 17
+                }
+            }, 
+            {
+                "PolicyName": "AmazonSESReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAINV2XPFRMWJJNSCGI", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonSESReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 3, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }
+            }, 
+            {
+                "PolicyName": "AmazonRedshiftQueryEditor", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 4, 
+                    "minute": 50
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAINVFHHP7CWVHTGBGM", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonRedshiftQueryEditor", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 4, 
+                    "minute": 50
+                }
+            }, 
+            {
+                "PolicyName": "AWSWAFReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 43
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAINZVDMX2SBF7EU2OC", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSWAFReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 54, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 7, 
+                    "minute": 30
+                }
+            }, 
+            {
+                "PolicyName": "AutoScalingNotificationAccessRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIO2VMUPGDC5PZVXVA", 
+                "DefaultVersionId": "v1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }
+            }, 
+            {
+                "PolicyName": "AmazonMechanicalTurkReadOnly", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 28, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 11, 
+                    "minute": 8
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIO5IY3G3WXSX5PPRM", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonMechanicalTurkReadOnly", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 27, 
+                    "minute": 45
+                }
+            }, 
+            {
+                "PolicyName": "AmazonKinesisReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIOCMTDT5RLKZ2CAJO", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonKinesisReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "AWSXRayDaemonWriteAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 0
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIOE47HSUE5AVBNEDM", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 0
+                }
+            }, 
+            {
+                "PolicyName": "AWSCloudMapReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 45
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIOHISHKLCJTVQQL5E", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCloudMapReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 45
+                }
+            }, 
+            {
+                "PolicyName": "AWSCloudFrontLogger", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 12, 
+                    "minute": 15
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIOI7RPKLCNINBTRP4", 
+                "DefaultVersionId": "v1", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSCloudFrontLogger", 
+                "UpdateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 12, 
+                    "minute": 15
+                }
+            }, 
+            {
+                "PolicyName": "AWSCodeDeployFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 19, 
+                    "minute": 13
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIONKN3TJZUKXCHXWC", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCodeDeployFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 19, 
+                    "minute": 13
+                }
+            }, 
+            {
+                "PolicyName": "AWSRoboMakerServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 19, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 33
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIOSFFLBBLCTKS3ATC", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSRoboMakerServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 5, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 19, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 26, 
+                    "minute": 33
+                }
+            }, 
+            {
+                "PolicyName": "CloudWatchActionsEC2Access", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 7, 
+                    "minute": 0
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIOWD4E3FVSORSZTGU", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/CloudWatchActionsEC2Access", 
+                "UpdateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 33, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 7, 
+                    "minute": 0
+                }
+            }, 
+            {
+                "PolicyName": "AWSLambdaDynamoDBExecutionRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 9
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIP7WNAGMIPYNW4WQG", 
+                "DefaultVersionId": "v1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole", 
+                "UpdateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 29, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 9
+                }
+            }, 
+            {
+                "PolicyName": "AmazonRoute53DomainsFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPAFBMIYUILMOKL6G", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonRoute53DomainsFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "AmazonElastiCacheReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPDACSNQHSENWAKM2", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonElastiCacheReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "AmazonRDSServiceRolePolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 46, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 8, 
+                    "minute": 17
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPEU5ZOBJWKWHUIBA", 
+                "DefaultVersionId": "v4", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AmazonRDSServiceRolePolicy", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 19, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "AmazonAthenaFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 30, 
+                    "minute": 46
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPJMLMD4C7RYZ6XCK", 
+                "DefaultVersionId": "v4", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonAthenaFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 32, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 21, 
+                    "minute": 47
+                }
+            }, 
+            {
+                "PolicyName": "AmazonMechanicalTurkCrowdFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 7
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPM7C67S54NPAHQ4Q", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonMechanicalTurkCrowdFullAccess", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 53, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 8
+                }
+            }, 
+            {
+                "PolicyName": "AmazonElasticFileSystemReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 25, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 27, 
+                    "minute": 25
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPN5S4NE5JJOKVC4Y", 
+                "DefaultVersionId": "v3", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonElasticFileSystemReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 10, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 49, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 9
+                }
+            }, 
+            {
+                "PolicyName": "AWSCloudMapDiscoverInstanceAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 29, 
+                    "minute": 2
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPRD7PYYQVYPDME4K", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCloudMapDiscoverInstanceAccess", 
+                "UpdateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 29, 
+                    "minute": 2
+                }
+            }, 
+            {
+                "PolicyName": "CloudFrontFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPRV52SH6HDCCFY6U", 
+                "DefaultVersionId": "v3", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/CloudFrontFullAccess", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 57, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 21, 
+                    "minute": 3
+                }
+            }, 
+            {
+                "PolicyName": "AmazonConnectFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 17, 
+                    "minute": 59
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIPZZCFFD55NYGBAJI", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonConnectFullAccess", 
+                "UpdateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 1, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 17, 
+                    "minute": 28
+                }
+            }, 
+            {
+                "PolicyName": "AWSCloud9Administrator", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 28, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 17
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQ4KWP455WDTCBGWK", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCloud9Administrator", 
+                "UpdateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 28, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 30, 
+                    "minute": 17
+                }
+            }, 
+            {
+                "PolicyName": "AmazonMachineLearningRoleforRedshiftDataSource", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 5
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQ5UDYYMNN42BM4AK", 
+                "DefaultVersionId": "v1", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonMachineLearningRoleforRedshiftDataSource", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 26, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 9, 
+                    "minute": 5
+                }
+            }, 
+            {
+                "PolicyName": "AWSApplicationAutoscalingEMRInstanceGroupPolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 57
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQ6M5Z7LQY2YSG2JS", 
+                "DefaultVersionId": "v1", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSApplicationAutoscalingEMRInstanceGroupPolicy", 
+                "UpdateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 39, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 26, 
+                    "minute": 57
+                }
+            }, 
+            {
+                "PolicyName": "AmazonTextractFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 7
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQDD47A7H3GBVPWOQ", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonTextractFullAccess", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 7
+                }
+            }, 
+            {
+                "PolicyName": "AWSOrganizationsServiceTrustPolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 23, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 7, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 10, 
+                    "minute": 4
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQH6ROMVVECFVRJPK", 
+                "DefaultVersionId": "v2", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSOrganizationsServiceTrustPolicy", 
+                "UpdateDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 18, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 1, 
+                    "minute": 1
+                }
+            }, 
+            {
+                "PolicyName": "AmazonMobileAnalyticsNon-financialReportAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQLKQ4RXPUBBVVRDE", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonMobileAnalyticsNon-financialReportAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 36, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }
+            }, 
+            {
+                "PolicyName": "AWSCloudTrailFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 58, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQNUJTQYDRJPC3BNK", 
+                "DefaultVersionId": "v5", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCloudTrailFullAccess", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 27, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 11, 
+                    "minute": 51
+                }
+            }, 
+            {
+                "PolicyName": "AmazonCognitoDeveloperAuthenticatedIdentities", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 24, 
+                    "minute": 22
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQOKZ5BGKLCMTXH4W", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonCognitoDeveloperAuthenticatedIdentities", 
+                "UpdateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 24, 
+                    "minute": 22
+                }
+            }, 
+            {
+                "PolicyName": "AWSConfigRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 4, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 2, 
+                    "minute": 36
+                }, 
+                "AttachmentCount": 2, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQRXRDRGJUA33ELIO", 
+                "DefaultVersionId": "v19", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AWSConfigRole", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 25, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 7, 
+                    "minute": 20
+                }
+            }, 
+            {
+                "PolicyName": "AWSSSOMemberAccountAdministrator", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 27, 
+                    "minute": 45
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIQYHEY7KJWXZFNDPY", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSSSOMemberAccountAdministrator", 
+                "UpdateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 17, 
+                    "minute": 35
+                }
+            }, 
+            {
+                "PolicyName": "AWSApplicationAutoscalingAppStreamFleetPolicy", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 4
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIRI724OWKP56ZG62M", 
+                "DefaultVersionId": "v1", 
+                "Path": "/aws-service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/aws-service-role/AWSApplicationAutoscalingAppStreamFleetPolicy", 
+                "UpdateDate": {
+                    "hour": 19, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 6, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 20, 
+                    "minute": 4
+                }
+            }, 
+            {
+                "PolicyName": "AWSCertificateManagerPrivateCAFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 23, 
+                    "minute": 54
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIRTQUC55CREAWFLBG", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCertificateManagerPrivateCAFullAccess", 
+                "UpdateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 23, 
+                    "minute": 54
+                }
+            }, 
+            {
+                "PolicyName": "AWSGlueServiceRole", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 13, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 21, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 37
+                }, 
+                "AttachmentCount": 1, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAIRUJCPEBPMEZFAS32", 
+                "DefaultVersionId": "v4", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 9, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 25, 
+                    "minute": 23
+                }
+            }, 
+            {
+                "PolicyName": "AmazonAppStreamServiceAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 4, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 19, 
+                    "minute": 17
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAISBRZ7LMMCBYEF3SE", 
+                "DefaultVersionId": "v4", 
+                "Path": "/service-role/", 
+                "Arn": "arn:aws:iam::aws:policy/service-role/AmazonAppStreamServiceAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 51, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 13, 
+                    "minute": 19
+                }
+            }, 
+            {
+                "PolicyName": "AmazonRedshiftFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 50, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 40
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAISEKCHH4YDB46B5ZO", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonRedshiftFullAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 9, 
+                    "second": 44, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 27
+                }
+            }, 
+            {
+                "PolicyName": "AmazonZocaloReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAISRCSSJNS3QPKZJPM", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonZocaloReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 14, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 41
+                }
+            }, 
+            {
+                "PolicyName": "AWSCloudHSMReadOnlyAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAISVCBSY7YDBOT67KE", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AWSCloudHSMReadOnlyAccess", 
+                "UpdateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 52, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 6, 
+                    "minute": 39
+                }
+            }, 
+            {
+                "PolicyName": "ComprehendFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 18, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 43, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 29, 
+                    "minute": 8
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAITBM2PMWNG2P7RZEQ", 
+                "DefaultVersionId": "v2", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/ComprehendFullAccess", 
+                "UpdateDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 36
+                }
+            }, 
+            {
+                "PolicyName": "AmazonFSxConsoleFullAccess", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 36
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAITDDJ23Y5UZ2WCZRQ", 
+                "DefaultVersionId": "v1", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::aws:policy/AmazonFSxConsoleFullAccess", 
+                "UpdateDate": {
+                    "hour": 16, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 28, 
+                    "minute": 36
+                }
+            }, 
+            {
+                "PolicyName": "SystemAdministrator", 
+                "PermissionsBoundaryUsageCount": 0, 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 56, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 10, 
+                    "minute": 23
+                }, 
+                "AttachmentCount": 0, 
+                "IsAttachable": true, 
+                "PolicyId": "ANPAITJPEZXCYCBXANDSW", 
+                "DefaultVersionId": "v4", 
+                "Path": "/job-function/", 
+                "Arn": "arn:aws:iam::aws:policy/job-function/SystemAdministrator", 
+                "UpdateDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 45, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 8, 
+                    "minute": 33
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2968268d-f678-11e8-8700-7f377c0f7a24", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2968268d-f678-11e8-8700-7f377c0f7a24", 
+                "content-type": "text/xml", 
+                "content-length": "57033", 
+                "vary": "Accept-Encoding", 
+                "date": "Sun, 02 Dec 2018 21:20:57 GMT"
+            }
+        }
+    }
+}

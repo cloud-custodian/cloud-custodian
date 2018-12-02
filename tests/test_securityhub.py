@@ -249,7 +249,11 @@ class SecurityHubTest(BaseTest):
             {
                 "name": "iam-profile-finding",
                 "resource": "iam-profile",
-                "filters": [{"type": "value", "key": "InstanceProfileName", "value": "CloudCustodian"}],
+                "filters": [ {
+                    "type": "value", 
+                    "key": "InstanceProfileName", 
+                    "value": "CloudCustodian"
+                } ],
                 "actions": [
                     {
                         "type": "post-finding",
@@ -292,6 +296,71 @@ class SecurityHubTest(BaseTest):
                         "CreateDate": "2018-08-19T22:32:30+00:00",
                         "InstanceProfileName": "CloudCustodian",
                         "c7n:MatchedFilters": "[\"InstanceProfileName\"]"
+                    }
+                }
+            }
+        )
+
+    def test_iam_profile(self):
+        factory = self.replay_flight_data("test_security_hub_iam_policy")
+        # factory = self.record_flight_data("test_security_hub_iam_policy")
+
+        policy = self.load_policy(
+            {
+                "name": "iam-policy-finding",
+                "resource": "iam-policy",
+                "filters": [ 
+                    {"type": "used", "state": True},
+                    {
+                        "type": "value", 
+                        "key": "PolicyName", 
+                        "value": "app1"
+                    } 
+                ],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "ResourceId": [
+                    {
+                        "Value": "arn:aws:iam::101010101111:policy/app1",
+                        "Comparison": "EQUALS",
+                    }
+                ]
+            }
+        ).get("Findings")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(
+            findings[0]["Resources"][0],
+            {
+                "Region": "us-east-1",
+                "Type": "Other",
+                "Id": "arn:aws:iam::101010101111:policy/app1",
+                "Details": {
+                    "Other": {
+                        "PolicyName": "app1",
+                        "CreateDate": "2017-11-18T22:44:16+00:00",
+                        "c7n:MatchedFilters": "[\"PolicyName\"]",
+                        "UpdateDate": "2017-11-18T22:44:16+00:00",
+                        "DefaultVersionId": "v1",
+                        "PolicyId": "ANPAIRAZGXEEMQKBCSDSG"
                     }
                 }
             }
