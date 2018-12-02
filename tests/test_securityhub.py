@@ -282,17 +282,17 @@ class SecurityHubTest(BaseTest):
         self.assertEqual(len(findings), 1)
         self.assertEqual(
             findings[0]["Resources"][0],
-      {
-                        "Region": "us-east-1", 
-                        "Type": "Other", 
-                        "Id": "arn:aws:iam::101010101111:instance-profile/CloudCustodian", 
-                        "Details": {
-                            "Other": {
-                                "InstanceProfileId": "AIPAJO63EBUVI2SO6IJFI", 
-                                "CreateDate": "2018-08-19T22:32:30+00:00", 
-                                "InstanceProfileName": "CloudCustodian", 
-                                "c7n:MatchedFilters": "[\"InstanceProfileName\"]"
-                            }
-                        }
+            {
+                "Region": "us-east-1",
+                "Type": "Other",
+                "Id": "arn:aws:iam::101010101111:instance-profile/CloudCustodian",
+                "Details": {
+                    "Other": {
+                        "InstanceProfileId": "AIPAJO63EBUVI2SO6IJFI",
+                        "CreateDate": "2018-08-19T22:32:30+00:00",
+                        "InstanceProfileName": "CloudCustodian",
+                        "c7n:MatchedFilters": "[\"InstanceProfileName\"]"
                     }
+                }
+            }
         )
