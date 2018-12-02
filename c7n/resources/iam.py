@@ -1058,7 +1058,6 @@ class UserAccessKey(ValueFilter):
                 chunks(augment_set, 50)))
 
         matched = []
-        block_op = self.get_block_operator()
         for r in resources:
             k_matched = []
             for k in r[self.annotation_key]:
