@@ -130,3 +130,58 @@ class SecurityHubTest(BaseTest):
                 "Type": "AwsEc2Instance",
             },
         )
+
+
+    def test_iam_user(self):
+        factory = self.replay_flight_data("test_security_hub_iam_user")
+        #factory = self.record_flight_data("test_security_hub_iam_user")
+
+        policy = self.load_policy(
+            {
+                "name": "iam-user-finding",
+                "resource": "iam-user",
+                "filters": [],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "ResourceId": [
+                    {
+                        "Value": "arn:aws:iam::101010101111:user/developer",
+                        "Comparison": "EQUALS",
+                    }
+                ]
+            }
+        ).get("Findings")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(
+            findings[0]["Resources"][0],
+            {
+                        "Region": "us-east-1", 
+                        "Type": "Other", 
+                        "Id": "arn:aws:iam::101010101111:user/developer", 
+                        "Details": {
+                            "Other": {
+                                "CreateDate": "2016-09-10T15:45:42+00:00", 
+                                "UserId": "AIDAJYFPV7WUG3EV7MIIO"
+                            }
+                        }
+                    }
+        )
