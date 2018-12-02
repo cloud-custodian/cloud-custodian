@@ -1116,7 +1116,7 @@ class SetS3PublicBlock(BaseAction):
         BlockPublicPolicy={'type': 'boolean'},
         RestrictPublicBuckets={'type': 'boolean'})
 
-    permissions = ('s3:PutAccountPublicAccessBlock', 's33:GetAccountPublicAccessBlock')
+    permissions = ('s3:PutAccountPublicAccessBlock', 's3:GetAccountPublicAccessBlock')
 
     def validate(self):
         config = self.data.copy()

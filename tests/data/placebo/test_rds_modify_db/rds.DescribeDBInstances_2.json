@@ -1,0 +1,48 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DBInstances": [
+            {
+                "PubliclyAccessible": true, 
+                "MasterUsername": "testtest", 
+                "MonitoringInterval": 0, 
+                "LicenseModel": "general-public-license", 
+                "ReadReplicaDBInstanceIdentifiers": [], 
+                "AllocatedStorage": 20, 
+                "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:testtest", 
+                "BackupRetentionPeriod": 7, 
+                "PreferredMaintenanceWindow": "tue:06:10-tue:06:40", 
+                "Endpoint": {
+                    "HostedZoneId": "Z2R2ITUGPM61AM", 
+                    "Port": 3306, 
+                    "Address": "testtest.cz6wy8cci3uf.us-east-1.rds.amazonaws.com"
+                }, 
+                "DBInstanceStatus": "available", 
+                "IAMDatabaseAuthenticationEnabled": false, 
+                "EngineVersion": "5.6.40", 
+                "DeletionProtection": false, 
+                "AvailabilityZone": "us-east-1b", 
+                "DomainMemberships": [], 
+                "StorageType": "gp2", 
+                "DbiResourceId": "db-CD4OCGJ4TUL66B5JXYY7UTQLH4", 
+                "CACertificateIdentifier": "rds-ca-2015", 
+                "StorageEncrypted": false, 
+                "DBInstanceClass": "db.t2.medium", 
+                "DbInstancePort": 0, 
+                "DBInstanceIdentifier": "testtest"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "270bfdd7-597f-4cf7-adae-438956062d7b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "270bfdd7-597f-4cf7-adae-438956062d7b", 
+                "content-type": "text/xml", 
+                "content-length": "4586", 
+                "vary": "Accept-Encoding", 
+                "date": "Tue, 20 Nov 2018 00:36:44 GMT"
+            }
+        }
+    }
+}

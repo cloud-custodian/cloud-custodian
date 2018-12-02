@@ -18,7 +18,7 @@ import sys
 
 import six
 from azure.mgmt.eventgrid.models import \
-    StorageQueueEventSubscriptionDestination
+    StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
 
 from c7n import utils
 from c7n.actions import EventAction
@@ -336,8 +336,14 @@ class AzureEventGridMode(AzureFunctionMode):
         destination = StorageQueueEventSubscriptionDestination(resource_id=storage_account.id,
                                                                queue_name=queue_name)
 
+        # filter specific events
+        subscribed_events = AzureEvents.get_event_operations(
+            self.policy.data['mode'].get('events'))
+        advance_filter = StringInAdvancedFilter(key='Data.OperationName', values=subscribed_events)
+        event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
+
         try:
-            AzureEventSubscription.create(destination, queue_name, session)
+            AzureEventSubscription.create(destination, queue_name, session, event_filter)
             self.log.info('Event grid subscription creation succeeded')
         except Exception as e:
             self.log.error('Event Subscription creation failed with error: %s' % e)

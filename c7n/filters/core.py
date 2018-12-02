@@ -178,6 +178,18 @@ class Filter(object):
         """ Bulk process resources and return filtered set."""
         return list(filter(self, resources))
 
+    def get_block_operator(self):
+        block_stack = ['and']
+        for f in self.manager.iter_filters(block_end=True):
+            if f is None:
+                block_stack.pop()
+                continue
+            if f.type in ('and', 'or', 'not'):
+                block_stack.append(f.type)
+            if f == self:
+                break
+        return block_stack[-1]
+
 
 class BooleanGroupFilter(Filter):
 
