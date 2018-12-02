@@ -492,3 +492,17 @@ class Delete(BaseAction):
                     continue
                 raise
         self.log.debug("Deleted %d functions", len(functions))
+
+
+@resources.register('lambda-layer')
+class LambdaLayer(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'lambda'
+        type = 'function'
+        enum_spec = ('list_layers', 'Layers', None)
+        name = id = 'LayerName'
+        filter_name = None
+        date = 'LatestMatchingVersion.CreatedDate'
+        dimension = None
+        config_type = None
