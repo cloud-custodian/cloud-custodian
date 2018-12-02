@@ -307,6 +307,7 @@ class UserFinding(PostFinding):
                 user["Tags"] = tags
             return user
 
+
 @Role.action_registry.register("post-finding")
 class RoleFinding(PostFinding):
     def format_resource(self, r):
