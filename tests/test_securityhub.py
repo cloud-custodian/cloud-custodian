@@ -311,7 +311,7 @@ class SecurityHubTest(BaseTest):
                 "resource": "iam-policy",
                 "filters": [ 
                     {
-                        "type": "used" git 
+                        "type": "used" 
                     },
                     {
                         "type": "value", 
@@ -417,6 +417,73 @@ class SecurityHubTest(BaseTest):
                     "Other": {
                         "account_name": "filiatra-primary"
                     }
+                }
+            }
+        )
+
+    def test_rds(self):
+        factory = self.replay_flight_data("test_security_hub_rds")
+        # factory = self.record_flight_data("test_security_hub_rds")
+
+        policy = self.load_policy(
+            {
+                "name": "rds-finding",
+                "resource": "rds",
+                "filters": [ 
+                ],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "ResourceId": [
+                    {
+                        "Value": "arn:aws:rds:us-east-1:101010101111:db:testme",
+                        "Comparison": "EQUALS",
+                    }
+                ]
+            }
+        ).get("Findings")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(
+            findings[0]["Resources"][0],
+            {
+                "Details": {
+                    "Other": {
+                        "Engine": "mariadb",
+                        "VpcId": "vpc-d6fe6cb1",
+                        "PubliclyAccessible": "False",
+                        "DBName": "testme",
+                        "AvailabilityZone": "us-east-1a",
+                        "InstanceCreateTime": "2018-11-05T03:25:12.384000+00:00",
+                        "StorageEncrypted": "False",
+                        "AllocatedStorage": "20",
+                        "EngineVersion": "10.3.8",
+                        "DBInstanceClass": "db.t2.micro",
+                        "DBSubnetGroupName": "default"
+                    }
+                },
+                "Region": "us-east-1",
+                "Type": "Other",
+                "Id": "arn:aws:rds:us-east-1:101010101111:db:testme",
+                "Tags": {
+                    "workload-type": "other"
                 }
             }
         )

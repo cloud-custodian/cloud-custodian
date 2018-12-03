@@ -25,6 +25,7 @@ from c7n.resources.ec2 import EC2
 from c7n.resources.s3 import S3, get_region
 from c7n.resources.iam import User, UserAccessKey, Role, InstanceProfile, Policy
 from c7n.resources.account import Account
+from c7n.resources.rds import RDS
 from c7n.version import version
 
 
@@ -400,3 +401,31 @@ class AccountFinding(PostFinding):
             "Details": {"Other": details},
         }
         return resource
+
+
+@RDS.action_registry.register("post-finding")
+class DbInstanceFinding(PostFinding):
+    def format_resource(self, r):
+        details = {
+            "StorageEncrypted": str(r["StorageEncrypted"]),
+            "PubliclyAccessible": str(r["PubliclyAccessible"]),
+            "DBInstanceClass": r["DBInstanceClass"],
+            "Engine": r["Engine"],
+            "EngineVersion": r["EngineVersion"],
+            "DBName": r["DBName"],
+            "DBSubnetGroupName": r["DBSubnetGroup"]["DBSubnetGroupName"],
+            "VpcId": r["DBSubnetGroup"]["VpcId"],
+            "AllocatedStorage": str(r["AllocatedStorage"]),
+            "InstanceCreateTime": r["InstanceCreateTime"].isoformat(),
+            "AvailabilityZone": r["AvailabilityZone"],
+        }
+        instance = {
+            "Type": "Other",
+            "Id": r["DBInstanceArn"],
+            "Region": self.manager.config.region,
+            "Details": {"Other": details},
+        }
+        tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
+        if tags:
+            instance["Tags"] = tags
+        return instance
