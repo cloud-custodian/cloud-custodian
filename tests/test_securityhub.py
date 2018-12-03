@@ -238,7 +238,7 @@ class SecurityHubTest(BaseTest):
                 }
             }
         )
-  
+
     def test_iam_profile(self):
         factory = self.replay_flight_data("test_security_hub_iam_profile")
 
@@ -247,8 +247,8 @@ class SecurityHubTest(BaseTest):
                 "name": "iam-profile-finding",
                 "resource": "iam-profile",
                 "filters": [{
-                    "type": "value", 
-                    "key": "InstanceProfileName", 
+                    "type": "value",
+                    "key": "InstanceProfileName",
                     "value": "CloudCustodian"
                 }],
                 "actions": [
@@ -298,7 +298,7 @@ class SecurityHubTest(BaseTest):
             }
         )
 
-    def test_iam_profile(self):
+    def test_iam_policy(self):
         factory = self.replay_flight_data("test_security_hub_iam_policy")
 
         policy = self.load_policy(
