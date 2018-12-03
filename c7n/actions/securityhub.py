@@ -394,8 +394,7 @@ class AccountFinding(PostFinding):
             details["account_name"] = r["account_name"]
         resource = {
             "Type": "Other",
-            "Id": r["account_id"],
-                        "Id": "arn:aws:::{}:".format(
+            "Id": "arn:aws:::{}:".format(
                 self.manager.config.account_id),
             "Region": self.manager.config.region,
             "Details": {"Other": details},

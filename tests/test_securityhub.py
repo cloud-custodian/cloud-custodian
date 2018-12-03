@@ -133,7 +133,6 @@ class SecurityHubTest(BaseTest):
 
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")
-        # factory = self.record_flight_data("test_security_hub_iam_user")
 
         policy = self.load_policy(
             {
@@ -187,7 +186,6 @@ class SecurityHubTest(BaseTest):
 
     def test_iam_role(self):
         factory = self.replay_flight_data("test_security_hub_iam_role")
-        # factory = self.record_flight_data("test_security_hub_iam_role")
 
         policy = self.load_policy(
             {
@@ -240,20 +238,19 @@ class SecurityHubTest(BaseTest):
                 }
             }
         )
-        
+  
     def test_iam_profile(self):
         factory = self.replay_flight_data("test_security_hub_iam_profile")
-        # factory = self.record_flight_data("test_security_hub_iam_profile")
 
         policy = self.load_policy(
             {
                 "name": "iam-profile-finding",
                 "resource": "iam-profile",
-                "filters": [ {
+                "filters": [{
                     "type": "value", 
                     "key": "InstanceProfileName", 
                     "value": "CloudCustodian"
-                } ],
+                }],
                 "actions": [
                     {
                         "type": "post-finding",
@@ -303,21 +300,20 @@ class SecurityHubTest(BaseTest):
 
     def test_iam_profile(self):
         factory = self.replay_flight_data("test_security_hub_iam_policy")
-        # factory = self.record_flight_data("test_security_hub_iam_policy")
 
         policy = self.load_policy(
             {
                 "name": "iam-policy-finding",
                 "resource": "iam-policy",
-                "filters": [ 
+                "filters": [
                     {
-                        "type": "used" 
+                        "type": "used"
                     },
                     {
-                        "type": "value", 
-                        "key": "PolicyName", 
+                        "type": "value",
+                        "key": "PolicyName",
                         "value": "app1"
-                    } 
+                    }
                 ],
                 "actions": [
                     {
@@ -367,10 +363,9 @@ class SecurityHubTest(BaseTest):
                 }
             }
         )
-        
+
     def test_account(self):
         factory = self.replay_flight_data("test_security_hub_account")
-        # factory = self.record_flight_data("test_security_hub_account")
 
         policy = self.load_policy(
             {
@@ -429,7 +424,7 @@ class SecurityHubTest(BaseTest):
             {
                 "name": "rds-finding",
                 "resource": "rds",
-                "filters": [ 
+                "filters": [
                 ],
                 "actions": [
                     {
