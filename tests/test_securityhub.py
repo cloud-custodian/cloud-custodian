@@ -365,3 +365,56 @@ class SecurityHubTest(BaseTest):
                 }
             }
         )
+        
+    def test_account(self):
+        factory = self.replay_flight_data("test_security_hub_account")
+        # factory = self.record_flight_data("test_security_hub_account")
+
+        policy = self.load_policy(
+            {
+                "name": "account-finding",
+                "resource": "account",
+                "filters": [],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "ResourceId": [
+                    {
+                        "Value": "arn:aws:::101010101111:",
+                        "Comparison": "EQUALS"
+                    }
+                ]
+            }
+        ).get("Findings")
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(
+            findings[0]["Resources"][0],
+            {
+                "Region": "us-east-1",
+                "Type": "Other",
+                "Id": "arn:aws:::101010101111:",
+                "Details": {
+                    "Other": {
+                        "account_name": "filiatra-primary"
+                    }
+                }
+            }
+        )

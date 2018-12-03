@@ -386,12 +386,16 @@ class PolicyFinding(PostFinding):
 @Account.action_registry.register("post-finding")
 class AccountFinding(PostFinding):
     def format_resource(self, r):
-        details = {"account_name": r["account_name"]}
+        details = {}
         if "c7n:MatchedFilters" in r:
             details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
+        if "account_name" in r:
+            details["account_name"] = r["account_name"]
         resource = {
             "Type": "Other",
             "Id": r["account_id"],
+                        "Id": "arn:aws:::{}:".format(
+                self.manager.config.account_id),
             "Region": self.manager.config.region,
             "Details": {"Other": details},
         }
