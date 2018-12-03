@@ -310,7 +310,9 @@ class SecurityHubTest(BaseTest):
                 "name": "iam-policy-finding",
                 "resource": "iam-policy",
                 "filters": [ 
-                    {"type": "used", "state": True},
+                    {
+                        "type": "used" git 
+                    },
                     {
                         "type": "value", 
                         "key": "PolicyName", 
