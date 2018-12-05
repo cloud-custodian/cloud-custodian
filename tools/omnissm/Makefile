@@ -13,6 +13,10 @@ build-linux:
 	@mkdir -p bin
 	@GOOS=linux GOARCH=amd64 go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent-linux-amd64 ./cmd/omnissm-agent
 
+build-windows:
+	@mkdir -p bin
+	@GOOS=windows GOARCH=amd64 go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent-windows-amd64.exe ./cmd/omnissm-agent
+
 build-lambda: $(functions)
 $(functions):
 	cd $@ && $(MAKE) build

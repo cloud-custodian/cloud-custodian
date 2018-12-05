@@ -297,6 +297,12 @@ class ApiStats(DeltaStats):
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if isinstance(self.ctx.session_factory, credentials.SessionFactory):
             self.ctx.session_factory.set_subscribers(())
+
+        # With cached sessions, we need to unregister any events subscribers
+        # on extant sessions to allow for the next registration.
+        utils.local_session(self.ctx.session_factory).events.unregister(
+            'after-call.*.*', self._record, unique_id='c7n-api-stats')
+
         self.ctx.metrics.put_metric(
             "ApiCalls", sum(self.api_calls.values()), "Count")
         self.pop_snapshot()
@@ -307,8 +313,7 @@ class ApiStats(DeltaStats):
 
     def _record(self, http_response, parsed, model, **kwargs):
         self.api_calls["%s.%s" % (
-            model.service_model.endpoint_prefix,
-            model.name)] += 1
+            model.service_model.endpoint_prefix, model.name)] += 1
 
 
 @blob_outputs.register('s3')

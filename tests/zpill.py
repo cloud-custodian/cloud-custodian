@@ -269,7 +269,7 @@ class PillTest(unittest.TestCase):
         self.assertEqual(value, expected)
 
     def cleanUp(self):
-        pass
+        self.pill = None
 
     def record_flight_data(self, test_case, zdata=False, augment=False):
         self.recording = True
@@ -287,6 +287,7 @@ class PillTest(unittest.TestCase):
             pill = attach(session, self.archive_path, test_case, debug=True)
 
         pill.record()
+        self.pill = pill
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
 

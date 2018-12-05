@@ -16,13 +16,14 @@ package inventory
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
+	"github.com/aws/amazon-ssm-agent/agent/appconfig"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/sysmon"
 )
@@ -50,7 +51,7 @@ var ProcessCmd = &cobra.Command{
 		if err != nil {
 			logger.Fatal().Err(err).Msg("cannot marshal inventory")
 		}
-		path := fmt.Sprintf("/var/lib/amazon/ssm/%s/inventory/custom/ProcessInfo.json", info.InstanceId)
+		path := filepath.Join(appconfig.DefaultDataStorePath, info.InstanceId, "inventory/custom/ProcessInfo.json")
 		if err := ioutil.WriteFile(path, data, 0644); err != nil {
 			logger.Fatal().Err(err).Msgf("cannot write file: %#v", path)
 		}

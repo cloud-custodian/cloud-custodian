@@ -75,7 +75,7 @@ def policy_command(f):
                 continue
             except ValueError as e:
                 log.error('problem loading policy file ({}) error: {}'.format(
-                    fp, e.message))
+                    fp, str(e)))
                 errors += 1
                 continue
 

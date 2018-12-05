@@ -709,6 +709,38 @@ class RDSTest(BaseTest):
 
         self.assertEqual(len(resources), 1, "Resources should be unused")
 
+    def test_rds_modify_db(self):
+        session_factory = self.replay_flight_data("test_rds_modify_db")
+        p = self.load_policy(
+            {
+                "name": "rds-modify-db",
+                "resource": "rds",
+                "filters": [
+                    {"DeletionProtection": True},
+                    {"MasterUsername": "testtest"}
+                ],
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'DeletionProtection',
+                                "value": False
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("rds")
+        db_info = client.describe_db_instances(DBInstanceIdentifier="testtest")
+        self.assertFalse(db_info["DBInstances"][0]["DeletionProtection"])
+
 
 class RDSSnapshotTest(BaseTest):
 

@@ -287,7 +287,7 @@ class SetQueryLogging(BaseAction):
             # By forcing use of a filter we ensure both getting to right set of
             # resources as well avoiding an extra api call here, as we'll reuse
             # the annotation from the filter for logging config.
-            if not [f for f in self.manager.filters if isinstance(
+            if not [f for f in self.manager.iter_filters() if isinstance(
                     f, IsQueryLoggingEnabled)]:
                 raise ValueError(
                     "set-query-logging when deleting requires "
