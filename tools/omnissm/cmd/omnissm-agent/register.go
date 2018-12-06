@@ -15,14 +15,13 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ec2metadata"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/omnissm"
 )
@@ -32,19 +31,6 @@ var RegisterCmd = &cobra.Command{
 	Short: "",
 	Run: func(cmd *cobra.Command, args []string) {
 		url := viper.GetString("register_endpoint")
-		if url == "" {
-			env := strings.ToLower(viper.GetString("env"))
-			switch env {
-			case "dev", "qa", "prod":
-			default:
-				log.Fatal().Msgf("invalid env provided: %#v", env)
-			}
-			region := ec2metadata.GetLocalInstanceRegion()
-			if region == "" {
-				log.Fatal().Msg("unable to determine instance region from metadata")
-			}
-			url = viper.GetString(fmt.Sprintf("register_endpoints.%s.%s", env, region))
-		}
 		if url == "" {
 			log.Fatal().Msg("registration url (OMNISSM_REGISTER_ENDPOINT) cannot be blank")
 		}
@@ -69,5 +55,7 @@ var RegisterCmd = &cobra.Command{
 
 func init() {
 	RegisterCmd.Flags().String("register-endpoint", "", "")
-	viper.BindPFlags(RegisterCmd.Flags())
+	RegisterCmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
+		viper.BindPFlag(strings.Replace(f.Name, "-", "_", -1), RegisterCmd.Flags().Lookup(f.Name))
+	})
 }

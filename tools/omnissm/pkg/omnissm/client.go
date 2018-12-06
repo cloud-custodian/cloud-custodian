@@ -30,7 +30,7 @@ import (
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/servicectl"
 )
 
-const ClientVersion = "1.0.0"
+const ClientVersion = "1.1.0"
 
 type Client struct {
 	*http.Client
@@ -44,7 +44,7 @@ type Client struct {
 
 // New returns a new client for the registrations API
 func NewClient(url string) (*Client, error) {
-	s, err := servicectl.New("amazon-ssm-agent")
+	s, err := servicectl.New(AmazonSSMAgentServiceName)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func NewClient(url string) (*Client, error) {
 		registrationURL: url,
 		service:         s,
 	}
-	c.ManagedId, _ = ssm.ReadRegistrationFile(ssm.DefaultLinuxSSMRegistrationPath)
+	c.ManagedId, _ = ssm.ReadRegistrationFile(ssm.DefaultSSMRegistrationPath)
 	return c, nil
 }
 

@@ -26,7 +26,7 @@ from c7n.output import (
     sys_stats_outputs,
     tracer_outputs)
 
-from c7n.utils import reset_session_cache, dumps
+from c7n.utils import reset_session_cache, dumps, local_session
 from c7n.version import version
 
 
@@ -90,6 +90,12 @@ class ExecutionContext(object):
 
         self.api_stats.__enter__()
         self.tracer.__enter__()
+
+        # Api stats and user agent modification by policy require updating
+        # in place the cached session thread local.
+        update_session = getattr(self.session_factory, 'update', None)
+        if update_session:
+            update_session(local_session(self.session_factory))
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
