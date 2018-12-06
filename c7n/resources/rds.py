@@ -1086,7 +1086,7 @@ class RestoreInstance(BaseAction):
 
     def validate(self):
         found = False
-        for f in self.manager.filters:
+        for f in self.manager.iter_filters():
             if isinstance(f, LatestSnapshot):
                 found = True
         if not found:
