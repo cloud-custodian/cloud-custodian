@@ -8,7 +8,7 @@ jsonschema>=2.5.1
 c7n
 Markup
 MarkupSafe==1.0
-python-dateutil>=2.5.2
+python-dateutil>=2.6
 ldap3
 ruamel.yaml==0.15.42
 six==1.11.0
