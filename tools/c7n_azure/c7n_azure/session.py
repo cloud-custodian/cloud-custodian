@@ -113,7 +113,8 @@ class Session(object):
                     client_id=os.environ[constants.ENV_CLIENT_ID],
                     resource=self.resource_namespace)
             else:
-                self.credentials = MSIAuthentication(resource=self.resource_namespace)
+                self.credentials = MSIAuthentication(
+                    resource=self.resource_namespace)
 
             self.subscription_id = os.environ[constants.ENV_SUB_ID]
             self.log.info("Creating session with MSI Authentication")
