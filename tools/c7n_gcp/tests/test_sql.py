@@ -42,7 +42,7 @@ class SqlInstanceTest(BaseTest):
     def test_stop_instance(self):
         project_id = 'cloud-custodian'
         instance_name = 'custodiansqltest'
-        factory = self.record_flight_data('sqlinstance-stop', project_id=project_id)
+        factory = self.replay_flight_data('sqlinstance-stop', project_id=project_id)
         p = self.load_policy(
             {'name': 'istop',
              'resource': 'gcp.sql-instance',
