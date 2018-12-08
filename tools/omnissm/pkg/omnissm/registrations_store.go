@@ -43,8 +43,8 @@ type RegistrationEntry struct {
 	// represented as integers to allow for a LSI to be created in DynamoDB, as
 	// DynamoDB disallows creating a LSI on a Bool type. The value is false
 	// when equal to 0 and true when greater than 0.
-	IsTagged      int `json:"IsTagged,omitempty"`
-	IsInventoried int `json:"IsInventoried,omitempty"`
+	IsTagged      int `json:"IsTagged"`
+	IsInventoried int `json:"IsInventoried"`
 
 	ClientVersion string `json:"ClientVersion,omitempty"`
 
