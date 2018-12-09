@@ -66,9 +66,9 @@ Features
 Links
 #####
 
-- `Homepage <https://developer.capitalone.com/opensource-projects/cloud-custodian>`_
-- `Docs <http://capitalone.github.io/cloud-custodian/docs/>`_
-- `Developer Install <http://capitalone.github.io/cloud-custodian/docs/developer/installing.html>`_
+- `Homepage <http://cloudcustodian.io>`_
+- `Docs <http://cloudcustodian.io/docs/index.html>`_
+- `Developer Install <https://pypi.python.org/pypi/c7n>`_
 - `Presentations <https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid>`_
 
 Quick Install

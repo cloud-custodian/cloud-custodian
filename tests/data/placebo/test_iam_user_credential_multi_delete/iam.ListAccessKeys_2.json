@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccessKeyMetadata": [
+            {
+                "UserName": "kapil",
+                "AccessKeyId": "AKIAJEZJDQQX4TZNRMKQ",
+                "Status": "Active",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 2,
+                    "hour": 3,
+                    "minute": 34,
+                    "second": 13,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "f191de39-f5e3-11e8-860e-07ae61cefdc8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f191de39-f5e3-11e8-860e-07ae61cefdc8",
+                "content-type": "text/xml",
+                "content-length": "553",
+                "date": "Sun, 02 Dec 2018 03:39:58 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
