@@ -319,7 +319,8 @@ class OtherResourcePostFinding(PostFinding):
 
     @classmethod
     def register_resource(klass, registry, resource_class):
-        resource_class.action_registry.register('post-finding', klass)
+        if 'post-finding' not in resource_class.action_registry:
+            resource_class.action_registry.register('post-finding', klass)
 
 
 aws_resources.subscribe(
