@@ -19,13 +19,13 @@ import jmespath
 import json
 
 from .core import BaseAction
-from c7n.utils import type_schema, local_session, chunks
+from c7n.utils import type_schema, local_session, chunks, dumps
 
 from c7n.resources.ec2 import EC2
+from c7n.resources.iam import User, UserAccessKey
 from c7n.resources.s3 import S3, get_region
-from c7n.resources.iam import User, UserAccessKey, Role, InstanceProfile, Policy
-from c7n.resources.account import Account
 from c7n.resources.rds import RDS
+from c7n.manager import resources as aws_resources
 from c7n.version import version
 
 
@@ -276,10 +276,61 @@ class InstanceFinding(PostFinding):
         return instance
 
 
-@User.action_registry.register("post-finding")
-class UserFinding(PostFinding):
+class OtherResourcePostFinding(PostFinding):
+
+    fields = ()
+
     def format_resource(self, r):
-        if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.filters)):
+        details = {}
+        for k in r:
+            if isinstance(k, [list, dict]):
+                continue
+            details[k] = r[k]
+
+        for f in self.fields:
+            value = jmespath.search(f['expr'], r)
+            if not value:
+                continue
+            details[f['key']] = value
+
+        for k, v in details.items():
+            if isinstance(v, datetime):
+                v = v.isoformat()
+            elif isinstance(v, [list, dict]):
+                v = dumps(v)
+            elif isinstance(v, [int, float, bool]):
+                v = str(v)
+            else:
+                continue
+            details[k] = v
+
+        details['c7n:resource-type'] = self.manager.type
+
+        other = {
+            'Type': 'Other',
+            'Id': self.manager.get_arns(r)[0],
+            'Region': self.manager.config.region,
+            'Details': {'Other': details}
+        }
+        tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        if tags:
+            other['Tags'] = tags
+        return other
+
+    @classmethod
+    def register_resource(klass, registry, resource_class):
+        resource_class.action_registry.register('post-finding', klass)
+
+
+aws_resources.subscribe(
+    aws_resources.EVENT_REGISTER, OtherResourcePostFinding.register_resource)
+
+
+@User.action_registry.register("post-finding")
+class UserFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.iter_filters())):
             details = {
                 "UserName": "arn:aws::{}:user/{}".format(
                     self.manager.config.account_id, r["c7n:AccessKeys"][0]["UserName"]
@@ -295,136 +346,12 @@ class UserFinding(PostFinding):
             }
             return filter_empty(accesskey)
         else:
-            details = {"CreateDate": r["CreateDate"].isoformat(), "UserId": r["UserId"]}
-            if "c7n:MatchedFilters" in r:
-                details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
-            user = {
-                "Type": "Other",
-                "Id": r["Arn"],
-                "Region": self.manager.config.region,
-                "Details": {"Other": details},
-            }
-            tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
-            if tags:
-                user["Tags"] = tags
-            return user
-
-
-@Role.action_registry.register("post-finding")
-class RoleFinding(PostFinding):
-    def format_resource(self, r):
-        details = {
-            "RoleName": r["RoleName"],
-            "RoleId": r["RoleId"],
-            "CreateDate": r["CreateDate"].isoformat(),
-        }
-        if "c7n:MatchedFilters" in r:
-            details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
-        if "Description" in r:
-            details["Description"] = r["Description"]
-        role = {
-            "Type": "Other",
-            "Id": r["Arn"],
-            "Region": self.manager.config.region,
-            "Details": {"Other": details},
-        }
-        tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
-        if tags:
-            role["Tags"] = tags
-        return role
-
-
-@InstanceProfile.action_registry.register("post-finding")
-class InstanceProfileFinding(PostFinding):
-    def format_resource(self, r):
-        details = {
-            "InstanceProfileName": r["InstanceProfileName"],
-            "InstanceProfileId": r["InstanceProfileId"],
-            "CreateDate": r["CreateDate"].isoformat(),
-        }
-        if "c7n:MatchedFilters" in r:
-            details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
-        if "Description" in r:
-            details["Description"] = r["Description"]
-        resource = {
-            "Type": "Other",
-            "Id": r["Arn"],
-            "Region": self.manager.config.region,
-            "Details": {"Other": details},
-        }
-        tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
-        if tags:
-            resource["Tags"] = tags
-        return resource
-
-
-@Policy.action_registry.register("post-finding")
-class PolicyFinding(PostFinding):
-    def format_resource(self, r):
-        details = {
-            "PolicyName": r["PolicyName"],
-            "PolicyId": r["PolicyId"],
-            "DefaultVersionId": r["DefaultVersionId"],
-            "CreateDate": r["CreateDate"].isoformat(),
-            "UpdateDate": r["UpdateDate"].isoformat(),
-        }
-        if "c7n:MatchedFilters" in r:
-            details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
-        if "Description" in r:
-            details["Description"] = r["Description"]
-        resource = {
-            "Type": "Other",
-            "Id": r["Arn"],
-            "Region": self.manager.config.region,
-            "Details": {"Other": details},
-        }
-        tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
-        if tags:
-            resource["Tags"] = tags
-        return resource
-
-
-@Account.action_registry.register("post-finding")
-class AccountFinding(PostFinding):
-    def format_resource(self, r):
-        details = {}
-        if "c7n:MatchedFilters" in r:
-            details["c7n:MatchedFilters"] = json.dumps(r["c7n:MatchedFilters"])
-        if "account_name" in r:
-            details["account_name"] = r["account_name"]
-        resource = {
-            "Type": "Other",
-            "Id": "arn:aws:::{}:".format(
-                self.manager.config.account_id),
-            "Region": self.manager.config.region,
-            "Details": {"Other": details},
-        }
-        return resource
+            return super(OtherResourcePostFinding, self).format_resource(r)
 
 
 @RDS.action_registry.register("post-finding")
 class DbInstanceFinding(PostFinding):
-    def format_resource(self, r):
-        details = {
-            "StorageEncrypted": str(r["StorageEncrypted"]),
-            "PubliclyAccessible": str(r["PubliclyAccessible"]),
-            "DBInstanceClass": r["DBInstanceClass"],
-            "Engine": r["Engine"],
-            "EngineVersion": r["EngineVersion"],
-            "DBName": r["DBName"],
-            "DBSubnetGroupName": r["DBSubnetGroup"]["DBSubnetGroupName"],
-            "VpcId": r["DBSubnetGroup"]["VpcId"],
-            "AllocatedStorage": str(r["AllocatedStorage"]),
-            "InstanceCreateTime": r["InstanceCreateTime"].isoformat(),
-            "AvailabilityZone": r["AvailabilityZone"],
-        }
-        instance = {
-            "Type": "Other",
-            "Id": r["DBInstanceArn"],
-            "Region": self.manager.config.region,
-            "Details": {"Other": details},
-        }
-        tags = {t["Key"]: t["Value"] for t in r.get("Tags", [])}
-        if tags:
-            instance["Tags"] = tags
-        return instance
+    fields = [
+        {'key': 'DBSubnetGroupName', 'expr': 'DBSubnetGroup.DBSubnetGroupName'},
+        {'key': 'VpcId', 'expr': 'DBSubnetGroup.VpcId'},
+    ]
