@@ -93,6 +93,32 @@ class PostFinding(BaseAction):
 
     Custodian acts as a finding provider, allowing users to craft
     policies that report to the AWS SecurityHub.
+
+    For resources that are taggable, we will tag the resource with an identifier
+    such that further findings generate updates.
+
+    Example generate a finding for accounts that don't have shield enabled.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+
+       - name: account-shield-enabled
+         resource: account
+         filters:
+           - shield-enabled
+         actions:
+           - type: post-finding
+             severity_normalized: 6
+             types:
+               - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
+             recommendation: "Enable shield"
+             recommendation_url: "https://www.example.com/policies/AntiDDoS.html"
+             confidence: 100
+             compliance_status: FAILED
+
     """
 
     FindingVersion = "2018-10-08"
@@ -107,6 +133,8 @@ class PostFinding(BaseAction):
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
+        # Cross region aggregation
+        region={'type': 'string', 'description': 'cross-region aggregation target'},
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
@@ -121,7 +149,9 @@ class PostFinding(BaseAction):
     )
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client("securityhub")
+        region_name = self.data.get('region', self.manager.region)
+        client = local_session(
+            self.manager.session_factory).client("securityhub", region_name=region_name)
         for resource_set in chunks(resources, 10):
             finding = self.get_finding(resource_set)
             client.batch_import_findings(Findings=[finding])

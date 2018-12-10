@@ -352,7 +352,6 @@ class SecurityHubTest(BaseTest):
 
     def test_rds(self):
         factory = self.replay_flight_data("test_security_hub_rds")
-        # factory = self.record_flight_data("test_security_hub_rds")
 
         policy = self.load_policy(
             {
