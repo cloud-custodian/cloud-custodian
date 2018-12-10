@@ -13,8 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import OrderedDict
 import csv
 import datetime
+import functools
 import io
 from datetime import timedelta
 import itertools
@@ -22,11 +24,14 @@ import time
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
+from dateutil.parser import parse as parse_date
+
 import six
 from botocore.exceptions import ClientError
-from collections import OrderedDict
+
 
 from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
@@ -770,6 +775,9 @@ class CredentialReport(Filter):
         ('cert_1_', 'certs'),
         ('cert_2_', 'certs'))
 
+    # for access keys only
+    matched_annotation_key = 'c7n:matched-keys'
+
     permissions = ('iam:GenerateCredentialReport',
                    'iam:GetCredentialReport')
 
@@ -846,7 +854,7 @@ class CredentialReport(Filter):
             self.matcher_config['key'] = self.data['key'].split('.', 1)[1]
         return []
 
-    def match(self, info):
+    def match(self, resource, info):
         if info is None:
             return False
         k = self.data.get('key')
@@ -855,12 +863,22 @@ class CredentialReport(Filter):
             vf.annotate = False
             return vf(info)
 
+        # access key matching
         prefix, sk = k.split('.', 1)
         vf = ValueFilter(self.matcher_config)
         vf.annotate = False
+
+        # annotation merging with previous respecting block operators
+        k_matched = []
         for v in info.get(prefix, ()):
             if vf.match(v):
-                return True
+                k_matched.append(v)
+
+        for k in k_matched:
+            k['c7n:match-type'] = 'credential'
+
+        self.merge_annotation(resource, self.matched_annotation_key, k_matched)
+        return bool(k_matched)
 
 
 @User.filter_registry.register('credential')
@@ -874,7 +892,7 @@ class UserCredentialReport(CredentialReport):
         results = []
         for r in resources:
             info = report.get(r['UserName'])
-            if self.match(info):
+            if self.match(r, info):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
@@ -1019,26 +1037,37 @@ class UserAccessKey(ValueFilter):
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAccessKeys',)
+    annotation_key = 'c7n:AccessKeys'
+    matched_annotation_key = 'c7n:matched-keys'
+    annotate = False
 
-    def user_keys(self, user_set):
-        client = local_session(self.manager.session_factory).client('iam')
+    def get_user_keys(self, client, user_set):
         for u in user_set:
-            u['c7n:AccessKeys'] = client.list_access_keys(
+            u[self.annotation_key] = self.manager.retry(
+                client.list_access_keys,
                 UserName=u['UserName'])['AccessKeyMetadata']
 
     def process(self, resources, event=None):
-        user_set = chunks(resources, size=50)
+        client = local_session(self.manager.session_factory).client('iam')
         with self.executor_factory(max_workers=2) as w:
+            augment_set = [r for r in resources if self.annotation_key not in r]
             self.log.debug(
-                "Querying %d users' api keys" % len(resources))
-            list(w.map(self.user_keys, user_set))
+                "Querying %d users' api keys" % len(augment_set))
+            list(w.map(
+                functools.partial(self.get_user_keys, client),
+                chunks(augment_set, 50)))
 
         matched = []
         for r in resources:
-            for k in r['c7n:AccessKeys']:
+            k_matched = []
+            for k in r[self.annotation_key]:
                 if self.match(k):
-                    matched.append(r)
-                    break
+                    k_matched.append(k)
+            for k in k_matched:
+                k['c7n:matched-type'] = 'access'
+            self.merge_annotation(r, self.matched_annotation_key, k_matched)
+            if k_matched:
+                matched.append(r)
         return matched
 
 
@@ -1339,7 +1368,7 @@ class UserRemoveAccessKey(BaseAction):
 
         .. code-block:: yaml
 
-         - name: iam-mfa-active-keys-no-login
+         - name: iam-mfa-active-key-no-login
            resource: iam-user
            actions:
              - type: remove-keys
@@ -1350,15 +1379,29 @@ class UserRemoveAccessKey(BaseAction):
     """
 
     schema = type_schema(
-        'remove-keys', age={'type': 'number'}, disable={'type': 'boolean'})
+        'remove-keys',
+        matched={'type': 'boolean'},
+        age={'type': 'number'},
+        disable={'type': 'boolean'})
     permissions = ('iam:ListAccessKeys', 'iam:UpdateAccessKey',
                    'iam:DeleteAccessKey')
+
+    def validate(self):
+        if self.data.get('matched') and self.data.get('age'):
+            raise PolicyValidationError(
+                "policy:%s cant mix matched and age parameters")
+        ftypes = {f.type for f in self.manager.iter_filters()}
+        if 'credential' in ftypes and 'access-key' in ftypes:
+            raise PolicyValidationError(
+                "policy:%s cant mix credential and access-key filters w/ delete action")
+        return self
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
 
         age = self.data.get('age')
         disable = self.data.get('disable')
+        matched = self.data.get('matched')
 
         if age:
             threshold_date = datetime.datetime.now(tz=tzutc()) - timedelta(age)
@@ -1367,7 +1410,15 @@ class UserRemoveAccessKey(BaseAction):
             if 'c7n:AccessKeys' not in r:
                 r['c7n:AccessKeys'] = client.list_access_keys(
                     UserName=r['UserName'])['AccessKeyMetadata']
+
             keys = r['c7n:AccessKeys']
+            if matched:
+                m_keys = resolve_credential_keys(
+                    r.get(CredentialReport.matched_annotation_key),
+                    keys)
+                assert m_keys, "shouldn't have gotten this far without keys"
+                keys = m_keys
+
             for k in keys:
                 if age:
                     if not k['CreateDate'] < threshold_date:
@@ -1381,6 +1432,22 @@ class UserRemoveAccessKey(BaseAction):
                     client.delete_access_key(
                         UserName=r['UserName'],
                         AccessKeyId=k['AccessKeyId'])
+
+
+def resolve_credential_keys(m_keys, keys):
+    res = []
+    for k in m_keys:
+        if k['c7n:match-type'] == 'credential':
+            c_date = parse_date(k['last_rotated'])
+            for ak in keys:
+                if c_date == ak['CreateDate']:
+                    ak = dict(ak)
+                    ak['c7n:match-type'] = 'access'
+                    if ak not in res:
+                        res.append(ak)
+        elif k not in res:
+            res.append(k)
+    return res
 
 
 #################
