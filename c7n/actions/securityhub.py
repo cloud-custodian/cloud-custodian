@@ -149,7 +149,7 @@ class PostFinding(BaseAction):
     )
 
     def process(self, resources, event=None):
-        region_name = self.data.get('region', self.manager.region)
+        region_name = self.data.get('region', self.manager.config.region)
         client = local_session(
             self.manager.session_factory).client("securityhub", region_name=region_name)
         for resource_set in chunks(resources, 10):
