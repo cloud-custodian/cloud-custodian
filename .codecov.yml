@@ -1,0 +1,26 @@
+codecov:
+  notify:
+    require_ci_to_pass: yes
+
+comment: off
+
+coverage:
+  precision: 2
+  round: up
+  range: "70...100"
+  status:
+    patch:
+      default:
+        threshold: "10%"
+    project:
+      azure:
+        paths: "tools/c7n_azure"
+      gcp:
+        paths: "tools/c7n_gcp"
+      # aws is weaved throughout core atm can't easily call it out separately
+      mailer:
+        paths: "tools/c7n_mailer"
+      custodian:
+        paths:
+          - "!tools"
+      default: off

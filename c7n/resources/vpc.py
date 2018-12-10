@@ -500,7 +500,7 @@ class SecurityGroupApplyPatch(BaseAction):
                    'ec2:DeleteTags')
 
     def validate(self):
-        diff_filters = [n for n in self.manager.filters if isinstance(
+        diff_filters = [n for n in self.manager.iter_filters() if isinstance(
             n, SecurityGroupDiffFilter)]
         if not len(diff_filters):
             raise PolicyValidationError(

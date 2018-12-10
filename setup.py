@@ -24,7 +24,8 @@ setup(
             'custodian = c7n.cli:main']},
     install_requires=[
         "boto3>=1.9.54",
-        "botocore>=1.12.54",
+        "botocore>=1.12.57",
+        "python-dateutil>=2.6,<3.0.0",
         "pyyaml",
         "jsonschema",
         "jsonpatch>=1.21",

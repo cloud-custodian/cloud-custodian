@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccessKeyMetadata": [
+            {
+                "UserName": "kapil",
+                "AccessKeyId": "AKIAJEZJDQQX4TZNRMKQ",
+                "Status": "Active",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 2,
+                    "hour": 3,
+                    "minute": 34,
+                    "second": 13,
+                    "microsecond": 0
+                }
+            },
+            {
+                "UserName": "kapil",
+                "AccessKeyId": "AKIAIFX6HPKAM5F7JVAA",
+                "Status": "Active",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 6,
+                    "day": 24,
+                    "hour": 20,
+                    "minute": 30,
+                    "second": 37,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "f0df3074-f5e3-11e8-8700-7f377c0f7a24",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f0df3074-f5e3-11e8-8700-7f377c0f7a24",
+                "content-type": "text/xml",
+                "content-length": "761",
+                "date": "Sun, 02 Dec 2018 03:39:57 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

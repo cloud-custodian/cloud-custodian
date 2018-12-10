@@ -17,6 +17,7 @@ import json
 import datetime
 import os
 import tempfile
+import time
 
 from unittest import TestCase
 from .common import load_data, BaseTest, functional, TestConfig as Config
@@ -51,7 +52,7 @@ from c7n.executor import MainThreadExecutor
 
 class UserCredentialReportTest(BaseTest):
 
-    def test_credential_report_generatpoe(self):
+    def test_credential_report_generate(self):
         session_factory = self.replay_flight_data("test_iam_user_unused_keys")
         p = self.load_policy(
             {
@@ -75,6 +76,40 @@ class UserCredentialReportTest(BaseTest):
             sorted([r["UserName"] for r in resources]),
             ["Hazmat", "charmworld", "kaleb", "kapilt"],
         )
+
+    def test_credential_access_key_multifilter_delete(self):
+        factory = self.replay_flight_data('test_iam_user_credential_multi_delete')
+        p = self.load_policy({
+            'name': 'user-cred-multi',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'kapil'},
+                {"type": "credential",
+                 "report_max_age": 1543724277,
+                 "key": "access_keys.last_used_date",
+                 "value": 30,
+                 'op': 'less-than',
+                 "value_type": "age"},
+                {"type": "credential",
+                 "report_max_age": 1543724277,
+                 "key": "access_keys.last_rotated",
+                 "value": 700,
+                 "op": "greater-than",
+                 'value_type': 'age'}],
+            'actions': [
+                {'type': 'remove-keys',
+                 'matched': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
+        client = factory().client('iam')
+        if self.recording:
+            time.sleep(1)
+        keys = client.list_access_keys(UserName='kapil').get('AccessKeyMetadata')
+        self.assertEqual(len(keys), 1)
+        dt = parser.parse(resources[0]['c7n:matched-keys'][0]['last_rotated'])
+        self.assertNotEqual(keys[0]['CreateDate'], dt)
 
     def test_access_key_last_service(self):
         # Note we're reusing the old console users flight records
@@ -266,7 +301,24 @@ class IamUserTest(BaseTest):
         users = client.list_users(PathPrefix="/test/").get("Users", [])
         self.assertEqual(users, [])
 
-    @functional
+    def test_iam_user_access_key_multi(self):
+        factory = self.replay_flight_data('test_iam_user_access_key_multi')
+        p = self.load_policy({
+            'name': 'user-del',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'kapil'},
+                {'type': 'access-key', 'key': 'Status', 'value': 'Active'},
+                {'type': 'access-key', 'key': 'CreateDate',
+                 'value_type': 'age', 'value': 90, 'op': 'greater-than'}
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
+        self.assertEqual(
+            resources[0]['c7n:matched-keys'][0]['c7n:matched-type'], 'access')
+
     def test_iam_user_delete_some_access(self):
         factory = self.replay_flight_data("test_iam_user_delete_options")
         p = self.load_policy(
@@ -276,7 +328,8 @@ class IamUserTest(BaseTest):
                 "filters": [
                     {"UserName": "test_user"},
                     {"type": "access-key", "key": "Status", "value": "Active"},
-                    {"type": "credential", "key": "password_enabled", "value": True}],
+                    {"type": "credential", "report_max_age": 1543724277,
+                     "key": "password_enabled", "value": True}],
                 "actions": [{
                     "type": "delete",
                     "options": ["console-access", "access-keys"]}],

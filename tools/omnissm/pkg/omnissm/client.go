@@ -30,7 +30,7 @@ import (
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/servicectl"
 )
 
-const ClientVersion = "1.1.0"
+const ClientVersion = "1.2.0"
 
 type Client struct {
 	*http.Client
