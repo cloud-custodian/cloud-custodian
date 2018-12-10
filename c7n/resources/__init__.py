@@ -92,9 +92,6 @@ def load_resources():
     import c7n.resources.vpc
     import c7n.resources.waf
 
-    # super cheese tech debt / fix me pls
-    from c7n.actions import securityhub
-
     # Load external plugins (private sdks etc)
     from c7n.manager import resources
     resources.load_plugins()

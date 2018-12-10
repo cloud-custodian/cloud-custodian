@@ -24,10 +24,12 @@ import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
+import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
+from c7n.actions.securityhub import PostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
@@ -39,7 +41,7 @@ from c7n.manager import resources
 from c7n import query
 
 from c7n import utils
-from c7n.utils import type_schema
+from c7n.utils import type_schema, filter_empty
 
 
 filters = FilterRegistry('ec2.filters')
@@ -799,6 +801,39 @@ class SingletonFilter(Filter, StateTransitionFilter):
                     return True
 
         return False
+
+
+@EC2.action_registry.register("post-finding")
+class InstanceFinding(PostFinding):
+    def format_resource(self, r):
+        details = {
+            "Type": r["InstanceType"],
+            "ImageId": r["ImageId"],
+            "IpV4Addresses": jmespath.search(
+                "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
+            ),
+            "KeyName": r.get("KeyName"),
+            "VpcId": r["VpcId"],
+            "SubnetId": r["SubnetId"],
+            "LaunchedAt": r["LaunchTime"].isoformat(),
+        }
+
+        if "IamInstanceProfile" in r:
+            details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
+
+        instance = {
+            "Type": "AwsEc2Instance",
+            "Id": "arn:aws:{}:{}:instance/{}".format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r["InstanceId"]),
+            "Region": self.manager.config.region,
+            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
+            "Details": {"AwsEc2Instance": filter_empty(details)},
+        }
+
+        instance = filter_empty(instance)
+        return instance
 
 
 @actions.register('start')

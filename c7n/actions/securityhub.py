@@ -19,13 +19,8 @@ import jmespath
 import json
 
 from .core import BaseAction
-from c7n.utils import type_schema, local_session, chunks, dumps
+from c7n.utils import type_schema, local_session, chunks, dumps, filter_empty
 
-from c7n.resources.account import Account
-from c7n.resources.ec2 import EC2
-from c7n.resources.iam import User, UserAccessKey
-from c7n.resources.s3 import S3, get_region
-from c7n.resources.rds import RDS
 from c7n.manager import resources as aws_resources
 from c7n.version import version
 
@@ -91,13 +86,6 @@ def build_vocabulary():
         for q in quals:
             vocab.append("{}/{}".format(ns, q))
     return vocab
-
-
-def filter_empty(d):
-    for k, v in list(d.items()):
-        if not v:
-            del d[k]
-    return d
 
 
 class PostFinding(BaseAction):
@@ -224,59 +212,6 @@ class PostFinding(BaseAction):
         raise NotImplementedError("subclass responsibility")
 
 
-@S3.action_registry.register("post-finding")
-class BucketFinding(PostFinding):
-    def format_resource(self, r):
-        owner = r.get("Acl", {}).get("Owner", {})
-        resource = {
-            "Type": "AwsS3Bucket",
-            "Id": "arn:aws:::{}".format(r["Name"]),
-            "Region": get_region(r),
-            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
-            "Details": {"AwsS3Bucket": {"OwnerId": owner.get('ID', 'Unknown')}}
-        }
-
-        if "DisplayName" in owner:
-            resource["Details"]["AwsS3Bucket"]["OwnerName"] = owner['DisplayName']
-
-        return filter_empty(resource)
-
-
-@EC2.action_registry.register("post-finding")
-class InstanceFinding(PostFinding):
-    def format_resource(self, r):
-        details = {
-            "Type": r["InstanceType"],
-            "ImageId": r["ImageId"],
-            "IpV4Addresses": jmespath.search(
-                "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
-            ),
-            "KeyName": r.get("KeyName"),
-            "VpcId": r["VpcId"],
-            "SubnetId": r["SubnetId"],
-            "LaunchedAt": r["LaunchTime"].isoformat(),
-        }
-
-        if "IamInstanceProfile" in r:
-            details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
-
-        details = filter_empty(details)
-
-        instance = {
-            "Type": "AwsEc2Instance",
-            "Id": "arn:aws:{}:{}:instance/{}".format(
-                self.manager.config.region,
-                self.manager.config.account_id,
-                r["InstanceId"]),
-            "Region": self.manager.config.region,
-            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
-            "Details": {"AwsEc2Instance": details},
-        }
-
-        instance = filter_empty(instance)
-        return instance
-
-
 class OtherResourcePostFinding(PostFinding):
 
     fields = ()
@@ -327,38 +262,3 @@ class OtherResourcePostFinding(PostFinding):
 
 aws_resources.subscribe(
     aws_resources.EVENT_FINAL, OtherResourcePostFinding.register_resource)
-
-
-# AWS Account doesn't participate in events (not based on query resource manager)
-Account.action_registry.register('post-finding', OtherResourcePostFinding)
-
-
-@User.action_registry.register("post-finding")
-class UserFinding(OtherResourcePostFinding):
-
-    def format_resource(self, r):
-        if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.iter_filters())):
-            details = {
-                "UserName": "arn:aws::{}:user/{}".format(
-                    self.manager.config.account_id, r["c7n:AccessKeys"][0]["UserName"]
-                ),
-                "Status": r["c7n:AccessKeys"][0]["Status"],
-                "CreatedAt": r["c7n:AccessKeys"][0]["CreateDate"].isoformat(),
-            }
-            accesskey = {
-                "Type": "AwsIamAccessKey",
-                "Id": r["c7n:AccessKeys"][0]["AccessKeyId"],
-                "Region": self.manager.config.region,
-                "Details": {"AwsIamAccessKey": filter_empty(details)},
-            }
-            return filter_empty(accesskey)
-        else:
-            return super(UserFinding, self).format_resource(r)
-
-
-@RDS.action_registry.register("post-finding")
-class DbInstanceFinding(OtherResourcePostFinding):
-    fields = [
-        {'key': 'DBSubnetGroupName', 'expr': 'DBSubnetGroup.DBSubnetGroupName'},
-        {'key': 'VpcId', 'expr': 'DBSubnetGroup.VpcId'},
-    ]
