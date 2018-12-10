@@ -310,7 +310,7 @@ class OtherResourcePostFinding(PostFinding):
             'Type': 'Other',
             'Id': self.manager.get_arns([r])[0],
             'Region': self.manager.config.region,
-            'Details': {'Other': details}
+            'Details': {'Other': filter_empty(details)}
         }
         tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
         if tags:
