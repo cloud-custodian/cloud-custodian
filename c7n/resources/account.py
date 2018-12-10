@@ -85,7 +85,7 @@ class AccountCredentialReport(CredentialReport):
         results = []
         info = report.get('<root_account>')
         for r in resources:
-            if self.match(info):
+            if self.match(r, info):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
