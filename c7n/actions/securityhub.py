@@ -119,7 +119,7 @@ class PostFinding(BaseAction):
              confidence: 100
              compliance_status: FAILED
 
-    """
+    """ # NOQA
 
     FindingVersion = "2018-10-08"
     ProductName = "default"
