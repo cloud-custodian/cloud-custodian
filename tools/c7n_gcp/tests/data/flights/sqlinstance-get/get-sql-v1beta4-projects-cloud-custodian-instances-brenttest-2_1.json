@@ -1,0 +1,80 @@
+{
+  "headers": {
+    "expires": "Fri, 09 Nov 2018 14:16:26 GMT",
+    "date": "Fri, 09 Nov 2018 14:16:26 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2973",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/brenttest-2?alt=json"
+  },
+  "body": {
+    "kind": "sql#instance",
+    "selfLink": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/brenttest-2",
+    "name": "brenttest-2",
+    "connectionName": "cloud-custodian:us-central1:brenttest-2",
+    "etag": "782d45a4b889d9264114999a8aa4efa0ba8d55a45da2a5c7b2fa68f60daa6bd0",
+    "project": "cloud-custodian",
+    "state": "RUNNABLE",
+    "backendType": "SECOND_GEN",
+    "databaseVersion": "MYSQL_5_7",
+    "region": "us-central1",
+    "settings": {
+      "kind": "sql#settings",
+      "settingsVersion": "1",
+      "authorizedGaeApplications": [],
+      "tier": "db-f1-micro",
+      "backupConfiguration": {
+        "kind": "sql#backupConfiguration",
+        "startTime": "09:00",
+        "enabled": true,
+        "binaryLogEnabled": true,
+        "replicationLogArchivingEnabled": false
+      },
+      "pricingPlan": "PER_USE",
+      "replicationType": "SYNCHRONOUS",
+      "activationPolicy": "ALWAYS",
+      "ipConfiguration": {
+        "ipv4Enabled": false,
+        "authorizedNetworks": [],
+        "privateNetwork": "projects/cloud-custodian/global/networks/default"
+      },
+      "dataDiskSizeGb": "10",
+      "dataDiskType": "PD_SSD",
+      "maintenanceWindow": {
+        "kind": "sql#maintenanceWindow",
+        "hour": 0,
+        "day": 0
+      },
+      "storageAutoResize": true,
+      "storageAutoResizeLimit": "0"
+    },
+    "serverCaCert": {
+      "kind": "sql#sslCert",
+      "instance": "brenttest-2",
+      "sha1Fingerprint": "d4cdeb0a2f0dbffe444691dd04f9b2f028345122",
+      "commonName": "C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA",
+      "certSerialNumber": "0",
+      "cert": "-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2xvdWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJ\nBgNVBAYTAlVTMB4XDTE4MTEwOTEzNTE0MFoXDTI4MTEwNjEzNTI0MFowSDEjMCEG\nA1UEAxMaR29vZ2xlIENsb3VkIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2ds\nZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\nggEBAL9ELKS/s6sMEaGPZw4LaMjjv0V0SELhUjCc56bXVjAXnyr4dj1HlZE+emoP\n4CTKTbxEAIBccDSklq5g/AD4R5T0ogH2PeSkpD0wjdRHQhu29BB4Lmx3yy7W31Qa\nmukZvT+lpxOcE86Bhb+SebnFBr9nzpj6XbANz5aJfXvIFjrHfdA1FadVKaW29qrk\n6+H6YV+wpfMEjVuhY2Yb47KM0Q/WYKnXwnV9Xzq6/L0WdeDUl5aMrxGnIySSBn2V\nuC9m4ghqXRcPbqywnJLMNMYIQaLV5UovYStmpMI6rzvAX0VBUVxUxOv2uHHYz6Vf\nSDhcvIEWVLZC5d+kf47Tm0FEJL8CAwEAAaMWMBQwEgYDVR0TAQH/BAgwBgEB/wIB\nADANBgkqhkiG9w0BAQsFAAOCAQEADUorGtAb5/HZvWqS0paZuSZllLU4floHENT1\nCu7qlWDU364zqgCH+4scMgVHmH5mNPdhxMoPo6j2cNeQ+WkxJhBnN/2hfVI0Dha8\nlpmMuPHuJEbF2wQkY08RnrOFRaLWmm8+jRu/T5FYE7lodxc3Duw2YmUvNHgmtyb4\n59fC8ueeXeas0fcCPbX0w97rJIffczameqDFVYXVn44xoRZFKxIY+8infRrygiq1\nr48W60hsnCRpf4UGhEGqTX2l/SsqoUx0xJBJh6o6yOBXEQGeQAjeINjeZUevDwFK\nbtiB7Vd/4R0A3NuykTMr+0XlLN2G9WRJJwYVILZdpt4FnlDynw==\n-----END CERTIFICATE-----",
+      "createTime": "2018-11-09T13:51:40.970Z",
+      "expirationTime": "2028-11-06T13:52:40.970Z"
+    },
+    "ipAddresses": [
+      {
+        "ipAddress": "10.59.144.3",
+        "type": "PRIVATE"
+      }
+    ],
+    "instanceType": "CLOUD_SQL_INSTANCE",
+    "serviceAccountEmailAddress": "pazmx4ayqbb3ddok7rupyqsqay@speckle-umbrella-23.iam.gserviceaccount.com",
+    "gceZone": "us-central1-a"
+  }
+}
