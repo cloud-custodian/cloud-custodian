@@ -1188,7 +1188,6 @@ class CrossAccountChecker(TestCase):
 
 
 class SetRolePolicyAction(BaseTest):
-    @functional
     def test_set_policy_attached(self):
         factory = self.replay_flight_data("test_iam_set_policy_attached")
 
