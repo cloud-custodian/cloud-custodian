@@ -1,6 +1,7 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
+        "AttachedPolicies": [],
 	    "IsTruncated": false,
         "ResponseMetadata": {
             "RetryAttempts": 0, 
