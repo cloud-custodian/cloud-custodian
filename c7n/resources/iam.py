@@ -504,10 +504,14 @@ class SetPolicy(BaseAction):
 
         for r in resources:
             if self.data.get('state') == 'attached':
-                client.attach_role_policy(RoleName=r.get('RoleName'), PolicyArn=self.data.get('arn'))
+                client.attach_role_policy(
+                    RoleName=r.get('RoleName'),
+                    PolicyArn=self.data.get('arn'))
                 results.append(r)
             elif self.data.get('state') == 'detached':
-                client.detach_role_policy(RoleName=r.get('RoleName'), PolicyArn=self.data.get('arn'))
+                client.detach_role_policy(
+                    RoleName=r.get('RoleName'),
+                    PolicyArn=self.data.get('arn'))
                 results.append(r)
 
         return results
