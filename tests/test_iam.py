@@ -46,7 +46,6 @@ from c7n.resources.iam import (
     IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
-    SetPolicy,
 )
 from c7n.executor import MainThreadExecutor
 
