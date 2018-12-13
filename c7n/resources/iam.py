@@ -31,13 +31,14 @@ from botocore.exceptions import ClientError
 
 
 from c7n.actions import BaseAction
+from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema, chunks, filter_empty
 
 
 @resources.register('iam-group')
@@ -1116,6 +1117,29 @@ class UserMfaDevice(ValueFilter):
                 matched.append(r)
 
         return matched
+
+
+@User.action_registry.register('post-finding')
+class UserFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.iter_filters())):
+            details = {
+                "UserName": "arn:aws::{}:user/{}".format(
+                    self.manager.config.account_id, r["c7n:AccessKeys"][0]["UserName"]
+                ),
+                "Status": r["c7n:AccessKeys"][0]["Status"],
+                "CreatedAt": r["c7n:AccessKeys"][0]["CreateDate"].isoformat(),
+            }
+            accesskey = {
+                "Type": "AwsIamAccessKey",
+                "Id": r["c7n:AccessKeys"][0]["AccessKeyId"],
+                "Region": self.manager.config.region,
+                "Details": {"AwsIamAccessKey": filter_empty(details)},
+            }
+            return filter_empty(accesskey)
+        else:
+            return super(UserFinding, self).format_resource(r)
 
 
 @User.action_registry.register('delete')

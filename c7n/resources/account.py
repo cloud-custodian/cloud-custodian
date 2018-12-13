@@ -23,6 +23,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.missing import Missing
@@ -63,6 +64,9 @@ class Account(ResourceManager):
     @classmethod
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
+
+    def get_arns(self, resources):
+        return ["arn:::{account_id}".format(**r) for r in resources]
 
     def get_model(self):
         return self.resource_type
@@ -610,6 +614,12 @@ def cloudtrail_policy(original, bucket_name, account_id):
         if cta['Action'] not in original_actions:
             policy['Statement'].append(cta)
     return json.dumps(policy)
+
+
+# AWS Account doesn't participate in events (not based on query resource manager)
+# so the event subscriber used by postfinding to register doesn't apply, manually
+# register it.
+Account.action_registry.register('post-finding', OtherResourcePostFinding)
 
 
 @actions.register('enable-cloudtrail')
