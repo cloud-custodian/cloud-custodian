@@ -1213,7 +1213,9 @@ class SetRolePolicyAction(BaseTest):
         )
 
         resources = p.run()
+
         self.assertEqual(len(resources), 1)
+        self.assertIn('test-role-us-east-1', resources[0]['RoleName'])
 
     def test_set_policy_detached(self):
         factory = self.replay_flight_data("test_iam_set_policy_detached")
@@ -1224,7 +1226,7 @@ class SetRolePolicyAction(BaseTest):
                 "resource": "iam-role",
                 "filters": [
                     {
-                        "type": "no-specific-managed-policy",
+                        "type": "has-specific-managed-policy",
                         "value": "my-iam-policy",
                     }
                 ],
@@ -1240,4 +1242,6 @@ class SetRolePolicyAction(BaseTest):
         )
 
         resources = p.run()
+
         self.assertEqual(len(resources), 1)
+        self.assertIn('test-role-us-east-1', resources[0]['RoleName'])

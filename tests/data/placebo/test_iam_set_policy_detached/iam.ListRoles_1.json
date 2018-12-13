@@ -27,9 +27,9 @@
                     "day": 24, 
                     "minute": 38
                 }, 
-                "RoleName": "a123456-test-role-us-east-1",
+                "RoleName": "test-role-us-east-1",
                 "Path": "/human-role/",
-                "Arn": "arn:aws:iam::644160558196:role/human-role/a123456-test-role-us-east-1"
+                "Arn": "arn:aws:iam::644160558196:role/human-role/test-role-us-east-1"
             }
         ]
     }

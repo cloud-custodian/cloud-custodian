@@ -486,7 +486,7 @@ class SetPolicy(BaseAction):
           actions:
             - type: set-policy
               state: attached
-              arn: arn:aws:iam::123456789012:policy:my-iam-policy
+              arn: arn:aws:iam::123456789012:policy/my-iam-policy
 
     """
     schema = type_schema('set-policy', state={'type': 'string'}, arn={'type': 'string'})
@@ -503,12 +503,12 @@ class SetPolicy(BaseAction):
         results = []
 
         for r in resources:
-            if self.data.get('state', 'attached'):
+            if self.data.get('state') == 'attached':
                 client.attach_role_policy(RoleName=r.get('RoleName'), PolicyArn=self.data.get('arn'))
-                results.append(r.get('RoleName'))
-            elif self.data.get('state', 'detached'):
+                results.append(r)
+            elif self.data.get('state') == 'detached':
                 client.detach_role_policy(RoleName=r.get('RoleName'), PolicyArn=self.data.get('arn'))
-                results.append(r.get('RoleName'))
+                results.append(r)
 
         return results
 
