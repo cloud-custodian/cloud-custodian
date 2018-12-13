@@ -468,9 +468,9 @@ class NoSpecificIamRoleManagedPolicy(Filter):
 class SetPolicy(BaseAction):
     """Set a specific IAM policy as attached or detached on a role.
 
-    You will identify the policy by arn.
+    You will identify the policy by its arn.
 
-    Returns a list of names of roles modified by the action.
+    Returns a list of roles modified by the action.
 
     For example, if you want to automatically attach a policy to all roles which don't have it...
 
