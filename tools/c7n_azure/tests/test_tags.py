@@ -563,6 +563,53 @@ class TagsTest(BaseTest):
         self.assertEqual(after_tags['CreatorEmail'], 'cloud@custodian.com')
 
     @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_service_admin_event(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'SvcAdminEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = [{
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'role': 'Subscription Admin'
+                    }
+                },
+                'claims': {
+                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress':
+                        'cloud@custodian.com',
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }]
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['SvcAdminEmail'], 'cloud@custodian.com')
+
+    @arm_template('vm.json')
     def test_auto_tag_user_event_grid_sp_event(self):
         policy = self.load_policy(
             {
