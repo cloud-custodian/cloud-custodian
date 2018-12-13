@@ -57,6 +57,8 @@ from concurrent.futures import as_completed
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
+from c7n.actions.securityhub import OtherResourcePostFinding
+
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
@@ -678,6 +680,14 @@ class CopySnapshotTags(BaseAction):
         self.manager.retry(c.modify_db_instance(
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
             CopyTagsToSnapshot=self.data.get('enable', True)))
+
+
+@RDS.action_registry.register("post-finding")
+class DbInstanceFinding(OtherResourcePostFinding):
+    fields = [
+        {'key': 'DBSubnetGroupName', 'expr': 'DBSubnetGroup.DBSubnetGroupName'},
+        {'key': 'VpcId', 'expr': 'DBSubnetGroup.VpcId'},
+    ]
 
 
 @actions.register('snapshot')

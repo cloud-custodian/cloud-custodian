@@ -68,7 +68,7 @@ Links
 
 - `Homepage <http://cloudcustodian.io>`_
 - `Docs <http://cloudcustodian.io/docs/index.html>`_
-- `Developer Install <https://pypi.python.org/pypi/c7n>`_
+- `Developer Install <https://cloudcustodian.io/docs/developer/installing.html>`_
 - `Presentations <https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid>`_
 
 Quick Install

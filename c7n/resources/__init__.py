@@ -97,7 +97,4 @@ def load_resources():
     resources.load_plugins()
     resources.notify(resources.EVENT_FINAL)
 
-    # super cheese tech debt / fix me pls
-    from c7n.actions import securityhub
-
     LOADED = True
