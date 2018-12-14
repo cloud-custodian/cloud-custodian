@@ -24,7 +24,10 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         functionapp_def = Site(location=params['location'], site_config=site_config)
 
         functionapp_def.kind = 'functionapp,linux'
-        functionapp_def.server_farm_id = params['app_service_plan_id']
+
+        # dedicated linux app plan
+        if params['app_service_plan_id']:
+            functionapp_def.server_farm_id = params['app_service_plan_id']
 
         site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
         site_config.always_on = True

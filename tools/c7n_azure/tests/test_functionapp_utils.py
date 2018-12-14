@@ -67,5 +67,5 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name='custodian-test-app')
 
-        app = self.functionapp_util.deploy_dedicated_function_app(parameters)
+        app = self.functionapp_util.deploy_function_app(parameters)
         self.assertIsNotNone(app)

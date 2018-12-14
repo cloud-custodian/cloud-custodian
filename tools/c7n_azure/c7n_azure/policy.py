@@ -107,14 +107,12 @@ class AzureFunctionMode(ServerlessExecutionMode):
             'servicePlan',
             {
                 'name': 'cloud-custodian',
-                'location': 'westus2',
+                'location': 'westus',
                 'resource_group_name': 'cloud-custodian',
-                'sku_name': 'B1',
-                'sku_tier': 'Basic'
             })
 
         # Metadata used for automatic naming
-        location = service_plan.get('location', 'westus2')
+        location = service_plan.get('location', 'westus')
         rg_name = service_plan['resource_group_name']
         sub_id = session.get_subscription_id()
         target_sub_id = session.get_function_target_subscription_id()
@@ -175,7 +173,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             sys.exit(1)
 
         self.function_params = self.get_function_app_params()
-        FunctionAppUtilities().deploy_dedicated_function_app(self.function_params)
+        FunctionAppUtilities().deploy_function_app(self.function_params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
