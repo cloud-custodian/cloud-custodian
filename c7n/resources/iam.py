@@ -490,32 +490,31 @@ class SetPolicy(BaseAction):
               arn: arn:aws:iam::123456789012:policy/my-iam-policy
 
     """
-    schema = type_schema('set-policy', state={'type': 'string'}, arn={'type': 'string'})
-    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
+    schema = type_schema(
+        'set-policy',
+        state={'enum': ['attached', 'detached']},
+        arn={'type': 'string'},
+        required=['state', 'policy'])
 
-    def validate(self):
-        if self.data.get('state') not in ['attached', 'detached']:
-            raise PolicyValidationError(
-                "Policy 'state' must be 'attached' or 'detached'.")
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
-
-        results = []
+        policy_arn = self.data['arn']
+        state = self.data['state']
 
         for r in resources:
-            if self.data.get('state') == 'attached':
+            if state == 'attached':
                 client.attach_role_policy(
-                    RoleName=r.get('RoleName'),
-                    PolicyArn=self.data.get('arn'))
-                results.append(r)
-            elif self.data.get('state') == 'detached':
-                client.detach_role_policy(
-                    RoleName=r.get('RoleName'),
-                    PolicyArn=self.data.get('arn'))
-                results.append(r)
-
-        return results
+                    RoleName=r['RoleName'],
+                    PolicyArn=policy_arn)
+            elif state == 'detached':
+                try:
+                    client.detach_role_policy(
+                        RoleName=r['RoleName'],
+                        PolicyArn=policy_arn)
+                except client.exceptions.NoSuchEntityException:
+                    pass
 
 
 ######################
