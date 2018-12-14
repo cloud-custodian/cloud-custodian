@@ -117,6 +117,12 @@ class LambdaPermissionTest(BaseTest):
         self.assertRaises(ClientError, client.get_policy, FunctionName=name)
 
 
+class LambdaLayerTest(BaseTest):
+
+    def test_lambda_layer_cross_account(self):
+        factory = self.record_flight_data(
+
+
 class LambdaTest(BaseTest):
 
     def test_lambda_config_source(self):

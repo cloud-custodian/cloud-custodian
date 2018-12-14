@@ -19,6 +19,7 @@ import json
 import six
 
 from botocore.exceptions import ClientError
+from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, RemovePolicyBase
@@ -528,13 +529,22 @@ class LambdaLayerVersion(query.QueryResourceManager):
 
         versions = []
         for layer_name in layer_names:
-            # todo: boto3 paginator def needed
-            for v in self.retry(
-                    client.list_layer_versions,
-                    LayerName=layer_name).get('LayerVersions'):
+            pager = get_layer_version_paginator(client)
+            for v in pager.build_full_result().get('LayerVersions'):
                 v['LayerName'] = layer_name
                 versions.append(v)
         return versions
+
+
+def get_layer_version_paginator(client):
+    pager = Paginator(
+        client.list_layer_versions,
+        {'input_token': 'NextToken',
+         'output_token': 'NextToken',
+         'result_key': 'LayerVersions'},
+        client.meta.service_model.operation_model('ListLayerVersions'))
+    pager.PAGE_ITERATOR_CLS = query.RetryPageIterator
+    return pager
 
 
 @LambdaLayerVersion.filter_registry.register('cross-account')
