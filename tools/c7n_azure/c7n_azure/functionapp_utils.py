@@ -66,7 +66,7 @@ class FunctionAppUtilities(object):
             return function_app
 
         # provision a dedicated app service plan
-        if parameters.service_plan['sku_name'] and parameters.service_plan['sku_tier']:
+        if parameters.service_plan.get('sku_name') and parameters.service_plan.get('sku_tier'):
             sp_unit = AppServicePlanUnit()
             app_service_plan = sp_unit.provision_if_not_exists(parameters.service_plan)
             function_app_params.update({'location': app_service_plan.location,

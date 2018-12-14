@@ -95,6 +95,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_params = None
+        self.function_app = None
 
     def get_function_app_params(self):
         session = local_session(self.policy.session_factory)
@@ -173,7 +174,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             sys.exit(1)
 
         self.function_params = self.get_function_app_params()
-        FunctionAppUtilities().deploy_function_app(self.function_params)
+        self.function_app = FunctionAppUtilities().deploy_function_app(self.function_params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
@@ -197,19 +198,22 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.log.info("Building function package for %s" % self.function_params.function_app_name)
 
         package = self._build_functions_package(queue_name)
-
         self.log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
 
-        client = local_session(self.policy.session_factory)\
+        client = local_session(self.policy.session_factory) \
             .client('azure.mgmt.web.WebSiteManagementClient')
-        publish_creds = client.web_apps.list_publishing_credentials(
-            self.function_params.function_app_resource_group_name,
-            self.function_params.function_app_name).result()
 
-        if package.wait_for_status(publish_creds):
-            package.publish(publish_creds)
+        if self.function_app['server_farm_id']:
+            publish_creds = client.web_apps.list_publishing_credentials(
+                self.function_params.function_app_resource_group_name,
+                self.function_params.function_app_name).result()
+
+            if package.wait_for_status(publish_creds):
+                package.publish(publish_creds)
+            else:
+                self.log.error("Aborted deployment, ensure Application Service is healthy.")
         else:
-            self.log.error("Aborted deployment, ensure Application Service is healthy.")
+            self.log.info("Consumption Plan")
 
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)
