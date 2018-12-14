@@ -31,13 +31,14 @@ from botocore.exceptions import ClientError
 
 
 from c7n.actions import BaseAction
+from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter, OPERATORS
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema, chunks, filter_empty
 
 
 @resources.register('iam-group')
@@ -462,6 +463,58 @@ class NoSpecificIamRoleManagedPolicy(Filter):
             return [r for r in resources if not self.data.get('value') in
             self._managed_policies(c, r)]
         return []
+
+
+@Role.action_registry.register('set-policy')
+class SetPolicy(BaseAction):
+    """Set a specific IAM policy as attached or detached on a role.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a policy to all roles which don't have it...
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-role-policy
+          resource: iam-role
+          filters:
+            - type: no-specific-managed-policy
+              value: my-iam-policy
+          actions:
+            - type: set-policy
+              state: attached
+              arn: arn:aws:iam::123456789012:policy/my-iam-policy
+
+    """
+    schema = type_schema(
+        'set-policy',
+        state={'enum': ['attached', 'detached']},
+        arn={'type': 'string'},
+        required=['state', 'arn'])
+
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        policy_arn = self.data['arn']
+        state = self.data['state']
+
+        for r in resources:
+            if state == 'attached':
+                client.attach_role_policy(
+                    RoleName=r['RoleName'],
+                    PolicyArn=policy_arn)
+            elif state == 'detached':
+                try:
+                    client.detach_role_policy(
+                        RoleName=r['RoleName'],
+                        PolicyArn=policy_arn)
+                except client.exceptions.NoSuchEntityException:
+                    pass
 
 
 ######################
@@ -1116,6 +1169,29 @@ class UserMfaDevice(ValueFilter):
                 matched.append(r)
 
         return matched
+
+
+@User.action_registry.register('post-finding')
+class UserFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.iter_filters())):
+            details = {
+                "UserName": "arn:aws::{}:user/{}".format(
+                    self.manager.config.account_id, r["c7n:AccessKeys"][0]["UserName"]
+                ),
+                "Status": r["c7n:AccessKeys"][0]["Status"],
+                "CreatedAt": r["c7n:AccessKeys"][0]["CreateDate"].isoformat(),
+            }
+            accesskey = {
+                "Type": "AwsIamAccessKey",
+                "Id": r["c7n:AccessKeys"][0]["AccessKeyId"],
+                "Region": self.manager.config.region,
+                "Details": {"AwsIamAccessKey": filter_empty(details)},
+            }
+            return filter_empty(accesskey)
+        else:
+            return super(UserFinding, self).format_resource(r)
 
 
 @User.action_registry.register('delete')

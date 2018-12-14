@@ -21,6 +21,7 @@ coverage:
       mailer:
         paths: "tools/c7n_mailer"
       custodian:
+        threshold: "0.05%"
         paths:
           - "!tools"
       default: off
