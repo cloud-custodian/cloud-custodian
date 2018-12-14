@@ -494,7 +494,7 @@ class SetPolicy(BaseAction):
         'set-policy',
         state={'enum': ['attached', 'detached']},
         arn={'type': 'string'},
-        required=['state', 'policy'])
+        required=['state', 'arn'])
 
     permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
 
