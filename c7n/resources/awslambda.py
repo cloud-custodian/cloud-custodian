@@ -497,13 +497,23 @@ class Delete(BaseAction):
 
 @resources.register('lambda-layer')
 class LambdaLayerVersion(query.QueryResourceManager):
-    """Note custodian models the lambda layer version not a layer.
+    """Note custodian models the lambda layer version.
 
     Layers end up being a logical asset, the physical asset for use
     and management is the layer verison.
 
     To ease that distinction, we support querying just the latest
     layer version or having a policy against all layer versions.
+
+    Query all versions
+
+    .. code-block:: yaml
+
+        policies:
+          - name: lambda-layer
+            query:
+              - version: all
+
     """
 
     class resource_type(object):
@@ -522,7 +532,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
             versions[r['LayerName']] = v = r['LatestMatchingVersion']
             v['LayerName'] = r['LayerName']
 
-        if self.data.get('query', {}).get('version') != 'all':
+        if {'version': 'all'} not in self.data.get('query', []):
             return list(versions.values())
 
         layer_names = list(versions)

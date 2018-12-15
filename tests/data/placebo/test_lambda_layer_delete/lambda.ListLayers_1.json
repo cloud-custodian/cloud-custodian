@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "055cfade-001a-11e9-8bee-914cb685ae50",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 15 Dec 2018 03:32:17 GMT",
+                "content-type": "application/json",
+                "content-length": "341",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "055cfade-001a-11e9-8bee-914cb685ae50"
+            },
+            "RetryAttempts": 0
+        },
+        "Layers": [
+            {
+                "LayerName": "test",
+                "LayerArn": "arn:aws:lambda:us-east-1:644160558196:layer:test",
+                "LatestMatchingVersion": {
+                    "LayerVersionArn": "arn:aws:lambda:us-east-1:644160558196:layer:test:1",
+                    "Version": 1,
+                    "Description": "xyz",
+                    "CreatedDate": "2018-12-02T04:50:47.585+0000",
+                    "CompatibleRuntimes": [
+                        "python3.7"
+                    ]
+                }
+            }
+        ]
+    }
+}

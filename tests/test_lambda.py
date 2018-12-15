@@ -136,6 +136,21 @@ class LambdaLayerTest(BaseTest):
                 LayerName=resources[0]['LayerName'],
                 VersionNumber=resources[0]['Version']).get('Policy')
 
+    def test_delete_layer(self):
+        factory = self.replay_flight_data('test_lambda_layer_delete')
+        p = self.load_policy({
+            'name': 'lambda-layer-delete',
+            'resource': 'lambda-layer',
+            'filters': [{'LayerName': 'test'}],
+            'actions': [{'type': 'delete'}]},
+            session_factory=factory)
+        resources = p.run()
+        client = factory().client('lambda')
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.get_layer_version(
+                LayerName='test',
+                VersionNumber=resources[0]['Version'])
+
 
 class LambdaTest(BaseTest):
 
