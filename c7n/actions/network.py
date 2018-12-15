@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
+import jmespath
 import six
 
-from c7n.exceptions import PolicyExecutionError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n import utils
 
 from .core import Action
@@ -62,174 +64,150 @@ class ModifyVpcSecurityGroupsAction(Action):
             {'required': ['add', 'type']}]
     }
 
-    def get_resource_vpc(self, r):
+    SYMBOLIC_SGS = set(('all', 'matched', 'network-location'))
+
+    sg_expr = None
+    vpc_expr = None
+
+    def validate(self):
+        sg_filter = self.manager.filter_registry.get('security-group')
+        if not sg_filter or not sg_filter.RelatedIdsExpression:
+            raise PolicyValidationError(self._format_error((
+                "policy:{policy} resource:{resource_type} does "
+                "not support {action_type} action")))
+        if self.get_action_group_names():
+            vpc_filter = self.manager.filter_registry.get('vpc')
+            if not vpc_filter or not vpc_filter.RelatedIdsExpression:
+                raise PolicyValidationError(self._format_error((
+                    "policy:{policy} resource:{resource_type} does not support "
+                    "security-group names only ids in action:{action_type}")))
+            self.vpc_expr = jmespath.compile(vpc_filter.RelatedIdsExpression)
+        self.sg_expr = jmespath.compile(
+            self.manager.filter_registry.get('security-group').RelatedIdsExpression)
+        return self
+
+    def get_group_names(self, groups):
+        names = []
+        for g in groups:
+            if g.startswith('sg-'):
+                continue
+            elif g in self.SYMBOLIC_SGS:
+                continue
+            names.append(g)
+        return names
+
+    def get_action_group_names(self):
+        return self.get_group_names(
+            list(itertools.chain(
+                *[self._get_array('add'),
+                  self._get_array('remove'),
+                  self._get_array('isolation-group')])))
+
+    def _format_error(self, msg, **kw):
+        return msg.format(
+            policy=self.manager.ctx.policy.name,
+            resource_type=self.manager.type,
+            action_type=self.type,
+            **kw)
+
+    def _get_array(self, k):
+        v = self.data.get(k, [])
+        if isinstance(v, six.string_types):
+            return [v]
+        return v
+
+    def get_groups_by_names(self, names):
+        """Resolve security names to security groups resources."""
+        if not names:
+            return []
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        sgs = self.manager.retry(
+            client.describe_security_groups,
+            Filters=[{
+                'Name': 'group-name', 'Values': names}]).get(
+                    'SecurityGroups', [])
+        if len(sgs) != len(names):
+            raise PolicyExecutionError(self._format_error(
+                "policy:{policy} security groups not found "
+                "requested: {names}, found: {groups}",
+                names=names, groups=[g['GroupId'] for g in sgs]))
+        return sgs
+
+    def resolve_group_names(self, r, target_group_ids, groups):
+        """Resolve any policy security group names to the corresponding group ids.
         """
-        Returns the resource's VPC ID
+        names = self.get_group_names(target_group_ids)
+        if not names:
+            return target_group_ids
+
+        target_group_ids = list(target_group_ids)
+        vpc_id = self.vpc_expr.search(r)
+        if not vpc_id:
+            raise PolicyExecutionError(self._format_error(
+                "policy:{policy} non vpc attached resource used "
+                "with modify-security-group: {resource_id}",
+                resource_id=r[self.manager.resource_type.id]))
+
+        found = False
+        for n in names:
+            for g in groups:
+                if g['GroupName'] == n and g['VpcId'] == vpc_id:
+                    found = g['GroupId']
+            if not found:
+                raise PolicyExecutionError(self._format_error((
+                    "policy:{policy} could not resolve sg:{name} for "
+                    "resource:{resource_id} in vpc:{vpc}"),
+                    name=n,
+                    resource_id=r[self.manager.resource_type.id], vpc=vpc_id))
+            target_group_ids.remove(n)
+            target_group_ids.append(found)
+        return target_group_ids
+
+    def resolve_remove_symbols(self, r, target_group_ids, rgroups):
+        """Resolve the resources security groups that need be modified.
+
+        Specifically handles symbolic names that match annotations from policy filters
+        for groups being removed.
         """
-        vpc = r.get('VpcId', None)
-        lambda_vpc_config = r.get('VpcConfig', None)
-        elb_vpc = r.get('VPCId', None)
+        if 'matched' in target_group_ids:
+            return r.get('c7n:matched-security-groups', ())
+        elif 'network-location' in target_group_ids:
+            for reason in r.get('c7n:NetworkLocation', ()):
+                if reason['reason'] == 'SecurityGroupMismatch':
+                    return list(reason['security-groups'])
+        elif 'all' in target_group_ids:
+            return rgroups
+        return target_group_ids
 
-        if lambda_vpc_config is not None:
-            return lambda_vpc_config.get('VpcId', None)
-        elif elb_vpc is not None:
-            return elb_vpc
-        else:
-            return vpc
-
-    def get_security_group_ids_and_names(self, data):
-        """
-        Returns Security Group ids and names.
-        Raises PolicyExecutionError if group names are not found
-        """
-        group_ids = []
-        group_names = []
-
-        # Can assume sg's won't start with 'sg-'
-        # https://docs.aws.amazon.com/cli/latest/reference/ec2/create-security-group.html
-        if isinstance(data, list):
-            group_ids = [id for id in data if id.startswith('sg-')]
-            group_names = [name for name in data if not name.startswith('sg-')]
-        elif isinstance(data, six.string_types):
-            if data.startswith('sg-') or data in ["all", "matched", "network-location"]:
-                group_ids = [data]
-            else:
-                group_names = [data]
-
-        if len(group_names) > 0:
-            client = utils.local_session(
-                self.manager.session_factory).client('ec2')
-
-            filtered_sgs = client.describe_security_groups(
-                Filters=[
-                    {
-                        'Name': 'group-name',
-                        'Values': group_names
-                    }
-                ]
-            )['SecurityGroups']
-
-            filtered_ids = [
-                {
-                    'GroupName': a.get('GroupName', None),
-                    'GroupId': a.get('GroupId', None),
-                    'VpcId': a.get('VpcId', None)
-                }
-                for a in filtered_sgs
-            ]
-            if not filtered_ids or len(filtered_ids) == 0:
-                raise PolicyExecutionError(
-                    "Security Groups not found: requested: %s, found: %s" %
-                    (group_names, filtered_ids))
-            group_names = filtered_ids
-        return group_ids, group_names
-
-    def parse_groups(self, r, target_group_ids, target_group_names, rgroups, action):
-        """
-        Parse user-provided groups in policy and resolves security groups
-        from either names or whitelisted names (matched, network-location, all)
-        """
-        groups = []
-
-        if action == 'remove':
-            # Parse remove_groups
-            if 'matched' in target_group_ids:
-                return r.get('c7n:matched-security-groups', ())
-            elif 'network-location' in target_group_ids:
-                for reason in r.get('c7n:NetworkLocation', ()):
-                    if reason['reason'] == 'SecurityGroupMismatch':
-                        return list(reason['security-groups'])
-            elif 'all' in target_group_ids:
-                return rgroups
-
-        group_names_ids = [g['GroupId'] for g in target_group_names
-            if g.get('VpcId', None) == self.get_resource_vpc(r)]
-        # removes duplicate values
-        groups = list(set(group_names_ids + target_group_ids))
-
-        return groups
-
-    def get_resource_security_groups(self, r, metadata_key=None):
-        """
-        Returns Security Groups based for a variety of vpc attached resources
-        """
-        if r.get('Groups'):
-            if metadata_key and isinstance(r['Groups'][0], dict):
-                rgroups = [g[metadata_key] for g in r['SecurityGroups']]
-            else:
-                rgroups = [g['GroupId'] for g in r['Groups']]
-        elif r.get('SecurityGroups'):
-            # elb, ec2, elasticache, efs, dax vpc resource security groups
-            if metadata_key and isinstance(r['SecurityGroups'][0], dict):
-                rgroups = [g[metadata_key] for g in r['SecurityGroups']]
-            else:
-                rgroups = [g for g in r['SecurityGroups']]
-        elif r.get('VpcSecurityGroups'):
-            # rds resource security groups
-            if metadata_key and isinstance(r['VpcSecurityGroups'][0], dict):
-                rgroups = [g[metadata_key] for g in r['VpcSecurityGroups']]
-            else:
-                rgroups = [g for g in r['VpcSecurityGroups']]
-        elif r.get('VPCOptions', {}).get('SecurityGroupIds', []):
-            # elasticsearch resource security groups
-            if metadata_key and isinstance(
-                    r['VPCOptions']['SecurityGroupIds'][0], dict):
-                rgroups = [g[metadata_key] for g in r[
-                    'VPCOptions']['SecurityGroupIds']]
-            else:
-                rgroups = [g for g in r['VPCOptions']['SecurityGroupIds']]
-        # use as substitution for 'Groups' or '[Vpc]SecurityGroups'
-        # unsure if necessary - defer to coverage report
-        elif metadata_key and r.get(metadata_key):
-            rgroups = [g for g in r[metadata_key]]
-
-        return rgroups
-
-    def get_groups(self, resources, metadata_key=None):
-        """Parse policies to get lists of security groups to attach to each resource
+    def get_groups(self, resources):
+        """Return lists of security groups to set on each resource
 
         For each input resource, parse the various add/remove/isolation-
         group policies for 'modify-security-groups' to find the resulting
         set of VPC security groups to attach to that resource.
 
-        The 'metadata_key' parameter can be used for two purposes at
-        the moment; The first use is for resources' APIs that return a
-        list of security group IDs but use a different metadata key
-        than 'Groups' or 'SecurityGroups'.
-
-        The second use is for when there are richer objects in the 'Groups' or
-        'SecurityGroups' lists. The custodian actions need to act on lists of
-        just security group IDs, so the metadata_key can be used to select IDs
-        from the richer objects in the provided lists.
-
         Returns a list of lists containing the resulting VPC security groups
         that should end up on each resource passed in.
 
         :param resources: List of resources containing VPC Security Groups
-        :param metadata_key: Metadata key for security groups list
         :return: List of lists of security groups per resource
 
         """
-        # parse the add, remove, and isolation group params to return the
-        # list of security groups that will end up on the resource
-        # target_group_ids = self.data.get('groups', 'matched')
-
-        add_ids, add_names = self.get_security_group_ids_and_names(
-            self.data.get('add', None))
-        remove_ids, remove_names = self.get_security_group_ids_and_names(
-            self.data.get('remove', None))
-        isolation_ids, isolation_names = self.get_security_group_ids_and_names(
-            self.data.get('isolation-group', None))
+        resolved_groups = self.get_groups_by_names(self.get_action_group_names())
         return_groups = []
 
         for idx, r in enumerate(resources):
-            rgroups = self.get_resource_security_groups(r, metadata_key)
-            add_groups = self.parse_groups(r, add_ids, add_names, rgroups, "add")
-            remove_groups = self.parse_groups(r, remove_ids, remove_names, rgroups, "remove")
-
-            # seems extraneous with list?
-            # if not remove_groups and not add_groups:
-            #     continue
+            rgroups = self.sg_expr.search(r) or []
+            add_groups = self.resolve_group_names(
+                r, self._get_array('add'), resolved_groups)
+            remove_groups = self.resolve_remove_symbols(
+                r,
+                self.resolve_group_names(
+                    r, self._get_array('remove'), resolved_groups),
+                rgroups)
+            isolation_groups = self.resolve_group_names(
+                r, self._get_array('isolation-group'), resolved_groups)
 
             for g in remove_groups:
                 if g in rgroups:
@@ -239,7 +217,7 @@ class ModifyVpcSecurityGroupsAction(Action):
                     rgroups.append(g)
 
             if not rgroups:
-                rgroups = self.parse_groups(r, isolation_ids, isolation_names, rgroups, "isolation")
+                rgroups = list(isolation_groups)
 
             return_groups.append(rgroups)
 
