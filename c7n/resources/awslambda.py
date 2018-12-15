@@ -561,6 +561,8 @@ def get_layer_version_paginator(client):
 @LambdaLayerVersion.filter_registry.register('cross-account')
 class LayerCrossAccount(CrossAccountAccessFilter):
 
+    permissions = ('lambda:GetLayerVersionPolicy',)
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('lambda')
         for r in resources:
@@ -623,6 +625,7 @@ class LayerRemovePermissions(RemovePolicyBase):
 class DeleteLayerVersion(BaseAction):
 
     schema = type_schema('delete')
+    permissions = ('lambda:DeleteLayerVersion',)
 
     def process(self, resources):
         client = local_session(
