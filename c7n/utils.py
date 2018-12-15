@@ -119,6 +119,13 @@ def format_event(evt):
     return json.dumps(evt, indent=2)
 
 
+def filter_empty(d):
+    for k, v in list(d.items()):
+        if not v:
+            del d[k]
+    return d
+
+
 def type_schema(
         type_name, inherits=None, rinherit=None,
         aliases=None, required=None, **props):

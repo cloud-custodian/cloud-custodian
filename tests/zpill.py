@@ -83,6 +83,7 @@ def serialize(obj):
         result["__module__"] = obj.__module__
     except AttributeError:
         pass
+
     # Convert objects to dictionary representation based on type
     if isinstance(obj, datetime):
         result["year"] = obj.year
@@ -98,6 +99,9 @@ def serialize(obj):
         obj._raw_stream = StringIO(result["body"])
         obj._amount_read = 0
         return result
+    if isinstance(obj, bytes):
+        return obj.decode('utf8')
+
     # Raise a TypeError if the object isn't recognized
     raise TypeError("Type not serializable")
 
