@@ -22,21 +22,24 @@ from .core import Action
 
 
 class ModifyVpcSecurityGroupsAction(Action):
-    """Common actions for modifying security groups on a resource
+    """Common action for modifying security groups on a vpc attached resources.
 
-    Can target either physical groups as a list of group ids or
-    symbolic groups like 'matched', 'network-location' or 'all'. 'matched' uses
-    the annotations of the 'security-group' interface filter. 'network-location' uses
-    the annotations of the 'network-location' interface filter for `SecurityGroupMismatch`.
+    Security groups for add or remove can be specified via group id or
+    name. Group removal also supports symbolic names such as
+    'matched', 'network-location' or 'all'. 'matched' uses the
+    annotations/output of the 'security-group' filter
+    filter. 'network-location' uses the annotations of the
+    'network-location' interface filter for `SecurityGroupMismatch`.
 
-    Note an interface always gets at least one security group, so
-    we mandate the specification of an isolation/quarantine group
-    that can be specified if there would otherwise be no groups.
+    Note a vpc attached resource requires at least one security group,
+    this action will use the sg specified in `isolation-group` to ensure
+    resources always have at least one security-group.
 
     type: modify-security-groups
         add: []
         remove: [] | matched | network-location
         isolation-group: sg-xyz
+
     """
     schema_alias = True
     schema = {
@@ -84,6 +87,10 @@ class ModifyVpcSecurityGroupsAction(Action):
             self.vpc_expr = jmespath.compile(vpc_filter.RelatedIdsExpression)
         self.sg_expr = jmespath.compile(
             self.manager.filter_registry.get('security-group').RelatedIdsExpression)
+        if 'all' in self._get_array('remove') and not self._get_array('isolation-group'):
+            raise PolicyValidationError(self._format_error((
+                "policy:{policy} use of action:{action_type} with "
+                "remove: all requires specifying isolation-group")))
         return self
 
     def get_group_names(self, groups):
