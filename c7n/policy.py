@@ -355,7 +355,7 @@ class LambdaMode(ServerlessExecutionMode):
             'member-role': {'type': 'string'},
             'packages': {'type': 'array'},
             # Lambda passthrough config
-            'runtime': {'enum': ['python2.7', 'python3.6']},
+            'runtime': {'enum': ['python2.7', 'python3.6', 'python3.7']},
             'role': {'type': 'string'},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
