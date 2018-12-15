@@ -85,8 +85,9 @@ class ModifyVpcSecurityGroupsAction(Action):
                     "policy:{policy} resource:{resource_type} does not support "
                     "security-group names only ids in action:{action_type}")))
             self.vpc_expr = jmespath.compile(vpc_filter.RelatedIdsExpression)
-        self.sg_expr = jmespath.compile(
-            self.manager.filter_registry.get('security-group').RelatedIdsExpression)
+        if self.sg_expr is None:
+            self.sg_expr = jmespath.compile(
+                self.manager.filter_registry.get('security-group').RelatedIdsExpression)
         if 'all' in self._get_array('remove') and not self._get_array('isolation-group'):
             raise PolicyValidationError(self._format_error((
                 "policy:{policy} use of action:{action_type} with "

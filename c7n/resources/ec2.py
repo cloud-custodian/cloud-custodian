@@ -173,7 +173,7 @@ class DescribeEC2(query.DescribeSource):
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    RelatedIdsExpression = "Groups[].GroupId"
+    RelatedIdsExpression = "SecurityGroups[].GroupId"
 
 
 @filters.register('subnet')
@@ -1286,6 +1286,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
+    sg_expr = jmespath.compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):
