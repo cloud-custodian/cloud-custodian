@@ -1,0 +1,16 @@
+{
+    "status_code": 204,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "18260323-0018-11e9-8381-79ac6714e3d5",
+            "HTTPStatusCode": 204,
+            "HTTPHeaders": {
+                "date": "Sat, 15 Dec 2018 03:18:29 GMT",
+                "content-type": "application/json",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "18260323-0018-11e9-8381-79ac6714e3d5"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

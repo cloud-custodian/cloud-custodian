@@ -120,12 +120,21 @@ class LambdaPermissionTest(BaseTest):
 class LambdaLayerTest(BaseTest):
 
     def test_lambda_layer_cross_account(self):
-        factory = self.record_flight_data('test_lambda_layer_cross_account')
+        factory = self.replay_flight_data('test_lambda_layer_cross_account')
         p = self.load_policy({
             'name': 'lambda-layer-cross',
             'resource': 'lambda-layer',
-            'filters': [{'type': 'cross-account'}]
-        })
+            'filters': [{'type': 'cross-account'}],
+            'actions': [{'type': 'remove-statements',
+                         'statement_ids': 'matched'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('lambda')
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.get_layer_version_policy(
+                LayerName=resources[0]['LayerName'],
+                VersionNumber=resources[0]['Version']).get('Policy')
 
 
 class LambdaTest(BaseTest):

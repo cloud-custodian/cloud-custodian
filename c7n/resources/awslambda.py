@@ -505,6 +505,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
     To ease that distinction, we support querying just the latest
     layer version or having a policy against all layer versions.
     """
+
     class resource_type(object):
         service = 'lambda'
         type = 'function'
@@ -554,19 +555,62 @@ class LayerCrossAccount(CrossAccountAccessFilter):
         client = local_session(self.manager.session_factory).client('lambda')
         for r in resources:
             r['c7n:Policy'] = self.manager.retry(
-                r.get_layer_version_policy,
-                r['LayerName'],
-                r['Version']).get('Policy')
+                client.get_layer_version_policy,
+                LayerName=r['LayerName'],
+                VersionNumber=r['Version']).get('Policy')
         return super(LayerCrossAccount, self).process(resources)
 
     def get_resource_policy(self, r):
         return r['c7n:Policy']
 
 
+@LambdaLayerVersion.action_registry.register('remove-statements')
+class LayerRemovePermissions(RemovePolicyBase):
+
+    schema = type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    permissions = (
+        "lambda:GetLayerVersionPolicy",
+        "lambda:RemoveLayerVersionPermission")
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('lambda')
+        for r in resources:
+            self.process_resource(client, r)
+
+    def process_resource(self, client, r):
+        if 'c7n:Policy' not in r:
+            try:
+                r['c7n:Policy'] = self.manager.retry(
+                    client.get_layer_version_policy,
+                    LayerName=r['LayerName'],
+                    VersionNumber=r['Version'])
+            except client.exceptions.ResourceNotFound:
+                return
+
+        p = json.loads(r['c7n:Policy'])
+
+        statements, found = self.process_policy(
+            p, r, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        for f in found:
+            self.manager.retry(
+                client.remove_layer_version_permission,
+                LayerName=r['LayerName'],
+                StatementId=f['Sid'],
+                VersionNumber=r['Version'])
+
+
 @LambdaLayerVersion.action_registry.register('delete')
 class DeleteLayerVersion(BaseAction):
-
-    LayerVersionsAnnotation = LambdaLayerVersion.LayerVersionsAnnotation
 
     schema = type_schema('delete')
 
@@ -579,6 +623,6 @@ class DeleteLayerVersion(BaseAction):
                 self.manager.retry(
                     client.delete_layer_version,
                     LayerName=r['LayerName'],
-                    Version=r['Version'])
+                    VersionNumber=r['Version'])
             except client.exceptions.ResourceNotFound:
                 continue
