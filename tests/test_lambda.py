@@ -120,7 +120,12 @@ class LambdaPermissionTest(BaseTest):
 class LambdaLayerTest(BaseTest):
 
     def test_lambda_layer_cross_account(self):
-        factory = self.record_flight_data(
+        factory = self.record_flight_data('test_lambda_layer_cross_account')
+        p = self.load_policy({
+            'name': 'lambda-layer-cross',
+            'resource': 'lambda-layer',
+            'filters': [{'type': 'cross-account'}]
+        })
 
 
 class LambdaTest(BaseTest):
