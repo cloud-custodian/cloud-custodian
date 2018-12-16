@@ -394,7 +394,7 @@ class AWS(object):
         """
         _default_region(options)
         _default_account_id(options)
-        if options.trace:
+        if options.tracer:
             XrayTracer.initialize()
 
         return options
