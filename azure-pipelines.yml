@@ -56,7 +56,7 @@ jobs:
 
   - script: codecov -t $(CODECOV_TOKEN)
     displayName: 'Publish Code Coverage'
-    condition: "eq(python.version, '2.7')"
+    condition: "eq(variables['python.version'], '2.7')"
 
   - task: PublishTestResults@2
     inputs:
