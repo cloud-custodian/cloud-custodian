@@ -56,9 +56,11 @@ jobs:
   - script: tox
     displayName: 'Tox'
 
-  - script: CODECOV_TOKEN="$CODECOV_TOKEN" codecov
+  - script: codecov
     displayName: 'Publish Code Coverage'
     condition: "eq(variables['python.version'], '2.7')"
+    env:
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
 
   - task: PublishTestResults@2
     inputs:
