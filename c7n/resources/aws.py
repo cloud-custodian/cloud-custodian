@@ -216,6 +216,7 @@ class XrayTracer(object):
     use_daemon = 'AWS_XRAY_DAEMON_ADDRESS' in os.environ
     service_name = 'custodian'
 
+    @classmethod
     def initialize(cls):
         context = XrayContext()
         xray_recorder.configure(
