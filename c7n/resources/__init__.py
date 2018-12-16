@@ -91,6 +91,7 @@ def load_resources():
     import c7n.resources.support
     import c7n.resources.vpc
     import c7n.resources.waf
+    import c7n.resources.fsx
 
     # Load external plugins (private sdks etc)
     from c7n.manager import resources
