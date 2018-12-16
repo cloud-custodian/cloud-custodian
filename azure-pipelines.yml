@@ -6,8 +6,10 @@
 trigger:
 - master
 
-jobs:
+variables:
+- group: CustodianCoreCI
 
+jobs:
 - job: 'Lint'
   pool:
     vmImage: 'Ubuntu-16.04'
