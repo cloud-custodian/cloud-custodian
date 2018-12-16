@@ -1,0 +1,61 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- master
+
+jobs:
+
+- job: 'Lint'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '2.7'
+        architecture: 'x64'
+    - script: python -m pip install --upgrade pip && pip install flake8==3.5.0
+      displayName: "Install Dependencies"
+    - script: make lint
+      displayName: "Flake8 Lint"
+
+- job: 'Test'
+  condition: "succeeded()"
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+        TOXENV: py27-cov
+      Python36:
+        python.version: '3.6'
+        TOXENV: py36
+      Python37:
+        python.version: '3.7'
+        TOXENV: py37
+    maxParallel: 3
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: python -m pip install --upgrade pip && pip install tox
+    displayName: 'Install Test Runner'
+
+  - script: tox --notest
+    displayName: 'Install Dependencies'
+
+  - script: tox
+    displayName: 'Tox'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '**/test-results.xml'
+      testRunTitle: 'Python $(python.version)'
+    condition: succeededOrFailed()
