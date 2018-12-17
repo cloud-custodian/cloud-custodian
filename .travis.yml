@@ -12,8 +12,6 @@ matrix:
           sudo: true
 
 install:
-  - pip install codecov tox
+  - pip install tox
 script:
   - TOXENV=`tools/dev/citoxenv.py` tox
-after_success:
-  - if [ "$TRAVIS_PYTHON_VERSION" == "2.7" ]; then codecov; fi
