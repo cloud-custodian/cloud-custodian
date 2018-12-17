@@ -39,6 +39,7 @@ jobs:
 
   steps:
   - task: UsePythonVersion@0
+    displayName: "Set Python Version"
     inputs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
@@ -63,6 +64,7 @@ jobs:
       COMMIT: $(system.pullRequest.sourceCommitId)
 
   - task: PublishTestResults@2
+    displayName: "Publish Test Results Azure"
     inputs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version)'
