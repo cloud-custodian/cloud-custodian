@@ -1,8 +1,3 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
 trigger:
 - master
 
@@ -10,6 +5,7 @@ variables:
 - group: CustodianCoreCI
 
 jobs:
+
 - job: 'Lint'
   pool:
     vmImage: 'Ubuntu-16.04'
@@ -60,7 +56,6 @@ jobs:
     displayName: 'Publish Code Coverage'
     condition: "eq(variables['python.version'], '2.7')"
     env:
-      REPO_URL: $(system.pullRequest.sourceRepositoryUri)
       BUILD_ID: $(Build.BuildNumber)
       CODECOV_TOKEN: $(CODECOV_TOKEN)
       PR: $(system.pullRequest.pullRequestNumber)
