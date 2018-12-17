@@ -1,21 +1,4 @@
 build:
-
-  unit_tests:
-    image: python:2.7
-    commands:
-      - pip install tox
-      - tox -e py27
-
-#  pypy_unit_tests:
-#    # just enough variation to make a matrix not viable
-#    image: pypy:2-5.8.0-slim
-#    commands:
-#      - pip install tox
-#      - tox -e pypy
-#    when:
-#      event: push
-#      branch: master
-
   documentation:
      image: python:2.7
      commands:
