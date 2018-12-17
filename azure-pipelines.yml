@@ -56,11 +56,16 @@ jobs:
   - script: tox
     displayName: 'Tox'
 
-  - script: codecov
+  - script: codecov --branch $BRANCH --pr $PR --commit $COMMIT --build $BUILD_ID --slug $(REPO_URL)
     displayName: 'Publish Code Coverage'
     condition: "eq(variables['python.version'], '2.7')"
     env:
+      REPO_URL: $(system.pullRequest.sourceRepositoryUri)
+      BUILD_ID: $(Build.BuildNumber)
       CODECOV_TOKEN: $(CODECOV_TOKEN)
+      PR: $(system.pullRequest.pullRequestNumber)
+      BRANCH: $(system.pullRequest.sourceBranch)
+      COMMIT: $(system.pullRequest.sourceCommitId)
 
   - task: PublishTestResults@2
     inputs:
