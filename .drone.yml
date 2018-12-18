@@ -1,35 +1,35 @@
-build:
-  documentation:
-     image: python:2.7
-     commands:
-       - git config --global user.email "cibot@cloud-custodian.io"
-       - git config --global user.name "Custodian CI"
-       - pip install tox
-       - tox -e docs
-       - git remote update origin --prune
-       - make ghpages
-       - git branch
-       # switch back to master post doc-build
-       - git checkout master
-     when:
-       event: push
-       branch: master
+#build:
+#  documentation:
+#     image: python:2.7
+#     commands:
+#       - git config --global user.email "cibot@cloud-custodian.io"
+#       - git config --global user.name "Custodian CI"
+#       - pip install tox
+#       - tox -e docs
+#       - git remote update origin --prune
+#       - make ghpages
+#       - git branch
+#       # switch back to master post doc-build
+#       - git checkout master
+#     when:
+#       event: push
+#       branch: master
 
-deploy:
-  # sphinx documentation build / per documentation build section
-  git_push:
-    remote_name: origin
-    branch: gh-pages
-    local_branch: gh-pages
-    when:
-      event: push
-      branch: master
+#deploy:
+#  # sphinx documentation build / per documentation build section
+#  git_push:
+#    remote_name: origin
+#    branch: gh-pages
+#    local_branch: gh-pages
+#    when:
+#      event: push
+#      branch: master
 
-notify:
-  gitter:
-    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
-    when:
-      repo: capitalone/cloud-custodian
+#notify:
+#  gitter:
+#    webhook: "https://webhooks.gitter.im/e/0bbc88699fe6e59c8993"
+#    when:
+#      repo: capitalone/cloud-custodian
 
 cache:
   mount:
