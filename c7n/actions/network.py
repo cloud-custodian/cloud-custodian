@@ -105,6 +105,7 @@ class ModifyVpcSecurityGroupsAction(Action):
         return names
 
     def get_action_group_names(self):
+        """Return all the security group names configured in this action."""
         return self.get_group_names(
             list(itertools.chain(
                 *[self._get_array('add'),
@@ -135,15 +136,23 @@ class ModifyVpcSecurityGroupsAction(Action):
             Filters=[{
                 'Name': 'group-name', 'Values': names}]).get(
                     'SecurityGroups', [])
-        if len(sgs) != len(names):
+
+        s_names = set(names)
+        for s in sgs:
+            if s['GroupName'] in s_names:
+                s_names.remove(s)
+
+        if s_names:
             raise PolicyExecutionError(self._format_error(
                 "policy:{policy} security groups not found "
                 "requested: {names}, found: {groups}",
-                names=names, groups=[g['GroupId'] for g in sgs]))
+                names=list(s_names), groups=[g['GroupId'] for g in sgs]))
         return sgs
 
     def resolve_group_names(self, r, target_group_ids, groups):
-        """Resolve any policy security group names to the corresponding group ids.
+        """Resolve any security group names to the corresponding group ids
+
+        With the context of a given network attached resource.
         """
         names = self.get_group_names(target_group_ids)
         if not names:
