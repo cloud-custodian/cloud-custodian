@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "BackupPolicy": "DEFAULT",
+                "ClusterId": "cluster-rhuxbiveqa2",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 8,
+                    "day": 27,
+                    "hour": 16,
+                    "minute": 48,
+                    "second": 30,
+                    "microsecond": 149000
+                },
+                "Hsms": [
+                    {
+                        "AvailabilityZone": "us-east-1d",
+                        "ClusterId": "cluster-rhuxbiveqa2",
+                        "SubnetId": "subnet-e3985acd",
+                        "EniId": "eni-0f7dd690d0f5393da",
+                        "EniIp": "172.31.93.196",
+                        "HsmId": "hsm-mp3i7obxqdb",
+                        "State": "ACTIVE",
+                        "StateMessage": "HSM created."
+                    }
+                ],
+                "HsmType": "hsm1.medium",
+                "SecurityGroup": "sg-0e05677ea7fbd12fd",
+                "State": "ACTIVE",
+                "SubnetMapping": {
+                    "us-east-1a": "subnet-0955c143",
+                    "us-east-1b": "subnet-8e6baad2",
+                    "us-east-1c": "subnet-7a50991d",
+                    "us-east-1d": "subnet-e3985acd",
+                    "us-east-1e": "subnet-806178bf",
+                    "us-east-1f": "subnet-0d168102"
+                },
+                "VpcId": "vpc-02320879",
+                "Certificates": {
+                    "ClusterCertificate": "-----BEGIN CERTIFICATE-----HelloThere-----END CERTIFICATE-----\n"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8bcd4803-e928-11e8-8883-f7796c9f5a01",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Thu, 15 Nov 2018 22:48:18 GMT",
+                "x-amzn-requestid": "8bcd4803-e928-11e8-8883-f7796c9f5a01",
+                "content-length": "2017",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

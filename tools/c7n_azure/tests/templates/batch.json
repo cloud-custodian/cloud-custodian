@@ -17,9 +17,6 @@
             "location": "westus2",
             "scale": null,
             "properties": {
-                "autoStorage": {
-                    "storageAccountId": "[parameters('batchAccounts_cctest_storageAccountId')]"
-                },
                 "poolAllocationMode": "BatchService"
             },
             "dependsOn": []

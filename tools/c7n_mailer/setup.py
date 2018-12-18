@@ -22,11 +22,13 @@ requires = [
     "Jinja2",
     "boto3",
     "jsonschema",
+    "python-dateutil>=2.6",
     "ruamel.yaml==0.15.42",
     "datadog",
     "slackclient",
     "sendgrid",
-    "ldap3"]
+    "ldap3",
+    "redis"]
 
 try:
     from concurrent import futures  # noqa F401
@@ -63,4 +65,5 @@ setup(
         ]
     },
     install_requires=requires,
+    package_data={str(''): [str('msg-templates/*.j2')]},
 )

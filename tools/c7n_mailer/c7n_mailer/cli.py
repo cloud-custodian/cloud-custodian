@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import functools
 import logging
+from os import path
 
 import boto3
 import jsonschema
@@ -20,6 +21,7 @@ CONFIG_SCHEMA = {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
+        'org_domain': {'type': 'string'},
 
         # Standard Lambda Function Config
         'region': {'type': 'string'},
@@ -36,10 +38,47 @@ CONFIG_SCHEMA = {
         'lambda_schedule': {'type': 'string'},
 
         # Azure Function Config
-        'function_name': {'type': 'string'},
-        'function_servicePlanName': {'type': 'string'},
-        'function_location': {'type': 'string'},
-        'function_appInsightsLocation': {'type': 'string'},
+        'function_properties': {
+            'type': 'object',
+            'appInsights': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'storageAccount': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'servicePlan': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string',
+                            'skuTier': 'string',
+                            'skuName': 'string'}
+                     }
+                ]
+            },
+        },
         'function_schedule': {'type': 'string'},
         'function_skuCode': {'type': 'string'},
         'function_sku': {'type': 'string'},
@@ -118,6 +157,8 @@ def get_c7n_mailer_parser():
     parser.add_argument('--debug', action='store_true', help=debug_help_msg)
     max_num_processes_help_msg = 'will run the mailer in parallel, integer of max processes allowed'
     parser.add_argument('--max-num-processes', type=int, help=max_num_processes_help_msg)
+    templates_folder_help_msg = 'message templates folder location'
+    parser.add_argument('-t', '--templates', help=templates_folder_help_msg)
     group = parser.add_mutually_exclusive_group(required=True)
     update_lambda_help_msg = 'packages your c7n_mailer, uploads the zip to aws lambda as a function'
     group.add_argument('--update-lambda', action='store_true', help=update_lambda_help_msg)
@@ -144,6 +185,16 @@ def main():
     mailer_config = get_and_validate_mailer_config(args)
     args_dict = vars(args)
     logger = get_logger(debug=args_dict.get('debug', False))
+
+    module_dir = path.dirname(path.abspath(__file__))
+    default_templates = [path.abspath(path.join(module_dir, 'msg-templates')),
+                         path.abspath(path.join(module_dir, '..', 'msg-templates')),
+                         path.abspath('.')]
+    templates = args_dict.get('templates', None)
+    if templates:
+        default_templates.append(path.abspath(path.expanduser(path.expandvars(templates))))
+
+    mailer_config['templates_folders'] = default_templates
 
     if args_dict.get('update_lambda'):
         if args_dict.get('debug'):

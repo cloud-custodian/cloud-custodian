@@ -13,10 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import deque
 import logging
 
 from c7n import cache
 from c7n.executor import ThreadPoolExecutor
+from c7n.provider import clouds
 from c7n.registry import PluginRegistry
 try:
     from c7n.resources.aws import AWS
@@ -39,7 +41,6 @@ class ResourceManager(object):
         self.session_factory = ctx.session_factory
         self.config = ctx.options
         self.data = data
-        self.log_dir = ctx.log_dir
         self._cache = cache.factory(self.ctx.options)
         self.log = logging.getLogger('custodian.resources.%s' % (
             self.__class__.__name__.lower()))
@@ -70,13 +71,24 @@ class ResourceManager(object):
         raise NotImplementedError("")
 
     def get_resource_manager(self, resource_type, data=None):
-        klass = resources.get(resource_type)
+        """get a resource manager or a given resource type.
+
+        assumes the query is for the same underlying cloud provider.
+        """
+        if '.' in resource_type:
+            provider_name, resource_type = resource_type.split('.', 1)
+        else:
+            provider_name = self.ctx.policy.provider_name
+
+        provider_resources = clouds[provider_name].resources
+        klass = provider_resources.get(resource_type)
         if klass is None:
             raise ValueError(resource_type)
+
         # if we're already querying via config carry it forward
         if not data and self.source_type == 'config' and getattr(
                 klass.get_model(), 'config_type', None):
-            return klass(self.ctx, {'source': self.config_type})
+            return klass(self.ctx, {'source': self.source_type})
         return klass(self.ctx, data or {})
 
     def filter_resources(self, resources, event=None):
@@ -88,7 +100,10 @@ class ResourceManager(object):
             if not resources:
                 break
             rcount = len(resources)
-            resources = f.process(resources, event)
+
+            with self.ctx.tracer.subsegment("filter:%s" % f.type):
+                resources = f.process(resources, event)
+
             if event and event.get('debug', False):
                 self.log.debug(
                     "applied filter %s %d->%d", f, rcount, len(resources))
@@ -100,3 +115,14 @@ class ResourceManager(object):
         """Returns the resource meta-model.
         """
         return self.query.resolve(self.resource_type)
+
+    def iter_filters(self, block_end=False):
+        queue = deque(self.filters)
+        while queue:
+            f = queue.popleft()
+            if f and f.type in ('or', 'and', 'not'):
+                if block_end:
+                    queue.appendleft(None)
+                for gf in f.filters:
+                    queue.appendleft(gf)
+            yield f

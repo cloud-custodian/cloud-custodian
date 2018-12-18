@@ -22,6 +22,32 @@ import time
 
 class TestEcsService(BaseTest):
 
+    def test_ecs_cluster_tag_augment(self):
+        session_factory = self.replay_flight_data(
+            'test_ecs_cluster_tag_augment')
+        p = self.load_policy({
+            'name': 'ctags', 'resource': 'ecs',
+            'filters': [{'tag:Data': 'Magic'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'Env', 'Value': 'Dev'},
+             {'Key': 'Data', 'Value': 'Magic'}])
+
+    def test_ecs_service_tag_augment(self):
+        session_factory = self.replay_flight_data(
+            'test_ecs_service_tag_augment')
+        p = self.load_policy({
+            'name': 'ctags', 'resource': 'ecs-service'},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'Name', 'Value': 'Dev'}])
+
     def test_ecs_service_resource(self):
         session_factory = self.replay_flight_data("test_ecs_service")
         p = self.load_policy(

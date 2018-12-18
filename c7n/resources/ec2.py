@@ -24,29 +24,28 @@ import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
+import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
+from c7n.actions.securityhub import PostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
 
 from c7n import utils
-from c7n.utils import type_schema
+from c7n.utils import type_schema, filter_empty
 
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
@@ -694,8 +693,11 @@ class UserData(ValueFilter):
     annotation = 'c7n:user-data'
     permissions = ('ec2:DescribeInstanceAttribute',)
 
-    def process(self, resources, event=None):
+    def __init__(self, data, manager):
+        super(UserData, self).__init__(data, manager)
         self.data['key'] = '"c7n:user-data"'
+
+    def process(self, resources, event=None):
         client = utils.local_session(self.manager.session_factory).client('ec2')
         results = []
         with self.executor_factory(max_workers=3) as w:
@@ -799,6 +801,39 @@ class SingletonFilter(Filter, StateTransitionFilter):
                     return True
 
         return False
+
+
+@EC2.action_registry.register("post-finding")
+class InstanceFinding(PostFinding):
+    def format_resource(self, r):
+        details = {
+            "Type": r["InstanceType"],
+            "ImageId": r["ImageId"],
+            "IpV4Addresses": jmespath.search(
+                "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
+            ),
+            "KeyName": r.get("KeyName"),
+            "VpcId": r["VpcId"],
+            "SubnetId": r["SubnetId"],
+            "LaunchedAt": r["LaunchTime"].isoformat(),
+        }
+
+        if "IamInstanceProfile" in r:
+            details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
+
+        instance = {
+            "Type": "AwsEc2Instance",
+            "Id": "arn:aws:{}:{}:instance/{}".format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r["InstanceId"]),
+            "Region": self.manager.config.region,
+            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
+            "Details": {"AwsEc2Instance": filter_empty(details)},
+        }
+
+        instance = filter_empty(instance)
+        return instance
 
 
 @actions.register('start')
@@ -1376,14 +1411,17 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         profile_name = self.data.get('name')
         profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
 
-        associations = {
-            a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
-            for a in client.describe_iam_instance_profile_associations(
-                Filters=[
-                    {'Name': 'instance-id',
-                     'Values': [i['InstanceId'] for i in profile_instances]},
-                    {'Name': 'state', 'Values': ['associating', 'associated']}]
-            ).get('IamInstanceProfileAssociations', ())}
+        if profile_instances:
+            associations = {
+                a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+                for a in client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {'Name': 'instance-id',
+                         'Values': [i['InstanceId'] for i in profile_instances]},
+                        {'Name': 'state', 'Values': ['associating', 'associated']}]
+                ).get('IamInstanceProfileAssociations', ())}
+        else:
+            associations = {}
 
         for i in instances:
             if profile_name and i['InstanceId'] not in associations:

@@ -19,7 +19,7 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import logging
@@ -851,6 +851,10 @@ class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
     batch_size = 50
     annotation = 'c7n:user-data'
 
+    def __init__(self, data, manager):
+        super(UserDataFilter, self).__init__(data, manager)
+        self.data['key'] = '"c7n:user-data"'
+
     def get_permissions(self):
         return self.manager.get_resource_manager('asg').get_permissions()
 
@@ -1410,7 +1414,7 @@ class MarkForOp(Tag):
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
     def validate(self):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise PolicyValidationError(
@@ -1418,7 +1422,7 @@ class MarkForOp(Tag):
         return self
 
     def process(self, asgs):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('message', self.default_template)

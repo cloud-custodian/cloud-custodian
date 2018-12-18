@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "58831a73-f36a-11e8-949b-d538e66d0c38",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 29 Nov 2018 00:04:31 GMT",
+                "content-type": "application/json",
+                "content-length": "1385",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "58831a73-f36a-11e8-949b-d538e66d0c38",
+                "x-amz-apigw-id": "RGP6XHKbIAMF0jQ=",
+                "x-amzn-trace-id": "Root=1-5bff2d0f-7f5fda0c6375ccf491ff0920;Sampled=0"
+            },
+            "RetryAttempts": 0
+        },
+        "Findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "us-east-1/644160558196/1c2225c1b6021b20eca238fb14173179/e101eec6e852466eddbcd92d0fe09123",
+                "ProductArn": "arn:aws:securityhub:us-east-1:644160558196:product/644160558196/default",
+                "GeneratorId": "s3-finding",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+                ],
+                "CreatedAt": "2018-11-29T00:02:14.810068+00:00",
+                "UpdatedAt": "2018-11-29T00:02:14.810068+00:00",
+                "Severity": {
+                    "Product": 0,
+                    "Normalized": 0
+                },
+                "Title": "s3-finding",
+                "ProductFields": {
+                    "resource": "s3",
+                    "ProviderName": "CloudCustodian",
+                    "ProviderVersion": "0.8.32.0",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:644160558196:product/644160558196/default/us-east-1/644160558196/1c2225c1b6021b20eca238fb14173179/e101eec6e852466eddbcd92d0fe09123",
+                    "aws/securityhub/SeverityLabel": "INFORMATIONAL",
+                    "aws/securityhub/ProductName": "Default",
+                    "aws/securityhub/CompanyName": "Personal"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsS3Bucket",
+                        "Id": "arn:aws:::c7n-test-public-bucket",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsS3Bucket": {
+                                "OwnerId": "Unknown"
+                            }
+                        }
+                    }
+                ],
+                "RecordState": "ACTIVE"
+            }
+        ]
+    }
+}

@@ -20,6 +20,18 @@ type APIGatewayError interface {
 	StatusCode() int
 }
 
+type BadRequestError struct {
+	Message string
+}
+
+func (e BadRequestError) Error() string {
+	if e.Message == "" {
+		return "bad request"
+	}
+	return e.Message
+}
+func (BadRequestError) StatusCode() int { return http.StatusBadRequest }
+
 type NotFoundError struct {
 	Message string
 }
@@ -28,3 +40,12 @@ func (e NotFoundError) Error() string {
 	return e.Message
 }
 func (NotFoundError) StatusCode() int { return http.StatusNotFound }
+
+type UnauthorizedError struct {
+	Message string
+}
+
+func (e UnauthorizedError) Error() string {
+	return e.Message
+}
+func (UnauthorizedError) StatusCode() int { return http.StatusUnauthorized }

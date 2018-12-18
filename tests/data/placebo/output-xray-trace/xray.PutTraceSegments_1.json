@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "e5fd9656-c6b2-11e8-a512-43815a788243",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Wed, 03 Oct 2018 02:20:30 GMT",
+                "content-type": "application/json",
+                "content-length": "31",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "e5fd9656-c6b2-11e8-a512-43815a788243"
+            },
+            "RetryAttempts": 0
+        },
+        "UnprocessedTraceSegments": []
+    }
+}

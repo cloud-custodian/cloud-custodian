@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import operator
+from concurrent.futures import as_completed
 from datetime import timedelta
+
+from azure.mgmt.policyinsights import PolicyInsightsClient
+from dateutil import tz as tzutils
+from dateutil.parser import parse
 
 from c7n_azure.utils import Math
 from c7n_azure.utils import now
-from dateutil import zoneinfo
-from dateutil.parser import parse
+from c7n_azure.tags import TagHelper
 
-from c7n.filters import Filter
+from c7n.filters import Filter, ValueFilter
 from c7n.filters.core import PolicyValidationError
-from c7n.filters.offhours import Time
+from c7n.filters.offhours import Time, OffHour, OnHour
+from c7n.utils import chunks
 from c7n.utils import type_schema
 
 
@@ -124,7 +129,7 @@ class MetricFilter(Filter):
             resource['id'],
             timespan=self.timespan,
             interval=self.interval,
-            metric=self.metric,
+            metricnames=self.metric,
             aggregation=self.aggregation
         )
         m = [getattr(item, self.aggregation) for item in metrics_data.value[0].timeseries[0].data]
@@ -196,7 +201,7 @@ class TagActionFilter(Filter):
             raise PolicyValidationError(
                 "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified '%s' in %s" % (
@@ -211,7 +216,7 @@ class TagActionFilter(Filter):
         self.op = self.data.get('op', 'stop')
         self.skew = self.data.get('skew', 0)
         self.skew_hours = self.data.get('skew_hours', 0)
-        self.tz = zoneinfo.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         return super(TagActionFilter, self).process(resources, event)
 
     def __call__(self, i):
@@ -242,3 +247,124 @@ class TagActionFilter(Filter):
 
         return self.current_date >= (
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
+
+
+class DiagnosticSettingsFilter(ValueFilter):
+
+    schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        futures = []
+        results = []
+        # Process each resource in a separate thread, returning all that pass filter
+        with self.executor_factory(max_workers=3) as w:
+            for resource_set in chunks(resources, 20):
+                futures.append(w.submit(self.process_resource_set, resource_set))
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.warning(
+                        "Diagnostic settings filter error: %s" % f.exception())
+                    continue
+                else:
+                    results.extend(f.result())
+
+            return results
+
+    def process_resource_set(self, resources):
+        #: :type: azure.mgmt.monitor.MonitorManagementClient
+        client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        matched = []
+        for resource in resources:
+            settings = client.diagnostic_settings.list(resource['id'])
+            settings = [s.as_dict() for s in settings.value]
+
+            filtered_settings = super(DiagnosticSettingsFilter, self).process(settings, event=None)
+
+            if filtered_settings:
+                matched.append(resource)
+
+        return matched
+
+
+class PolicyCompliantFilter(Filter):
+    """Filter resources based on Azure Policy compliance status
+
+    Filter resources by their current Azure Policy compliance status.
+
+    You can specify if you want to filter compliant or non-compiant resources.
+
+    You can provide a list of Azure Policy definitions display names or names to limit
+    amount of non-compliant resources. By default it returns a list of all non-compliant
+    resources.
+
+    .. code-block :: yaml
+
+      - policies:
+        - name: vm-stop-marked
+          resource: azure.vm
+          filters:
+            - type: policy-compliant
+              compliant: false
+              definitions:
+                - "Definition display name 1"
+                - "Definition display name 2"
+
+    """
+    schema = type_schema('policy-compliant', required=['type', 'compliant'],
+                         compliant={'type': 'boolean'},
+                         definitions={'type': 'array'})
+
+    def __init__(self, data, manager=None):
+        super(PolicyCompliantFilter, self).__init__(data, manager)
+        self.compliant = self.data['compliant']
+        self.definitions = self.data.get('definitions')
+
+    def process(self, resources, event=None):
+        s = self.manager.get_session()
+
+        # Translate definitions display names into ids
+        policyClient = s.client("azure.mgmt.resource.policy.PolicyClient")
+        definitions = [d for d in policyClient.policy_definitions.list()]
+        definition_ids = [d.id.lower() for d in definitions
+                          if self.definitions is None or
+                          d.display_name in self.definitions or
+                          d.name in self.definitions]
+
+        # Find non-compliant resources
+        client = PolicyInsightsClient(s.get_credentials())
+        query = client.policy_states.list_query_results_for_subscription(
+            policy_states_resource='latest', subscription_id=s.subscription_id).value
+        non_compliant = [f.resource_id.lower() for f in query
+                         if f.policy_definition_id.lower() in definition_ids]
+
+        if self.compliant:
+            return [r for r in resources if r['id'].lower() not in non_compliant]
+        else:
+            return [r for r in resources if r['id'].lower() in non_compliant]
+
+
+class AzureOffHour(OffHour):
+
+    # Override get_tag_value because Azure stores tags differently from AWS
+    def get_tag_value(self, i):
+        tag_value = TagHelper.get_tag_value(resource=i,
+                                            tag=self.tag_key,
+                                            utf_8=True)
+
+        if tag_value is not False:
+            tag_value = tag_value.lower().strip("'\"")
+        return tag_value
+
+
+class AzureOnHour(OnHour):
+
+    # Override get_tag_value because Azure stores tags differently from AWS
+    def get_tag_value(self, i):
+        tag_value = TagHelper.get_tag_value(resource=i,
+                                            tag=self.tag_key,
+                                            utf_8=True)
+
+        if tag_value is not False:
+            tag_value = tag_value.lower().strip("'\"")
+        return tag_value

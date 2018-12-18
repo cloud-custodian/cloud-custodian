@@ -313,12 +313,13 @@ class DistributionDisableAction(BaseAction):
                    "distribution:UpdateDistribution",)
 
     def process(self, distributions):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_distribution, distributions))
-
-    def process_distribution(self, distribution):
         client = local_session(
             self.manager.session_factory).client(self.manager.get_model().service)
+
+        for d in distributions:
+            self.process_distribution(client, d)
+
+    def process_distribution(self, client, distribution):
         try:
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
@@ -359,12 +360,12 @@ class StreamingDistributionDisableAction(BaseAction):
                    "streaming-distribution:UpdateStreamingDistribution",)
 
     def process(self, distributions):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_distribution, distributions))
-
-    def process_distribution(self, distribution):
         client = local_session(
             self.manager.session_factory).client(self.manager.get_model().service)
+        for d in distributions:
+            self.process_distribution(client, d)
+
+    def process_distribution(self, client, distribution):
         try:
             res = client.get_streaming_distribution_config(
                 Id=distribution[self.manager.get_model().id])
@@ -423,12 +424,12 @@ class DistributionSSLAction(BaseAction):
                    "distribution:UpdateDistribution",)
 
     def process(self, distributions):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_distribution, distributions))
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for d in distributions:
+            self.process_distribution(client, d)
 
-    def process_distribution(self, distribution):
-        client = local_session(
-            self.manager.session_factory).client(self.manager.get_model().service)
+    def process_distribution(self, client, distribution):
         try:
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])

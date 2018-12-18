@@ -19,8 +19,8 @@ from botocore.paginate import Paginator
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
-from c7n.utils import local_session, type_schema
+from c7n.query import QueryResourceManager, RetryPageIterator
+from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('shield-protection')
@@ -57,13 +57,17 @@ def get_protections_paginator(client):
 
 
 def get_type_protections(client, model):
+    pager = get_protections_paginator(client)
+    pager.PAGE_ITERATOR_CLS = RetryPageIterator
     try:
-        protections = get_protections_paginator(
-            client).paginate().build_full_result().get('Protections')
+        protections = pager.paginate().build_full_result().get('Protections', [])
     except client.exceptions.ResourceNotFoundException:
         # shield is not enabled in the account, so all resources are not protected
         return []
     return [p for p in protections if model.type in p['ResourceArn']]
+
+
+ShieldRetry = get_retry(('ThrottlingException',))
 
 
 class IsShieldProtected(Filter):
@@ -119,13 +123,14 @@ class SetShieldProtection(BaseAction):
             if state and arn in protected_resources:
                 continue
             if state is False and arn in protected_resources:
-                client.delete_protection(
+                ShieldRetry(
+                    client.delete_protection,
                     ProtectionId=protected_resources[arn]['Id'])
                 continue
             try:
-                client.create_protection(
-                    Name=r[model.name],
-                    ResourceArn=arn)
+                ShieldRetry(
+                    client.create_protection,
+                    Name=r[model.name], ResourceArn=arn)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
                     continue
@@ -133,7 +138,8 @@ class SetShieldProtection(BaseAction):
 
     def clear_stale(self, client, protections):
         # Get all resources unfiltered
-        resources = self.manager.get_resource_manager(self.manager.type).resources()
+        resources = self.manager.get_resource_manager(
+            self.manager.type).resources()
         resource_arns = set(map(self.manager.get_arn, resources))
 
         pmap = {}
@@ -148,5 +154,4 @@ class SetShieldProtection(BaseAction):
         stale = set(pmap).difference(resource_arns)
         self.log.info("clearing %d stale protections", len(stale))
         for s in stale:
-            client.delete_protection(
-                ProtectionId=pmap[s]['Id'])
+            ShieldRetry(client.delete_protection, ProtectionId=pmap[s]['Id'])

@@ -20,6 +20,14 @@ class NetworkInterfaceTest(BaseTest):
     def setUp(self):
         super(NetworkInterfaceTest, self).setUp()
 
+    def test_network_interface_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-network-interface',
+                'resource': 'azure.networkinterface'
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('network_interface.json')
     def test_find_by_name(self):
         p = self.load_policy({
@@ -29,7 +37,7 @@ class NetworkInterfaceTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': 'myVMNic'}],
+                 'value': 'cctestnic'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

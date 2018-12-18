@@ -19,7 +19,8 @@ import zlib
 
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
-from common import MAILER_CONFIG_AZURE, ASQ_MESSAGE, logger
+from common import MAILER_CONFIG_AZURE, ASQ_MESSAGE, ASQ_MESSAGE_TAG, logger
+
 from mock import MagicMock, patch
 
 
@@ -30,6 +31,8 @@ class AzureTest(unittest.TestCase):
         self.compressed_message.content = base64.b64encode(
             zlib.compress(ASQ_MESSAGE.encode('utf8')))
         self.loaded_message = json.loads(ASQ_MESSAGE)
+
+        self.tag_message = json.loads(ASQ_MESSAGE_TAG)
 
     @patch('c7n_mailer.azure.sendgrid_delivery.SendGridDelivery.sendgrid_handler')
     @patch('c7n_mailer.azure.sendgrid_delivery.SendGridDelivery.get_to_addrs_sendgrid_messages_map')

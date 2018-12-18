@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import jmespath
+
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -125,6 +127,90 @@ class FirehoseDelete(Action):
                 continue
             client.delete_delivery_stream(
                 DeliveryStreamName=r['DeliveryStreamName'])
+
+
+@DeliveryStream.action_registry.register('encrypt-s3-destination')
+class FirehoseEncryptS3Destination(Action):
+    """Action to set encryption key a Firehose S3 destination
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: encrypt-s3-destination
+                resource: firehose
+                filters:
+                  - KmsMasterKeyId: absent
+                actions:
+                  - type: encrypt-s3-destination
+                    key_arn: <arn of KMS key/alias>
+    """
+    schema = type_schema(
+        'encrypt-s3-destination',
+        key_arn={'type': 'string'}, required=('key_arn',))
+
+    permissions = ("firehose:UpdateDestination",)
+
+    DEST_MD = {
+        'SplunkDestinationDescription': {
+            'update': 'SplunkDestinationUpdate',
+            'clear': ['S3BackupMode'],
+            'encrypt_path': 'S3DestinationDescription.EncryptionConfiguration',
+            'remap': [('S3DestinationDescription', 'S3Update')]
+        },
+        'ElasticsearchDestinationDescription': {
+            'update': 'ElasticsearchDestinationUpdate',
+            'clear': ['S3BackupMode'],
+            'encrypt_path': 'S3DestinationDescription.EncryptionConfiguration',
+            'remap': [('S3DestinationDescription', 'S3Update')],
+        },
+        'ExtendedS3DestinationDescription': {
+            'update': 'ExtendedS3DestinationUpdate',
+            'clear': ['S3BackupMode'],
+            'encrypt_path': 'EncryptionConfiguration',
+            'remap': []
+        },
+        'RedshiftDestinationDescription': {
+            'update': 'RedshiftDestinationUpdate',
+            'clear': ['S3BackupMode', "ClusterJDBCURL", "CopyCommand", "Username"],
+            'encrypt_path': 'S3DestinationDescription.EncryptionConfiguration',
+            'remap': [('S3DestinationDescription', 'S3Update')]
+        },
+    }
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('firehose')
+        key = self.data.get('key_arn')
+        for r in resources:
+            if not r['DeliveryStreamStatus'] == 'ACTIVE':
+                continue
+            version = r['VersionId']
+            name = r['DeliveryStreamName']
+            d = r['Destinations'][0]
+            destination_id = d['DestinationId']
+
+            for dtype, dmetadata in self.DEST_MD.items():
+                if dtype not in d:
+                    continue
+                dinfo = d[dtype]
+                for k in dmetadata['clear']:
+                    dinfo.pop(k, None)
+                if dmetadata['encrypt_path']:
+                    encrypt_info = jmespath.search(dmetadata['encrypt_path'], dinfo)
+                else:
+                    encrypt_info = dinfo
+                encrypt_info.pop('NoEncryptionConfig', None)
+                encrypt_info['KMSEncryptionConfig'] = {'AWSKMSKeyARN': key}
+
+                for old_k, new_k in dmetadata['remap']:
+                    if old_k in dinfo:
+                        dinfo[new_k] = dinfo.pop(old_k)
+                params = dict(DeliveryStreamName=name,
+                              DestinationId=destination_id,
+                              CurrentDeliveryStreamVersionId=version)
+                params[dmetadata['update']] = dinfo
+                client.update_destination(**params)
 
 
 @resources.register('kinesis-analytics')
