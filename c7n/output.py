@@ -362,7 +362,7 @@ class LogOutput(object):
 class LogFile(LogOutput):
 
     def __repr__(self):
-        return "<LogFile path:%s>" % self.log_path
+        return "<LogFile file://%s>" % self.log_path
 
     @property
     def log_path(self):
