@@ -140,7 +140,7 @@ class ModifyVpcSecurityGroupsAction(Action):
         s_names = set(names)
         for s in sgs:
             if s['GroupName'] in s_names:
-                s_names.remove(s)
+                s_names.remove(s['GroupName'])
 
         if s_names:
             raise PolicyExecutionError(self._format_error(
