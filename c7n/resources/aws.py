@@ -21,6 +21,7 @@ import datetime
 import itertools
 import logging
 import os
+import operator
 import shutil
 import sys
 import tempfile
@@ -215,14 +216,14 @@ class XrayTracer(object):
     use_daemon = 'AWS_XRAY_DAEMON_ADDRESS' in os.environ
     service_name = 'custodian'
 
-    context = XrayContext()
-    if HAVE_XRAY:
+    @classmethod
+    def initialize(cls):
+        context = XrayContext()
         xray_recorder.configure(
-            emitter=use_daemon is False and emitter or None,
+            emitter=cls.use_daemon is False and cls.emitter or None,
             context=context,
             sampling=True,
-            context_missing='LOG_ERROR'
-        )
+            context_missing='LOG_ERROR')
         patch(['boto3', 'requests'])
         logging.getLogger('aws_xray_sdk.core').setLevel(logging.ERROR)
 
@@ -296,10 +297,14 @@ class ApiStats(DeltaStats):
     def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
         if isinstance(self.ctx.session_factory, credentials.SessionFactory):
             self.ctx.session_factory.set_subscribers(())
+
+        # With cached sessions, we need to unregister any events subscribers
+        # on extant sessions to allow for the next registration.
+        utils.local_session(self.ctx.session_factory).events.unregister(
+            'after-call.*.*', self._record, unique_id='c7n-api-stats')
+
         self.ctx.metrics.put_metric(
             "ApiCalls", sum(self.api_calls.values()), "Count")
-        self.ctx.policy._write_file(
-            'api-stats.json', utils.dumps(dict(self.api_calls)))
         self.pop_snapshot()
 
     def __call__(self, s):
@@ -308,8 +313,7 @@ class ApiStats(DeltaStats):
 
     def _record(self, http_response, parsed, model, **kwargs):
         self.api_calls["%s.%s" % (
-            model.service_model.endpoint_prefix,
-            model.name)] += 1
+            model.service_model.endpoint_prefix, model.name)] += 1
 
 
 @blob_outputs.register('s3')
@@ -357,7 +361,6 @@ class S3Output(DirectoryOutput):
         if exc_type is not None:
             log.exception("Error while executing policy")
         log.debug("Uploading policy logs")
-        self.leave_log()
         self.compress()
         self.transfer = S3Transfer(
             self.ctx.session_factory(assume=False).client('s3'))
@@ -392,6 +395,9 @@ class AWS(object):
         """
         _default_region(options)
         _default_account_id(options)
+        if options.tracer:
+            XrayTracer.initialize()
+
         return options
 
     def get_session_factory(self, options):
@@ -419,8 +425,12 @@ class AWS(object):
             options.regions, policy_collection.resource_types)
 
         for p in policy_collection:
+            if 'aws.' in p.resource_type:
+                _, resource_type = p.resource_type.split('.', 1)
+            else:
+                resource_type = p.resource_type
             available_regions = service_region_map.get(
-                resource_service_map.get(p.resource_type), ())
+                resource_service_map.get(resource_type), ())
 
             # its a global service/endpoint, use user provided region
             # or us-east-1.
@@ -452,7 +462,13 @@ class AWS(object):
                 policies.append(
                     Policy(p.data, options_copy,
                            session_factory=policy_collection.session_factory()))
-        return PolicyCollection(policies, options)
+
+        return PolicyCollection(
+            # order policies by region to minimize local session invalidation.
+            # note relative ordering of policies must be preserved, python sort
+            # is stable.
+            sorted(policies, key=operator.attrgetter('options.region')),
+            options)
 
 
 def get_service_region_map(regions, resource_types):

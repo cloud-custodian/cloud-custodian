@@ -1,0 +1,8 @@
+click
+boto3
+requests
+c7n
+pygit2
+pyyaml
+sqlalchemy
+urllib3<1.24

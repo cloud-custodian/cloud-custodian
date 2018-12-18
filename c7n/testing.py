@@ -30,7 +30,7 @@ import yaml
 from c7n import policy
 from c7n.schema import validate as schema_validate
 from c7n.ctx import ExecutionContext
-from c7n.utils import CONN_CACHE
+from c7n.utils import reset_session_cache
 from c7n.config import Bag, Config
 
 C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
@@ -57,7 +57,7 @@ class TestUtils(unittest.TestCase):
 
     def cleanUp(self):
         # Clear out thread local session cache
-        CONN_CACHE.session = None
+        reset_session_cache()
 
     def write_policy_file(self, policy, format="yaml"):
         """ Write a policy file to disk in the specified format.

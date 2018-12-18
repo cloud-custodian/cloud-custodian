@@ -21,6 +21,18 @@ class KeyVaultTest(BaseTest):
     def setUp(self):
         super(KeyVaultTest, self).setUp()
 
+    def test_key_vault_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-key-vault',
+                'resource': 'azure.keyvault',
+                'filters': [
+                    {'type': 'whitelist',
+                     'key': 'test'}
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('keyvault.json')
     def test_find_by_name(self):
         p = self.load_policy({

@@ -6,8 +6,9 @@ interactions:
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.5 (Darwin-17.6.0-x86_64-i386-64bit) requests/2.19.1
-          msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-applicationinsights/0.1.1 Azure-SDK-For-Python]
+      User-Agent: [python/3.6.3 (Linux-4.9.93-linuxkit-aufs-x86_64-with-centos-7.5.1804-Core)
+          requests/2.19.1 msrest/0.5.4 msrest_azure/0.5.0 azure-mgmt-applicationinsights/0.1.1
+          Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01
@@ -19,29 +20,31 @@ interactions:
         o0cf3W3Wk2ZaF6u2qJbN3Sx7ePDwwf5k+/5sL9venz082M4eHGTb9w72zu892L0/23mQ363zplrX
         0/zzulqvmrtt3rS///l6OQWIbLXarvNf1Nxd1dVlMcvr5u6imNZVU52342LZFBfztrk7rRarapkv
         8WtZrWfb03XTVrMiW24D2kejj5bZIif0Br5tr1f4diNkalZW0wxIUdMrenHd7NGHbXbRfPToF380
-        L2azfLldFsu3j+7+7FPhC4vrd/PJ3aag9vGxP/rolUL+6JeMPnpbLDFNV/mEUM8Jd/rj9/1oZ7az
-        82D/3oPtHXq8f+5PPj3f35mc0+87v+9H9Ab1v8rrtsh5yD+Z1/T6JahwvFqVhVDnDB1EUeFm/PVs
-        uv/g4CDb3Z7lD/a398/3Z9sPdyb59sPJzk4+mzyY3Z/sSnMD9fd/I3MkmD8rqyv9ZLkuyxGN8Ret
-        qYvf/7WM9NFHZ5PiBxmRhkCcvmtzms9qeVLnWZvT62fLpq3XC5pWhv175df0xvn+pw8e5kSEg/sP
-        H9Is7e5vT7KH0+37Dz7NP907yO/v3HtI777YyEncBYF8io4efbS3s3uwvXOwvbv7Zm/n0c7eo50H
-        4/s7Dw/2Pt3/ZIc+2KFXXmbTt9lFDrrIWN7ky2zZ4u+PbsM5BOLb1fRtfk1DxUsCxH70pnqbE8fK
-        pzR/lwVIUSwvXtPggePr9XSa57N8RoBeZwui+PLiZU5UJOpcUAN58wQjXXyRt3Uxbb5ctfnsbOkm
-        4Jf8kv8HN6FLeQAEAAA=
+        L2azfLldFsu3j+7+7FPhC4vrd/PJ3aag9vGxP/rolUL+6JeMPnpbLDFNV/mEUM8Jd/rj9/1oh579
+        bC/fpp873j/3J9MHB5OdA/p95/f9iN6g/ld53RY5D/kn85pevwQVjlershDqnKGDKCrcjL9+cH4w
+        yT+9/+n2wWxvd3t/N9sliuzvbt/b2f90tvfp7oToI80N1N//jcyRYP6srK70k+W6LEc0xl+0pi5+
+        /9cy0kcfnU2KH2REGgJx+q7NaT6r5UmdZ21Or58tm7ZeL2haGfbvlV/TG9Tlp5ODh/n23sPd+9v7
+        B4TOw08f7G7fv7+zs/fp+fm96f5DevfFRk7iLgjkU3T06KO9nd2D7d2d7d0Hb3YfPto9eHRvb/zp
+        /r39Tz/9ZGfn0c4OvfEym77NLnKQRYbyJl9myxZ/f3QbxiEQ366mb/NrGileEiD2ozfV25wYVj6l
+        6bssQIliefGaxg4UX6+n0zyf5TMC9DpbEMGXFy9zIiIR54IayJsnGOjii7yti2nz5arNZ2dLR/9f
+        8kv+H4xoKv3/AwAA
     headers:
+      Access-Control-Expose-Headers: [Request-Context]
       Cache-Control: [no-cache]
       Content-Encoding: [gzip]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 11 Aug 2018 20:34:48 GMT']
+      Date: ['Wed, 17 Oct 2018 19:28:08 GMT']
       Expires: ['-1']
       Pragma: [no-cache]
+      Request-Context: ['appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525']
       Server: [Microsoft-IIS/8.5]
       Strict-Transport-Security: [max-age=31536000; includeSubDomains]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Powered-By: [ASP.NET]
-      x-ms-correlation-request-id: [fb695158-288d-4d18-bb7f-7440c5deea4c]
-      x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [fd60c252-9da5-11e8-8b43-8c8590ced288]
-      x-ms-routing-request-id: ['WESTUS2:20180811T203448Z:fb695158-288d-4d18-bb7f-7440c5deea4c']
+      x-ms-correlation-request-id: [af2c6737-0e79-419d-a654-d59276fdd336]
+      x-ms-ratelimit-remaining-subscription-reads: ['11996']
+      x-ms-request-id: [c74221d0-d242-11e8-8559-0242ac110003]
+      x-ms-routing-request-id: ['WESTUS2:20181017T192808Z:af2c6737-0e79-419d-a654-d59276fdd336']
     status: {code: 200, message: OK}
 version: 1

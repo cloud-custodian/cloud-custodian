@@ -90,7 +90,7 @@ class MetricsFilter(Filter):
         'ec2': 'AWS/EC2',
         'elb': 'AWS/ELB',
         'elbv2': 'AWS/ApplicationELB',
-        'emr': 'AWS/EMR',
+        'emr': 'AWS/ElasticMapReduce',
         'es': 'AWS/ES',
         'events': 'AWS/Events',
         'firehose': 'AWS/Firehose',

@@ -207,27 +207,75 @@ def _key_val_pair(value):
 
 
 def setup_parser():
-    c7n_desc = "Cloud fleet management"
+    c7n_desc = "Cloud Custodian - Cloud fleet management"
     parser = argparse.ArgumentParser(description=c7n_desc)
 
     # Setting `dest` means we capture which subparser was used.
-    subs = parser.add_subparsers(dest='subparser')
+    subs = parser.add_subparsers(
+        title='commands',
+        dest='subparser')
+
+    run_desc = "\n".join((
+        "Execute the policies in a config file.",
+        "",
+        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
+        "",
+        "When running across multiple regions, policies targeting resources in ",
+        "regions where they do not exist will not be run. The output directory ",
+        "when passing multiple regions is suffixed with the region. Resources ",
+        "with global endpoints are run just once and are suffixed with the first ",
+        "region passed in or us-east-1 if running against 'all' regions.",
+        ""
+    ))
+
+    run = subs.add_parser(
+        "run", description=run_desc,
+        help="Execute the policies in a config file",
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    run.set_defaults(command="c7n.commands.run")
+    _default_options(run)
+    _dryrun_option(run)
+    run.add_argument(
+        "--skip-validation",
+        action="store_true",
+        help="Skips validation of policies (assumes you've run the validate command seperately).")
+    run.add_argument(
+        "-m", "--metrics-enabled",
+        default=None, nargs="?", const="aws",
+        help="Emit metrics to provider metrics")
+    run.add_argument(
+        "--trace",
+        dest="tracer",
+        help=argparse.SUPPRESS,
+        default=None, nargs="?", const="default")
+
+    schema_desc = ("Browse the available vocabularies (resources, filters, and "
+                   "actions) for policy construction. The selector "
+                   "is specified with RESOURCE[.CATEGORY[.ITEM]] "
+                   "examples: s3, ebs.actions, or ec2.filters.instance-age")
+    schema = subs.add_parser(
+        'schema', description=schema_desc,
+        help="Interactive cli docs for policy authors")
+    schema.set_defaults(command="c7n.commands.schema_cmd")
+    _schema_options(schema)
 
     report_desc = ("Report of resources that a policy matched/ran on. "
                    "The default output format is csv, but other formats "
                    "are available.")
     report = subs.add_parser(
-        "report", description=report_desc, help=report_desc)
+        "report", description=report_desc,
+        help="Tabular report on policy matched resources")
     report.set_defaults(command="c7n.commands.report")
     _report_options(report)
 
-    logs_desc = "Get policy execution logs from s3 or cloud watch logs"
+    logs_desc = "Get policy execution logs"
     logs = subs.add_parser(
         'logs', help=logs_desc, description=logs_desc)
     logs.set_defaults(command="c7n.commands.logs")
     _logs_options(logs)
 
-    metrics_desc = "Retrieve metrics for policies from CloudWatch Metrics"
+    metrics_desc = "Retrieve policy execution metrics."
     metrics = subs.add_parser(
         'metrics', description=metrics_desc, help=metrics_desc)
     metrics.set_defaults(command="c7n.commands.metrics_cmd")
@@ -254,50 +302,6 @@ def setup_parser():
     validate.add_argument("-v", "--verbose", action="count", help="Verbose Logging")
     validate.add_argument("-q", "--quiet", action="count", help="Less logging (repeatable)")
     validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
-
-    schema_desc = ("Browse the available vocabularies (resources, filters, and "
-                   "actions) for policy construction. The selector "
-                   "is specified with RESOURCE[.CATEGORY[.ITEM]] "
-                   "examples: s3, ebs.actions, or ec2.filters.instance-age")
-    schema = subs.add_parser(
-        'schema', description=schema_desc,
-        help="Interactive cli docs for policy authors")
-    schema.set_defaults(command="c7n.commands.schema_cmd")
-    _schema_options(schema)
-
-    run_desc = "\n".join((
-        "Execute the policies in a config file",
-        "",
-        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
-        "",
-        "When running across multiple regions, policies targeting resources in ",
-        "regions where they do not exist will not be run. The output directory ",
-        "when passing multiple regions is suffixed with the region. Resources ",
-        "with global endpoints are run just once and are suffixed with the first ",
-        "region passed in or us-east-1 if running against 'all' regions.",
-        ""
-    ))
-
-    run = subs.add_parser(
-        "run", description=run_desc, help=run_desc,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-
-    run.set_defaults(command="c7n.commands.run")
-    _default_options(run)
-    _dryrun_option(run)
-    run.add_argument(
-        "--skip-validation",
-        action="store_true",
-        help="Skips validation of policies (assumes you've run the validate command seperately).")
-    run.add_argument(
-        "-m", "--metrics-enabled",
-        default=None, nargs="?", const="aws",
-        help="Emit metrics to provider metrics")
-    run.add_argument(
-        "--trace",
-        dest="tracer",
-        help=argparse.SUPPRESS,
-        default=None, nargs="?", const="default")
 
     return parser
 

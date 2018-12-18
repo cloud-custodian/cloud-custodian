@@ -207,10 +207,15 @@ class SystemStats(DeltaStats):
     def get_snapshot(self):
         snapshot = {
             'num_threads': self.process.num_threads(),
-            'num_fds': self.process.num_fds(),
             'snapshot_time': time.time(),
             'cache_size': self.ctx.policy.get_cache().size()
         }
+
+        # no num_fds on Windows, but likely num_handles
+        if hasattr(self.process, "num_fds"):
+            snapshot['num_fds'] = self.process.num_fds()
+        elif hasattr(self.process, "num_handles"):
+            snapshot['num_handles'] = self.process.num_handles()
 
         with self.process.oneshot():
             # simpler would be json.dumps(self.process.as_dict()), but
@@ -222,11 +227,15 @@ class SystemStats(DeltaStats):
                 snapshot['num_ctx_switches_involuntary']) = self.process.num_ctx_switches()
             # io counters ( not available on osx)
             if getattr(self.process, 'io_counters', None):
-                io = self.process.io_counters()
-                for counter in (
-                        'read_count', 'write_count',
-                        'write_bytes', 'read_bytes'):
-                    snapshot[counter] = getattr(io, counter)
+                try:
+                    io = self.process.io_counters()
+                    for counter in (
+                            'read_count', 'write_count',
+                            'write_bytes', 'read_bytes'):
+                        snapshot[counter] = getattr(io, counter)
+                except NotImplementedError:
+                    # some old kernels and Windows Linux Subsystem throw this
+                    pass
             # memory counters
             mem = self.process.memory_info()
             for counter in (
@@ -352,10 +361,16 @@ class LogOutput(object):
 @log_outputs.register('default')
 class LogFile(LogOutput):
 
+    def __repr__(self):
+        return "<LogFile file://%s>" % self.log_path
+
+    @property
+    def log_path(self):
+        return os.path.join(
+            self.ctx.log_dir, 'custodian-run.log')
+
     def get_handler(self):
-        return logging.FileHandler(
-            os.path.join(
-                self.ctx.log_dir, 'custodian-run.log'))
+        return logging.FileHandler(self.log_path)
 
 
 @blob_outputs.register('file')
@@ -404,7 +419,8 @@ class DirectoryOutput(object):
     def get_output_vars(self):
         data = {
             'account_id': self.ctx.options.account_id,
-            'policy': self.ctx.policy.name,
+            'region': self.ctx.options.region,
+            'policy_name': self.ctx.policy.name,
             'now': datetime.utcnow(),
             'uuid': str(uuid.uuid4())}
         return data

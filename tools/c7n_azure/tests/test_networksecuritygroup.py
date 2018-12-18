@@ -20,6 +20,32 @@ class NetworkSecurityGroupTest(BaseTest):
     def setUp(self):
         super(NetworkSecurityGroupTest, self).setUp()
 
+    def test_network_security_group_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-network-security-group',
+                'resource': 'azure.networksecuritygroup',
+                'filters': [
+                    {'type': 'ingress',
+                     'ports': '80',
+                     'access': 'Allow'},
+                    {'type': 'egress',
+                     'ports': '22',
+                     'ipProtocol': 'TCP',
+                     'access': 'Allow'}
+                ],
+                'actions': [
+                    {'type': 'open',
+                     'ports': '1000-1100',
+                     'direction': 'Inbound'},
+                    {'type': 'close',
+                     'ports': '1000-1100',
+                     'direction': 'Inbound'},
+
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('networksecuritygroup.json')
     def test_find_by_name(self):
         p = self.load_policy({

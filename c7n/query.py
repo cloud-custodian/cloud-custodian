@@ -34,8 +34,15 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource,
-    set_value_from_jmespath)
+    local_session, generate_arn, get_retry, chunks, camelResource)
+
+
+try:
+    from botocore.paginate import PageIterator
+except ImportError:
+    # Likely using another provider in a serverless environment
+    class PageIterator(object):
+        pass
 
 
 class ResourceQuery(object):
@@ -56,9 +63,8 @@ class ResourceQuery(object):
             p = client.get_paginator(enum_op)
             results = p.paginate(**params)
             if retry:
-                data = pager(results, retry)
-            else:
-                data = results.build_full_result()
+                p.PAGE_ITERATOR_CLS = RetryPageIterator
+            data = results.build_full_result()
         else:
             op = getattr(client, enum_op)
             data = op(**params)
@@ -152,7 +158,7 @@ class ChildResourceQuery(ResourceQuery):
         for parent_id in parent_ids:
             merged_params = dict(params, **{parent_key: parent_id})
             subset = self._invoke_client_enum(
-                client, enum_op, merged_params, path)
+                client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
                 for r in subset:
                     r[self.parent_key] = parent_id
@@ -293,12 +299,13 @@ class ConfigSource(object):
     def resources(self, query=None):
         client = local_session(self.manager.session_factory).client('config')
         paginator = client.get_paginator('list_discovered_resources')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
         pages = paginator.paginate(
             resourceType=self.manager.get_model().config_type)
         results = []
 
         with self.manager.executor_factory(max_workers=5) as w:
-            ridents = pager(pages, self.retry)
+            ridents = pages.build_full_result()
             resource_ids = [
                 r['resourceId'] for r in ridents.get('resourceIdentifiers', ())]
             self.manager.log.debug(
@@ -321,28 +328,6 @@ class ConfigSource(object):
         return resources
 
 
-def pager(p, retry):
-    results = {}
-    iterator = iter(p)
-
-    while True:
-        try:
-            page = retry(next, iterator)
-        except StopIteration:
-            return results
-        if isinstance(page, tuple) and len(page) == 2:
-            page = page[1]
-        for rexpr in p.result_keys:
-            rv = rexpr.search(page)
-            if rv is None:
-                continue
-            ev = rexpr.search(results)
-            if ev is None:
-                set_value_from_jmespath(results, rexpr.expression, rv)
-                continue
-            ev.extend(rv)
-
-
 @six.add_metaclass(QueryMeta)
 class QueryResourceManager(ResourceManager):
 
@@ -363,7 +348,6 @@ class QueryResourceManager(ResourceManager):
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
-            'ThorttlingException',
             'Client.RequestLimitExceeded')))
 
     def __init__(self, data, options):
@@ -544,7 +528,7 @@ class ChildResourceManager(QueryResourceManager):
 
 
 def _batch_augment(manager, model, detail_spec, resource_set):
-    detail_op, param_name, param_key, detail_path = detail_spec
+    detail_op, param_name, param_key, detail_path, detail_args = detail_spec
     client = local_session(manager.session_factory).client(
         model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
@@ -554,6 +538,8 @@ def _batch_augment(manager, model, detail_spec, resource_set):
     else:
         args = ()
     kw = {param_name: [param_key and r[param_key] or r for r in resource_set]}
+    if detail_args:
+        kw.update(detail_args)
     response = op(*args, **kw)
     return response[detail_path]
 
@@ -583,3 +569,11 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
             r.update(response)
         results.append(r)
     return results
+
+
+class RetryPageIterator(PageIterator):
+
+    retry = staticmethod(QueryResourceManager.retry)
+
+    def _make_request(self, current_kwargs):
+        return self.retry(self._method, **current_kwargs)

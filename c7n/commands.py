@@ -29,12 +29,10 @@ import yaml
 
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.reports import report as do_report
 from c7n.utils import dumps, load_file
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
-from c7n import schema
 
 
 log = logging.getLogger('custodian.commands')
@@ -60,16 +58,22 @@ def policy_command(f):
 
         # for a default region for policy loading, we'll expand regions later.
         options.region = ""
-
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
-            except IOError:
+            except IOError as e:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
+            except yaml.YAMLError as e:
+                log.error(
+                    "yaml syntax error loading policy file ({}) error:\n {}".format(
+                        fp, e))
+                errors += 1
+                continue
             except ValueError as e:
-                log.error('problem loading policy file ({})'.format(e.message))
+                log.error('problem loading policy file ({}) error: {}'.format(
+                    fp, str(e)))
                 errors += 1
                 continue
 
@@ -167,6 +171,7 @@ def _print_no_policies_warning(options, policies):
 
 
 def validate(options):
+    from c7n import schema
     load_resources()
     if len(options.configs) < 1:
         log.error('no config files specified')
@@ -243,6 +248,7 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
+    from c7n.reports import report as do_report
     if len(policies) == 0:
         log.error('Error: must supply at least one policy')
         sys.exit(1)
@@ -293,6 +299,7 @@ def schema_completer(prefix):
     For the given prefix so far, return the possible options.  Note that
     filtering via startswith happens after this list is returned.
     """
+    from c7n import schema
     load_resources()
     components = prefix.split('.')
 
@@ -334,6 +341,7 @@ def schema_completer(prefix):
 
 def schema_cmd(options):
     """ Print info about the resources, actions and filters available. """
+    from c7n import schema
     if options.json:
         schema.json_dump(options.resource)
         return

@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 import json
 import logging
 import os
@@ -237,7 +237,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_mark_hours(self):
-        localtz = zoneinfo.gettz("Etc/UTC")
+        localtz = tzutil.gettz("Etc/UTC")
         dt = datetime.datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=5, day=9, hour=21, minute=20, second=0, microsecond=0
@@ -708,6 +708,38 @@ class RDSTest(BaseTest):
         resources = policy.run()
 
         self.assertEqual(len(resources), 1, "Resources should be unused")
+
+    def test_rds_modify_db(self):
+        session_factory = self.replay_flight_data("test_rds_modify_db")
+        p = self.load_policy(
+            {
+                "name": "rds-modify-db",
+                "resource": "rds",
+                "filters": [
+                    {"DeletionProtection": True},
+                    {"MasterUsername": "testtest"}
+                ],
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'DeletionProtection',
+                                "value": False
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("rds")
+        db_info = client.describe_db_instances(DBInstanceIdentifier="testtest")
+        self.assertFalse(db_info["DBInstances"][0]["DeletionProtection"])
 
 
 class RDSSnapshotTest(BaseTest):

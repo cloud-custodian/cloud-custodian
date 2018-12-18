@@ -17,6 +17,7 @@ from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, ChildResourceManager
@@ -321,3 +322,80 @@ class LogCrossAccountFilter(CrossAccountAccessFilter):
             if found:
                 results.append(r)
         return results
+
+
+@LogGroup.action_registry.register('set-encryption')
+class EncryptLogGroup(BaseAction):
+    """Encrypt/Decrypt a log group
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: encrypt-log-group
+            resource: log-group
+            filters:
+              - kmsKeyId: absent
+            actions:
+              - type: set-encryption
+                kms-key: alias/mylogkey
+                state: True
+
+          - name: decrypt-log-group
+            resource: log-group
+            filters:
+              - kmsKeyId: kms:key:arn
+            actions:
+              - type: set-encryption
+                state: False
+    """
+    schema = type_schema(
+        'set-encryption',
+        **{'kms-key': {'type': 'string'},
+           'state': {'type': 'boolean'}})
+    permissions = (
+        'logs:AssociateKmsKey', 'logs:DisassociateKmsKey', 'kms:DescribeKey')
+
+    def validate(self):
+        if not self.data.get('state', True):
+            return self
+        key = self.data.get('kms-key', '')
+        if not key:
+            raise ValueError('Must specify either a KMS key ARN or Alias')
+        if 'alias/' not in key and ':key/' not in key:
+            raise PolicyValidationError(
+                "Invalid kms key format %s" % key)
+        return self
+
+    def resolve_key(self, key):
+        if not key:
+            return
+
+        # Qualified arn for key
+        if key.startswith('arn:') and ':key/' in key:
+            return key
+
+        # Alias
+        key = local_session(
+            self.manager.session_factory).client(
+                'kms').describe_key(
+                    KeyId=key)['KeyMetadata']['Arn']
+        return key
+
+    def process(self, resources):
+        session = local_session(self.manager.session_factory)
+        client = session.client('logs')
+
+        state = self.data.get('state', True)
+        key = self.resolve_key(self.data.get('kms-key'))
+
+        for r in resources:
+            try:
+                if state:
+                    client.associate_kms_key(
+                        logGroupName=r['logGroupName'], kmsKeyId=key)
+                else:
+                    client.disassociate_kms_key(logGroupName=r['logGroupName'])
+            except client.exceptions.ResourceNotFoundException:
+                continue

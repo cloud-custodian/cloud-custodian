@@ -14,16 +14,16 @@
 
 import logging
 import re
-import six
 
+import six
 from azure.graphrbac import GraphRbacManagementClient
+from c7n_azure.actions import AzureBaseAction
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 
-from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
@@ -231,17 +231,12 @@ class ScopeFilter(Filter):
 
 
 @RoleAssignment.action_registry.register('delete')
-class DeleteAssignmentAction(BaseAction):
+class DeleteAssignmentAction(AzureBaseAction):
 
     schema = type_schema('delete')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(DeleteAssignmentAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def delete(self, assignment_scope, assignment_name):
-        self.client.role_assignments.delete(assignment_scope, assignment_name)
-
-    def process(self, assignments):
+    def process_resource_set(self, assignments):
+        client = self.manager.get_client()
         for assignment in assignments:
-            self.delete(assignment['properties']['scope'], assignment['name'])
+            client.role_assignments.delete(
+                assignment['properties']['scope'], assignment['name'])

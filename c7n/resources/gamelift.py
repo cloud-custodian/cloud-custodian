@@ -41,5 +41,5 @@ class GameLiftFleet(QueryResourceManager):
         date = 'CreationTime'
         dimension = None
         batch_detail_spec = (
-            "describe_fleet_attributes", "FleetIds", None, "FleetAttributes")
+            "describe_fleet_attributes", "FleetIds", None, "FleetAttributes", None)
         filter_name = None

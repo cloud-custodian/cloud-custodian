@@ -61,11 +61,13 @@ class PythonPackageArchive(object):
 
     """
 
+    zip_compression = zipfile.ZIP_DEFLATED
+
     def __init__(self, *modules):
         self._temp_archive_file = tempfile.NamedTemporaryFile()
         self._zip_file = zipfile.ZipFile(
             self._temp_archive_file, mode='w',
-            compression=zipfile.ZIP_DEFLATED)
+            compression=self.zip_compression)
         self._closed = False
         self.add_modules(None, *modules)
 
@@ -180,6 +182,8 @@ class PythonPackageArchive(object):
         assert not self._closed, "Archive closed"
         if not isinstance(dest, zipfile.ZipInfo):
             dest = zinfo(dest)  # see for some caveats
+        # Ensure we apply the compression
+        dest.compress_type = self.zip_compression
         self._zip_file.writestr(dest, contents)
 
     def close(self):
@@ -414,6 +418,7 @@ class LambdaManager(object):
             # after configuration change?
 
             new_config = func.get_config()
+            new_config['Role'] = role
             new_tags = new_config.pop('Tags', {})
 
             config_changed = self.delta_function(old_config, new_config)
@@ -432,11 +437,11 @@ class LambdaManager(object):
             tags_to_add, tags_to_remove = self.diff_tags(old_tags, new_tags)
 
             if tags_to_add:
-                log.debug("Adding/updating tags: %s config" % func.name)
+                log.debug("Updating function tags: %s" % func.name)
                 self.client.tag_resource(
                     Resource=base_arn, Tags=tags_to_add)
             if tags_to_remove:
-                log.debug("Removing tags: %s config" % func.name)
+                log.debug("Removing function stale tags: %s" % func.name)
                 self.client.untag_resource(
                     Resource=base_arn, TagKeys=tags_to_remove)
 
