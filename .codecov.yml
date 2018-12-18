@@ -21,6 +21,7 @@ coverage:
       mailer:
         paths: "tools/c7n_mailer"
       custodian:
+      # one of the tests is slightly variable coverage due to concurrency (0.01)
         threshold: "0.05%"
         paths:
           - "!tools"

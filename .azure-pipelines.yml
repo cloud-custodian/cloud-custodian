@@ -1,10 +1,8 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
 trigger:
 - master
+
+variables:
+- group: CustodianCoreCI
 
 jobs:
 
@@ -41,11 +39,12 @@ jobs:
 
   steps:
   - task: UsePythonVersion@0
+    displayName: "Set Python Version"
     inputs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
-  - script: python -m pip install --upgrade pip && pip install tox
+  - script: python -m pip install --upgrade pip && pip install tox codecov
     displayName: 'Install Test Runner'
 
   - script: tox --notest
@@ -54,7 +53,18 @@ jobs:
   - script: tox
     displayName: 'Tox'
 
+  - script: codecov --branch $BRANCH --pr $PR --commit $COMMIT --build $BUILD_ID
+    displayName: 'Publish Code Coverage'
+    condition: "eq(variables['python.version'], '2.7')"
+    env:
+      BUILD_ID: $(Build.BuildNumber)
+      CODECOV_TOKEN: $(CODECOV_TOKEN)
+      PR: $(system.pullRequest.pullRequestNumber)
+      BRANCH: $(system.pullRequest.sourceBranch)
+      COMMIT: $(system.pullRequest.sourceCommitId)
+
   - task: PublishTestResults@2
+    displayName: "Publish Test Results Azure"
     inputs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version)'
