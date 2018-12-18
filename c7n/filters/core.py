@@ -161,6 +161,8 @@ class Filter(object):
     metrics = ()
     permissions = ()
     schema = {'type': 'object'}
+    # schema aliases get hoisted into a jsonschema definition
+    # location, and then referenced inline.
     schema_alias = None
 
     def __init__(self, data, manager=None):
@@ -179,6 +181,8 @@ class Filter(object):
         return list(filter(self, resources))
 
     def get_block_operator(self):
+        """Determine the immediate parent boolean operator for a filter"""
+        # Top level operator is `and`
         block_stack = ['and']
         for f in self.manager.iter_filters(block_end=True):
             if f is None:
@@ -189,6 +193,33 @@ class Filter(object):
             if f == self:
                 break
         return block_stack[-1]
+
+    def merge_annotation(self, r, annotation_key, values):
+        block_op = self.get_block_operator()
+        if block_op in ('and', 'not'):
+            r[self.matched_annotation_key] = intersect_list(
+                values,
+                r.get(self.matched_annotation_key))
+
+        if not values and block_op != 'or':
+            return
+
+        r_matched = r.setdefault(self.matched_annotation_key, [])
+        for k in values:
+            if k not in r_matched:
+                r_matched.append(k)
+
+
+def intersect_list(a, b):
+    if b is None:
+        return a
+    elif a is None:
+        return b
+    res = []
+    for x in a:
+        if x in b:
+            res.append(x)
+    return res
 
 
 class BooleanGroupFilter(Filter):

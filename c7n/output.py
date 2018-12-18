@@ -361,10 +361,16 @@ class LogOutput(object):
 @log_outputs.register('default')
 class LogFile(LogOutput):
 
+    def __repr__(self):
+        return "<LogFile file://%s>" % self.log_path
+
+    @property
+    def log_path(self):
+        return os.path.join(
+            self.ctx.log_dir, 'custodian-run.log')
+
     def get_handler(self):
-        return logging.FileHandler(
-            os.path.join(
-                self.ctx.log_dir, 'custodian-run.log'))
+        return logging.FileHandler(self.log_path)
 
 
 @blob_outputs.register('file')

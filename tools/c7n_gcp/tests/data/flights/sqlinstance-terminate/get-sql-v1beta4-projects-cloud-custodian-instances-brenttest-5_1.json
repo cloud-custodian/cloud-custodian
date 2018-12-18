@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Mon, 26 Nov 2018 16:46:35 GMT",
+    "expires": "Mon, 26 Nov 2018 16:46:35 GMT",
+    "cache-control": "private, max-age=0",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "404",
+    "content-length": "235",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "errors": [
+        {
+          "domain": "global",
+          "reason": "instanceDoesNotExist",
+          "message": "The Cloud SQL instance does not exist."
+        }
+      ],
+      "code": 404,
+      "message": "The Cloud SQL instance does not exist."
+    }
+  }
+}

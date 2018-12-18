@@ -15,9 +15,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 
-
-from c7n.actions import RemovePolicyBase, ModifyPolicyBase
+from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
 from c7n.filters import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.resolver import ValuesFrom
@@ -252,3 +252,70 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 AttributeValue=json.dumps(policy)
             )
         return results
+
+
+@SNS.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KmsMasterKeyId'
+
+
+@SNS.action_registry.register('set-encryption')
+class SetEncryption(BaseAction):
+    """
+    Set Encryption on SNS Topics
+
+    By default if no key is specified, alias/aws/sns is used
+
+    key can either be a KMS key ARN, key id, or an alias
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: set-sns-topic-encryption
+              resource: sns
+              actions:
+                - type: set-encryption
+                  key: alias/cmk/key
+                  enabled: True
+
+            - name: set-sns-topic-encryption-with-id
+              resource: sns
+              actions:
+                - type: set-encryption
+                  key: abcdefgh-1234-1234-1234-123456789012
+                  enabled: True
+
+            - name: set-sns-topic-encryption-with-arn
+              resource: sns
+              actions:
+                - type: set-encryption
+                  key: arn:aws:kms:us-west-1:123456789012:key/abcdefgh-1234-1234-1234-123456789012
+                  enabled: True
+    """
+
+    schema = type_schema(
+        'set-encryption',
+        enabled={'type': 'boolean'},
+        key={'type': 'string'}
+    )
+
+    permissions = ('sns:SetTopicAttributes', 'kms:DescribeKey',)
+
+    def process(self, resources):
+        sns = local_session(self.manager.session_factory).client('sns')
+
+        if self.data.get('enabled', True):
+            key = self.data.get('key', 'alias/aws/sns')
+        else:
+            key = ''
+
+        for r in resources:
+            sns.set_topic_attributes(
+                TopicArn=r['TopicArn'],
+                AttributeName='KmsMasterKeyId',
+                AttributeValue=key
+            )
+        return resources

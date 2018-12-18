@@ -11,27 +11,59 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import re
+
+from c7n.utils import type_schema
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
-"""
-sql instances represent roots in a logical hierarchy
-
- - sql instance
-  - logical databases
-  - users list
-
-"""
-
 
 @resources.register('sql-instance')
-class SQLInstance(QueryResourceManager):
+class SqlInstance(QueryResourceManager):
 
     class resource_type(TypeInfo):
-        service = 'sql'
+        service = 'sqladmin'
         version = 'v1beta4'
-        component = 'projects.locations.clusters'
-        enum_spec = ('list', 'items[]', None)
+        component = 'instances'
+        enum_spec = ('list', "items[]", None)
         scope = 'project'
-        # scope_key = 'project'
-        scope_template = "projects/{}/instances"
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project'],
+                        'instance': resource_info['name']})
+
+
+class SqlInstanceAction(MethodAction):
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project, 'instance': instance}
+
+
+@SqlInstance.action_registry.register('delete')
+class SqlInstanceDelete(SqlInstanceAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/instances/(.*)')
+
+
+@SqlInstance.action_registry.register('stop')
+class SqlInstanceStop(MethodAction):
+
+    schema = type_schema('stop')
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project,
+                'instance': instance,
+                'body': {'settings': {'activationPolicy': 'NEVER'}}}

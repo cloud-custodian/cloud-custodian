@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backup": {
+            "BackupId": "backup-0f759586d0481aeeb",
+            "Lifecycle": "CREATING",
+            "Type": "USER_INITIATED",
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 12,
+                "day": 12,
+                "hour": 11,
+                "minute": 26,
+                "second": 6,
+                "microsecond": 102000
+            },
+            "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+            "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-0f759586d0481aeeb",
+            "Tags": [
+                {
+                    "Key": "test-tag",
+                    "Value": "backup-tag"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "test"
+                }
+            ],
+            "FileSystem": {
+                "FileSystemId": "fs-002ccbccdcf032728",
+                "StorageCapacity": 300,
+                "WindowsConfiguration": {
+                    "WeeklyMaintenanceStartTime": "4:10:30",
+                    "DailyAutomaticBackupStartTime": "04:00",
+                    "AutomaticBackupRetentionDays": 7,
+                    "CopyTagsToBackups": false
+                }
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "fbc59de0-34a0-4a5e-87eb-8f667c636233",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Wed, 12 Dec 2018 16:26:06 GMT",
+                "x-amzn-requestid": "fbc59de0-34a0-4a5e-87eb-8f667c636233",
+                "content-length": "618",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
