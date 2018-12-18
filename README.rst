@@ -2,8 +2,8 @@
      :target: https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
      :alt: Join the chat at https://gitter.im/capitalone/cloud-custodian
 
-.. image:: https://ci.cloudcustodian.io/api/badges/capitalone/cloud-custodian/status.svg
-     :target: https://ci.cloudcustodian.io/capitalone/cloud-custodian
+.. image:: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
+     :target: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
      :alt: Build Status
 
 .. image:: https://img.shields.io/badge/license-Apache%202-blue.svg

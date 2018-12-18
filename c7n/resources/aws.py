@@ -216,14 +216,14 @@ class XrayTracer(object):
     use_daemon = 'AWS_XRAY_DAEMON_ADDRESS' in os.environ
     service_name = 'custodian'
 
-    context = XrayContext()
-    if HAVE_XRAY:
+    @classmethod
+    def initialize(cls):
+        context = XrayContext()
         xray_recorder.configure(
-            emitter=use_daemon is False and emitter or None,
+            emitter=cls.use_daemon is False and cls.emitter or None,
             context=context,
             sampling=True,
-            context_missing='LOG_ERROR'
-        )
+            context_missing='LOG_ERROR')
         patch(['boto3', 'requests'])
         logging.getLogger('aws_xray_sdk.core').setLevel(logging.ERROR)
 
@@ -395,6 +395,9 @@ class AWS(object):
         """
         _default_region(options)
         _default_account_id(options)
+        if options.tracer:
+            XrayTracer.initialize()
+
         return options
 
     def get_session_factory(self, options):

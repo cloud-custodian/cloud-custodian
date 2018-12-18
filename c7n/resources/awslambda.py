@@ -19,6 +19,7 @@ import json
 import six
 
 from botocore.exceptions import ClientError
+from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry, BaseAction, RemovePolicyBase
@@ -492,3 +493,151 @@ class Delete(BaseAction):
                     continue
                 raise
         self.log.debug("Deleted %d functions", len(functions))
+
+
+@resources.register('lambda-layer')
+class LambdaLayerVersion(query.QueryResourceManager):
+    """Note custodian models the lambda layer version.
+
+    Layers end up being a logical asset, the physical asset for use
+    and management is the layer verison.
+
+    To ease that distinction, we support querying just the latest
+    layer version or having a policy against all layer versions.
+
+    By default we query all versions, the following is an example
+    to query just the latest.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: lambda-layer
+            query:
+              - version: latest
+
+    """
+
+    class resource_type(object):
+        service = 'lambda'
+        type = 'function'
+        enum_spec = ('list_layers', 'Layers', None)
+        name = id = 'LayerName'
+        filter_name = None
+        date = 'CreatedDate'
+        dimension = None
+        config_type = None
+
+    def augment(self, resources):
+        versions = {}
+        for r in resources:
+            versions[r['LayerName']] = v = r['LatestMatchingVersion']
+            v['LayerName'] = r['LayerName']
+
+        if {'version': 'latest'} in self.data.get('query', []):
+            return list(versions.values())
+
+        layer_names = list(versions)
+        client = local_session(self.session_factory).client('lambda')
+
+        versions = []
+        for layer_name in layer_names:
+            pager = get_layer_version_paginator(client)
+            for v in pager.paginate(
+                    LayerName=layer_name).build_full_result().get('LayerVersions'):
+                v['LayerName'] = layer_name
+                versions.append(v)
+        return versions
+
+
+def get_layer_version_paginator(client):
+    pager = Paginator(
+        client.list_layer_versions,
+        {'input_token': 'NextToken',
+         'output_token': 'NextToken',
+         'result_key': 'LayerVersions'},
+        client.meta.service_model.operation_model('ListLayerVersions'))
+    pager.PAGE_ITERATOR_CLS = query.RetryPageIterator
+    return pager
+
+
+@LambdaLayerVersion.filter_registry.register('cross-account')
+class LayerCrossAccount(CrossAccountAccessFilter):
+
+    permissions = ('lambda:GetLayerVersionPolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('lambda')
+        for r in resources:
+            r['c7n:Policy'] = self.manager.retry(
+                client.get_layer_version_policy,
+                LayerName=r['LayerName'],
+                VersionNumber=r['Version']).get('Policy')
+        return super(LayerCrossAccount, self).process(resources)
+
+    def get_resource_policy(self, r):
+        return r['c7n:Policy']
+
+
+@LambdaLayerVersion.action_registry.register('remove-statements')
+class LayerRemovePermissions(RemovePolicyBase):
+
+    schema = type_schema(
+        'remove-statements',
+        required=['statement_ids'],
+        statement_ids={'oneOf': [
+            {'enum': ['matched']},
+            {'type': 'array', 'items': {'type': 'string'}}]})
+
+    permissions = (
+        "lambda:GetLayerVersionPolicy",
+        "lambda:RemoveLayerVersionPermission")
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('lambda')
+        for r in resources:
+            self.process_resource(client, r)
+
+    def process_resource(self, client, r):
+        if 'c7n:Policy' not in r:
+            try:
+                r['c7n:Policy'] = self.manager.retry(
+                    client.get_layer_version_policy,
+                    LayerName=r['LayerName'],
+                    VersionNumber=r['Version'])
+            except client.exceptions.ResourceNotFound:
+                return
+
+        p = json.loads(r['c7n:Policy'])
+
+        statements, found = self.process_policy(
+            p, r, CrossAccountAccessFilter.annotation_key)
+
+        if not found:
+            return
+
+        for f in found:
+            self.manager.retry(
+                client.remove_layer_version_permission,
+                LayerName=r['LayerName'],
+                StatementId=f['Sid'],
+                VersionNumber=r['Version'])
+
+
+@LambdaLayerVersion.action_registry.register('delete')
+class DeleteLayerVersion(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('lambda:DeleteLayerVersion',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('lambda')
+
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_layer_version,
+                    LayerName=r['LayerName'],
+                    VersionNumber=r['Version'])
+            except client.exceptions.ResourceNotFound:
+                continue

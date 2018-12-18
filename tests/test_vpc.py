@@ -2168,6 +2168,27 @@ class EndpointTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-6c7fa917"])
 
+    def test_endpoint_cross_account(self):
+        session_factory = self.replay_flight_data('test_vpce_cross_account')
+        p = self.load_policy(
+            {
+                'name': 'vpc-endpoint-cross-account',
+                'resource': 'vpc-endpoint',
+                'filters': [
+                    {'type': 'cross-account'}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        violations = resources[0]['c7n:CrossAccountViolations']
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]['Principal'], '*')
+        self.assertEqual(violations[0]['Action'], '*')
+        self.assertEqual(violations[0]['Resource'], '*')
+        self.assertEqual(violations[0]['Effect'], 'Allow')
+
 
 class NATGatewayTest(BaseTest):
 

@@ -1184,3 +1184,63 @@ class CrossAccountChecker(TestCase):
         for p, expected in zip(policies, [False, True]):
             violations = checker.check(p)
             self.assertEqual(bool(violations), expected)
+
+
+class SetRolePolicyAction(BaseTest):
+    def test_set_policy_attached(self):
+        factory = self.replay_flight_data("test_iam_set_policy_attached")
+
+        p = self.load_policy(
+            {
+                "name": "iam-attach-role-policy",
+                "resource": "iam-role",
+                "filters": [
+                    {
+                        "type": "no-specific-managed-policy",
+                        "value": "my-iam-policy",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::123456789012:policy/my-iam-policy",
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test-role-us-east-1', resources[0]['RoleName'])
+
+    def test_set_policy_detached(self):
+        factory = self.replay_flight_data("test_iam_set_policy_detached")
+
+        p = self.load_policy(
+            {
+                "name": "iam-attach-role-policy",
+                "resource": "iam-role",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "my-iam-policy",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "arn:aws:iam::123456789012:policy/my-iam-policy",
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test-role-us-east-1', resources[0]['RoleName'])
