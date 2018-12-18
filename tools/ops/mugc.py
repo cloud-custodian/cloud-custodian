@@ -16,7 +16,6 @@ import itertools
 import json
 import os
 import logging
-import sys
 
 from c7n.credentials import SessionFactory
 from c7n.config import Config
@@ -144,7 +143,7 @@ def setup_parser():
     parser.add_argument("configs", nargs='*', help="Policy configuration file(s)")
     parser.add_argument(
         '-c', '--config', dest="config_files", nargs="*", action='append',
-        help="Policy configuration files(s)")
+        help="Policy configuration files(s)", required=True)
     parser.add_argument(
         '-r', '--region', action='append', dest='regions', metavar='REGION',
         help="AWS Region to target. Can be used multiple times, also supports `all`")
@@ -186,10 +185,6 @@ def main():
     files.extend(itertools.chain(*options.config_files))
     files.extend(options.configs)
     options.config_files = files
-
-    if not files:
-        parser.print_help()
-        sys.exit(1)
 
     policy_config = Config.empty(
         regions=options.regions,
