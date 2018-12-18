@@ -2,18 +2,18 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "14abf71b-0018-11e9-b647-199903af13da",
+            "RequestId": "3aa70f82-02af-11e9-8f13-8b7358831acf",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Sat, 15 Dec 2018 03:18:23 GMT",
+                "date": "Tue, 18 Dec 2018 10:25:23 GMT",
                 "content-type": "application/json",
-                "content-length": "296",
+                "content-length": "295",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "14abf71b-0018-11e9-b647-199903af13da"
+                "x-amzn-requestid": "3aa70f82-02af-11e9-8f13-8b7358831acf"
             },
             "RetryAttempts": 0
         },
-        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"global\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:GetLayerVersion\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:layer:test:1\"}]}",
-        "RevisionId": "1b01dc2d-618e-49a2-9aff-d67bc89c542b"
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"Grant\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:GetLayerVersion\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:layer:test:2\"}]}",
+        "RevisionId": "dc14c754-0f12-49cb-b263-95dd45f45bd3"
     }
 }

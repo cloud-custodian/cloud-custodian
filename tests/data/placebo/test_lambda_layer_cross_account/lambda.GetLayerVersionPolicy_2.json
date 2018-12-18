@@ -2,18 +2,18 @@
     "status_code": 404,
     "data": {
         "Error": {
-            "Message": "Layer version arn:aws:lambda:us-east-1:644160558196:layer:test:1 does not have any resource policy.",
+            "Message": "Layer version arn:aws:lambda:us-east-1:644160558196:layer:test:2 does not have any resource policy.",
             "Code": "ResourceNotFoundException"
         },
         "ResponseMetadata": {
-            "RequestId": "1b9b52f0-0018-11e9-bb11-b54e36782c14",
+            "RequestId": "3ac7de4a-02af-11e9-b949-5d121549c0c1",
             "HTTPStatusCode": 404,
             "HTTPHeaders": {
-                "date": "Sat, 15 Dec 2018 03:18:35 GMT",
+                "date": "Tue, 18 Dec 2018 10:25:24 GMT",
                 "content-type": "application/json",
                 "content-length": "127",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "1b9b52f0-0018-11e9-bb11-b54e36782c14",
+                "x-amzn-requestid": "3ac7de4a-02af-11e9-b949-5d121549c0c1",
                 "x-amzn-errortype": "ResourceNotFoundException"
             },
             "RetryAttempts": 0

@@ -2,14 +2,14 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "112ede33-0018-11e9-9b2b-856f558ae83e",
+            "RequestId": "3a8a111d-02af-11e9-a945-e77482cd9b0c",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Sat, 15 Dec 2018 03:18:17 GMT",
+                "date": "Tue, 18 Dec 2018 10:25:23 GMT",
                 "content-type": "application/json",
-                "content-length": "341",
+                "content-length": "331",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "112ede33-0018-11e9-9b2b-856f558ae83e"
+                "x-amzn-requestid": "3a8a111d-02af-11e9-a945-e77482cd9b0c"
             },
             "RetryAttempts": 0
         },
@@ -18,13 +18,9 @@
                 "LayerName": "test",
                 "LayerArn": "arn:aws:lambda:us-east-1:644160558196:layer:test",
                 "LatestMatchingVersion": {
-                    "LayerVersionArn": "arn:aws:lambda:us-east-1:644160558196:layer:test:1",
-                    "Version": 1,
-                    "Description": "xyz",
-                    "CreatedDate": "2018-12-02T04:50:47.585+0000",
-                    "CompatibleRuntimes": [
-                        "python3.7"
-                    ]
+                    "LayerVersionArn": "arn:aws:lambda:us-east-1:644160558196:layer:test:2",
+                    "Version": 2,
+                    "CreatedDate": "2018-12-18T10:20:13.948+0000"
                 }
             }
         ]

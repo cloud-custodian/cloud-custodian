@@ -532,16 +532,17 @@ class LambdaLayerVersion(query.QueryResourceManager):
             versions[r['LayerName']] = v = r['LatestMatchingVersion']
             v['LayerName'] = r['LayerName']
 
-        if {'version': 'all'} not in self.data.get('query', []):
+        if {'version': 'latest'} in self.data.get('query', []):
             return list(versions.values())
 
         layer_names = list(versions)
-        client = local_session(self.manager.session_factory).client('lambda')
+        client = local_session(self.session_factory).client('lambda')
 
         versions = []
         for layer_name in layer_names:
             pager = get_layer_version_paginator(client)
-            for v in pager.build_full_result().get('LayerVersions'):
+            for v in pager.paginate(
+                    LayerName=layer_name).build_full_result().get('LayerVersions'):
                 v['LayerName'] = layer_name
                 versions.append(v)
         return versions

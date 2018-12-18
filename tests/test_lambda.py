@@ -130,6 +130,7 @@ class LambdaLayerTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertTrue('CrossAccountViolations' in resources[0].keys())        
         client = factory().client('lambda')
         with self.assertRaises(client.exceptions.ResourceNotFoundException):
             client.get_layer_version_policy(
