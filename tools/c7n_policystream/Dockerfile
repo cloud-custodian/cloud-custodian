@@ -2,8 +2,8 @@ FROM ubuntu:cosmic
 
 LABEL name="c7n-policystream" \
       description="Custodian policy changes streamed from Git" \
-      repository="http://github.com/capitalone/cloud-custodian" \
-      homepage="http://github.com/capitalone/cloud-custodian" \
+      repository="http://github.com/cloud-custodian/cloud-custodian" \
+      homepage="http://github.com/cloud-custodian/cloud-custodian" \
       maintainer="Kapil Thangavelu <http://twitter.com/kapilvt>"
 
 # Note this must be run from the root directory of the checkout

@@ -23,6 +23,7 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.missing import Missing
@@ -64,6 +65,9 @@ class Account(ResourceManager):
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
 
+    def get_arns(self, resources):
+        return ["arn:::{account_id}".format(**r) for r in resources]
+
     def get_model(self):
         return self.resource_type
 
@@ -85,7 +89,7 @@ class AccountCredentialReport(CredentialReport):
         results = []
         info = report.get('<root_account>')
         for r in resources:
-            if self.match(info):
+            if self.match(r, info):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
@@ -612,6 +616,12 @@ def cloudtrail_policy(original, bucket_name, account_id):
     return json.dumps(policy)
 
 
+# AWS Account doesn't participate in events (not based on query resource manager)
+# so the event subscriber used by postfinding to register doesn't apply, manually
+# register it.
+Account.action_registry.register('post-finding', OtherResourcePostFinding)
+
+
 @actions.register('enable-cloudtrail')
 class EnableTrail(BaseAction):
     """Enables logging on the trail(s) named in the policy
@@ -1116,7 +1126,7 @@ class SetS3PublicBlock(BaseAction):
         BlockPublicPolicy={'type': 'boolean'},
         RestrictPublicBuckets={'type': 'boolean'})
 
-    permissions = ('s3:PutAccountPublicAccessBlock', 's33:GetAccountPublicAccessBlock')
+    permissions = ('s3:PutAccountPublicAccessBlock', 's3:GetAccountPublicAccessBlock')
 
     def validate(self):
         config = self.data.copy()

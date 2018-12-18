@@ -12,7 +12,7 @@ For more examples see :ref:`azure_nsg`
          filters:
           - type: ingress
             exceptPorts: '22-24'
-            ports-op: 'any'
+            match: 'any'
             access: 'Allow'
          actions:
           - type: close

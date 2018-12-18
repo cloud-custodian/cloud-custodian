@@ -500,7 +500,7 @@ class SecurityGroupApplyPatch(BaseAction):
                    'ec2:DeleteTags')
 
     def validate(self):
-        diff_filters = [n for n in self.manager.filters if isinstance(
+        diff_filters = [n for n in self.manager.iter_filters() if isinstance(
             n, SecurityGroupDiffFilter)]
         if not len(diff_filters):
             raise PolicyValidationError(
@@ -1705,6 +1705,14 @@ class VpcEndpoint(query.QueryResourceManager):
         filter_type = 'list'
         dimension = None
         id_prefix = "vpce-"
+
+
+@VpcEndpoint.filter_registry.register('cross-account')
+class EndpointCrossAccountFilter(CrossAccountAccessFilter):
+
+    policy_attribute = 'PolicyDocument'
+    annotation_key = 'c7n:CrossAccountViolations'
+    permissions = ('ec2:DescribeVpcEndpoints',)
 
 
 @VpcEndpoint.filter_registry.register('security-group')

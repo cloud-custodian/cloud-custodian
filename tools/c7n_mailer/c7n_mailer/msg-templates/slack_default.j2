@@ -8,7 +8,7 @@
             {
                "title":"Resources",
                "value":"{%- for resource in resources -%}
-                        {{ format_resource(resource, policy['resource']) }}
+                        {{ format_resource(resource, policy['resource']) | replace('\\"', '"') | replace('"', '\\"') }}
                         {%- endfor -%}"
             },
             {

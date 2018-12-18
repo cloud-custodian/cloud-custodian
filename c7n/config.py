@@ -29,6 +29,12 @@ class Bag(dict):
 
 class Config(Bag):
 
+    def copy(self, **kw):
+        d = {}
+        d.update(self)
+        d.update(**kw)
+        return Config(d)
+
     @classmethod
     def empty(cls, **kw):
         d = {}
