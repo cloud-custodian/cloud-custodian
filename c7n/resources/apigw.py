@@ -112,7 +112,7 @@ class UpdateAccount(BaseAction):
 
 
 @resources.register('rest-api')
-class RestAPI(query.QueryResourceManager):
+class RestApi(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'apigateway'
@@ -125,15 +125,15 @@ class RestAPI(query.QueryResourceManager):
         dimension = 'GatewayName'
 
 
-@RestAPI.filter_registry.register('cross-account')
+@RestApi.filter_registry.register('cross-account')
 class RestApiCrossAccount(CrossAccountAccessFilter):
 
     policy_attribute = 'policy'
     permissions = ('apigateway:GET',)
 
 
-@RestAPI.action_registry.register('update')
-class UpdateAPI(BaseAction):
+@RestApi.action_registry.register('update')
+class UpdateApi(BaseAction):
     """Update configuration of a REST API.
 
     Non-exhaustive list of updateable attributes.
@@ -314,7 +314,7 @@ class DescribeRestResource(query.ChildDescribeSource):
 
 
 @resources.register('rest-vpclink')
-class RestAPI(query.QueryResourceManager):
+class RestApiVpcLink(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'apigateway'
