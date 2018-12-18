@@ -505,14 +505,15 @@ class LambdaLayerVersion(query.QueryResourceManager):
     To ease that distinction, we support querying just the latest
     layer version or having a policy against all layer versions.
 
-    Query all versions
+    By default we query all versions, the following is an example
+    to query just the latest.
 
     .. code-block:: yaml
 
         policies:
           - name: lambda-layer
             query:
-              - version: all
+              - version: latest
 
     """
 
