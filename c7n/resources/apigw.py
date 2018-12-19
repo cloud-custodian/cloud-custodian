@@ -25,6 +25,10 @@ from c7n import query, utils
 from c7n.tags import universal_augment
 
 
+ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
+ANNOTATION_KEY_MATCHED_INTEGRATIONS = 'c7n:matched-method-integrations'
+
+
 @resources.register('rest-account')
 class RestAccount(ResourceManager):
 
@@ -108,7 +112,7 @@ class UpdateAccount(BaseAction):
 
 
 @resources.register('rest-api')
-class RestAPI(query.QueryResourceManager):
+class RestApi(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'apigateway'
@@ -121,15 +125,15 @@ class RestAPI(query.QueryResourceManager):
         dimension = 'GatewayName'
 
 
-@RestAPI.filter_registry.register('cross-account')
+@RestApi.filter_registry.register('cross-account')
 class RestApiCrossAccount(CrossAccountAccessFilter):
 
     policy_attribute = 'policy'
     permissions = ('apigateway:GET',)
 
 
-@RestAPI.action_registry.register('update')
-class UpdateAPI(BaseAction):
+@RestApi.action_registry.register('update')
+class UpdateApi(BaseAction):
     """Update configuration of a REST API.
 
     Non-exhaustive list of updateable attributes.
@@ -309,7 +313,193 @@ class DescribeRestResource(query.ChildDescribeSource):
         return results
 
 
-ANNOTATION_KEY = 'c7n-matched-resource-methods'
+@resources.register('rest-vpclink')
+class RestApiVpcLink(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'apigateway'
+        type = None
+        dimension = None
+        enum_spec = ('get_vpc_links', 'items', None)
+        id = 'id'
+        filter_name = None
+        name = 'name'
+
+
+@RestResource.filter_registry.register('rest-integration')
+class FilterRestIntegration(ValueFilter):
+    """Filter rest resources based on a key value for the rest method integration of the api
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: api-method-integrations-with-type-aws
+            resource: rest-resource
+            filters:
+              - type: rest-integration
+                key: type
+                value: AWS
+    """
+
+    schema = utils.type_schema(
+        'rest-integration',
+        method={'type': 'string', 'enum': [
+            'all', 'ANY', 'PUT', 'GET', "POST",
+            "DELETE", "OPTIONS", "HEAD", "PATCH"]},
+        rinherit=ValueFilter.schema)
+    permissions = ('apigateway:GET',)
+
+    def process(self, resources, event=None):
+        method_set = self.data.get('method', 'all')
+        # 10 req/s with burst to 40
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+
+        # uniqueness constraint validity across apis?
+        resource_map = {r['id']: r for r in resources}
+
+        futures = {}
+        results = set()
+
+        with self.executor_factory(max_workers=2) as w:
+            tasks = []
+            for r in resources:
+                r_method_set = method_set
+                if method_set == 'all':
+                    r_method_set = r.get('resourceMethods', {}).keys()
+                for m in r_method_set:
+                    tasks.append((r, m))
+            for task_set in utils.chunks(tasks, 20):
+                futures[w.submit(
+                    self.process_task_set, client, task_set)] = task_set
+
+            for f in as_completed(futures):
+                task_set = futures[f]
+
+                if f.exception():
+                    self.manager.log.warning(
+                        "Error retrieving integrations on resources %s",
+                        ["%s:%s" % (r['restApiId'], r['path'])
+                         for r, mt in task_set])
+                    continue
+
+                for i in f.result():
+                    if self.match(i):
+                        results.add(i['resourceId'])
+                        resource_map[i['resourceId']].setdefault(
+                            ANNOTATION_KEY_MATCHED_INTEGRATIONS, []).append(i)
+
+        return [resource_map[rid] for rid in results]
+
+    def process_task_set(self, client, task_set):
+        results = []
+        for r, m in task_set:
+            try:
+                integration = client.get_integration(
+                    restApiId=r['restApiId'],
+                    resourceId=r['id'],
+                    httpMethod=m)
+                integration.pop('ResponseMetadata', None)
+                integration['restApiId'] = r['restApiId']
+                integration['resourceId'] = r['id']
+                integration['resourceHttpMethod'] = m
+                results.append(integration)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NotFoundException':
+                    pass
+
+        return results
+
+
+@RestResource.action_registry.register('update-integration')
+class UpdateRestIntegration(BaseAction):
+    """Change or remove api integration properties based on key value
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: enforce-timeout-on-api-integration
+            resource: rest-resource
+            filters:
+              - type: rest-integration
+                key: timeoutInMillis
+                value: 29000
+            actions:
+              - type: update-integration
+                patch:
+                  - op: replace
+                    path: /timeoutInMillis
+                    value: "3000"
+    """
+
+    schema = utils.type_schema(
+        'update-integration',
+        patch={'type': 'array', 'items': OP_SCHEMA},
+        required=['patch'])
+    permissions = ('apigateway:PATCH',)
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, FilterRestIntegration):
+                found = True
+                break
+        if not found:
+            raise ValueError(
+                ("update-integration action requires ",
+                 "rest-integration filter usage in policy"))
+        return self
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        ops = self.data['patch']
+        for r in resources:
+            for i in r.get(ANNOTATION_KEY_MATCHED_INTEGRATIONS, []):
+                client.update_integration(
+                    restApiId=i['restApiId'],
+                    resourceId=i['resourceId'],
+                    httpMethod=i['resourceHttpMethod'],
+                    patchOperations=ops)
+
+
+@RestResource.action_registry.register('delete-integration')
+class DeleteRestIntegration(BaseAction):
+    """Delete an api integration. Useful if the integration type is a security risk.
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: enforce-no-resource-integration-with-type-aws
+            resource: rest-resource
+            filters:
+              - type: rest-integration
+                key: type
+                value: AWS
+            actions:
+              - type: delete-integration
+    """
+    permissions = ('apigateway:Delete',)
+    schema = utils.type_schema('delete-integration')
+
+    def process(self, resources):
+        client = utils.local_session(self.manager.session_factory).client('apigateway')
+
+        for r in resources:
+            for i in r.get(ANNOTATION_KEY_MATCHED_INTEGRATIONS, []):
+                try:
+                    client.delete_integration(
+                        restApiId=i['restApiId'],
+                        resourceId=i['resourceId'],
+                        httpMethod=i['resourceHttpMethod'])
+                except client.exceptions.NotFoundException:
+                    continue
 
 
 @RestResource.filter_registry.register('rest-method')
@@ -373,7 +563,7 @@ class FilterRestMethod(ValueFilter):
                     if self.match(m):
                         results.add(m['resourceId'])
                         resource_map[m['resourceId']].setdefault(
-                            ANNOTATION_KEY, []).append(m)
+                            ANNOTATION_KEY_MATCHED_METHODS, []).append(m)
         return [resource_map[rid] for rid in results]
 
     def process_task_set(self, client, task_set):
@@ -437,7 +627,7 @@ class UpdateRestMethod(BaseAction):
             self.manager.session_factory).client('apigateway')
         ops = self.data['patch']
         for r in resources:
-            for m in r.get(ANNOTATION_KEY, []):
+            for m in r.get(ANNOTATION_KEY_MATCHED_METHODS, []):
                 client.update_method(
                     restApiId=m['restApiId'],
                     resourceId=m['resourceId'],

@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-09d3dfca849cfc629",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 13,
+                    "hour": 23,
+                    "minute": 10,
+                    "second": 32,
+                    "microsecond": 545000
+                },
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-09d3dfca849cfc629",
+                "Tags": [
+                    {
+                        "Key": "maid_status",
+                        "Value": "Resource does not meet policy: delete@2018/12/14"
+                    }
+                ],
+                "FileSystem": {
+                    "FileSystemId": "fs-002ccbccdcf032728",
+                    "StorageCapacity": 300,
+                    "WindowsConfiguration": {
+                        "ActiveDirectoryId": "d-9067141d9e",
+                        "WeeklyMaintenanceStartTime": "4:10:30",
+                        "DailyAutomaticBackupStartTime": "04:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "CopyTagsToBackups": false
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "f24cb0a5-ba3e-4271-8d6a-b2f903020b51",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 14 Dec 2018 20:18:35 GMT",
+                "x-amzn-requestid": "f24cb0a5-ba3e-4271-8d6a-b2f903020b51",
+                "content-length": "1913",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

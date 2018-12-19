@@ -465,6 +465,58 @@ class NoSpecificIamRoleManagedPolicy(Filter):
         return []
 
 
+@Role.action_registry.register('set-policy')
+class SetPolicy(BaseAction):
+    """Set a specific IAM policy as attached or detached on a role.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a policy to all roles which don't have it...
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-role-policy
+          resource: iam-role
+          filters:
+            - type: no-specific-managed-policy
+              value: my-iam-policy
+          actions:
+            - type: set-policy
+              state: attached
+              arn: arn:aws:iam::123456789012:policy/my-iam-policy
+
+    """
+    schema = type_schema(
+        'set-policy',
+        state={'enum': ['attached', 'detached']},
+        arn={'type': 'string'},
+        required=['state', 'arn'])
+
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        policy_arn = self.data['arn']
+        state = self.data['state']
+
+        for r in resources:
+            if state == 'attached':
+                client.attach_role_policy(
+                    RoleName=r['RoleName'],
+                    PolicyArn=policy_arn)
+            elif state == 'detached':
+                try:
+                    client.detach_role_policy(
+                        RoleName=r['RoleName'],
+                        PolicyArn=policy_arn)
+                except client.exceptions.NoSuchEntityException:
+                    pass
+
+
 ######################
 #    IAM Policies    #
 ######################

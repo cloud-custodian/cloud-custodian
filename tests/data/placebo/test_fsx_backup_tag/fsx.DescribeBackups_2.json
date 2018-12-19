@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-0b644cd380298f720",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 12,
+                    "hour": 23,
+                    "minute": 10,
+                    "second": 40,
+                    "microsecond": 656000
+                },
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-0b644cd380298f720",
+                "Tags": [
+                    {
+                        "Key": "tag-test",
+                        "Value": "tag-test"
+                    }
+                ],
+                "FileSystem": {
+                    "FileSystemId": "fs-002ccbccdcf032728",
+                    "StorageCapacity": 300,
+                    "WindowsConfiguration": {
+                        "ActiveDirectoryId": "d-9067141d9e",
+                        "WeeklyMaintenanceStartTime": "4:10:30",
+                        "DailyAutomaticBackupStartTime": "04:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "CopyTagsToBackups": false
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "ea5ad794-ed48-49b2-b7fa-1263cf7015f8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 14 Dec 2018 20:18:36 GMT",
+                "x-amzn-requestid": "ea5ad794-ed48-49b2-b7fa-1263cf7015f8",
+                "content-length": "1950",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
