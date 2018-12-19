@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "01d73228-2dde-11e8-9042-25b35e9628e6", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "01d73228-2dde-11e8-9042-25b35e9628e6", 
+                "date": "Thu, 22 Mar 2018 14:33:37 GMT", 
+                "content-length": "63", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "TagList": [
+            {
+                "Value": "c7n test instance", 
+                "Key": "description"
+            }
+        ]
+    }
+}

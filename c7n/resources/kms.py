@@ -121,7 +121,8 @@ class KeyRotationStatus(ValueFilter):
                 "Querying %d kms-keys' rotation status" % len(query_resources))
             list(w.map(_key_rotation_status, query_resources))
 
-        return [r for r in resources if self.match(r.get('KeyRotationEnabled',{}))]
+        return [r for r in resources if self.match(
+                r.get('KeyRotationEnabled', {}))]
 
 
 @Key.filter_registry.register('cross-account')

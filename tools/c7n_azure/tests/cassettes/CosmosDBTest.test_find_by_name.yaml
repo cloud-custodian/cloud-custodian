@@ -1,0 +1,49 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/2.7.10 (Darwin-17.5.0-x86_64-i386-64bit) requests/2.18.4
+          msrest/0.4.27 msrest_azure/0.4.24 azure-mgmt-cosmosdb/0.3.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2015-04-08
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXM3yx4ePHywP9m+P9vLtvdnDw+2swcH2fa9g73zew92
+        7892HuR367yp1vU0/7yu1it6Z/mDqqym8+02b9rtadUsqubuqq4ui1leN3e/KKZ11VTn7fhpNV0v
+        8mX79MndWdZmk6zJj6fTar1s40A+Gn20zBaE7EcD39JHGfCmFq+rdTtPTwh6nZXpV6/p2/Z6hXdv
+        1T81f1ssQZAvquVF9fQJfdBmF81Hj37xR7P8PFuX7em7VV4X+XLKQLXVLxl9RCOlL9oi58b012XR
+        EE7F8uJ1m7Vo/Ho9neb5LJ8R0JnicLqcrapi2dLX87ZdNY/uRkkwNu2bcfaDdZ2Pp9Xi0f7+vbsE
+        qli9ypYX+bOibPOa4NBH+TKblPnxuq0WRJjps6woq0t8eZ6VTU6vND9Z1O06K1/k7VVVv5V3T/kt
+        Gry2ugzavFqXGNr3vk/Ih1T78vw8r98IlWmsy1lWY4hTYqSiaYlS1y+rsphegy5KxBP33fP8Mi/x
+        Zt6AXvTiInt3tiR8iEXPlq9zgjOjju/zFwS/zJfU9GWdnxfvPnq0u7NDxKc258XFuqbRVssvaag1
+        MR299Is/kkE9aarl6+k8X2TU05uaOJ9euqqLNn+uvEONjSzEJmCbWL2dT2kGiK/W4BNqwS++yJg1
+        I4xn5uyWc9zpYtOU38Rd5zrhL+uiokES5Xd+Cc1bnWezn0/jtR+D/Vgwv+kh2x7CjqfZKpsUZSHa
+        4Hvf/yW/ZKQd3/1wPQuUf39BeTZ5bwU7neJ98zoNQVVr73MzePouMvD/rynVcHibeO1H6pT7+ubU
+        aUj6ryNlZrZunNcO8E3TfBMvDUj2gArdiAZB+//UGO3HYDMWvW9umBZ22GVfYX7/l/w/xSRk0KQK
+        AAA=
+    headers:
+      cache-control: ['no-store, no-cache']
+      content-encoding: [gzip]
+      content-location: ['https://management.documents.azure.com:450/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2015-04-08']
+      content-type: [application/json]
+      date: ['Thu, 19 Apr 2018 21:30:03 GMT']
+      pragma: [no-cache]
+      server: [Microsoft-HTTPAPI/2.0]
+      strict-transport-security: [max-age=31536000; includeSubDomains]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-ms-correlation-request-id: [d62d8ef9-7c98-4aa8-850c-ff58d00c7b30]
+      x-ms-gatewayversion: [version=1.21.0.0]
+      x-ms-ratelimit-remaining-subscription-reads: ['14998']
+      x-ms-request-id: [d62d8ef9-7c98-4aa8-850c-ff58d00c7b30]
+      x-ms-routing-request-id: ['WESTUS2:20180419T213004Z:d62d8ef9-7c98-4aa8-850c-ff58d00c7b30']
+    status: {code: 200, message: Ok}
+version: 1

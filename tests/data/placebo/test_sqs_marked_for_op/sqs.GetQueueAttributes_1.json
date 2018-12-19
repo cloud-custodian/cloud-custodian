@@ -1,31 +1,31 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "ApproximateNumberOfMessagesNotVisible": "0", 
-            "MessageRetentionPeriod": "345600", 
-            "ApproximateNumberOfMessagesDelayed": "0", 
-            "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1509563738", 
-            "ApproximateNumberOfMessages": "0", 
-            "ReceiveMessageWaitTimeSeconds": "0", 
-            "DelaySeconds": "0", 
-            "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1509563738", 
-            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:test-sqs"
-        }, 
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:test-sqs",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1523906471",
+            "LastModifiedTimestamp": "1523906471",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0"
+        },
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "b18c0f80-e41f-503e-bb7f-5df4fb84ddda", 
+            "RequestId": "647a5628-c852-59c8-b40d-056632546013",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "b18c0f80-e41f-503e-bb7f-5df4fb84ddda", 
-                "content-length": "1162", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Wed, 01 Nov 2017 19:15:39 GMT", 
-                "content-type": "text/xml"
-            }
+                "server": "Server",
+                "date": "Mon, 16 Apr 2018 19:21:42 GMT",
+                "content-type": "text/xml",
+                "content-length": "1162",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "647a5628-c852-59c8-b40d-056632546013"
+            },
+            "RetryAttempts": 0
         }
     }
 }

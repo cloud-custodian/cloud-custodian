@@ -24,7 +24,7 @@ from c7n.utils import local_session
 from c7n.query import QueryResourceManager
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 
 
 filters = FilterRegistry('sqs.filters')
@@ -36,7 +36,8 @@ class SQS(QueryResourceManager):
 
     class resource_type(object):
         service = 'sqs'
-        type = 'queue'
+        type = None
+        # type = 'queue'
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         id = 'QueueUrl'
@@ -59,33 +60,40 @@ class SQS(QueryResourceManager):
         perms.append('sqs:GetQueueAttributes')
         return perms
 
+    def get_arns(self, resources):
+        return [r['QueueArn'] for r in resources]
+
+    def get_resources(self, ids, cache=True):
+        ids_normalized = []
+        for i in ids:
+            if not i.startswith('https://'):
+                ids_normalized.append(i)
+                continue
+            ids_normalized.append(i.rsplit('/', 1)[-1])
+        return super(SQS, self).get_resources(ids_normalized, cache)
+
     def augment(self, resources):
+        client = local_session(self.session_factory).client('sqs')
 
         def _augment(r):
-            client = local_session(self.session_factory).client('sqs')
             try:
-                queue = client.get_queue_attributes(
+                queue = self.retry(
+                    client.get_queue_attributes,
                     QueueUrl=r,
                     AttributeNames=['All'])['Attributes']
-                # Augment Tags
-                tag_dict = client.list_queue_tags(
-                    QueueUrl=r).get('Tags', {})
+                queue['QueueUrl'] = r
             except ClientError as e:
+                if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
+                    return
                 if e.response['Error']['Code'] == 'AccessDenied':
                     self.log.warning("Denied access to sqs %s" % r)
                     return
                 raise
-            tag_list = []
-            for k, v in tag_dict.items():
-                tag_list.append({'Key': k, 'Value': v})
-
-            queue['QueueUrl'] = r
-            queue['Tags'] = tag_list
             return queue
 
-        self.log.debug('retrieving details for %d queues' % len(resources))
-        with self.executor_factory(max_workers=4) as w:
-            return list(filter(None, w.map(_augment, resources)))
+        with self.executor_factory(max_workers=2) as w:
+            return universal_augment(
+                self, list(filter(None, w.map(_augment, resources))))
 
 
 @SQS.filter_registry.register('metrics')
@@ -142,7 +150,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                 results += filter(None, [self.process_resource(client, r)])
             except Exception:
                 self.log.exception(
-                    "Error processing sns:%s", r['QueueUrl'])
+                    "Error processing sqs:%s", r['QueueUrl'])
         return results
 
     def process_resource(self, client, resource):
@@ -303,16 +311,16 @@ class DeleteSqsQueue(BaseAction):
     permissions = ('sqs:DeleteQueue',)
 
     def process(self, queues):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_queue, queues))
-
-    def process_queue(self, queue):
         client = local_session(self.manager.session_factory).client('sqs')
+        for q in queues:
+            self.process_queue(client, q)
+
+    def process_queue(self, client, queue):
         try:
             client.delete_queue(QueueUrl=queue['QueueUrl'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting queue:\n %s" % e)
+        except (client.exceptions.QueueDoesNotExist,
+                client.exceptions.QueueDeletedRecently):
+            pass
 
 
 @SQS.action_registry.register('set-encryption')
@@ -334,28 +342,28 @@ class SetEncryption(BaseAction):
     """
     schema = type_schema(
         'set-encryption',
-        key={'type': 'string'},required=('key',))
+        key={'type': 'string'}, required=('key',))
 
     permissions = ('sqs:SetQueueAttributes',)
 
     def process(self, queues):
         # get KeyId
         key = "alias/" + self.data.get('key')
-        self.key_id = local_session(self.manager.session_factory).client(
+        session = local_session(self.manager.session_factory)
+        key_id = session.client(
             'kms').describe_key(KeyId=key)['KeyMetadata']['KeyId']
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_queue, queues))
+        client = session.client('sqs')
 
-    def process_queue(self, queue):
-        client = local_session(self.manager.session_factory).client('sqs')
+        for q in queues:
+            self.process_queue(client, q, key_id)
+
+    def process_queue(self, client, queue, key_id):
         try:
             client.set_queue_attributes(
                 QueueUrl=queue['QueueUrl'],
-                Attributes={
-                    'KmsMasterKeyId':self.key_id
-                }
+                Attributes={'KmsMasterKeyId': key_id}
             )
-        except ClientError as e:
+        except (client.exceptions.QueueDoesNotExist,) as e:
             self.log.exception(
                 "Exception modifying queue:\n %s" % e)
 
@@ -389,13 +397,11 @@ class SetRetentionPeriod(BaseAction):
 
     permissions = ('sqs:SetQueueAttributes',)
 
-    def process_queue(self, q):
-        client = local_session(self.manager.session_factory).client('sqs')
-        client.set_queue_attributes(
-            QueueUrl=q['QueueUrl'],
-            Attributes={'MessageRetentionPeriod': str(self.period)})
-
     def process(self, queues):
-        self.period = self.data.get('period', 345600)
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_queue, queues))
+        client = local_session(self.manager.session_factory).client('sqs')
+        period = str(self.data.get('period', 345600))
+        for q in queues:
+            client.set_queue_attributes(
+                QueueUrl=q['QueueUrl'],
+                Attributes={
+                    'MessageRetentionPeriod': period})

@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-import redis
+
 import re
+import redis
+
 try:
     import sqlite3
 except ImportError:
@@ -27,18 +29,18 @@ from ldap3.core.exceptions import LDAPSocketOpenError
 class LdapLookup(object):
 
     def __init__(self, config, logger):
-        self.log          = logger
+        self.log = logger
         self.connection = self.get_connection(
             config.get('ldap_uri'),
             config.get('ldap_bind_user', None),
             config.get('ldap_bind_password', None)
         )
-        self.base_dn      = config.get('ldap_bind_dn')
-        self.email_key    = config.get('ldap_email_key', 'mail')
+        self.base_dn = config.get('ldap_bind_dn')
+        self.email_key = config.get('ldap_email_key', 'mail')
         self.manager_attr = config.get('ldap_manager_attribute', 'manager')
-        self.uid_key      = config.get('ldap_uid_attribute', 'sAMAccountName')
-        self.attributes   = ['displayName', self.uid_key, self.email_key, self.manager_attr]
-        self.uid_regex    = config.get('ldap_uid_regex', None)
+        self.uid_key = config.get('ldap_uid_attribute', 'sAMAccountName')
+        self.attributes = ['displayName', self.uid_key, self.email_key, self.manager_attr]
+        self.uid_regex = config.get('ldap_uid_regex', None)
         self.cache_engine = config.get('cache_engine', None)
         if self.cache_engine == 'redis':
             redis_host = config.get('redis_host')
@@ -115,8 +117,16 @@ class LdapLookup(object):
     def get_dict_from_ldap_object(self, ldap_user_object):
         ldap_user_metadata = {attr.key: attr.value for attr in ldap_user_object}
         ldap_user_metadata['dn'] = ldap_user_object.entry_dn
-        ldap_user_metadata[self.email_key] = ldap_user_metadata[self.email_key].lower()
-        ldap_user_metadata[self.uid_key] = ldap_user_metadata[self.uid_key].lower()
+
+        email_key = ldap_user_metadata.get(self.email_key, None)
+        uid_key = ldap_user_metadata.get(self.uid_key, None)
+
+        if not email_key or not uid_key:
+            return {}
+        else:
+            ldap_user_metadata['self.email_key'] = email_key.lower()
+            ldap_user_metadata['self.uid_key'] = uid_key.lower()
+
         return ldap_user_metadata
 
     # eg, uid = bill_lumbergh
@@ -159,7 +169,7 @@ class LdapLookup(object):
 # If you don't want a redis dependency and aren't running the mailer in lambda this works well
 class LocalSqlite(object):
     def __init__(self, local_filename, logger):
-        self.log    = logger
+        self.log = logger
         self.sqlite = sqlite3.connect(local_filename)
         self.sqlite.execute('''CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)''')
 

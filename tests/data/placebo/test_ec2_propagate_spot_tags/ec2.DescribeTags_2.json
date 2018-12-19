@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Name",
+                "ResourceId": "i-01db165f1452ef5e4",
+                "ResourceType": "instance",
+                "Value": "Test"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "37b69d35-6b99-48d9-9f7f-9dde77fe004a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 29 Mar 2018 09:12:51 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

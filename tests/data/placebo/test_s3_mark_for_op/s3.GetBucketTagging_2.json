@@ -1,28 +1,24 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
+        "ResponseMetadata": {
+            "RequestId": "BC50B8A1DB197319",
+            "HostId": "fzJx90ReMK0K14I0pfBt7oMJTKJI/DMihNw/sDtp4VxjxyCKDD33Ynqp/zjdL6qFvyEBd7RESvQ=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "fzJx90ReMK0K14I0pfBt7oMJTKJI/DMihNw/sDtp4VxjxyCKDD33Ynqp/zjdL6qFvyEBd7RESvQ=",
+                "x-amz-request-id": "BC50B8A1DB197319",
+                "date": "Wed, 28 Mar 2018 10:46:24 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
         "TagSet": [
             {
-                "Value": "Resource does not meet policy: delete@YYYY/MM/DD", 
-                "Key": "maid_status"
-            }, 
-            {
-                "Value": "mark-test", 
-                "Key": "testtag"
+                "Key": "env",
+                "Value": "dev"
             }
-        ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "4Dsofozdp6aPgxFzGV9chdXmXgfSB6Ifbs3vZP2KyZsaFJgXLnqKHG/vrnBWR+XAJc9KoRhUkX8=", 
-            "RequestId": "9539606CDBE88F96", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "4Dsofozdp6aPgxFzGV9chdXmXgfSB6Ifbs3vZP2KyZsaFJgXLnqKHG/vrnBWR+XAJc9KoRhUkX8=", 
-                "date": "Thu, 08 Sep 2016 22:38:54 GMT", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "9539606CDBE88F96", 
-                "server": "AmazonS3"
-            }
-        }
+        ]
     }
 }

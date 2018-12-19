@@ -27,12 +27,12 @@ import time
 import six
 import yaml
 
+from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.reports import report as do_report
-from c7n.utils import Bag, dumps, load_file
+from c7n.utils import dumps, load_file
+from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
-from c7n import schema
 
 
 log = logging.getLogger('custodian.commands')
@@ -42,6 +42,14 @@ def policy_command(f):
 
     @wraps(f)
     def _load_policies(options):
+
+        validate = True
+        if 'skip_validation' in options:
+            validate = not options.skip_validation
+
+        if not validate:
+            log.debug('Policy validation disabled')
+
         load_resources()
         vars = _load_vars(options)
 
@@ -49,17 +57,23 @@ def policy_command(f):
         all_policies = PolicyCollection.from_data({}, options)
 
         # for a default region for policy loading, we'll expand regions later.
-        options.region = options.regions[0]
-
+        options.region = ""
         for fp in options.configs:
             try:
-                collection = policy_load(options, fp, vars=vars)
-            except IOError:
+                collection = policy_load(options, fp, validate=validate, vars=vars)
+            except IOError as e:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
+            except yaml.YAMLError as e:
+                log.error(
+                    "yaml syntax error loading policy file ({}) error:\n {}".format(
+                        fp, e))
+                errors += 1
+                continue
             except ValueError as e:
-                log.error('problem loading policy file ({})'.format(e.message))
+                log.error('problem loading policy file ({}) error: {}'.format(
+                    fp, str(e)))
                 errors += 1
                 continue
 
@@ -80,8 +94,18 @@ def policy_command(f):
             getattr(options, 'policy_filter', None),
             getattr(options, 'resource_type', None))
 
-        # expand by region, this results in a separate policy instance per region of execution.
-        policies = policies.expand_regions(options.regions)
+        # provider initialization
+        provider_policies = {}
+        for p in policies:
+            provider_policies.setdefault(p.provider_name, []).append(p)
+
+        policies = PolicyCollection.from_data({}, options)
+        for provider_name in provider_policies:
+            provider = clouds[provider_name]()
+            p_options = provider.initialize(options)
+            policies += provider.initialize_policies(
+                PolicyCollection(provider_policies[provider_name], p_options),
+                p_options)
 
         if len(policies) == 0:
             _print_no_policies_warning(options, all_policies)
@@ -102,6 +126,11 @@ def policy_command(f):
                 if count > 1:
                     log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)
+
+        # Variable expansion and non schema validation (not optional)
+        for p in policies:
+            p.expand_variables(p.get_variables())
+            p.validate()
 
         return f(options, list(policies))
 
@@ -142,6 +171,7 @@ def _print_no_policies_warning(options, policies):
 
 
 def validate(options):
+    from c7n import schema
     load_resources()
     if len(options.configs) < 1:
         log.error('no config files specified')
@@ -150,6 +180,7 @@ def validate(options):
     used_policy_names = set()
     schm = schema.generate()
     errors = []
+
     for config_file in options.configs:
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
@@ -178,7 +209,7 @@ def validate(options):
             ))
         used_policy_names = used_policy_names.union(conf_policy_names)
         if not errors:
-            null_config = Bag(dryrun=True, log_group=None, cache=None, assume_role="na")
+            null_config = Config.empty(dryrun=True, account_id='na', region='na')
             for p in data.get('policies', ()):
                 try:
                     policy = Policy(p, null_config, Bag())
@@ -196,17 +227,6 @@ def validate(options):
             log.error("%s" % e)
     if errors:
         sys.exit(1)
-
-
-# This subcommand is disabled in cli.py.
-# Commmeting it out for coverage purposes.
-#
-# @policy_command
-# def access(options, policies):
-#    permissions = set()
-#    for p in policies:
-#        permissions.update(p.get_permissions())
-#    pprint.pprint(sorted(list(permissions)))
 
 
 @policy_command
@@ -228,6 +248,7 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
+    from c7n.reports import report as do_report
     if len(policies) == 0:
         log.error('Error: must supply at least one policy')
         sys.exit(1)
@@ -251,6 +272,8 @@ def logs(options, policies):
         sys.exit(1)
 
     policy = policies.pop()
+    # initialize policy execution context for access to outputs
+    policy.ctx.initialize()
 
     for e in policy.get_logs(options.start, options.end):
         print("%s: %s" % (
@@ -276,6 +299,7 @@ def schema_completer(prefix):
     For the given prefix so far, return the possible options.  Note that
     filtering via startswith happens after this list is returned.
     """
+    from c7n import schema
     load_resources()
     components = prefix.split('.')
 
@@ -317,6 +341,7 @@ def schema_completer(prefix):
 
 def schema_cmd(options):
     """ Print info about the resources, actions and filters available. """
+    from c7n import schema
     if options.json:
         schema.json_dump(options.resource)
         return
@@ -330,6 +355,8 @@ def schema_cmd(options):
     # Here are the formats for what we accept:
     # - No argument
     #   - List all available RESOURCES
+    # - PROVIDER
+    #   - List all available RESOURCES for supplied PROVIDER
     # - RESOURCE
     #   - List all available actions and filters for supplied RESOURCE
     # - RESOURCE.actions
@@ -348,7 +375,12 @@ def schema_cmd(options):
 
     # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
     # optional provider defaults to aws for compatibility
-    components = options.resource.split('.')
+    components = options.resource.lower().split('.')
+    if len(components) == 1 and components[0] in provider.clouds.keys():
+        resource_list = {'resources': sorted(
+            provider.resources(cloud_provider=components[0]).keys())}
+        print(yaml.safe_dump(resource_list, default_flow_style=False))
+        return
     if components[0] in provider.clouds.keys():
         cloud_provider = components.pop(0)
         resource_mapping = schema.resource_vocabulary(
@@ -360,7 +392,7 @@ def schema_cmd(options):
     #
     # Handle resource
     #
-    resource = components[0].lower()
+    resource = components[0]
     if resource not in resource_mapping:
         log.error('{} is not a valid resource'.format(resource))
         sys.exit(1)
@@ -374,7 +406,7 @@ def schema_cmd(options):
     #
     # Handle category
     #
-    category = components[1].lower()
+    category = components[1]
     if category not in ('actions', 'filters'):
         log.error("Valid choices are 'actions' and 'filters'. You supplied '{}'".format(category))
         sys.exit(1)
@@ -390,7 +422,7 @@ def schema_cmd(options):
     #
     # Handle item
     #
-    item = components[2].lower()
+    item = components[2]
     if item not in resource_mapping[resource][category]:
         log.error('{} is not in the {} list for resource {}'.format(item, category, resource))
         sys.exit(1)

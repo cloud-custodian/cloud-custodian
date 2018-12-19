@@ -17,7 +17,7 @@ import os
 
 description = ""
 if os.path.exists('README.md'):
-   description = open('README.md').read()
+    description = open('README.md').read()
 
 setup(
     name="c7n_salactus",

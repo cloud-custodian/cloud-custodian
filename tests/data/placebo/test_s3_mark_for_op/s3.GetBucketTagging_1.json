@@ -1,24 +1,24 @@
 {
     "status_code": 200,
     "data": {
+        "ResponseMetadata": {
+            "RequestId": "03686EA467C96F8D",
+            "HostId": "F1RTjwuMIxFi2Om8yw4bmMxYO+YHfUM1wD004XcNAD9Q6AK0hG5mfZceapInwTakUyH6Q4zsu9M=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "F1RTjwuMIxFi2Om8yw4bmMxYO+YHfUM1wD004XcNAD9Q6AK0hG5mfZceapInwTakUyH6Q4zsu9M=",
+                "x-amz-request-id": "03686EA467C96F8D",
+                "date": "Wed, 28 Mar 2018 10:46:23 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
         "TagSet": [
             {
-                "Value": "mark-test",
-                "Key": "testtag"
+                "Key": "env",
+                "Value": "dev"
             }
-        ],
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200,
-            "RetryAttempts": 0,
-            "HostId": "4Dsofozdp6aPgxFzGV9chdXmXgfSB6Ifbs3vZP2KyZsaFJgXLnqKHG/vrnBWR+XAJc9KoRhUkX8=",
-            "RequestId": "9539606CDBE88F96",
-            "HTTPHeaders": {
-                "x-amz-id-2": "4Dsofozdp6aPgxFzGV9chdXmXgfSB6Ifbs3vZP2KyZsaFJgXLnqKHG/vrnBWR+XAJc9KoRhUkX8=",
-                "date": "Thu, 08 Sep 2016 22:38:54 GMT",
-                "transfer-encoding": "chunked",
-                "x-amz-request-id": "9539606CDBE88F96",
-                "server": "AmazonS3"
-            }
-        }
+        ]
     }
 }

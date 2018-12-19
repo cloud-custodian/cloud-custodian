@@ -1,4 +1,4 @@
-# Copyright 2016 Capital One Services, LLC
+# Copyright 2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n_gcp",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Multi Account",
     classifiers=[
         "Topic :: System :: Systems Administration",
@@ -30,6 +30,14 @@ setup(
     entry_points={
         "custodian.resources": [
             'gcp = c7n_gcp.entry:initialize_gcp']
-            },
-    install_requires=["c7n", "click", "google-api-python-client", "ratelimiter", "retrying"]
+    },
+    install_requires=[
+        "c7n", "click",
+        "ratelimiter", "retrying",
+        "google-api-python-client>=1.7.3",
+        "google-auth-httplib2>=0.0.3",
+        "google-auth>=1.4.1",
+        "google-cloud-logging>=1.6.0",
+        "google-cloud-monitoring>=0.3.0"
+    ]
 )

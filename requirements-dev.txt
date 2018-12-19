@@ -2,24 +2,34 @@
 coverage>=4.2
 nose==1.3.7
 mock==2.0.0
-Sphinx==1.6.7
+Sphinx==1.7.6
 placebo==0.8.1
-flake8
+flake8==3.5.0
 redis
 ldap3
-sphinx-rtd-theme==0.2.4
-nose-timer==0.7.1
+sphinx-rtd-theme==0.4.1
+nose-timer>=0.7.3
 twine
 fakeredis
 pytest>=3.2.1
 pytest-xdist>=1.2.0
 pytest-cov
 tox
+psutil
+aws_xray_sdk
 
 # Local package required for Sphinx docs
 -e tools/c7n_sphinxext
 # Local package required for c7n_mailer tests
 -e tools/c7n_mailer
+# Local package required for c7n_azure tests
+-e tools/c7n_azure
+# Local package required for c7n_gcp tests
+-e tools/c7n_gcp
+# Local package required for c7n_kube tests
+-e tools/c7n_kube
+# Local package required for c7n_org tests
+-e tools/c7n_org
 
 # requires pandoc, fails on ci server, only used for pypi metadata
 # setuptools-markdown==0.2

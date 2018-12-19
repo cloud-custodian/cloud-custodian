@@ -23,6 +23,8 @@ from common import logger, get_ldap_lookup
 from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1
 from mock import patch, call
 
+from c7n_mailer.utils_email import is_email
+
 # note principalId is very org/domain specific for federated?, it would be good to get
 # confirmation from capone on this event / test.
 CLOUDTRAIL_EVENT = {
@@ -50,14 +52,15 @@ class EmailTest(unittest.TestCase):
         self.aws_session = boto3.Session()
         self.email_delivery = MockEmailDelivery(MAILER_CONFIG, self.aws_session, logger)
         self.email_delivery.ldap_lookup.uid_regex = ''
-        tests_dir = '/tools/c7n_mailer/tests/'
-        template_abs_filename = '%s%sexample.jinja' % (os.path.abspath(os.curdir), tests_dir)
+        template_abs_filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                             'example.jinja')
         SQS_MESSAGE_1['action']['template'] = template_abs_filename
 
     def test_valid_email(self):
-        self.assertFalse(self.email_delivery.target_is_email('foobar'))
-        self.assertFalse(self.email_delivery.target_is_email('foo@bar'))
-        self.assertTrue(self.email_delivery.target_is_email('foo@bar.com'))
+        self.assertFalse(is_email('foobar'))
+        self.assertFalse(is_email('foo@bar'))
+        self.assertFalse(is_email('slack://foo@bar.com'))
+        self.assertTrue(is_email('foo@bar.com'))
 
     def test_priority_header_is_valid(self):
         self.assertFalse(self.email_delivery.priority_header_is_valid('0'))
@@ -127,7 +130,8 @@ class EmailTest(unittest.TestCase):
         with patch("smtplib.SMTP") as mock_smtp:
             for email_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
                 self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
-                self.assertEqual(mimetext_msg['X-Priority'], '1')
+
+                self.assertEqual(mimetext_msg['X-Priority'], '1 (Highest)')
             # Get instance of mocked SMTP object
             smtp_instance = mock_smtp.return_value
             # Checks the mock has been called at least one time
@@ -229,3 +233,41 @@ class EmailTest(unittest.TestCase):
             SQS_MESSAGE
         )
         self.assertEqual(emails_to_resources_map, {})
+
+    def test_flattened_list_get_resource_owner_emails_from_resource(self):
+        RESOURCE_2 = {
+            'AvailabilityZone': 'us-east-1a',
+            'Attachments': [],
+            'Tags': [
+                {
+                    'Value': '123456',
+                    'Key': 'OwnerEmail'
+                }
+            ],
+            'VolumeId': 'vol-01a0e6ea6b8lsdkj93'
+        }
+        RESOURCE_3 = {
+            'AvailabilityZone': 'us-east-1a',
+            'Attachments': [],
+            'Tags': [
+                {
+                    'Value': 'milton@initech.com',
+                    'Key': 'OwnerEmail'
+                }
+            ],
+            'VolumeId': 'vol-01a0e6ea6b8lsdkj93'
+        }
+
+        ldap_emails = self.email_delivery.get_resource_owner_emails_from_resource(
+            SQS_MESSAGE_1,
+            RESOURCE_2
+        )
+
+        self.assertEqual(ldap_emails, ['milton@initech.com'])
+
+        ldap_emails = self.email_delivery.get_resource_owner_emails_from_resource(
+            SQS_MESSAGE_1,
+            RESOURCE_3
+        )
+
+        self.assertEqual(ldap_emails, ['milton@initech.com'])

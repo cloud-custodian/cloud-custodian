@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 
 import datetime
 import logging
@@ -38,7 +39,7 @@ from c7n.utils import chunks, dumps, get_retry, local_session
 # from c7n.executor import MainThreadExecutor
 # ThreadPoolExecutor = MainThreadExecutor
 # ProcessPoolExecutor = MainThreadExecutor
-# MainThreadExecutor.async = False
+# MainThreadExecutor.c7n_async = False
 
 MAX_POINTS = 1440.0
 NAMESPACE = 'CloudMaid'
@@ -210,7 +211,7 @@ class InfluxIndexer(Indexer):
 
 def index_metric_set(indexer, account, region, metric_set, start, end, period):
     session = local_session(
-        lambda : assumed_session(account['role'], 'PolicyIndex'))
+        lambda : assumed_session(account['role'], 'PolicyIndex')) # NOQA E203
     client = session.client('cloudwatch', region_name=region)
 
     t = time.time()
@@ -549,5 +550,5 @@ if __name__ == '__main__':
         cli()
     except Exception as e:
         import traceback, pdb, sys
-        print traceback.print_exc()
+        print(traceback.print_exc())
         pdb.post_mortem(sys.exc_info()[-1])

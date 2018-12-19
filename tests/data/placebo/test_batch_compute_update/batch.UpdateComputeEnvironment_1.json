@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "computeEnvironmentName": "c7n-test-env", 
+        "computeEnvironmentArn": "arn:aws:batch:us-east-1:644160558196:compute-environment/c7n-test-env", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "80be556f-30f8-11e8-ab64-d51184883102", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "80be556f-30f8-11e8-ab64-d51184883102", 
+                "content-length": "137", 
+                "x-amz-apigw-id": "EWsD4EmboAMFXAw=", 
+                "x-amzn-trace-id": "sampled=0;root=1-5ab8f3b2-74e180abf6a2237e2b99bf37", 
+                "connection": "keep-alive", 
+                "date": "Mon, 26 Mar 2018 13:20:50 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

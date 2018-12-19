@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
-from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, get_retry, type_schema
@@ -32,7 +32,7 @@ class CodeRepository(QueryResourceManager):
         enum_spec = ('list_repositories', 'repositories', None)
         batch_detail_spec = (
             'batch_get_repositories', 'repositoryNames', 'repositoryName',
-            'repositories')
+            'repositories', None)
         id = 'repositoryId'
         name = 'repositoryName'
         date = 'creationDate'
@@ -61,12 +61,12 @@ class DeleteRepository(BaseAction):
     permissions = ("codecommit:DeleteRepository",)
 
     def process(self, repositories):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_repository, repositories))
-
-    def process_repository(self, repository):
         client = local_session(
             self.manager.session_factory).client('codecommit')
+        for r in repositories:
+            self.process_repository(client, r)
+
+    def process_repository(self, client, repository):
         try:
             client.delete_repository(repositoryName=repository['repositoryName'])
         except ClientError as e:
@@ -81,22 +81,30 @@ class CodeBuildProject(QueryResourceManager):
         service = 'codebuild'
         enum_spec = ('list_projects', 'projects', None)
         batch_detail_spec = (
-            'batch_get_projects', 'names', None, 'projects')
-        name = id = 'project'
+            'batch_get_projects', 'names', None, 'projects', None)
+        name = id = 'name'
         date = 'created'
         dimension = None
         filter_name = None
         config_type = "AWS::CodeBuild::Project"
 
 
+@CodeBuildProject.filter_registry.register('subnet')
 class BuildSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "vpcConfig.subnets[]"
 
 
+@CodeBuildProject.filter_registry.register('security-group')
 class BuildSecurityGroupFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "vpcConfig.securityGroupIds[]"
+
+
+@CodeBuildProject.filter_registry.register('vpc')
+class BuildVpcFilter(VpcFilter):
+
+    RelatedIdsExpression = "vpcConfig.vpcId"
 
 
 @CodeBuildProject.action_registry.register('delete')
@@ -120,12 +128,12 @@ class DeleteProject(BaseAction):
     permissions = ("codebuild:DeleteProject",)
 
     def process(self, projects):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_project, projects))
+        client = local_session(self.manager.session_factory).client('codebuild')
+        for p in projects:
+            self.process_project(client, p)
 
-    def process_project(self, project):
-        client = local_session(
-            self.manager.session_factory).client('codebuild')
+    def process_project(self, client, project):
+
         try:
             client.delete_project(name=project['name'])
         except ClientError as e:

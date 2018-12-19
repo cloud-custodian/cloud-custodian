@@ -19,7 +19,7 @@ import itertools
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
 from c7n.filters import MetricsFilter, FilterRegistry
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
@@ -94,6 +94,12 @@ class Subnet(SubnetFilter):
 class SecurityGroup(SecurityGroupFilter):
 
     RelatedIdsExpression = "VPCOptions.SecurityGroupIds[]"
+
+
+@ElasticSearchDomain.filter_registry.register('vpc')
+class Vpc(VpcFilter):
+
+    RelatedIdsExpression = "VPCOptions.VPCId"
 
 
 @ElasticSearchDomain.filter_registry.register('metrics')

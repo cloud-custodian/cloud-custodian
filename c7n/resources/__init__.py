@@ -46,6 +46,7 @@ def load_resources():
     import c7n.resources.cw
     import c7n.resources.directory
     import c7n.resources.directconnect
+    import c7n.resources.dlm
     import c7n.resources.dms
     import c7n.resources.dynamodb
     import c7n.resources.datapipeline
@@ -58,9 +59,11 @@ def load_resources():
     import c7n.resources.elasticbeanstalk
     import c7n.resources.elasticsearch
     import c7n.resources.elb
+    import c7n.resources.eks
     import c7n.resources.emr
     import c7n.resources.gamelift
     import c7n.resources.glacier
+    import c7n.resources.glue
     import c7n.resources.health
     import c7n.resources.hsm
     import c7n.resources.iam
@@ -68,6 +71,7 @@ def load_resources():
     import c7n.resources.kinesis
     import c7n.resources.kms
     import c7n.resources.ml
+    import c7n.resources.mq
     import c7n.resources.opsworks
     import c7n.resources.rds
     import c7n.resources.rdsparamgroup
@@ -76,6 +80,7 @@ def load_resources():
     import c7n.resources.route53
     import c7n.resources.s3
     import c7n.resources.sagemaker
+    import c7n.resources.secretsmanager
     import c7n.resources.sfn
     import c7n.resources.shield
     import c7n.resources.simpledb
@@ -83,9 +88,11 @@ def load_resources():
     import c7n.resources.sns
     import c7n.resources.storagegw
     import c7n.resources.sqs
+    import c7n.resources.ssm
     import c7n.resources.support
     import c7n.resources.vpc
     import c7n.resources.waf
+    import c7n.resources.fsx
 
     # Load external plugins (private sdks etc)
     from c7n.manager import resources

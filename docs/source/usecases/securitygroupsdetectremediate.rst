@@ -18,7 +18,7 @@ rule additions on them!
      - name: high-risk-security-groups-remediate
        resource: security-group
        description: |
-         Remove any rule from a security group that allows 0.0.0.0/0 ingress
+         Remove any rule from a security group that allows 0.0.0.0/0 or ::/0 (IPv6) ingress
          and notify the user  who added the violating rule.
        mode:
            type: cloudtrail
@@ -36,9 +36,13 @@ rule additions on them!
                event: RevokeSecurityGroupIngress
                ids: "requestParameters.groupId"
        filters:
-         - type: ingress
-           Cidr:
-               value: "0.0.0.0/0"
+         - or:
+               - type: ingress
+                 Cidr:
+                   value: "0.0.0.0/0"
+               - type: ingress
+                 CidrV6:
+                   value: "::/0"
        actions:
            - type: remove-permissions
              ingress: matched
@@ -48,8 +52,11 @@ rule additions on them!
              subject: "Open Security Group Rule Created-[custodian {{ account }} - {{ region }}]"
              violation_desc: "Security Group(s) Which Had Rules Open To The World:"
              action_desc: |
-                 "Actions Taken:  The Violating Security Group Rule Has Been Removed As It
-                 Violates Our Company's Cloud Policy.  Please Refer To The Cloud FAQ."
+                 "Actions Taken:  The Violating Security Group Rule Has Been Removed As It Typically
+                 Allows Direct Incoming Public Internet Traffic Access To Your Resource Which Violates Our
+                 Company's Cloud Security Policy.  Please Refer To Our Company's Cloud Security Best
+                 Practices Documentation.  If This Ingress Rule Is Required You May Contact The Security
+                 Team To Request An Exception."
              to:
                  - CloudCustodian@Company.com
                  - event-owner

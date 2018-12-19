@@ -18,7 +18,7 @@ from botocore.exceptions import ClientError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.tags import Tag, RemoveTag
 
 
@@ -61,6 +61,12 @@ class DirectorySecurityGroupFilter(SecurityGroupFilter):
     RelatedIdsExpression = "VpcSettings.SecurityGroupId"
 
 
+@Directory.filter_registry.register('vpc')
+class DirectoryVpcFilter(VpcFilter):
+
+    RelatedIdsExpression = "VpcSettings.VpcId"
+
+
 @Directory.action_registry.register('tag')
 class DirectoryTag(Tag):
     """Add tags to a directory
@@ -85,7 +91,7 @@ class DirectoryTag(Tag):
         client = local_session(self.manager.session_factory).client('ds')
         tag_list = []
         for t in tags:
-            tag_list.append({'Key': t['Key'],'Value': t['Value']})
+            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
         for d in directories:
             try:
                 client.add_tags_to_resource(

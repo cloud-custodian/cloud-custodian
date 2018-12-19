@@ -1,19 +1,20 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Location": "/custodian-tagger", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "HostId": "1KUr59TDvICqopLtL+E06i2tTVSu8PiEePRfyDv4hBp/JhBRF+DF2IEYv7sbF3jI", 
-            "RequestId": "FB87D82D9C1E9B81", 
+            "RequestId": "5E4264B8D5BA48E2",
+            "HostId": "3sWnmw3oJochBRn3ZrmprDcte9oymC+vlW47ZZ7XXDqHtRbYQ+G4EYBnrciuPi3yEIYomyWXuJU=",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "content-length": "0", 
-                "x-amz-id-2": "1KUr59TDvICqopLtL+E06i2tTVSu8PiEePRfyDv4hBp/JhBRF+DF2IEYv7sbF3jI", 
-                "server": "AmazonS3", 
-                "x-amz-request-id": "FB87D82D9C1E9B81", 
-                "location": "/custodian-tagger", 
-                "date": "Sun, 24 Jul 2016 17:36:51 GMT"
-            }
-        }
+                "x-amz-id-2": "3sWnmw3oJochBRn3ZrmprDcte9oymC+vlW47ZZ7XXDqHtRbYQ+G4EYBnrciuPi3yEIYomyWXuJU=",
+                "x-amz-request-id": "5E4264B8D5BA48E2",
+                "date": "Wed, 28 Mar 2018 10:37:04 GMT",
+                "location": "http://custodian-tagger.s3.amazonaws.com/",
+                "content-length": "0",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Location": "http://custodian-tagger.s3.amazonaws.com/"
     }
 }

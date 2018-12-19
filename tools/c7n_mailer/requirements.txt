@@ -1,5 +1,5 @@
-boto3>=1.5.15
-botocore>=1.8.35
+boto3>=1.9.62
+botocore>=1.12.62
 docutils>=0.12
 Jinja2>=2.8
 jmespath>=0.9.0
@@ -8,8 +8,11 @@ jsonschema>=2.5.1
 c7n
 Markup
 MarkupSafe==1.0
-python-dateutil>=2.5.2
+python-dateutil>=2.6
 ldap3
-ruamel.yaml<0.15 # rq.filter: <0.15
+ruamel.yaml==0.15.42
 six==1.11.0
 redis
+datadog
+slackclient
+sendgrid

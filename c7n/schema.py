@@ -34,6 +34,7 @@ import logging
 from jsonschema import Draft4Validator as Validator
 from jsonschema.exceptions import best_match
 
+from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
@@ -43,9 +44,11 @@ def validate(data, schema=None):
     if schema is None:
         schema = generate()
         Validator.check_schema(schema)
+
     validator = Validator(schema)
 
     errors = list(validator.iter_errors(data))
+
     if not errors:
         counter = Counter([p['name'] for p in data.get('policies')])
         dupes = []
@@ -95,8 +98,9 @@ def specific_error(error):
     if r is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if r in v['$ref'].rsplit('/', 2)[1]:
+            if v['$ref'].rsplit('/', 2)[1].endswith(r):
                 found = idx
+                break
         if found is not None:
             # error context is a flat list of all validation
             # failures, we have to index back to the policy
@@ -111,8 +115,9 @@ def specific_error(error):
     if t is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if '$ref' in v and v['$ref'].endswith(t):
+            if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
                 found = idx
+                break
         if found is not None:
             # Try to walk back an element/type ref to the specific
             # error
@@ -162,6 +167,7 @@ def generate(resource_types=()):
                 {'required': ['NotPrincipal', 'NotAction', 'NotResource']}
             ]
         },
+        'actions': {},
         'filters': {
             'value': ValueFilter.schema,
             'event': EventFilter.schema,
@@ -182,8 +188,12 @@ def generate(resource_types=()):
                     'type': 'string',
                     'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
                 'region': {'type': 'string'},
+                'tz': {'type': 'string'},
+                'start': {'format': 'date-time'},
+                'end': {'format': 'date-time'},
                 'resource': {'type': 'string'},
-                'max-resources': {'type': 'integer'},
+                'max-resources': {'type': 'integer', 'minimum': 1},
+                'max-resources-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
                 'description': {'type': 'string'},
@@ -211,48 +221,8 @@ def generate(resource_types=()):
             },
         },
         'policy-mode': {
-            'type': 'object',
-            'required': ['type'],
-            'additionalProperties': False,
-            'properties': {
-                'type': {
-                    'enum': [
-                        'cloudtrail',
-                        'ec2-instance-state',
-                        'asg-instance-state',
-                        'config-rule',
-                        'guard-duty',
-                        'periodic'
-                    ]},
-                'events': {'type': 'array', 'items': {
-                    'oneOf': [
-                        {'type': 'string'},
-                        {'type': 'object',
-                         'required': ['event', 'source', 'ids'],
-                         'properties': {
-                             'source': {'type': 'string'},
-                             'ids': {'type': 'string'},
-                             'event': {'type': 'string'}}}],
-                }},
-                'execution-options': {'type': 'object'},
-                'role': {'type': 'string'},
-                'runtime': {'enum': ['python2.7', 'python3.6']},
-                'memory': {'type': 'number'},
-                'timeout': {'type': 'number'},
-                'schedule': {'type': 'string'},
-                'function-prefix': {'type': 'string'},
-                'dead_letter_config': {'type': 'object'},
-                'environment': {'type': 'object'},
-                'kms_key_arn': {'type': 'string'},
-                'tracing_config': {'type': 'object'},
-                'tags': {'type': 'object'},
-                'packages': {'type': 'array'},
-                'subnets': {'type': 'array'},
-                'security_groups': {'type': 'array'},
-                # specific to guard duty
-                'member-role': {'type': 'string'},
-            },
-        },
+            'anyOf': [e.schema for _, e in execution.items()],
+        }
     }
 
     resource_refs = []
@@ -265,7 +235,13 @@ def generate(resource_types=()):
             if cloud_name == 'aws':
                 alias_name = type_name
             resource_refs.append(
-                process_resource(r_type_name, resource_type, resource_defs, alias_name))
+                process_resource(
+                    r_type_name,
+                    resource_type,
+                    resource_defs,
+                    alias_name,
+                    definitions
+                ))
 
     schema = {
         '$schema': 'http://json-schema.org/schema#',
@@ -287,7 +263,7 @@ def generate(resource_types=()):
     return schema
 
 
-def process_resource(type_name, resource_type, resource_defs, alias_name=None):
+def process_resource(type_name, resource_type, resource_defs, alias_name=None, definitions=None):
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
 
     seen_actions = set()  # Aliases get processed once
@@ -297,10 +273,16 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None):
             continue
         else:
             seen_actions.add(a)
-        r['actions'][action_name] = a.schema
-        action_refs.append(
-            {'$ref': '#/definitions/resources/%s/actions/%s' % (
-                type_name, action_name)})
+        if a.schema_alias:
+            if action_name in definitions['actions']:
+                assert definitions['actions'][action_name] == a.schema, "Schema mismatch on action w/ schema alias"  # NOQA
+            definitions['actions'][action_name] = a.schema
+            action_refs.append({'$ref': '#/definitions/actions/%s' % action_name})
+        else:
+            r['actions'][action_name] = a.schema
+            action_refs.append(
+                {'$ref': '#/definitions/resources/%s/actions/%s' % (
+                    type_name, action_name)})
 
     # one word action shortcuts
     action_refs.append(
@@ -328,6 +310,13 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None):
             filters_seen.add(f)
 
         if filter_name in ('or', 'and', 'not'):
+            continue
+        if f.schema_alias:
+            if filter_name in definitions['filters']:
+                assert definitions['filters'][filter_name] == f.schema, "Schema mismatch on filter w/ schema alias" # NOQA
+            definitions['filters'][filter_name] = f.schema
+            filter_refs.append({
+                '$ref': '#/definitions/filters/%s' % filter_name})
             continue
         elif filter_name == 'value':
             r['filters'][filter_name] = {

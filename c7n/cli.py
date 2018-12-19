@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2018 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,9 +33,8 @@ except ImportError:
     def setproctitle(t):
         return None
 
-from c7n import utils
 from c7n.commands import schema_completer
-from c7n.utils import get_account_id_from_sts
+from c7n.config import Config
 
 DEFAULT_REGION = 'us-east-1'
 
@@ -99,7 +98,7 @@ def _default_options(p, blacklist=""):
 
     if 'output-dir' not in blacklist:
         p.add_argument("-s", "--output-dir", required=True,
-                       help="Directory or S3 URL For policy output")
+                       help="[REQUIRED] Directory or S3 URL For policy output")
 
     if 'cache' not in blacklist:
         p.add_argument(
@@ -110,43 +109,6 @@ def _default_options(p, blacklist=""):
             help="Cache validity in minutes (default %(default)i)")
     else:
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
-
-
-def _default_region(options):
-    marker = object()
-    value = getattr(options, 'regions', marker)
-    if value is marker:
-        return
-
-    if len(value) > 0:
-        return
-
-    try:
-        options.regions = [utils.get_profile_session(options).region_name]
-    except Exception:
-        log.warning('Could not determine default region')
-        options.regions = [None]
-
-    if options.regions[0] is None:
-        log.error('No default region set. Specify a default via AWS_DEFAULT_REGION '
-                  'or setting a region in ~/.aws/config')
-        sys.exit(1)
-
-    log.debug("using default region:%s from boto" % options.regions[0])
-
-
-def _default_account_id(options):
-    if options.assume_role:
-        try:
-            options.account_id = options.assume_role.split(':')[4]
-            return
-        except IndexError:
-            pass
-    try:
-        session = utils.get_profile_session(options)
-        options.account_id = get_account_id_from_sts(session)
-    except Exception:
-        options.account_id = None
 
 
 def _report_options(p):
@@ -245,27 +207,75 @@ def _key_val_pair(value):
 
 
 def setup_parser():
-    c7n_desc = "Cloud fleet management"
+    c7n_desc = "Cloud Custodian - Cloud fleet management"
     parser = argparse.ArgumentParser(description=c7n_desc)
 
     # Setting `dest` means we capture which subparser was used.
-    subs = parser.add_subparsers(dest='subparser')
+    subs = parser.add_subparsers(
+        title='commands',
+        dest='subparser')
+
+    run_desc = "\n".join((
+        "Execute the policies in a config file.",
+        "",
+        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
+        "",
+        "When running across multiple regions, policies targeting resources in ",
+        "regions where they do not exist will not be run. The output directory ",
+        "when passing multiple regions is suffixed with the region. Resources ",
+        "with global endpoints are run just once and are suffixed with the first ",
+        "region passed in or us-east-1 if running against 'all' regions.",
+        ""
+    ))
+
+    run = subs.add_parser(
+        "run", description=run_desc,
+        help="Execute the policies in a config file",
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    run.set_defaults(command="c7n.commands.run")
+    _default_options(run)
+    _dryrun_option(run)
+    run.add_argument(
+        "--skip-validation",
+        action="store_true",
+        help="Skips validation of policies (assumes you've run the validate command seperately).")
+    run.add_argument(
+        "-m", "--metrics-enabled",
+        default=None, nargs="?", const="aws",
+        help="Emit metrics to provider metrics")
+    run.add_argument(
+        "--trace",
+        dest="tracer",
+        help=argparse.SUPPRESS,
+        default=None, nargs="?", const="default")
+
+    schema_desc = ("Browse the available vocabularies (resources, filters, and "
+                   "actions) for policy construction. The selector "
+                   "is specified with RESOURCE[.CATEGORY[.ITEM]] "
+                   "examples: s3, ebs.actions, or ec2.filters.instance-age")
+    schema = subs.add_parser(
+        'schema', description=schema_desc,
+        help="Interactive cli docs for policy authors")
+    schema.set_defaults(command="c7n.commands.schema_cmd")
+    _schema_options(schema)
 
     report_desc = ("Report of resources that a policy matched/ran on. "
                    "The default output format is csv, but other formats "
                    "are available.")
     report = subs.add_parser(
-        "report", description=report_desc, help=report_desc)
+        "report", description=report_desc,
+        help="Tabular report on policy matched resources")
     report.set_defaults(command="c7n.commands.report")
     _report_options(report)
 
-    logs_desc = "Get policy execution logs from s3 or cloud watch logs"
+    logs_desc = "Get policy execution logs"
     logs = subs.add_parser(
         'logs', help=logs_desc, description=logs_desc)
     logs.set_defaults(command="c7n.commands.logs")
     _logs_options(logs)
 
-    metrics_desc = "Retrieve metrics for policies from CloudWatch Metrics"
+    metrics_desc = "Retrieve policy execution metrics."
     metrics = subs.add_parser(
         'metrics', description=metrics_desc, help=metrics_desc)
     metrics.set_defaults(command="c7n.commands.metrics_cmd")
@@ -292,49 +302,6 @@ def setup_parser():
     validate.add_argument("-v", "--verbose", action="count", help="Verbose Logging")
     validate.add_argument("-q", "--quiet", action="count", help="Less logging (repeatable)")
     validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
-
-    schema_desc = ("Browse the available vocabularies (resources, filters, and "
-                   "actions) for policy construction. The selector "
-                   "is specified with RESOURCE[.CATEGORY[.ITEM]] "
-                   "examples: s3, ebs.actions, or ec2.filters.instance-age")
-    schema = subs.add_parser(
-        'schema', description=schema_desc,
-        help="Interactive cli docs for policy authors")
-    schema.set_defaults(command="c7n.commands.schema_cmd")
-    _schema_options(schema)
-
-    # access_desc = ("Show permissions needed to execute the policies")
-    # access = subs.add_parser(
-    #    'access', description=access_desc, help=access_desc)
-    # access.set_defaults(command='c7n.commands.access')
-    # _default_options(access)
-    # access.add_argument(
-    #    '-m', '--access', default=False, action='store_true')
-
-    run_desc = "\n".join((
-        "Execute the policies in a config file",
-        "",
-        "Multiple regions can be passed in, as can the symbolic region 'all'. ",
-        "",
-        "When running across multiple regions, policies targeting resources in ",
-        "regions where they do not exist will not be run. The output directory ",
-        "when passing multiple regions is suffixed with the region. Resources ",
-        "with global endpoints are run just once and are suffixed with the first ",
-        "region passed in or us-east-1 if running against 'all' regions.",
-        ""
-    ))
-
-    run = subs.add_parser(
-        "run", description=run_desc, help=run_desc,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-
-    run.set_defaults(command="c7n.commands.run")
-    _default_options(run)
-    _dryrun_option(run)
-    run.add_argument(
-        "-m", "--metrics-enabled",
-        default=False, action="store_true",
-        help="Emit metrics to CloudWatch Metrics")
 
     return parser
 
@@ -366,13 +333,18 @@ def _setup_logger(options):
         external_log_level = logging.INFO
 
     logging.getLogger('botocore').setLevel(external_log_level)
+    logging.getLogger('urllib3').setLevel(external_log_level)
     logging.getLogger('s3transfer').setLevel(external_log_level)
+    logging.getLogger('urllib3').setLevel(logging.ERROR)
 
 
 def main():
     parser = setup_parser()
     argcomplete.autocomplete(parser)
     options = parser.parse_args()
+    if options.subparser is None:
+        parser.print_help(file=sys.stderr)
+        return sys.exit(2)
 
     _setup_logger(options)
 
@@ -380,9 +352,7 @@ def main():
     if getattr(options, 'config', None) is not None:
         options.configs.append(options.config)
 
-    if options.subparser in ('report', 'logs', 'metrics', 'run'):
-        _default_region(options)
-        _default_account_id(options)
+    config = Config.empty(**vars(options))
 
     try:
         command = options.command
@@ -395,7 +365,7 @@ def main():
         process_name = [os.path.basename(sys.argv[0])]
         process_name.extend(sys.argv[1:])
         setproctitle(' '.join(process_name))
-        command(options)
+        command(config)
     except Exception:
         if not options.debug:
             raise

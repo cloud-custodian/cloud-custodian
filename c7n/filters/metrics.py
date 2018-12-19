@@ -19,7 +19,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
-from c7n.filters.core import Filter, OPERATORS, FilterValidationError
+from c7n.exceptions import PolicyValidationError
+from c7n.filters.core import Filter, OPERATORS
 from c7n.utils import local_session, type_schema, chunks
 
 
@@ -48,8 +49,10 @@ class MetricsFilter(Filter):
     Note periods when a resource is not sending metrics are not part
     of calculated statistics as in the case of a stopped ec2 instance,
     nor for resources to new to have existed the entire
-    period. ie. being stopped for an ec2 intsance wouldn't lower the
-    average cpu utilization, nor would
+    period. ie. being stopped for an ec2 instance wouldn't lower the
+    average cpu utilization.
+
+    Note the default statistic for metrics is Average.
     """
 
     schema = type_schema(
@@ -67,7 +70,7 @@ class MetricsFilter(Filter):
            'attr-multiplier': {'type': 'number'},
            'percent-attr': {'type': 'string'},
            'required': ('value', 'name')})
-
+    schema_alias = True
     permissions = ("cloudwatch:GetMetricStatistics",)
 
     MAX_QUERY_POINTS = 50850
@@ -87,7 +90,7 @@ class MetricsFilter(Filter):
         'ec2': 'AWS/EC2',
         'elb': 'AWS/ELB',
         'elbv2': 'AWS/ApplicationELB',
-        'emr': 'AWS/EMR',
+        'emr': 'AWS/ElasticMapReduce',
         'es': 'AWS/ES',
         'events': 'AWS/Events',
         'firehose': 'AWS/Firehose',
@@ -211,10 +214,11 @@ class ShieldMetrics(MetricsFilter):
 
     def validate(self):
         if self.data.get('name') not in self.metrics:
-            raise FilterValidationError(
-                "invalid shield metric %s valid:%s" % (
+            raise PolicyValidationError(
+                "invalid shield metric %s valid:%s on %s" % (
                     self.data['name'],
-                    ", ".join(self.metrics)))
+                    ", ".join(self.metrics),
+                    self.manager.data))
 
     def get_dimensions(self, resource):
         return [{

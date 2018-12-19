@@ -23,8 +23,9 @@ import re
 from botocore.exceptions import ClientError
 
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    Filter, FilterRegistry, FilterValidationError, DefaultVpcBase, ValueFilter,
+    Filter, FilterRegistry, DefaultVpcBase, ValueFilter,
     ShieldMetrics)
 import c7n.filters.vpc as net_filters
 from datetime import datetime
@@ -41,7 +42,6 @@ log = logging.getLogger('custodian.elb')
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
 
-actions.register('set-shield', SetShieldProtection)
 filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
 filters.register('shield-enabled', IsShieldProtected)
@@ -53,6 +53,7 @@ class ELB(QueryResourceManager):
 
     class resource_type(object):
         service = 'elb'
+        resource_type = 'elasticloadbalancing:loadbalancer'
         type = 'loadbalancer'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
@@ -87,6 +88,9 @@ class ELB(QueryResourceManager):
             self.config.account_id,
             r[self.resource_type.id])
 
+    def get_arns(self, resources):
+        return map(self.get_arn, resources)
+
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeELB(self)
@@ -96,41 +100,18 @@ class ELB(QueryResourceManager):
 class DescribeELB(DescribeSource):
 
     def augment(self, resources):
-        _elb_tags(
-            resources,
-            self.manager.session_factory,
-            self.manager.executor_factory,
-            self.manager.retry)
-        return resources
+        return tags.universal_augment(self.manager, resources)
 
 
-def _elb_tags(elbs, session_factory, executor_factory, retry):
+@actions.register('set-shield')
+class SetELBShieldProtection(SetShieldProtection):
 
-    def process_tags(elb_set):
-        client = local_session(session_factory).client('elb')
-        elb_map = {elb['LoadBalancerName']: elb for elb in elb_set}
-
-        while True:
-            try:
-                results = retry(
-                    client.describe_tags,
-                    LoadBalancerNames=list(elb_map.keys()))
-                break
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'LoadBalancerNotFound':
-                    raise
-                msg = e.response['Error']['Message']
-                _, lb_name = msg.strip().rsplit(' ', 1)
-                elb_map.pop(lb_name)
-                if not elb_map:
-                    results = {'TagDescriptions': []}
-                    break
-                continue
-        for tag_desc in results['TagDescriptions']:
-            elb_map[tag_desc['LoadBalancerName']]['Tags'] = tag_desc['Tags']
-
-    with executor_factory(max_workers=2) as w:
-        list(w.map(process_tags, chunks(elbs, 20)))
+    def clear_stale(self, client, protections):
+        # elbs arns need extra discrimination to distinguish
+        # from app load balancer arns. See https://goo.gl/pE7TQb
+        super(SetELBShieldProtection, self).clear_stale(
+            client,
+            [p for p in protections if p['ResourceArn'].count('/') == 1])
 
 
 @actions.register('mark-for-op')
@@ -349,7 +330,7 @@ class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     def process(self, load_balancers):
         client = local_session(self.manager.session_factory).client('elb')
         groups = super(ELBModifyVpcSecurityGroups, self).get_groups(
-            load_balancers, 'SecurityGroups')
+            load_balancers)
         for idx, l in enumerate(load_balancers):
             client.apply_security_groups_to_load_balancer(
                 LoadBalancerName=l['LoadBalancerName'],
@@ -386,7 +367,7 @@ class EnableS3Logging(BaseAction):
         client = local_session(self.manager.session_factory).client('elb')
         for elb in resources:
             elb_name = elb['LoadBalancerName']
-            log_attrs = {'Enabled':True}
+            log_attrs = {'Enabled': True}
             if 'bucket' in self.data:
                 log_attrs['S3BucketName'] = self.data['bucket']
             if 'prefix' in self.data:
@@ -452,6 +433,13 @@ class SubnetFilter(net_filters.SubnetFilter):
     """ELB subnet filter"""
 
     RelatedIdsExpression = "Subnets[]"
+
+
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+    """ELB vpc filter"""
+
+    RelatedIdsExpression = "VPCId"
 
 
 filters.register('network-location', net_filters.NetworkLocation)
@@ -578,23 +566,25 @@ class SSLPolicyFilter(Filter):
 
     def validate(self):
         if 'whitelist' in self.data and 'blacklist' in self.data:
-            raise FilterValidationError(
-                "cannot specify whitelist and black list")
-
+            raise PolicyValidationError(
+                "cannot specify whitelist and black list on %s" % (
+                    self.manager.data,))
         if 'whitelist' not in self.data and 'blacklist' not in self.data:
-            raise FilterValidationError(
-                "must specify either policy blacklist or whitelist")
+            raise PolicyValidationError(
+                "must specify either policy blacklist or whitelist on %s" % (
+                    self.manager.data,))
         if ('blacklist' in self.data and
                 not isinstance(self.data['blacklist'], list)):
-            raise FilterValidationError("blacklist must be a list")
+            raise PolicyValidationError("blacklist must be a list on %s" % (
+                self.manager.data,))
 
         if 'matching' in self.data:
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['matching'])
                 except re.error as e:
-                    raise FilterValidationError(
-                        "Invalid regex: %s %s" % (e, self.data))
+                    raise PolicyValidationError(
+                        "Invalid regex: %s %s" % (e, self.manager.data))
 
         return self
 
@@ -877,5 +867,5 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
                     'S3BucketName', None)) or
                 (bucket_prefix and bucket_prefix != elb['Attributes'][
                     'AccessLog'].get(
-                    'S3AccessPrefix', None))
+                    'S3BucketPrefix', None))
                 ]

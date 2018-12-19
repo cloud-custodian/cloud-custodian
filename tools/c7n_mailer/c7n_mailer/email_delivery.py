@@ -11,54 +11,83 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import base64
 import smtplib
-
-from botocore.exceptions import ClientError
 from email.mime.text import MIMEText
-from email.utils import parseaddr
-
+from itertools import chain
 import six
+
 from .ldap_lookup import LdapLookup
+from c7n_mailer.utils_email import is_email
 from .utils import (
     format_struct, get_message_subject, get_resource_tag_targets,
-    get_rendered_jinja)
+    get_rendered_jinja, kms_decrypt)
+
+# Those headers are defined as follows:
+#  'X-Priority': 1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest)
+#              Non-standard, cf https://people.dsv.su.se/~jpalme/ietf/ietf-mail-attributes.html
+#              Set by Thunderbird
+#  'X-MSMail-Priority': High, Normal, Low
+#              Cf Microsoft https://msdn.microsoft.com/en-us/library/gg671973(v=exchg.80).aspx
+#              Note: May increase SPAM level on Spamassassin:
+#                    https://wiki.apache.org/spamassassin/Rules/MISSING_MIMEOLE
+#  'Priority': "normal" / "non-urgent" / "urgent"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.6
+#  'Importance': "low" / "normal" / "high"
+#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.4
+PRIORITIES = {
+    '1': {
+        'X-Priority': '1 (Highest)',
+        'X-MSMail-Priority': 'High',
+        'Priority': 'urgent',
+        'Importance': 'high',
+    },
+    '2': {
+        'X-Priority': '2 (High)',
+        'X-MSMail-Priority': 'High',
+        'Priority': 'urgent',
+        'Importance': 'high',
+    },
+    '3': {
+        'X-Priority': '3 (Normal)',
+        'X-MSMail-Priority': 'Normal',
+        'Priority': 'normal',
+        'Importance': 'normal',
+    },
+    '4': {
+        'X-Priority': '4 (Low)',
+        'X-MSMail-Priority': 'Low',
+        'Priority': 'non-urgent',
+        'Importance': 'low',
+    },
+    '5': {
+        'X-Priority': '5 (Lowest)',
+        'X-MSMail-Priority': 'Low',
+        'Priority': 'non-urgent',
+        'Importance': 'low',
+    }
+}
 
 
 class EmailDelivery(object):
 
     def __init__(self, config, session, logger):
-        self.config      = config
-        self.logger      = logger
-        self.session     = session
-        self.aws_ses     = session.client('ses', region_name=config.get('ses_region'))
+        self.config = config
+        self.logger = logger
+        self.session = session
+        self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
         self.ldap_lookup = self.get_ldap_connection()
 
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
-            try:
-                if self.config.get('ldap_bind_password', None):
-                    kms = self.session.client('kms')
-                    self.config['ldap_bind_password'] = kms.decrypt(
-                        CiphertextBlob=base64.b64decode(self.config['ldap_bind_password']))[
-                            'Plaintext']
-            except (TypeError, base64.binascii.Error) as e:
-                self.logger.warning(
-                    "Error: %s Unable to base64 decode ldap_bind_password, will assume plaintext." % (e)
-                )
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'InvalidCiphertextException':
-                    raise
-                self.logger.warning(
-                    "Error: %s Unable to decrypt ldap_bind_password with kms, will assume plaintext." % (e)
-                )
+            self.config['ldap_bind_password'] = kms_decrypt(self.config, self.logger,
+                                                            self.session, 'ldap_bind_password')
             return LdapLookup(self.config, self.logger)
         return None
 
     def priority_header_is_valid(self, priority_header):
         try:
             priority_header_int = int(priority_header)
-        except:
+        except ValueError:
             return False
         if priority_header_int and 0 < int(priority_header_int) < 6:
             return True
@@ -69,15 +98,31 @@ class EmailDelivery(object):
     def get_valid_emails_from_list(self, targets):
         emails = []
         for target in targets:
-            if self.target_is_email(target):
+            if is_email(target):
                 emails.append(target)
         return emails
 
     def get_event_owner_email(self, targets, event):
-        if 'event-owner' in targets and self.config.get('ldap_uri', False):
+        if 'event-owner' in targets:
             aws_username = self.get_aws_username_from_event(event)
             if aws_username:
-                return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
+                # is using SSO, the target might already be an email
+                if is_email(aws_username):
+                    return [aws_username]
+                # if the LDAP config is set, lookup in ldap
+                elif self.config.get('ldap_uri', False):
+                    return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
+                # the org_domain setting is configured, append the org_domain
+                # to the username from AWS
+                elif self.config.get('org_domain', False):
+                    org_domain = self.config.get('org_domain', False)
+                    self.logger.info('adding email %s to targets.', aws_username + '@' + org_domain)
+                    return [aws_username + '@' + org_domain]
+                else:
+                    self.logger.warning('unable to lookup owner email. \
+                            Please configure LDAP or org_domain')
+            else:
+                self.logger.info('no aws username in event')
         return []
 
     def get_ldap_emails_from_resource(self, sqs_message, resource):
@@ -110,7 +155,14 @@ class EmailDelivery(object):
             return []
         resource_owner_tag_keys = self.config.get('contact_tags', [])
         resource_owner_tag_values = get_resource_tag_targets(resource, resource_owner_tag_keys)
-        return self.get_valid_emails_from_list(resource_owner_tag_values)
+        explicit_emails = self.get_valid_emails_from_list(resource_owner_tag_values)
+
+        # resolve the contact info from ldap
+        non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
+        ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
+                                              (uid) for uid in non_email_ids]))
+
+        return list(chain(explicit_emails, ldap_emails))
 
     def get_account_emails(self, sqs_message):
         email_list = []
@@ -123,7 +175,8 @@ class EmailDelivery(object):
 
         if account_id is not None:
             account_email_mapping = self.config.get('account_emails', {})
-            self.logger.debug('get_account_emails account_email_mapping: %s.', account_email_mapping)
+            self.logger.debug(
+                'get_account_emails account_email_mapping: %s.', account_email_mapping)
             email_list = account_email_mapping.get(account_id, [])
             self.logger.debug('get_account_emails email_list: %s.', email_list)
 
@@ -137,7 +190,8 @@ class EmailDelivery(object):
         # these were manually set by the policy writer in notify to section
         # or it's an email from an aws event username from an ldap_lookup
         email_to_addrs_to_resources_map = {}
-        targets = sqs_message['action']['to']
+        targets = sqs_message['action']['to'] + \
+            (sqs_message['action']['cc'] if 'cc' in sqs_message['action'] else [])
         no_owner_targets = self.get_valid_emails_from_list(
             sqs_message['action'].get('owner_absent_contact', [])
         )
@@ -164,6 +218,7 @@ class EmailDelivery(object):
                 sqs_message,
                 resource
             )
+
             resource_emails = resource_emails + ro_emails
             # if 'owner_absent_contact' was specified in the policy and no resource
             # owner emails were found, add those addresses
@@ -193,15 +248,9 @@ class EmailDelivery(object):
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
         return to_addrs_to_mimetext_map
 
-    def target_is_email(self, target):
-        if parseaddr(target)[1] and '@' in target and '.' in target:
-            return True
-        else:
-            return False
-
     def send_smtp_email(self, smtp_server, message, to_addrs):
         smtp_port = int(self.config.get('smtp_port', 25))
-        smtp_ssl  = bool(self.config.get('smtp_ssl', True))
+        smtp_ssl = bool(self.config.get('smtp_ssl', True))
         smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
         if smtp_ssl:
             smtp_connection.starttls()
@@ -214,24 +263,28 @@ class EmailDelivery(object):
         smtp_connection.quit()
 
     def get_mimetext_message(self, sqs_message, resources, to_addrs):
-        body = get_rendered_jinja(to_addrs, sqs_message, resources, self.logger)
+        body = get_rendered_jinja(
+            to_addrs, sqs_message, resources, self.logger,
+            'template', 'default', self.config['templates_folders'])
         if not body:
             return None
         email_format = sqs_message['action'].get('template_format', None)
         if not email_format:
             email_format = sqs_message['action'].get(
                 'template', 'default').endswith('html') and 'html' or 'plain'
-        subject            = get_message_subject(sqs_message)
-        from_addr          = sqs_message['action'].get('from', self.config['from_address'])
-        message            = MIMEText(body, email_format)
-        message['From']    = from_addr
-        message['To']      = ', '.join(to_addrs)
+        subject = get_message_subject(sqs_message)
+        from_addr = sqs_message['action'].get('from', self.config['from_address'])
+        message = MIMEText(body, email_format, 'utf-8')
+        message['From'] = from_addr
+        message['To'] = ', '.join(to_addrs)
         message['Subject'] = subject
-        priority_header    = sqs_message['action'].get('priority_header', None)
+        priority_header = sqs_message['action'].get('priority_header', None)
         if priority_header and self.priority_header_is_valid(
             sqs_message['action']['priority_header']
         ):
-            message['X-Priority'] = str(priority_header)
+            priority_headers = PRIORITIES[str(priority_header)].copy()
+            for key in priority_headers:
+                message[key] = priority_headers[key]
         return message
 
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):
@@ -253,16 +306,13 @@ class EmailDelivery(object):
                     self.config
                 )
             )
-        self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" %
-            (
-                sqs_message.get('account', ''),
-                sqs_message['policy']['name'],
-                sqs_message['policy']['resource'],
-                str(len(sqs_message['resources'])),
-                sqs_message['action'].get('template', 'default'),
-                email_to_addrs
-            )
-        )
+        self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" % (
+            sqs_message.get('account', ''),
+            sqs_message['policy']['name'],
+            sqs_message['policy']['resource'],
+            str(len(sqs_message['resources'])),
+            sqs_message['action'].get('template', 'default'),
+            email_to_addrs))
 
     # https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
     def get_aws_username_from_event(self, event):
@@ -274,9 +324,17 @@ class EmailDelivery(object):
                 format_struct(event)))
             return None
         if identity['type'] == 'AssumedRole':
-            assume_role_msg = 'No ldap uid is associated with AssumedRole: %s' % identity['arn']
-            self.logger.debug(assume_role_msg)
-            return None
+            self.logger.debug(
+                'In some cases there is no ldap uid is associated with AssumedRole: %s',
+                identity['arn'])
+            self.logger.debug(
+                'We will try to assume that identity is in the AssumedRoleSessionName')
+            user = identity['arn'].rsplit('/', 1)[-1]
+            if user is None or user.startswith('i-') or user.startswith('awslambda'):
+                return None
+            if ':' in user:
+                user = user.split(':', 1)[-1]
+            return user
         if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
             return identity['userName']
         if identity['type'] == 'Root':

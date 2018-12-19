@@ -23,7 +23,7 @@ class StorageGateway(QueryResourceManager):
     class resource_type(object):
         service = 'storagegateway'
         enum_spec = ('list_gateways', 'Gateways', None)
-        id = 'GatewayArn'
+        id = 'GatewayARN'
         name = 'GatewayName'
         dimension = None
         filter_name = None

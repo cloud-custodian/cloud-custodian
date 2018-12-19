@@ -1,0 +1,45 @@
+{
+  "headers": {
+    "expires": "Wed, 31 Oct 2018 09:21:14 GMT",
+    "date": "Wed, 31 Oct 2018 09:21:14 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "etag": "\"RlhAWZsV3x7L9BL2_FR1d4nvYjI=/J0zhZzVxduCOP5vW8Ft1rt5uXSk=\"",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "886",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots?alt=json"
+  },
+  "body": {
+    "kind": "compute#snapshotList",
+    "id": "projects/cloud-custodian/global/snapshots",
+    "items": [
+      {
+        "kind": "compute#snapshot",
+        "id": "6553779127071329555",
+        "creationTimestamp": "2018-10-31T02:21:01.334-07:00",
+        "name": "snapshot-1",
+        "status": "UPLOADING",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/disks/instance-1",
+        "sourceDiskId": "842650625552022518",
+        "diskSizeGb": "0",
+        "licenses": [
+          "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+        ],
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/snapshot-1",
+        "labelFingerprint": "42WmSpB8rSM=",
+        "licenseCodes": [
+          "5926592092274602096"
+        ]
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots"
+  }
+}

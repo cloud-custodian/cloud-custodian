@@ -24,9 +24,10 @@ from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
 
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, FilterValidationError, OPERATORS)
+    ANNOTATION_KEY, OPERATORS)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
@@ -136,11 +137,12 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         self.accounts = self.get_accounts()
         results = []
+        client = local_session(self.manager.session_factory).client('ec2')
         with self.executor_factory(max_workers=3) as w:
             futures = []
             for resource_set in chunks(resources, 50):
                 futures.append(w.submit(
-                    self.process_resource_set, resource_set))
+                    self.process_resource_set, client, resource_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -150,8 +152,7 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
                 results.extend(f.result())
         return results
 
-    def process_resource_set(self, resource_set):
-        client = local_session(self.manager.session_factory).client('ec2')
+    def process_resource_set(self, client, resource_set):
         results = []
         for r in resource_set:
             attrs = self.manager.retry(
@@ -212,12 +213,6 @@ class SnapshotSkipAmiSnapshots(Filter):
     def get_permissions(self):
         return AMI(self.manager.ctx, {}).get_permissions()
 
-    def validate(self):
-        if not isinstance(self.data.get('value', True), bool):
-            raise FilterValidationError(
-                "invalid config: expected boolean value")
-        return self
-
     def process(self, snapshots, event=None):
         resources = _filter_ami_snapshots(self, snapshots)
         return resources
@@ -257,11 +252,12 @@ class SnapshotDelete(BaseAction):
         log.info("Deleting %d snapshots, auto-filtered %d ami-snapshots",
                  post, pre - post)
 
+        client = local_session(self.manager.session_factory).client('ec2')
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
-                    w.submit(self.process_snapshot_set, snapshot_set))
+                    w.submit(self.process_snapshot_set, client, snapshot_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -270,18 +266,17 @@ class SnapshotDelete(BaseAction):
         return snapshots
 
     @worker
-    def process_snapshot_set(self, snapshots_set):
+    def process_snapshot_set(self, client, snapshots_set):
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
 
-        c = local_session(self.manager.session_factory).client('ec2')
         for s in snapshots_set:
             if s['SnapshotId'] in self.image_snapshots:
                 continue
             try:
-                retry(c.delete_snapshot,
-                    SnapshotId=s['SnapshotId'],
-                    DryRun=self.manager.config.dryrun)
+                retry(client.delete_snapshot,
+                      SnapshotId=s['SnapshotId'],
+                      DryRun=self.manager.config.dryrun)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidSnapshot.NotFound":
                     continue
@@ -325,8 +320,9 @@ class CopySnapshot(BaseAction):
         if self.data.get('encrypted', True):
             key = self.data.get('target_key')
             if not key:
-                raise FilterValidationError(
-                    "Encrypted snapshot copy requires kms key")
+                raise PolicyValidationError(
+                    "Encrypted snapshot copy requires kms key on %s" % (
+                        self.manager.data,))
         return self
 
     def process(self, resources):
@@ -401,6 +397,43 @@ class EBS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+
+
+@EBS.action_registry.register('detach')
+class VolumeDetach(BaseAction):
+
+    """
+    Detach an EBS volume from an Instance.
+
+    If 'Force' Param is True, then we'll do a forceful detach
+    of the Volume. The default value for 'Force' is False.
+
+     :example:
+
+     .. code-block:: yaml
+
+             policies:
+               - name: instance-ebs-volumes
+                 resource: ebs
+                 filters:
+                   VolumeId :  volumeid
+                 actions:
+                   - detach
+
+
+    """
+
+    schema = type_schema('detach', force={'type': 'boolean'})
+    permissions = ('ec2:DetachVolume',)
+
+    def process(self, volumes, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vol in volumes:
+            for attachment in vol.get('Attachments', []):
+                client.detach_volume(InstanceId=attachment['InstanceId'],
+                                VolumeId=attachment['VolumeId'],
+                                Force=self.data.get('force', False))
 
 
 @filters.register('instance')
@@ -521,19 +554,19 @@ class HealthFilter(HealthEventFilter):
         paginator = client.get_paginator('describe_events')
         events = list(itertools.chain(
             *[p['events']for p in paginator.paginate(filter=f)]))
-        entities = self.process_event(events)
+        entities = self.process_event(client, events)
 
         event_map = {e['arn']: e for e in events}
+        config = local_session(self.manager.session_factory).client('config')
         for e in entities:
             rid = e['entityValue']
             if not resource_map.get(rid):
-                resource_map[rid] = self.load_resource(rid)
+                resource_map[rid] = self.load_resource(config, rid)
             resource_map[rid].setdefault(
                 'c7n:HealthEvent', []).append(event_map[e['eventArn']])
         return list(resource_map.values())
 
-    def load_resource(self, rid):
-        config = local_session(self.manager.session_factory).client('config')
+    def load_resource(self, config, rid):
         resources_histories = config.get_resource_config_history(
             resourceType='AWS::EC2::Volume',
             resourceId=rid,
@@ -591,12 +624,13 @@ class CopyInstanceTags(BaseAction):
                 "ebs copy tags action implicitly filtered from %d to %d",
                 vol_count, len(volumes))
         self.initialize(volumes)
+        client = local_session(self.manager.session_factory).client('ec2')
         with self.executor_factory(max_workers=10) as w:
             futures = []
             for instance_set in chunks(sorted(
                     self.instance_map.keys(), reverse=True), size=100):
                 futures.append(
-                    w.submit(self.process_instance_set, instance_set))
+                    w.submit(self.process_instance_set, client, instance_set))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -615,8 +649,7 @@ class CopyInstanceTags(BaseAction):
         self.instance_vol_map = instance_vol_map
         self.instance_map = instance_map
 
-    def process_instance_set(self, instance_ids):
-        client = local_session(self.manager.session_factory).client('ec2')
+    def process_instance_set(self, client, instance_ids):
         for i in instance_ids:
             try:
                 self.process_instance_volumes(
@@ -742,11 +775,6 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DeleteTags')
 
     def validate(self):
-        key = self.data.get('key')
-        if not key:
-            raise ValueError(
-                "action:encrypt-instance-volume "
-                "requires kms keyid/alias specified")
         self.verbose = self.data.get('verbose', False)
         return self
 
@@ -771,11 +799,14 @@ class EncryptInstanceVolumes(BaseAction):
             self.manager.get_resource_manager('ec2').get_resources(
                 list(instance_vol_map.keys()), cache=False)}
 
-        with self.executor_factory(max_workers=10) as w:
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        with self.executor_factory(max_workers=3) as w:
             futures = {}
             for instance_id, vol_set in instance_vol_map.items():
                 futures[w.submit(
-                    self.process_volume, instance_id, vol_set)] = instance_id
+                    self.process_volume, client,
+                    instance_id, vol_set)] = instance_id
 
             for f in as_completed(futures):
                 if f.exception():
@@ -785,7 +816,7 @@ class EncryptInstanceVolumes(BaseAction):
                             instance_id, instance_vol_map[instance_id],
                             f.exception()))
 
-    def process_volume(self, instance_id, vol_set):
+    def process_volume(self, client, instance_id, vol_set):
         """Encrypt attached unencrypted ebs volumes
 
         vol_set corresponds to all the unencrypted volumes on a given instance.
@@ -794,17 +825,15 @@ class EncryptInstanceVolumes(BaseAction):
         if self.verbose:
             self.log.debug("Using encryption key: %s" % key_id)
 
-        client = local_session(self.manager.session_factory).client('ec2')
-
         # Only stop and start the instance if it was running.
-        instance_running = self.stop_instance(instance_id)
+        instance_running = self.stop_instance(client, instance_id)
         if instance_running is None:
             return
 
         # Create all the volumes before patching the instance.
         paired = []
         for v in vol_set:
-            vol_id = self.create_encrypted_volume(v, key_id, instance_id)
+            vol_id = self.create_encrypted_volume(client, v, key_id, instance_id)
             paired.append((v, vol_id))
 
         # Next detach and reattach
@@ -853,8 +882,7 @@ class EncryptInstanceVolumes(BaseAction):
                 ]
             )
 
-    def stop_instance(self, instance_id):
-        client = local_session(self.manager.session_factory).client('ec2')
+    def stop_instance(self, client, instance_id):
         instance_state = self.instance_map[instance_id]['State']['Name']
         if instance_state in ('shutting-down', 'terminated'):
             self.log.debug('Skipping terminating instance: %s' % instance_id)
@@ -865,9 +893,8 @@ class EncryptInstanceVolumes(BaseAction):
             return True
         return False
 
-    def create_encrypted_volume(self, v, key_id, instance_id):
+    def create_encrypted_volume(self, ec2, v, key_id, instance_id):
         # Create a current snapshot
-        ec2 = local_session(self.manager.session_factory).client('ec2')
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
             Description="maid transient snapshot for encryption",)
@@ -1021,11 +1048,20 @@ class Delete(BaseAction):
         'ec2:DetachVolume', 'ec2:DeleteVolume', 'ec2:DescribeVolumes')
 
     def process(self, volumes):
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_volume, volumes))
-
-    def process_volume(self, volume):
         client = local_session(self.manager.session_factory).client('ec2')
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for v in volumes:
+                futures[
+                    w.submit(self.process_volume, client, v)] = v
+            for f in as_completed(futures):
+                v = futures[f]
+                if f.exception():
+                    self.log.error(
+                        "Error processing volume:%s error:%s",
+                        v['VolumeId'], f.exception())
+
+    def process_volume(self, client, volume):
         try:
             if self.data.get('force') and len(volume['Attachments']):
                 client.detach_volume(VolumeId=volume['VolumeId'], Force=True)
@@ -1217,20 +1253,20 @@ class ModifyVolume(BaseAction):
 
     def validate(self):
         if 'modifyable' not in self.manager.data.get('filters', ()):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "modify action requires modifyable filter in policy")
         if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
-            raise FilterValidationError((
+            raise PolicyValidationError((
                 "shrinking volumes requires os/fs support "
                 "or data-loss may ensue, use `shrink: true` to override"))
         return self
 
     def process(self, resources):
-        for resource_set in chunks(resources, 50):
-            self.process_resource_set(resource_set)
-
-    def process_resource_set(self, resource_set):
         client = local_session(self.manager.session_factory).client('ec2')
+        for resource_set in chunks(resources, 50):
+            self.process_resource_set(client, resource_set)
+
+    def process_resource_set(self, client, resource_set):
         vtype = self.data.get('volume-type')
         psize = self.data.get('size-percent')
         piops = self.data.get('iops-percent')

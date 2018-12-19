@@ -1,0 +1,66 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Clusters": [
+            {
+                "Status": "available", 
+                "SubnetGroup": "c7n-dax-subnet-group", 
+                "NodeType": "dax.t2.small", 
+                "ClusterName": "c7n-dax", 
+                "ActiveNodes": 1, 
+                "TotalNodes": 1, 
+                "IamRoleArn": "arn:aws:iam::644160558196:role/service-role/C7N-DAXtoDynamoDB-Role", 
+                "SecurityGroups": [
+                    {
+                        "Status": "active", 
+                        "SecurityGroupIdentifier": "sg-4b9ada34"
+                    }
+                ], 
+                "ClusterArn": "arn:aws:dax:us-east-1:644160558196:cache/c7n-dax", 
+                "Nodes": [
+                    {
+                        "Endpoint": {
+                            "Port": 8111, 
+                            "Address": "c7n-dax-a.qgcgte.0001.dax.use1.cache.amazonaws.com"
+                        }, 
+                        "NodeStatus": "available", 
+                        "ParameterGroupStatus": "applying", 
+                        "NodeId": "c7n-dax-a", 
+                        "AvailabilityZone": "us-east-1a", 
+                        "NodeCreateTime": {
+                            "hour": 10, 
+                            "__class__": "datetime", 
+                            "month": 5, 
+                            "second": 12, 
+                            "microsecond": 110000, 
+                            "year": 2018, 
+                            "day": 11, 
+                            "minute": 10
+                        }
+                    }
+                ], 
+                "ClusterDiscoveryEndpoint": {
+                    "Port": 8111, 
+                    "Address": "c7n-dax.qgcgte.clustercfg.dax.use1.cache.amazonaws.com"
+                }, 
+                "ParameterGroup": {
+                    "NodeIdsToReboot": [], 
+                    "ParameterGroupName": "testparamgroup", 
+                    "ParameterApplyStatus": "applying"
+                }, 
+                "PreferredMaintenanceWindow": "thu:04:30-thu:05:30"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "ba796966-5525-11e8-8d38-2b6f8936bddb", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ba796966-5525-11e8-8d38-2b6f8936bddb", 
+                "date": "Fri, 11 May 2018 14:15:15 GMT", 
+                "content-length": "896", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

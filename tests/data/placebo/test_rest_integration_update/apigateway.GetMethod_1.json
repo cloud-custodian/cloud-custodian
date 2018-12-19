@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b578f947-023f-11e9-808b-33e17f44ed7b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 17 Dec 2018 21:07:06 GMT",
+                "content-type": "application/json",
+                "content-length": "584",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b578f947-023f-11e9-808b-33e17f44ed7b",
+                "x-amz-apigw-id": "SEdvGKYNoAMEclA="
+            },
+            "RetryAttempts": 0
+        },
+        "httpMethod": "GET",
+        "authorizationType": "AWS_IAM",
+        "apiKeyRequired": false,
+        "methodResponses": {
+            "200": {
+                "statusCode": "200",
+                "responseModels": {
+                    "application/json": "Empty"
+                }
+            }
+        },
+        "methodIntegration": {
+            "type": "AWS",
+            "httpMethod": "GET",
+            "uri": "arn:aws:apigateway:us-east-1:cloudcustodiantestdomain.com.ecs:action/",
+            "credentials": "arn:aws:iam::644160558196:role/aws-ec2-spot-fleet-role",
+            "passthroughBehavior": "WHEN_NO_MATCH",
+            "timeoutInMillis": 29000,
+            "cacheNamespace": "ovgcc9m0b7",
+            "cacheKeyParameters": [],
+            "integrationResponses": {
+                "200": {
+                    "statusCode": "200",
+                    "responseTemplates": {
+                        "application/json": null
+                    }
+                }
+            }
+        }
+    }
+}

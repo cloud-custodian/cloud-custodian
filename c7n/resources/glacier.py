@@ -155,9 +155,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         else:
             client.set_vault_access_policy(
                 vaultName=resource['VaultName'],
-                policy={
-                    'Policy':json.dumps(p)
-                }
+                policy={'Policy': json.dumps(p)}
             )
         return {'Name': resource['VaultName'],
                 'State': 'PolicyRemoved',

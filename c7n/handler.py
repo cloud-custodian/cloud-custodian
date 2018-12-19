@@ -19,67 +19,32 @@ an event.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import logging
 import os
 import uuid
+import logging
 import json
 
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
 from c7n.utils import format_event, get_account_id_from_sts
+from c7n.config import Config
 
+import boto3
 
 logging.root.setLevel(logging.DEBUG)
 logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
+account_id = None
 
-# TODO move me / we should load config options directly from policy config
-class Config(dict):
-
-    def __getattr__(self, k):
-        try:
-            return self[k]
-        except KeyError:
-            raise AttributeError(k)
-
-    @classmethod
-    def empty(cls, **kw):
-        account_id = None
-        if 'AWS_LAMBDA_FUNCTION_NAME' in os.environ:
-            try:
-                import boto3
-                session = boto3.Session()
-                account_id = get_account_id_from_sts(session)
-            except Exception:
-                pass
-
-        d = {}
-        d.update({
-            'region': os.environ.get('AWS_DEFAULT_REGION'),
-            'cache': '',
-            'profile': None,
-            'account_id': account_id,
-            'assume_role': None,
-            'external_id': None,
-            'log_group': None,
-            'metrics_enabled': True,
-            'output_dir': os.environ.get(
-                'C7N_OUTPUT_DIR',
-                '/tmp/' + str(uuid.uuid4())),
-            'cache_period': 0,
-            'dryrun': False})
-        d.update(kw)
-        if not os.path.exists(d['output_dir']):
-            try:
-                os.mkdir(d['output_dir'])
-            except OSError as error:
-                log.warning("Unable to make output directory: {}".format(error))
-
-        return cls(d)
+# On cold start load all resources, requires a pythonpath directory scan
+if 'AWS_EXECUTION_ENV' in os.environ:
+    load_resources()
 
 
 def dispatch_event(event, context):
+
+    global account_id
 
     error = event.get('detail', {}).get('errorCode')
     if error:
@@ -90,19 +55,50 @@ def dispatch_event(event, context):
     if event['debug']:
         log.info("Processing event\n %s", format_event(event))
 
-    # policies file should always be valid in lambda so do loading naively
+    # Policies file should always be valid in lambda so do loading naively
     with open('config.json') as f:
         policy_config = json.load(f)
 
     if not policy_config or not policy_config.get('policies'):
         return False
 
+    # Initialize output directory, we've seen occassional perm issues with
+    # lambda on temp directory and changing unix execution users, so
+    # use a per execution temp space.
+    output_dir = os.environ.get(
+        'C7N_OUTPUT_DIR',
+        '/tmp/' + str(uuid.uuid4()))
+    if not os.path.exists(output_dir):
+        try:
+            os.mkdir(output_dir)
+        except OSError as error:
+            log.warning("Unable to make output directory: {}".format(error))
+
     # TODO. This enshrines an assumption of a single policy per lambda.
     options_overrides = policy_config[
         'policies'][0].get('mode', {}).get('execution-options', {})
+
+    # if using assume role in lambda ensure that the correct
+    # execution account is captured in options.
+    if 'assume_role' in options_overrides:
+        account_id = options_overrides['assume_role'].split(':')[4]
+    elif account_id is None:
+        session = boto3.Session()
+        account_id = get_account_id_from_sts(session)
+
+    # Historical compatibility with manually set execution options
+    # previously this was a boolean, its now a string value with the
+    # boolean flag triggering a string value of 'aws'
+    if 'metrics_enabled' in options_overrides and isinstance(
+            options_overrides['metrics_enabled'], bool):
+        options_overrides['metrics_enabled'] = 'aws'
+
+    options_overrides['account_id'] = account_id
+
+    if 'output_dir' not in options_overrides:
+        options_overrides['output_dir'] = output_dir
     options = Config.empty(**options_overrides)
 
-    load_resources()
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:

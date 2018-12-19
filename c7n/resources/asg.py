@@ -19,18 +19,19 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
+from dateutil import tz as tzutil
 from dateutil.parser import parse
-from dateutil.tz import tzutc
 
 import logging
 import itertools
 import time
 
 from c7n.actions import Action, ActionRegistry
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, ValueFilter, AgeFilter, Filter, FilterValidationError,
+    FilterRegistry, ValueFilter, AgeFilter, Filter,
     OPERATORS)
-from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -38,6 +39,9 @@ from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
+
+
+from .ec2 import deserialize_user_data
 
 log = logging.getLogger('custodian.asg')
 
@@ -105,10 +109,15 @@ class LaunchConfigFilterBase(object):
         self.log.debug(
             "Querying launch configs for filter %s",
             self.__class__.__name__)
-        configs = self.manager.get_resource_manager(
-            'launch-config').resources()
+
+        lc_resources = self.manager.get_resource_manager('launch-config')
+        if len(config_names) < 5:
+            configs = lc_resources.get_resources(list(config_names))
+        else:
+            configs = lc_resources.resources()
         self.configs = {
-            cfg['LaunchConfigurationName']: cfg for cfg in configs}
+            cfg['LaunchConfigurationName']: cfg for cfg in configs
+            if cfg['LaunchConfigurationName'] in config_names}
 
 
 @filters.register('security-group')
@@ -189,7 +198,7 @@ class ConfigValidFilter(Filter, LaunchConfigFilterBase):
 
     def validate(self):
         if self.manager.data.get('mode'):
-            raise FilterValidationError(
+            raise PolicyValidationError(
                 "invalid-config makes too many queries to be run in lambda")
         return self
 
@@ -413,6 +422,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                   - type: not-encrypted
                     exclude_image: true
     """
+
     schema = type_schema('not-encrypted', exclude_image={'type': 'boolean'})
     permissions = (
         'ec2:DescribeImages',
@@ -521,20 +531,33 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
         return unencrypted_configs
 
     def get_snapshots(self, ec2, snap_ids):
-        """get snapshots corresponding to id, but tolerant of missing."""
-        while True:
+        """get snapshots corresponding to id, but tolerant of invalid id's."""
+        while snap_ids:
             try:
                 result = ec2.describe_snapshots(SnapshotIds=snap_ids)
             except ClientError as e:
-                if e.response['Error']['Code'] == 'InvalidSnapshot.NotFound':
-                    msg = e.response['Error']['Message']
-                    e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
-                    self.log.warning("Snapshot not found %s" % e_snap_id)
-                    snap_ids.remove(e_snap_id)
+                bad_snap = NotEncryptedFilter.get_bad_snapshot(e)
+                if bad_snap:
+                    snap_ids.remove(bad_snap)
                     continue
                 raise
             else:
                 return result.get('Snapshots', ())
+        return ()
+
+    @staticmethod
+    def get_bad_snapshot(e):
+        """Handle various client side errors when describing snapshots"""
+        msg = e.response['Error']['Message']
+        error = e.response['Error']['Code']
+        e_snap_id = None
+        if error == 'InvalidSnapshot.NotFound':
+            e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
+            log.warning("Snapshot not found %s" % e_snap_id)
+        elif error == 'InvalidSnapshotID.Malformed':
+            e_snap_id = msg[msg.find('"') + 1:msg.rfind('"')]
+            log.warning("Snapshot id malformed %s" % e_snap_id)
+        return e_snap_id
 
 
 @filters.register('image-age')
@@ -690,6 +713,7 @@ class VpcIdFilter(ValueFilter):
 
 
 @filters.register('progagated-tags')
+@filters.register('propagated-tags')
 class PropagatedTagFilter(Filter):
     """Filter ASG based on propagated tags
 
@@ -713,6 +737,7 @@ class PropagatedTagFilter(Filter):
     """
     schema = type_schema(
         'progagated-tags',
+        aliases=('propagated-tags',),
         keys={'type': 'array', 'items': {'type': 'string'}},
         match={'type': 'boolean'},
         propagate={'type': 'boolean'})
@@ -801,6 +826,64 @@ class CapacityDelta(Filter):
                 len(a['Instances']) < a['MinSize']]
 
 
+@filters.register('user-data')
+class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+    """Filter on ASG's whose launch configs have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: lc_userdata
+                resource: asg
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+
+    def __init__(self, data, manager):
+        super(UserDataFilter, self).__init__(data, manager)
+        self.data['key'] = '"c7n:user-data"'
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
+
+    def process(self, asgs, event=None):
+        '''
+        Get list of autoscaling groups whose launch configs match the user-data filter.
+        Note: Since this is an autoscaling filter, this won't match unused launch configs.
+        :param launch_configs: List of launch configurations
+        :param event: Event
+        :return: List of ASG's with matching launch configs
+        '''
+
+        self.data['key'] = '"c7n:user-data"'
+        results = []
+        super(UserDataFilter, self).initialize(asgs)
+
+        for asg in asgs:
+            launch_config = self.configs.get(asg['LaunchConfigurationName'])
+            if self.annotation not in launch_config:
+                if not launch_config['UserData']:
+                    asg[self.annotation] = None
+                else:
+                    asg[self.annotation] = deserialize_user_data(
+                        launch_config['UserData'])
+            if self.match(asg):
+                results.append(asg)
+            return results
+
+
 @actions.register('resize')
 class Resize(Action):
     """Action to resize the min/max/desired instances in an ASG
@@ -881,12 +964,6 @@ class Resize(Action):
         'autoscaling:UpdateAutoScalingGroup',
         'autoscaling:CreateOrUpdateTags'
     )
-
-    def validate(self):
-        # if self.data['desired_size'] != 'current':
-        #    raise FilterValidationError(
-        #        "only resizing desired/min to current capacity is supported")
-        return self
 
     def process(self, asgs):
         # ASG parameters to save to/restore from a tag
@@ -1330,30 +1407,55 @@ class MarkForOp(Tag):
         key={'type': 'string'},
         tag={'type': 'string'},
         message={'type': 'string'},
-        days={'type': 'number', 'minimum': 0})
+        days={'type': 'number', 'minimum': 0},
+        hours={'type': 'number', 'minimum': 0})
 
     default_template = (
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
+    def validate(self):
+        self.tz = tzutil.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        if not self.tz:
+            raise PolicyValidationError(
+                "Invalid timezone specified %s on %s" % (self.tz, self.manager.data))
+        return self
+
     def process(self, asgs):
+        self.tz = tzutil.gettz(
+            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+
         msg_tmpl = self.data.get('message', self.default_template)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         op = self.data.get('op', 'suspend')
-        date = self.data.get('days', 4)
+        days = self.data.get('days', 0)
+        hours = self.data.get('hours', 0)
 
-        n = datetime.now(tz=tzutc())
-        stop_date = n + timedelta(days=date)
+        action_date = self._generate_timestamp(days, hours)
         try:
             msg = msg_tmpl.format(
-                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
+                op=op, action_date=action_date)
         except Exception:
             self.log.warning("invalid template %s" % msg_tmpl)
             msg = self.default_template.format(
-                op=op, action_date=stop_date.strftime('%Y/%m/%d'))
+                op=op, action_date=action_date)
 
         self.log.info("Tagging %d asgs for %s on %s" % (
-            len(asgs), op, stop_date.strftime('%Y/%m/%d')))
+            len(asgs), op, action_date))
         self.tag(asgs, key, msg)
+
+    def _generate_timestamp(self, days, hours):
+        n = datetime.now(tz=self.tz)
+        if days == hours == 0:
+            # maintains default value of days being 4 if nothing is provided
+            days = 4
+        action_date = (n + timedelta(days=days, hours=hours))
+        if hours > 0:
+            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
+        else:
+            action_date_string = action_date.strftime('%Y/%m/%d')
+
+        return action_date_string
 
 
 @actions.register('suspend')
@@ -1592,8 +1694,6 @@ class LaunchConfig(query.QueryResourceManager):
 class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
-        for r in resources:
-            r.pop('UserData', None)
         return resources
 
 

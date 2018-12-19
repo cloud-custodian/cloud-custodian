@@ -1,0 +1,88 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoints": [
+            {
+                "Username": "erwerwerrs",
+                "Status": "active",
+                "EndpointArn": "arn:aws:dms:us-east-1:123456789012:endpoint:BICKTYIDPR4U6TPFW7Z7ORGSY4",
+                "ServerName": "c7n-test",
+                "CertificateArn": "arn:aws:dms:us-east-1:123456789012:cert:KAU6PM6MFLOKW7NUFW2LYQD6TA",
+                "EndpointType": "SOURCE",
+                "SslMode": "verify-ca",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/fffffffff-3f7f-40d1-a81f-f10728064be9",
+                "EngineDisplayName": "MariaDB",
+                "EngineName": "mariadb",
+                "EndpointIdentifier": "c7n-test",
+                "Port": 32342
+            },
+            {
+                "Username": "admin",
+                "Status": "active",
+                "EndpointArn": "arn:aws:dms:us-east-1:123456789012:endpoint:2YQDQ2L56H2HKJPMADIRK5E5QU",
+                "ServerName": "rds-isamdev-mysql-cluster.cluster-chlbxczddovi.us-east-1.rds.amazonaws.com",
+                "EndpointType": "TARGET",
+                "SslMode": "none",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/fffffff-0ae2-42af-9494-f946f8df695c",
+                "ExtraConnectionAttributes": "parallelLoadThreads=1",
+                "EngineDisplayName": "MySQL",
+                "EngineName": "mysql",
+                "EndpointIdentifier": "dms-isamdev-mysql",
+                "Port": 3306
+            },
+            {
+                "Username": "system",
+                "Status": "active",
+                "EndpointArn": "arn:aws:dms:us-east-1:123456789012:endpoint:PO3YXFKLUQDY4HA4CWGRBROXHM",
+                "ServerName": "161.179.239.118",
+                "EndpointType": "SOURCE",
+                "SslMode": "none",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/ffffffff-0ae2-42af-9494-f946f8df695c",
+                "DatabaseName": "isamdev.world",
+                "EngineDisplayName": "Oracle",
+                "EngineName": "oracle",
+                "EndpointIdentifier": "dms-isamdev-oracle",
+                "Port": 1562
+            },
+            {
+                "Username": "AWS",
+                "Status": "active",
+                "EndpointArn": "arn:aws:dms:us-east-1:123456789012:endpoint:3SNCBLLMQBJUPB47RI4Q4VMS6Y",
+                "ServerName": "1234556.company.domain.com",
+                "EndpointType": "SOURCE",
+                "SslMode": "none",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/1462981a-3f7f-40d1-a81f-f10728064be9",
+                "DatabaseName": "IDWQ",
+                "EngineDisplayName": "Oracle",
+                "EngineName": "oracle",
+                "EndpointIdentifier": "prodendpoint",
+                "Port": 1532
+            },
+            {
+                "Username": "AWS",
+                "Status": "active",
+                "EndpointArn": "arn:aws:dms:us-east-1:123456789012:endpoint:P4WO7C3HTQU66LE6JYJ3MWF2XI",
+                "ServerName": "1234556.company.domain.com",
+                "EndpointType": "SOURCE",
+                "SslMode": "none",
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/1462981a-3f7f-40d1-a81f-f10728064be9",
+                "DatabaseName": "IDWQ",
+                "EngineDisplayName": "Oracle",
+                "EngineName": "oracle",
+                "EndpointIdentifier": "prodendpoint333",
+                "Port": 1532
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "013c353f-4b50-11e8-a505-61dbe6461519",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "013c353f-4b50-11e8-a505-61dbe6461519",
+                "date": "Sun, 29 Apr 2018 01:52:41 GMT",
+                "content-length": "2512",
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

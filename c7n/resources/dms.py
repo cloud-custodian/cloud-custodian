@@ -19,7 +19,8 @@ from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.utils import local_session, chunks, type_schema, get_retry
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import FilterRegistry
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
@@ -112,6 +113,12 @@ class InstanceDescribe(DescribeSource):
             r['Tags'] = tags
 
 
+@ReplicationInstance.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KmsKeyId'
+
+
 @ReplicationInstance.filter_registry.register('subnet')
 class Subnet(SubnetFilter):
 
@@ -124,6 +131,12 @@ class SecurityGroup(SecurityGroupFilter):
     RelatedIdsExpression = 'VpcSecurityGroups[].VpcSecurityGroupId'
 
 
+@ReplicationInstance.filter_registry.register('vpc')
+class Vpc(VpcFilter):
+
+    RelatedIdsExpression = 'ReplicationSubnetGroup.VpcId'
+
+
 @ReplicationInstance.action_registry.register('delete')
 class InstanceDelete(BaseAction):
 
@@ -134,6 +147,72 @@ class InstanceDelete(BaseAction):
         client = local_session(self.manager.session_factory).client('dms')
         for arn, r in zip(self.manager.get_arns(resources), resources):
             client.delete_replication_instance(ReplicationInstanceArn=arn)
+
+
+@ReplicationInstance.action_registry.register('modify-instance')
+class ModifyReplicationInstance(BaseAction):
+    """Modify replication instance(s) to apply new settings
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: enable-minor-version-upgrade
+            resource: dms-instance
+            filters:
+              - AutoMinorVersionUpgrade: False
+            actions:
+              - type: modify-instance
+                ApplyImmediately: True
+                AutoMinorVersionUpgrade: True
+                PreferredMaintenanceWindow: mon:23:00-mon:23:59
+
+    AWS ModifyReplicationInstance Documentation: https://goo.gl/ePye9N
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['modify-instance']},
+            'ReplicationInstanceArn': {'type': 'string'},
+            'AllocatedStorage': {'type': 'integer'},
+            'ApplyImmediately': {'type': 'boolean'},
+            'ReplicationInstanceClass': {'type': 'string'},
+            'VpcSecurityGroupIds': {
+                'type': 'array', 'items': {'type': 'string'}
+            },
+            'PreferredMaintenanceWindow': {'type': 'string'},
+            'MultiAZ': {'type': 'boolean'},
+            'EngineVersion': {'type': 'string'},
+            'AllowMajorVersionUpgrade': {'type': 'boolean'},
+            'AutoMinorVersionUpgrade': {'type': 'boolean'},
+            'ReplicationInstanceIdentifier': {'type': 'string'}
+        }
+    }
+    permissions = ('dms:ModifyReplicationInstance',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dms')
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            params['ReplicationInstanceArn'] = r['ReplicationInstanceArn']
+            try:
+                client.modify_replication_instance(**params)
+            except ClientError as e:
+                ecode = e.response['Error']['Code']
+                if ecode in (
+                        'InvalidResourceStateFault',
+                        'ResourceAlreadyExistsFault',
+                        'ResourceNotFoundFault'):
+                    continue
+                elif ecode == 'UpgradeDependencyFailureFault':
+                    self.log.exception(
+                        'Exception modifying instance %s :%s' % (
+                            r['ReplicationInstanceArn'], e))
+                    continue
+                raise
 
 
 @ReplicationInstance.action_registry.register('tag')
@@ -345,3 +424,37 @@ class ModifyDmsEndpoint(BaseAction):
                         'ResourceNotFoundFault'):
                     continue
                 raise
+
+
+@DmsEndpoints.action_registry.register('delete')
+class DeleteDmsEndpoint(BaseAction):
+    """Delete a DMS endpoint
+
+    :example:
+
+    .. code-block: yaml
+
+        - policies:
+            - name: dms-endpoint-no-ssl-delete
+              resource: dms-endpoint
+              filters:
+                - EngineName: mariadb
+                - SslMode: none
+              actions:
+                - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('dms:DeleteEndpoint',)
+
+    def process(self, endpoints):
+        client = local_session(self.manager.session_factory).client('dms')
+        for e in endpoints:
+            EndpointArn = e['EndpointArn']
+            try:
+                client.delete_endpoint(EndpointArn=EndpointArn)
+            except ClientError as e:
+                self.log.exception(
+                    'Exception deleting endpoint %s :%s' % (
+                        EndpointArn, e))
+                continue

@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {
             "HTTPStatusCode": 200, 
-            "RequestId": "5418877a-201e-11e6-a63e-ab6d48bc31eb"
+            "RequestId": "55269c1a-201e-11e6-9a00-4dbf4ea1869e"
         }, 
         "TagDescriptions": [
             {
@@ -11,6 +11,10 @@
                     {
                         "Value": "ubuntu", 
                         "Key": "Platform"
+                    }, 
+                    {
+                        "Value": "Resource does not meet policy: delete@2016/05/21", 
+                        "Key": "custodian_next"
                     }
                 ], 
                 "LoadBalancerName": "CloudCustodian"

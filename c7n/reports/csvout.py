@@ -77,14 +77,16 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
 
     records = []
     for policy in policies:
-        if policy.ctx.output.use_s3():
+        # initialize policy execution context for output access
+        policy.ctx.initialize()
+        if policy.ctx.output.type == 's3':
             policy_records = record_set(
                 policy.session_factory,
                 policy.ctx.output.bucket,
                 policy.ctx.output.key_prefix,
                 start_date)
         else:
-            policy_records = fs_record_set(policy.ctx.output_path, policy.name)
+            policy_records = fs_record_set(policy.ctx.log_dir, policy.name)
 
         log.debug("Found %d records for region %s", len(policy_records), policy.options.region)
 

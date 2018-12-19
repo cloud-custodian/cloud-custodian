@@ -22,9 +22,9 @@ from .utils import (
 class SnsDelivery(object):
 
     def __init__(self, config, session, logger):
-        self.config    = config
-        self.logger    = logger
-        self.aws_sts   = session.client('sts')
+        self.config = config
+        self.logger = logger
+        self.aws_sts = session.client('sts')
         self.sns_cache = {}
 
     def deliver_sns_messages(self, packaged_sns_messages, sqs_message):
@@ -46,7 +46,10 @@ class SnsDelivery(object):
             policy_sns_address,
             sqs_message,
             resources,
-            self.logger
+            self.logger,
+            'template',
+            'default',
+            self.config['templates_folders']
         )
         return {
             'topic': policy_sns_address,

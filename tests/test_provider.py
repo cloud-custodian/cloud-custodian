@@ -21,6 +21,6 @@ from c7n.provider import clouds
 class ProviderTest(BaseTest):
 
     def test_available_clouds(self):
-        self.assertEqual(
-            sorted(clouds.keys()),
-            ['aws', 'azure', 'gcp'])
+        # the other providers are currently distributed as separate
+        # installs (tools/c7n_azure and tools/c7n_gcp)
+        self.assertEqual(sorted(clouds.keys()), ["aws", "azure", "gcp", "k8s"])

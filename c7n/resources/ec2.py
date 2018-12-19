@@ -13,37 +13,39 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import itertools
 import operator
 import random
 import re
+import zlib
 
 import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
+import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
+from c7n.actions.securityhub import PostFinding
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
 
 from c7n import utils
-from c7n.utils import type_schema
+from c7n.utils import type_schema, filter_empty
 
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
@@ -178,6 +180,12 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetId"
+
+
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
 
 
 filters.register('network-location', net_filters.NetworkLocation)
@@ -338,18 +346,19 @@ class DisableApiTermination(Filter):
         perms.extend(self.manager.get_permissions())
         return perms
 
-    def is_termination_protection_enabled(self, inst):
-        res_id = self.manager.get_model().id
-        client = utils.local_session(self.manager.session_factory).client('ec2')
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        return [r for r in resources
+                if self.is_termination_protection_enabled(client, r)]
+
+    def is_termination_protection_enabled(self, client, inst):
         attr_val = self.manager.retry(
             client.describe_instance_attribute,
             Attribute='disableApiTermination',
-            InstanceId=inst[res_id]
+            InstanceId=inst['InstanceId']
         )
         return attr_val['DisableApiTermination']['Value']
-
-    def __call__(self, i):
-        return self.is_termination_protection_enabled(i)
 
 
 class InstanceImageBase(object):
@@ -655,6 +664,83 @@ class DefaultVpc(DefaultVpcBase):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
 
 
+def deserialize_user_data(user_data):
+    data = base64.b64decode(user_data)
+    # try raw and compressed
+    try:
+        return data.decode('utf8')
+    except UnicodeDecodeError:
+        return zlib.decompress(data, 16).decode('utf8')
+
+
+@filters.register('user-data')
+class UserData(ValueFilter):
+    """Filter on EC2 instances which have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ec2_userdata_stop
+                resource: ec2
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - stop
+    """
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def __init__(self, data, manager):
+        super(UserData, self).__init__(data, manager)
+        self.data['key'] = '"c7n:user-data"'
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        results = []
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for instance_set in utils.chunks(resources, self.batch_size):
+                futures[w.submit(
+                    self.process_instance_set,
+                    client, instance_set)] = instance_set
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error processing userdata on instance set %s", f.exception())
+                results.extend(f.result())
+        return results
+
+    def process_instance_set(self, client, resources):
+        results = []
+        for r in resources:
+            if self.annotation not in r:
+                try:
+                    result = client.describe_instance_attribute(
+                        Attribute='userData',
+                        InstanceId=r['InstanceId'])
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
+                        continue
+                if 'Value' not in result['UserData']:
+                    r[self.annotation] = None
+                else:
+                    r[self.annotation] = deserialize_user_data(
+                        result['UserData']['Value'])
+            if self.match(r):
+                results.append(r)
+        return results
+
+
 @filters.register('singleton')
 class SingletonFilter(Filter, StateTransitionFilter):
     """EC2 instances without autoscaling or a recover alarm
@@ -721,6 +807,39 @@ class SingletonFilter(Filter, StateTransitionFilter):
                     return True
 
         return False
+
+
+@EC2.action_registry.register("post-finding")
+class InstanceFinding(PostFinding):
+    def format_resource(self, r):
+        details = {
+            "Type": r["InstanceType"],
+            "ImageId": r["ImageId"],
+            "IpV4Addresses": jmespath.search(
+                "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
+            ),
+            "KeyName": r.get("KeyName"),
+            "VpcId": r["VpcId"],
+            "SubnetId": r["SubnetId"],
+            "LaunchedAt": r["LaunchTime"].isoformat(),
+        }
+
+        if "IamInstanceProfile" in r:
+            details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
+
+        instance = {
+            "Type": "AwsEc2Instance",
+            "Id": "arn:aws:{}:{}:instance/{}".format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r["InstanceId"]),
+            "Region": self.manager.config.region,
+            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
+            "Details": {"AwsEc2Instance": filter_empty(details)},
+        }
+
+        instance = filter_empty(instance)
+        return instance
 
 
 @actions.register('start')
@@ -1044,24 +1163,22 @@ class Terminate(BaseAction, StateTransitionFilter):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
         if self.data.get('force'):
             self.log.info("Disabling termination protection on instances")
             self.disable_deletion_protection(
+                client,
                 [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
         # limit batch sizes to avoid api limits
         for batch in utils.chunks(instances, 100):
             self.manager.retry(
                 client.terminate_instances,
                 InstanceIds=[i['InstanceId'] for i in instances])
 
-    def disable_deletion_protection(self, instances):
+    def disable_deletion_protection(self, client, instances):
 
-        @utils.worker
         def process_instance(i):
-            client = utils.local_session(
-                self.manager.session_factory).client('ec2')
             try:
                 self.manager.retry(
                     client.modify_instance_attribute,
@@ -1100,32 +1217,37 @@ class Snapshot(BaseAction):
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def process(self, resources):
-        for resource in resources:
-            with self.executor_factory(max_workers=2) as w:
-                futures = []
-                futures.append(w.submit(self.process_volume_set, resource))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.log.error(
-                            "Exception creating snapshot set \n %s" % (
-                                f.exception()))
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource in resources:
+                futures.append(w.submit(
+                    self.process_volume_set, client, resource))
+            for f in as_completed(futures):
+                if f.exception():
+                    raise f.exception()
+                    self.log.error(
+                        "Exception creating snapshot set \n %s" % (
+                            f.exception()))
 
-    @utils.worker
-    def process_volume_set(self, resource):
-        c = utils.local_session(self.manager.session_factory).client('ec2')
+    def process_volume_set(self, client, resource):
         for block_device in resource['BlockDeviceMappings']:
             if 'Ebs' not in block_device:
                 continue
             volume_id = block_device['Ebs']['VolumeId']
             description = "Automated,Backup,%s,%s" % (
-                resource['InstanceId'],
-                volume_id)
+                resource['InstanceId'], volume_id)
+            tags = self.get_snapshot_tags(resource, block_device)
             try:
-                response = self.manager.retry(
-                    c.create_snapshot,
+                self.manager.retry(
+                    client.create_snapshot,
                     DryRun=self.manager.config.dryrun,
                     VolumeId=volume_id,
-                    Description=description)
+                    Description=description,
+                    TagSpecifications=[{
+                        'ResourceType': 'snapshot',
+                        'Tags': tags}])
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectState':
                     self.log.warning(
@@ -1135,34 +1257,28 @@ class Snapshot(BaseAction):
                     continue
                 raise
 
-            tags = [
-                {'Key': 'Name', 'Value': volume_id},
-                {'Key': 'InstanceId', 'Value': resource['InstanceId']},
-                {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
-                {'Key': 'custodian_snapshot', 'Value': ''}
-            ]
+    def get_snapshot_tags(self, resource, block_device):
+        tags = [
+            {'Key': 'Name', 'Value': block_device['Ebs']['VolumeId']},
+            {'Key': 'InstanceId', 'Value': resource['InstanceId']},
+            {'Key': 'DeviceName', 'Value': block_device['DeviceName']},
+            {'Key': 'custodian_snapshot', 'Value': ''}]
 
-            copy_keys = self.data.get('copy-tags', [])
-            copy_tags = []
-            if copy_keys:
-                for t in resource.get('Tags', []):
-                    if t['Key'] in copy_keys:
-                        copy_tags.append(t)
+        copy_keys = self.data.get('copy-tags', [])
+        copy_tags = []
+        if copy_keys:
+            for t in resource.get('Tags', []):
+                if t['Key'] in copy_keys:
+                    copy_tags.append(t)
 
             if len(copy_tags) + len(tags) > 40:
                 self.log.warning(
                     "action:%s volume:%s too many tags to copy" % (
                         self.__class__.__name__.lower(),
-                        volume_id))
+                        block_device['Ebs']['VolumeId']))
                 copy_tags = []
-
             tags.extend(copy_tags)
-            self.manager.retry(
-                c.create_tags,
-                DryRun=self.manager.config.dryrun,
-                Resources=[
-                    response['SnapshotId']],
-                Tags=tags)
+        return tags
 
 
 @actions.register('modify-security-groups')
@@ -1170,6 +1286,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
+    sg_expr = jmespath.compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):
@@ -1184,6 +1301,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 if i.get('c7n:matched-security-groups'):
                     eni['c7n:matched-security-groups'] = i[
                         'c7n:matched-security-groups']
+                if i.get('c7n:NetworkLocation'):
+                    eni['c7n:NetworkLocation'] = i[
+                        'c7n:NetworkLocation']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
@@ -1260,7 +1380,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 @actions.register('set-instance-profile')
 class SetInstanceProfile(BaseAction, StateTransitionFilter):
-    """Sets (or removes) the instance profile for a running EC2 instance.
+    """Sets (add, modify, remove) the instance profile for a running EC2 instance.
 
     :Example:
 
@@ -1288,40 +1408,159 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
-        profile_name = self.data.get('name', '')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name')
+        profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
+
+        if profile_instances:
+            associations = {
+                a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+                for a in client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {'Name': 'instance-id',
+                         'Values': [i['InstanceId'] for i in profile_instances]},
+                        {'Name': 'state', 'Values': ['associating', 'associated']}]
+                ).get('IamInstanceProfileAssociations', ())}
+        else:
+            associations = {}
 
         for i in instances:
-            if profile_name:
+            if profile_name and i['InstanceId'] not in associations:
                 client.associate_iam_instance_profile(
-                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    IamInstanceProfile={'Name': profile_name},
                     InstanceId=i['InstanceId'])
+                continue
+            # Removing profile and no profile on instance.
+            elif profile_name is None and i['InstanceId'] not in associations:
+                continue
+
+            p_assoc_id, p_arn = associations[i['InstanceId']]
+
+            # Already associated to target profile, skip
+            if profile_name and p_arn.endswith('/%s' % profile_name):
+                continue
+
+            if profile_name is None:
+                client.disassociate_iam_instance_profile(
+                    AssociationId=p_assoc_id)
             else:
-                response = client.describe_iam_instance_profile_associations(
-                    Filters=[
-                        {
-                            'Name': 'instance-id',
-                            'Values': [i['InstanceId']],
-                        },
-                        {
-                            'Name': 'state',
-                            'Values': ['associating', 'associated']
-                        }
-                    ]
-                )
-                for a in response['IamInstanceProfileAssociations']:
-                    client.disassociate_iam_instance_profile(
-                        AssociationId=a['AssociationId']
-                    )
+                client.replace_iam_instance_profile_association(
+                    IamInstanceProfile={'Name': profile_name},
+                    AssociationId=p_assoc_id)
 
         return instances
+
+
+@actions.register('propagate-spot-tags')
+class PropagateSpotTags(BaseAction):
+    """Propagate Tags that are set at Spot Request level to EC2 instances.
+
+    :Example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: ec2-spot-instances
+            resource: ec2
+          filters:
+            - State.Name: pending
+            - instanceLifecycle: spot
+          actions:
+            - type: propagate-spot-tags
+              only_tags:
+                - Name
+                - BillingTag
+    """
+
+    schema = type_schema(
+        'propagate-spot-tags',
+        **{'only_tags': {'type': 'array', 'items': {'type': 'string'}}})
+
+    permissions = (
+        'ec2:DescribeInstances',
+        'ec2:DescribeSpotInstanceRequests',
+        'ec2:DescribeTags',
+        'ec2:CreateTags')
+
+    MAX_TAG_COUNT = 50
+
+    def process(self, instances):
+        instances = [
+            i for i in instances if i['InstanceLifecycle'] == 'spot']
+        if not len(instances):
+            self.log.warning(
+                "action:%s no spot instances found, implicit filter by action" % (
+                    self.__class__.__name__.lower()))
+            return
+
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        request_instance_map = {}
+        for i in instances:
+            request_instance_map.setdefault(
+                i['SpotInstanceRequestId'], []).append(i)
+
+        # ... and describe the corresponding spot requests ...
+        requests = client.describe_spot_instance_requests(
+            Filters=[{
+                'Name': 'spot-instance-request-id',
+                'Values': list(request_instance_map.keys())}]).get(
+                    'SpotInstanceRequests', [])
+
+        updated = []
+        for r in requests:
+            if not r.get('Tags'):
+                continue
+            updated.extend(
+                self.process_request_instances(
+                    client, r, request_instance_map[r['SpotInstanceRequestId']]))
+        return updated
+
+    def process_request_instances(self, client, request, instances):
+        # Now we find the tags we can copy : either all, either those
+        # indicated with 'only_tags' parameter.
+        copy_keys = self.data.get('only_tags', [])
+        request_tags = {t['Key']: t['Value'] for t in request['Tags']
+                        if not t['Key'].startswith('aws:')}
+        if copy_keys:
+            for k in set(copy_keys).difference(request_tags):
+                del request_tags[k]
+
+        update_instances = []
+        for i in instances:
+            instance_tags = {t['Key']: t['Value'] for t in i.get('Tags', [])}
+            # We may overwrite tags, but if the operation changes no tag,
+            # we will not proceed.
+            for k, v in request_tags.items():
+                if k not in instance_tags or instance_tags[k] != v:
+                    update_instances.append(i['InstanceId'])
+
+            if len(set(instance_tags) | set(request_tags)) > self.MAX_TAG_COUNT:
+                self.log.warning(
+                    "action:%s instance:%s too many tags to copy (> 50)" % (
+                        self.__class__.__name__.lower(),
+                        i['InstanceId']))
+                continue
+
+        for iset in utils.chunks(update_instances, 20):
+            client.create_tags(
+                DryRun=self.manager.config.dryrun,
+                Resources=iset,
+                Tags=[{'Key': k, 'Value': v} for k, v in request_tags.items()])
+
+        self.log.debug(
+            "action:%s tags updated on instances:%r" % (
+                self.__class__.__name__.lower(),
+                update_instances))
+
+        return update_instances
 
 
 # Valid EC2 Query Filters
@@ -1368,18 +1607,18 @@ class QueryFilter(object):
 
     def validate(self):
         if not len(list(self.data.keys())) == 1:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filter Invalid %s" % self.data)
         self.key = list(self.data.keys())[0]
         self.value = list(self.data.values())[0]
 
         if self.key not in EC2_VALID_FILTERS and not self.key.startswith(
                 'tag:'):
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filter invalid filter name %s" % (self.data))
 
         if self.value is None:
-            raise ValueError(
+            raise PolicyValidationError(
                 "EC2 Query Filters must have a value, use tag-key"
                 " w/ tag name as value for tag present checks"
                 " %s" % self.data)
@@ -1391,3 +1630,71 @@ class QueryFilter(object):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+
+@filters.register('instance-attribute')
+class InstanceAttribute(ValueFilter):
+    """EC2 Instance Value FIlter on a given instance attribute.
+
+    Filters EC2 Instances with the given instance attribute
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-unoptimized-ebs
+            resource: ec2
+            filters:
+              - type: instance-attribute
+                attribute: ebsOptimized
+                key: "Value"
+                value: false
+    """
+
+    valid_attrs = (
+        'instanceType',
+        'kernel',
+        'ramdisk',
+        'userData',
+        'disableApiTermination',
+        'instanceInitiatedShutdownBehavior',
+        'rootDeviceName',
+        'blockDeviceMapping',
+        'productCodes',
+        'sourceDestCheck',
+        'groupSet',
+        'ebsOptimized',
+        'sriovNetSupport',
+        'enaSupport')
+
+    schema = type_schema(
+        'instance-attribute',
+        rinherit=ValueFilter.schema,
+        attribute={'enum': valid_attrs},
+        required=('attribute',))
+
+    def get_permissions(self):
+        return ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources, event=None):
+        attribute = self.data['attribute']
+        self.get_instance_attribute(resources, attribute)
+        return [resource for resource in resources
+                if self.match(resource['c7n:attribute-%s' % attribute])]
+
+    def get_instance_attribute(self, resources, attribute):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+
+        for resource in resources:
+            instance_id = resource['InstanceId']
+            fetched_attribute = self.manager.retry(
+                client.describe_instance_attribute,
+                Attribute=attribute,
+                InstanceId=instance_id)
+            keys = list(fetched_attribute.keys())
+            keys.remove('ResponseMetadata')
+            keys.remove('InstanceId')
+            resource['c7n:attribute-%s' % attribute] = fetched_attribute[
+                keys[0]]

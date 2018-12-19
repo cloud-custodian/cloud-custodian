@@ -1,64 +1,64 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "BackupDescription": {
             "BackupDetails": {
+                "BackupArn": "arn:aws:dynamodb:us-east-2:644160558196:table/omnissm-registrations/backup/01524841533037-4b25e487",
+                "BackupName": "registrations-backup",
+                "BackupSizeBytes": 901,
+                "BackupStatus": "DELETED",
                 "BackupCreationDateTime": {
-                    "hour": 19, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 2, 
-                    "microsecond": 9000, 
-                    "year": 2018, 
-                    "day": 16, 
-                    "minute": 39
-                }, 
-                "BackupSizeBytes": 0, 
-                "BackupArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup/backup/01516149542009-0bbfb894", 
-                "BackupStatus": "DELETED", 
-                "BackupName": "Backup-c7n-dynamodb-backup-2018-01-16-19-39"
-            }, 
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 27,
+                    "hour": 11,
+                    "minute": 5,
+                    "second": 33,
+                    "microsecond": 37000
+                }
+            },
             "SourceTableDetails": {
-                "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-dynamodb-backup", 
-                "ProvisionedThroughput": {
-                    "WriteCapacityUnits": 5, 
-                    "ReadCapacityUnits": 5
-                }, 
-                "TableSizeBytes": 0, 
-                "TableName": "c7n-dynamodb-backup", 
-                "TableId": "d4f0100b-96ea-4429-8cf4-53cce61719dd", 
+                "TableName": "omnissm-registrations",
+                "TableId": "9d9d6b94-8ee4-4fc6-bd1d-7ad29d7ce0ad",
+                "TableArn": "arn:aws:dynamodb:us-east-2:644160558196:table/omnissm-registrations",
+                "TableSizeBytes": 901,
                 "KeySchema": [
                     {
-                        "KeyType": "HASH", 
-                        "AttributeName": "test"
+                        "AttributeName": "id",
+                        "KeyType": "HASH"
                     }
-                ], 
-                "ItemCount": 0, 
+                ],
                 "TableCreationDateTime": {
-                    "hour": 19, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 40, 
-                    "microsecond": 237000, 
-                    "year": 2018, 
-                    "day": 9, 
-                    "minute": 56
-                }
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 26,
+                    "hour": 9,
+                    "minute": 9,
+                    "second": 53,
+                    "microsecond": 427000
+                },
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 5,
+                    "WriteCapacityUnits": 5
+                },
+                "ItemCount": 6
             }
-        }, 
+        },
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "UVS934F732NHF6T19OMH46HMEJVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "RequestId": "4K4H2568ELF4MCEBJ9D8E0NQJFVV4KQNSO5AEMVJF66Q9ASUAAJG",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "UVS934F732NHF6T19OMH46HMEJVV4KQNSO5AEMVJF66Q9ASUAAJG", 
-                "content-length": "684", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "x-amz-crc32": "954322717", 
-                "date": "Wed, 17 Jan 2018 00:39:03 GMT", 
-                "content-type": "application/x-amz-json-1.0"
-            }
+                "server": "Server",
+                "date": "Fri, 27 Apr 2018 15:06:21 GMT",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "669",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "4K4H2568ELF4MCEBJ9D8E0NQJFVV4KQNSO5AEMVJF66Q9ASUAAJG",
+                "x-amz-crc32": "3066664566"
+            },
+            "RetryAttempts": 0
         }
     }
 }

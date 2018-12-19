@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "StackId": "arn:aws:cloudformation:us-east-2:644160558196:stack/mytopic/7efb2d40-3a5d-11e8-8c44-500cef930ce6",
+        "ResponseMetadata": {
+            "RequestId": "57af247e-3a5f-11e8-9a16-0bc34bbf8d72",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "57af247e-3a5f-11e8-9a16-0bc34bbf8d72",
+                "content-type": "text/xml",
+                "content-length": "441",
+                "date": "Sat, 07 Apr 2018 12:29:40 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
