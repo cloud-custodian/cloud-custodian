@@ -137,16 +137,16 @@ class ModifyVpcSecurityGroupsAction(Action):
                 'Name': 'group-name', 'Values': names}]).get(
                     'SecurityGroups', [])
 
-        s_names = set(names)
+        unresolved = set(names)
         for s in sgs:
-            if s['GroupName'] in s_names:
-                s_names.remove(s['GroupName'])
+            if s['GroupName'] in unresolved:
+                unresolved.remove(s['GroupName'])
 
-        if s_names:
+        if unresolved:
             raise PolicyExecutionError(self._format_error(
                 "policy:{policy} security groups not found "
                 "requested: {names}, found: {groups}",
-                names=list(s_names), groups=[g['GroupId'] for g in sgs]))
+                names=list(unresolved), groups=[g['GroupId'] for g in sgs]))
         return sgs
 
     def resolve_group_names(self, r, target_group_ids, groups):
