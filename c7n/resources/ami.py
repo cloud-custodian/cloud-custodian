@@ -85,14 +85,14 @@ class Deregister(BaseAction):
     permissions = ('ec2:DeregisterImage',)
 
     def process(self, images):
-        with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_image, images))
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in images:
+            self.process_image(client, i)
 
-    def process_image(self, image):
+    def process_image(self, client, image):
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
 
-        client = local_session(self.manager.session_factory).client('ec2')
         retry(client.deregister_image, ImageId=image['ImageId'])
 
 
@@ -123,11 +123,11 @@ class RemoveLaunchPermissions(BaseAction):
     permissions = ('ec2:ResetImageAttribute',)
 
     def process(self, images):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_image, images))
-
-    def process_image(self, image):
         client = local_session(self.manager.session_factory).client('ec2')
+        for i in images:
+            self.process(client, i)
+
+    def process_image(self, client, image):
         client.reset_image_attribute(
             ImageId=image['ImageId'], Attribute="launchPermission")
 
