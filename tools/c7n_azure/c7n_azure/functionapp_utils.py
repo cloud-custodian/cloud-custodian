@@ -22,7 +22,7 @@ from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
 from c7n_azure.session import Session
-from c7n_azure.utils import ResourceIdParser
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class FunctionAppUtilities(object):
@@ -65,8 +65,8 @@ class FunctionAppUtilities(object):
         if function_app:
             return function_app
 
-        # provision a dedicated app service plan
-        if parameters.service_plan.get('sku_name') and parameters.service_plan.get('sku_tier'):
+        # provision app plan for non-consumption Function apps
+        if not StringUtils.equal(parameters.service_plan['tier'], 'dynamic'):
             sp_unit = AppServicePlanUnit()
             app_service_plan = sp_unit.provision_if_not_exists(parameters.service_plan)
             function_app_params.update({'location': app_service_plan.location,
