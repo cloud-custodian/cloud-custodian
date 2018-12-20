@@ -108,7 +108,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             'servicePlan',
             {
                 'name': 'cloud-custodian',
-                'location': 'westus',
+                'location': 'eastus',
                 'resource_group_name': 'cloud-custodian',
             })
 
