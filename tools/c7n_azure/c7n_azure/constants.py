@@ -11,7 +11,7 @@ FUNCTION_KEY_URL = 'hostruntime/admin/host/systemkeys/_master?api-version=2018-0
 """
 Event Grid Mode
 """
-EVENT_GRID_DEFAULT_NAME_JMES_PATH = \
+EVENT_GRID_UPN_CLAIM_JMES_PATH = \
     'data.claims."http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"'
 EVENT_GRID_SP_NAME_JMES_PATH = 'data.claims.appid'
 EVENT_GRID_SERVICE_ADMIN_JMES_PATH = \

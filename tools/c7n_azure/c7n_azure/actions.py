@@ -177,7 +177,7 @@ class AutoTagUser(EventAction):
     # compiled JMES paths
     service_admin_jmes_path = jmespath.compile(constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH)
     sp_jmes_path = jmespath.compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
-    default_jmes_path = jmespath.compile(constants.EVENT_GRID_DEFAULT_NAME_JMES_PATH)
+    upn_jmes_path = jmespath.compile(constants.EVENT_GRID_UPN_CLAIM_JMES_PATH)
     principal_role_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH)
     principal_type_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
 
@@ -238,8 +238,8 @@ class AutoTagUser(EventAction):
             elif StringUtils.equal(principal_type, 'ServicePrincipal'):
                 user = self.sp_jmes_path.search(event_item) or user
             # Other types (e.g. User, Office 365 Groups, and Security Groups)
-            elif self.default_jmes_path.search(event_item):
-                user = self.default_jmes_path.search(event_item)
+            elif self.upn_jmes_path.search(event_item):
+                user = self.upn_jmes_path.search(event_item)
             else:
                 self.log.error('Principal could not be determined.')
         else:
