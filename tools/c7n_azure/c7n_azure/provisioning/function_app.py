@@ -23,17 +23,18 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         site_config = SiteConfig(app_settings=[])
         functionapp_def = Site(location=params['location'], site_config=site_config)
 
+        # linux app
         functionapp_def.kind = 'functionapp,linux'
+        functionapp_def.reserved = True
 
-        # dedicated linux app plan
+        # dedicated app plan
         if params['app_service_plan_id']:
             functionapp_def.server_farm_id = params['app_service_plan_id']
             site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
             site_config.app_settings.append(
                 azure_name_value_pair('MACHINEKEY_DecryptionKey',
                                       FunctionAppDeploymentUnit.generate_machine_decryption_key()))
-
-        site_config.always_on = True
+            site_config.always_on = True
 
         app_insights_key = params['app_insights_key']
         if app_insights_key:

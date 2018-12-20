@@ -203,6 +203,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         client = local_session(self.policy.session_factory) \
             .client('azure.mgmt.web.WebSiteManagementClient')
 
+        # dedicated
         if self.function_app['server_farm_id']:
             publish_creds = client.web_apps.list_publishing_credentials(
                 self.function_params.function_app_resource_group_name,
