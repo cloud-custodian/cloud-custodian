@@ -152,7 +152,8 @@ class PostFinding(BaseAction):
         finding_tag = None
         tags = resource.get('Tags', [])
 
-        finding_key = '{}:{}'.format('c7n:FindingId',self.data.get('title', self.manager.ctx.policy.name))
+        finding_key = '{}:{}'.format('c7n:FindingId',
+            self.data.get('title', self.manager.ctx.policy.name))
 
         for t in tags:
             key = t['Key']
@@ -174,7 +175,7 @@ class PostFinding(BaseAction):
             grouped_resources[finding_tag].append(r)
 
         return grouped_resources
-        
+
     def process(self, resources, event=None):
         region_name = self.data.get('region', self.manager.config.region)
         client = local_session(
@@ -182,14 +183,14 @@ class PostFinding(BaseAction):
 
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
 
-        for key,grouped_resources in self.group_resources(resources).items():
+        for key, grouped_resources in self.group_resources(resources).items():
             for resource_set in chunks(grouped_resources, 10):
                 if key == 'New':
                     finding_id = None
                     created_at = now
                     updated_at = now
                 else:
-                    finding_id, created_at = self.get_finding_tag(resource_set[0]).split(':',1)
+                    finding_id, created_at = self.get_finding_tag(resource_set[0]).split(':', 1)
                     updated_at = now
 
                 finding = self.get_finding(resource_set, finding_id, created_at, updated_at)
@@ -285,10 +286,12 @@ class PostFinding(BaseAction):
             finding_resources.append(self.format_resource(r))
         finding["Resources"] = finding_resources
         finding["Types"] = list(self.data["types"])
-        
+
         if existing_finding_id:
             tag_action = self.manager.action_registry.get('tag')
-            tag_action({'key': '{}:{}'.format('c7n:FindingId', self.data.get('title', policy.name)), 'value': '{}:{}'.format(finding_id,created_at)}, self.manager).process(resources)
+            tag_action({'key': '{}:{}'.format('c7n:FindingId',
+                self.data.get('title', policy.name)),
+                'value': '{}:{}'.format(finding_id, created_at)}, self.manager).process(resources)
 
         return filter_empty(finding)
 
