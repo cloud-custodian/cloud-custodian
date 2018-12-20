@@ -15,6 +15,8 @@
 import logging
 from collections import defaultdict
 
+from c7n_azure.function_package import FunctionPackage
+
 from c7n.utils import local_session
 
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
@@ -83,3 +85,19 @@ class FunctionAppUtilities(object):
                                     'storage_account_connection_string': con_string})
 
         return function_app_unit.provision(function_app_params)
+
+    def publish_functions_package(self, function_params, package):
+        client = local_session(Session).client('azure.mgmt.web.WebSiteManagementClient')
+
+        # provision using Kudu
+        if not StringUtils.equal(function_params.service_plan['tier'], 'dynamic'):
+            publish_creds = client.web_apps.list_publishing_credentials(
+                self.function_params.function_app_resource_group_name,
+                self.function_params.function_app_name).result()
+
+            if package.wait_for_status(publish_creds):
+                package.publish(publish_creds)
+            else:
+                self.log.error("Aborted deployment, ensure Application Service is healthy.")
+        else:
+            self.log.info("Consumption Plan")
