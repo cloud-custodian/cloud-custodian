@@ -197,8 +197,12 @@ class PostFinding(BaseAction):
                     "finding=%s" % (finding))
 
                 import_response = client.batch_import_findings(Findings=[finding])
-                self.log.info(
-                    "import_response=%s" % (import_response))
+                if import_response['FailedCount'] > 0:
+                    self.log.error(
+                        "import_response=%s" % (import_response))    
+                else:
+                    self.log.debug(
+                        "import_response=%s" % (import_response))
 
     def get_finding(self, resources, existing_finding_id, created_at, updated_at):
         policy = self.manager.ctx.policy
