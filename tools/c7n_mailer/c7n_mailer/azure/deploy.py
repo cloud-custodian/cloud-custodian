@@ -113,7 +113,7 @@ def provision(config):
         function_app_resource_group_name=service_plan['resource_group_name'],
         function_app_name=function_app_name)
 
-    FunctionAppUtilities().deploy_function_app(params)
+    FunctionAppUtilities.deploy_function_app(params)
 
     log.info("Building function package for %s" % function_app_name)
     package = build_function_package(config, function_name)

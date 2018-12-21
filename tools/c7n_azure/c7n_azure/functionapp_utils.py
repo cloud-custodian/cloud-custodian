@@ -28,8 +28,7 @@ from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class FunctionAppUtilities(object):
-    def __init__(self):
-        self.log = logging.getLogger('custodian.azure.function_app_utils')
+    log = logging.getLogger('custodian.azure.function_app_utils')
 
     class FunctionAppInfrastructureParameters:
         def __init__(self, app_insights, service_plan, storage_account,
@@ -86,18 +85,19 @@ class FunctionAppUtilities(object):
 
         return function_app_unit.provision(function_app_params)
 
-    def publish_functions_package(self, function_params, package):
+    @classmethod
+    def publish_functions_package(cls, function_params, package):
         client = local_session(Session).client('azure.mgmt.web.WebSiteManagementClient')
 
         # provision using Kudu
         if not StringUtils.equal(function_params.service_plan['tier'], 'dynamic'):
             publish_creds = client.web_apps.list_publishing_credentials(
-                self.function_params.function_app_resource_group_name,
-                self.function_params.function_app_name).result()
+                function_params.function_app_resource_group_name,
+                function_params.function_app_name).result()
 
             if package.wait_for_status(publish_creds):
                 package.publish(publish_creds)
             else:
-                self.log.error("Aborted deployment, ensure Application Service is healthy.")
+                cls.log.error("Aborted deployment, ensure Application Service is healthy.")
         else:
-            self.log.info("Consumption Plan")
+            cls.log.info("Consumption Plan")

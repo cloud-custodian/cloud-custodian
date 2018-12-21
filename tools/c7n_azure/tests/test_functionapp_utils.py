@@ -27,7 +27,7 @@ CONST_GROUP_NAME = 'test_functionapp-reqs'
 class FunctionAppUtilsTest(BaseTest):
     def setUp(self):
         super(FunctionAppUtilsTest, self).setUp()
-        self.functionapp_util = FunctionAppUtilities()
+        self.functionapp_util = FunctionAppUtilities
 
     @arm_template('functionapp-reqs.json')
     def test_get_storage_connection_string(self):

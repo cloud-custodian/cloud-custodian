@@ -175,7 +175,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             sys.exit(1)
 
         self.function_params = self.get_function_app_params()
-        self.function_app = FunctionAppUtilities().deploy_function_app(self.function_params)
+        self.function_app = FunctionAppUtilities.deploy_function_app(self.function_params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
@@ -210,7 +210,7 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
     def provision(self):
         super(AzurePeriodicMode, self).provision()
         package = self.build_functions_package()
-        FunctionAppUtilities().publish_functions_package(self.function_params, package)
+        FunctionAppUtilities.publish_functions_package(self.function_params, package)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -248,7 +248,7 @@ class AzureEventGridMode(AzureFunctionMode):
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
         package = self.build_functions_package(queue_name)
-        FunctionAppUtilities().publish_functions_package(self.function_params, package)
+        FunctionAppUtilities.publish_functions_package(self.function_params, package)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
