@@ -188,14 +188,14 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.log.info("Building function package for %s" % self.function_params.function_app_name)
 
         package = FunctionPackage(self.policy_name)
-        self.log.info("Function package , size is %dMB" % (package.pkg.size / (1024 * 1024)))
-
         package.build(self.policy.data,
                       modules=['c7n', 'c7n-azure'],
                       non_binary_packages=['pyyaml', 'pycparser', 'tabulate'],
                       excluded_packages=['azure-cli-core', 'distlib', 'futures'],
                       queue_name=queue_name)
         package.close()
+
+        self.log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
         return package
 
 
