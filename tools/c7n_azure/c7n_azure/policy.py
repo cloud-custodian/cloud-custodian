@@ -110,11 +110,11 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'name': 'cloud-custodian',
                 'location': 'eastus',
                 'resource_group_name': 'cloud-custodian',
-                'tier': 'dynamic' #consumption
+                'tier': 'dynamic' # consumption plan
             })
 
         # Metadata used for automatic naming
-        location = service_plan.get('location', 'westus')
+        location = service_plan.get('location', 'eastus')
         rg_name = service_plan['resource_group_name']
         sub_id = session.get_subscription_id()
         target_sub_id = session.get_function_target_subscription_id()

@@ -55,6 +55,10 @@ class FunctionAppUtilities(object):
         return connection_string
 
     @staticmethod
+    def is_consumption_plan(function_params):
+        return StringUtils.equal(function_params.service_plan['tier'], 'dynamic')
+
+    @staticmethod
     def deploy_function_app(function_params):
         function_app_unit = FunctionAppDeploymentUnit()
         function_app_params = defaultdict(lambda: None)
@@ -68,7 +72,7 @@ class FunctionAppUtilities(object):
             return function_app
 
         # provision app plan for non-consumption Function apps
-        if not StringUtils.equal(function_params.service_plan['tier'], 'dynamic'):
+        if not FunctionAppUtilities.is_consumption_plan(function_params):
             sp_unit = AppServicePlanUnit()
             app_service_plan = sp_unit.provision_if_not_exists(function_params.service_plan)
             function_app_params.update({'location': app_service_plan.location,
@@ -94,7 +98,7 @@ class FunctionAppUtilities(object):
         cls.log.info('Publishing Function application')
 
         # provision using Kudu Zip-Deploy
-        if not StringUtils.equal(function_params.service_plan['tier'], 'dynamic'):
+        if not FunctionAppUtilities.is_consumption_plan(function_params):
             publish_creds = web_client.web_apps.list_publishing_credentials(
                 function_params.function_app_resource_group_name,
                 function_params.function_app_name).result()
@@ -137,7 +141,6 @@ class FunctionAppUtilities(object):
                 function_params.function_app_resource_group_name,
                 function_params.function_app_name)
             app_settings.properties['WEBSITE_RUN_FROM_PACKAGE'] = blob_url
-
             web_client.web_apps.update_application_settings(
                 function_params.function_app_resource_group_name,
                 function_params.function_app_name,
@@ -145,4 +148,4 @@ class FunctionAppUtilities(object):
                 properties=app_settings.properties
             )
 
-            cls.log.debug('Finished publishing Function application')
+            cls.log.info('Finished publishing Function application')
