@@ -55,30 +55,30 @@ class FunctionAppUtilities(object):
         return connection_string
 
     @staticmethod
-    def deploy_function_app(parameters):
+    def deploy_function_app(function_params):
         function_app_unit = FunctionAppDeploymentUnit()
         function_app_params = defaultdict(lambda: None)
         function_app_params.update({
-            'name': parameters.function_app_name,
-            'resource_group_name': parameters.function_app_resource_group_name,
-            'location': parameters.service_plan['location']})
+            'name': function_params.function_app_name,
+            'resource_group_name': function_params.function_app_resource_group_name,
+            'location': function_params.service_plan['location']})
 
         function_app = function_app_unit.get(function_app_params)
         if function_app:
             return function_app
 
         # provision app plan for non-consumption Function apps
-        if not StringUtils.equal(parameters.service_plan['tier'], 'dynamic'):
+        if not StringUtils.equal(function_params.service_plan['tier'], 'dynamic'):
             sp_unit = AppServicePlanUnit()
-            app_service_plan = sp_unit.provision_if_not_exists(parameters.service_plan)
+            app_service_plan = sp_unit.provision_if_not_exists(function_params.service_plan)
             function_app_params.update({'location': app_service_plan.location,
                                         'app_service_plan_id': app_service_plan.id})
 
         ai_unit = AppInsightsUnit()
-        app_insights = ai_unit.provision_if_not_exists(parameters.app_insights)
+        app_insights = ai_unit.provision_if_not_exists(function_params.app_insights)
 
         sa_unit = StorageAccountUnit()
-        storage_account_id = sa_unit.provision_if_not_exists(parameters.storage_account).id
+        storage_account_id = sa_unit.provision_if_not_exists(function_params.storage_account).id
         con_string = FunctionAppUtilities.get_storage_account_connection_string(storage_account_id)
 
         function_app_params.update({'app_insights_key': app_insights.instrumentation_key,
