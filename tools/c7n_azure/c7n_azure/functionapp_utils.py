@@ -11,20 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import datetime
 import logging
 from collections import defaultdict
 
-from c7n_azure.function_package import FunctionPackage
-
-from c7n.utils import local_session
-
+from azure.storage.blob import BlobPermissions
+from c7n_azure.constants import FUNCTION_CONSUMPTION_BLOB_CONTAINER, FUNCTION_PACKAGE_SAS_EXPIRY_DAYS
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
-from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
+from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.session import Session
+from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
+
+from c7n.utils import local_session
 
 
 class FunctionAppUtilities(object):
@@ -87,11 +88,14 @@ class FunctionAppUtilities(object):
 
     @classmethod
     def publish_functions_package(cls, function_params, package):
-        client = local_session(Session).client('azure.mgmt.web.WebSiteManagementClient')
+        session = local_session(Session)
+        web_client = session.client('azure.mgmt.web.WebSiteManagementClient')
 
-        # provision using Kudu
+        cls.log.info('Publishing Function application')
+
+        # provision using Kudu Zip-Deploy
         if not StringUtils.equal(function_params.service_plan['tier'], 'dynamic'):
-            publish_creds = client.web_apps.list_publishing_credentials(
+            publish_creds = web_client.web_apps.list_publishing_credentials(
                 function_params.function_app_resource_group_name,
                 function_params.function_app_name).result()
 
@@ -99,5 +103,46 @@ class FunctionAppUtilities(object):
                 package.publish(publish_creds)
             else:
                 cls.log.error("Aborted deployment, ensure Application Service is healthy.")
+        # provision using WEBSITE_RUN_FROM_PACKAGE
         else:
-            cls.log.info("Consumption Plan")
+            # fetch blob client
+            blob_client = StorageUtilities.get_blob_client_from_storage_account(
+                function_params.storage_account['resource_group_name'],
+                function_params.storage_account['name'],
+                session,
+                sas_generation=True
+            )
+
+            # create container for package
+            blob_client.create_container(FUNCTION_CONSUMPTION_BLOB_CONTAINER)
+
+            # upload package
+            blob_name = '%s.zip' % function_params.function_app_name
+            blob_client.create_blob_from_path(FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, package.pkg.path)
+
+            # create blob url for package
+            sas = blob_client.generate_blob_shared_access_signature(
+                FUNCTION_CONSUMPTION_BLOB_CONTAINER,
+                blob_name,
+                BlobPermissions.READ,
+                datetime.datetime.utcnow() + datetime.timedelta(days=FUNCTION_PACKAGE_SAS_EXPIRY_DAYS)  # expire in 10 years
+            )
+            blob_url = blob_client.make_blob_url(
+                FUNCTION_CONSUMPTION_BLOB_CONTAINER,
+                blob_name,
+                sas_token=sas)
+
+            # update application settings function package
+            app_settings = web_client.web_apps.list_application_settings(
+                function_params.function_app_resource_group_name,
+                function_params.function_app_name)
+            app_settings.properties['WEBSITE_RUN_FROM_PACKAGE'] = blob_url
+
+            web_client.web_apps.update_application_settings(
+                function_params.function_app_resource_group_name,
+                function_params.function_app_name,
+                kind=str,
+                properties=app_settings.properties
+            )
+
+            cls.log.debug('Finished publishing Function application')
