@@ -149,6 +149,8 @@ class PostFinding(BaseAction):
         },
     )
 
+    NEW_FINDING = 'New'
+
     def get_finding_tag(self, resource):
         finding_tag = None
         tags = resource.get('Tags', [])
@@ -166,7 +168,7 @@ class PostFinding(BaseAction):
     def group_resources(self, resources):
         grouped_resources = {}
         for r in resources:
-            finding_tag = self.get_finding_tag(r) or 'New'
+            finding_tag = self.get_finding_tag(r) or self.NEW_FINDING
             grouped_resources.setdefault(finding_tag, []).append(r)
         return grouped_resources
 
@@ -182,7 +184,7 @@ class PostFinding(BaseAction):
         for key, grouped_resources in self.group_resources(resources).items():
             for resource_set in chunks(grouped_resources, 10):
                 stats['Finding'] += 1
-                if key == 'New':
+                if key == self.NEW_FINDING:
                     finding_id = None
                     created_at = now
                     updated_at = now
@@ -199,8 +201,18 @@ class PostFinding(BaseAction):
                     stats['Failed'] += import_response['FailedCount']
                     self.log.error(
                         "import_response=%s" % (import_response))
-                elif key == 'New':
+                if key == self.NEW_FINDING:
                     stats['New'] += len(resource_set)
+                    # Tag resources with new finding ids
+                    tag_action = self.manager.action_registry.get('tag')
+                    tag_action({
+                        'key': '{}:{}'.format(
+                            'c7n:FindingId',
+                            self.data.get(
+                                'title', self.manager.ctx.policy.name)),
+                        'value': '{}:{}'.format(
+                            finding_id, created_at)},
+                        self.manager).process(resources)
                 else:
                     stats['Update'] += len(resource_set)
 
@@ -293,12 +305,6 @@ class PostFinding(BaseAction):
             finding_resources.append(self.format_resource(r))
         finding["Resources"] = finding_resources
         finding["Types"] = list(self.data["types"])
-
-        if existing_finding_id:
-            tag_action = self.manager.action_registry.get('tag')
-            tag_action({'key': '{}:{}'.format('c7n:FindingId',
-                self.data.get('title', policy.name)),
-                'value': '{}:{}'.format(finding_id, created_at)}, self.manager).process(resources)
 
         return filter_empty(finding)
 
