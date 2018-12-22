@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
 
@@ -165,45 +166,51 @@ class PostFinding(BaseAction):
     def group_resources(self, resources):
         grouped_resources = {}
         for r in resources:
-            finding_tag = self.get_finding_tag(r)
-            if not finding_tag:
-                finding_tag = 'New'
-
-            if not grouped_resources.get(finding_tag):
-                grouped_resources[finding_tag] = list()
-
-            grouped_resources[finding_tag].append(r)
-
+            finding_tag = self.get_finding_tag(r) or 'New'
+            grouped_resources.setdefault(finding_tag, []).append(r)
         return grouped_resources
 
     def process(self, resources, event=None):
         region_name = self.data.get('region', self.manager.config.region)
         client = local_session(
-            self.manager.session_factory).client("securityhub", region_name=region_name)
+            self.manager.session_factory).client(
+                "securityhub", region_name=region_name)
 
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
 
+        stats = Counter()
         for key, grouped_resources in self.group_resources(resources).items():
             for resource_set in chunks(grouped_resources, 10):
+                stats['Finding'] += 1
                 if key == 'New':
                     finding_id = None
                     created_at = now
                     updated_at = now
                 else:
-                    finding_id, created_at = self.get_finding_tag(resource_set[0]).split(':', 1)
+                    finding_id, created_at = self.get_finding_tag(
+                        resource_set[0]).split(':', 1)
                     updated_at = now
 
-                finding = self.get_finding(resource_set, finding_id, created_at, updated_at)
-                self.log.debug(
-                    "finding=%s" % (finding))
-
-                import_response = client.batch_import_findings(Findings=[finding])
+                finding = self.get_finding(
+                    resource_set, finding_id, created_at, updated_at)
+                import_response = client.batch_import_findings(
+                    Findings=[finding])
                 if import_response['FailedCount'] > 0:
+                    stats['Failed'] += import_response['FailedCount']
                     self.log.error(
                         "import_response=%s" % (import_response))
+                elif key == 'New':
+                    stats['New'] += len(resource_set)
                 else:
-                    self.log.debug(
-                        "import_response=%s" % (import_response))
+                    stats['Update'] += len(resource_set)
+
+        self.log.debug(
+            "policy:%s securityhub %d findings resources %d new %d updated %d failed",
+            self.manager.ctx.policy.name,
+            stats['Finding'],
+            stats['New'],
+            stats['Update'],
+            stats['Failed'])
 
     def get_finding(self, resources, existing_finding_id, created_at, updated_at):
         policy = self.manager.ctx.policy
