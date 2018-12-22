@@ -205,6 +205,8 @@ class PostFinding(BaseAction):
                     stats['New'] += len(resource_set)
                     # Tag resources with new finding ids
                     tag_action = self.manager.action_registry.get('tag')
+                    if tag_action is None:
+                        continue
                     tag_action({
                         'key': '{}:{}'.format(
                             'c7n:FindingId',
