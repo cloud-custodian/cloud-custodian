@@ -15,6 +15,7 @@
 import logging
 
 import c7n_gcp.policy
+import c7n_gcp.resources.bigquery
 import c7n_gcp.resources.build
 import c7n_gcp.resources.compute
 import c7n_gcp.resources.function

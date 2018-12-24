@@ -134,7 +134,8 @@ class QueryResourceManager(ResourceManager):
                 'component': self.resource_type.component}
 
     def get_resource(self, resource_info):
-        return self.resource_type.get(self.get_client(), resource_info)
+        return self.augment(
+            [self.resource_type.get(self.get_client(), resource_info)])[0]
 
     @property
     def source_type(self):
@@ -197,6 +198,8 @@ class TypeInfo(object):
 
     # individual resource retrieval method, for serverless policies.
     get = None
+    # for get methods that require the full event payload
+    get_requires_event = False
 
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')
