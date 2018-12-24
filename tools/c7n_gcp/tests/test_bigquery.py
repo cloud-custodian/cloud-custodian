@@ -30,4 +30,3 @@ class BigQueryDataSetTest(BaseTest):
             'devxyz')
         self.assertTrue('access' in dataset)
         self.assertEqual(dataset['labels'], {'env': 'dev'})
-
