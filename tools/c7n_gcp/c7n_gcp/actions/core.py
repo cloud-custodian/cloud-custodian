@@ -82,6 +82,4 @@ class MethodAction(Action):
 
     def get_client(self, session, model):
         return session.client(
-            model.service, model.version, model.component)        
-        
-
+            model.service, model.version, model.component)

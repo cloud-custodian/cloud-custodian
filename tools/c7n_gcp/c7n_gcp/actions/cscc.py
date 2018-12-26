@@ -23,16 +23,13 @@ class PostFinding(MethodAction):
                 'patternProperties': {'^*': {'type': 'string'}},
                 'additionalProperties': False}})
 
-    method_spec = {
-        'op': 'create',
-        'result': 'name',
-        'annotation_key': 'c7n:Finding'}
+    method_spec = {'op': 'create', 'result': 'name', 'annotation_key': 'c7n:Finding'}
     CustodianSourceName = 'CloudCustodian'
     Service = 'securitycenter'
     ServiceVersion = 'v1beta1'
 
     _source = None
-        
+
     def validate(self):
         if not any([self.data.get(k) for k in ('source', 'org-domain', 'org-id')]):
             raise PolicyValidationError(
@@ -71,8 +68,9 @@ class PostFinding(MethodAction):
         # Resolve Source
         client = session.client(self.Service, self.ServiceVersion, 'organizations.sources')
         source = None
-        res = [s for s in client.execute_query(
-            'list', {'name': 'organizations/{}'.format(org_id)}).get('sources')
+        res = [s for s in
+               client.execute_query(
+                   'list', {'name': 'organizations/{}'.format(org_id)}).get('sources')
                if s['name'] == self.CustodianSourceName]
         if res:
             source = res[0]['name']
@@ -125,4 +123,3 @@ class PostFinding(MethodAction):
         }
 
         return finding
-        
