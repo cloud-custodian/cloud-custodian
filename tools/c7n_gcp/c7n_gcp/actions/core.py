@@ -63,7 +63,7 @@ class MethodAction(Action):
             resources = self.filter_resources(resources)
         m = self.manager.get_model()
         session = local_session(self.manager.session_factory)
-        client = session.client(m.service, m.version, m.component)
+        client = self.get_client(session, m)
         for resource_set in chunks(resources, self.chunk_size):
             self.process_resource_set(client, m, resource_set)
 
@@ -79,3 +79,9 @@ class MethodAction(Action):
 
     def get_resource_params(self, m, r):
         raise NotImplementedError("subclass responsibility")
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)        
+        
+
