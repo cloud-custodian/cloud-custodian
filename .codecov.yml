@@ -15,11 +15,14 @@ coverage:
     project:
       azure:
         paths: "tools/c7n_azure"
+        threshold: "1%"
       gcp:
         paths: "tools/c7n_gcp"
+        threshold: "1%"
       # aws is weaved throughout core atm can't easily call it out separately
       mailer:
         paths: "tools/c7n_mailer"
+        threshold: "2%"
       custodian:
         threshold: "0.05%"
         paths:
