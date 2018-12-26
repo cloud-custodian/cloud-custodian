@@ -286,12 +286,20 @@ import sys
 
 def run(event, context=None):
     logging.info("starting function execution")
-    event = json.loads(base64.b64decode(event['data']).decode('utf-8'))
+
+    trigger_type = os.environ.get('FUNCTION_TRIGGER_TYPE', '')
+    if trigger_type == 'HTTP_TRIGGER':
+        event = {'request': event}
+    else:
+        event = json.loads(base64.b64decode(event['data']).decode('utf-8'))
     print("Event: %s" % (event,))
+
     try:
         from c7n_gcp.handler import run
         result = run(event, context)
         logging.info("function execution complete")
+        if trigger_type == 'HTTP_TRIGGER':
+            return json.dumps(result), 200, (('Content-Type', 'application/json'),)
         return result
     except Exception as e:
         traceback.print_exc()
