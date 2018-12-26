@@ -14,6 +14,7 @@
 
 import time
 
+from c7n.exceptions import PolicyValidationError
 from c7n.testing import functional
 from c7n_gcp import mu
 from gcp_common import BaseTest
@@ -52,6 +53,43 @@ class FunctionTest(BaseTest):
         self.assertEqual(
             func_info['name'],
             'projects/custodian-1291/locations/us-central1/functions/custodian-dev')
+
+    def test_periodic_validate_tz(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'instance-off',
+             'resource': 'gcp.instance',
+             'mode': {'type': 'gcp-periodic',
+                      'schedule': 'every 2 hours',
+                      'tz': 'zulugold'}})
+
+    def test_periodic_update_schedule(self):
+        factory = self.replay_flight_data(
+            'mu-perodic-update-schedule', project_id='test-226520')
+        session = factory()
+        project_id = session.get_default_project()
+        region = 'us-central1'
+
+        sched_client = session.client('cloudscheduler', 'v1beta1', 'projects.locations.jobs')
+        job_v1 = sched_client.execute_query(
+            'get',
+            {'name': 'projects/{}/locations/{}/jobs/{}'.format(
+                project_id, region, 'custodian-auto-gcp-find-instances')})
+
+        p = self.load_policy({
+            'name': 'gcp-find-instances',
+            'resource': 'gcp.instance',
+            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            session_factory=factory)
+        p.run()
+
+        job_v2 = sched_client.execute_query(
+            'get',
+            {'name': 'projects/{}/locations/{}/jobs/{}'.format(
+                project_id, region, 'custodian-auto-gcp-find-instances')})
+        self.assertEqual(job_v1['schedule'], 'every 3 hours')
+        self.assertEqual(job_v2['schedule'], 'every 2 hours')
 
     @functional
     def test_periodic_subscriber(self):
