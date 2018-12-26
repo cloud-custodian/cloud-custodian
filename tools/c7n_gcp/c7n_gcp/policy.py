@@ -33,6 +33,7 @@ class FunctionMode(ServerlessExecutionMode):
            'network': {'type': 'string'},
            'region': {'type': 'string'},
            'max-instances': {'type': 'integer'},
+           'service-account': {'type': 'string'},
            'environment': {'type': 'object'}})
 
     def __init__(self, policy):
@@ -120,7 +121,7 @@ class ApiAuditMode(FunctionMode):
     def _get_function(self):
         events = [mu.ApiSubscriber(
             local_session(self.policy.session_factory),
-            {'methods': self.policy.data['mode']['methods']})]
+            self.policy.data['mode'])]
         return mu.PolicyFunction(self.policy, events=events)
 
     def validate(self):

@@ -223,6 +223,10 @@ class CloudFunction(object):
         return self.func_data.get('memory-size', 512)
 
     @property
+    def service_account(self):
+        return self.func_data.get('service-account', None)
+
+    @property
     def runtime(self):
         return self.func_data.get('runtime', 'python37')
 
@@ -268,6 +272,9 @@ class CloudFunction(object):
 
         if self.max_instances:
             conf['maxInstances'] = self.max_instances
+
+        if self.service_account:
+            conf['serviceAccountEmail'] = self.service_account
 
         for e in self.events:
             conf.update(e.get_config(self))
@@ -522,11 +529,7 @@ class PeriodicEvent(EventSource):
         client = self.session.client(
             'cloudscheduler', 'v1beta1', 'projects.locations.jobs')
 
-        return client.execute_command(
-            'delete', {'name': 'projects/{}/locations/{}/jobs/{}'.format(
-                self.session.get_default_project(),
-                self.data.get('region', DEFAULT_REGION),
-                job['name'])})
+        return client.execute_command('delete', {'name': job['name']})
 
     # Periodic impl
 

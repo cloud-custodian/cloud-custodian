@@ -54,6 +54,44 @@ class FunctionTest(BaseTest):
             'projects/custodian-1291/locations/us-central1/functions/custodian-dev')
 
     @functional
+    def test_periodic_subscriber(self):
+        factory = self.replay_flight_data('mu-perodic', project_id='test-226520')
+        p = self.load_policy({
+            'name': 'instance-off',
+            'resource': 'gcp.instance',
+            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            session_factory=factory)
+
+        p.provision()
+
+        session = factory()
+        project_id = session.get_default_project()
+        region = 'us-central1'
+
+        func_client = session.client('cloudfunctions', 'v1', 'projects.locations.functions')
+
+        # check function exists
+        func_info = func_client.execute_command(
+            'get', {'name': 'projects/{}/locations/{}/functions/instance-off'.format(
+                project_id, region)})
+        self.assertEqual(
+            "https://{}-{}.cloudfunctions.net/{}".format(
+                region, project_id, 'instance-off'),
+            func_info['httpsTrigger']['url'])
+
+        sched_client = session.client('cloudscheduler', 'v1beta1', 'projects.locations.jobs')
+        job = sched_client.execute_query(
+            'get',
+            {'name': 'projects/{}/locations/{}/jobs/{}'.format(
+                project_id, region, 'custodian-auto-instance-off')})
+        self.assertEqual(job['schedule'], 'every 2 hours')
+        self.assertEqual(job['timeZone'], 'Etc/UTC')
+
+        if self.recording:
+            time.sleep(52)
+        p.get_execution_mode().deprovision()
+
+    @functional
     def test_api_subscriber(self):
         # integration styled..
 
