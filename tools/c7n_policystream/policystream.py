@@ -357,15 +357,27 @@ class PolicyRepo(object):
 
     def _policy_file_rev(self, f, commit):
         try:
-            return PolicyCollection.from_data(
-                yaml.safe_load(self.repo.get(commit.tree[f].id).data),
-                Config.empty(), f)
+            return self._validate_policies(
+                PolicyCollection.from_data(
+                    yaml.safe_load(self.repo.get(commit.tree[f].id).data),
+                    Config.empty(), f))
         except Exception as e:
             log.warning(
                 "invalid policy file %s @ %s %s %s \n error:%s",
                 f, str(commit.id)[:6], commit_date(commit).isoformat(),
                 commit.author.name, e)
             return PolicyCollection()
+
+    def _validate_policies(self, policies):
+        res = []
+        for p in policies:
+            try:
+                p.resource_type
+                p.name
+            except KeyError:
+                continue
+            res.append(p)
+        return PolicyCollection(res)
 
     def _process_stream_commit(self, change):
         if not change.parents:
@@ -433,8 +445,12 @@ class PolicyRepo(object):
             elif pchange.kind in (ChangeType.MOVED, ChangeType.MODIFIED):
                 if pchange.policy.file_path != pchange.previous.file_path:
                     self.policy_files[pchange.previous.file_path].remove(pchange.previous)
-                    self.policy_files.setdefault(
-                        pchange.file_path, PolicyCollection()).add(pchange.policy)
+                    if (pchange.policy.file_path in self.policy_files and
+                            pchange.policy.name in self.policy_files[pchange.file_path]):
+                        self.policy_files[pchange.file_path][pchange.policy.name] = pchange.policy
+                    else:
+                        self.policy_files.setdefault(
+                            pchange.file_path, PolicyCollection()).add(pchange.policy)
                 else:
                     self.policy_files[pchange.file_path][pchange.policy.name] = pchange.policy
             yield pchange

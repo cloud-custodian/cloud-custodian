@@ -57,6 +57,8 @@ class ApiAuditMode(FunctionMode):
     def resolve_resources(self, event):
         """Resolve a gcp resource from its audit trail metadata.
         """
+        if self.policy.resource_manager.resource_type.get_requires_event:
+            return [self.policy.resource_manager.get_resource(event)]
         resource_info = event.get('resource')
         if resource_info is None or 'labels' not in resource_info:
             self.policy.log.warning("Could not find resource information in event")

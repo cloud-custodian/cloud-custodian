@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import functools
+import json
 import os
 import shutil
 
@@ -29,6 +30,13 @@ load_resources()
 PROJECT_ID = ""
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data', 'flights')
+
+EVENT_DIR = os.path.join(os.path.dirname(__file__), 'data', 'events')
+
+
+def event_data(fname):
+    with open(os.path.join(EVENT_DIR, fname)) as fh:
+        return json.load(fh)
 
 
 class FlightRecorderTest(TestUtils):
