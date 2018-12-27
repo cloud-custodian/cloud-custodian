@@ -53,7 +53,7 @@ jobs:
   - script: tox
     displayName: 'Tox'
 
-  - script: python tools/ops/cicov.py
+  - script: python tools/dev/cicov.py
     displayName: 'Publish Code Coverage'
     condition: "eq(variables['python.version'], '2.7')"
     env:
