@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "74690c0c-0a30-11e9-affc-9f2589191868",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 27 Dec 2018 23:38:03 GMT",
+                "content-type": "application/json",
+                "content-length": "1969",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "74690c0c-0a30-11e9-affc-9f2589191868"
+            },
+            "RetryAttempts": 0
+        },
+        "Configuration": {
+            "FunctionName": "check",
+            "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:check",
+            "Runtime": "python2.7",
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+            "Handler": "lambda_function.lambda_handler",
+            "CodeSize": 301,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2018-11-26T19:01:38.558+0000",
+            "CodeSha256": "D8RkghLf4BvG73/MkNcD780zBP/urgq4HCwGd9ixmGU=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "d384566d-3528-4b18-bcca-e4c4a7389501"
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://awslambda-us-east-2-tasks.s3.us-east-2.amazonaws.com/snapshots/644160558196/check-39b4d582-5bd6-425c-a61f-79c0dd21a00e?versionId=APglqTvtERzZCXz8wfQ6dAanMKurGjie&X-Amz-Security-Token=FQoGZXIvYXdzEAgaDPqmFGi0TlZUDgjQfCK3A52CZ7817R0jMqrar8BBi2Xp1bNwNPEl%2Fl3oQZvv3sGbzhpFzyhdgAMm5KAiZStVu9fwzCaln3u4yNl4BWFYoBtFN1d9vJeLMq7q4uESTi6fUOFDm%2B8HtvRUBkpqALdEUM2w45SN52IUniZebAKJyB6qCFSOJX3rHg2wlxtBq3cOSlobAPuVEWm%2BspvFR%2FYZ26sUsy1qWmp6e5scbmEb%2B2akyTOll5aKXf6Lbp7UXZSLKjRFOO8PqXkDzM7Kl4SuU1FFpg9uyg03gi6CcROrlrvEoNjMNs4IlpZnXx7g9SIEDc18G1TqPT3c3ufc3kd8t3nFbxnuDYVs8AqrqaeZxV4s6nO4MJKVyO092r%2FuqQ6vjKWhwIeYzAFv4fMxFrAM4EnXoPoO9vqfAj9Sz0nLLuZkXbk67sZKxgggeLT1UxKf2JixBwIAFJS01mJ%2FsNxdQnYsHO%2BegSsEEs0a3faclTJXZy%2B9PF47O13da9SR%2FQeEJJwovPwUYrtrOr4yRrt8dzb5W5WyPR1pRZRYPdXRl9FwLQxnOakjl4ZZzCtSZIITPFxwUZf%2FxDZAeWNv0ZzU4zF6vNAqODcox6CV4QU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20181227T233803Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIARQRML75E5XZ2QXNF%2F20181227%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=fe786fcdd5580127de626352995bb22cf217cbe3a596318f7cfee26c3621db7a"
+        },
+        "Tags": {
+            "Dev": "Test",
+            "c7n:FindingId:sec-hub-lambda": "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23:2018-12-27T23:35:58.406869+00:00"
+        }
+    }
+}

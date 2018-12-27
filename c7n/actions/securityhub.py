@@ -158,6 +158,11 @@ class PostFinding(BaseAction):
         finding_key = '{}:{}'.format('c7n:FindingId',
             self.data.get('title', self.manager.ctx.policy.name))
 
+        # Support Tags as dictionary
+        if isinstance(tags, dict):
+            return tags.get(finding_key)
+
+        # Support Tags as list of {'Key': 'Value'}
         for t in tags:
             key = t['Key']
             value = t['Value']
@@ -213,7 +218,7 @@ class PostFinding(BaseAction):
                             self.data.get(
                                 'title', self.manager.ctx.policy.name)),
                         'value': '{}:{}'.format(
-                            finding_id, created_at)},
+                            finding['Id'], created_at)},
                         self.manager).process(resources)
                 else:
                     stats['Update'] += len(resource_set)
