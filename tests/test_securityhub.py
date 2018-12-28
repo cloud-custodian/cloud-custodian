@@ -105,14 +105,13 @@ class SecurityHubTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         func_post_exec = client.get_function(FunctionName='check')
-        self.maxDiff = None
         self.assertEqual(
-            func_post_exec['Tags']['c7n:FindingId:sec-hub-lambda'].rsplit(":", 1)[0],
+            func_post_exec['Tags']['c7n:FindingId:sec-hub-lambda'].split(":", 1)[0],
             LambdaFindingId)
 
     def test_lambda_update(self):
         # test lambda function via post finding, uses tag to update finding.
-        factory = self.record_flight_data('test_security_hub_lambda_update')
+        factory = self.replay_flight_data('test_security_hub_lambda_update')
 
         client = factory().client("securityhub", region_name='us-east-2')
         finding_v1 = client.get_findings(
