@@ -13,8 +13,10 @@
 # limitations under the License.
 import logging
 
+from dateutil.tz import tz
+
 from c7n.exceptions import PolicyValidationError
-from c7n.policy import execution, ServerlessExecutionMode
+from c7n.policy import execution, ServerlessExecutionMode, PullMode
 from c7n.utils import local_session, type_schema
 
 from c7n_gcp import mu
@@ -23,13 +25,15 @@ from c7n_gcp import mu
 class FunctionMode(ServerlessExecutionMode):
 
     schema = type_schema(
-        'gcp-audit',
+        'gcp',
         **{'execution-options': {'type': 'object'},
            'timeout': {'type': 'string'},
            'memory-size': {'type': 'integer'},
            'labels': {'type': 'object'},
            'network': {'type': 'string'},
+           'region': {'type': 'string'},
            'max-instances': {'type': 'integer'},
+           'service-account': {'type': 'string'},
            'environment': {'type': 'object'}})
 
     def __init__(self, policy):
@@ -39,8 +43,54 @@ class FunctionMode(ServerlessExecutionMode):
     def run(self):
         raise NotImplementedError("subclass responsibility")
 
+    def provision(self):
+        self.log.info("Provisioning policy function %s", self.policy.name)
+        manager = mu.CloudFunctionManager(self.policy.session_factory)
+        return manager.publish(self._get_function())
+
+    def deprovision(self):
+        manager = mu.CloudFunctionManager(self.policy.session_factory)
+        return manager.remove(self._get_function())
+
     def validate(self):
         pass
+
+    def _get_function(self):
+        raise NotImplementedError("subclass responsibility")
+
+
+@execution.register('gcp-periodic')
+class PeriodicMode(FunctionMode, PullMode):
+
+    schema = type_schema(
+        'gcp-periodic',
+        rinherit=FunctionMode.schema,
+        required=['schedule'],
+        **{'trigger-type': {'enum': ['http', 'pubsub']},
+           'tz': {'type': 'string'},
+           'schedule': {'type': 'string'}})
+
+    def validate(self):
+        mode = self.policy.data['mode']
+        if 'tz' in mode:
+            error = PolicyValidationError(
+                "policy:%s gcp-periodic invalid tz:%s" % (
+                    self.policy.name, mode['tz']))
+            # We can't catch all errors statically, our local tz retrieval
+            # then the form gcp is using, ie. not all the same aliases are
+            # defined.
+            tzinfo = tz.gettz(mode['tz'])
+            if tzinfo is None:
+                raise error
+
+    def _get_function(self):
+        events = [mu.PeriodicEvent(
+            local_session(self.policy.session_factory),
+            self.policy.data['mode'])]
+        return mu.PolicyFunction(self.policy, events=events)
+
+    def run(self, event, context):
+        return PullMode.run(self)
 
 
 @execution.register('gcp-audit')
@@ -73,17 +123,8 @@ class ApiAuditMode(FunctionMode):
     def _get_function(self):
         events = [mu.ApiSubscriber(
             local_session(self.policy.session_factory),
-            {'methods': self.policy.data['mode']['methods']})]
+            self.policy.data['mode'])]
         return mu.PolicyFunction(self.policy, events=events)
-
-    def provision(self):
-        self.log.info("Provisioning policy function %s", self.policy.name)
-        manager = mu.CloudFunctionManager(self.policy.session_factory)
-        return manager.publish(self._get_function())
-
-    def deprovision(self):
-        manager = mu.CloudFunctionManager(self.policy.session_factory)
-        return manager.remove(self._get_function())
 
     def validate(self):
         if not self.policy.resource_manager.resource_type.get:
