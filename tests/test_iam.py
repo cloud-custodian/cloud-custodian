@@ -88,7 +88,7 @@ class UserCredentialReportTest(BaseTest):
                  "report_max_age": 1543724277,
                  "key": "access_keys.last_used_date",
                  "value": 30,
-                 'op': 'less-than',
+                 'op': 'greater-than',
                  "value_type": "age"},
                 {"type": "credential",
                  "report_max_age": 1543724277,
