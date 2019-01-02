@@ -30,6 +30,8 @@ import (
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/servicectl"
 )
 
+const ClientVersion = "1.2.0"
+
 type Client struct {
 	*http.Client
 
@@ -42,7 +44,7 @@ type Client struct {
 
 // New returns a new client for the registrations API
 func NewClient(url string) (*Client, error) {
-	s, err := servicectl.New("amazon-ssm-agent")
+	s, err := servicectl.New(AmazonSSMAgentServiceName)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +55,7 @@ func NewClient(url string) (*Client, error) {
 		registrationURL: url,
 		service:         s,
 	}
-	c.ManagedId, _ = ssm.ReadRegistrationFile(ssm.DefaultLinuxSSMRegistrationPath)
+	c.ManagedId, _ = ssm.ReadRegistrationFile(ssm.DefaultSSMRegistrationPath)
 	return c, nil
 }
 
@@ -62,9 +64,10 @@ func NewClient(url string) (*Client, error) {
 // should an existing one not be found in the registrations table.
 func (c *Client) Register() error {
 	data, err := json.Marshal(RegistrationRequest{
-		Provider:  "aws",
-		Document:  c.document,
-		Signature: c.signature,
+		Provider:      "aws",
+		Document:      c.document,
+		Signature:     c.signature,
+		ClientVersion: ClientVersion,
 	})
 	if err != nil {
 		return errors.Wrap(err, "cannot marshal new registration request")
@@ -112,10 +115,11 @@ func (c *Client) Update() error {
 	}
 	c.ManagedId = info.InstanceId
 	data, err := json.Marshal(RegistrationRequest{
-		Provider:  "aws",
-		Document:  c.document,
-		Signature: c.signature,
-		ManagedId: info.InstanceId,
+		Provider:      "aws",
+		Document:      c.document,
+		Signature:     c.signature,
+		ManagedId:     info.InstanceId,
+		ClientVersion: ClientVersion,
 	})
 	if err != nil {
 		return errors.Wrap(err, "cannot marshal registration request")

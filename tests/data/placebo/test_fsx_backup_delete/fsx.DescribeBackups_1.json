@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-0d1fb25003287b260",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 12,
+                    "hour": 11,
+                    "minute": 2,
+                    "second": 36,
+                    "microsecond": 906000
+                },
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-0d1fb25003287b260",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-002ccbccdcf032728",
+                    "StorageCapacity": 300,
+                    "WindowsConfiguration": {
+                        "ActiveDirectoryId": "d-9067141d9e",
+                        "WeeklyMaintenanceStartTime": "4:10:30",
+                        "DailyAutomaticBackupStartTime": "04:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "CopyTagsToBackups": false
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "567e802d-887f-494a-8413-067cc2ff4d16",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 14 Dec 2018 19:53:12 GMT",
+                "x-amzn-requestid": "567e802d-887f-494a-8413-067cc2ff4d16",
+                "content-length": "2425",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

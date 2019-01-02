@@ -46,6 +46,7 @@ def load_resources():
     import c7n.resources.cw
     import c7n.resources.directory
     import c7n.resources.directconnect
+    import c7n.resources.dlm
     import c7n.resources.dms
     import c7n.resources.dynamodb
     import c7n.resources.datapipeline
@@ -92,6 +93,8 @@ def load_resources():
     import c7n.resources.vpc
     import c7n.resources.waf
     import c7n.resources.guardduty
+    import c7n.resources.fsx
+
 
     # Load external plugins (private sdks etc)
     from c7n.manager import resources

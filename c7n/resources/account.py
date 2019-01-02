@@ -23,8 +23,10 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema
 
@@ -33,6 +35,9 @@ from c7n.resources.iam import CredentialReport
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
+
+
+filters.register('missing', Missing)
 
 
 def get_account(session_factory, config):
@@ -60,6 +65,9 @@ class Account(ResourceManager):
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
 
+    def get_arns(self, resources):
+        return ["arn:::{account_id}".format(**r) for r in resources]
+
     def get_model(self):
         return self.resource_type
 
@@ -81,7 +89,7 @@ class AccountCredentialReport(CredentialReport):
         results = []
         info = report.get('<root_account>')
         for r in resources:
-            if self.match(info):
+            if self.match(r, info):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
@@ -608,6 +616,12 @@ def cloudtrail_policy(original, bucket_name, account_id):
     return json.dumps(policy)
 
 
+# AWS Account doesn't participate in events (not based on query resource manager)
+# so the event subscriber used by postfinding to register doesn't apply, manually
+# register it.
+Account.action_registry.register('post-finding', OtherResourcePostFinding)
+
+
 @actions.register('enable-cloudtrail')
 class EnableTrail(BaseAction):
     """Enables logging on the trail(s) named in the policy
@@ -928,8 +942,7 @@ class ShieldEnabled(Filter):
 
     def process(self, resources, event=None):
         state = self.data.get('state', False)
-        client = self.manager.session_factory().client('shield')
-
+        client = local_session(self.manager.session_factory).client('shield')
         try:
             subscription = client.describe_subscription().get(
                 'Subscription', None)
@@ -958,7 +971,7 @@ class SetShieldAdvanced(BaseAction):
         state={'type': 'boolean'})
 
     def process(self, resources):
-        client = self.manager.session_factory().client('shield')
+        client = local_session(self.manager.session_factory).client('shield')
         state = self.data.get('state', True)
 
         if state:
@@ -970,3 +983,188 @@ class SetShieldAdvanced(BaseAction):
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
                     return
                 raise
+
+
+@filters.register('xray-encrypt-key')
+class XrayEncrypted(Filter):
+    """Determine if xray is encrypted.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: xray-encrypt-with-default
+                resource: aws.account
+                filters:
+                  - type: xray-encrypt-key
+                    key: default
+              - name: xray-encrypt-with-kms
+                  - type: xray-encrypt-key
+                    key: kms
+              - name: xray-encrypt-with-specific-key
+                  -type: xray-encrypt-key
+                   key: alias/my-alias or arn or keyid
+    """
+
+    permissions = ('xray:GetEncryptionConfig',)
+    schema = type_schema(
+        'xray-encrypt-key',
+        required=['key'],
+        key={'type': 'string'}
+    )
+
+    def process(self, resources, event=None):
+        client = self.manager.session_factory().client('xray')
+        gec_result = client.get_encryption_config()['EncryptionConfig']
+        resources[0]['c7n:XrayEncryptionConfig'] = gec_result
+
+        k = self.data.get('key')
+        if k not in ['default', 'kms']:
+            kmsclient = self.manager.session_factory().client('kms')
+            keyid = kmsclient.describe_key(KeyId=k)['KeyMetadata']['Arn']
+            rc = resources if (gec_result['KeyId'] == keyid) else []
+        else:
+            kv = 'KMS' if self.data.get('key') == 'kms' else 'NONE'
+            rc = resources if (gec_result['Type'] == kv) else []
+        return rc
+
+
+@actions.register('set-xray-encrypt')
+class SetXrayEncryption(BaseAction):
+    """Enable specific xray encryption.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: xray-default-encrypt
+                resource: aws.account
+                actions:
+                  - type: set-xray-encrypt
+                    key: default
+              - name: xray-kms-encrypt
+                  - type: set-xray-encrypt
+                    key: alias/some/alias/ke
+    """
+
+    permissions = ('xray:PutEncryptionConfig',)
+    schema = type_schema(
+        'set-xray-encrypt',
+        required=['key'],
+        key={'type': 'string'}
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('xray')
+        key = self.data.get('key')
+        req = {'Type': 'NONE'} if key == 'default' else {'Type': 'KMS', 'KeyId': key}
+        client.put_encryption_config(**req)
+
+
+@filters.register('s3-public-block')
+class S3PublicBlock(ValueFilter):
+    """Check for s3 public blocks on an account.
+
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html
+    """
+
+    annotation_key = 'c7n:s3-public-block'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('s3-public-block', rinherit=ValueFilter.schema)
+    permissions = ('s3:GetAccountPublicAccessBlock',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(S3PublicBlock, self).process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('s3control')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_public_access_block(
+                    AccountId=r['account_id']).get('PublicAccessBlockConfiguration', {})
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(S3PublicBlock, self).__call__(r[self.annotation_key])
+
+
+@actions.register('set-s3-public-block')
+class SetS3PublicBlock(BaseAction):
+    """Configure S3 Public Access Block on an account.
+
+    All public access block attributes can be set. If not specified they are merged
+    with the extant configuration.
+
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html
+
+    :example:
+
+    .. yaml:
+
+      policies:
+        - name: restrict-public-buckets
+          resource: aws.account
+          filters:
+            - not:
+               - type: s3-public-block
+                 key: RestrictPublicBuckets
+                 value: true
+          actions:
+            - type: set-s3-public-block
+              RestrictPublicBuckets: true
+
+    """
+    schema = type_schema(
+        'set-s3-public-block',
+        state={'type': 'boolean', 'default': True},
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
+
+    permissions = ('s3:PutAccountPublicAccessBlock', 's3:GetAccountPublicAccessBlock')
+
+    def validate(self):
+        config = self.data.copy()
+        config.pop('type')
+        if config.pop('state', None) is False and config:
+            raise PolicyValidationError(
+                "%s cant set state false with controls specified".format(
+                    self.type))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('s3control')
+        if self.data.get('state', True) is False:
+            for r in resources:
+                client.delete_public_access_block(AccountId=r['account_id'])
+            return
+
+        keys = (
+            'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
+
+        for r in resources:
+            # try to merge with existing configuration if not explicitly set.
+            base = {}
+            if S3PublicBlock.annotation_key in r:
+                base = r[S3PublicBlock.annotation_key]
+            else:
+                try:
+                    base = client.get_public_access_block(AccountId=r['account_id']).get(
+                        'PublicAccessBlockConfiguration')
+                except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                    base = {}
+
+            config = {}
+            for k in keys:
+                if k in self.data:
+                    config[k] = self.data[k]
+                elif k in base:
+                    config[k] = base[k]
+
+            client.put_public_access_block(
+                AccountId=r['account_id'],
+                PublicAccessBlockConfiguration=config)

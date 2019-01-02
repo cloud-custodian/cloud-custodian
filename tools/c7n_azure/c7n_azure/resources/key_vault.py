@@ -16,7 +16,7 @@ from azure.graphrbac import GraphRbacManagementClient
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
 
-from c7n.filters import ValueFilter
+from c7n.filters import Filter
 from c7n.utils import type_schema
 from c7n_azure.utils import GraphHelper
 
@@ -33,13 +33,23 @@ class KeyVault(ArmResourceManager):
 
 
 @KeyVault.filter_registry.register('whitelist')
-class WhiteListFilter(ValueFilter):
-    schema = type_schema('whitelist', rinherit=ValueFilter.schema)
+class WhiteListFilter(Filter):
+    schema = type_schema('whitelist', rinherit=None,
+                         required=['key'],
+                         key={'type': 'string'},
+                         users={'type': 'array'},
+                         permissions={
+                             'certificates': {'type': 'array'},
+                             'secrets': {'type': 'array'},
+                             'keys': {'type': 'array'}})
     graph_client = None
 
     def __init__(self, data, manager=None):
         super(WhiteListFilter, self).__init__(data, manager)
-        self.op = 'difference'
+        self.key = self.data['key']
+        # If not specified, initialize with empty list or dictionary.
+        self.users = self.data.get('users', [])
+        self.permissions = self.data.get('permissions', {})
 
     def __call__(self, i):
         if 'accessPolicies' not in i:
@@ -58,9 +68,33 @@ class WhiteListFilter(ValueFilter):
                         'certificates': policy.permissions.certificates
                     }
                 })
-            # Enhance access policies with display_name, object_type and principal_name
+            # Enhance access policies with displayName, aadType and principalName
             i['accessPolicies'] = self.enhance_policies(access_policies)
-        return super(WhiteListFilter, self).__call__(i)
+
+        # Ensure each policy is
+        #   - User is whitelisted
+        #   - Permissions don't exceed allowed permissions
+        for p in i['accessPolicies']:
+            if p[self.key] not in self.users:
+                if not self.compare_permissions(p['permissions'], self.permissions):
+                    return False
+        return True
+
+    @staticmethod
+    def compare_permissions(user_permissions, permissions):
+        for v in user_permissions.keys():
+            if user_permissions[v]:
+                if v not in permissions.keys():
+                    # If user_permissions is not empty, but allowed permissions is empty -- Failed.
+                    return False
+                # User lowercase to compare sets
+                lower_user_perm = set([x.lower() for x in user_permissions[v]])
+                lower_perm = set([x.lower() for x in permissions[v]])
+                if lower_user_perm.difference(lower_perm):
+                    # If user has more permissions than allowed -- Failed
+                    return False
+
+        return True
 
     def enhance_policies(self, access_policies):
         if self.graph_client is None:

@@ -19,7 +19,7 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import logging
@@ -422,6 +422,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                   - type: not-encrypted
                     exclude_image: true
     """
+
     schema = type_schema('not-encrypted', exclude_image={'type': 'boolean'})
     permissions = (
         'ec2:DescribeImages',
@@ -712,6 +713,7 @@ class VpcIdFilter(ValueFilter):
 
 
 @filters.register('progagated-tags')
+@filters.register('propagated-tags')
 class PropagatedTagFilter(Filter):
     """Filter ASG based on propagated tags
 
@@ -735,6 +737,7 @@ class PropagatedTagFilter(Filter):
     """
     schema = type_schema(
         'progagated-tags',
+        aliases=('propagated-tags',),
         keys={'type': 'array', 'items': {'type': 'string'}},
         match={'type': 'boolean'},
         propagate={'type': 'boolean'})
@@ -825,13 +828,32 @@ class CapacityDelta(Filter):
 
 @filters.register('user-data')
 class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+    """Filter on ASG's whose launch configs have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: lc_userdata
+                resource: asg
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - delete
+    """
 
     schema = type_schema('user-data', rinherit=ValueFilter.schema)
     batch_size = 50
     annotation = 'c7n:user-data'
 
-    def validate(self):
-        return self
+    def __init__(self, data, manager):
+        super(UserDataFilter, self).__init__(data, manager)
+        self.data['key'] = '"c7n:user-data"'
 
     def get_permissions(self):
         return self.manager.get_resource_manager('asg').get_permissions()
@@ -1392,7 +1414,7 @@ class MarkForOp(Tag):
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
     def validate(self):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise PolicyValidationError(
@@ -1400,7 +1422,7 @@ class MarkForOp(Tag):
         return self
 
     def process(self, asgs):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('message', self.default_template)

@@ -18,14 +18,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
+	"io/ioutil"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/lambda"
+	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/omnissm"
 )
 
@@ -34,75 +34,49 @@ type registrationHandler struct {
 }
 
 func (r *registrationHandler) RequestActivation(ctx context.Context, req *omnissm.RegistrationRequest) (*omnissm.RegistrationResponse, error) {
-	logger := log.With().Str("handler", "CreateRegistration").Logger()
-	logger.Info().Interface("identity", req.Identity()).Msg("new registration request")
-	entry, err, ok := r.OmniSSM.Registrations.Get(req.Identity().Hash())
+	logger := log.With().Str("handler", "RequestActivation").Logger()
+	logger.Info().Interface("request", req).Interface("identity", req.Identity()).Msg("new registration request")
+	resp, err := r.OmniSSM.RequestActivation(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	if ok {
-		logger.Info().Interface("entry", entry).Msg("existing registration entry found")
-		return &omnissm.RegistrationResponse{RegistrationEntry: *entry, Region: req.Identity().Region}, nil
+	if resp.Existing() {
+		logger.Info().Interface("entry", resp).Msg("existing registration entry found")
+	} else {
+		logger.Info().Interface("entry", resp).Msg("new registration entry created")
 	}
-	activation, err := r.SSM.CreateActivation(req.Identity().Name())
-	if err != nil {
-		if r.OmniSSM.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-			sqsErr := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
-				Type:  omnissm.CreateActivation,
-				Value: req.Identity(),
-			})
-			if sqsErr != nil {
-				return nil, sqsErr
-			}
-			return nil, errors.Wrapf(err, "deferred action to SQS queue: %#v", r.OmniSSM.Config.QueueName)
-		}
-		return nil, err
-	}
-	entry = &omnissm.RegistrationEntry{
-		Id:         req.Identity().Hash(),
-		CreatedAt:  time.Now().UTC(),
-		AccountId:  req.Identity().AccountId,
-		Region:     req.Identity().Region,
-		InstanceId: req.Identity().InstanceId,
-		Activation: *activation,
-		ManagedId:  "-",
-	}
-	if err := r.OmniSSM.Registrations.Put(entry); err != nil {
-		if r.OmniSSM.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-			sqsErr := r.OmniSSM.SQS.Send(&omnissm.DeferredActionMessage{
-				Type:  omnissm.PutRegistrationEntry,
-				Value: entry,
-			})
-			if sqsErr != nil {
-				return nil, sqsErr
-			}
-			return nil, errors.Wrapf(err, "deferred action to SQS queue: %#v", r.OmniSSM.Config.QueueName)
-		}
-		return nil, err
-	}
-	logger.Info().Interface("entry", entry).Msg("new registration entry created")
-	return &omnissm.RegistrationResponse{RegistrationEntry: *entry, Region: req.Identity().Region}, nil
+	return resp, nil
 }
 
 func (r *registrationHandler) UpdateRegistration(ctx context.Context, req *omnissm.RegistrationRequest) (*omnissm.RegistrationResponse, error) {
 	logger := log.With().Str("handler", "UpdateRegistration").Logger()
-	logger.Info().Interface("identity", req.Identity()).Msg("update registration request")
+	logger.Info().Interface("request", req).Interface("identity", req.Identity()).Msg("update registration request")
+	if !ssm.IsManagedInstance(req.ManagedId) {
+		return nil, lambda.BadRequestError{fmt.Sprintf("invalid managedId %#v", req.ManagedId)}
+	}
 	id := req.Identity().Hash()
-	entry, err, ok := r.OmniSSM.Registrations.Get(id)
+	entry, err, ok := r.OmniSSM.Registrations.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	if !ok {
 		logger.Info().Str("instanceName", req.Identity().Name()).Str("id", id).Msg("registration entry not found")
-		return nil, errors.Wrapf(err, "entry not found: %#v", id)
+		return nil, lambda.NotFoundError{fmt.Sprintf("entry not found: %#v", id)}
 	}
 	logger.Info().Interface("entry", entry).Msg("registration entry found")
-	if req.ManagedId != "" || req.ManagedId != "-" {
-		entry.ManagedId = req.ManagedId
-		if err := r.OmniSSM.Registrations.Update(entry); err != nil {
-			return nil, err
+	entry.ManagedId = req.ManagedId
+	if err := r.OmniSSM.Registrations.Update(ctx, entry); err != nil {
+		return nil, err
+	}
+	logger.Info().Interface("entry", entry).Msg("registration entry updated")
+	if t := r.OmniSSM.Config.ResourceRegisteredSNSTopic; t != "" {
+		if data, err := json.Marshal(entry); err == nil {
+			if err := r.OmniSSM.SNS.Publish(ctx, t, data); err != nil {
+				logger.Error().Str("topic", t).Err(err).Msg("cannot send SNS message")
+			}
+		} else {
+			logger.Error().Err(err).Msg("cannot marshal SNS message")
 		}
-		logger.Info().Interface("entry", entry).Msg("registration entry updated")
 	}
 	return &omnissm.RegistrationResponse{RegistrationEntry: *entry}, nil
 }
@@ -116,20 +90,48 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	var amiWhitelist map[string]bool
+	if config.AMIWhitelistFile != "" {
+		b, err := ioutil.ReadFile(config.AMIWhitelistFile)
+		if err != nil {
+			panic(fmt.Sprintf("unable to read AMI whitelist: %v", err))
+		}
+		var tmp omnissm.ImageWhitelist
+		if err := json.Unmarshal(b, &tmp); err != nil {
+			panic(fmt.Sprintf("unable to unmarshal AMI whitelist file: %v", err))
+		}
+		amiWhitelist = make(map[string]bool)
+		for _, i := range tmp.Images {
+			amiWhitelist[strings.Join([]string{i.AccountId, i.RegionName, i.ImageId}, ",")] = true
+		}
+	}
 	r := registrationHandler{omni}
 	lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 		switch req.Resource {
 		case "/register":
 			var registerReq omnissm.RegistrationRequest
 			if err := json.Unmarshal([]byte(req.Body), &registerReq); err != nil {
-				return nil, err
+				log.Error().Err(err).Msg("cannot unmarshal request body")
+				return nil, lambda.BadRequestError{}
 			}
 			if err := registerReq.Verify(); err != nil {
-				return nil, err
+				log.Error().Err(err).Msg("cannot verify request")
+				return nil, lambda.BadRequestError{}
 			}
-			if !config.IsAuthorized(registerReq.Identity().AccountId) {
-				return nil, errors.Errorf("account not authorized: %#v", registerReq.Identity().AccountId)
+			doc := registerReq.Identity()
+			if a := doc.AccountId; !config.IsAuthorized(a) {
+				return nil, lambda.UnauthorizedError{fmt.Sprintf("account not authorized: %#v", a)}
 			}
+			if !omni.RequestVersionValid(registerReq.ClientVersion) {
+				return nil, lambda.BadRequestError{fmt.Sprintf("client version does not meet constraints %#v", omni.Config.ClientVersionConstraints)}
+			}
+			if amiWhitelist != nil {
+				k := strings.Join([]string{doc.AccountId, doc.Region, doc.ImageId}, ",")
+				if doc.ImageId == "" || !amiWhitelist[k] {
+					return nil, lambda.BadRequestError{fmt.Sprintf("registration from AMI %#v is not permitted", doc.ImageId)}
+				}
+			}
+
 			switch req.HTTPMethod {
 			case "POST":
 				return lambda.JSON(r.RequestActivation(ctx, &registerReq))

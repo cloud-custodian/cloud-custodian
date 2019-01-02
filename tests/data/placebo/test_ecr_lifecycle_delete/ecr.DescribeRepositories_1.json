@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/repository-name-wubwub",
+                "registryId": "644160558196",
+                "repositoryName": "repository-name-wubwub",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/repository-name-wubwub",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 9,
+                    "day": 19,
+                    "hour": 11,
+                    "minute": 13,
+                    "second": 45,
+                    "microsecond": 0
+                }
+            },
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/omnissm-register",
+                "registryId": "644160558196",
+                "repositoryName": "omnissm-register",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/omnissm-register",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 5,
+                    "day": 3,
+                    "hour": 17,
+                    "minute": 20,
+                    "second": 42,
+                    "microsecond": 0
+                }
+            },
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/c7n",
+                "registryId": "644160558196",
+                "repositoryName": "c7n",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/c7n",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 31,
+                    "hour": 13,
+                    "minute": 32,
+                    "second": 53,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "59bba54a-ee89-11e8-9271-61b7219ef9e6",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "59bba54a-ee89-11e8-9271-61b7219ef9e6",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "756"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

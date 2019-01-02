@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "ce9599dc-cb21-11e8-be70-47f565f207b9",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 08 Oct 2018 17:44:29 GMT",
+                "content-type": "application/json",
+                "content-length": "655",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "ce9599dc-cb21-11e8-be70-47f565f207b9"
+            },
+            "RetryAttempts": 0
+        },
+        "Functions": [
+            {
+                "FunctionName": "c7n-s3-encrypt",
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:c7n-s3-encrypt",
+                "Runtime": "python2.7",
+                "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+                "Handler": "s3crypt.process_event",
+                "CodeSize": 1526205,
+                "Description": "Custodian S3 Key Encrypt",
+                "Timeout": 30,
+                "MemorySize": 256,
+                "LastModified": "2017-09-15T20:31:23.412+0000",
+                "CodeSha256": "Ag2piyr2O8kx8US38tdG8giriNst2Iu+qIZq2g1fgOQ=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "9a94240a-d120-44d1-b978-85e8fac4f75b"
+            }
+        ]
+    }
+}

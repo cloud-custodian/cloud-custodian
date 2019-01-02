@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from .common import BaseTest
 import datetime
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
@@ -108,7 +108,7 @@ class DynamodbTest(BaseTest):
         tags = client.list_tags_of_resource(ResourceArn=arn)
         tag_map = {t["Key"]: t["Value"] for t in tags["Tags"]}
 
-        localtz = zoneinfo.gettz("America/New_York")
+        localtz = tzutil.gettz("America/New_York")
         dt = datetime.datetime.now(localtz)
         dt = dt.replace(year=2018, month=6, day=8, hour=7, minute=00)
         result = datetime.datetime.strptime(

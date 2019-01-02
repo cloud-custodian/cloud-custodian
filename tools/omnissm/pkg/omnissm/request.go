@@ -23,10 +23,11 @@ import (
 )
 
 type RegistrationRequest struct {
-	Provider  string `json:"provider"`
-	Document  string `json:"document"`
-	Signature string `json:"signature"`
-	ManagedId string `json:"managedId,omitempty"`
+	Provider      string `json:"provider"`
+	Document      string `json:"document"`
+	Signature     string `json:"signature"`
+	ManagedId     string `json:"managedId,omitempty"`
+	ClientVersion string `json:"clientVersion,omitempty"`
 
 	document ec2metadata.Document
 }

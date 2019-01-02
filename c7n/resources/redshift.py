@@ -631,8 +631,9 @@ class RedshiftModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('redshift')
-        groups = super(RedshiftModifyVpcSecurityGroups, self).get_groups(
-            clusters, metadata_key='VpcSecurityGroupId')
+        groups = super(
+            RedshiftModifyVpcSecurityGroups, self).get_groups(clusters)
+
         for idx, c in enumerate(clusters):
             client.modify_cluster(
                 ClusterIdentifier=c['ClusterIdentifier'],
@@ -850,7 +851,7 @@ class RedshiftSnapshotRevokeAccess(BaseAction):
     schema = type_schema('revoke-access')
 
     def validate(self):
-        for f in self.manager.filters:
+        for f in self.manager.iter_filters():
             if isinstance(f, RedshiftSnapshotCrossAccount):
                 return self
         raise PolicyValidationError(

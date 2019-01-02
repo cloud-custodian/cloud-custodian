@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import sys
 from os.path import dirname, join
@@ -23,10 +24,11 @@ from c7n_azure import handler, entry
 
 try:
     import azure.functions as func
-    from azure.functions_worker.bindings.http import HttpRequest
+    from azure.functions_worker.bindings.queue import QueueMessage
 except ImportError:
     pass
 
+max_dequeue_count = 3
 
 def main(input):
     logging.info("Running Azure Cloud Custodian Policy")
@@ -36,13 +38,15 @@ def main(input):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
 
-    if type(input) is HttpRequest:
-        context['event'] = input.get_json()
+    events = None
 
-    handler.run(None, context)
+    if type(input) is QueueMessage:
+        if input.dequeue_count > max_dequeue_count:
+            return
+        events = [input.get_json()]
 
-    if type(input) is HttpRequest:
-        return func.HttpResponse("OK")
+    handler.run(events, context)
+
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()

@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DeliveryStreamARN": "arn:aws:firehose:us-east-1:123456789:deliverystream/firehose-s3", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "0ed5acef-a773-4508-8d10-b81f7806f681", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0ed5acef-a773-4508-8d10-b81f7806f681", 
+                "x-amz-id-2": "//QjC0Ku7VvDsFo00dXUvkm6D3OE52ASVKJwc1qdy35zCWKK8qjwqHZSRtYSBdY4FSQchZzCEZgBg+eC4C11073eVgj5FbuY", 
+                "content-length": "90", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Wed, 15 Aug 2018 09:40:17 GMT"
+            }
+        }
+    }
+}

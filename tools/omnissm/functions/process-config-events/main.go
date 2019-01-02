@@ -55,17 +55,28 @@ func init() {
 	}
 }
 
-func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail) error {
-	entry, err, ok := omni.Registrations.Get(detail.ConfigurationItem.Hash())
+func removeTimestampMilliseconds(s string) string {
+	t, err := time.Parse(time.RFC3339, s)
+	if err != nil {
+		// default to using the current time if we cannot parse the timestamp
+		t = time.Now()
+	}
+	t = t.UTC()
+	return t.Format("2006-01-02T15:04:05Z")
+}
+
+func handleConfigurationItemChange(ctx context.Context, detail configservice.ConfigurationItemDetail) error {
+	entry, err, ok := omni.Registrations.Get(ctx, detail.ConfigurationItem.Hash())
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return errors.Errorf("registration entry not found: %#v", detail.ConfigurationItem.Name())
+		log.Info().Str("name", detail.ConfigurationItem.Name()).Msgf("registration entry not found")
+		return nil
 	}
 	log.Info().Interface("entry", entry).Msg("existing registration entry found")
 	if !ssm.IsManagedInstance(entry.ManagedId) {
-		return errors.Errorf("ManagedId %#v invalid for %s/%s", entry.AccountId, entry.InstanceId)
+		return errors.Errorf("ManagedId %#v invalid for %s/%s", entry.ManagedId, entry.AccountId, entry.InstanceId)
 	}
 	switch detail.ConfigurationItem.ConfigurationItemStatus {
 	case "ResourceDiscovered", "OK":
@@ -76,14 +87,18 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 			}
 			tags[k] = v
 		}
+		ci := detail.ConfigurationItem
+		tags["AccountId"] = ci.AWSAccountId
+		tags["VPCId"] = ci.Configuration.VPCId
+		tags["SubnetId"] = ci.Configuration.SubnetId
 		resourceTags := &ssm.ResourceTags{
 			ManagedId: entry.ManagedId,
 			Tags:      tags,
 		}
-		err := omni.SSM.AddTagsToResource(resourceTags)
+		err := omni.SSM.AddTagsToResource(ctx, resourceTags)
 		if err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 					Type:  omnissm.AddTagsToResource,
 					Value: resourceTags,
 				})
@@ -95,16 +110,21 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 			return err
 		}
 		log.Info().Msgf("AddTagsToResource successful for %#v", entry.ManagedId)
+		// NOTE: CanfigurationItemCaptureTime is sometimes sent by AWS as
+		// a timestamp with milliseconds, which are not accepted by SSM when
+		// calling PutInventory. Here we must attempt to remove milliseconds
+		// from the timestamp and return it in the proper format - otherwise the
+		// current time is used.
 		inv := &ssm.CustomInventory{
 			TypeName:    "Custom:CloudInfo",
 			ManagedId:   entry.ManagedId,
-			CaptureTime: detail.ConfigurationItem.ConfigurationItemCaptureTime,
+			CaptureTime: removeTimestampMilliseconds(detail.ConfigurationItem.ConfigurationItemCaptureTime),
 			Content:     configservice.ConfigurationItemContentMap(detail.ConfigurationItem),
 		}
-		err = omni.SSM.PutInventory(inv)
+		err = omni.SSM.PutInventory(ctx, inv)
 		if err != nil {
 			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
+				sqsErr := omni.SQS.Send(ctx, &omnissm.DeferredActionMessage{
 					Type:  omnissm.PutInventory,
 					Value: inv,
 				})
@@ -117,38 +137,10 @@ func handleConfigurationItemChange(detail configservice.ConfigurationItemDetail)
 		}
 		log.Info().Msgf("PutInventory successful for %#v", entry.ManagedId)
 	case "ResourceDeleted":
-		if err := omni.SSM.DeregisterManagedInstance(entry.ManagedId); err != nil {
-			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
-					Type:  omnissm.DeregisterManagedInstance,
-					Value: entry.ManagedId,
-				})
-				if sqsErr != nil {
-					return sqsErr
-				}
-				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
-			}
+		if err := omni.DeregisterInstance(ctx, entry); err != nil {
 			return err
 		}
 		log.Info().Msgf("Successfully deregistered instance: %#v", entry.ManagedId)
-		if err := omni.Registrations.Delete(entry.Id); err != nil {
-			return err
-		}
-		log.Info().Msgf("Successfully deleted registration entry: %#v", entry.ManagedId)
-		if omni.Config.ResourceDeletedSNSTopic != "" {
-			data, err := json.Marshal(map[string]interface{}{
-				"ManagedId":    entry.ManagedId,
-				"ResourceId":   detail.ConfigurationItem.ResourceId,
-				"AWSAccountId": detail.ConfigurationItem.AWSAccountId,
-				"AWSRegion":    detail.ConfigurationItem.AWSRegion,
-			})
-			if err != nil {
-				return errors.Wrap(err, "cannot marshal SNS message")
-			}
-			if err := omni.SNS.Publish(omni.Config.ResourceDeletedSNSTopic, data); err != nil {
-				return err
-			}
-		}
 	}
 	return nil
 }
@@ -178,7 +170,7 @@ func main() {
 			if _, ok := resourceStatusTypes[event.Detail.ConfigurationItem.ConfigurationItemStatus]; !ok {
 				return
 			}
-			return handleConfigurationItemChange(event.Detail.ConfigurationItemDetail)
+			return handleConfigurationItemChange(ctx, event.Detail.ConfigurationItemDetail)
 		case "OversizedConfigurationItemChangeNotification":
 			if _, ok := resourceTypes[event.Detail.ConfigurationItemSummary.ResourceType]; !ok {
 				return
@@ -186,7 +178,7 @@ func main() {
 			if _, ok := resourceStatusTypes[event.Detail.ConfigurationItemSummary.ConfigurationItemStatus]; !ok {
 				return
 			}
-			data, err := omni.S3.GetObject(event.Detail.S3DeliverySummary.S3BucketLocation)
+			data, err := omni.S3.GetObject(ctx, event.Detail.S3DeliverySummary.S3BucketLocation)
 			if err != nil {
 				return err
 			}
@@ -194,7 +186,7 @@ func main() {
 			if err := json.Unmarshal(data, &eventDetail); err != nil {
 				return err
 			}
-			return handleConfigurationItemChange(eventDetail)
+			return handleConfigurationItemChange(ctx, eventDetail)
 		default:
 			err = fmt.Errorf("unknown message type: %#v", event.Detail.MessageType)
 		}

@@ -397,6 +397,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources[0]["SecurityGroups"]), 1)
+        policy.validate()
         after_resources = policy.run()
         self.assertEqual(len(after_resources[0]["SecurityGroups"]), 2)
 
@@ -431,6 +432,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources[0]["SecurityGroups"]), 1)
+        policy.validate()
         after_resources = policy.run()
         self.assertEqual(len(after_resources[0]["SecurityGroups"]), 4)
 
@@ -473,6 +475,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources[0]["SecurityGroups"]), 2)
+        policy.validate()
         after_resources = policy.run()
         self.assertEqual(len(after_resources[0]["SecurityGroups"]), 1)
         # Check that it is indeed the isolation group on the ELB

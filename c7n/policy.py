@@ -13,35 +13,26 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from datetime import datetime
+from dateutil import parser, tz as tzutil
 import json
 import fnmatch
 import itertools
 import logging
 import os
 import time
-from dateutil import tz, parser
-from datetime import datetime
 
 import jmespath
 import six
 
-from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
-from c7n.exceptions import ClientError
+from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds
-from c7n import mu
-from c7n import query
 from c7n import utils
-from c7n.logs_support import (
-    normalized_log_entries,
-    log_entries_in_range,
-    log_entries_from_s3,
-    log_entries_from_group,
-)
 from c7n.version import version
 
 log = logging.getLogger('c7n.policy')
@@ -237,7 +228,14 @@ class PullMode(PolicyExecutionMode):
                 version)
 
             s = time.time()
-            resources = self.policy.resource_manager.resources()
+            try:
+                resources = self.policy.resource_manager.resources()
+            except ResourceLimitExceeded as e:
+                self.policy.log.error(str(e))
+                self.policy.ctx.metrics.put_metric(
+                    'ResourceLimitExceeded', e.selection_count, "Count")
+                raise
+
             rt = time.time() - s
             self.policy.log.info(
                 "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
@@ -254,13 +252,6 @@ class PullMode(PolicyExecutionMode):
 
             if not resources:
                 return []
-            elif (self.policy.max_resources is not None and
-                  len(resources) > self.policy.max_resources):
-                msg = "policy %s matched %d resources max resources %s" % (
-                    self.policy.name, len(resources),
-                    self.policy.max_resources)
-                self.policy.log.warning(msg)
-                raise RuntimeError(msg)
 
             if self.policy.options.dryrun:
                 self.policy.log.debug("dryrun: skipping actions")
@@ -269,7 +260,8 @@ class PullMode(PolicyExecutionMode):
             at = time.time()
             for a in self.policy.resource_manager.actions:
                 s = time.time()
-                results = a.process(resources)
+                with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
+                    results = a.process(resources)
                 self.policy.log.info(
                     "policy: %s action: %s"
                     " resources: %d"
@@ -284,18 +276,19 @@ class PullMode(PolicyExecutionMode):
             return resources
 
     def get_logs(self, start, end):
+        from c7n import logs_support
         log_source = self.policy.ctx.output
         log_gen = ()
         if self.policy.options.log_group is not None:
             session = utils.local_session(self.policy.session_factory)
-            log_gen = log_entries_from_group(
+            log_gen = logs_support.log_entries_from_group(
                 session,
                 self.policy.options.log_group,
                 start,
                 end,
             )
         elif log_source.type == 's3':
-            raw_entries = log_entries_from_s3(
+            raw_entries = logs_support.log_entries_from_s3(
                 self.policy.session_factory,
                 log_source,
                 start,
@@ -304,15 +297,15 @@ class PullMode(PolicyExecutionMode):
             # log files can be downloaded out of order, so sort on timestamp
             # log_gen isn't really a generator once we do this, but oh well
             log_gen = sorted(
-                normalized_log_entries(raw_entries),
+                logs_support.normalized_log_entries(raw_entries),
                 key=lambda e: e.get('timestamp', 0),
             )
         else:
             log_path = os.path.join(log_source.root_dir, 'custodian-run.log')
             with open(log_path) as log_fh:
                 raw_entries = log_fh.readlines()
-                log_gen = normalized_log_entries(raw_entries)
-        return log_entries_in_range(
+                log_gen = logs_support.normalized_log_entries(raw_entries)
+        return logs_support.log_entries_in_range(
             log_gen,
             start,
             end,
@@ -354,7 +347,7 @@ class LambdaMode(ServerlessExecutionMode):
             'member-role': {'type': 'string'},
             'packages': {'type': 'array'},
             # Lambda passthrough config
-            'runtime': {'enum': ['python2.7', 'python3.6']},
+            'runtime': {'enum': ['python2.7', 'python3.6', 'python3.7']},
             'role': {'type': 'string'},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
@@ -426,11 +419,11 @@ class LambdaMode(ServerlessExecutionMode):
         Lambda automatically generates cloud watch logs, and metrics
         for us, albeit with some deficienies, metrics no longer count
         against valid resources matches, but against execution.
-        Fortunately we already have replacements.
 
-        TODO: better customization around execution context outputs
-        TODO: support centralized lambda exec across accounts.
+        If metrics execution option is enabled, custodian will generate
+        metrics per normal.
         """
+        from c7n.actions import EventAction
 
         mode = self.policy.data.get('mode', {})
         if not bool(mode.get("log", True)):
@@ -477,28 +470,11 @@ class LambdaMode(ServerlessExecutionMode):
                     "action-%s" % action.name, utils.dumps(results))
         return resources
 
-    def expand_variables(self, variables):
-        """expand variables in the mode role and output_dir fields.
-        """
-        p = self.policy.data
-        if 'mode' in p:
-            if 'role' in p['mode']:
-                p['mode']['role'] = utils.format_string_values(p['mode']['role'], **variables)
-            if 'execution-options' in p['mode']:
-                if 'output_dir' in p['mode']['execution-options']:
-                    p['mode']['execution-options']['output_dir'] = utils.format_string_values(
-                        p['mode']['execution-options']['output_dir'], **variables)
-        return p
-
     def provision(self):
+        from c7n import mu
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
-            variables = {
-                'account_id': self.policy.options.account_id,
-                'region': self.policy.options.region
-            }
-            self.policy.data = self.expand_variables(variables)
             try:
                 manager = mu.LambdaManager(self.policy.session_factory)
             except ClientError:
@@ -511,9 +487,10 @@ class LambdaMode(ServerlessExecutionMode):
                 role=self.policy.options.assume_role)
 
     def get_logs(self, start, end):
+        from c7n import mu, logs_support
         manager = mu.LambdaManager(self.policy.session_factory)
         log_gen = manager.logs(mu.PolicyLambda(self.policy), start, end)
-        return log_entries_in_range(
+        return logs_support.log_entries_in_range(
             log_gen,
             start,
             end,
@@ -552,6 +529,7 @@ class CloudTrailMode(LambdaMode):
         rinherit=LambdaMode.schema)
 
     def validate(self):
+        from c7n import query
         events = self.policy.data['mode'].get('events')
         assert events, "cloud trail mode requires specifiying events to subscribe"
         for e in events:
@@ -569,12 +547,16 @@ class CloudTrailMode(LambdaMode):
 
 @execution.register('ec2-instance-state')
 class EC2InstanceState(LambdaMode):
-    """a lambda policy that executes on ec2 instance state changes."""
+    """
+    A lambda policy that executes on ec2 instance state changes.
+
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
+    """
 
     schema = utils.type_schema(
         'ec2-instance-state', rinherit=LambdaMode.schema,
         events={'type': 'array', 'items': {
-            'enum': ['running', 'shutting-down',
+            'enum': ['pending', 'running', 'shutting-down',
                      'stopped', 'stopping', 'terminated']}})
 
 
@@ -702,7 +684,7 @@ class Policy(object):
             session_factory = clouds[self.provider_name]().get_session_factory(options)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
 
     def __repr__(self):
         return "<Policy resource: %s name: %s region: %s>" % (
@@ -730,7 +712,7 @@ class Policy(object):
 
     @property
     def tz(self):
-        return tz.gettz(self.data.get('tz', 'UTC'))
+        return tzutil.gettz(self.data.get('tz', 'UTC'))
 
     @property
     def start(self):
@@ -749,12 +731,25 @@ class Policy(object):
         return self.data.get('max-resources')
 
     @property
+    def max_resources_percent(self):
+        return self.data.get('max-resources-percent')
+
+    @property
     def tags(self):
         return self.data.get('tags', ())
 
+    def get_cache(self):
+        return self.resource_manager._cache
+
+    @property
+    def execution_mode(self):
+        return self.data.get('mode', {'type': 'pull'})['type']
+
     def get_execution_mode(self):
-        exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        return execution.get(exec_mode_type)(self)
+        exec_mode = execution[self.execution_mode]
+        if exec_mode is None:
+            return None
+        return exec_mode(self)
 
     @property
     def is_lambda(self):
@@ -764,12 +759,73 @@ class Policy(object):
 
     def validate(self):
         m = self.get_execution_mode()
+        if m is None:
+            raise PolicyValidationError(
+                "Invalid Execution mode in policy %s" % (self.data,))
         m.validate()
         self.validate_policy_start_stop()
         for f in self.resource_manager.filters:
             f.validate()
         for a in self.resource_manager.actions:
             a.validate()
+
+    def get_variables(self):
+        # Global policy variable expansion, we have to carry forward on
+        # various filter/action local vocabularies. Where possible defer
+        # by using a format string.
+        #
+        # See https://github.com/capitalone/cloud-custodian/issues/2330
+        return {
+            # standard runtime variables for interpolation
+            'account': '{account}',
+            'account_id': self.options.account_id,
+            'region': self.options.region,
+            # non-standard runtime variables from local filter/action vocabularies
+            #
+            # notify action
+            'policy': self.data,
+            'event': '{event}',
+            # mark for op action
+            'op': '{op}',
+            'action_date': '{action_date}',
+            # tag action pyformat-date handling
+            'now': utils.FormatDate(datetime.utcnow()),
+            # account increase limit action
+            'service': '{service}',
+            # s3 set logging action :-( see if we can revisit this one.
+            'bucket_region': '{bucket_region}',
+            'bucket_name': '{bucket_name}',
+            'source_bucket_name': '{source_bucket_name}',
+            'target_bucket_name': '{target_bucket_name}',
+            'target_prefix': '{target_prefix}',
+            'LoadBalancerName': '{LoadBalancerName}'
+        }
+
+    def expand_variables(self, variables):
+        """Expand variables in policy data.
+
+        Updates the policy data in-place.
+        """
+        # format string values returns a copy
+        updated = utils.format_string_values(self.data, **variables)
+
+        # Several keys should only be expanded at runtime, perserve them.
+        if 'member-role' in updated.get('mode', {}):
+            updated['mode']['member-role'] = self.data['mode']['member-role']
+
+        # Update ourselves in place
+        self.data = updated
+        # Reload filters/actions using updated data, we keep a reference
+        # for some compatiblity preservation work.
+        m = self.resource_manager
+        self.resource_manager = self.load_resource_manager()
+
+        # XXX: Compatiblity hack
+        # Preserve notify action subject lines which support
+        # embedded jinja2 as a passthrough to the mailer.
+        for old_a, new_a in zip(m.actions, self.resource_manager.actions):
+            if old_a.type == 'notify' and 'subject' in old_a.data:
+                new_a.data['subject'] = old_a.data['subject']
 
     def push(self, event, lambda_ctx):
         mode = self.get_execution_mode()
@@ -813,7 +869,7 @@ class Policy(object):
         else:
             resources = mode.run()
         # clear out resource manager post run, to clear cache
-        self.resource_manager = self.get_resource_manager()
+        self.resource_manager = self.load_resource_manager()
         return resources
 
     run = __call__
@@ -822,7 +878,7 @@ class Policy(object):
         with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
-    def get_resource_manager(self):
+    def load_resource_manager(self):
         resource_type = self.data.get('resource')
 
         provider = clouds.get(self.provider_name)
@@ -845,11 +901,11 @@ class Policy(object):
 
         if policy_tz:
             try:
-                p_tz = tz.gettz(policy_tz)
+                p_tz = tzutil.gettz(policy_tz)
             except Exception as e:
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
-            if not isinstance(p_tz, tz.tzfile):
+            if not isinstance(p_tz, tzutil.tzfile):
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
 

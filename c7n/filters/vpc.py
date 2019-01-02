@@ -26,6 +26,7 @@ class SecurityGroupFilter(RelatedResourceFilter):
         'security-group', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']}})
+    schema_alias = True
 
     RelatedResource = "c7n.resources.vpc.SecurityGroup"
     AnnotationKey = "matched-security-groups"
@@ -37,9 +38,22 @@ class SubnetFilter(RelatedResourceFilter):
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
            'operator': {'enum': ['and', 'or']}})
+    schema_alias = True
 
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
+
+
+class VpcFilter(RelatedResourceFilter):
+    """Filter a resource by its associated vpc."""
+    schema = type_schema(
+        'vpc', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+
+    schema_alias = True
+    RelatedResource = "c7n.resources.vpc.Vpc"
+    AnnotationKey = "matched-vpcs"
 
 
 class DefaultVpcBase(Filter):

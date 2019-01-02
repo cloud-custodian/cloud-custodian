@@ -28,6 +28,9 @@ Filters
   .. c7n-schema:: NetworkInterfaceFilter
         :module: c7n_azure.resources.vm
 
+- ``off-hours and on-hours``
+  Filter based on on-hour and off-hour configurations (see :ref:`offhours`)
+
 Actions
 -------
 - ``start``
@@ -36,8 +39,14 @@ Actions
   .. c7n-schema:: VmStartAction
        :module: c7n_azure.resources.vm
 
-- ``stop``
+- ``poweroff``
   Stop the VMs
+
+  .. c7n-schema:: VmPowerOffAction
+        :module: c7n_azure.resources.vm
+
+- ``stop``
+  Stop the VMs and deallocate resources
 
   .. c7n-schema:: VmStopAction
         :module: c7n_azure.resources.vm

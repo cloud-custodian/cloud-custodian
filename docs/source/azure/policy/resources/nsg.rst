@@ -11,14 +11,26 @@ Filters
     - Metric Filter - Filter on metrics from Azure Monitor
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
-- ``ingress``
-  Filter based on Inbound Security Rules
+- ``ingress`` Filter based on Inbound Security Rules
+    - `ports`: ports to include (`0-65535` if not specified)
+        - `80`, `80-100`, `80,90-100`
+    - `exceptPorts`: ports to ignore (empty if not specified)
+    - `match`: match operation, filter includes NSGs with all or at least one port from the list.
+        -Possible values: `any`, `all`
+    - `ipProtocol`: `TCP`, `UDP` or `*`. Default: `*`
+    - `access`: `Allow`, `Deny`
 
   .. c7n-schema:: IngressFilter
       :module: c7n_azure.resources.network_security_group
 
-- ``egress``
-  Filter based on Outbound Security Rules
+- ``egress`` Filter based on Outbound Security Rules
+    - `ports`: ports to include (`0-65535` if not specified)
+        - `80`, `80-100`, `80,90-100`
+    - `exceptPorts`: ports to ignore (empty if not specified)
+    - `match`: match operation, filter includes NSGs with all or at least one port from the list.
+        -Possible values: `any`, `all`
+    - `ipProtocol`: `TCP`, `UDP` or `*`. Default: `*`
+    - `access`: `Allow`, `Deny`
 
   .. c7n-schema:: EgressFilter
       :module: c7n_azure.resources.network_security_group
@@ -27,14 +39,24 @@ Filters
 Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
-- ``open``
-  Allow access to security rules
+- ``open`` Allow access to security rules
+    - `ports`: ports to include (`0-65535` if not specified)
+        - `80`, `80-100`, `80,90-100`
+    - `exceptPorts`: ports to ignore (empty if not specified)
+    - `ipProtocol`: `TCP`, `UDP` or `*`. Default: `*`
+    - `direction`: `Inbound`, `Outbound`
+    - `access`: `Allow`, `Deny`
 
   .. c7n-schema:: CloseRules
       :module: c7n_azure.resources.network_security_group
 
-- ``close``
-  Deny access to security rules
+- ``close`` Deny access to security rules
+    - `ports`: ports to include (`0-65535` if not specified)
+        - `80`, `80-100`, `80,90-100`
+    - `exceptPorts`: ports to ignore (empty if not specified)
+    - `ipProtocol`: `TCP`, `UDP` or `*`. Default: `*`
+    - `direction`: `Inbound`, `Outbound`
+    - `access`: `Allow`, `Deny`
 
   .. c7n-schema:: OpenRules
       :module: c7n_azure.resources.network_security_group
@@ -43,36 +65,24 @@ Actions
 Example Policies
 ----------------
 
-This policy will deny access to all security rules with Inbound SSH ports in the range [8080,8090]
+This policy will deny access to all ports that are NOT 22, 23 or 24 for all Network Security Groups
 
 .. code-block:: yaml
 
-     policies:
-       - name: close-ingress-8080-8090
+      policies:
+       - name: close-inbound-except-22-24
          resource: azure.networksecuritygroup
          filters:
           - type: ingress
-            fromPort: 8080
-            toPort: 8090
-            access: Allow
+            exceptPorts: '22-24'
+            ports-op: 'any'
+            access: 'Allow'
          actions:
           - type: close
+            exceptPorts: '22-24'
+            direction: 'Inbound'
 
-This policy will deny access to all security rules with any Inbound SSH ports that are NOT 22, 23 or 24
-
-.. code-block:: yaml
-
-     policies:
-       - name: close-ingress-except-22-24
-         resource: azure.networksecuritygroup
-         filters:
-          - type: ingress
-            exceptPorts: [22,23,24]
-            access: Allow
-         actions:
-          - type: close
-
-This policy will deny access to all security rules with any Outbound SSH ports with a TCP Protocol
+This policy will find all NSGs with port 80 opened and port 443 closed, then it will open port 443
 
 .. code-block:: yaml
 
@@ -80,8 +90,12 @@ This policy will deny access to all security rules with any Outbound SSH ports w
        - name: close-egress-except-TCP
          resource: azure.networksecuritygroup
          filters:
-          - type: egress
-            ipProtocol: TCP
-            access: Allow
+          - type: ingress
+            ports: '80'
+            access: 'Allow'
+          - type: ingress
+            ports: '443'
+            access: 'Deny'
          actions:
-          - type: close
+          - type: open
+            ports: '443'

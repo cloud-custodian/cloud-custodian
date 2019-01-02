@@ -14,18 +14,16 @@
 
 import logging
 import re
-import six
 
+import six
 from azure.graphrbac import GraphRbacManagementClient
+from c7n_azure.actions import AzureBaseAction
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 
-from c7n.actions import BaseAction
-from c7n.config import Config
-from c7n.ctx import ExecutionContext
 from c7n.filters import Filter
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
@@ -69,9 +67,10 @@ class RoleAssignment(QueryResourceManager):
         for resource in resources:
             if resource['properties']['principalId'] in principal_dics.keys():
                 graph_resource = principal_dics[resource['properties']['principalId']]
-                resource['principalName'] = GraphHelper.get_principal_name(graph_resource)
-                resource['displayName'] = graph_resource.display_name
-                resource['aadType'] = graph_resource.object_type
+                if graph_resource.object_id:
+                    resource['principalName'] = GraphHelper.get_principal_name(graph_resource)
+                    resource['displayName'] = graph_resource.display_name
+                    resource['aadType'] = graph_resource.object_type
 
         return resources
 
@@ -181,9 +180,7 @@ class ResourceAccessFilter(RelatedResourceFilter):
             resource_type.rsplit('.', 1)[-1])
 
     def get_related(self, resources):
-        ctx = ExecutionContext(local_session(Session), self.data, Config.empty())
-        manager = self.factory(ctx, self.data)
-        related = manager.source.get_resources(None)
+        related = self.manager.get_resource_manager(self.factory.type).resources()
         if self.data.get('op'):
             return [r['id'] for r in related if self.match(r)]
         else:
@@ -234,17 +231,12 @@ class ScopeFilter(Filter):
 
 
 @RoleAssignment.action_registry.register('delete')
-class DeleteAssignmentAction(BaseAction):
+class DeleteAssignmentAction(AzureBaseAction):
 
     schema = type_schema('delete')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(DeleteAssignmentAction, self).__init__(data, manager, log_dir)
-        self.client = self.manager.get_client()
-
-    def delete(self, assignment_scope, assignment_name):
-        self.client.role_assignments.delete(assignment_scope, assignment_name)
-
-    def process(self, assignments):
+    def process_resource_set(self, assignments):
+        client = self.manager.get_client()
         for assignment in assignments:
-            self.delete(assignment['properties']['scope'], assignment['name'])
+            client.role_assignments.delete(
+                assignment['properties']['scope'], assignment['name'])

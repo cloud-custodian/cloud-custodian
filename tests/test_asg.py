@@ -14,12 +14,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 
 from .common import BaseTest
 from botocore.exceptions import ClientError
 from c7n.resources.asg import NotEncryptedFilter
-import c7n.resources.asg
 
 
 class LaunchConfigTest(BaseTest):
@@ -72,17 +71,8 @@ class TestUserData(BaseTest):
             },
             session_factory=session_factory
         )
-
         resources = policy.run()
-
         self.assertGreater(len(resources), 0)
-
-    def test_validate(self):
-        dataz = {u'type': u'user-data', u'key': u'"c7n:user-data"',
-                 u'value': u'(?smi).*BEGIN RSA PRIVATE KEY',
-                 u'op': u'regex'}
-        ud = c7n.resources.asg.UserDataFilter(dataz).validate()
-        self.assertEqual(type(ud), c7n.resources.asg.UserDataFilter)
 
 
 class AutoScalingTest(BaseTest):
@@ -137,7 +127,7 @@ class AutoScalingTest(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         snap = NotEncryptedFilter.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-malformedsnap")
+        self.assertEqual(snap, "snap-malformedsnap")
 
     def test_get_bad_snapshot_notfound(self):
         operation_name = "DescribeSnapshots"
@@ -149,7 +139,7 @@ class AutoScalingTest(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         snap = NotEncryptedFilter.get_bad_snapshot(e)
-        self.assertEquals(snap, "snap-notfound")
+        self.assertEqual(snap, "snap-notfound")
 
     def test_asg_image_age_filter(self):
         factory = self.replay_flight_data("test_asg_image_age_filter")
@@ -306,7 +296,7 @@ class AutoScalingTest(BaseTest):
         session_factory = self.replay_flight_data("test_asg_mark_for_op_hours")
         session = session_factory(region="us-east-1")
         asg = session.client("autoscaling")
-        localtz = zoneinfo.gettz("America/New_York")
+        localtz = tzutil.gettz("America/New_York")
         dt = datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=2, day=20, hour=12, minute=42, second=0, microsecond=0
@@ -674,6 +664,19 @@ class AutoScalingTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["AutoScalingGroupName"], "c7n.asg.ec2.01")
+
+        policy = self.load_policy(
+            {
+                "name": "asg-propagated-tag-filter",
+                "resource": "asg",
+                "filters": [
+                    {"type": "propagated-tags", "keys": ["Tag01", "Tag02", "Tag03"]}
+                ],
+            },
+            session_factory=session,
+        )
+
+        policy.validate()
 
     def test_asg_propagate_tag_missing(self):
         session = self.replay_flight_data("test_asg_propagate_tag_missing")

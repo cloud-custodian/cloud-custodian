@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b49c063a-023f-11e9-a982-fbd1e372987d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 17 Dec 2018 21:07:04 GMT",
+                "content-type": "application/json",
+                "content-length": "164",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b49c063a-023f-11e9-a982-fbd1e372987d",
+                "x-amz-apigw-id": "SEdu3JZ_oAMEdyA="
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "41tqbpyer2",
+                "name": "CloudCustodian",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 11,
+                    "day": 8,
+                    "hour": 13,
+                    "minute": 43,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "REGIONAL"
+                    ]
+                }
+            }
+        ]
+    }
+}

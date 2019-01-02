@@ -83,6 +83,7 @@ def serialize(obj):
         result["__module__"] = obj.__module__
     except AttributeError:
         pass
+
     # Convert objects to dictionary representation based on type
     if isinstance(obj, datetime):
         result["year"] = obj.year
@@ -98,6 +99,9 @@ def serialize(obj):
         obj._raw_stream = StringIO(result["body"])
         obj._amount_read = 0
         return result
+    if isinstance(obj, bytes):
+        return obj.decode('utf8')
+
     # Raise a TypeError if the object isn't recognized
     raise TypeError("Type not serializable")
 
@@ -269,7 +273,7 @@ class PillTest(unittest.TestCase):
         self.assertEqual(value, expected)
 
     def cleanUp(self):
-        pass
+        self.pill = None
 
     def record_flight_data(self, test_case, zdata=False, augment=False):
         self.recording = True
@@ -287,6 +291,7 @@ class PillTest(unittest.TestCase):
             pill = attach(session, self.archive_path, test_case, debug=True)
 
         pill.record()
+        self.pill = pill
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
 

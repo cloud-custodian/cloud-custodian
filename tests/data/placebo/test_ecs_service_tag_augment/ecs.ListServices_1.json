@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "serviceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:service/Default/devx"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "c424d839-ecfd-11e8-a068-6f1761246895",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c424d839-ecfd-11e8-a068-6f1761246895",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "75",
+                "date": "Tue, 20 Nov 2018 19:52:08 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
