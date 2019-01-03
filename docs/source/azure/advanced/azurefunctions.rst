@@ -27,9 +27,12 @@ When deploying an Azure function the following ARM resources are required and cr
 - Application Service Plan (shared across functions)
 - Application Service (per function)
 
-A single Application Service Plan (Basic, Standard or Premium) can service a large number
-of Application Service Instances.  If you provide the same servicePlanName with all policies or
-use the default name then only new Applications will be created during deployment, all using the same
+Functions can be ran in either a dedicated Application Service Plan (Basic, Standard or Premium) or in a Consumption plan.
+More details on the different hosting models offered by Azure Functions can be found `here <https://docs.microsoft.com/en-us/azure/azure-functions/functions-scale>`_.
+By default, we will run all Custodian policies using the Consumption hosting model. (i.e. skuTier=dynamic)
+
+A dedicated plan can service multiple Function Applications.  If you provide the same servicePlanName with all policies or
+use the default name then only new Function Applications will be created during deployment, all using the same
 shared plan resources.
 
 Execution in Azure functions comes with a default set of configurations for the provisioned
@@ -40,8 +43,8 @@ keys:
   - name (default: cloud-custodian)
   - location (default: West US 2)
   - resourceGroupName (default: cloud-custodian)
-  - skuTier (default: Basic)
-  - skuName (default: B1)
+  - skuTier (default: dynamic) # consumption
+  - skuName (default: None)
 - storageAccount
   - name (default: custodian + sha256(resourceGroupName+subscription_id)[:8])
   - location (default: servicePlan location)
