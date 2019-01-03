@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                "LaunchTemplateName": "test-template",
+                "VersionNumber": 1,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 15,
+                    "minute": 12,
+                    "second": 36,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "Encrypted": false,
+                                "VolumeSize": 1
+                            }
+                        }
+                    ],
+                    "ImageId": "ami-009d6802948d06e52",
+                    "InstanceType": "t2.small",
+                    "SecurityGroupIds": [
+                        "sg-015ed77d59ea1c12f"
+                    ]
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "a9af7c54-6746-4548-ad0c-652578ff0f36",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 03 Jan 2019 16:32:10 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

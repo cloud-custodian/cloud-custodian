@@ -1,55 +1,117 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "AutoScalingGroups": [
             {
-                "AutoScalingGroupARN": "arn:aws:autoscaling:us-west-2:619193117841:autoScalingGroup:650754f5-21d3-409f-b43a-fffdeb22910d:autoScalingGroupName/CustodianASG", 
-                "HealthCheckGracePeriod": 300, 
-                "SuspendedProcesses": [], 
-                "DesiredCapacity": 3, 
-                "Tags": [
+                "AutoScalingGroupName": "skunk-test-config-asg",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:2e4193ec-fbeb-4b92-b700-0f2faffeec2c:autoScalingGroupName/skunk-test-config-asg",
+                "LaunchConfigurationName": "test-config",
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
                     {
-                        "ResourceType": "auto-scaling-group", 
-                        "ResourceId": "CustodianASG", 
-                        "PropagateAtLaunch": true, 
-                        "Value": "ubuntu", 
-                        "Key": "Platform"
+                        "InstanceId": "i-03dc9dd5750d4b073",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchConfigurationName": "test-config",
+                        "ProtectedFromScaleIn": false
                     }
-                ], 
-                "EnabledMetrics": [], 
-                "LoadBalancerNames": [], 
-                "AutoScalingGroupName": "CustodianASG", 
-                "DefaultCooldown": 300, 
-                "MinSize": 3, 
-                "Instances": [], 
-                "MaxSize": 3, 
-                "VPCZoneIdentifier": "subnet-3f9e3d54,subnet-389e3d53,subnet-3e9e3d55", 
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 16,
+                    "minute": 16,
+                    "second": 2,
+                    "microsecond": 126000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3a334610",
+                "EnabledMetrics": [],
+                "Tags": [],
                 "TerminationPolicies": [
                     "Default"
-                ], 
-                "LaunchConfigurationName": "CustodianASGTestCopyCopy", 
-                "CreatedTime": {
-                    "hour": 18, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 32, 
-                    "microsecond": 276000, 
-                    "year": 2016, 
-                    "day": 16, 
-                    "minute": 31
-                }, 
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            },
+            {
+                "AutoScalingGroupName": "test-asg",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:b66a97b2-d2e7-429f-8090-e75a24a92e25:autoScalingGroupName/test-asg",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                    "LaunchTemplateName": "test-template",
+                    "Version": "1"
+                },
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
                 "AvailabilityZones": [
-                    "us-west-2c", 
-                    "us-west-2b", 
-                    "us-west-2a"
-                ], 
-                "HealthCheckType": "EC2", 
-                "NewInstancesProtectedFromScaleIn": false
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-0c1eb0f8ea4caf02b",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                            "LaunchTemplateName": "test-template",
+                            "Version": "1"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 15,
+                    "minute": 13,
+                    "second": 4,
+                    "microsecond": 862000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3a334610",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "6f543cd2-1b94-11e6-90cf-81867695311d"
+            "RequestId": "1e7e3b47-0f75-11e9-b682-cd8268f1f965",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1e7e3b47-0f75-11e9-b682-cd8268f1f965",
+                "content-type": "text/xml",
+                "content-length": "4129",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 03 Jan 2019 16:32:10 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }

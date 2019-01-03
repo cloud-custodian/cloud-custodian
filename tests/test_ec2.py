@@ -1428,3 +1428,18 @@ class TestUserData(BaseTest):
         )
         resources = policy.run()
         self.assertGreater(len(resources), 0)
+
+
+class LaunchTemplateTest(BaseTest):
+
+    def test_launch_template(self):
+        session_factory = self.replay_flight_data("test_launch_template")
+        policy = self.load_policy(
+            {
+                "name": "launch-template-test",
+                "resource": "launch-template"
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)

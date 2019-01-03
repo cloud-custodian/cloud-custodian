@@ -1,72 +1,66 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "LaunchConfigurations": [
             {
-                "UserData": "", 
-                "IamInstanceProfile": "BaseIAMRole", 
-                "EbsOptimized": false, 
-                "LaunchConfigurationARN": "arn:aws:autoscaling:us-west-2:619193117841:launchConfiguration:e99ebfb6-f44e-4fed-b441-b52a81a29add:launchConfigurationName/CustodianASGTestCopyCopy", 
-                "InstanceMonitoring": {
-                    "Enabled": false
-                }, 
-                "ClassicLinkVPCSecurityGroups": [], 
-                "CreatedTime": {
-                    "hour": 18, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 33, 
-                    "microsecond": 170000, 
-                    "year": 2016, 
-                    "day": 16, 
-                    "minute": 30
-                }, 
+                "LaunchConfigurationName": "test-config",
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:3e56210b-9b2d-4b3d-a056-d4e9af6514fa:launchConfigurationName/test-config",
+                "ImageId": "ami-009d6802948d06e52",
+                "KeyName": "cewkey",
+                "SecurityGroups": [
+                    "sg-02d416c151dcf69c7"
+                ],
+                "ClassicLinkVPCSecurityGroups": [],
+                "UserData": "",
+                "InstanceType": "t2.small",
+                "KernelId": "",
+                "RamdiskId": "",
                 "BlockDeviceMappings": [
                     {
-                        "DeviceName": "/dev/sdb", 
-                        "VirtualName": "ephemeral0"
-                    }, 
-                    {
-                        "DeviceName": "/dev/sda1", 
+                        "DeviceName": "/dev/sdc",
                         "Ebs": {
-                            "DeleteOnTermination": true, 
-                            "VolumeSize": 8, 
-                            "VolumeType": "gp2"
+                            "VolumeSize": 1,
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": false,
+                            "Encrypted": false
                         }
-                    }, 
+                    },
                     {
-                        "DeviceName": "/dev/sde", 
+                        "DeviceName": "/dev/xvda",
                         "Ebs": {
-                            "DeleteOnTermination": false, 
-                            "Encrypted": false, 
-                            "VolumeSize": 8, 
-                            "VolumeType": "gp2"
-                        }
-                    }, 
-                    {
-                        "DeviceName": "/dev/sdc", 
-                        "Ebs": {
-                            "DeleteOnTermination": false, 
-                            "SnapshotId": "snap-8b0a6271", 
-                            "VolumeSize": 8, 
-                            "VolumeType": "gp2"
+                            "SnapshotId": "snap-05c184ed39d0ecd7b",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": true
                         }
                     }
-                ], 
-                "KeyName": "hazmat-west", 
-                "SecurityGroups": [
-                    "sg-47b76f22"
-                ], 
-                "LaunchConfigurationName": "CustodianASGTestCopyCopy", 
-                "KernelId": "", 
-                "RamdiskId": "", 
-                "ImageId": "ami-9abea4fb", 
-                "InstanceType": "m3.medium"
+                ],
+                "InstanceMonitoring": {
+                    "Enabled": false
+                },
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 16,
+                    "minute": 15,
+                    "second": 34,
+                    "microsecond": 659000
+                },
+                "EbsOptimized": false
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "6fb4106f-1b94-11e6-a29b-750886ac0da7"
+            "RequestId": "1eae994d-0f75-11e9-9f66-97c3d9b6231b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1eae994d-0f75-11e9-9f66-97c3d9b6231b",
+                "content-type": "text/xml",
+                "content-length": "1902",
+                "date": "Thu, 03 Jan 2019 16:32:10 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }

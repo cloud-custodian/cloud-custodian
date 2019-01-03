@@ -1,47 +1,49 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Images": [
             {
-                "VirtualizationType": "hvm", 
-                "Name": "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20160114.5", 
-                "Hypervisor": "xen", 
-                "SriovNetSupport": "simple", 
-                "ImageId": "ami-9abea4fb", 
-                "State": "available", 
+                "Architecture": "x86_64",
+                "CreationDate": "2018-11-14T09:06:55.000Z",
+                "ImageId": "ami-009d6802948d06e52",
+                "ImageLocation": "amazon/amzn2-ami-hvm-2.0.20181114-x86_64-gp2",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "137112412989",
+                "State": "available",
                 "BlockDeviceMappings": [
                     {
-                        "DeviceName": "/dev/sda1", 
+                        "DeviceName": "/dev/xvda",
                         "Ebs": {
-                            "DeleteOnTermination": true, 
-                            "SnapshotId": "snap-306df873", 
-                            "VolumeSize": 8, 
-                            "VolumeType": "gp2", 
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-05c184ed39d0ecd7b",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
                             "Encrypted": false
                         }
-                    }, 
-                    {
-                        "DeviceName": "/dev/sdb", 
-                        "VirtualName": "ephemeral0"
-                    }, 
-                    {
-                        "DeviceName": "/dev/sdc", 
-                        "VirtualName": "ephemeral1"
                     }
-                ], 
-                "Architecture": "x86_64", 
-                "ImageLocation": "099720109477/ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20160114.5", 
-                "RootDeviceType": "ebs", 
-                "OwnerId": "099720109477", 
-                "RootDeviceName": "/dev/sda1", 
-                "CreationDate": "2016-01-15T22:11:35.000Z", 
-                "Public": true, 
-                "ImageType": "machine"
+                ],
+                "Description": "Amazon Linux 2 AMI 2.0.20181114 x86_64 HVM gp2",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "ImageOwnerAlias": "amazon",
+                "Name": "amzn2-ami-hvm-2.0.20181114-x86_64-gp2",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "a299762f-37b7-4e44-855e-19751b2d76fb"
+            "RequestId": "96cc021e-d480-4b33-8b29-14991daf22d1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1727",
+                "date": "Thu, 03 Jan 2019 16:32:11 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
         }
     }
 }

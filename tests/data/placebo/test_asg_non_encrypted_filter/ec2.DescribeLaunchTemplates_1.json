@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplates": [
+            {
+                "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                "LaunchTemplateName": "test-template",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 15,
+                    "minute": 12,
+                    "second": 36,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com",
+                "DefaultVersionNumber": 1,
+                "LatestVersionNumber": 1
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "2b680833-7b24-4adf-96da-f58bbbbcc9be",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 03 Jan 2019 16:32:11 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

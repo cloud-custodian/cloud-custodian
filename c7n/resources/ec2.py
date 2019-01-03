@@ -41,7 +41,7 @@ from c7n.manager import resources
 from c7n import query
 
 from c7n import utils
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, local_session
 
 
 filters = FilterRegistry('ec2.filters')
@@ -1691,3 +1691,55 @@ class InstanceAttribute(ValueFilter):
             keys.remove('InstanceId')
             resource['c7n:attribute-%s' % attribute] = fetched_attribute[
                 keys[0]]
+
+
+@resources.register('launch-template')
+class LaunchTemplate(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        type = 'LaunchTemplate'
+        id = 'LaunchTemplateId'
+        name = 'LaunchTemplateName'
+        date = 'CreateTime'
+        dimension = 'LaunchTemplateName'
+        enum_spec = (
+            'describe_launch_templates', 'LaunchTemplates', None)
+        filter_name = 'LaunchTemplateNames'
+        filter_type = 'list'
+        config_type = "AWS::EC2::LaunchTemplate"
+
+
+class LaunchTemplateDataFilterBase(object):
+
+    template_configs = {}
+
+    def initialize(self, asgs):
+        super(LaunchTemplateDataFilterBase, self).initialize(asgs)
+        config_names = set()
+        skip = []
+
+        for a in asgs:
+            if 'LaunchTemplate' not in a and 'LaunchConfigurationName' not in a:
+                skip.append(a)
+                continue
+            if 'LaunchTemplate' in a:
+                config_names.add(a['LaunchTemplate']['LaunchTemplateName'])
+
+        for a in skip:
+            asgs.remove(a)
+
+        client = local_session(self.manager.session_factory).client('ec2')
+        lt_resources = self.manager.get_resource_manager('launch-template')
+        templates = lt_resources.resources()
+
+        for t in templates:
+            data = client.describe_launch_template_versions(
+                LaunchTemplateName=t['LaunchTemplateName'],
+                Versions=[str(t['LatestVersionNumber'])]
+            )
+            t['LaunchTemplateData'] = data['LaunchTemplateVersions'][0]['LaunchTemplateData']
+            t['LaunchTemplateData']['LaunchTemplateName'] = t['LaunchTemplateName']
+            if 'UserData' in t['LaunchTemplateData']:
+                del t['LaunchTemplateData']['UserData']
+            self.template_configs[t['LaunchTemplateName']] = t['LaunchTemplateData']

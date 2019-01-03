@@ -41,7 +41,7 @@ from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
 
 
-from .ec2 import deserialize_user_data
+from .ec2 import deserialize_user_data, LaunchTemplateDataFilterBase
 
 log = logging.getLogger('custodian.asg')
 
@@ -97,10 +97,11 @@ class LaunchConfigFilterBase(object):
 
         for a in asgs:
             # Per https://github.com/capitalone/cloud-custodian/issues/143
-            if 'LaunchConfigurationName' not in a:
+            if 'LaunchConfigurationName' not in a and 'LaunchTemplate' not in a:
                 skip.append(a)
                 continue
-            config_names.add(a['LaunchConfigurationName'])
+            if 'LaunchConfigurationName' in a:
+                config_names.add(a['LaunchConfigurationName'])
 
         for a in skip:
             asgs.remove(a)
@@ -406,7 +407,7 @@ class InvalidConfigFilter(ConfigValidFilter):
 
 
 @filters.register('not-encrypted')
-class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
+class NotEncryptedFilter(Filter, LaunchTemplateDataFilterBase, LaunchConfigFilterBase):
     """Check if an ASG is configured to have unencrypted volumes.
 
     Checks both the ami snapshots and the launch configuration.
@@ -429,7 +430,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
         'ec2:DescribeSnapshots',
         'autoscaling:DescribeLaunchConfigurations')
 
-    images = unencrypted_configs = unencrypted_images = None
+    images = unencrypted_configs = unencrypted_templates = unencrypted_images = None
 
     # TODO: resource-manager, notfound err mgr
 
@@ -438,7 +439,11 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
         return super(NotEncryptedFilter, self).process(asgs, event)
 
     def __call__(self, asg):
-        cfg = self.configs.get(asg['LaunchConfigurationName'])
+        cfg = None
+        if 'LaunchConfigurationName' in asg:
+            cfg = self.configs.get(asg['LaunchConfigurationName'])
+        if not cfg and 'LaunchTemplate' in asg:
+            cfg = self.template_configs.get(asg['LaunchTemplate']['LaunchTemplateName'])
         if not cfg:
             self.log.warning(
                 "ASG %s instances: %d has missing config: %s",
@@ -448,8 +453,11 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
         unencrypted = []
         if (not self.data.get('exclude_image') and cfg['ImageId'] in self.unencrypted_images):
             unencrypted.append('Image')
-        if cfg['LaunchConfigurationName'] in self.unencrypted_configs:
+        if ('LaunchConfigurationName' in cfg and
+                cfg['LaunchConfigurationName'] in self.unencrypted_configs):
             unencrypted.append('LaunchConfig')
+        if 'LaunchTemplateName' in cfg and cfg['LaunchTemplateName'] in self.unencrypted_templates:
+            unencrypted.append('LaunchTemplate')
         if unencrypted:
             asg['Unencrypted'] = unencrypted
         return bool(unencrypted)
@@ -458,7 +466,8 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
         super(NotEncryptedFilter, self).initialize(asgs)
         ec2 = local_session(self.manager.session_factory).client('ec2')
         self.unencrypted_images = self.get_unencrypted_images(ec2)
-        self.unencrypted_configs = self.get_unencrypted_configs(ec2)
+        self.unencrypted_configs = self.get_unencrypted_launch_methods(ec2, self.configs)
+        self.unencrypted_templates = self.get_unencrypted_launch_methods(ec2, self.template_configs)
 
     def _fetch_images(self, ec2, image_ids):
         while True:
@@ -483,6 +492,8 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
         image_ids = set()
         for cfg in self.configs.values():
             image_ids.add(cfg['ImageId'])
+        for cfg in self.template_configs.values():
+            image_ids.add(cfg['ImageId'])
 
         self.log.debug("querying %d images", len(image_ids))
         results = self._fetch_images(ec2, image_ids)
@@ -496,11 +507,11 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                     break
         return unencrypted_images
 
-    def get_unencrypted_configs(self, ec2):
+    def get_unencrypted_launch_methods(self, ec2, launch_method):
         """retrieve configs that have unencrypted ebs voluems referenced."""
-        unencrypted_configs = set()
+        unencrypted_launch_methods = set()
         snaps = {}
-        for cid, c in self.configs.items():
+        for cid, c in launch_method.items():
             image = self.images.get(c['ImageId'])
             # image deregistered/unavailable
             if image is not None:
@@ -509,26 +520,27 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                     for bd in image['BlockDeviceMappings'] if 'Ebs' in bd}
             else:
                 image_block_devs = {}
-            for bd in c['BlockDeviceMappings']:
-                if 'Ebs' not in bd:
-                    continue
-                # Launch configs can shadow image devices, images have
-                # precedence.
-                if bd['DeviceName'] in image_block_devs:
-                    continue
-                if 'SnapshotId' in bd['Ebs']:
-                    snaps.setdefault(
-                        bd['Ebs']['SnapshotId'].strip(), []).append(cid)
-                elif not bd['Ebs'].get('Encrypted'):
-                    unencrypted_configs.add(cid)
+            if 'BlockDeviceMappings' in c:
+                for bd in c['BlockDeviceMappings']:
+                    if 'Ebs' not in bd:
+                        continue
+                    # Launch configs can shadow image devices, images have
+                    # precedence.
+                    if bd['DeviceName'] in image_block_devs:
+                        continue
+                    if 'SnapshotId' in bd['Ebs']:
+                        snaps.setdefault(
+                            bd['Ebs']['SnapshotId'].strip(), []).append(cid)
+                    elif not bd['Ebs'].get('Encrypted'):
+                        unencrypted_launch_methods.add(cid)
         if not snaps:
-            return unencrypted_configs
+            return unencrypted_launch_methods
 
         self.log.debug("querying %d snapshots", len(snaps))
         for s in self.get_snapshots(ec2, list(snaps.keys())):
             if not s.get('Encrypted'):
-                unencrypted_configs.update(snaps[s['SnapshotId']])
-        return unencrypted_configs
+                unencrypted_launch_methods.update(snaps[s['SnapshotId']])
+        return unencrypted_launch_methods
 
     def get_snapshots(self, ec2, snap_ids):
         """get snapshots corresponding to id, but tolerant of invalid id's."""

@@ -114,8 +114,9 @@ class AutoScalingTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]["Unencrypted"], ["Image", "LaunchConfig"])
+        self.assertEqual(resources[1]["Unencrypted"], ["Image", "LaunchTemplate"])
 
     def test_get_bad_snapshot_malformed(self):
         operation_name = "DescribeSnapshots"
