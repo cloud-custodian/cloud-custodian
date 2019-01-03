@@ -110,7 +110,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'name': 'cloud-custodian',
                 'location': 'eastus',
                 'resource_group_name': 'cloud-custodian',
-                'tier': 'dynamic' # consumption plan
+                'sku_tier': 'dynamic' # consumption plan
             })
 
         # Metadata used for automatic naming

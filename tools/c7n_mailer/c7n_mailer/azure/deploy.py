@@ -82,7 +82,7 @@ def provision(config):
                                                     'name': 'cloud-custodian',
                                                     'location': 'eastus',
                                                     'resource_group_name': 'cloud-custodian',
-                                                    'tier': 'dynamic'  # consumption plan
+                                                    'sku_tier': 'dynamic'  # consumption plan
                                                 })
 
     location = service_plan.get('location', 'eastus')

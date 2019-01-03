@@ -23,11 +23,11 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         site_config = SiteConfig(app_settings=[])
         functionapp_def = Site(location=params['location'], site_config=site_config)
 
-        # linux app
+        # linux app settings
         functionapp_def.kind = 'functionapp,linux'
         functionapp_def.reserved = True
 
-        # dedicated app plan
+        # dedicated app plan settings
         if params['app_service_plan_id']:
             functionapp_def.server_farm_id = params['app_service_plan_id']
             site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
@@ -36,11 +36,13 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
                                       FunctionAppDeploymentUnit.generate_machine_decryption_key()))
             site_config.always_on = True
 
+        # application insights settings
         app_insights_key = params['app_insights_key']
         if app_insights_key:
             site_config.app_settings.append(
                 azure_name_value_pair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
 
+        # general app settings
         con_string = params['storage_account_connection_string']
         site_config.app_settings.append(azure_name_value_pair('AzureWebJobsStorage', con_string))
         site_config.app_settings.append(azure_name_value_pair('AzureWebJobsDashboard', con_string))
