@@ -66,7 +66,7 @@ Find KeyVaults with more than 1000 API hits in the last hour
             threshold: 1000
             timeframe: 1
 
-Find SQL servers with less than 10% average DTU consumption over last 24 hours
+Find SQL servers with less than 10% average DTU consumption across all databases over last 24 hours
 
 .. code-block:: yaml
 
@@ -80,6 +80,7 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
             op: lt
             threshold: 10
             timeframe: 24
+            filter:  "DatabaseResourceId eq '*'"
 
 
 Tag Filter
