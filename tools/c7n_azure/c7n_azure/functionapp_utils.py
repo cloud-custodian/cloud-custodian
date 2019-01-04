@@ -161,14 +161,14 @@ class FunctionAppUtilities(object):
                 )
             except CloudError as e:
                 # This appears to be a bug in the API
-                # Success returns a 200, which is unexpected and gets rethrown as a CloudError
-                if e.response.status_code == 200:
+                # Success can be either 200 or 204, which is unexpected and gets rethrown as a CloudError
+                if e.response.status_code in [200, 204]:
                     break
 
                 cls.log.error("Failed to sync triggers...")
                 cls.log.error(e)
 
-            if res and res.status_code == 200:
+            if res and res.status_code in [200, 204]:
                 break
             else:
                 cls.log.info("Retrying in 5 seconds...")
