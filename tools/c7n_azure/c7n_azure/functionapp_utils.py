@@ -16,7 +16,8 @@ import logging
 import time
 
 from azure.storage.blob import BlobPermissions
-from c7n_azure.constants import FUNCTION_CONSUMPTION_BLOB_CONTAINER, FUNCTION_PACKAGE_SAS_EXPIRY_DAYS
+from c7n_azure.constants import \
+    FUNCTION_CONSUMPTION_BLOB_CONTAINER, FUNCTION_PACKAGE_SAS_EXPIRY_DAYS
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
@@ -90,11 +91,12 @@ class FunctionAppUtilities(object):
         storage_account_id = sa_unit.provision_if_not_exists(function_params.storage_account).id
         con_string = FunctionAppUtilities.get_storage_account_connection_string(storage_account_id)
 
-        function_app_params.update({'location': app_service_plan.location,
-                                    'app_service_plan_id': app_service_plan.id,
-                                    'app_insights_key': app_insights.instrumentation_key,
-                                    'is_consumption_plan': FunctionAppUtilities.is_consumption_plan(function_params),
-                                    'storage_account_connection_string': con_string})
+        function_app_params.update(
+            {'location': app_service_plan.location,
+             'app_service_plan_id': app_service_plan.id,
+             'app_insights_key': app_insights.instrumentation_key,
+             'is_consumption_plan': FunctionAppUtilities.is_consumption_plan(function_params),
+             'storage_account_connection_string': con_string})
 
         return function_app_unit.provision(function_app_params)
 
@@ -130,14 +132,16 @@ class FunctionAppUtilities(object):
 
             # upload package
             blob_name = '%s.zip' % function_params.function_app_name
-            blob_client.create_blob_from_path(FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, package.pkg.path)
+            blob_client.create_blob_from_path(
+                FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, package.pkg.path)
 
             # create blob url for package
             sas = blob_client.generate_blob_shared_access_signature(
                 FUNCTION_CONSUMPTION_BLOB_CONTAINER,
                 blob_name,
                 BlobPermissions.READ,
-                datetime.datetime.utcnow() + datetime.timedelta(days=FUNCTION_PACKAGE_SAS_EXPIRY_DAYS)
+                datetime.datetime.utcnow() +
+                datetime.timedelta(days=FUNCTION_PACKAGE_SAS_EXPIRY_DAYS)
                 # expire in 10 years
             )
             blob_url = blob_client.make_blob_url(
@@ -167,7 +171,8 @@ class FunctionAppUtilities(object):
                 )
             except CloudError as e:
                 # This appears to be a bug in the API
-                # Success can be either 200 or 204, which is unexpected and gets rethrown as a CloudError
+                # Success can be either 200 or 204, which is
+                # unexpected and gets rethrown as a CloudError
                 if e.response.status_code in [200, 204]:
                     break
 

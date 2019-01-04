@@ -4,7 +4,7 @@ from binascii import hexlify
 from azure.mgmt.web.models import (Site, SiteConfig)
 from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
-from c7n_azure.utils import azure_name_value_pair, StringUtils
+from c7n_azure.utils import azure_name_value_pair
 
 
 class FunctionAppDeploymentUnit(DeploymentUnit):

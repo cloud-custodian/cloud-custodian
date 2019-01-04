@@ -110,7 +110,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'name': 'cloud-custodian',
                 'location': 'eastus',
                 'resource_group_name': 'cloud-custodian',
-                'sku_tier': 'Dynamic', # consumption plan
+                'sku_tier': 'Dynamic',  # consumption plan
                 'sku_name': 'Y1'
             })
 
