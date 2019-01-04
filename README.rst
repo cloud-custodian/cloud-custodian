@@ -3,7 +3,7 @@
      :alt: Join the chat at https://gitter.im/capitalone/cloud-custodian
 
 .. image:: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
-     :target: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
+     :target: https://dev.azure.com/cloud-custodian/cloud-custodian/_build
      :alt: Build Status
 
 .. image:: https://img.shields.io/badge/license-Apache%202-blue.svg
