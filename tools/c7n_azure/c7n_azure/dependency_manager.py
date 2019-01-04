@@ -41,15 +41,14 @@ class DependencyManager(object):
         res = [t for t in res if not any((e in t) for e in excluded_packages + packages)]
 
         # boto3 is a dependency for both c7n and c7n_mailer.. Remove the duplicate from the list
-        # because not all versions of pip can handle this.   
+        # because not all versions of pip can handle this. 
         # use regex to get rid of duplicates excluding version number
         regex = "^[^<>~=]*"
         for i, val in enumerate(res):
             pname = re.match(regex, val)
             if sum(pname[0] in e for e in res) > 1:
                 logger.debug("removing duplicate dependency:" + val)
-                res.pop(i)
-        
+                res.pop(i)        
         return res
 
     @staticmethod
