@@ -13,6 +13,7 @@
 # limitations under the License.
 import datetime
 import logging
+import time
 from collections import defaultdict
 
 from azure.storage.blob import BlobPermissions
@@ -24,6 +25,7 @@ from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
+from msrestazure.azure_exceptions import CloudError
 
 from c7n.utils import local_session
 
@@ -129,7 +131,8 @@ class FunctionAppUtilities(object):
                 FUNCTION_CONSUMPTION_BLOB_CONTAINER,
                 blob_name,
                 BlobPermissions.READ,
-                datetime.datetime.utcnow() + datetime.timedelta(days=FUNCTION_PACKAGE_SAS_EXPIRY_DAYS)  # expire in 10 years
+                datetime.datetime.utcnow() + datetime.timedelta(days=FUNCTION_PACKAGE_SAS_EXPIRY_DAYS)
+                # expire in 10 years
             )
             blob_url = blob_client.make_blob_url(
                 FUNCTION_CONSUMPTION_BLOB_CONTAINER,
@@ -147,5 +150,28 @@ class FunctionAppUtilities(object):
                 kind=str,
                 properties=app_settings.properties
             )
+
+        cls.log.info('Sync Triggers...')
+        for r in range(3):
+            res = None
+            try:
+                res = web_client.web_apps.sync_function_triggers(
+                    function_params.function_app_resource_group_name,
+                    function_params.function_app_name
+                )
+            except CloudError as e:
+                # This appears to be a bug in the API
+                # Success returns a 200, which is unexpected and gets rethrown as a CloudError
+                if e.response.status_code == 200:
+                    break
+
+                cls.log.error("Failed to sync triggers...")
+                cls.log.error(e)
+
+            if res and res.status_code == 200:
+                break
+            else:
+                cls.log.info("Retrying in 5 seconds...")
+                time.sleep(5)
 
         cls.log.info('Finished publishing Function application')

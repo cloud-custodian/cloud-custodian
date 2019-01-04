@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import sys
-import os
 
 # do not generate pycache
 sys.dont_write_bytecode = True
