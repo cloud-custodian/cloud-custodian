@@ -13,17 +13,21 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from mock import patch
+
 from azure_common import BaseTest
 from c7n_azure.utils import Math
 from c7n_azure.utils import ResourceIdParser
 from c7n_azure.utils import StringUtils
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import PortsRangeHelper
+from c7n_azure.utils import AppInsightsHelper
 
 
 RESOURCE_ID = (
     "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
     "rgtest/providers/Microsoft.Compute/virtualMachines/nametest")
+GUID = '00000000-0000-0000-0000-000000000000'
 
 
 class UtilsTest(BaseTest):
@@ -166,3 +170,11 @@ class UtilsTest(BaseTest):
         self.assertEqual(StringUtils.naming_hash(source), '16aba539')
         self.assertEqual(StringUtils.naming_hash(source, 10), '16aba5393a')
         self.assertNotEqual(StringUtils.naming_hash(source), StringUtils.naming_hash(source2))
+
+    @patch('azure.mgmt.applicationinsights.operations.ComponentsOperations.get',
+           return_value=type(str('result_data'), (), {'instrumentation_key': GUID}))
+    def test_app_insights_get_instrumentation_key(self, mock_handler_run):
+        self.assertEqual(AppInsightsHelper.get_instrumentation_key('azure://' + GUID), GUID)
+        self.assertEqual(AppInsightsHelper.get_instrumentation_key('azure://resourceGroup/name'),
+                         GUID)
+        mock_handler_run.assert_called_once_with('resourceGroup', 'name')
