@@ -44,6 +44,18 @@ class SubnetFilter(RelatedResourceFilter):
     AnnotationKey = "matched-subnets"
 
 
+class VpcFilter(RelatedResourceFilter):
+    """Filter a resource by its associated vpc."""
+    schema = type_schema(
+        'vpc', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+
+    schema_alias = True
+    RelatedResource = "c7n.resources.vpc.Vpc"
+    AnnotationKey = "matched-vpcs"
+
+
 class DefaultVpcBase(Filter):
     """Filter to resources in a default vpc."""
     vpcs = None

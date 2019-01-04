@@ -61,9 +61,9 @@ class ResourceQuery(object):
     def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
         if client.can_paginate(enum_op):
             p = client.get_paginator(enum_op)
-            results = p.paginate(**params)
             if retry:
                 p.PAGE_ITERATOR_CLS = RetryPageIterator
+            results = p.paginate(**params)
             data = results.build_full_result()
         else:
             op = getattr(client, enum_op)

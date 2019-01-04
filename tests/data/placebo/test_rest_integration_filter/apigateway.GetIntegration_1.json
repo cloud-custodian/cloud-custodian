@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "851bd6de-023f-11e9-986d-e73c85291857",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 17 Dec 2018 21:05:45 GMT",
+                "content-type": "application/json",
+                "content-length": "396",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "851bd6de-023f-11e9-986d-e73c85291857",
+                "x-amz-apigw-id": "SEdiaK6soAMEbpg="
+            },
+            "RetryAttempts": 0
+        },
+        "type": "AWS",
+        "httpMethod": "GET",
+        "uri": "arn:aws:apigateway:us-east-1:cloudcustodiantestdomain.com.ecs:action/",
+        "credentials": "arn:aws:iam::644160558196:role/aws-ec2-spot-fleet-role",
+        "passthroughBehavior": "WHEN_NO_MATCH",
+        "timeoutInMillis": 3000,
+        "cacheNamespace": "ovgcc9m0b7",
+        "cacheKeyParameters": [],
+        "integrationResponses": {
+            "200": {
+                "statusCode": "200",
+                "responseTemplates": {
+                    "application/json": null
+                }
+            }
+        }
+    }
+}

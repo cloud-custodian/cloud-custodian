@@ -190,7 +190,8 @@ class EmailDelivery(object):
         # these were manually set by the policy writer in notify to section
         # or it's an email from an aws event username from an ldap_lookup
         email_to_addrs_to_resources_map = {}
-        targets = sqs_message['action']['to']
+        targets = sqs_message['action']['to'] + \
+            (sqs_message['action']['cc'] if 'cc' in sqs_message['action'] else [])
         no_owner_targets = self.get_valid_emails_from_list(
             sqs_message['action'].get('owner_absent_contact', [])
         )

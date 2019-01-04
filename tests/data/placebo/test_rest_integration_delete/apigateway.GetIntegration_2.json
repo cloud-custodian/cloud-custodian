@@ -1,0 +1,23 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "No integration defined for method",
+            "Code": "NotFoundException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "bb35054a-023f-11e9-bc40-730eea26e259",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "date": "Mon, 17 Dec 2018 21:07:15 GMT",
+                "content-type": "application/json",
+                "content-length": "48",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "bb35054a-023f-11e9-bc40-730eea26e259",
+                "x-amzn-errortype": "NotFoundException",
+                "x-amz-apigw-id": "SEdwmKY9oAMEcSA="
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

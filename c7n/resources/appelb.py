@@ -193,6 +193,12 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "AvailabilityZones[].SubnetId"
 
 
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 filters.register('network-location', net_filters.NetworkLocation)
 
 

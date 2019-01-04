@@ -1,0 +1,20 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 26 Dec 2018 15:04:19 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "640",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "downloadUrl": "https://storage.googleapis.com/gcf-sources-us-central1-83fec15d-2d93-4ab7-89c6-f6c7a45912c0/24f8db69-2024-4516-8aaf-4f74ba78f7b6/8/function-source.zip?GoogleAccessId=service-435820424010@gcf-admin-robot.iam.gserviceaccount.com&Expires=1545838459&Signature=Nqj69xsBWZmUK%2Fdqfbi0NMOau11jtLfn1PbB1Khycy6q9xobdBQJSURWdGcEs08xJfU1skXMopuwyIwvaufpws4%2FgCiX9pmvMiBVI30g0dDXuXRGFHyOFndpEZWf%2BB%2BnzcSsE0R6yNRA7GpxiMwy7LkkjJ4jFmhILjIORYeH6ivGHNlBrg6tTb3vuW8064wqgmNE%2FSWOXbQst3TMceXJddat3scO66KV7j7ijIy91IRtU2rXKFT%2BB5WfBjQV0kSISiICSkiwa9RCShCy43qqD9Q49ogi3LmHR4iLWmZbvazCMzJLqMvA2u4vQPt3Wao90OcZ6WRPszQBdiRjOcElng%3D%3D"
+  }
+}

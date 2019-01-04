@@ -59,6 +59,8 @@ This policy will find all SQL servers with average DTU consumption under 10 perc
             aggregation: average
             threshold: 10
             timeframe: 72
+            filter: "ElasticPoolResourceId eq '*'"
+            no_data_action: include
          actions:
           - type: notify
             template: default
