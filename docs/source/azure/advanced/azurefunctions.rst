@@ -43,7 +43,7 @@ keys:
   - name (default: cloud-custodian)
   - location (default: West US 2)
   - resourceGroupName (default: cloud-custodian)
-  - skuTier (default: dynamic) # consumption
+  - skuTier (default: Dynamic) # consumption
   - skuName (default: None)
 - storageAccount
   - name (default: custodian + sha256(resourceGroupName+subscription_id)[:8])
