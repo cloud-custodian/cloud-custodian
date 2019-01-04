@@ -14,7 +14,6 @@
 import datetime
 import logging
 import time
-from collections import defaultdict
 
 from azure.storage.blob import BlobPermissions
 from c7n_azure.constants import FUNCTION_CONSUMPTION_BLOB_CONTAINER, FUNCTION_PACKAGE_SAS_EXPIRY_DAYS
@@ -63,22 +62,26 @@ class FunctionAppUtilities(object):
     @staticmethod
     def deploy_function_app(function_params):
         function_app_unit = FunctionAppDeploymentUnit()
-        function_app_params = defaultdict(lambda: None)
-        function_app_params.update({
-            'name': function_params.function_app_name,
-            'resource_group_name': function_params.function_app_resource_group_name,
-            'location': function_params.service_plan['location']})
-
+        function_app_params = \
+            {'name': function_params.function_app_name,
+             'resource_group_name': function_params.function_app_resource_group_name}
         function_app = function_app_unit.get(function_app_params)
+
         if function_app:
+            # retrieve the type of app service plan hosting the existing function app
+            session = local_session(Session)
+            web_client = session.client('azure.mgmt.web.WebSiteManagementClient')
+            app_id = function_app.server_farm_id
+            app_name = ResourceIdParser.get_resource_name(app_id)
+            app_resource_group_name = ResourceIdParser.get_resource_group(app_id)
+            app_service_plan = web_client.app_service_plans.get(app_name, app_resource_group_name)
+            function_params.service_plan['sku_tier'] = app_service_plan.sku.tier
+
             return function_app
 
-        # dedicated app plan
-        if not FunctionAppUtilities.is_consumption_plan(function_params):
-            sp_unit = AppServicePlanUnit()
-            app_service_plan = sp_unit.provision_if_not_exists(function_params.service_plan)
-            function_app_params.update({'location': app_service_plan.location,
-                                        'app_service_plan_id': app_service_plan.id})
+        sp_unit = AppServicePlanUnit()
+        app_service_plan = sp_unit.provision_if_not_exists(function_params.service_plan)
+        function_params.service_plan['sku_tier'] = app_service_plan.sku.tier
 
         ai_unit = AppInsightsUnit()
         app_insights = ai_unit.provision_if_not_exists(function_params.app_insights)
@@ -87,7 +90,10 @@ class FunctionAppUtilities(object):
         storage_account_id = sa_unit.provision_if_not_exists(function_params.storage_account).id
         con_string = FunctionAppUtilities.get_storage_account_connection_string(storage_account_id)
 
-        function_app_params.update({'app_insights_key': app_insights.instrumentation_key,
+        function_app_params.update({'location': app_service_plan.location,
+                                    'app_service_plan_id': app_service_plan.id,
+                                    'app_insights_key': app_insights.instrumentation_key,
+                                    'is_consumption_plan': FunctionAppUtilities.is_consumption_plan(function_params),
                                     'storage_account_connection_string': con_string})
 
         return function_app_unit.provision(function_app_params)
@@ -100,7 +106,7 @@ class FunctionAppUtilities(object):
         cls.log.info('Publishing Function application')
 
         # provision using Kudu Zip-Deploy
-        if not FunctionAppUtilities.is_consumption_plan(function_params):
+        if not cls.is_consumption_plan(function_params):
             publish_creds = web_client.web_apps.list_publishing_credentials(
                 function_params.function_app_resource_group_name,
                 function_params.function_app_name).result()

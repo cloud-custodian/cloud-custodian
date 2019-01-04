@@ -111,7 +111,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'location': 'eastus',
                 'resource_group_name': 'cloud-custodian',
                 'sku_tier': 'Dynamic', # consumption plan
-                'sku_name': None
+                'sku_name': 'Y1'
             })
 
         # Metadata used for automatic naming

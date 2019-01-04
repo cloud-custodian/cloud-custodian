@@ -2,11 +2,9 @@ import os
 from binascii import hexlify
 
 from azure.mgmt.web.models import (Site, SiteConfig)
-
-from c7n_azure.utils import azure_name_value_pair
-
-from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
+from c7n_azure.provisioning.deployment_unit import DeploymentUnit
+from c7n_azure.utils import azure_name_value_pair, StringUtils
 
 
 class FunctionAppDeploymentUnit(DeploymentUnit):
@@ -23,13 +21,13 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         site_config = SiteConfig(app_settings=[])
         functionapp_def = Site(location=params['location'], site_config=site_config)
 
-        # linux app settings
+        # common function app settings
         functionapp_def.kind = 'functionapp,linux'
         functionapp_def.reserved = True
+        functionapp_def.server_farm_id = params['app_service_plan_id']
 
         # dedicated app plan settings
-        if params['app_service_plan_id']:
-            functionapp_def.server_farm_id = params['app_service_plan_id']
+        if not params['is_consumption_plan']:
             site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
             site_config.app_settings.append(
                 azure_name_value_pair('MACHINEKEY_DecryptionKey',
