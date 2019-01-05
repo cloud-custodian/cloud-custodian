@@ -23,7 +23,6 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
 
         # common function app settings
         functionapp_def.kind = 'functionapp,linux'
-        functionapp_def.reserved = True
         functionapp_def.server_farm_id = params['app_service_plan_id']
 
         # dedicated app plan settings

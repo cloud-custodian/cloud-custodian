@@ -15,8 +15,6 @@
 import logging
 import sys
 
-# do not generate pycache
-sys.dont_write_bytecode = True
 from os.path import dirname, join
 
 # The working path for the Azure Function doesn't include this file's folder

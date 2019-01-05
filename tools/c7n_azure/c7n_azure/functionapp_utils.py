@@ -161,8 +161,20 @@ class FunctionAppUtilities(object):
                 properties=app_settings.properties
             )
 
+        # sync the scale controller for the Function App
+        if not cls._sync_function_triggers(function_params):
+            cls.log.error("Unable to sync triggers...")
+
+        cls.log.info('Finished publishing Function application')
+
+    @classmethod
+    def _sync_function_triggers(cls, function_params):
         cls.log.info('Sync Triggers...')
-        for r in range(3):
+        session = local_session(Session)
+        web_client = session.client('azure.mgmt.web.WebSiteManagementClient')
+
+        max_retry_attempts = 3
+        for r in range(max_retry_attempts):
             res = None
             try:
                 res = web_client.web_apps.sync_function_triggers(
@@ -174,15 +186,15 @@ class FunctionAppUtilities(object):
                 # Success can be either 200 or 204, which is
                 # unexpected and gets rethrown as a CloudError
                 if e.response.status_code in [200, 204]:
-                    break
+                    return True
 
                 cls.log.error("Failed to sync triggers...")
                 cls.log.error(e)
 
             if res and res.status_code in [200, 204]:
-                break
+                return True
             else:
                 cls.log.info("Retrying in 5 seconds...")
                 time.sleep(5)
 
-        cls.log.info('Finished publishing Function application')
+        return False

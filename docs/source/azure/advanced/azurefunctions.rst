@@ -42,7 +42,7 @@ keys:
 
 - servicePlan
   - name (default: cloud-custodian)
-  - location (default: West US 2)
+  - location (default: East US)
   - resourceGroupName (default: cloud-custodian)
   - skuTier (default: Dynamic) # consumption
   - skuName (default: Y1)
