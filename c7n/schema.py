@@ -118,20 +118,14 @@ def specific_error(error):
             if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
                 found = idx
                 break
+
         if found is not None:
-            # Try to walk back an element/type ref to the specific
-            # error
-            spath = list(error.context[0].absolute_schema_path)
-            spath.reverse()
-            slen = len(spath)
-            if 'oneOf' in spath:
-                idx = spath.index('oneOf')
-            elif 'anyOf' in spath:
-                idx = spath.index('anyOf')
-            vidx = slen - idx
             for e in error.context:
-                if e.absolute_schema_path[vidx] == found:
-                    return e
+                for el in reversed(e.absolute_schema_path):
+                    if isinstance(el, int):
+                        if el == found:
+                            return e
+                        break
     return error
 
 
