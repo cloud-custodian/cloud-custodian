@@ -53,15 +53,18 @@ jobs:
   - script: tox
     displayName: 'Tox'
 
-  - script: codecov --branch $BRANCH --pr $PR --commit $COMMIT --build $BUILD_ID
+  - script: python tools/dev/cicov.py
     displayName: 'Publish Code Coverage'
     condition: "eq(variables['python.version'], '2.7')"
     env:
-      BUILD_ID: $(Build.BuildNumber)
       CODECOV_TOKEN: $(CODECOV_TOKEN)
       PR: $(system.pullRequest.pullRequestNumber)
       BRANCH: $(system.pullRequest.sourceBranch)
       COMMIT: $(system.pullRequest.sourceCommitId)
+      BUILD_ID: $(Build.BuildNumber)
+      BUILD_COMMIT: $(Build.SourceVersion)
+      BUILD_REASON: $(Build.Reason)
+      BUILD_BRANCH: $(Build.SourceBranchName)
 
   - task: PublishTestResults@2
     displayName: "Publish Test Results Azure"
