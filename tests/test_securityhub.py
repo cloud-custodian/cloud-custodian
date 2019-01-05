@@ -214,6 +214,34 @@ class SecurityHubTest(BaseTest):
             },
         )
 
+    def test_instance_findings_filter(self):
+        factory = self.replay_flight_data("test_security_hub_instance_findings_filter")
+        policy = self.load_policy(
+            {
+                "name": "ec2-findings-filter",
+                "resource": "ec2",
+                "filters": ["findings"],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client("securityhub")
+        findings = client.get_findings(
+            Filters={
+                "ResourceId": [
+                    {
+                        "Value": "arn:aws:us-east-1:101010101111:instance/i-0f1c2ffaea36228b0",
+                        "Comparison": "EQUALS",
+                    }
+                ]
+            }
+        ).get("Findings")
+        self.assertEqual(len(findings), 2)
+
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")
 
