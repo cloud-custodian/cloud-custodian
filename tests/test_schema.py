@@ -84,7 +84,7 @@ class SchemaTest(BaseTest):
         result = validate(data)
         self.assertEqual(len(result), 2)
         err, policy = result
-        self.assertTrue("'asdf' is not of type 'boolean'" in str(err))
+        self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
         self.assertEqual(policy, 'policy-ec2')
 
     def test_semantic_error(self):
