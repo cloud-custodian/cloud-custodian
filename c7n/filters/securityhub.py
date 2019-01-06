@@ -27,7 +27,6 @@ class SecurityHubFindingFilter(Filter):
     permissions = ('securityhub:GetFindings',)
 
     def process(self, resources, event=None):
-
         client = local_session(self.manager.session_factory).client(
             'securityhub', region_name='us-east-1')
 
@@ -57,8 +56,7 @@ class SecurityHubFindingFilter(Filter):
                     found.add(resource)
 
         return [resource_map[resource_id] for resource_id in found]
-arn:aws:us-east-1:369510138361:instance/i-0f1c2ffaea36228b0
-arn:aws:ec2:us-east-1:369510138361:instance/i-0f1c2ffaea36228b0
+
     @classmethod
     def register_resources(klass, registry, resource_class):
         """ meta model subscriber on resource registration.
