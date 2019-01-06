@@ -119,10 +119,11 @@ class PostFinding(MethodAction):
     def get_finding(self, resource):
         policy = self.manager.ctx.policy
         resource_name = self.get_name(resource)
-        finding_id = hashlib.shake_256(
+        # ideally we could be using shake, but its py3.6+ only
+        finding_id = hashlib.sha256(
             b"%s%s" % (
                 policy.name.encode('utf8'),
-                resource_name.encode('utf8'))).hexdigest(32)
+                resource_name.encode('utf8'))).hexdigest()[:32]
 
         finding = {
             'name': '{}/findings/{}'.format(self._source, finding_id),
