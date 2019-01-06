@@ -8,23 +8,23 @@
                         "Monitoring": {
                             "State": "disabled"
                         }, 
-                        "PublicDnsName": "ec2-18-205-247-134.compute-1.amazonaws.com", 
+                        "PublicDnsName": "ec2-3-86-213-106.compute-1.amazonaws.com", 
                         "State": {
                             "Code": 16, 
                             "Name": "running"
                         }, 
                         "EbsOptimized": true, 
                         "LaunchTime": {
-                            "hour": 19, 
+                            "hour": 14, 
                             "__class__": "datetime", 
                             "month": 1, 
-                            "second": 11, 
+                            "second": 2, 
                             "microsecond": 0, 
                             "year": 2019, 
-                            "day": 5, 
-                            "minute": 25
+                            "day": 6, 
+                            "minute": 32
                         }, 
-                        "PublicIpAddress": "18.205.247.134", 
+                        "PublicIpAddress": "3.86.213.106", 
                         "PrivateIpAddress": "172.31.57.211", 
                         "ProductCodes": [], 
                         "VpcId": "vpc-d6fe6cb1", 
@@ -64,8 +64,8 @@
                                         "PrivateIpAddress": "172.31.57.211", 
                                         "Primary": true, 
                                         "Association": {
-                                            "PublicIp": "18.205.247.134", 
-                                            "PublicDnsName": "ec2-18-205-247-134.compute-1.amazonaws.com", 
+                                            "PublicIp": "3.86.213.106", 
+                                            "PublicDnsName": "ec2-3-86-213-106.compute-1.amazonaws.com", 
                                             "IpOwnerId": "amazon"
                                         }
                                     }
@@ -102,8 +102,8 @@
                                 "PrivateIpAddress": "172.31.57.211", 
                                 "SubnetId": "subnet-d17b4bfb", 
                                 "Association": {
-                                    "PublicIp": "18.205.247.134", 
-                                    "PublicDnsName": "ec2-18-205-247-134.compute-1.amazonaws.com", 
+                                    "PublicIp": "3.86.213.106", 
+                                    "PublicDnsName": "ec2-3-86-213-106.compute-1.amazonaws.com", 
                                     "IpOwnerId": "amazon"
                                 }
                             }
@@ -196,12 +196,12 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "a32b902a-c57f-4d18-b26c-808778fe7611", 
+            "RequestId": "27b36aa3-5e1c-431b-8fe1-0f0d763b664e", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "content-type": "text/xml;charset=UTF-8", 
                 "vary": "Accept-Encoding", 
-                "date": "Sat, 05 Jan 2019 21:56:56 GMT", 
+                "date": "Sun, 06 Jan 2019 19:48:09 GMT", 
                 "server": "AmazonEC2"
             }
         }

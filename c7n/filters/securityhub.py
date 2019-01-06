@@ -21,7 +21,9 @@ from c7n.manager import resources
 class SecurityHubFindingFilter(Filter):
     """Check if there are Security Hub Findings related to the resources
     """
-    schema = type_schema('finding')
+    schema = type_schema(
+        'finding'
+        )
     permissions = ('securityhub:GetFindings',)
 
     def process(self, resources, event=None):
@@ -48,13 +50,15 @@ class SecurityHubFindingFilter(Filter):
                         }
                     ]
                 }
+                self.log.debug("filter=%s", f)
                 findings = client.get_findings(Filters=f).get("Findings")
 
                 if len(findings) > 0:
                     found.add(resource)
 
         return [resource_map[resource_id] for resource_id in found]
-
+arn:aws:us-east-1:369510138361:instance/i-0f1c2ffaea36228b0
+arn:aws:ec2:us-east-1:369510138361:instance/i-0f1c2ffaea36228b0
     @classmethod
     def register_resources(klass, registry, resource_class):
         """ meta model subscriber on resource registration.
