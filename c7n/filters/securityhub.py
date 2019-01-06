@@ -1,4 +1,4 @@
-# Copyright 2017 Capital One Services, LLC
+# Copyright 2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,19 +21,10 @@ from c7n.manager import resources
 class SecurityHubFindingFilter(Filter):
     """Check if there are Security Hub Findings related to the resources
     """
-    schema = type_schema('findings')
+    schema = type_schema('finding')
     permissions = ('securityhub:GetFindings',)
 
-    def get_arn(self, r):
-        # need to make generic to support other resource types
-        return "arn:aws:{}:{}:instance/{}".format(
-            self.manager.config.region,
-            self.manager.config.account_id,
-            r["InstanceId"])
-
     def process(self, resources, event=None):
-        if not resources:
-            return resources
 
         client = local_session(self.manager.session_factory).client(
             'securityhub', region_name='us-east-1')
@@ -48,10 +39,11 @@ class SecurityHubFindingFilter(Filter):
         for resource_set in chunks(resource_map.keys(), 100):
             for resource in resource_set:
                 # TODO: Support parameterized filters rather not just finding exists
+                self.log.debug("resource level arn=%s", self.manager.generate_arn(resource))
                 f = {
                     "ResourceId": [
                         {
-                            "Value": self.get_arn(resource_map[resource]),
+                            "Value": self.manager.generate_arn(resource),
                             "Comparison": "EQUALS",
                         }
                     ]
@@ -67,13 +59,12 @@ class SecurityHubFindingFilter(Filter):
     def register_resources(klass, registry, resource_class):
         """ meta model subscriber on resource registration.
 
-        SecurityHub Findings Filter - Todo see how done for post-findings action
+        SecurityHub Findings Filter
         """
-        services = {'acm-certificate', 'directconnect', 'dms-instance', 'directory', 'ec2',
-                    'dynamodb-table', 'cache-cluster', 'efs', 'app-elb', 'elb', 'emr', 'rds',
-                    'storage-gateway'}
-        if resource_class.type in services:
-            resource_class.filter_registry.register('findings', klass)
+        for rtype, resource_manager in registry.items():
+            if 'post-finding' in resource_manager.action_registry:
+                continue
+            resource_class.filter_registry.register('finding', klass)
 
 
 resources.subscribe(resources.EVENT_REGISTER, SecurityHubFindingFilter.register_resources)

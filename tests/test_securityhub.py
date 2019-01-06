@@ -220,7 +220,7 @@ class SecurityHubTest(BaseTest):
             {
                 "name": "ec2-findings-filter",
                 "resource": "ec2",
-                "filters": ["findings"],
+                "filters": ["finding"],
             },
             config={"account_id": "101010101111"},
             session_factory=factory,
@@ -228,19 +228,7 @@ class SecurityHubTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-
-        client = factory().client("securityhub")
-        findings = client.get_findings(
-            Filters={
-                "ResourceId": [
-                    {
-                        "Value": "arn:aws:us-east-1:101010101111:instance/i-0f1c2ffaea36228b0",
-                        "Comparison": "EQUALS",
-                    }
-                ]
-            }
-        ).get("Findings")
-        self.assertEqual(len(findings), 2)
+       
 
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")
