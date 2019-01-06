@@ -86,7 +86,9 @@ class MetricFilter(Filter):
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
-            'aggregation': {'enum': ['total', 'average']}
+            'aggregation': {'enum': ['total', 'average']},
+            'no_data_action': {'enum': ['include', 'exclude']},
+            'filter': {'type': 'string'}
         }
     }
 
@@ -106,6 +108,10 @@ class MetricFilter(Filter):
         self.aggregation = self.data.get('aggregation', self.DEFAULT_AGGREGATION)
         # Aggregation function to be used locally
         self.func = self.aggregation_funcs[self.aggregation]
+        # Used to reduce the set of metric data returned
+        self.filter = self.data.get('filter', None)
+        # Include or exclude resources if there is no metric data available
+        self.no_data_action = self.data.get('no_data_action', 'exclude')
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
@@ -130,13 +136,20 @@ class MetricFilter(Filter):
             timespan=self.timespan,
             interval=self.interval,
             metricnames=self.metric,
-            aggregation=self.aggregation
+            aggregation=self.aggregation,
+            filter=self.filter
         )
-        m = [getattr(item, self.aggregation) for item in metrics_data.value[0].timeseries[0].data]
+        if len(metrics_data.value) > 0 and len(metrics_data.value[0].timeseries) > 0:
+            m = [getattr(item, self.aggregation)
+                 for item in metrics_data.value[0].timeseries[0].data]
+        else:
+            m = None
         return m
 
     def passes_op_filter(self, resource):
         m_data = self.get_metric_data(resource)
+        if m_data is None:
+            return self.no_data_action == 'include'
         aggregate_value = self.func(m_data)
         return self.op(aggregate_value, self.threshold)
 

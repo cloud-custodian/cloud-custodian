@@ -22,10 +22,19 @@ import shutil
 import tempfile
 
 from c7n_azure.storage_utils import StorageUtilities
-from c7n.output import DirectoryOutput, blob_outputs
-
+from c7n_azure.utils import AppInsightsHelper
+from c7n.output import (
+    blob_outputs,
+    log_outputs,
+    metrics_outputs,
+    DirectoryOutput,
+    LogOutput,
+    Metrics
+)
 from c7n.utils import local_session
 
+from applicationinsights import TelemetryClient
+from applicationinsights.logging import LoggingHandler
 from azure.common import AzureHttpError
 
 
@@ -95,3 +104,87 @@ class AzureStorageOutput(DirectoryOutput):
         # provides easier test isolation
         s = local_session(ctx.session_factory)
         return StorageUtilities.get_blob_client_by_uri(output_path, s)
+
+
+@metrics_outputs.register('azure')
+class MetricsOutput(Metrics):
+    """Send metrics data to app insights
+    """
+
+    def __init__(self, ctx, config=None):
+        super(MetricsOutput, self).__init__(ctx, config)
+        self.namespace = self.ctx.policy.name
+        self.tc = None
+
+    def _initialize(self):
+        if self.tc is not None:
+            return
+        self.instrumentation_key = AppInsightsHelper.get_instrumentation_key(self.config['url'])
+        self.tc = TelemetryClient(self.instrumentation_key)
+        self.subscription_id = local_session(self.ctx.policy.session_factory).get_subscription_id()
+
+    def _format_metric(self, key, value, unit, dimensions):
+        self._initialize()
+        d = {
+            'Name': key,
+            'Value': value,
+            'Dimensions': {
+                'Policy': self.ctx.policy.name,
+                'ResType': self.ctx.policy.resource_type,
+                'SubscriptionId': self.subscription_id,
+                'ExecutionId': self.ctx.execution_id,
+                'Unit': unit
+            }
+        }
+        for k, v in dimensions.items():
+            d['Dimensions'][k] = v
+        return d
+
+    def _put_metrics(self, ns, metrics):
+        self._initialize()
+        for m in metrics:
+            self.tc.track_metric(name=m['Name'],
+                                 value=m['Value'],
+                                 properties=m['Dimensions'])
+        self.tc.flush()
+
+
+class AppInsightsLogHandler(LoggingHandler):
+    def __init__(self, instrumentation_key, policy_name, subscription_id, execution_id):
+        super(AppInsightsLogHandler, self).__init__(instrumentation_key)
+        self.policy_name = policy_name
+        self.subscription_id = subscription_id
+        self.execution_id = execution_id
+
+    def emit(self, record):
+        properties = {
+            'Process': record.processName,
+            'Module': record.module,
+            'FileName': record.filename,
+            'LineNumber': record.lineno,
+            'Level': record.levelname,
+            'Policy': self.policy_name,
+            'SubscriptionId': self.subscription_id,
+            'ExecutionId': self.execution_id
+        }
+
+        if record.exc_info:
+            self.client.track_exception(*record.exc_info, properties=properties)
+            return
+
+        formatted_message = self.format(record)
+        self.client.track_trace(formatted_message, properties=properties, severity=record.levelname)
+
+
+@log_outputs.register('azure')
+class AppInsightsLogOutput(LogOutput):
+
+    log_format = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+
+    def get_handler(self):
+        self.instrumentation_key = AppInsightsHelper.get_instrumentation_key(self.config['url'])
+        self.subscription_id = local_session(self.ctx.policy.session_factory).get_subscription_id()
+        return AppInsightsLogHandler(self.instrumentation_key,
+                                     self.ctx.policy.name,
+                                     self.subscription_id,
+                                     self.ctx.execution_id)
