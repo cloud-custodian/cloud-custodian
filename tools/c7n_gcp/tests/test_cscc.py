@@ -18,9 +18,11 @@ from gcp_common import BaseTest
 class PostFinding(BaseTest):
 
     def test_cscc_post(self):
-        factory = self.replay_flight_data('cscc-post-finding')
+        factory = self.replay_flight_data(
+            'cscc-post-finding', project_id='test-226520')
         session = factory()
-        findings = session.client('securitycenter', 'v1beta1', 'organizations.sources.findings')
+        findings = session.client(
+            'securitycenter', 'v1beta1', 'organizations.sources.findings')
 
         p = self.load_policy({
             'name': 'sketchy-drive',
@@ -43,4 +45,5 @@ class PostFinding(BaseTest):
         results = findings.execute_query(
             'list', {'parent': source}).get('findings', [])
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['sourceProperties']['resource-type'], 'disk')
+        self.assertEqual(
+            results[0]['sourceProperties']['resource-type'], 'disk')
