@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import logging
 import os
 import shutil
 from datetime import date
@@ -23,6 +24,10 @@ from c7n_azure.output import AzureStorageOutput
 
 from c7n.config import Bag, Config
 from c7n.ctx import ExecutionContext
+from c7n_azure.session import Session
+
+from c7n_azure.output import MetricsOutput, AppInsightsLogOutput
+from c7n.output import log_outputs, metrics_outputs
 
 
 class OutputTest(BaseTest):
@@ -100,3 +105,18 @@ class OutputTest(BaseTest):
         path = output.get_output_path(output.config['url'])
         self.assertEqual(path,
                          'azure://mystorage.blob.core.windows.net/logs/MyAccountId/MyPolicy/2018')
+
+    def test_app_insights_logs(self):
+        policy = Bag(name='test', resource_type='azure.vm', session_factory=Session)
+        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000')
+        with log_outputs.select('azure://00000000-0000-0000-0000-000000000000', ctx) as log:
+            self.assertTrue(isinstance(log, AppInsightsLogOutput))
+            logging.getLogger('custodian.test').warning('test message')
+
+    def test_app_insights_metrics(self):
+        policy = Bag(name='test', resource_type='azure.vm', session_factory=Session)
+        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000')
+        sink = metrics_outputs.select('azure://00000000-0000-0000-0000-000000000000', ctx)
+        self.assertTrue(isinstance(sink, MetricsOutput))
+        sink.put_metric('ResourceCount', 101, 'Count')
+        sink.flush()

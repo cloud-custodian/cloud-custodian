@@ -11,3 +11,4 @@ Topics for advanced usage of the Azure provider
   azurefunctions
   multiplesubs
   bloboutput
+  appinsightslogging
