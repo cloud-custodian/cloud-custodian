@@ -170,13 +170,13 @@ def name_compute(r):
 
 
 def name_iam(r):
-    return "//iam.googleapis.com/projects/{}/serviceAccount/{}".format(
+    return "//iam.googleapis.com/projects/{}/serviceAccounts/{}".format(
         r['projectId'],
         r['uniqueId'])
 
 
 def name_resourcemanager(r):
-    rid = r.get('projectId')
+    rid = r.get('projectNumber')
     if rid is not None:
         rtype = 'projects'
     else:
