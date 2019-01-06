@@ -17,12 +17,15 @@ class PostFinding(MethodAction):
     The source for custodian can either be specified inline to the policy, or
     custodian can generate one at runtime if it doesn't exist given a org-domain
     or org-id.
+
+    Finding updates are not currently supported, due to upstream api issues.
     """
     schema = type_schema(
         'post-finding',
         **{
-            'source': {'type': 'string',
-                       'description': 'qualified name of source to post to CSCC as'},
+            'source': {
+                'type': 'string',
+                'description': 'qualified name of source to post to CSCC as'},
             'org-domain': {'type': 'string'},
             'org-id': {'type': 'integer'},
             'category': {'type': 'string'},
@@ -32,7 +35,12 @@ class PostFinding(MethodAction):
                 'additionalProperties': False}})
 
     method_spec = {'op': 'create', 'result': 'name', 'annotation_key': 'c7n:Finding'}
+
+    # create throws error if already exists, patch method has bad docs.
+    ignore_error_codes = (409,)
+
     CustodianSourceName = 'CloudCustodian'
+    DefaultCategory = 'Custodian'
     Service = 'securitycenter'
     ServiceVersion = 'v1beta1'
 
@@ -58,9 +66,11 @@ class PostFinding(MethodAction):
     def initialize_source(self):
         # Ideally we'll be given a source, but we'll attempt to auto create it
         # if given an org_domain or org_id.
-        if 'source' in self.data:
+        if self._source:
+            return self._source
+        elif 'source' in self.data:
             self._source = self.data['source']
-            return
+            return self._source
 
         session = local_session(self.manager.session_factory)
 
@@ -83,7 +93,7 @@ class PostFinding(MethodAction):
         res = [s for s in
                client.execute_query(
                    'list', {'parent': 'organizations/{}'.format(org_id)}).get('sources')
-               if s['name'] == self.CustodianSourceName]
+               if s['displayName'] == self.CustodianSourceName]
         if res:
             source = res[0]['name']
 
@@ -92,61 +102,110 @@ class PostFinding(MethodAction):
                 'create',
                 {'parent': 'organizations/{}'.format(org_id),
                  'body': {
-                    'displayName': 'CloudCustodian',
-                    'description': 'Cloud Management Rules Engine'}}).get('name')
-
+                     'displayName': self.CustodianSourceName,
+                     'description': 'Cloud Management Rules Engine'}}).get('name')
         self.log.info(
-            "Resolved source: %s, please update policy with this source value" % source)
+            "policy:%s resolved cscc source: %s, update policy with this source value",
+            self.manager.ctx.policy.name,
+            source)
         self._source = source
+        return self._source
 
     def get_name(self, r):
         """Given an arbitrary resource attempt to resolve back to a qualified name."""
-        # common with compute and older apis
-        if 'selfLink' in r:
-            u = urlparse(r['selfLink'])
-            return "//{}/{}".format(u.netloc, u.path)
-        if 'name' in r and '/' in r['name']:
-            return "//{}.googleapis.com/{}/{}" % (
-                self.manager.resource_type.service,
-                self.manager.resource_type.version,
-                r['name'])
-        raise ValueError("resource-type:%s cant fetch name" % self.manager.type)
+        namer = ResourceNameAdapters[self.manager.resource_type.service]
+        return namer(r)
 
     def get_finding(self, resource):
         policy = self.manager.ctx.policy
         resource_name = self.get_name(resource)
-
-        id_gen = hashlib.shake_256(policy.name.encode('utf8'))
-        id_gen.update(resource_name.encode('utf8'))
-        finding_id = id_gen.hexdigest(32)
+        finding_id = hashlib.shake_256(
+            b"%s%s" % (
+                policy.name.encode('utf8'),
+                resource_name.encode('utf8'))).hexdigest(32)
 
         finding = {
-            'parent': self._source,
-            'body': {
-                'name': '{}/findings/{}'.format(
-                    self._source, finding_id),
-                'resource_name': resource_name,
-                'state': 'ACTIVE',
-                'category': self.data.get('category'),
-                'event_time': "%sZ" % datetime.datetime.utcnow().isoformat(),
-                'source_properties': {
-                    'resource-type': self.manager.type,
-                    'title': policy.data.get('title', policy.name),
-                    'policy-name': policy.name,
-                    'policy': json.dumps(policy.data)
-                }
+            'name': '{}/findings/{}'.format(self._source, finding_id),
+            'resourceName': resource_name,
+            'state': 'ACTIVE',
+            'category': self.data.get('category', self.DefaultCategory),
+            'eventTime': datetime.datetime.utcnow().isoformat('T') + 'Z',
+            'sourceProperties': {
+                'resource-type': self.manager.type,
+                'title': policy.data.get('title', policy.name),
+                'policy-name': policy.name,
+                'policy': json.dumps(policy.data)
             }
         }
 
-        return finding
+        request = {
+            'parent': self._source,
+            'findingId': finding_id[:31],
+            'body': finding}
+        return request
 
     @classmethod
     def register_resource(klass, registry, event):
         for rtype, resource_manager in registry.items():
-            if 'post-finding' in resource_manager.action_registry:
+            if resource_manager.resource_type.service not in ResourceNameAdapters:
+                continue
+            elif 'post-finding' in resource_manager.action_registry:
                 continue
             resource_manager.action_registry.register('post-finding', klass)
 
+
+# CSCC uses its own notion of resource id, if we want our findings on
+# a resource to be linked from the asset view we need to post w/ the
+# same resource name. If this conceptulization of resource name is
+# standard, then we should move these to resource types with
+# appropriate hierarchies by service.
+
+
+def name_compute(r):
+    prefix = urlparse(r['selfLink']).path.strip('/').split('/')[2:][:-1]
+    return "//compute.googleapis.com/{}/{}".format(
+        "/".join(prefix),
+        r['id'])
+
+
+def name_iam(r):
+    return "//iam.googleapis.com/projects/{}/serviceAccount/{}".format(
+        r['projectId'],
+        r['uniqueId'])
+
+
+def name_resourcemanager(r):
+    rid = r.get('projectId')
+    if rid is not None:
+        rtype = 'projects'
+    else:
+        rid = r.get('organizationId')
+        rtype = 'organizations'
+    return "//cloudresourcemanager.googleapis.com/{}/{}".format(
+        rtype, rid)
+
+
+def name_container(r):
+    return "//container.googleapis.com/{}".format(
+        "/".join(urlparse(r['selfLink']).path.strip('/').split('/')[1:]))
+
+
+def name_storage(r):
+    return "//storage.googleapis.com/{}".format(r['name'])
+
+
+def name_appengine(r):
+    return "//appengine.googleapis.com/{}".format(r['name'])
+
+
+ResourceNameAdapters = {
+    'appengine': name_appengine,
+    'cloudresourcemanager': name_resourcemanager,
+    'compute': name_compute,
+    'container': name_container,
+    'iam': name_iam,
+    'storage': name_storage,
+}
 
 gcp_resources.subscribe(
     gcp_resources.EVENT_FINAL, PostFinding.register_resource)
