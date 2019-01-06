@@ -18,7 +18,7 @@ from botocore.exceptions import ClientError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.tags import Tag, RemoveTag
 
 
@@ -59,6 +59,12 @@ class DirectorySubnetFilter(SubnetFilter):
 class DirectorySecurityGroupFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSettings.SecurityGroupId"
+
+
+@Directory.filter_registry.register('vpc')
+class DirectoryVpcFilter(VpcFilter):
+
+    RelatedIdsExpression = "VpcSettings.VpcId"
 
 
 @Directory.action_registry.register('tag')

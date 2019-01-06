@@ -297,3 +297,144 @@ class TestFSx(BaseTest):
         self.assertEqual(len(backups['Backups']), 1)
         expected_tags = [{'Key': 'test-tag', 'Value': 'backup-tag'}]
         self.assertEqual(expected_tags, backups['Backups'][0]['Tags'])
+
+
+class TestFSxBackup(BaseTest):
+    def test_fsx_backup_delete(self):
+        session_factory = self.replay_flight_data('test_fsx_backup_delete')
+        backup_id = 'backup-0d1fb25003287b260'
+        p = self.load_policy(
+            {
+                'name': 'fsx-backup-resource',
+                'resource': 'fsx-backup',
+                'filters': [
+                    {'BackupId': backup_id}
+                ],
+                'actions': [
+                    {'type': 'delete'}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(resources)
+        client = session_factory().client('fsx')
+        backups = client.describe_backups(
+            Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': ['fs-002ccbccdcf032728']
+                }
+            ]
+        )['Backups']
+        results = [b for b in backups if b['BackupId'] == backup_id]
+        self.assertFalse(results)
+
+    def test_fsx_backup_tag(self):
+        session_factory = self.replay_flight_data('test_fsx_backup_tag')
+        backup_id = 'backup-0b644cd380298f720'
+        p = self.load_policy(
+            {
+                'name': 'fsx-backup-resource-tag',
+                'resource': 'fsx-backup',
+                'filters': [
+                    {'BackupId': backup_id},
+                    {'Tags': []}
+                ],
+                'actions': [
+                    {'type': 'tag', 'tags': {'tag-test': 'tag-test'}}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory().client('fsx')
+        backups = client.describe_backups(
+            Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': ['fs-002ccbccdcf032728']
+                }
+            ]
+        )['Backups']
+        tags = None
+        for b in backups:
+            if b['BackupId'] == backup_id:
+                self.assertTrue(len(b['Tags']), 1)
+                tags = b['Tags']
+        self.assertTrue(tags)
+        self.assertEqual(tags[0]['Key'], 'tag-test')
+        self.assertEqual(tags[0]['Value'], 'tag-test')
+
+    def test_fsx_backup_mark_for_op(self):
+        session_factory = self.replay_flight_data('test_fsx_backup_mark_for_op')
+        backup_id = 'backup-09d3dfca849cfc629'
+        p = self.load_policy(
+            {
+                'name': 'fsx-backup-resource-mark-for-op',
+                'resource': 'fsx-backup',
+                'filters': [
+                    {'BackupId': backup_id},
+                    {'Tags': []}
+                ],
+                'actions': [
+                    {'type': 'mark-for-op', 'op': 'delete'}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+
+        client = session_factory().client('fsx')
+        backups = client.describe_backups(
+            Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': ['fs-002ccbccdcf032728']
+                }
+            ]
+        )['Backups']
+        tags = None
+        for b in backups:
+            if b['BackupId'] == backup_id:
+                self.assertTrue(len(b['Tags']), 1)
+                tags = [t for t in b['Tags'] if t['Key'] == 'maid_status']
+        self.assertTrue(tags)
+
+    def test_fsx_backup_remove_tag(self):
+        session_factory = self.replay_flight_data('test_fsx_backup_remove_tag')
+        backup_id = 'backup-05c81253149962783'
+        p = self.load_policy(
+            {
+                'name': 'fsx-backup-resource-remove-tag',
+                'resource': 'fsx-backup',
+                'filters': [
+                    {'BackupId': backup_id},
+                    {'tag:test-tag': 'backup-tag'},
+                ],
+                'actions': [
+                    {'type': 'remove-tag', 'tags': ['test-tag']}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+
+        client = session_factory().client('fsx')
+        backups = client.describe_backups(
+            Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': ['fs-002ccbccdcf032728']
+                }
+            ]
+        )['Backups']
+        tags = [1]
+        for b in backups:
+            if b['BackupId'] == backup_id:
+                if len(b['Tags']) == 0:
+                    tags = b['Tags']
+        self.assertEqual(len(tags), 0)

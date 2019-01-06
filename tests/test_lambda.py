@@ -117,6 +117,42 @@ class LambdaPermissionTest(BaseTest):
         self.assertRaises(ClientError, client.get_policy, FunctionName=name)
 
 
+class LambdaLayerTest(BaseTest):
+
+    def test_lambda_layer_cross_account(self):
+        factory = self.replay_flight_data('test_lambda_layer_cross_account')
+        p = self.load_policy({
+            'name': 'lambda-layer-cross',
+            'resource': 'lambda-layer',
+            'filters': [{'type': 'cross-account'}],
+            'actions': [{'type': 'remove-statements',
+                         'statement_ids': 'matched'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('CrossAccountViolations' in resources[0].keys())
+        client = factory().client('lambda')
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.get_layer_version_policy(
+                LayerName=resources[0]['LayerName'],
+                VersionNumber=resources[0]['Version']).get('Policy')
+
+    def test_delete_layer(self):
+        factory = self.replay_flight_data('test_lambda_layer_delete')
+        p = self.load_policy({
+            'name': 'lambda-layer-delete',
+            'resource': 'lambda-layer',
+            'filters': [{'LayerName': 'test'}],
+            'actions': [{'type': 'delete'}]},
+            session_factory=factory)
+        resources = p.run()
+        client = factory().client('lambda')
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.get_layer_version(
+                LayerName='test',
+                VersionNumber=resources[0]['Version'])
+
+
 class LambdaTest(BaseTest):
 
     def test_lambda_config_source(self):

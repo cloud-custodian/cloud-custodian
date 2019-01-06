@@ -24,7 +24,6 @@ from c7n.utils import local_session, type_schema
 class FSx(QueryResourceManager):
     filter_registry = FilterRegistry('fsx.filters')
     action_registry = ActionRegistry('fsx.actions')
-    permissions = ('fsx:ListTagForResource',)
 
     class resource_type(object):
         service = 'fsx'
@@ -35,6 +34,56 @@ class FSx(QueryResourceManager):
         filter_name = None
 
 
+@resources.register('fsx-backup')
+class FSxBackup(QueryResourceManager):
+    filter_registry = FilterRegistry('fsx-baackup.filters')
+    action_registry = ActionRegistry('fsx-baackup.actions')
+
+    class resource_type(object):
+        service = 'fsx'
+        enum_spec = ('describe_backups', 'Backups', None)
+        name = id = 'BackupId'
+        date = 'CreationTime'
+        dimension = None
+        filter_name = None
+
+
+@FSxBackup.action_registry.register('delete')
+class DeleteBackup(BaseAction):
+    """
+    Delete backups
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+            - type: delete-backups
+              resource: fsx-backup
+              filters:
+                - type: value
+                  value_type: age
+                  key: CreationDate
+                  value: 30
+                  op: gt
+              actions:
+                - type: delete
+    """
+    permissions = ('fsx:DeleteBackup',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('fsx')
+        for r in resources:
+            try:
+                client.delete_backup(BackupId=r['BackupId'])
+            except client.exceptions.BackupRestoring as e:
+                self.log.warning(
+                    'Unable to delete backup for: %s - %s - %s' % (
+                        r['FileSystemId'], r['BackupId'], e))
+
+
+@FSxBackup.action_registry.register('mark-for-op')
 @FSx.action_registry.register('mark-for-op')
 class MarkForOpFileSystem(TagDelayedAction):
     concurrency = 2
@@ -47,6 +96,7 @@ class MarkForOpFileSystem(TagDelayedAction):
             client.tag_resource(ResourceARN=r['ResourceARN'], Tags=tags)
 
 
+@FSxBackup.action_registry.register('tag')
 @FSx.action_registry.register('tag')
 class TagFileSystem(Tag):
     concurrency = 2
@@ -59,6 +109,7 @@ class TagFileSystem(Tag):
             client.tag_resource(ResourceARN=r['ResourceARN'], Tags=tags)
 
 
+@FSxBackup.action_registry.register('remove-tag')
 @FSx.action_registry.register('remove-tag')
 class UnTagFileSystem(RemoveTag):
     concurrency = 2
