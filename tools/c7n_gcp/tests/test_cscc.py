@@ -30,7 +30,7 @@ class PostFinding(BaseTest):
             'filters': [{'name': 'instance-1'}],
             'actions': [
                 {'type': 'post-finding',
-                 'org-domain': 'cloudcustodian.io'}
+                 'org-domain': 'example.io'}
             ]},
             session_factory=factory)
 
