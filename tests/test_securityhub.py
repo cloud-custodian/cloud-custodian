@@ -228,7 +228,6 @@ class SecurityHubTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-       
 
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")

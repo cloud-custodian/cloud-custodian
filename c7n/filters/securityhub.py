@@ -23,7 +23,7 @@ class SecurityHubFindingFilter(Filter):
     """
     schema = type_schema(
         'finding'
-        )
+    )
     permissions = ('securityhub:GetFindings',)
 
     def process(self, resources, event=None):
