@@ -12,6 +12,7 @@ coverage:
     patch:
       default:
         threshold: "10%"
+        only_pulls: true
     project:
       azure:
         paths: "tools/c7n_azure"

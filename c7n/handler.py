@@ -33,6 +33,7 @@ import boto3
 
 logging.root.setLevel(logging.DEBUG)
 logging.getLogger('botocore').setLevel(logging.WARNING)
+logging.getLogger('urllib3').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
 account_id = None

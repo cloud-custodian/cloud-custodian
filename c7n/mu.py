@@ -296,6 +296,8 @@ class LambdaManager(object):
                     e, func.alias)
         return result
 
+    add = publish
+
     def remove(self, func, alias=None):
         for e in func.get_events(self.session_factory):
             e.remove(func)
@@ -735,7 +737,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python2.7')
+        return self.policy.data['mode'].get('runtime', 'python3.7')
 
     @property
     def memory_size(self):
