@@ -27,6 +27,20 @@ class PostFinding(MethodAction):
     """Post finding for matched resources to Cloud Security Command Center.
 
 
+    :Example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: gcp-instances-with-label
+           resource: gcp.instance
+           filters:
+             - "tag:name": "bad-instance"
+           actions:
+             - type: post-finding
+               org-domain: example.io
+               category: MEDIUM_INTERNET_SECURITY
+
     The source for custodian can either be specified inline to the policy, or
     custodian can generate one at runtime if it doesn't exist given a org-domain
     or org-id.
@@ -41,11 +55,7 @@ class PostFinding(MethodAction):
                 'description': 'qualified name of source to post to CSCC as'},
             'org-domain': {'type': 'string'},
             'org-id': {'type': 'integer'},
-            'category': {'type': 'string'},
-            'marks': {
-                'type': 'object',
-                'patternProperties': {'^*': {'type': 'string'}},
-                'additionalProperties': False}})
+            'category': {'type': 'string'}})
 
     method_spec = {'op': 'create', 'result': 'name', 'annotation_key': 'c7n:Finding'}
 
