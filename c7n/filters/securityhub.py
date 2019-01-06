@@ -22,7 +22,8 @@ class SecurityHubFindingFilter(Filter):
     """Check if there are Security Hub Findings related to the resources
     """
     schema = type_schema(
-        'finding'
+        'finding',
+        types={'type': 'array', 'items': {'type': 'string'}}
     )
     permissions = ('securityhub:GetFindings',)
 
@@ -36,19 +37,19 @@ class SecurityHubFindingFilter(Filter):
             id_attr = self.manager.get_model().id
         resource_map = {r[id_attr]: r for r in resources}
         found = set()
+        f = self.get_filter_parameters()
 
         for resource_set in chunks(resource_map.keys(), 100):
             for resource in resource_set:
                 # TODO: Support parameterized filters rather not just finding exists
                 self.log.debug("resource level arn=%s", self.manager.generate_arn(resource))
-                f = {
-                    "ResourceId": [
+                f['ResourceId'] = [
                         {
                             "Value": self.manager.generate_arn(resource),
                             "Comparison": "EQUALS",
                         }
                     ]
-                }
+                
                 self.log.debug("filter=%s", f)
                 findings = client.get_findings(Filters=f).get("Findings")
 
@@ -56,6 +57,19 @@ class SecurityHubFindingFilter(Filter):
                     found.add(resource)
 
         return [resource_map[resource_id] for resource_id in found]
+
+    def get_filter_parameters(self):
+        m = self.manager
+
+        f = {}
+        if self.data.get('types'):
+            f['Type'] = [
+                {
+                    "Value": self.data.get('types')[0],
+                    "Comparison": "EQUALS",
+                }
+            ]
+        return f
 
     @classmethod
     def register_resources(klass, registry, resource_class):
