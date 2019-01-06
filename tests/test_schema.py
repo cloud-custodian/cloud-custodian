@@ -73,6 +73,20 @@ class SchemaTest(BaseTest):
         self.assertTrue(isinstance(result[0], ValueError))
         self.assertTrue("monday-morning" in str(result[0]))
 
+    def test_py3_policy_error(self):
+        data = {
+            'policies': [{
+                'name': 'policy-ec2',
+                'resource': 'ec2',
+                'actions': [
+                    {'type': 'terminate',
+                     'force': 'asdf'}]}]}
+        result = validate(data)
+        self.assertEqual(len(result), 2)
+        err, policy = result
+        self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
+        self.assertEqual(policy, 'policy-ec2')
+
     def test_semantic_error(self):
         data = {
             "policies": [

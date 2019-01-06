@@ -210,9 +210,11 @@ sources = PluginRegistry('sources')
 @sources.register('describe')
 class DescribeSource(object):
 
+    QueryFactory = ResourceQuery
+
     def __init__(self, manager):
         self.manager = manager
-        self.query = ResourceQuery(self.manager.session_factory)
+        self.query = self.QueryFactory(self.manager.session_factory)
 
     def get_resources(self, ids, cache=True):
         return self.query.get(self.manager, ids)
