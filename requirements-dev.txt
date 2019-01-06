@@ -11,7 +11,7 @@ sphinx-rtd-theme==0.4.1
 nose-timer>=0.7.3
 twine
 fakeredis
-pytest>=3.2.1
+pytest<4.1.0
 pytest-xdist>=1.2.0
 pytest-cov
 tox
