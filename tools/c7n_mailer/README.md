@@ -375,7 +375,7 @@ For reference purposes, the JSON Schema of the `notify` action:
 
 Requires:
 
-- `c7n_azure` package.  See [Installing Azure Plugin](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html#install-cloud-custodian)
+- `c7n_azure` package.  See [Installing Azure Plugin](https://cloudcustodian.io/docs/azure/gettingstarted.html#azure-install-cc)
 - SendGrid account. See [Using SendGrid with Azure](https://docs.microsoft.com/en-us/azure/sendgrid-dotnet-how-to-send-email)
 - [Azure Storage Queue](https://azure.microsoft.com/en-us/services/storage/queues/)
 

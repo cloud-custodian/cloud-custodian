@@ -175,9 +175,9 @@ class AutoTagUser(EventAction):
     max_query_days = 90
 
     # compiled JMES paths
-    sp_jmes_path = jmespath.compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
-    user_jmes_path = jmespath.compile(constants.EVENT_GRID_USER_NAME_JMES_PATH)
     service_admin_jmes_path = jmespath.compile(constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH)
+    sp_jmes_path = jmespath.compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
+    upn_jmes_path = jmespath.compile(constants.EVENT_GRID_UPN_CLAIM_JMES_PATH)
     principal_role_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH)
     principal_type_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
 
@@ -234,14 +234,14 @@ class AutoTagUser(EventAction):
             # The Subscription Admins role does not have a principal type
             if StringUtils.equal(principal_role, 'Subscription Admin'):
                 user = self.service_admin_jmes_path.search(event_item) or user
-            # Non Subscription Admins have either a User or ServicePrincipal type
-            elif StringUtils.equal(principal_type, 'User'):
-                user = self.user_jmes_path.search(event_item) or user
+            # ServicePrincipal type
             elif StringUtils.equal(principal_type, 'ServicePrincipal'):
                 user = self.sp_jmes_path.search(event_item) or user
+            # Other types (e.g. User, Office 365 Groups, and Security Groups)
+            elif self.upn_jmes_path.search(event_item):
+                user = self.upn_jmes_path.search(event_item)
             else:
-                self.log.error('Principal type of event cannot be determined.')
-                return
+                self.log.error('Principal could not be determined.')
         else:
             # Calculate start time
             delta_days = self.data.get('days', self.max_query_days)

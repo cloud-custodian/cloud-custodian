@@ -124,6 +124,12 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcConfig.VpcId"
+
+
 filters.register('network-location', net_filters.NetworkLocation)
 
 

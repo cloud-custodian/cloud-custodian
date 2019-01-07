@@ -182,6 +182,12 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 filters.register('network-location', net_filters.NetworkLocation)
 
 
@@ -1280,6 +1286,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
+    sg_expr = jmespath.compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Sql/servers",
+      "location": "EastUS2",
+      "name": "cctestsqlserver12262018",
+      "properties": {
+        "administratorLogin": "custodian",
+        "administratorLoginPassword": "Cust0dianPassw0rd" ,
+        "version": "12.0"
+      },
+    },
+  ],
+  "outputs": {}
+}

@@ -703,13 +703,11 @@ class DaxModifySecurityGroup(ModifyVpcSecurityGroupsAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('dax')
-        groups = super(DaxModifySecurityGroup, self).get_groups(
-            resources, metadata_key='SecurityGroupIdentifier')
+        groups = super(DaxModifySecurityGroup, self).get_groups(resources)
 
         for idx, r in enumerate(resources):
             client.update_cluster(
-                ClusterName=r['ClusterName'],
-                SecurityGroupIds=groups[idx])
+                ClusterName=r['ClusterName'], SecurityGroupIds=groups[idx])
 
 
 @DynamoDbAccelerator.filter_registry.register('subnet')

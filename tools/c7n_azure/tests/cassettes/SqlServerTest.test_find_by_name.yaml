@@ -1,0 +1,39 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python/3.6.3 (Linux-4.9.125-linuxkit-x86_64-with-centos-7.5.1804-Core)
+          msrest/0.6.2 msrest_azure/0.6.0 azure-mgmt-sql/0.11.0 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/zR22I5++jRR5e7e+Odj0YfrepqlddtkTcfPfrFH2WzRbEsmrbO2qp+Xl0US2o6XTdt
+        NSuyJTW/zOumqPCpvt+0WUuAP3qVZ7Nr+vt8XZbXP7HOyuK8yGdPq0VWLF9kCzSZTtu8aZtfVDZ5
+        TXB29/Y+3dvZPRjPsjabZE0+viLUqqtmvMzbj37J6KOymmatdJZnTbtu9gh+AeTvNutJM62LFb5u
+        7mbZw4OHD/Yn2/dne9n2/uzhwXb24CDbvnewd37vwe792c6D/G6dN9W6nuaf19V61dwFKr+/xeUu
+        keGymNHg7n5RTOuqqc7b8etfVN6Vr5u7A7gTQsuNg6MG7fUKDaJwP/ol3/8l/w+XDs29nQEAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 26 Dec 2018 22:12:47 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [ca6b2c26-908a-4cde-b763-ae6c0378842c]
+      x-ms-ratelimit-remaining-subscription-reads: ['11997']
+      x-ms-request-id: [bba5c1f0-3df2-4a1b-b5db-b73ea1c0ca49]
+      x-ms-routing-request-id: ['WESTUS2:20181226T221247Z:ca6b2c26-908a-4cde-b763-ae6c0378842c']
+    status: {code: 200, message: OK}
+version: 1
