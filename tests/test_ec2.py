@@ -1442,4 +1442,5 @@ class LaunchTemplateTest(BaseTest):
             session_factory=session_factory,
         )
         resources = policy.run()
+        self.assertEqual(resources[0]['LaunchTemplateName'], 'test-template')
         self.assertEqual(len(resources), 1)

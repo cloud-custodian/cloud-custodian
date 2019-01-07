@@ -1702,12 +1702,11 @@ class LaunchTemplate(query.QueryResourceManager):
         id = 'LaunchTemplateId'
         name = 'LaunchTemplateName'
         date = 'CreateTime'
-        dimension = 'LaunchTemplateName'
+        dimension = 'None'
         enum_spec = (
             'describe_launch_templates', 'LaunchTemplates', None)
-        filter_name = 'LaunchTemplateNames'
+        filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
-        config_type = "AWS::EC2::LaunchTemplate"
 
 
 class LaunchTemplateDataFilterBase(object):
@@ -1738,8 +1737,8 @@ class LaunchTemplateDataFilterBase(object):
                 LaunchTemplateName=t['LaunchTemplateName'],
                 Versions=[str(t['LatestVersionNumber'])]
             )
-            t['LaunchTemplateData'] = data['LaunchTemplateVersions'][0]['LaunchTemplateData']
-            t['LaunchTemplateData']['LaunchTemplateName'] = t['LaunchTemplateName']
-            if 'UserData' in t['LaunchTemplateData']:
-                del t['LaunchTemplateData']['UserData']
-            self.template_configs[t['LaunchTemplateName']] = t['LaunchTemplateData']
+            t['c7n:LaunchTemplateData'] = data['LaunchTemplateVersions'][0]['LaunchTemplateData']
+            t['c7n:LaunchTemplateData']['LaunchTemplateName'] = t['LaunchTemplateName']
+            if 'UserData' in t['c7n:LaunchTemplateData']:
+                del t['c7n:LaunchTemplateData']['UserData']
+            self.template_configs[t['LaunchTemplateName']] = t['c7n:LaunchTemplateData']

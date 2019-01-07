@@ -520,19 +520,18 @@ class NotEncryptedFilter(Filter, LaunchTemplateDataFilterBase, LaunchConfigFilte
                     for bd in image['BlockDeviceMappings'] if 'Ebs' in bd}
             else:
                 image_block_devs = {}
-            if 'BlockDeviceMappings' in c:
-                for bd in c['BlockDeviceMappings']:
-                    if 'Ebs' not in bd:
-                        continue
-                    # Launch configs can shadow image devices, images have
-                    # precedence.
-                    if bd['DeviceName'] in image_block_devs:
-                        continue
-                    if 'SnapshotId' in bd['Ebs']:
-                        snaps.setdefault(
-                            bd['Ebs']['SnapshotId'].strip(), []).append(cid)
-                    elif not bd['Ebs'].get('Encrypted'):
-                        unencrypted_launch_methods.add(cid)
+            for bd in c.get('BlockDeviceMappings', ()):
+                if 'Ebs' not in bd:
+                    continue
+                # Launch configs can shadow image devices, images have
+                # precedence.
+                if bd['DeviceName'] in image_block_devs:
+                    continue
+                if 'SnapshotId' in bd['Ebs']:
+                    snaps.setdefault(
+                        bd['Ebs']['SnapshotId'].strip(), []).append(cid)
+                elif not bd['Ebs'].get('Encrypted'):
+                    unencrypted_launch_methods.add(cid)
         if not snaps:
             return unencrypted_launch_methods
 
