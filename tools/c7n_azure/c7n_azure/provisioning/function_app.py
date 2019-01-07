@@ -22,11 +22,15 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         functionapp_def = Site(location=params['location'], site_config=site_config)
 
         # common function app settings
-        functionapp_def.kind = 'functionapp,linux'
         functionapp_def.server_farm_id = params['app_service_plan_id']
+        functionapp_def.reserved = True  # This implies Linux for auto-created app plans
 
-        # dedicated app plan settings
-        if not params['is_consumption_plan']:
+        # consumption app plan
+        if params['is_consumption_plan']:
+            functionapp_def.kind = 'functionapp,linux'
+        # dedicated app plan
+        else:
+            functionapp_def.kind = 'functionapp,linux,container'
             site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
             site_config.app_settings.append(
                 azure_name_value_pair('MACHINEKEY_DecryptionKey',
