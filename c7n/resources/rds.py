@@ -57,6 +57,8 @@ from concurrent.futures import as_completed
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
+from c7n.actions.securityhub import OtherResourcePostFinding
+
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
@@ -299,6 +301,12 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "DBSubnetGroup.Subnets[].SubnetIdentifier"
+
+
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "DBSubnetGroup.Subnets[].VpcId"
 
 
 filters.register('network-location', net_filters.NetworkLocation)
@@ -678,6 +686,14 @@ class CopySnapshotTags(BaseAction):
         self.manager.retry(c.modify_db_instance(
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
             CopyTagsToSnapshot=self.data.get('enable', True)))
+
+
+@RDS.action_registry.register("post-finding")
+class DbInstanceFinding(OtherResourcePostFinding):
+    fields = [
+        {'key': 'DBSubnetGroupName', 'expr': 'DBSubnetGroup.DBSubnetGroupName'},
+        {'key': 'VpcId', 'expr': 'DBSubnetGroup.VpcId'},
+    ]
 
 
 @actions.register('snapshot')
@@ -1361,7 +1377,7 @@ class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         replication_group_map = {}
         client = local_session(self.manager.session_factory).client('rds')
         groups = super(RDSModifyVpcSecurityGroups, self).get_groups(
-            rds_instances, metadata_key='VpcSecurityGroupId')
+            rds_instances)
 
         # either build map for DB cluster or modify DB instance directly
         for idx, i in enumerate(rds_instances):

@@ -257,8 +257,8 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         client = local_session(
             self.manager.session_factory).client('elasticache')
         groups = super(
-            ElasticacheClusterModifyVpcSecurityGroups,
-            self).get_groups(clusters, metadata_key='SecurityGroupId')
+            ElasticacheClusterModifyVpcSecurityGroups, self).get_groups(
+                clusters)
         for idx, c in enumerate(clusters):
             # build map of Replication Groups to Security Groups
             replication_group_map[c['ReplicationGroupId']] = groups[idx]

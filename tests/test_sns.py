@@ -475,3 +475,121 @@ class TestSNS(BaseTest):
         self.assertTrue("AddMe" in statement_ids)
         self.assertTrue("RemoveMe" not in statement_ids)
         self.assertTrue("SpecificAllow" in statement_ids)
+
+    def test_sns_topic_encryption(self):
+        session_factory = self.replay_flight_data('test_sns_kms_related_filter_test')
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-sns-kms-related-filter',
+                'resource': 'sns',
+                'filters': [
+                    {
+                        'TopicArn': 'arn:aws:sns:us-east-1:644160558196:test'
+                    },
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/skunk/trails'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KmsMasterKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+    def test_set_sns_topic_encryption(self):
+        session_factory = self.replay_flight_data('test_sns_set_encryption')
+        topic = 'arn:aws:sns:us-west-1:644160558196:test'
+        p = self.load_policy(
+            {
+                'name': 'test-sns-kms-related-filter',
+                'resource': 'sns',
+                'filters': [
+                    {
+                        'TopicArn': topic
+                    },
+                    {
+                        'KmsMasterKeyId': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'set-encryption'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 1)
+        sns = session_factory().client('sns')
+        attributes = sns.get_topic_attributes(TopicArn=topic)
+        self.assertTrue(attributes['Attributes']['KmsMasterKeyId'], 'alias/aws/sns')
+
+    def test_sns_disable_encryption(self):
+        session_factory = self.replay_flight_data('test_sns_unset_encryption')
+        topic = 'arn:aws:sns:us-west-1:644160558196:test'
+        p = self.load_policy(
+            {
+                'name': 'test-sns-kms-related-filter',
+                'resource': 'sns',
+                'filters': [
+                    {
+                        'TopicArn': topic
+                    },
+                    {
+                        'KmsMasterKeyId': 'alias/aws/sns'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'set-encryption',
+                        'enabled': False
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+        sns = session_factory().client('sns')
+        attributes = sns.get_topic_attributes(TopicArn=topic)['Attributes']
+        self.assertFalse(attributes.get('KmsMasterKeyId'))
+
+    def test_sns_set_encryption_custom_key(self):
+        session_factory = self.replay_flight_data('test_sns_set_encryption_custom_key')
+        topic = 'arn:aws:sns:us-west-1:644160558196:test'
+        key_alias = 'alias/alias/test/key'
+        sns = session_factory().client('sns')
+        p = self.load_policy(
+            {
+                'name': 'test-sns-kms-related-filter-alias',
+                'resource': 'sns',
+                'filters': [
+                    {
+                        'TopicArn': topic
+                    },
+                    {
+                        'KmsMasterKeyId': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'set-encryption',
+                        'key': key_alias
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 1)
+        attributes = sns.get_topic_attributes(TopicArn=topic)['Attributes']
+        self.assertEqual(attributes.get('KmsMasterKeyId'), key_alias)

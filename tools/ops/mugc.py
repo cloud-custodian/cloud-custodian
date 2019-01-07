@@ -144,7 +144,7 @@ def setup_parser():
     parser.add_argument("configs", nargs='*', help="Policy configuration file(s)")
     parser.add_argument(
         '-c', '--config', dest="config_files", nargs="*", action='append',
-        help="Policy configuration files(s)")
+        help="Policy configuration files(s)", default=[])
     parser.add_argument(
         '-r', '--region', action='append', dest='regions', metavar='REGION',
         help="AWS Region to target. Can be used multiple times, also supports `all`")
@@ -198,7 +198,12 @@ def main():
 
     # use cloud provider to initialize policies to get region expansion
     policies = AWS().initialize_policies(
-        load_policies(options, policy_config), policy_config)
+        PolicyCollection([
+            p for p in load_policies(
+                options, policy_config)
+            if p.provider_name == 'aws'],
+            policy_config),
+        policy_config)
 
     resources_gc_prefix(options, policy_config, policies)
 
