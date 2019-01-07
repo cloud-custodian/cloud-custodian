@@ -44,12 +44,12 @@ class SecurityHubFindingFilter(Filter):
                 # TODO: Support parameterized filters rather not just finding exists
                 self.log.debug("resource level arn=%s", self.manager.generate_arn(resource))
                 f['ResourceId'] = [
-                        {
-                            "Value": self.manager.generate_arn(resource),
-                            "Comparison": "EQUALS",
-                        }
-                    ]
-                
+                    {
+                        "Value": self.manager.generate_arn(resource),
+                        "Comparison": "EQUALS",
+                    }
+                ]
+
                 self.log.debug("filter=%s", f)
                 findings = client.get_findings(Filters=f).get("Findings")
 
@@ -59,8 +59,6 @@ class SecurityHubFindingFilter(Filter):
         return [resource_map[resource_id] for resource_id in found]
 
     def get_filter_parameters(self):
-        m = self.manager
-
         f = {}
         if self.data.get('types'):
             f['Type'] = [

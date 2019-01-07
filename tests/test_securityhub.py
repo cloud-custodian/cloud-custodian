@@ -220,7 +220,12 @@ class SecurityHubTest(BaseTest):
             {
                 "name": "ec2-findings-filter",
                 "resource": "ec2",
-                "filters": [{"type": "finding", "types": ["Software and Configuration Checks/AWS Security Best Practices"]}],
+                "filters": [
+                    {
+                        "type": "finding",
+                        "types": ["Software and Configuration Checks/AWS Security Best Practices"]
+                    }
+                ],
             },
             config={"account_id": "101010101111"},
             session_factory=factory,
