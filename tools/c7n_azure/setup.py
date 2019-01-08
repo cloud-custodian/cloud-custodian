@@ -44,7 +44,8 @@ setup(
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
     },
-    install_requires=["azure-mgmt-authorization",
+    install_requires=["applicationinsights",
+                      "azure-mgmt-authorization",
                       "azure-mgmt-applicationinsights",
                       "azure-mgmt-batch",
                       "azure-mgmt-cognitiveservices",

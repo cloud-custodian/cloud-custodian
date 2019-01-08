@@ -76,6 +76,8 @@ class FunctionAppUtilities(object):
             app_name = ResourceIdParser.get_resource_name(app_id)
             app_resource_group_name = ResourceIdParser.get_resource_group(app_id)
             app_service_plan = web_client.app_service_plans.get(app_resource_group_name, app_name)
+
+            # update the sku tier to properly reflect what is provisioned in Azure
             parameters.service_plan['sku_tier'] = app_service_plan.sku.tier
 
             return function_app

@@ -40,7 +40,7 @@ def build_function_package(config, function_name):
         os.path.join(os.path.dirname(__file__), 'function.py'))
 
     package.build(None,
-                  modules=['c7n', 'c7n-azure', 'c7n-mailer', 'applicationinsights'],
+                  modules=['c7n', 'c7n-azure', 'c7n-mailer'],
                   non_binary_packages=['pyyaml', 'pycparser', 'tabulate',
                                        'datadog', 'MarkupSafe', 'simplejson'],
                   excluded_packages=['azure-cli-core', 'distlib', 'futures'])
