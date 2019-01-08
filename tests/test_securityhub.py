@@ -245,7 +245,6 @@ class SecurityHubTest(BaseTest):
                 'types': ["Software and Configuration Checks/AWS Security Best Practices"]}]},
             config={'region': 'us-east-1', 'account_id': '644160558196'})
         post_finding = policy.resource_manager.actions.pop()
-        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
         resource = post_finding.format_resource(instances[0])
         self.assertEqual(
             resource['Id'], 'arn:aws:ec2:us-east-1:644160558196:instance/i-0fdc9cff318add68f')
