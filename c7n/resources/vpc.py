@@ -202,7 +202,88 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
             self.manager.get_resource_manager('security-group').resources()
             if g.get('VpcId', '') in vpc_ids
         }
+        self.log.debug("Returning vpc_group_ids: " + str(vpc_group_ids))
         return vpc_group_ids
+
+@Vpc.filter_registry.register('subnet')
+class VpcSubnetFilter(RelatedResourceFilter):
+    """Filter VPCs based on Subnet attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: security-group
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'subnet', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.Subnet"
+    RelatedIdsExpression = '[Subnets][].SubnetId'
+    #AnnotationKey = "matched-vpcs-subnets"
+    AnnotationKey = "MatchedVpcsSubnets"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_subnet_ids = {
+            g['SubnetId'] for g in
+            self.manager.get_resource_manager('subnet').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        self.log.debug("Returning vpc_subnet_ids: " + str(vpc_subnet_ids))
+        return vpc_subnet_ids
+
+@Vpc.filter_registry.register('internet-gateway')
+class VpcInternetGatewayFilter(RelatedResourceFilter):
+    """Filter VPCs based on Internet Gateway attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: security-group
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'internet-gateway', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.InternetGateway"
+    RelatedIdsExpression = '[InternetGateways][].InternetGatewayId'
+    #AnnotationKey = "matched-vpcs-igws"
+    AnnotationKey = "MatchedVpcsIgws"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        self.log.debug("Filtering vpc_ids: " + str(vpc_ids))
+        #vpc_igw_ids = {
+            #g['InternetGatewayId'] for g in
+            #self.manager.get_resource_manager('internet-gateway').resources()
+            #if g.get('VpcId', '') in vpc_ids
+        #}
+        vpc_igw_ids = set()
+        for igw in self.manager.get_resource_manager('internet-gateway').resources():
+            self.log.debug("Found IGW: " + igw['InternetGatewayId'])
+            for attachment in igw['Attachments']:
+                self.log.debug("Found VpcId: " + attachment.get('VpcId'))
+                if attachment.get('VpcId', '') in vpc_ids:
+                    self.log.debug("Matching VpcId: " + attachment.get('VpcId'))
+		    vpc_igw_ids.add(igw['InternetGatewayId'])
+
+        self.log.debug("Returning vpc_igw_ids: " + str(vpc_igw_ids))
+        return vpc_igw_ids
 
 
 @Vpc.filter_registry.register('vpc-attributes')
