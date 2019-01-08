@@ -14,12 +14,30 @@
 
 from .common import BaseTest
 
+from datetime import datetime
+from dateutil.tz import tzutc
 import time
 
 LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23" # NOQA
 
 
 class SecurityHubTest(BaseTest):
+
+    def test_s3_bucket_arn(self):
+        policy = self.load_policy({
+            'name': 's3',
+            'resource': 's3',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"  # NOQA
+                     ]}]})
+        post_finding = policy.resource_manager.actions[0]
+        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
+        resource = post_finding.format_resource(
+            {'Name': 'xyz', 'CreationDate': 'xtf'})
+        self.assertEqual(resource['Id'], "arn:aws:s3:::xyz")
+
     def test_bucket(self):
         factory = self.replay_flight_data("test_security_hub_bucket")
         policy = self.load_policy(
@@ -213,6 +231,26 @@ class SecurityHubTest(BaseTest):
                 "Type": "AwsEc2Instance",
             },
         )
+
+    def test_finding_ec2_arn(self):
+        # reuse another tests recorded data to get an ec2 instance
+        # not a best practice, avoid if practical.
+        factory = self.replay_flight_data("test_security_hub_instance")
+        client = factory().client('ec2')
+        instances = client.describe_instances().get('Reservations')[0]['Instances']
+        policy = self.load_policy({
+            'name': 'ec2',
+            'resource': 'ec2',
+            'actions': [{
+                'type': 'post-finding', 'severity': 10,
+                'types': ["Software and Configuration Checks/AWS Security Best Practices"]}]},
+            config={'region': 'us-east-1', 'account_id': '644160558196'})
+        post_finding = policy.resource_manager.actions.pop()
+        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
+        finding = post_finding.get_finding(instances, None, now, now)
+        self.assertEqual(
+            finding['Id'],
+            'us-east-1/644160558196/c028ef22ca0b5c056ae8f95656030f24/e4670955469582fcc46726adaf10fd99') # NOQA
 
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")
