@@ -33,7 +33,6 @@ class SecurityHubTest(BaseTest):
                      "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"  # NOQA
                      ]}]})
         post_finding = policy.resource_manager.actions[0]
-        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
         resource = post_finding.format_resource(
             {'Name': 'xyz', 'CreationDate': 'xtf'})
         self.assertEqual(resource['Id'], "arn:aws:s3:::xyz")
@@ -247,10 +246,9 @@ class SecurityHubTest(BaseTest):
             config={'region': 'us-east-1', 'account_id': '644160558196'})
         post_finding = policy.resource_manager.actions.pop()
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
-        finding = post_finding.get_finding(instances, None, now, now)
+        resource = post_finding.format_resource(instances[0])
         self.assertEqual(
-            finding['Id'],
-            'us-east-1/644160558196/c028ef22ca0b5c056ae8f95656030f24/e4670955469582fcc46726adaf10fd99') # NOQA
+            resource['Id'], 'arn:aws:ec2:us-east-1:644160558196:instance/i-0fdc9cff318add68f')
 
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")
