@@ -14,8 +14,6 @@
 
 from .common import BaseTest
 
-from datetime import datetime
-from dateutil.tz import tzutc
 import time
 
 LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23" # NOQA
