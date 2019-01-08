@@ -17,8 +17,7 @@ import importlib
 
 import jmespath
 
-from .core import ValueFilter
-
+from .core import ValueFilter, glob_match, regex_match, operator_in, operator_ni, difference, intersect, OPERATORS
 
 class RelatedResourceFilter(ValueFilter):
 
@@ -70,9 +69,14 @@ class RelatedResourceFilter(ValueFilter):
         model = self.manager.get_model()
         op = self.data.get('operator', 'or')
         found = []
+        self.log.debug("Processings resources " + str(related_ids))
         if self.data.get('match-resource') is True:
             self.data['value'] = self.get_resource_value(
                 self.data['key'], resource)
+        if self.data.get('value_type') == 'resource_count':
+            self.log.debug("Op for resource_count: " + op)
+            self.log.debug("Which op for count? " + str(self.data))
+            return OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
         for rid in related_ids:
             robj = related.get(rid, None)
             if robj is None:
