@@ -27,8 +27,8 @@ When deploying an Azure function the following ARM resources are required and cr
 - Application Service Plan (shared across functions)
 - Application Service (per function)
 
-Functions can be ran in either a dedicated Application Service Plan (Basic, Standard or Premium) or in a Consumption plan.
-More details on the different hosting models offered by Azure Functions can be found `here <https://docs.microsoft.com/en-us/azure/azure-functions/functions-scale>`_.
+Functions can be deployed in either a dedicated Application Service Plan (Basic, Standard or Premium) or in a Consumption plan.
+More details on the different hosting models offered by Azure Functions can be found in the `Azure Functions documentation <https://docs.microsoft.com/en-us/azure/azure-functions/functions-scale>`_.
 By default, we will run all Custodian policies using the Consumption hosting model. (i.e. skuTier=dynamic)
 Linux Consumption is currently only available in the following regions: East Asia, East US, West Europe, and West US
 
@@ -63,7 +63,7 @@ West Europe. The sku, skuCode, and workerSize correlate to scaling up the App Se
 If specified resources already exist in the subscription (discoverable by resource group name and resource name), Cloud Custodian won't make any changes (location, sku)
 and will use existing resources as-is. If resource doesn't exist, it will be provisioned using provided configuration.
 
-If you have existing infrastructure, you can specify resource ids for the following itesm (instead of applying previous schema):
+If you have existing infrastructure, you can specify resource ids for the following items (instead of applying previous schema):
 
 - storageAccount
 - servicePlan
