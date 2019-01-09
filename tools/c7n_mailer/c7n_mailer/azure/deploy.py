@@ -40,7 +40,7 @@ def build_function_package(config, function_name):
         os.path.join(os.path.dirname(__file__), 'function.py'))
 
     package.build(None,
-                  modules=['c7n', 'c7n-azure', 'c7n-mailer'],
+                  modules=['c7n', 'c7n-azure', 'c7n-mailer', 'applicationinsights'],
                   non_binary_packages=['pyyaml', 'pycparser', 'tabulate',
                                        'datadog', 'MarkupSafe', 'simplejson'],
                   excluded_packages=['azure-cli-core', 'distlib', 'futures'])
@@ -78,13 +78,15 @@ def provision(config):
     # service plan is parse first, because its location might be shared with storage & insights
     service_plan = AzureFunctionMode.extract_properties(function_properties,
                                                 'servicePlan',
-                                                {'name': 'cloud-custodian',
-                                                 'location': 'westus2',
-                                                 'resource_group_name': 'cloud-custodian',
-                                                 'sku_name': 'B1',
-                                                 'sku_tier': 'Basic'})
+                                                {
+                                                    'name': 'cloud-custodian',
+                                                    'location': 'eastus',
+                                                    'resource_group_name': 'cloud-custodian',
+                                                    'sku_tier': 'Dynamic',  # consumption plan
+                                                    'sku_name': 'Y1'
+                                                })
 
-    location = service_plan.get('location', 'westus2')
+    location = service_plan.get('location', 'eastus')
     rg_name = service_plan['resource_group_name']
 
     sub_id = local_session(Session).get_subscription_id()
@@ -113,19 +115,11 @@ def provision(config):
         function_app_resource_group_name=service_plan['resource_group_name'],
         function_app_name=function_app_name)
 
-    FunctionAppUtilities().deploy_dedicated_function_app(params)
+    FunctionAppUtilities.deploy_function_app(params)
 
     log.info("Building function package for %s" % function_app_name)
     package = build_function_package(config, function_name)
 
     log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
 
-    client = local_session(Session).client('azure.mgmt.web.WebSiteManagementClient')
-    publish_creds = client.web_apps.list_publishing_credentials(
-        service_plan['resource_group_name'],
-        function_app_name).result()
-
-    if package.wait_for_status(publish_creds):
-        package.publish(publish_creds)
-    else:
-        log.error("Aborted deployment, ensure Application Service is healthy.")
+    FunctionAppUtilities.publish_functions_package(params, package)

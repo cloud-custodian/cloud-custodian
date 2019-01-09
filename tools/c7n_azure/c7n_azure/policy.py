@@ -95,6 +95,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_params = None
+        self.function_app = None
 
     def get_function_app_params(self):
         session = local_session(self.policy.session_factory)
@@ -107,14 +108,14 @@ class AzureFunctionMode(ServerlessExecutionMode):
             'servicePlan',
             {
                 'name': 'cloud-custodian',
-                'location': 'westus2',
+                'location': 'eastus',
                 'resource_group_name': 'cloud-custodian',
-                'sku_name': 'B1',
-                'sku_tier': 'Basic'
+                'sku_tier': 'Dynamic',  # consumption plan
+                'sku_name': 'Y1'
             })
 
         # Metadata used for automatic naming
-        location = service_plan.get('location', 'westus2')
+        location = service_plan.get('location', 'eastus')
         rg_name = service_plan['resource_group_name']
         sub_id = session.get_subscription_id()
         target_sub_id = session.get_function_target_subscription_id()
@@ -175,7 +176,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             sys.exit(1)
 
         self.function_params = self.get_function_app_params()
-        FunctionAppUtilities().deploy_dedicated_function_app(self.function_params)
+        self.function_app = FunctionAppUtilities.deploy_function_app(self.function_params)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
@@ -184,34 +185,19 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def validate(self):
         """Validate configuration settings for execution mode."""
 
-    def _build_functions_package(self, queue_name):
-        package = FunctionPackage(self.policy_name,
-                                  )
+    def build_functions_package(self, queue_name=None):
+        self.log.info("Building function package for %s" % self.function_params.function_app_name)
+
+        package = FunctionPackage(self.policy_name)
         package.build(self.policy.data,
-                      modules=['c7n', 'c7n-azure'],
+                      modules=['c7n', 'c7n-azure', 'applicationinsights'],
                       non_binary_packages=['pyyaml', 'pycparser', 'tabulate'],
                       excluded_packages=['azure-cli-core', 'distlib', 'futures'],
                       queue_name=queue_name)
         package.close()
-        return package
-
-    def _publish_functions_package(self, queue_name=None):
-        self.log.info("Building function package for %s" % self.function_params.function_app_name)
-
-        package = self._build_functions_package(queue_name)
 
         self.log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
-
-        client = local_session(self.policy.session_factory)\
-            .client('azure.mgmt.web.WebSiteManagementClient')
-        publish_creds = client.web_apps.list_publishing_credentials(
-            self.function_params.function_app_resource_group_name,
-            self.function_params.function_app_name).result()
-
-        if package.wait_for_status(publish_creds):
-            package.publish(publish_creds)
-        else:
-            self.log.error("Aborted deployment, ensure Application Service is healthy.")
+        return package
 
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)
@@ -224,7 +210,8 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
 
     def provision(self):
         super(AzurePeriodicMode, self).provision()
-        self._publish_functions_package()
+        package = self.build_functions_package()
+        FunctionAppUtilities.publish_functions_package(self.function_params, package)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
@@ -261,7 +248,8 @@ class AzureEventGridMode(AzureFunctionMode):
         queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app_name.lower())
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
-        self._publish_functions_package(queue_name)
+        package = self.build_functions_package(queue_name)
+        FunctionAppUtilities.publish_functions_package(self.function_params, package)
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
