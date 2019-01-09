@@ -17,7 +17,7 @@ import importlib
 
 import jmespath
 
-from .core import ValueFilter, glob_match, regex_match, operator_in, operator_ni, difference, intersect, OPERATORS
+from .core import ValueFilter, OPERATORS
 
 class RelatedResourceFilter(ValueFilter):
 
@@ -70,13 +70,18 @@ class RelatedResourceFilter(ValueFilter):
         op = self.data.get('operator', 'or')
         found = []
         self.log.debug("Processings resources " + str(related_ids))
+
         if self.data.get('match-resource') is True:
             self.data['value'] = self.get_resource_value(
                 self.data['key'], resource)
+
         if self.data.get('value_type') == 'resource_count':
             self.log.debug("Op for resource_count: " + op)
-            self.log.debug("Which op for count? " + str(self.data))
-            return OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
+            count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
+            if count_matches:
+                self.add_annotations(related_ids, resource)
+            return count_matches
+
         for rid in related_ids:
             robj = related.get(rid, None)
             if robj is None:
@@ -90,15 +95,19 @@ class RelatedResourceFilter(ValueFilter):
             if self.match(robj):
                 found.append(rid)
 
-        if self.AnnotationKey is not None and found:
-            akey = 'c7n:%s' % self.AnnotationKey
-            resource[akey] = list(set(found).union(resource.get(akey, [])))
+        if found:
+            self.add_annotations(found, resource)
 
         if op == 'or' and found:
             return True
         elif op == 'and' and len(found) == len(related_ids):
             return True
         return False
+
+    def add_annotations(self, related_ids, resource):
+        if self.AnnotationKey is not None:
+            akey = 'c7n:%s' % self.AnnotationKey
+            resource[akey] = list(set(related_ids).union(resource.get(akey, [])))
 
     def process(self, resources, event=None):
         related = self.get_related(resources)
