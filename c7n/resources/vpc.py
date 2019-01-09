@@ -202,7 +202,6 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
             self.manager.get_resource_manager('security-group').resources()
             if g.get('VpcId', '') in vpc_ids
         }
-        self.log.debug("Returning vpc_group_ids: " + str(vpc_group_ids))
         return vpc_group_ids
 
 @Vpc.filter_registry.register('subnet')
@@ -236,7 +235,6 @@ class VpcSubnetFilter(RelatedResourceFilter):
             self.manager.get_resource_manager('subnet').resources()
             if g.get('VpcId', '') in vpc_ids
         }
-        self.log.debug("Returning vpc_subnet_ids: " + str(vpc_subnet_ids))
         return vpc_subnet_ids
 
 @Vpc.filter_registry.register('nat-gateway')
@@ -270,7 +268,6 @@ class VpcNatGatewayFilter(RelatedResourceFilter):
             self.manager.get_resource_manager('nat-gateway').resources()
             if g.get('VpcId', '') in vpc_ids
         }
-        self.log.debug("Returning vpc_natgw_ids: " + str(vpc_natgw_ids))
         return vpc_natgw_ids
 
 @Vpc.filter_registry.register('internet-gateway')
@@ -303,9 +300,7 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
         for igw in self.manager.get_resource_manager('internet-gateway').resources():
             for attachment in igw['Attachments']:
                 if attachment.get('VpcId', '') in vpc_ids:
-		    vpc_igw_ids.add(igw['InternetGatewayId'])
-
-        self.log.debug("Returning vpc_igw_ids: " + str(vpc_igw_ids))
+                    vpc_igw_ids.add(igw['InternetGatewayId'])
         return vpc_igw_ids
 
 
