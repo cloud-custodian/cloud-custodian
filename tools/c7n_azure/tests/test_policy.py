@@ -120,15 +120,15 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
         self.assertEqual(params.service_plan['name'], "cloud-custodian")
-        self.assertEqual(params.service_plan['location'], "westus2")
+        self.assertEqual(params.service_plan['location'], "eastus")
         self.assertEqual(params.service_plan['resource_group_name'], "cloud-custodian")
 
         self.assertEqual(params.app_insights['name'], 'cloud-custodian')
-        self.assertEqual(params.app_insights['location'], "westus2")
+        self.assertEqual(params.app_insights['location'], "eastus")
         self.assertEqual(params.app_insights['resource_group_name'], 'cloud-custodian')
 
         self.assertTrue(params.storage_account['name'].startswith('custodian'))
-        self.assertEqual(params.storage_account['location'], "westus2")
+        self.assertEqual(params.storage_account['location'], "eastus")
         self.assertEqual(params.storage_account['resource_group_name'], 'cloud-custodian')
 
         self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))

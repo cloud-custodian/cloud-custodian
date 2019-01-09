@@ -27,9 +27,13 @@ When deploying an Azure function the following ARM resources are required and cr
 - Application Service Plan (shared across functions)
 - Application Service (per function)
 
-A single Application Service Plan (Basic, Standard or Premium) can service a large number
-of Application Service Instances.  If you provide the same servicePlanName with all policies or
-use the default name then only new Applications will be created during deployment, all using the same
+Functions can be deployed in either a dedicated Application Service Plan (Basic, Standard or Premium) or in a Consumption plan.
+More details on the different hosting models offered by Azure Functions can be found in the `Azure Functions documentation <https://docs.microsoft.com/en-us/azure/azure-functions/functions-scale>`_.
+By default, we will run all Custodian policies using the Consumption hosting model. (i.e. skuTier=dynamic)
+Linux Consumption is currently only available in the following regions: East Asia, East US, West Europe, and West US
+
+A dedicated plan can service multiple Function Applications.  If you provide the same servicePlanName with all policies or
+use the default name then only new Function Applications will be created during deployment, all using the same
 shared plan resources.
 
 Execution in Azure functions comes with a default set of configurations for the provisioned
@@ -38,10 +42,10 @@ keys:
 
 - servicePlan
   - name (default: cloud-custodian)
-  - location (default: West US 2)
+  - location (default: East US)
   - resourceGroupName (default: cloud-custodian)
-  - skuTier (default: Basic)
-  - skuName (default: B1)
+  - skuTier (default: Dynamic) # consumption
+  - skuName (default: Y1)
 - storageAccount
   - name (default: custodian + sha256(resourceGroupName+subscription_id)[:8])
   - location (default: servicePlan location)
@@ -59,7 +63,7 @@ West Europe. The sku, skuCode, and workerSize correlate to scaling up the App Se
 If specified resources already exist in the subscription (discoverable by resource group name and resource name), Cloud Custodian won't make any changes (location, sku)
 and will use existing resources as-is. If resource doesn't exist, it will be provisioned using provided configuration.
 
-If you have existing infrastructure, you can specify resource ids for the following itesm (instead of applying previous schema):
+If you have existing infrastructure, you can specify resource ids for the following items (instead of applying previous schema):
 
 - storageAccount
 - servicePlan

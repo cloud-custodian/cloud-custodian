@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import sys
+
 from os.path import dirname, join
 
 # The working path for the Azure Function doesn't include this file's folder

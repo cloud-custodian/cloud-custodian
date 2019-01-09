@@ -172,4 +172,4 @@ subscriptions.
 
 For instructions on creating a service principal and granting access
 across subscriptions, visit the [Azure authentication docs
-page](http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html).
+page](https://cloudcustodian.io/docs/azure/authentication.html).
