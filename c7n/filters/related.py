@@ -69,14 +69,12 @@ class RelatedResourceFilter(ValueFilter):
         model = self.manager.get_model()
         op = self.data.get('operator', 'or')
         found = []
-        self.log.debug("Processings resources " + str(related_ids))
 
         if self.data.get('match-resource') is True:
             self.data['value'] = self.get_resource_value(
                 self.data['key'], resource)
 
         if self.data.get('value_type') == 'resource_count':
-            self.log.debug("Op for resource_count: " + op)
             count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
             if count_matches:
                 self.add_annotations(related_ids, resource)
