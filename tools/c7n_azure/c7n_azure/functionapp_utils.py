@@ -13,6 +13,7 @@
 # limitations under the License.
 import datetime
 import logging
+import re
 import time
 
 from azure.storage.blob import BlobPermissions
@@ -104,6 +105,13 @@ class FunctionAppUtilities(object):
 
         return function_app_unit.provision(function_app_params)
 
+    @staticmethod
+    def validate_function_name(function_name):
+        if (function_name is None or len(function_name) > 60 or len(function_name) < 1):
+            raise ValueError('Function name must be between 1-60 characters')
+
+        return re.sub('[^A-Za-z0-9\\-]', '-', function_name)
+    
     @classmethod
     def publish_functions_package(cls, function_params, package):
         session = local_session(Session)
