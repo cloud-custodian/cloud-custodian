@@ -54,7 +54,30 @@ class CloudWatchEventsFacadeTest(TestCase):
                 {"detail": event_data("event-cloud-trail-run-instances.json")},
                 {"type": "cloudtrail", "events": ["RunInstances"]},
             ),
-            ["i-784cdacd", u"i-7b4cdace"],
+            ["i-784cdacd", "i-7b4cdace"],
+        )
+
+    def test_get_ids_sans_with_details_expr(self):
+        self.assertEqual(
+            CloudWatchEvents.get_ids(
+                {'detail': event_data('event-cloud-trail-run-instances.json')},
+                {'type': 'cloudtrail', 'events': [
+                    {'ids': 'detail.responseElements.instancesSet.items[].instanceId',
+                     'source': 'ec2.amazonaws.com',
+                     'event': 'RunInstances'}]}),
+            ["i-784cdacd", "i-7b4cdace"],
+        )
+
+    def test_get_ids_sans_without_details_expr(self):
+        self.assertEqual(
+            sorted(CloudWatchEvents.get_ids(
+                {'detail': event_data('event-cloud-trail-run-instances.json')},
+                {'type': 'cloudtrail', 'events': [
+                    {'ids': 'responseElements.instancesSet.items[].instanceId',
+                     'source': 'ec2.amazonaws.com',
+                     'event': 'RunInstances'}
+                ]})),
+            ["i-784cdacd", "i-7b4cdace"],
         )
 
     def test_get_ids_multiple_events(self):

@@ -38,14 +38,14 @@ def main(input):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
 
-    events = None
+    event = None
 
     if type(input) is QueueMessage:
         if input.dequeue_count > max_dequeue_count:
             return
-        events = [input.get_json()]
+        event = input.get_json()
 
-    handler.run(events, context)
+    handler.run(event, context)
 
 
 # Need to manually initialize c7n_azure

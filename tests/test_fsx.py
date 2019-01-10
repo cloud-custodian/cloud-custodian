@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .common import BaseTest
+import time
 
 
 class TestFSx(BaseTest):
@@ -225,7 +226,6 @@ class TestFSx(BaseTest):
         client = session_factory().client('fsx')
 
         if self.recording:
-            import time
             time.sleep(500)
 
         backups = client.describe_backups(
@@ -278,7 +278,6 @@ class TestFSx(BaseTest):
         self.assertEqual(len(resources), 1)
 
         if self.recording:
-            import time
             time.sleep(500)
 
         client = session_factory().client('fsx')
@@ -297,6 +296,122 @@ class TestFSx(BaseTest):
         self.assertEqual(len(backups['Backups']), 1)
         expected_tags = [{'Key': 'test-tag', 'Value': 'backup-tag'}]
         self.assertEqual(expected_tags, backups['Backups'][0]['Tags'])
+
+    def test_fsx_delete_file_system_skip_snapshot(self):
+        session_factory = self.replay_flight_data('test_fsx_delete_file_system_skip_snapshot')
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'skip-snapshot': True
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertTrue(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+        backups = client.describe_backups(
+            Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [fs[0]['FileSystemId']]
+                },
+                {
+                    'Name': 'backup-type',
+                    'Values': ['USER_INITIATED']
+                }
+            ]
+        )['Backups']
+        self.assertEqual(len(backups), 0)
+
+    def test_fsx_delete_file_system(self):
+        session_factory = self.replay_flight_data('test_fsx_delete_file_system')
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'AVAILABLE'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'tags': {
+                            'DeletedBy': 'CloudCustodian'
+                        },
+                        'skip-snapshot': False
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertTrue(len(fs), 1)
+        self.assertEqual(fs[0]['Lifecycle'], 'DELETING')
+        backups = client.describe_backups(
+            Filters=[
+                {
+                    'Name': 'file-system-id',
+                    'Values': [fs[0]['FileSystemId']]
+                },
+                {
+                    'Name': 'backup-type',
+                    'Values': ['USER_INITIATED']
+                }
+            ]
+        )['Backups']
+        self.assertEqual(len(backups), 1)
+
+    def test_fsx_delete_file_system_with_error(self):
+        session_factory = self.replay_flight_data('test_fsx_delete_file_system_with_error')
+        p = self.load_policy(
+            {
+                'name': 'fsx-delete-file-system',
+                'resource': 'fsx',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Lifecycle',
+                        'value': 'CREATING'
+                    }
+                ],
+                'actions': [
+                    {'type': 'delete'}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory().client('fsx')
+        fs = client.describe_file_systems(
+            FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
+        self.assertTrue(len(fs), 1)
+        self.assertNotEqual(fs[0]['Lifecycle'], 'DELETING')
 
 
 class TestFSxBackup(BaseTest):
