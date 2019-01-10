@@ -27,7 +27,7 @@ Automatically tag the creator of a resource or resource group.
                 resourceProvider: 'Microsoft.Compute/virtualMachines',
                 event: 'write'
             }]
-          resource: azure.resourcegroup
+          resource: azure.vm
           description: |
             Tag all existing virtual machines with the 'CreatorEmail' tag using ARM events.
           actions:
