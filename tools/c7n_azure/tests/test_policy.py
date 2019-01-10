@@ -134,7 +134,7 @@ class AzurePolicyModeTest(BaseTest):
 
     def test_init_azure_function_mode_invalid_policy_name(self):
         p = self.load_policy({
-            'name': 'test-azure-this-policy-name-is-going-to-be-too-long-since-the-maximum-size-is-60',
+            'name': 'this-policy-name-is-going-to-be-too-long-since-the-maximum-size-is-60',
             'resource': 'azure.vm',
             'mode':
                 {'type': FUNCTION_EVENT_TRIGGER_MODE,
