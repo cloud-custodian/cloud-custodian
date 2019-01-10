@@ -218,7 +218,7 @@ class SnapshotElastiCacheCluster(BaseAction):
     def process(self, clusters):
         set_size = len(clusters)
         clusters = [c for c in clusters if _cluster_eligible_for_snapshot(c)]
-        if len(set_size) != len(clusters):
+        if set_size != len(clusters):
             self.log.info(
                 "action:snapshot implicitly filtered from %d to %d clusters for snapshot support",
                 set_size, len(clusters))
