@@ -140,7 +140,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'resource_group_name': rg_name
             })
 
-        function_app_name = self.policy_name + '-' + function_suffix
+        function_app_name = FunctionAppUtilities.validate_function_name(self.policy_name + '-' + function_suffix)
 
         params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights=app_insights,
