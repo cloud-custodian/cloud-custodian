@@ -105,8 +105,8 @@ def provision(config):
                                                      'resource_group_name': rg_name})
 
     function_app_name = \
-        '-'.join([service_plan['name'], function_name, suffix]) \
-        .replace(' ', '-').lower()
+        FunctionAppUtilities.validate_function_name(
+            '-'.join([service_plan['name'], function_name, suffix]).lower())
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
