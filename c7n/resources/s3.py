@@ -733,7 +733,7 @@ class BucketFinding(PostFinding):
         owner = r.get("Acl", {}).get("Owner", {})
         resource = {
             "Type": "AwsS3Bucket",
-            "Id": "arn:aws:::{}".format(r["Name"]),
+            "Id": "arn:aws:s3:::{}".format(r["Name"]),
             "Region": get_region(r),
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
             "Details": {"AwsS3Bucket": {"OwnerId": owner.get('ID', 'Unknown')}}

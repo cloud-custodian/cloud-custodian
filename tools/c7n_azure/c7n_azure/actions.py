@@ -17,6 +17,7 @@ Actions to perform on Azure resources
 import abc
 import datetime
 import logging
+from concurrent.futures import as_completed
 from datetime import timedelta
 
 import jmespath
@@ -34,7 +35,7 @@ from c7n.filters import FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
 from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema
+from c7n.utils import type_schema, chunks
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -214,75 +215,99 @@ class AutoTagUser(EventAction):
         self.tag_key = self.data['tag']
         self.should_update = self.data.get('update', False)
 
-        with self.executor_factory(max_workers=3) as w:
+        futures = []
+        results = []
+        exceptions = []
+
+        max_num_workers = 1 if ThreadHelper.disable_multi_threading \
+            else constants.DEFAULT_MAX_THREAD_WORKERS
+
+        with self.executor_factory(max_workers=max_num_workers) as w:
+            for resource_set in chunks(resources, constants.DEFAULT_CHUNK_SIZE):
+                futures.append(w.submit(self.process_resource_set, resource_set, event))
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Execution failed with error: %s" % f.exception())
+                    exceptions.append(f.exception())
+                    continue
+                else:
+                    result = f.result()
+                    if result:
+                        results.extend(result)
+
+            return results, list(set(exceptions))
+
+    def process_resource_set(self, resources, event=None):
+        for resource in resources:
+            # if the auto-tag-user policy set update to False (or it's unset) then we
+            # will skip writing their UserName tag and not overwrite pre-existing values
+            if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
+                return
+
+            user = self.default_user
             if event:
-                list(w.map(self.process_resource, resources, event))
+                user = self._get_user_from_event(event) or user
             else:
-                list(w.map(self.process_resource, resources))
+                user = self._get_user_from_resource_logs(resource) or user
 
-    def process_resource(self, resource, event_item=None):
-        # if the auto-tag-user policy set update to False (or it's unset) then we
-        # will skip writing their UserName tag and not overwrite pre-existing values
-        if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
-            return
+            # issue tag action to label user
+            try:
+                TagHelper.add_tags(self, resource, {self.tag_key: user})
+            except CloudError as e:
+                # resources can be locked
+                if e.inner_exception.error == 'ScopeLocked':
+                    pass
 
-        user = self.default_user
-        if event_item:
-            principal_role = self.principal_role_jmes_path.search(event_item)
-            principal_type = self.principal_type_jmes_path.search(event_item)
+    def _get_user_from_event(self, event):
+        principal_role = self.principal_role_jmes_path.search(event)
+        principal_type = self.principal_type_jmes_path.search(event)
 
-            # The Subscription Admins role does not have a principal type
-            if StringUtils.equal(principal_role, 'Subscription Admin'):
-                user = self.service_admin_jmes_path.search(event_item) or user
-            # ServicePrincipal type
-            elif StringUtils.equal(principal_type, 'ServicePrincipal'):
-                user = self.sp_jmes_path.search(event_item) or user
-            # Other types (e.g. User, Office 365 Groups, and Security Groups)
-            elif self.upn_jmes_path.search(event_item):
-                user = self.upn_jmes_path.search(event_item)
-            else:
-                self.log.error('Principal could not be determined.')
+        # The Subscription Admins role does not have a principal type
+        if StringUtils.equal(principal_role, 'Subscription Admin'):
+            return self.service_admin_jmes_path.search(event)
+        # ServicePrincipal type
+        elif StringUtils.equal(principal_type, 'ServicePrincipal'):
+            return self.sp_jmes_path.search(event)
+        # Other types (e.g. User, Office 365 Groups, and Security Groups)
+        elif self.upn_jmes_path.search(event):
+            return self.upn_jmes_path.search(event)
         else:
-            # Calculate start time
-            delta_days = self.data.get('days', self.max_query_days)
-            start_time = utcnow() - datetime.timedelta(days=delta_days)
+            self.log.error('Principal could not be determined.')
 
-            # resource group type
-            if self.manager.type == 'resourcegroup':
-                resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
-                query_filter = " and ".join([
-                    "eventTimestamp ge '%s'" % start_time,
-                    "resourceGroupName eq '%s'" % resource['name'],
-                    "eventChannels eq 'Operation'"
-                ])
-            # other Azure resources
-            else:
-                resource_type = resource['type']
-                query_filter = " and ".join([
-                    "eventTimestamp ge '%s'" % start_time,
-                    "resourceUri eq '%s'" % resource['id'],
-                    "eventChannels eq 'Operation'"
-                ])
+    def _get_user_from_resource_logs(self, resource):
+        # Calculate start time
+        delta_days = self.data.get('days', self.max_query_days)
+        start_time = utcnow() - datetime.timedelta(days=delta_days)
 
-            # fetch activity logs
-            logs = self.client.activity_logs.list(
-                filter=query_filter,
-                select=self.query_select
-            )
+        # resource group type
+        if self.manager.type == 'resourcegroup':
+            resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % start_time,
+                "resourceGroupName eq '%s'" % resource['name'],
+                "eventChannels eq 'Operation'"
+            ])
+        # other Azure resources
+        else:
+            resource_type = resource['type']
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % start_time,
+                "resourceUri eq '%s'" % resource['id'],
+                "eventChannels eq 'Operation'"
+            ])
 
-            # get the user who issued the first operation
-            operation_name = "%s/write" % resource_type
-            first_op = self.get_first_operation(logs, operation_name)
-            if first_op is not None:
-                user = first_op.caller
+        # fetch activity logs
+        logs = self.client.activity_logs.list(
+            filter=query_filter,
+            select=self.query_select
+        )
 
-        # issue tag action to label user
-        try:
-            TagHelper.add_tags(self, resource, {self.tag_key: user})
-        except CloudError as e:
-            # resources can be locked
-            if e.inner_exception.error == 'ScopeLocked':
-                pass
+        # get the user who issued the first operation
+        operation_name = "%s/write" % resource_type
+        first_op = self.get_first_operation(logs, operation_name)
+        return first_op.caller if first_op else None
 
     @staticmethod
     def get_first_operation(logs, operation_name):

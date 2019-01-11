@@ -49,7 +49,7 @@ class DependencyManager(object):
             if sum(pname[0].lower() in e.lower() for e in res) > 1:
                 logger.debug("removing duplicate dependency:" + val)
                 res.pop(i)
-        return res
+        return sorted(res)
 
     @staticmethod
     def prepare_non_binary_wheels(packages, folder):

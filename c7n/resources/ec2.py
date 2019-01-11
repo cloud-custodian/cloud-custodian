@@ -829,7 +829,7 @@ class InstanceFinding(PostFinding):
 
         instance = {
             "Type": "AwsEc2Instance",
-            "Id": "arn:aws:{}:{}:instance/{}".format(
+            "Id": "arn:aws:ec2:{}:{}:instance/{}".format(
                 self.manager.config.region,
                 self.manager.config.account_id,
                 r["InstanceId"]),
