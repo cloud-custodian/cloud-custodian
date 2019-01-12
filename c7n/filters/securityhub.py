@@ -38,7 +38,8 @@ class SecurityHubFindingFilter(Filter):
         for resource in resources:
             f['ResourceId'] = [
                 {
-                    "Value": self.manager.generate_arn(resource[self.manager.get_model().id]),  # TODO: test if this will this fail for app-elb?
+                    # TODO: test if this will this fail for app-elb?
+                    "Value": self.manager.generate_arn(resource[self.manager.get_model().id]),
                     "Comparison": "EQUALS",
                 }
             ]
