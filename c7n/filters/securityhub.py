@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+import json
 
 from c7n.utils import local_session, type_schema
 from .core import Filter
@@ -23,7 +24,7 @@ class SecurityHubFindingFilter(Filter):
     """
     schema = type_schema(
         'finding',
-        types={'type': 'array', 'items': {'type': 'string'}}
+        filter_json={'type': 'string'}
     )
     permissions = ('securityhub:GetFindings',)
 
@@ -35,11 +36,9 @@ class SecurityHubFindingFilter(Filter):
         f = self.get_filter_parameters()
 
         for resource in resources:
-            # TODO: Support parameterized filters rather not just finding exists
-            self.log.debug("resource level arn=%s", self.manager.generate_arn(resource))
             f['ResourceId'] = [
                 {
-                    "Value": self.manager.generate_arn(resource),
+                    "Value": self.manager.generate_arn(resource[self.manager.get_model().id]),  # TODO: test if this will this fail for app-elb?
                     "Comparison": "EQUALS",
                 }
             ]
@@ -54,13 +53,8 @@ class SecurityHubFindingFilter(Filter):
 
     def get_filter_parameters(self):
         f = {}
-        if self.data.get('types'):
-            f['Type'] = [
-                {
-                    "Value": self.data.get('types')[0],
-                    "Comparison": "EQUALS",
-                }
-            ]
+        if self.data.get('filter_json'):
+            f = json.loads(self.data.get('filter_json'))
         return f
 
     @classmethod

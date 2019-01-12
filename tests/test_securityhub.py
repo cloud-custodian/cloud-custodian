@@ -238,7 +238,7 @@ class SecurityHubTest(BaseTest):
                 "filters": [
                     {
                         "type": "finding",
-                        "types": ["Software and Configuration Checks/AWS Security Best Practices"]
+                        "filter_json": '{ "Type": [ { "Value": "Software and Configuration Checks/AWS Security Best Practices","Comparison":"EQUALS"}]}'
                     }
                 ],
             },
