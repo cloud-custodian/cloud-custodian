@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure.mgmt.storage.models import StorageAccount
 from azure_common import BaseTest
-from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 from mock import mock
@@ -171,43 +170,6 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.service_plan['resource_group_name'], "testrg")
 
         self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
-
-    def test_event_mode_is_subscribed_to_event_true(self):
-        p = self.load_policy({
-            'name': 'test-azure-event',
-            'resource': 'azure.vm',
-            'mode':
-                {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
-        })
-
-        subscribed_events = AzureEvents.get_event_operations(p.data['mode']['events'])
-        event = {
-            'data': {
-                'operationName': 'Microsoft.Compute/virtualMachines/write'
-            }
-        }
-
-        event_mode = AzureEventGridMode(p)
-        self.assertTrue(event_mode._is_subscribed_to_event(event, subscribed_events))
-
-    def test_event_mode_is_subscribed_to_event_false(self):
-        p = self.load_policy({
-            'name': 'test-azure-event',
-            'resource': 'azure.vm',
-            'mode':
-                {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
-        })
-
-        subscribed_events = AzureEvents.get_event_operations(p.data['mode']['events'])
-        event = {
-            'data': {
-                'operationName': 'Microsoft.Compute/virtualMachineScaleSets/write'
-            }
-        }
-        event_mode = AzureEventGridMode(p)
-        self.assertFalse(event_mode._is_subscribed_to_event(event, subscribed_events))
 
     def test_event_grid_mode_creates_advanced_filtered_subscription(self):
         p = self.load_policy({

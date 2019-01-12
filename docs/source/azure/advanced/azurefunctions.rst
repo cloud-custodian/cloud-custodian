@@ -206,7 +206,6 @@ of one of the `shortcuts <https://github.com/capitalone/cloud-custodian/blob/mas
           actions:
             - type: auto-tag-user
               tag: CreatorEmail
-              days: 10
 
 Advanced Authentication Options
 ###############################

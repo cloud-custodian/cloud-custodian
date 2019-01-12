@@ -541,7 +541,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -555,7 +555,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -588,7 +588,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -602,7 +602,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -635,7 +635,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -648,7 +648,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -681,7 +681,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -695,7 +695,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -728,7 +728,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -740,7 +740,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -773,7 +773,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -785,7 +785,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -818,7 +818,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -830,7 +830,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -863,7 +863,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -875,7 +875,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 

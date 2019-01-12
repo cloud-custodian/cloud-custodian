@@ -14,10 +14,39 @@
 
 import logging
 
-import c7n_kube.resources.namespace
-import c7n_kube.resources.service  # NOQA
+from c7n_kube.resources.core import (
+    configmap,
+    namespace,
+    node,
+    pod,
+    replicationcontroller,
+    secret,
+    service,
+    serviceaccount,
+    volume)
+
+from c7n_kube.resources.apps import (
+    daemonset,
+    deployment,
+    replicaset,
+    statefulset)
 
 log = logging.getLogger('custodian.k8s')
+
+ALL = [
+    configmap,
+    deployment,
+    namespace,
+    node,
+    pod,
+    replicationcontroller,
+    secret,
+    service,
+    serviceaccount,
+    volume,
+    daemonset,
+    replicaset,
+    statefulset]
 
 
 def initialize_kube():
