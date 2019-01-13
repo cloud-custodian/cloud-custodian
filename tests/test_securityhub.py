@@ -250,6 +250,27 @@ class SecurityHubTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_alb_findings_filter(self):
+        factory = self.replay_flight_data("test_security_hub_alb_findings_filter")
+        policy = self.load_policy(
+            {
+                "name": "alb-findings-filter",
+                "resource": "app-elb",
+                "filters": [{
+                    "type": "finding",
+                    "filter_json": '{ "Type": [ {\
+                        "Value": "Software and Configuration Checks/AWS Security Best Practices",\
+                        "Comparison":"EQUALS"\
+                    }]}'
+                }],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
     def test_finding_ec2_arn(self):
         # reuse another tests recorded data to get an ec2 instance
         # not a best practice, avoid if practical.
