@@ -28,12 +28,6 @@ class SecurityHubFindingFilter(Filter):
     )
     permissions = ('securityhub:GetFindings',)
 
-    def get_arn(self, resource):
-        if self.manager.data['resource'] in {'app-elb'}:
-            return resource[self.manager.get_model().id]
-        else:
-            return self.manager.generate_arn(resource[self.manager.get_model().id])
-
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'securityhub', region_name='us-east-1')
@@ -44,8 +38,7 @@ class SecurityHubFindingFilter(Filter):
         for resource in resources:
             f['ResourceId'] = [
                 {
-                    # TODO: test if this will this fail for app-elb?
-                    "Value": self.get_arn(resource),
+                    "Value": self.manager.get_arns([resource])[0],
                     "Comparison": "EQUALS",
                 }
             ]
