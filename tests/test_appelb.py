@@ -358,9 +358,9 @@ class AppELBTest(BaseTest):
         )
         resources = p.run()
         arn = resources[0]["LoadBalancerArn"]
-        
+
         # test arn generation
-        self.assertEqual(arn, p.resource_manager.generate_arn(resources[0][AppELB.resource_type.name]))
+        self.assertEqual(arn, p.resource_manager.get_arns([resources[0]])[0])
 
         attributes = client.describe_load_balancer_attributes(LoadBalancerArn=arn)[
             "Attributes"
