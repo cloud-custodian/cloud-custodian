@@ -1,19 +1,19 @@
-#build:
-#  documentation:
-#     image: python:2.7
-#     commands:
-#       - git config --global user.email "cibot@cloud-custodian.io"
-#       - git config --global user.name "Custodian CI"
-#       - pip install tox
-#       - tox -e docs
-#       - git remote update origin --prune
-#       - make ghpages
-#       - git branch
-#       # switch back to master post doc-build
-#       - git checkout master
-#     when:
-#       event: push
-#       branch: master
+build:
+  documentation:
+     image: python:2.7
+     commands:
+       - git config --global user.email "cibot@cloud-custodian.io"
+       - git config --global user.name "Custodian CI"
+       - pip install tox
+       - tox -e docs
+       - git remote update origin --prune
+       - make ghpages
+       - git branch
+       # switch back to master post doc-build
+       - git checkout master
+     when:
+       event: push
+       branch: master
 
 #deploy:
 #  # sphinx documentation build / per documentation build section
