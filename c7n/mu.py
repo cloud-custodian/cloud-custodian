@@ -296,6 +296,8 @@ class LambdaManager(object):
                     e, func.alias)
         return result
 
+    add = publish
+
     def remove(self, func, alias=None):
         for e in func.get_events(self.session_factory):
             e.remove(func)
@@ -735,7 +737,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python2.7')
+        return self.policy.data['mode'].get('runtime', 'python3.7')
 
     @property
     def memory_size(self):
@@ -859,9 +861,21 @@ class CloudWatchEventSource(object):
 
     def __init__(self, data, session_factory):
         self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('events')
+        self._session = None
+        self._client = None
         self.data = data
+
+    @property
+    def session(self):
+        if not self._session:
+            self._session = self.session_factory()
+        return self._session
+
+    @property
+    def client(self):
+        if not self._client:
+            self._client = self.session.client('events')
+        return self._client
 
     def get(self, rule_name):
         return resource_exists(self.client.describe_rule, Name=rule_name)

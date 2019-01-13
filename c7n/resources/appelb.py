@@ -193,6 +193,12 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "AvailabilityZones[].SubnetId"
 
 
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 filters.register('network-location', net_filters.NetworkLocation)
 
 
@@ -271,7 +277,7 @@ class SetWaf(BaseAction):
 
     def validate(self):
         found = False
-        for f in self.manager.filters:
+        for f in self.manager.iter_filters():
             if isinstance(f, WafEnabled):
                 found = True
                 break
@@ -691,8 +697,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
     def validate(self):
         if not self.data.get('matched'):
             return
-        listeners = [f for f in self.manager.filters
-                     if isinstance(f, self.__class__)]
+        listeners = list(self.manager.iter_filters())
         found = False
         for f in listeners[:listeners.index(self)]:
             if not f.data.get('matched', False):
@@ -755,8 +760,8 @@ class AppELBModifyListenerPolicy(BaseAction):
     permissions = ("elasticloadbalancing:ModifyListener",)
 
     def validate(self):
-        for f in self.manager.data.get('filters', ()):
-            if 'listener' in f.get('type', ()):
+        for f in self.manager.iter_filters():
+            if f.type == 'listener':
                 return self
         raise PolicyValidationError(
             "modify-listener action requires the listener filter %s" % (

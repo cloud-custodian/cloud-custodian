@@ -396,9 +396,11 @@ class DeleteBackup(BaseAction, StatusFilter):
               - name: dynamodb-delete-backup
                 resource: dynamodb-backup
                 filters:
-                  - type: age
-                    days: 28
-                    op: ge
+                  - type: value
+                    key: BackupCreationDateTime
+                    op: greater-than
+                    value_type: age
+                    value: 28
                 actions:
                   - type: delete
     """
@@ -426,7 +428,7 @@ class DeleteBackup(BaseAction, StatusFilter):
                     BackupArn=t['BackupArn'])
             except ClientError as e:
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                    self.log.warning("Could not complete DynamoDB backup table:%s", t)
+                    self.log.warning("Could not complete DynamoDB backup deletion for table:%s", t)
                     continue
                 raise
 
@@ -701,13 +703,11 @@ class DaxModifySecurityGroup(ModifyVpcSecurityGroupsAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('dax')
-        groups = super(DaxModifySecurityGroup, self).get_groups(
-            resources, metadata_key='SecurityGroupIdentifier')
+        groups = super(DaxModifySecurityGroup, self).get_groups(resources)
 
         for idx, r in enumerate(resources):
             client.update_cluster(
-                ClusterName=r['ClusterName'],
-                SecurityGroupIds=groups[idx])
+                ClusterName=r['ClusterName'], SecurityGroupIds=groups[idx])
 
 
 @DynamoDbAccelerator.filter_registry.register('subnet')

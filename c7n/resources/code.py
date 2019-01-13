@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
-from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, get_retry, type_schema
@@ -32,7 +32,7 @@ class CodeRepository(QueryResourceManager):
         enum_spec = ('list_repositories', 'repositories', None)
         batch_detail_spec = (
             'batch_get_repositories', 'repositoryNames', 'repositoryName',
-            'repositories')
+            'repositories', None)
         id = 'repositoryId'
         name = 'repositoryName'
         date = 'creationDate'
@@ -81,7 +81,7 @@ class CodeBuildProject(QueryResourceManager):
         service = 'codebuild'
         enum_spec = ('list_projects', 'projects', None)
         batch_detail_spec = (
-            'batch_get_projects', 'names', None, 'projects')
+            'batch_get_projects', 'names', None, 'projects', None)
         name = id = 'name'
         date = 'created'
         dimension = None
@@ -89,14 +89,22 @@ class CodeBuildProject(QueryResourceManager):
         config_type = "AWS::CodeBuild::Project"
 
 
+@CodeBuildProject.filter_registry.register('subnet')
 class BuildSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "vpcConfig.subnets[]"
 
 
+@CodeBuildProject.filter_registry.register('security-group')
 class BuildSecurityGroupFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "vpcConfig.securityGroupIds[]"
+
+
+@CodeBuildProject.filter_registry.register('vpc')
+class BuildVpcFilter(VpcFilter):
+
+    RelatedIdsExpression = "vpcConfig.vpcId"
 
 
 @CodeBuildProject.action_registry.register('delete')

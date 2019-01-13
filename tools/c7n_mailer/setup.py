@@ -22,6 +22,7 @@ requires = [
     "Jinja2",
     "boto3",
     "jsonschema",
+    "python-dateutil>=2.6",
     "ruamel.yaml==0.15.42",
     "datadog",
     "slackclient",
@@ -46,7 +47,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_mailer",
-    version='0.3.2',
+    version='0.4.0',
     description="Cloud Custodian - Reference Mailer",
     long_description=long_description,
     long_description_content_type='text/markdown',

@@ -93,12 +93,7 @@ def load_file(path, format=None, vars=None):
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
-            try:
-                return yaml_load(contents)
-            except yaml.YAMLError as e:
-                log.error('Error while loading yaml file %s', path)
-                log.error('Skipping this file.  Error message below:\n%s', e)
-                return None
+            return yaml_load(contents)
         elif format == 'json':
             return loads(contents)
 
@@ -122,6 +117,13 @@ def dumps(data, fh=None, indent=0):
 
 def format_event(evt):
     return json.dumps(evt, indent=2)
+
+
+def filter_empty(d):
+    for k, v in list(d.items()):
+        if not v:
+            del d[k]
+    return d
 
 
 def type_schema(

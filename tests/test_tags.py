@@ -18,7 +18,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 from mock import MagicMock, call
-from c7n.tags import universal_retry
+from c7n.tags import universal_retry, coalesce_copy_user_tags
 from .common import BaseTest
 
 
@@ -55,3 +55,102 @@ class UniversalTagRetry(BaseTest):
             {"FailedResourcesMap": {"arn:abc": {"ErrorCode": "PermissionDenied"}}}
         ]
         self.assertRaises(Exception, universal_retry, method, ["arn:abc"])
+
+
+class CoalesceCopyUserTags(BaseTest):
+    def test_copy_bool_user_tags(self):
+        tags = [{'Key': 'test-key', 'Value': 'test-value'}]
+        resource = {
+            'Tags': tags
+        }
+
+        copy_tags = True
+        user_tags = []
+
+        final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
+        self.assertEqual(final_tags, tags)
+
+        copy_tags = False
+        user_tags = {'test-key-1': 'test-value'}
+
+        final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
+        self.assertEqual(final_tags, [{'Key': 'test-key-1', 'Value': 'test-value'}])
+
+    def test_copy_list_user_tags(self):
+        tags = [
+            {
+                'Key': 'test-key-1',
+                'Value': 'test-value'
+            },
+            {
+                'Key': 'test-key',
+                'Value': 'test-value'
+            }
+        ]
+        resource = {
+            'Tags': tags
+        }
+
+        copy_tags = ['test-key-1']
+        user_tags = []
+
+        final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
+        self.assertEqual(final_tags, [{'Key': 'test-key-1', 'Value': 'test-value'}])
+
+    def test_copy_asterisk_user_tags(self):
+        tags = [
+            {
+                'Key': 'test-key-1',
+                'Value': 'test-value'
+            },
+            {
+                'Key': 'test-key',
+                'Value': 'test-value'
+            }
+        ]
+
+        resource = {
+            'Tags': tags
+        }
+
+        copy_tags = ['*']
+        user_tags = []
+        final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
+        self.assertEqual(final_tags, tags)
+
+    def test_empty_resource_tags(self):
+        resource = {}
+        copy_tags = ['test-key-1']
+        user_tags = {'user-key': 'test-value'}
+        final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
+        self.assertEqual(final_tags, [{'Key': 'user-key', 'Value': 'test-value'}])
+
+    def test_copy_user_tags_conflict(self):
+        tags = [
+            {
+                'Key': 'test-key-1',
+                'Value': 'test-value'
+            },
+            {
+                'Key': 'test-key',
+                'Value': 'test-value'
+            }
+        ]
+
+        resource = {
+            'Tags': tags
+        }
+
+        copy_tags = ['*']
+        user_tags = [{'Key': 'test-key', 'Value': 'test-value-user'}]
+        final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
+        self.assertEqual(len(final_tags), 2)
+        self.assertTrue({'Key': 'test-key-1', 'Value': 'test-value'} in final_tags)
+        self.assertTrue({'Key': 'test-key', 'Value': 'test-value-user'} in final_tags)
+
+    def test_empty_response(self):
+        resource = {}
+        user_tags = {}
+        copy_tags = []
+        final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
+        self.assertEqual(final_tags, [])

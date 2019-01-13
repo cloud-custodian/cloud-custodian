@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime
-from dateutil import tz, parser
+from dateutil import parser, tz as tzutil
 import json
 import fnmatch
 import itertools
@@ -25,7 +25,6 @@ import time
 import jmespath
 import six
 
-from c7n.actions import EventAction
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
@@ -33,15 +32,7 @@ from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds
-from c7n import mu
-from c7n import query
 from c7n import utils
-from c7n.logs_support import (
-    normalized_log_entries,
-    log_entries_in_range,
-    log_entries_from_s3,
-    log_entries_from_group,
-)
 from c7n.version import version
 
 log = logging.getLogger('c7n.policy')
@@ -285,18 +276,19 @@ class PullMode(PolicyExecutionMode):
             return resources
 
     def get_logs(self, start, end):
+        from c7n import logs_support
         log_source = self.policy.ctx.output
         log_gen = ()
         if self.policy.options.log_group is not None:
             session = utils.local_session(self.policy.session_factory)
-            log_gen = log_entries_from_group(
+            log_gen = logs_support.log_entries_from_group(
                 session,
                 self.policy.options.log_group,
                 start,
                 end,
             )
         elif log_source.type == 's3':
-            raw_entries = log_entries_from_s3(
+            raw_entries = logs_support.log_entries_from_s3(
                 self.policy.session_factory,
                 log_source,
                 start,
@@ -305,15 +297,15 @@ class PullMode(PolicyExecutionMode):
             # log files can be downloaded out of order, so sort on timestamp
             # log_gen isn't really a generator once we do this, but oh well
             log_gen = sorted(
-                normalized_log_entries(raw_entries),
+                logs_support.normalized_log_entries(raw_entries),
                 key=lambda e: e.get('timestamp', 0),
             )
         else:
             log_path = os.path.join(log_source.root_dir, 'custodian-run.log')
             with open(log_path) as log_fh:
                 raw_entries = log_fh.readlines()
-                log_gen = normalized_log_entries(raw_entries)
-        return log_entries_in_range(
+                log_gen = logs_support.normalized_log_entries(raw_entries)
+        return logs_support.log_entries_in_range(
             log_gen,
             start,
             end,
@@ -355,7 +347,7 @@ class LambdaMode(ServerlessExecutionMode):
             'member-role': {'type': 'string'},
             'packages': {'type': 'array'},
             # Lambda passthrough config
-            'runtime': {'enum': ['python2.7', 'python3.6']},
+            'runtime': {'enum': ['python2.7', 'python3.6', 'python3.7']},
             'role': {'type': 'string'},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
@@ -368,6 +360,14 @@ class LambdaMode(ServerlessExecutionMode):
             'subnets': {'type': 'array'}
         }
     }
+
+    def validate(self):
+        super(LambdaMode, self).validate()
+        prefix = self.policy.data.get('function-prefix', 'custodian-')
+        if len(prefix + self.policy.name) > 64:
+            raise PolicyValidationError(
+                "Custodian Lambda policies have a max length with prefix of 64"
+                " policy:%s prefix:%s" % (prefix, self.policy.name))
 
     def get_metrics(self, start, end, period):
         from c7n.mu import LambdaManager, PolicyLambda
@@ -427,11 +427,11 @@ class LambdaMode(ServerlessExecutionMode):
         Lambda automatically generates cloud watch logs, and metrics
         for us, albeit with some deficienies, metrics no longer count
         against valid resources matches, but against execution.
-        Fortunately we already have replacements.
 
-        TODO: better customization around execution context outputs
-        TODO: support centralized lambda exec across accounts.
+        If metrics execution option is enabled, custodian will generate
+        metrics per normal.
         """
+        from c7n.actions import EventAction
 
         mode = self.policy.data.get('mode', {})
         if not bool(mode.get("log", True)):
@@ -479,6 +479,7 @@ class LambdaMode(ServerlessExecutionMode):
         return resources
 
     def provision(self):
+        from c7n import mu
         with self.policy.ctx:
             self.policy.log.info(
                 "Provisioning policy lambda %s", self.policy.name)
@@ -494,9 +495,10 @@ class LambdaMode(ServerlessExecutionMode):
                 role=self.policy.options.assume_role)
 
     def get_logs(self, start, end):
+        from c7n import mu, logs_support
         manager = mu.LambdaManager(self.policy.session_factory)
         log_gen = manager.logs(mu.PolicyLambda(self.policy), start, end)
-        return log_entries_in_range(
+        return logs_support.log_entries_in_range(
             log_gen,
             start,
             end,
@@ -535,6 +537,8 @@ class CloudTrailMode(LambdaMode):
         rinherit=LambdaMode.schema)
 
     def validate(self):
+        super(CloudTrailMode, self).validate()
+        from c7n import query
         events = self.policy.data['mode'].get('events')
         assert events, "cloud trail mode requires specifiying events to subscribe"
         for e in events:
@@ -603,6 +607,7 @@ class GuardDutyMode(LambdaMode):
         return resources
 
     def validate(self):
+        super(GuardDutyMode, self).validate()
         if self.policy.data['resource'] not in self.supported_resources:
             raise ValueError(
                 "Policy:%s resource:%s Guard duty mode only supported for %s" % (
@@ -717,7 +722,7 @@ class Policy(object):
 
     @property
     def tz(self):
-        return tz.gettz(self.data.get('tz', 'UTC'))
+        return tzutil.gettz(self.data.get('tz', 'UTC'))
 
     @property
     def start(self):
@@ -746,9 +751,12 @@ class Policy(object):
     def get_cache(self):
         return self.resource_manager._cache
 
+    @property
+    def execution_mode(self):
+        return self.data.get('mode', {'type': 'pull'})['type']
+
     def get_execution_mode(self):
-        exec_mode_type = self.data.get('mode', {'type': 'pull'}).get('type')
-        exec_mode = execution[exec_mode_type]
+        exec_mode = execution[self.execution_mode]
         if exec_mode is None:
             return None
         return exec_mode(self)
@@ -903,11 +911,11 @@ class Policy(object):
 
         if policy_tz:
             try:
-                p_tz = tz.gettz(policy_tz)
+                p_tz = tzutil.gettz(policy_tz)
             except Exception as e:
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
-            if not isinstance(p_tz, tz.tzfile):
+            if not isinstance(p_tz, tzutil.tzfile):
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
 

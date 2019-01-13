@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.session import Session
+from c7n_azure.utils import ResourceIdParser
 
 
 class StorageUtilsTest(BaseTest):
@@ -86,3 +87,46 @@ class StorageUtilsTest(BaseTest):
     def test_get_storage_token(self):
         token = StorageUtilities.get_storage_token(self.session)
         self.assertIsNotNone(token.token)
+
+    @arm_template('storage.json')
+    def test_get_blob_client_from_storage_account_without_sas(self):
+        account = self.setup_account()
+        resource_group = ResourceIdParser.get_resource_group(account.id)
+        blob_client = StorageUtilities.get_blob_client_from_storage_account(
+            resource_group,
+            account.name,
+            self.session)
+
+        self.assertIsNotNone(blob_client)
+
+    @arm_template('storage.json')
+    def test_get_blob_client_from_storage_account_without_sas_fails_sas_generation(self):
+        with self.assertRaises(ValueError):
+            account = self.setup_account()
+            resource_group = ResourceIdParser.get_resource_group(account.id)
+            blob_client = StorageUtilities.get_blob_client_from_storage_account(
+                resource_group,
+                account.name,
+                self.session)
+
+            # create container for package
+            blob_client.create_container('test')
+            blob_client.create_blob_from_text('test', 'test.txt', 'My test contents.')
+            blob_client.generate_blob_shared_access_signature('test', 'test.txt')
+
+    @arm_template('storage.json')
+    def test_get_blob_client_from_storage_account_with_sas(self):
+        account = self.setup_account()
+        resource_group = ResourceIdParser.get_resource_group(account.id)
+        blob_client = StorageUtilities.get_blob_client_from_storage_account(
+            resource_group,
+            account.name,
+            self.session,
+            True)
+
+        # create sas token for blob
+        blob_client.create_container('test')
+        blob_client.create_blob_from_text('test', 'test.txt', 'My test contents.')
+        sas = blob_client.generate_blob_shared_access_signature('test', 'test.txt')
+
+        self.assertIsNotNone(sas)

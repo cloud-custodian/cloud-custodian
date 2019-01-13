@@ -99,6 +99,8 @@ class FlowLogFilter(Filter):
            'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
            'set-op': {'enum': ['or', 'and'], 'default': 'or'},
            'status': {'enum': ['active']},
+           'deliver-status': {'enum': ['success', 'failure']},
+           'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
 
@@ -120,7 +122,9 @@ class FlowLogFilter(Filter):
         enabled = self.data.get('enabled', False)
         log_group = self.data.get('log-group')
         traffic_type = self.data.get('traffic-type')
+        destination_type = self.data.get('destination-type')
         status = self.data.get('status')
+        delivery_status = self.data.get('deliver-status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
         set_op = self.data.get('set-op', 'or')
 
@@ -142,7 +146,11 @@ class FlowLogFilter(Filter):
             if enabled:
                 fl_matches = []
                 for fl in flogs:
+                    dest_match = (destination_type is None) or op(
+                        fl['LogDestinationType'], destination_type)
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
+                    delivery_status_match = (delivery_status is None) or op(
+                        fl['DeliverLogsStatus'], delivery_status.upper())
                     traffic_type_match = (
                         traffic_type is None) or op(
                         fl['TrafficType'],
@@ -150,7 +158,8 @@ class FlowLogFilter(Filter):
                     log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
 
                     # combine all conditions to check if flow log matches the spec
-                    fl_match = status_match and traffic_type_match and log_group_match
+                    fl_match = (status_match and traffic_type_match and
+                                log_group_match and dest_match and delivery_status_match)
                     fl_matches.append(fl_match)
 
                 if set_op == 'or':
@@ -491,7 +500,7 @@ class SecurityGroupApplyPatch(BaseAction):
                    'ec2:DeleteTags')
 
     def validate(self):
-        diff_filters = [n for n in self.manager.filters if isinstance(
+        diff_filters = [n for n in self.manager.iter_filters() if isinstance(
             n, SecurityGroupDiffFilter)]
         if not len(diff_filters):
             raise PolicyValidationError(
@@ -1199,6 +1208,12 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "Groups[].GroupId"
 
 
+@NetworkInterface.filter_registry.register('vpc')
+class InterfaceVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpress = "VpcId"
+
+
 @NetworkInterface.action_registry.register('modify-security-groups')
 class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Remove security groups from an interface.
@@ -1698,6 +1713,14 @@ class VpcEndpoint(query.QueryResourceManager):
         id_prefix = "vpce-"
 
 
+@VpcEndpoint.filter_registry.register('cross-account')
+class EndpointCrossAccountFilter(CrossAccountAccessFilter):
+
+    policy_attribute = 'PolicyDocument'
+    annotation_key = 'c7n:CrossAccountViolations'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+
 @VpcEndpoint.filter_registry.register('security-group')
 class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
@@ -1708,6 +1731,12 @@ class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
 class EndpointSubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetIds[]"
+
+
+@VpcEndpoint.filter_registry.register('vpc')
+class EndpointVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
 
 
 @resources.register('key-pair')

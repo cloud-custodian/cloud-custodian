@@ -58,12 +58,12 @@ class MailerTester(object):
                 self.data, self.data['resources'], ['foo@example.com']
             )
             logger.info('Send mail with subject: "%s"', mime['Subject'])
-            print(mime.get_payload())
+            print(mime.get_payload(None, True))
             return
         if dry_run:
             for to_addrs, mimetext_msg in addrs_to_msgs.items():
-                print('-> SEND MESSAGE TO: %s' % to_addrs)
-                print(mimetext_msg)
+                print('-> SEND MESSAGE TO: %s' % '; '.join(to_addrs))
+                print(mimetext_msg.get_payload(None, True))
             return
         # else actually send the message...
         for to_addrs, mimetext_msg in addrs_to_msgs.items():
@@ -77,9 +77,11 @@ def setup_parser():
     parser.add_argument('-d', '--dry-run', dest='dry_run', action='store_true',
                         default=False,
                         help='Log messages that would be sent, but do not send')
-    parser.add_argument('-t', '--template-print', dest='print_only',
+    parser.add_argument('-T', '--template-print', dest='print_only',
                         action='store_true', default=False,
                         help='Just print rendered templates')
+    parser.add_argument('-t', '--templates', default=None, type=str,
+                        help='message templates folder location')
     parser.add_argument('-p', '--plain', dest='plain', action='store_true',
                         default=False,
                         help='Expect MESSAGE_FILE to be a plain string, '
@@ -104,6 +106,18 @@ def main():
     parser = setup_parser()
     options = parser.parse_args()
 
+    module_dir = os.path.dirname(os.path.abspath(__file__))
+    default_templates = [
+        os.path.abspath(os.path.join(module_dir, 'msg-templates')),
+        os.path.abspath(os.path.join(module_dir, '..', 'msg-templates')),
+        os.path.abspath('.')
+    ]
+    templates = options.templates
+    if templates:
+        default_templates.append(
+            os.path.abspath(os.path.expanduser(os.path.expandvars(templates)))
+        )
+
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.DEBUG, format=log_format)
     logging.getLogger('botocore').setLevel(logging.WARNING)
@@ -113,6 +127,7 @@ def main():
 
     jsonschema.validate(config, CONFIG_SCHEMA)
     setup_defaults(config)
+    config['templates_folders'] = default_templates
 
     tester = MailerTester(
         options.MESSAGE_FILE, config, msg_plain=options.plain,

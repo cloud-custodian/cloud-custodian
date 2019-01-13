@@ -1,0 +1,32 @@
+{
+    "status_code": 200, 
+    "data": {
+        "PaginationToken": "", 
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:testtest", 
+                "Tags": [
+                    {
+                        "Value": "tag", 
+                        "Key": "missing"
+                    }, 
+                    {
+                        "Value": "other", 
+                        "Key": "workload-type"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b4bf15e-ec5c-11e8-b6cf-c342e464df24", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5b4bf15e-ec5c-11e8-b6cf-c342e464df24", 
+                "date": "Tue, 20 Nov 2018 00:36:44 GMT", 
+                "content-length": "195", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

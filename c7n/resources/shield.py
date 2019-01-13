@@ -19,7 +19,7 @@ from botocore.paginate import Paginator
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, pager
+from c7n.query import QueryResourceManager, RetryPageIterator
 from c7n.utils import local_session, type_schema, get_retry
 
 
@@ -57,10 +57,10 @@ def get_protections_paginator(client):
 
 
 def get_type_protections(client, model):
+    pager = get_protections_paginator(client)
+    pager.PAGE_ITERATOR_CLS = RetryPageIterator
     try:
-        protections = pager(
-            get_protections_paginator(client).paginate(),
-            ShieldRetry).get('Protections')
+        protections = pager.paginate().build_full_result().get('Protections', [])
     except client.exceptions.ResourceNotFoundException:
         # shield is not enabled in the account, so all resources are not protected
         return []

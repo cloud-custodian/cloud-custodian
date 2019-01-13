@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 
 from .common import BaseTest
 from botocore.exceptions import ClientError
@@ -296,7 +296,7 @@ class AutoScalingTest(BaseTest):
         session_factory = self.replay_flight_data("test_asg_mark_for_op_hours")
         session = session_factory(region="us-east-1")
         asg = session.client("autoscaling")
-        localtz = zoneinfo.gettz("America/New_York")
+        localtz = tzutil.gettz("America/New_York")
         dt = datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=2, day=20, hour=12, minute=42, second=0, microsecond=0

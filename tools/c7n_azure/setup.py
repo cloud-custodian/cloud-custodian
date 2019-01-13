@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.2',
+    version='0.4',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -65,10 +65,11 @@ setup(
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
                       "azure-mgmt-subscription",
-                      "azure-mgmt-eventgrid>=2.0.0rc1",
+                      "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
                       "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
+                      "distlib",
                       "requests",
                       "PyJWT",
                       "c7n",

@@ -4,6 +4,8 @@ github.com/DATA-DOG/go-sqlmock v1.3.0 h1:ljjRxlddjfChBJdFKJs5LuCwCWPLaC1UZLwAo3P
 github.com/DATA-DOG/go-sqlmock v1.3.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/StackExchange/wmi v0.0.0-20180725035823-b12b22c5341f h1:5ZfJxyXo8KyX8DgGXC5B7ILL8y51fci/qYz2B4j8iLY=
 github.com/StackExchange/wmi v0.0.0-20180725035823-b12b22c5341f/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
+github.com/aws/amazon-ssm-agent v0.0.0-20181107231829-b9654b268afc h1:nPfw+TutDKDMxoMG0Hq97Mccwhh+Y6+OvJLJuxkDcDc=
+github.com/aws/amazon-ssm-agent v0.0.0-20181107231829-b9654b268afc/go.mod h1:hakw1QP1RD4yZbTQBm7b8EOSYsHKpHK+i+WMEZxF50U=
 github.com/aws/aws-lambda-go v1.6.0 h1:T+u/g79zPKw1oJM7xYhvpq7i4Sjc0iVsXZUaqRVVSOg=
 github.com/aws/aws-lambda-go v1.6.0/go.mod h1:zUsUQhAUjYzR8AuduJPCfhBuKWUaDbQiPOG+ouzmE1A=
 github.com/aws/aws-sdk-go v1.15.23 h1:kOoboR2trlezdCoazZ0RXvJbM7YrOglDekarwdLP74c=
