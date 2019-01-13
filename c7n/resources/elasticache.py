@@ -39,7 +39,7 @@ log = logging.getLogger('custodian.elasticache')
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
 
-TTYPE = re.compile('cache.t')
+TTYPE = re.compile('cache.t1')
 
 
 @resources.register('cache-cluster')
@@ -216,14 +216,19 @@ class SnapshotElastiCacheCluster(BaseAction):
     permissions = ('elasticache:CreateSnapshot',)
 
     def process(self, clusters):
+        set_size = len(clusters)
+        clusters = [c for c in clusters if _cluster_eligible_for_snapshot(c)]
+        if set_size != len(clusters):
+            self.log.info(
+                "action:snapshot implicitly filtered from %d to %d clusters for snapshot support",
+                set_size, len(clusters))
+
         with self.executor_factory(max_workers=2) as w:
             futures = []
+            client = local_session(self.manager.session_factory).client('elasticache')
             for cluster in clusters:
-                if not _cluster_eligible_for_snapshot(cluster):
-                    continue
-                futures.append(w.submit(
-                    self.process_cluster_snapshot,
-                    cluster))
+                futures.append(
+                    w.submit(self.process_cluster_snapshot, client, cluster))
 
             for f in as_completed(futures):
                 if f.exception():
@@ -232,9 +237,8 @@ class SnapshotElastiCacheCluster(BaseAction):
                         f.exception())
         return clusters
 
-    def process_cluster_snapshot(self, cluster):
-        c = local_session(self.manager.session_factory).client('elasticache')
-        c.create_snapshot(
+    def process_cluster_snapshot(self, client, cluster):
+        client.create_snapshot(
             SnapshotName=snapshot_identifier(
                 'Backup',
                 cluster['CacheClusterId']),
@@ -385,9 +389,10 @@ class DeleteElastiCacheSnapshot(BaseAction):
         log.info("Deleting %d ElastiCache snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
+            client = local_session(self.manager.session_factory).client('elasticache')
             for snapshot_set in chunks(reversed(snapshots), size=50):
                 futures.append(
-                    w.submit(self.process_snapshot_set, snapshot_set))
+                    w.submit(self.process_snapshot_set, client, snapshot_set))
                 for f in as_completed(futures):
                     if f.exception():
                         self.log.error(
@@ -395,10 +400,9 @@ class DeleteElastiCacheSnapshot(BaseAction):
                             f.exception())
         return snapshots
 
-    def process_snapshot_set(self, snapshots_set):
-        c = local_session(self.manager.session_factory).client('elasticache')
+    def process_snapshot_set(self, client, snapshots_set):
         for s in snapshots_set:
-            c.delete_snapshot(SnapshotName=s['SnapshotName'])
+            client.delete_snapshot(SnapshotName=s['SnapshotName'])
 
 
 @ElastiCacheSnapshot.action_registry.register('copy-cluster-tags')

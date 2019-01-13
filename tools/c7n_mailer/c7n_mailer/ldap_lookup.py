@@ -154,8 +154,11 @@ class LdapLookup(object):
             ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])
             if self.cache_engine:
                 self.log.debug('Writing user: %s metadata to cache engine.' % uid)
-                self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
-                self.caching.set(uid, ldap_user_metadata)
+                if ldap_user_metadata.get('dn'):
+                    self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
+                    self.caching.set(uid, ldap_user_metadata)
+                else:
+                    self.caching.set(uid, {})
         else:
             if self.cache_engine:
                 self.caching.set(uid, {})

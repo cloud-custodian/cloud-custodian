@@ -1,46 +1,86 @@
 {
-    "resources": [
-        {
-            "apiVersion": "2015-05-01-preview",
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "cloudcustodiantest",
-            "location": "westus2",
-            "properties": {
-                "accountType": "Standard_LRS"
+  "variables": {
+    "functionAppName": "cloud-custodian-test",
+    "appHostingPlanName": "cloud-custodian-test",
+    "storageAccountName": "cloudcustodiantest",
+    "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "location": "westus2",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
+    {
+      "apiVersion": "2016-09-01",
+      "name": "[variables('appHostingPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "westus2",
+      "properties": {
+        "name": "[variables('appHostingPlanName')]",
+        "workerSizeId": "0",
+        "reserved": true,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      },
+      "sku": {
+        "Tier": "Basic",
+        "Name": "B1"
+      },
+      "kind": "linux"
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "cloud-custodian-test",
+      "type": "microsoft.insights/components",
+      "location": "westus2",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', 'cloud-custodian-test')]": "Resource"
+      },
+      "properties": {
+        "ApplicationId": "cloud-custodian-test",
+        "Request_Source": "IbizaWebAppExtensionCreate"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "kind": "functionapp,linux,container",
+      "name": "[variables('functionAppName')]",
+      "apiVersion": "2016-08-01",
+      "location": "westus2",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureWebJobsDashboard",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2018-07-01').keys[0].value)]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2018-07-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "python"
             }
-        },
-        {
-            "apiVersion": "2016-09-01",
-            "name": "cloud-custodian-test",
-            "type": "Microsoft.Web/serverfarms",
-            "location": "westus2",
-            "properties": {
-                "name": "cloud-custodian-test",
-                "workerSizeId": "0",
-                "reserved": true,
-                "numberOfWorkers": "1",
-                "hostingEnvironment": ""
-            },
-            "sku": {
-                "Tier": "Basic",
-                "Name": "B1"
-            },
-            "kind": "linux"
-        },
-        {
-            "apiVersion": "2015-05-01",
-            "name": "cloud-custodian-test",
-            "type": "microsoft.insights/components",
-            "location": "westus2",
-            "tags": {
-                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', 'cloud-custodian-test')]": "Resource"
-            },
-            "properties": {
-                "ApplicationId": "cloud-custodian-test",
-                "Request_Source": "IbizaWebAppExtensionCreate"
-            }
+          ]
         }
-    ],
-    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0"
+      }
+    }
+  ],
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0"
 }

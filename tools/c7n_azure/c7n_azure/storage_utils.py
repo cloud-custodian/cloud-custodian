@@ -39,6 +39,25 @@ class StorageUtilities(object):
         return blob_service, storage.container_name, storage.file_prefix
 
     @staticmethod
+    def get_blob_client_from_storage_account(resource_group, name, session, sas_generation=False):
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_account = storage_client.storage_accounts.get_properties(resource_group, name)
+
+        # sas tokens can only be generated from clients created from account keys
+        primary_key = token = None
+        if sas_generation:
+            storage_keys = storage_client.storage_accounts.list_keys(resource_group, name)
+            primary_key = storage_keys.keys[0].value
+        else:
+            token = StorageUtilities.get_storage_token(session)
+
+        return BlockBlobService(
+            account_name=storage_account.name,
+            account_key=primary_key,
+            token_credential=token
+        )
+
+    @staticmethod
     def get_queue_client_by_uri(queue_uri, session):
         storage = StorageUtilities.get_storage_from_uri(queue_uri, session)
 

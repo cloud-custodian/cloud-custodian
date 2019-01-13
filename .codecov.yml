@@ -20,10 +20,13 @@ coverage:
       gcp:
         paths: "tools/c7n_gcp"
         threshold: "1%"
-      # aws is weaved throughout core atm can't easily call it out separately
       mailer:
         paths: "tools/c7n_mailer"
-        threshold: "2%"
+        threshold: "3%"
+      k8s:
+        paths: "tools/c7n_kube"
+        threshold: "1%"
+      # aws is weaved throughout core atm can't easily call it out separately
       custodian:
       # one of the tests is slightly variable coverage due to concurrency (0.01)
         threshold: "0.05%"
