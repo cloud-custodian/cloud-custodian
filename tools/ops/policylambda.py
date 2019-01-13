@@ -45,7 +45,8 @@ from c7n import mu, resources
 
 
 def render(p):
-    properties = mu.PolicyLambda(p).get_config()
+    policy_lambda = mu.PolicyLambda(p)
+    properties = policy_lambda.get_config()
 
     # Translate api call params to sam
     env = properties.pop('Environment', None)
@@ -73,14 +74,15 @@ def render(p):
                     'Schedule': p.data.get('mode', {}).get('schedule')}}
         }
     else:
-        events = [e for e in p.get_events() if isinstance(e, mu.CloudWatchEventSource)]
+        events = [e for e in policy_lambda.get_events(None)
+                  if isinstance(e, mu.CloudWatchEventSource)]
         if not events:
             return
 
         revents = {}
         for idx, e in enumerate(events):
             revents[
-                'PolicyTrigger%' % string.ascii_uppercase[idx]] = {
+                'PolicyTrigger%s' % string.ascii_uppercase[idx]] = {
                     'Type': 'CloudWatchEvent',
                     'Properties': {
                         'Pattern': json.loads(e.render_event_pattern())}
