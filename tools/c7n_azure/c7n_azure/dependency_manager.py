@@ -42,8 +42,14 @@ class DependencyManager(object):
 
         # boto3 is a dependency for both c7n and c7n_mailer.. Remove the duplicate from the list
         # because not all versions of pip can handle this.
-        res = [t for t in res if not any((e != t and t in e) for e in res)]
-        return res
+        # use regex to get rid of duplicates excluding version number
+        regex = "^[^<>~=]*"
+        for i, val in enumerate(res):
+            pname = re.match(regex, val)
+            if sum(pname[0].lower() in e.lower() for e in res) > 1:
+                logger.debug("removing duplicate dependency:" + val)
+                res.pop(i)
+        return sorted(res)
 
     @staticmethod
     def prepare_non_binary_wheels(packages, folder):

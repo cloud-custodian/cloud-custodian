@@ -733,7 +733,7 @@ class BucketFinding(PostFinding):
         owner = r.get("Acl", {}).get("Owner", {})
         resource = {
             "Type": "AwsS3Bucket",
-            "Id": "arn:aws:::{}".format(r["Name"]),
+            "Id": "arn:aws:s3:::{}".format(r["Name"]),
             "Region": get_region(r),
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
             "Details": {"AwsS3Bucket": {"OwnerId": owner.get('ID', 'Unknown')}}
@@ -1283,7 +1283,7 @@ class ToggleLogging(BucketActionBase):
 
         for r in resources:
             client = bucket_client(session, r)
-            is_logging = bool(r['Logging'])
+            is_logging = bool(r.get('Logging'))
 
             if enabled and not is_logging:
                 variables = {
@@ -2022,7 +2022,7 @@ class LogTarget(Filter):
     def get_s3_bucket_locations(buckets, self_log=False):
         """return (bucket_name, prefix) for all s3 logging targets"""
         for b in buckets:
-            if b['Logging']:
+            if b.get('Logging'):
                 if self_log:
                     if b['Name'] != b['Logging']['TargetBucket']:
                         continue

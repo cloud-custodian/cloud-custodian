@@ -263,7 +263,7 @@ class PolicyLambdaProvision(BaseTest):
             {
                 "resource": "s3",
                 "name": "s3-bucket-policy",
-                "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
+                "mode": {"type": "cloudtrail", "events": ["CreateBucket"], 'runtime': 'python2.7'},
                 "filters": [
                     {
                         "type": "missing-policy-statement",
@@ -286,6 +286,7 @@ class PolicyLambdaProvision(BaseTest):
                 "mode": {
                     "type": "cloudtrail",
                     "memory": 256,
+                    'runtime': 'python2.7',
                     "events": [
                         "CreateBucket",
                         {
@@ -737,7 +738,7 @@ class PolicyLambdaProvision(BaseTest):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python2.7",
+                "Runtime": "python3.7",
                 "Tags": {},
                 "Timeout": 60,
                 "TracingConfig": {"Mode": "PassThrough"},

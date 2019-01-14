@@ -14,20 +14,23 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
+from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
+from mock import patch
 
 from c7n.utils import local_session
 from c7n_azure.session import Session
 
 CONST_GROUP_NAME = 'test_functionapp-reqs'
+prefix = 'hxxuvke6yrmoe'
 
 
 class FunctionAppUtilsTest(BaseTest):
     def setUp(self):
         super(FunctionAppUtilsTest, self).setUp()
-        self.functionapp_util = FunctionAppUtilities()
+        self.session = local_session(Session)
 
     @arm_template('functionapp-reqs.json')
     def test_get_storage_connection_string(self):
@@ -67,5 +70,103 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name='custodian-test-app')
 
-        app = self.functionapp_util.deploy_dedicated_function_app(parameters)
+        app = FunctionAppUtilities.deploy_function_app(parameters)
         self.assertIsNotNone(app)
+
+    @arm_template('functionapp-reqs.json')
+    def test_deploy_function_app_pre_existing_app_fetch_actual_sku_tier(self):
+
+        parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
+            app_insights={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test'
+            },
+            storage_account={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloudcustodiantest'
+            },
+            service_plan={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test',
+                'sku_tier': 'something wrong'
+            },
+            function_app_resource_group_name=CONST_GROUP_NAME,
+            function_app_name='cloud-custodian-test')
+
+        FunctionAppUtilities.deploy_function_app(parameters)
+        self.assertEquals(parameters.service_plan['sku_tier'], 'Basic')
+
+    def test_is_consumption_plan(self):
+        params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
+            app_insights=None,
+            storage_account=None,
+            service_plan={
+                'sku_tier': 'dynamic'
+            },
+            function_app_resource_group_name=CONST_GROUP_NAME,
+            function_app_name='cloud-custodian-test')
+
+        self.assertTrue(FunctionAppUtilities.is_consumption_plan(params))
+
+        params.service_plan['sku_tier'] = 'other'
+        self.assertFalse(FunctionAppUtilities.is_consumption_plan(params))
+
+    @arm_template('functionapp-reqs.json')
+    def test_publish_functions_package_consumption(self):
+        parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
+            app_insights={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test'
+            },
+            storage_account={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloudcustodiantest'
+            },
+            service_plan={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test',
+                'sku_tier': 'dynamic'
+            },
+            function_app_resource_group_name=CONST_GROUP_NAME,
+            function_app_name='cloud-custodian-test')
+
+        FunctionAppUtilities.publish_functions_package(
+            parameters, FunctionPackage("TestPolicy"))
+
+        # verify app setting updated
+        wc = self.session.client('azure.mgmt.web.WebSiteManagementClient')
+        app_settings = wc.web_apps.list_application_settings(
+            CONST_GROUP_NAME, 'cloud-custodian-test')
+        self.assertIsNotNone(app_settings.properties['WEBSITE_RUN_FROM_PACKAGE'])
+
+    @arm_template('functionapp-reqs.json')
+    @patch('c7n_azure.function_package.FunctionPackage.publish')
+    def test_publish_functions_package_dedicated(self, mock_function_package_publish):
+        parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
+            app_insights={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test'
+            },
+            storage_account={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloudcustodiantest'
+            },
+            service_plan={
+                'id': '',
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test',
+                'sku_tier': 'Basic'
+            },
+            function_app_resource_group_name=CONST_GROUP_NAME,
+            function_app_name='cloud-custodian-test')
+
+        FunctionAppUtilities.publish_functions_package(parameters, FunctionPackage("TestPolicy"))
+        mock_function_package_publish.assert_called_once()

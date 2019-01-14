@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
 
@@ -148,19 +149,103 @@ class PostFinding(BaseAction):
         },
     )
 
+    NEW_FINDING = 'New'
+
+    def get_finding_tag(self, resource):
+        finding_tag = None
+        tags = resource.get('Tags', [])
+
+        finding_key = '{}:{}'.format('c7n:FindingId',
+            self.data.get('title', self.manager.ctx.policy.name))
+
+        # Support Tags as dictionary
+        if isinstance(tags, dict):
+            return tags.get(finding_key)
+
+        # Support Tags as list of {'Key': 'Value'}
+        for t in tags:
+            key = t['Key']
+            value = t['Value']
+            if key == finding_key:
+                finding_tag = value
+        return finding_tag
+
+    def group_resources(self, resources):
+        grouped_resources = {}
+        for r in resources:
+            finding_tag = self.get_finding_tag(r) or self.NEW_FINDING
+            grouped_resources.setdefault(finding_tag, []).append(r)
+        return grouped_resources
+
     def process(self, resources, event=None):
         region_name = self.data.get('region', self.manager.config.region)
         client = local_session(
-            self.manager.session_factory).client("securityhub", region_name=region_name)
-        for resource_set in chunks(resources, 10):
-            finding = self.get_finding(resource_set)
-            client.batch_import_findings(Findings=[finding])
+            self.manager.session_factory).client(
+                "securityhub", region_name=region_name)
 
-    def get_finding(self, resources):
+        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
+
+        stats = Counter()
+        for key, grouped_resources in self.group_resources(resources).items():
+            for resource_set in chunks(grouped_resources, 10):
+                stats['Finding'] += 1
+                if key == self.NEW_FINDING:
+                    finding_id = None
+                    created_at = now
+                    updated_at = now
+                else:
+                    finding_id, created_at = self.get_finding_tag(
+                        resource_set[0]).split(':', 1)
+                    updated_at = now
+
+                finding = self.get_finding(
+                    resource_set, finding_id, created_at, updated_at)
+                import_response = client.batch_import_findings(
+                    Findings=[finding])
+                if import_response['FailedCount'] > 0:
+                    stats['Failed'] += import_response['FailedCount']
+                    self.log.error(
+                        "import_response=%s" % (import_response))
+                if key == self.NEW_FINDING:
+                    stats['New'] += len(resource_set)
+                    # Tag resources with new finding ids
+                    tag_action = self.manager.action_registry.get('tag')
+                    if tag_action is None:
+                        continue
+                    tag_action({
+                        'key': '{}:{}'.format(
+                            'c7n:FindingId',
+                            self.data.get(
+                                'title', self.manager.ctx.policy.name)),
+                        'value': '{}:{}'.format(
+                            finding['Id'], created_at)},
+                        self.manager).process(resources)
+                else:
+                    stats['Update'] += len(resource_set)
+
+        self.log.debug(
+            "policy:%s securityhub %d findings resources %d new %d updated %d failed",
+            self.manager.ctx.policy.name,
+            stats['Finding'],
+            stats['New'],
+            stats['Update'],
+            stats['Failed'])
+
+    def get_finding(self, resources, existing_finding_id, created_at, updated_at):
         policy = self.manager.ctx.policy
         model = self.manager.resource_type
 
-        now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
+        if existing_finding_id:
+            finding_id = existing_finding_id
+        else:
+            finding_id = '{}/{}/{}/{}'.format(
+                self.manager.config.region,
+                self.manager.config.account_id,
+                hashlib.md5(json.dumps(
+                    policy.data).encode('utf8')).hexdigest(),
+                hashlib.md5(json.dumps(list(sorted(
+                    [r[model.id] for r in resources]))).encode(
+                        'utf8')).hexdigest())
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:aws:securityhub:{}:{}:product/{}/{}".format(
@@ -174,19 +259,10 @@ class PostFinding(BaseAction):
                 "description", policy.data.get("description", "")
             ).strip(),
             "Title": self.data.get("title", policy.name),
-            "Id": "{}/{}/{}/{}".format(
-                self.manager.config.region,
-                self.manager.config.account_id,
-                hashlib.md5(json.dumps(policy.data).encode("utf8")).hexdigest(),
-                hashlib.md5(
-                    json.dumps(list(sorted([r[model.id] for r in resources]))).encode(
-                        "utf8"
-                    )
-                ).hexdigest(),
-            ),
+            'Id': finding_id,
             "GeneratorId": policy.name,
-            "CreatedAt": now,
-            "UpdatedAt": now,
+            'CreatedAt': created_at,
+            'UpdatedAt': updated_at,
             "RecordState": "ACTIVE",
         }
 
@@ -236,6 +312,7 @@ class PostFinding(BaseAction):
             finding_resources.append(self.format_resource(r))
         finding["Resources"] = finding_resources
         finding["Types"] = list(self.data["types"])
+
         return filter_empty(finding)
 
     def format_resource(self, r):

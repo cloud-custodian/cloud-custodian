@@ -38,9 +38,6 @@ class HealthEventFilter(Filter):
                    'health:DescribeEventDetails')
 
     def process(self, resources, event=None):
-        if not resources:
-            return resources
-
         client = local_session(self.manager.session_factory).client(
             'health', region_name='us-east-1')
         f = self.get_filter_parameters()

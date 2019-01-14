@@ -19,6 +19,7 @@ import time
 
 from datetime import datetime
 from dateutil import tz
+import jmespath
 from mock import mock
 from jsonschema.exceptions import ValidationError
 
@@ -1138,7 +1139,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
         }
         self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
 
-    def test_invalid_add_params(self):
+    def test_valid_add_params(self):
         # string invalid
         policy = {
             "name": "add-with-incorrect-param-string",
@@ -1151,7 +1152,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 },
             ],
         }
-        self.assertRaises(ValidationError, self.load_policy, data=policy, validate=True)
+        self.assertTrue(self.load_policy(data=policy, validate=True))
 
     def test_invalid_isolation_group_params(self):
         policy = {
@@ -1239,12 +1240,7 @@ class TestModifySecurityGroupAction(BaseTest):
         client = session_factory().client("ec2")
 
         default_sg_id = client.describe_security_groups(GroupNames=["default"])[
-            "SecurityGroups"
-        ][
-            0
-        ][
-            "GroupId"
-        ]
+            "SecurityGroups"][0]["GroupId"]
 
         # Catch on anything that uses the *PROD-ONLY* security groups but isn't in a prod role
         policy = self.load_policy(
@@ -1337,8 +1333,35 @@ class TestModifySecurityGroupAction(BaseTest):
 
         first_resources = policy.run()
         self.assertEqual(len(first_resources[0]["NetworkInterfaces"][0]["Groups"]), 1)
+        policy.validate()
         second_resources = policy.run()
         self.assertEqual(len(second_resources[0]["NetworkInterfaces"][0]["Groups"]), 2)
+
+    def test_add_remove_with_name(self):
+        session_factory = self.replay_flight_data(
+            "test_ec2_modify_groups_action_with_name")
+        policy = self.load_policy({
+            "name": "add-remove-sg-with-name",
+            "resource": "ec2",
+            "query": [
+                {'instance-id': "i-094207d64930768dc"}],
+            "actions": [
+                {"type": "modify-security-groups",
+                 "remove": ["launch-wizard-1"],
+                 "add": "launch-wizard-2"}]},
+            session_factory=session_factory, config={'region': 'us-east-2'})
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('ec2')
+        if self.recording:
+            time.sleep(3)
+        self.assertEqual(
+            jmespath.search(
+                "Reservations[].Instances[].SecurityGroups[].GroupName",
+                client.describe_instances(InstanceIds=["i-094207d64930768dc"])),
+            ["launch-wizard-2"])
 
 
 class TestAutoRecoverAlarmAction(BaseTest):

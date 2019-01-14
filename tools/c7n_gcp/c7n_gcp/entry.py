@@ -15,10 +15,12 @@
 import logging
 
 import c7n_gcp.policy
+import c7n_gcp.resources.bigquery
 import c7n_gcp.resources.build
 import c7n_gcp.resources.compute
 import c7n_gcp.resources.function
 import c7n_gcp.resources.gke
+import c7n_gcp.resources.iam
 import c7n_gcp.resources.logging
 import c7n_gcp.resources.network
 import c7n_gcp.resources.pubsub
@@ -28,8 +30,12 @@ import c7n_gcp.resources.source
 import c7n_gcp.resources.storage
 import c7n_gcp.resources.sql  # noqa: F401
 
+from c7n_gcp.provider import resources as gcp_resources
 
 logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
+
+# Let resource registry subscribers have a chance to look at full set of resources.
+gcp_resources.notify(gcp_resources.EVENT_FINAL)
 
 
 def initialize_gcp():

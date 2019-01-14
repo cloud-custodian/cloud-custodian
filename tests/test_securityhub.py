@@ -14,8 +14,27 @@
 
 from .common import BaseTest
 
+import time
+
+LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23" # NOQA
+
 
 class SecurityHubTest(BaseTest):
+
+    def test_s3_bucket_arn(self):
+        policy = self.load_policy({
+            'name': 's3',
+            'resource': 's3',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"  # NOQA
+                     ]}]})
+        post_finding = policy.resource_manager.actions[0]
+        resource = post_finding.format_resource(
+            {'Name': 'xyz', 'CreationDate': 'xtf'})
+        self.assertEqual(resource['Id'], "arn:aws:s3:::xyz")
+
     def test_bucket(self):
         factory = self.replay_flight_data("test_security_hub_bucket")
         policy = self.load_policy(
@@ -72,6 +91,85 @@ class SecurityHubTest(BaseTest):
                 "Type": "AwsS3Bucket",
             },
         )
+
+    def test_lambda(self):
+        # test lambda function via post finding gets tagged with finding id
+        factory = self.replay_flight_data('test_security_hub_lambda')
+        client = factory().client('lambda')
+        func = client.get_function(FunctionName='check')['Configuration']
+
+        def resources():
+            return [func]
+
+        policy = self.load_policy({
+            'name': 'sec-hub-lambda',
+            'resource': 'lambda',
+            'actions': [
+                {
+                    "type": "post-finding",
+                    "severity": 10,
+                    "severity_normalized": 10,
+                    "types": [
+                        "Software and Configuration Checks/AWS Security Best Practices"
+                    ],
+                }]},
+            config={"account_id": "644160558196", 'region': 'us-east-2'},
+            session_factory=factory)
+        self.patch(policy.resource_manager, "resources", resources)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        func_post_exec = client.get_function(FunctionName='check')
+        self.assertEqual(
+            func_post_exec['Tags']['c7n:FindingId:sec-hub-lambda'].split(":", 1)[0],
+            LambdaFindingId)
+
+    def test_lambda_update(self):
+        # test lambda function via post finding, uses tag to update finding.
+        factory = self.replay_flight_data('test_security_hub_lambda_update')
+
+        client = factory().client("securityhub", region_name='us-east-2')
+        finding_v1 = client.get_findings(
+            Filters={
+                "Id": [{
+                    "Value": LambdaFindingId,
+                    "Comparison": "EQUALS",
+                }]}).get("Findings")[0]
+
+        lambda_client = factory().client('lambda')
+        func = lambda_client.get_function(FunctionName='check')['Configuration']
+
+        def resources():
+            return [func]
+
+        policy = self.load_policy({
+            'name': 'sec-hub-lambda',
+            'resource': 'lambda',
+            'actions': [{
+                "type": "post-finding",
+                "severity": 10,
+                "severity_normalized": 10,
+                "types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ],
+            }]},
+            config={"account_id": "644160558196", 'region': 'us-east-2'},
+            session_factory=factory)
+        self.patch(policy.resource_manager, "resources", resources)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(16)
+
+        finding_v2 = client.get_findings(
+            Filters={
+                "Id": [{
+                    "Value": LambdaFindingId,
+                    "Comparison": "EQUALS",
+                }]}).get("Findings")[0]
+
+        self.assertNotEqual(finding_v1['UpdatedAt'], finding_v2['UpdatedAt'])
 
     def test_instance(self):
         factory = self.replay_flight_data("test_security_hub_instance")
@@ -130,6 +228,24 @@ class SecurityHubTest(BaseTest):
                 "Type": "AwsEc2Instance",
             },
         )
+
+    def test_finding_ec2_arn(self):
+        # reuse another tests recorded data to get an ec2 instance
+        # not a best practice, avoid if practical.
+        factory = self.replay_flight_data("test_security_hub_instance")
+        client = factory().client('ec2')
+        instances = client.describe_instances().get('Reservations')[0]['Instances']
+        policy = self.load_policy({
+            'name': 'ec2',
+            'resource': 'ec2',
+            'actions': [{
+                'type': 'post-finding', 'severity': 10,
+                'types': ["Software and Configuration Checks/AWS Security Best Practices"]}]},
+            config={'region': 'us-east-1', 'account_id': '644160558196'})
+        post_finding = policy.resource_manager.actions.pop()
+        resource = post_finding.format_resource(instances[0])
+        self.assertEqual(
+            resource['Id'], 'arn:aws:ec2:us-east-1:644160558196:instance/i-0fdc9cff318add68f')
 
     def test_iam_user(self):
         factory = self.replay_flight_data("test_security_hub_iam_user")

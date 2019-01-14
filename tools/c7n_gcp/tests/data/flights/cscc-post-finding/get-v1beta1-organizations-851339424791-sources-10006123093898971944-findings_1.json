@@ -1,0 +1,42 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 06 Jan 2019 11:14:29 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1061",
+    "-content-encoding": "gzip",
+    "content-location": "https://securitycenter.googleapis.com/v1beta1/organizations/851339424791/sources/10006123093898971944/findings?alt=json"
+  },
+  "body": {
+    "findings": [
+      {
+        "name": "organizations/851339424791/sources/10006123093898971944/findings/d7986435fbcfc061627d9fc79dc94f1",
+        "parent": "organizations/851339424791/sources/10006123093898971944",
+        "resourceName": "//compute.googleapis.com/projects/test-226520/zones/us-east1-b/disks/3417007078727732465",
+        "state": "ACTIVE",
+        "category": "Custodian",
+        "sourceProperties": {
+          "resource-type": "disk",
+          "policy-name": "sketchy-drive",
+          "title": "sketchy-drive",
+          "policy": "{\"name\": \"sketchy-drive\", \"resource\": \"gcp.disk\", \"filters\": [{\"name\": \"instance-1\"}], \"actions\": [{\"type\": \"post-finding\", \"org-domain\": \"cloudcustodian.io\"}]}"
+        },
+        "securityMarks": {
+          "name": "organizations/851339424791/sources/10006123093898971944/findings/d7986435fbcfc061627d9fc79dc94f1/securityMarks"
+        },
+        "eventTime": "2019-01-06T02:36:35.773Z",
+        "createTime": "2019-01-06T02:36:39.214Z"
+      }
+    ],
+    "readTime": "2019-01-06T11:14:29.697Z",
+    "totalSize": 1
+  }
+}

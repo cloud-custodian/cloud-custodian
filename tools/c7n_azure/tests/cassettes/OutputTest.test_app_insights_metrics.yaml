@@ -1,0 +1,31 @@
+interactions:
+- request:
+    body: !!python/unicode 'mock_body'
+    headers:
+      Accept: [application/json]
+      Connection: [close]
+      Content-Length: ['736']
+      Content-Type: [application/json; charset=utf-8]
+      Host: [dc.services.visualstudio.com]
+      User-Agent: [Python-urllib/2.7]
+    method: POST
+    uri: https://dc.services.visualstudio.com/v2/track
+  response:
+    body: {string: !!python/unicode '{"itemsReceived":1,"itemsAccepted":0,"errors":[{"index":0,"statusCode":400,"message":"Invalid
+        instrumentation key"}]}'}
+    headers:
+      access-control-allow-headers: ['Origin, X-Requested-With, Content-Name, Content-Type,
+          Accept, Sdk-Context']
+      access-control-allow-origin: ['*']
+      access-control-max-age: ['3600']
+      connection: [close]
+      content-length: ['117']
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 03 Jan 2019 20:29:21 GMT']
+      server: [Microsoft-IIS/8.5]
+      strict-transport-security: [max-age=31536000]
+      x-content-type-options: [nosniff]
+      x-ms-session-id: [80EC8E40-5058-460D-A617-390EF7552337]
+      x-powered-by: [ASP.NET]
+    status: {code: 400, message: Invalid instrumentation key}
+version: 1

@@ -31,6 +31,11 @@ class Function(QueryResourceManager):
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
 
+        events = {
+            'create': 'google.cloud.functions.v1.CloudFunctionsService.CreateFunction',
+            'delete': 'google.cloud.functions.v1.CloudFunctionsService.DeleteFunction',
+            'update': 'google.cloud.functions.v1.CloudFunctionsService.UpdateFunction'}
+
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(

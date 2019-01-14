@@ -541,7 +541,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -550,12 +550,12 @@ class TagsTest(BaseTest):
                     }
                 },
                 'claims': {
-                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name':
+                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn':
                         'cloud@custodian.com',
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -588,7 +588,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -602,7 +602,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -635,7 +635,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -648,12 +648,104 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
         after_tags = self.get_tags()
         self.assertEqual(after_tags['CreatorEmail'], '12345')
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_group_event(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = {
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'User'
+                    }
+                },
+                'claims': {
+                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn':
+                        'cloud@custodian.com',
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], 'cloud@custodian.com')
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_unknown_principal_event(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = {
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'Group'
+                    }
+                },
+                'claims': {
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], 'Unknown')
 
     @arm_template('vm.json')
     def test_auto_tag_user_event_grid_user_event_missing_info(self):
@@ -681,7 +773,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -693,7 +785,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -726,7 +818,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -738,7 +830,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
@@ -771,7 +863,7 @@ class TagsTest(BaseTest):
 
         vm_id = self.get_vm_resource_id()
 
-        event = [{
+        event = {
             'subject': vm_id,
             'data': {
                 'authorization': {
@@ -783,7 +875,7 @@ class TagsTest(BaseTest):
                 },
                 'operationName': 'Microsoft.Compute/virtualMachines/write',
             }
-        }]
+        }
 
         policy.push(event, None)
 
