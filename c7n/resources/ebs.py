@@ -22,6 +22,7 @@ import time
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
+import six
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -91,17 +92,17 @@ class Snapshot(QueryResourceManager):
 class QueryParser(object):
 
     QuerySchema = {
-        'description': str,
+        'description': six.string_types,
         'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
-        'owner-id': str,
-        'progress': str,
-        'snapshot-id': str,
-        'start-time': str,
+        'owner-id': six.string_types,
+        'progress': six.string_types,
+        'snapshot-id': six.string_types,
+        'start-time': six.string_types,
         'status': ('pending', 'completed', 'error'),
-        'tag': str,
-        'tag-key': str,
-        'volume-id': str,
-        'volume-size': str,
+        'tag': six.string_types,
+        'tag-key': six.string_types,
+        'volume-id': six.string_types,
+        'volume-size': six.string_types,
     }
 
     @classmethod
@@ -129,14 +130,14 @@ class QueryParser(object):
 
             vtype = cls.QuerySchema.get(key)
             if vtype is None and key.startswith('tag'):
-                vtype = str
+                vtype = six.string_types
 
             if not isinstance(values, list):
                 raise PolicyValidationError(
                     "EBS Query Filter Invalid Values, must be array %s" % (data,))
 
             for v in values:
-                if isinstance(vtype, tuple):
+                if isinstance(vtype, tuple) and vtype != six.string_types:
                     if v not in vtype:
                         raise PolicyValidationError(
                             "EBS Query Filter Invalid Value: %s Valid: %s" % (
