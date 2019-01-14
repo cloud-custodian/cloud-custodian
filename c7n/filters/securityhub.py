@@ -17,6 +17,8 @@ import json
 from c7n.utils import local_session, type_schema
 from .core import Filter
 from c7n.manager import resources
+from c7n.exceptions import PolicyValidationError
+from c7n.resources import aws
 
 
 class SecurityHubFindingFilter(Filter):
@@ -56,6 +58,19 @@ class SecurityHubFindingFilter(Filter):
         if self.data.get('filter_json'):
             f = json.loads(self.data.get('filter_json'))
         return f
+
+    def validate(self):
+        if self.data.get('filter_json'):
+            if aws.shape_validate(
+                json.loads(self.data.get('filter_json')),
+                'AwsSecurityFindingFilters',
+                'securityhub'):
+                raise PolicyValidationError(
+                    "finding requires json formated to the spec at\
+                    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/\
+                    securityhub.html#SecurityHub.Client.get_findings")
+
+        return self
 
     @classmethod
     def register_resources(klass, registry, resource_class):
