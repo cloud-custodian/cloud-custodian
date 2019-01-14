@@ -114,7 +114,6 @@ class RDS(QueryResourceManager):
     filter_registry = filters
     action_registry = actions
     _generate_arn = None
-    retry = staticmethod(get_retry(('Throttled',)))
 
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)

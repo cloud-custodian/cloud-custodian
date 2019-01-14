@@ -1,10 +1,8 @@
 # Makefile for Sphinx documentation
 #
 
-VIRTUALENV	  = $(shell echo $$VIRTUAL_ENV | awk -F "/" '{print $$NF}')
-
 ifndef VIRTUALENV
-VIRTUALENV = py27
+VIRTUALENV = py37
 endif
 
 # You can set these variables from the command line.
