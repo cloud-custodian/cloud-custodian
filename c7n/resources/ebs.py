@@ -79,10 +79,75 @@ class Snapshot(QueryResourceManager):
     action_registry = ActionRegistry('ebs-snapshot.actions')
 
     def resources(self, query=None):
+        qfilters = QueryParser.parse(self.data.get('query', []))
         query = query or {}
+        if qfilters:
+            query['Filters'] = qfilters
         if query.get('OwnerIds') is None:
             query['OwnerIds'] = ['self']
         return super(Snapshot, self).resources(query=query)
+
+
+class QueryParser(object):
+
+    QuerySchema = {
+        'description': str,
+        'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
+        'owner-id': str,
+        'progress': str,
+        'snapshot-id': str,
+        'start-time': str,
+        'status': ('pending', 'completed', 'error'),
+        'tag': str,
+        'tag-key': str,
+        'volume-id': str,
+        'volume-size': str,
+    }
+
+    @classmethod
+    def parse(cls, data):
+        filters = []
+
+        if not isinstance(data, (tuple, list)):
+            raise PolicyValidationError(
+                "EBS Query invalid format, must be array of dicts %s" % (
+                    data))
+        for d in data:
+            if not isinstance(d, dict):
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid %s" % data)
+            if "Name" not in d or "Values" not in d:
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid Missing Key, Values in %s" % data)
+            key = d['Name']
+            values = d['Values']
+
+            if key not in cls.QuerySchema and not key.startswith('tag:'):
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid Key:%s Valid: %s" % (
+                        key, ", ".join(cls.QuerySchema.keys())))
+
+            vtype = cls.QuerySchema.get(key)
+            if vtype is None and key.startswith('tag'):
+                vtype = str
+
+            if not isinstance(values, list):
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid Values, must be array %s" % (data,))
+
+            for v in values:
+                if isinstance(vtype, tuple):
+                    if v not in vtype:
+                        raise PolicyValidationError(
+                            "EBS Query Filter Invalid Value: %s Valid: %s" % (
+                                v, ", ".join(vtype)))
+                elif not isinstance(v, vtype):
+                    raise PolicyValidationError(
+                        "EBS Query Filter Invalid Value Type %s" % (data,))
+
+            filters.append(d)
+
+        return filters
 
 
 @Snapshot.filter_registry.register('age')
