@@ -109,7 +109,7 @@ class FunctionAppUtilsTest(BaseTest):
 
         for test_case in test_cases:
             self.assertEqual(test_case[1], FunctionAppUtilities.get_function_name(
-                function_name=test_case[0]))
+                policy_name=test_case[0], suffix=''))
 
     def test_validate_function_name_length_requirements(self):
         with self.assertRaises(ValueError):
