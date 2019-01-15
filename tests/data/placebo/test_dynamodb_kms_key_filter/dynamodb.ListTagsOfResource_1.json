@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [],
+        "ResponseMetadata": {
+            "RequestId": "4KQ9GEGE904AVPFMTJK8UK36OVVV4KQNSO5AEMVJF66Q9ASUAAJG",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 15 Jan 2019 23:11:08 GMT",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "11",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "4KQ9GEGE904AVPFMTJK8UK36OVVV4KQNSO5AEMVJF66Q9ASUAAJG",
+                "x-amz-crc32": "1756070277"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -20,6 +20,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry
+from c7n.filters.kms import KmsRelatedFilter
 from c7n import query
 from c7n.manager import resources
 from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
@@ -114,6 +115,28 @@ class StatusFilter(object):
         self.log.info("%s %d of %d tables" % (
             self.__class__.__name__, len(result), orig_count))
         return result
+
+
+@Table.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: dynamodb-kms-key-filters
+                  resource: dynamodb-table
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/dynamodb)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
 @Table.action_registry.register('mark-for-op')
