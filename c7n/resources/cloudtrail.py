@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.actions import Action
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -28,9 +29,6 @@ class CloudTrail(QueryResourceManager):
     class resource_type(object):
         service = 'cloudtrail'
         enum_spec = ('describe_trails', 'trailList', None)
-        #
-        # detail_spec = (
-        #    'get_event_selectors', 'TrailName', 'TrailArn', None)
         filter_name = 'trailNameList'
         filter_type = 'list'
         id = 'TrailARN'
@@ -56,7 +54,7 @@ class Status(ValueFilter):
               value: False
     """
 
-    schema = type('status', rinherit=ValueFilter.schema)
+    schema = type_schema('status', rinherit=ValueFilter.schema)
     permissions = ('cloudtrail:GetTrailStatus',)
     annotation_key = 'c7n:TrailStatus'
 
@@ -93,7 +91,7 @@ class UpdateTrail(Action):
             - type: update-trail
               attribute:
                 KmsKeyId: arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef
-                LogFileValidationEnabled: true
+                EnableLogFileValidation: true
     """
     schema = type_schema(
         'update-trail',
@@ -102,8 +100,13 @@ class UpdateTrail(Action):
     shape = 'UpdateTrailRequest'
 
     def validate(self):
+        attrs = dict(self.data['attributes'])
+        if 'Name' in attrs:
+            raise PolicyValidationError(
+                "Can't include Name in update-trail action")
+        attrs['Name'] = 'PolicyValidation'
         return shape_validate(
-            self.data['attributes'],
+            attrs,
             self.shape,
             self.manager.resource_type.service)
 
@@ -138,7 +141,8 @@ class SetLogging(Action):
         'set-logging', {'enabled': {'type': 'boolean'}})
 
     def get_permissions(self):
-        if self.data.get('state', True) == True:
+        enable = self.data.get('enabled', True)
+        if enable is True:
             return ('cloudtrail:StartLogging',)
         else:
             return ('cloudtrail:StopLogging',)
@@ -146,7 +150,7 @@ class SetLogging(Action):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('cloudtrail')
-        enable = self.data.get('state', True)
+        enable = self.data.get('enabled', True)
         for r in resources:
             if enable:
                 client.start_logging(Name=r['Name'])
