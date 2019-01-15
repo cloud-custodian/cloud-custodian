@@ -62,9 +62,8 @@ class SecurityHubFindingFilter(Filter):
     def validate(self):
         if self.data.get('filter_json'):
             if aws.shape_validate(
-                json.loads(self.data.get('filter_json')),
-                'AwsSecurityFindingFilters',
-                'securityhub'):
+                    json.loads(self.data.get('filter_json')),
+                    'AwsSecurityFindingFilters', 'securityhub'):
                 raise PolicyValidationError(
                     "finding requires json formated to the spec at\
                     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/\
