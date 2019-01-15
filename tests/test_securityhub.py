@@ -270,6 +270,18 @@ class SecurityHubTest(BaseTest):
             session_factory=factory,
         )
         self.assertRaises(PolicyValidationError, policy.validate())
+        # test absert filter_json
+        policy = self.load_policy(
+            {
+                "name": "ec2-findings-filter",
+                "resource": "ec2",
+                "filters": [{
+                    "type": "finding",
+                }],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
 
     def test_alb_findings_filter(self):
         factory = self.replay_flight_data("test_security_hub_alb_findings_filter")
