@@ -145,6 +145,19 @@ class AzurePolicyModeTest(BaseTest):
         with self.assertRaises(ValueError):
             function_mode.get_function_app_params()
 
+    def test_init_azure_function_mode_invalid_characters_in_policy_name(self):
+        p = self.load_policy({
+            'name': 'invalid_policy_name!1',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']}
+        })
+
+        function_mode = AzureFunctionMode(p)
+        params = function_mode.get_function_app_params()
+        self.assertEqual(params.function_app_name, "invalid-policy-name-1")
+
     def test_init_azure_function_mode_with_resource_ids(self):
         ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
                 '/testrg/providers/microsoft.insights/components/testai'

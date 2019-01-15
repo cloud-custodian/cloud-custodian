@@ -99,7 +99,7 @@ class FunctionAppUtilsTest(BaseTest):
         FunctionAppUtilities.deploy_function_app(parameters)
         self.assertEquals(parameters.service_plan['sku_tier'], 'Basic')
 
-    def test_validate_function_name_replacements(self):
+    def test_get_function_name_replacements(self):
         test_cases = [
             ('test-function-name', 'test-function-name'),
             ('test_function_name', 'test-function-name'),
@@ -108,7 +108,7 @@ class FunctionAppUtilsTest(BaseTest):
         ]
 
         for test_case in test_cases:
-            self.assertEqual(test_case[1], FunctionAppUtilities.validate_function_name(
+            self.assertEqual(test_case[1], FunctionAppUtilities.get_function_name(
                 function_name=test_case[0]))
 
     def test_validate_function_name_length_requirements(self):

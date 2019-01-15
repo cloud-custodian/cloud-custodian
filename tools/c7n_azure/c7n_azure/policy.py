@@ -140,17 +140,16 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'resource_group_name': rg_name
             })
 
-        function_app_name = self.policy_name + '-' + function_suffix
-        validated_function_app_name = FunctionAppUtilities.validate_function_name(function_app_name)
-        if (function_app_name != validated_function_app_name):
-            self.log.info('Function app name contains invalid characters; replacing with "-"')
+        function_app_name = FunctionAppUtilities.get_function_name(self.policy_name,
+            function_suffix)
+        FunctionAppUtilities.validate_function_name(function_app_name)
 
         params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights=app_insights,
             service_plan=service_plan,
             storage_account=storage_account,
             function_app_resource_group_name=service_plan['resource_group_name'],
-            function_app_name=validated_function_app_name)
+            function_app_name=function_app_name)
 
         return params
 
