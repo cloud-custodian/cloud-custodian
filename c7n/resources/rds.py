@@ -119,6 +119,12 @@ class RDS(QueryResourceManager):
     def __init__(self, data, options):
         super(RDS, self).__init__(data, options)
 
+    def augment(self, dbs):
+        return [
+            db for db in self.source.augment(dbs)
+            if db.get('Engine') != 'docdb'
+        ]
+
     @property
     def generate_arn(self):
         if self._generate_arn is None:
@@ -135,6 +141,36 @@ class RDS(QueryResourceManager):
         raise ValueError("Unsupported source: %s for %s" % (
             source_type, self.resource_type.config_type))
 
+docdb_filters = FilterRegistry('docdb.filters')
+docdb_actions = ActionRegistry('docdb.actions')
+
+@resources.register('docdb')
+class docdb(RDS):
+    """
+    Resource manager for docdb instances.
+    """
+
+    def __init__(self, data, options):
+        super( docdb, self ).__init__(data, options)
+
+        self.resource_type.default_report_fields = (
+            'DBInstanceIdentifier',
+            'Engine',
+            'EngineVersion',
+            'StorageEncrypted',
+            'PubliclyAccessible',
+            'InstanceCreateTime',
+        )
+
+    def augment(self, dbs):
+        return [
+            db for db in self.source.augment(dbs)
+            if db.get('Engine') == 'docdb'
+        ]
+
+register_universal_tags(
+    docdb.filter_registry,
+    docdb.action_registry)
 
 class DescribeRDS(DescribeSource):
 
@@ -260,17 +296,20 @@ def _get_available_engine_upgrades(client, major=False):
     return results
 
 
+@docdb_filters.register('offhour')
 @filters.register('offhour')
 class RDSOffHour(OffHour):
     """Scheduled action on rds instance.
     """
 
 
+@docdb_filters.register('onhour')
 @filters.register('onhour')
 class RDSOnHour(OnHour):
     """Scheduled action on rds instance."""
 
 
+@docdb_filters.register('default-vpc')
 @filters.register('default-vpc')
 class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an rds database is in the default vpc
@@ -291,21 +330,25 @@ class DefaultVpc(net_filters.DefaultVpcBase):
         return self.match(rdb['DBSubnetGroup']['VpcId'])
 
 
+@docdb_filters.register('security-group')
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
+@docdb_filters.register('subnet')
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "DBSubnetGroup.Subnets[].SubnetIdentifier"
 
 
+docdb_filters.register('network-location', net_filters.NetworkLocation)
 filters.register('network-location', net_filters.NetworkLocation)
 
 
+@docdb_filters.register('kms-alias')
 @filters.register('kms-alias')
 class KmsKeyAlias(ResourceKmsKeyAlias):
 
@@ -313,6 +356,7 @@ class KmsKeyAlias(ResourceKmsKeyAlias):
         return self.get_matching_aliases(dbs)
 
 
+@docdb_filters.register('auto-patch')
 @actions.register('auto-patch')
 class AutoPatch(BaseAction):
     """Toggle AutoMinorUpgrade flag on RDS instance
@@ -356,6 +400,7 @@ class AutoPatch(BaseAction):
                 **params)
 
 
+@docdb_filters.register('upgrade-available')
 @filters.register('upgrade-available')
 class UpgradeAvailable(Filter):
     """ Scan DB instances for available engine upgrades
@@ -538,6 +583,7 @@ class Start(BaseAction):
                     r['DBInstanceIdentifier'], e)
 
 
+@docdb_actions.register('delete')
 @actions.register('delete')
 class Delete(BaseAction):
     """Deletes selected RDS instances

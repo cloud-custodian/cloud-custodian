@@ -1,0 +1,22 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "InvalidParameterValue",
+            "Message": "Invalid resource name:  arn:aws:rds:us-east-1::cluster:docdb-2019-01-15-20-50-29"
+        },
+        "ResponseMetadata": {
+            "RequestId": "69de725e-07c5-4d9e-8a0d-39906021a36a",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "69de725e-07c5-4d9e-8a0d-39906021a36a",
+                "content-type": "text/xml",
+                "content-length": "332",
+                "date": "Wed, 16 Jan 2019 14:37:42 GMT",
+                "connection": "close"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

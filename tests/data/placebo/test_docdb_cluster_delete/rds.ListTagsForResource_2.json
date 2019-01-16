@@ -1,0 +1,22 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "InvalidParameterValue",
+            "Message": "Invalid resource name:  arn:aws:rds:us-east-1::cluster:test-cluster"
+        },
+        "ResponseMetadata": {
+            "RequestId": "74469c4d-ea85-47e8-a7f1-b4b6027b5107",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "74469c4d-ea85-47e8-a7f1-b4b6027b5107",
+                "content-type": "text/xml",
+                "content-length": "319",
+                "date": "Wed, 16 Jan 2019 14:37:43 GMT",
+                "connection": "close"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

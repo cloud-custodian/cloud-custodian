@@ -74,6 +74,17 @@ class RDSCluster(QueryResourceManager):
             self.generate_arn, self.retry))
         return dbs
 
+docdb_cluster_filters = FilterRegistry('docdb-cluster.filters')
+docdb_cluster_actions = ActionRegistry('docdb-cluster.actions')
+
+@resources.register('docdb-cluster')
+class docdbCluster(RDSCluster):
+    """
+    Resource manager for DocumentDB clusters.
+    """
+    def __init__(self, data, options):
+        super( docdbCluster, self ).__init__(data, options)
+
 
 def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, retry):
     """Augment rds clusters with their respective tags."""
@@ -194,12 +205,14 @@ class RemoveTag(tags.RemoveTag):
                 ResourceName=arn, TagKeys=tag_keys)
 
 
+@docdb_cluster_filters.register('security-group')
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSecurityGroups[].VpcSecurityGroupId"
 
 
+@docdb_cluster_filters.register('subnet')
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
@@ -227,6 +240,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 filters.register('network-location', net_filters.NetworkLocation)
 
 
+@docdb_cluster_actions.register('delete')
 @actions.register('delete')
 class Delete(BaseAction):
     """Action to delete a RDS cluster

@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:docdb-2019-01-15-20-50-292",
+                "Tags": [
+                    {
+                        "Key": "missing",
+                        "Value": "tag"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:docdb-2019-01-15-20-50-293",
+                "Tags": [
+                    {
+                        "Key": "missing",
+                        "Value": "tag"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:rds:us-east-1:644160558196:db:test",
+                "Tags": [
+                    {
+                        "Key": "missing",
+                        "Value": "tag"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "4ff2428c-199c-11e9-a469-f1f595dd4ec4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4ff2428c-199c-11e9-a469-f1f595dd4ec4",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "399",
+                "date": "Wed, 16 Jan 2019 14:37:55 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
