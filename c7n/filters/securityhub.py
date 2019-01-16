@@ -52,7 +52,6 @@ class SecurityHubFindingFilter(Filter):
                 resource[annotation_key] = json.dumps(f)
                 found.append(resource)
 
-
         return found
 
     def get_filter_parameters(self):
