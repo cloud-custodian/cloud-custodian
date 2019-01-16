@@ -30,10 +30,12 @@ class SecurityHubFindingFilter(Filter):
     )
     permissions = ('securityhub:GetFindings',)
 
+    
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'securityhub', region_name='us-east-1')
-
+            
+        annotation_key = 'c7n:finding'
         found = []
         f = self.get_filter_parameters()
 
@@ -50,6 +52,7 @@ class SecurityHubFindingFilter(Filter):
 
             if len(findings) > 0:
                 found.append(resource)
+                resource[annotation_key] = json.dumps(f)
 
         return found
 
