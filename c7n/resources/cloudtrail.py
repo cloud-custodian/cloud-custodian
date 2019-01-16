@@ -98,6 +98,7 @@ class UpdateTrail(Action):
         attributes={'type': 'object'},
         required=('attributes',))
     shape = 'UpdateTrailRequest'
+    permissions = ('cloudtrail:UpdateTrail',)
 
     def validate(self):
         attrs = dict(self.data['attributes'])
@@ -139,7 +140,6 @@ class SetLogging(Action):
     """
     schema = type_schema(
         'set-logging', enabled={'type': 'boolean'})
-    permissions = ('cloudtrail:UpdateTrail',)
 
     def get_permissions(self):
         enable = self.data.get('enabled', True)
