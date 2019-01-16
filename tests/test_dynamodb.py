@@ -82,18 +82,18 @@ class DynamodbTest(BaseTest):
 
     def test_kms_key_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_kms_key_filter")
-        client = session_factory().client("dynamodb")
         p = self.load_policy(
             {
                 "name": "dynamodb-kms-key-filters",
                 "resource": "dynamodb-table",
                 "filters": [
-                {
-                    "type": "kms-key",
-                    "key": "c7n:AliasName",
-                    "value": "^(alias/aws/dynamodb)",
-                    "op": "regex"
-                }]
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/dynamodb)",
+                        "op": "regex"
+                    }
+                ]
             },
             session_factory=session_factory,
         )
