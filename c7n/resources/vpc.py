@@ -1328,6 +1328,18 @@ class Route(ValueFilter):
         return results
 
 
+@resources.register('transit-gateway')
+class TransitGateway(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
+        dimension = None
+        name = id = 'TransitGatewayId'
+        filter_name = 'TransitGatewayIds'
+        filter_type = 'list'
+
+
 @resources.register('peering-connection')
 class PeeringConnection(query.QueryResourceManager):
 
