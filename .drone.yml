@@ -1,11 +1,12 @@
 build:
   documentation:
-     image: python:2.7
+     image: python:3.7
      commands:
        - git config --global user.email "cibot@cloud-custodian.io"
        - git config --global user.name "Custodian CI"
        - pip install tox
-       - tox -e docs
+       - tox -e py37 --notests
+       - make sphinx
        - git remote update origin --prune
        - make ghpages
        - git branch
