@@ -10,7 +10,7 @@ interactions:
           msrest_azure/0.4.33 azure-mgmt-redis/5.0.0 Azure-SDK-For-Python]
       accept-language: [en-US]
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cache/Redis/?api-version=2017-10-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cache/Redis?api-version=2018-03-01
   response:
     body:
       string: !!binary |
