@@ -99,6 +99,7 @@ class DynamodbTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TableName"], "test-table-kms-filter")
 
     def test_dynamodb_mark(self):
         session_factory = self.replay_flight_data("test_dynamodb_mark")
