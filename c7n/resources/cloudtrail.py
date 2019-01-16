@@ -139,6 +139,7 @@ class SetLogging(Action):
     """
     schema = type_schema(
         'set-logging', enabled={'type': 'boolean'})
+    permissions = ('cloudtrail:UpdateTrail',)
 
     def get_permissions(self):
         enable = self.data.get('enabled', True)
