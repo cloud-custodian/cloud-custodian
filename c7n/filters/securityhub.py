@@ -33,7 +33,7 @@ class SecurityHubFindingFilter(Filter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'securityhub', region_name='us-east-1')
-        annotation_key = 'c7n:finding'
+        annotation_key = 'c7n:finding-filter'
         found = []
         f = self.get_filter_parameters()
 
