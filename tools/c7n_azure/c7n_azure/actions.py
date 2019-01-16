@@ -17,6 +17,8 @@ Actions to perform on Azure resources
 import abc
 import datetime
 import logging
+from email.utils import parseaddr
+
 from concurrent.futures import as_completed
 from datetime import timedelta
 
@@ -263,18 +265,38 @@ class AutoTagUser(EventAction):
     def _get_user_from_event(self, event):
         principal_role = self.principal_role_jmes_path.search(event)
         principal_type = self.principal_type_jmes_path.search(event)
-
+        user = None
         # The Subscription Admins role does not have a principal type
         if StringUtils.equal(principal_role, 'Subscription Admin'):
-            return self.service_admin_jmes_path.search(event)
+            user = self.service_admin_jmes_path.search(event)
         # ServicePrincipal type
         elif StringUtils.equal(principal_type, 'ServicePrincipal'):
-            return self.sp_jmes_path.search(event)
-        # Other types (e.g. User, Office 365 Groups, and Security Groups)
-        elif self.upn_jmes_path.search(event):
-            return self.upn_jmes_path.search(event)
-        else:
+            user = self.sp_jmes_path.search(event)
+
+        # Other types and main fallback (e.g. User, Office 365 Groups, and Security Groups)
+        if not user and self.upn_jmes_path.search(event):
+            user = self.upn_jmes_path.search(event)
+
+        # Last effort search for an email address in the claims
+        if not user:
+            claims = event['data']['claims']
+            for c in claims:
+                value = claims[c]
+                if self._is_email(value):
+                    user = value
+
+        if not user:
             self.log.error('Principal could not be determined.')
+
+        return user
+
+    def _is_email(self, target):
+        if target is None:
+            return False
+        elif parseaddr(target)[1] and '@' in target and '.' in target:
+            return True
+        else:
+            return False
 
     def _get_user_from_resource_logs(self, resource):
         # Calculate start time

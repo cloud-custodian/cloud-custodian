@@ -66,6 +66,10 @@ jobs:
       BUILD_REASON: $(Build.Reason)
       BUILD_BRANCH: $(Build.SourceBranchName)
 
+  - script: make sphinx
+    displayName: "Docs Build"
+    condition: "eq(variables['python.version'], '3.7')"
+
   - task: PublishTestResults@2
     displayName: "Publish Test Results Azure"
     inputs:

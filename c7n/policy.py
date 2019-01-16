@@ -361,6 +361,14 @@ class LambdaMode(ServerlessExecutionMode):
         }
     }
 
+    def validate(self):
+        super(LambdaMode, self).validate()
+        prefix = self.policy.data.get('function-prefix', 'custodian-')
+        if len(prefix + self.policy.name) > 64:
+            raise PolicyValidationError(
+                "Custodian Lambda policies have a max length with prefix of 64"
+                " policy:%s prefix:%s" % (prefix, self.policy.name))
+
     def get_metrics(self, start, end, period):
         from c7n.mu import LambdaManager, PolicyLambda
         manager = LambdaManager(self.policy.session_factory)
@@ -529,6 +537,7 @@ class CloudTrailMode(LambdaMode):
         rinherit=LambdaMode.schema)
 
     def validate(self):
+        super(CloudTrailMode, self).validate()
         from c7n import query
         events = self.policy.data['mode'].get('events')
         assert events, "cloud trail mode requires specifiying events to subscribe"
@@ -598,6 +607,7 @@ class GuardDutyMode(LambdaMode):
         return resources
 
     def validate(self):
+        super(GuardDutyMode, self).validate()
         if self.policy.data['resource'] not in self.supported_resources:
             raise ValueError(
                 "Policy:%s resource:%s Guard duty mode only supported for %s" % (
