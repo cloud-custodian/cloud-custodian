@@ -138,7 +138,7 @@ class SetLogging(Action):
              enabled: True
     """
     schema = type_schema(
-        'set-logging', {'enabled': {'type': 'boolean'}})
+        'set-logging', enabled={'type': 'boolean'})
 
     def get_permissions(self):
         enable = self.data.get('enabled', True)
