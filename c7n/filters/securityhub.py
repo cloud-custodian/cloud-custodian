@@ -49,8 +49,9 @@ class SecurityHubFindingFilter(Filter):
             findings = client.get_findings(Filters=f).get("Findings")
 
             if len(findings) > 0:
-                found.append(resource)
                 resource[annotation_key] = json.dumps(f)
+                found.append(resource)
+
 
         return found
 
