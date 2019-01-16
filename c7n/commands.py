@@ -29,7 +29,7 @@ import yaml
 
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.utils import dumps, load_file
+from c7n.utils import dumps, load_file, local_session
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
@@ -232,6 +232,17 @@ def validate(options):
 @policy_command
 def run(options, policies):
     exit_code = 0
+
+    if options.assume_role:
+        try:
+            session_factory = clouds['aws']().get_session_factory(options)
+            local_session(session_factory)
+        except Exception:
+            log.exception(
+                "Unable to assume %s, exiting" % (
+                    options.assume_role))
+            sys.exit(1)
+
     for policy in policies:
         try:
             policy()

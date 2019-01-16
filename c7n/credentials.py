@@ -17,7 +17,6 @@ Authentication utilities
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
-import sys
 
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
@@ -25,8 +24,6 @@ from boto3 import Session
 
 from c7n.version import version
 from c7n.utils import get_retry
-
-log = logging.getLogger('custodian.credentials')
 
 
 class SessionFactory(object):
@@ -51,13 +48,9 @@ class SessionFactory(object):
     def __call__(self, assume=True, region=None):
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
-            try:
-                session = assumed_session(
-                    self.assume_role, self.session_name, session,
-                    region or self.region, self.external_id)
-            except Exception:
-                log.error("Failed to assume role: %s" % (self.assume_role))
-                sys.exit(1)
+            session = assumed_session(
+                self.assume_role, self.session_name, session,
+                region or self.region, self.external_id)
         else:
             session = Session(
                 region_name=region or self.region, profile_name=self.profile)
