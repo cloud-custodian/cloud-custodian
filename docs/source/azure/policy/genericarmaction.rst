@@ -3,8 +3,7 @@
 Generic Actions
 ================
 
-These actions can be applied to a specific resource type, such as ``azure.vm``, or they can be
-applied to all Azure resources by using ``azure.armresource`` as the resource type.
+These actions can be applied to a specific resource type, such as ``azure.vm``.
 
 Tags
 -----
@@ -33,17 +32,17 @@ Tags
   .. c7n-schema:: AutoTagUser
       :module: c7n_azure.actions
 
-      .. code-block:: yaml
+  .. code-block:: yaml
 
-            policies:
-              - name: azure-auto-tag-creator
-                resource: azure.resourcegroup
-                description: |
-                  Tag all existing resource groups with the 'CreatorEmail' tag
-                actions:
-                 - type: auto-tag-user
-                   tag: CreatorEmail
-                   days: 10
+        policies:
+          - name: azure-auto-tag-creator
+            resource: azure.resourcegroup
+            description: |
+              Tag all existing resource groups with the 'CreatorEmail' tag
+            actions:
+              - type: auto-tag-user
+                tag: CreatorEmail
+                days: 10
 
 ``RemoveTag``
       Remove a set of tags.
