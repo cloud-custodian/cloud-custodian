@@ -239,10 +239,8 @@ def run(options, policies):
     if options.assume_role and [p for p in policies if p.provider_name == 'aws']:
         try:
             local_session(clouds['aws']().get_session_factory(options))
-        except ClientError as e:
-            log.exception(
-                "Unable to assume %s, error %s" % (
-                    options.assume_role, e))
+        except ClientError:
+            log.exception("Unable to assume role %s", options.assume_role)
             sys.exit(1)
 
     for policy in policies:
