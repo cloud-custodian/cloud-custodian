@@ -13,7 +13,7 @@ Tags
   .. c7n-schema:: Tag
       :module: c7n_azure.actions
 
-  ..code-block:: yaml
+  .. code-block:: yaml
 
         policies:
           - name: azure-tag
@@ -129,9 +129,9 @@ Others
                 actions:
                  - type: delete
 
-        The delete action also works with a specified resource type:
+      The delete action also works with a specified resource type:
 
-        .. code-block:: yaml
+      .. code-block:: yaml
 
           - policies:
               - name: delete-test-nsg
