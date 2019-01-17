@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointGroups": [
+            {
+                "EndpointGroupArn": "arn:aws:globalaccelerator::644160558196:accelerator/1460ad64-e386-41e4-9715-d8bcc665963e/listener/17a532f0/endpoint-group/72e82a96c002",
+                "EndpointGroupRegion": "us-east-1",
+                "EndpointDescriptions": [
+                    {
+                        "EndpointId": "eipalloc-0b0cb213820a08ae6",
+                        "Weight": 100,
+                        "HealthState": "UNHEALTHY"
+                    }
+                ],
+                "TrafficDialPercentage": 100.0,
+                "HealthCheckPort": 80,
+                "HealthCheckProtocol": "TCP",
+                "HealthCheckIntervalSeconds": 30,
+                "ThresholdCount": 4
+            },
+            {
+                "EndpointGroupArn": "arn:aws:globalaccelerator::644160558196:accelerator/1460ad64-e386-41e4-9715-d8bcc665963e/listener/17a532f0/endpoint-group/bad9bd37b005",
+                "EndpointGroupRegion": "us-west-2",
+                "EndpointDescriptions": [],
+                "TrafficDialPercentage": 0.0,
+                "HealthCheckPort": 80,
+                "HealthCheckProtocol": "TCP",
+                "HealthCheckIntervalSeconds": 30,
+                "ThresholdCount": 4
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "4fa772e5-edca-4211-b634-69af4307b971",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Thu, 17 Jan 2019 14:05:23 GMT",
+                "x-amzn-requestid": "4fa772e5-edca-4211-b634-69af4307b971",
+                "content-length": "796",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
