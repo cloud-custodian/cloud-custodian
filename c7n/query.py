@@ -350,6 +350,7 @@ class QueryResourceManager(ResourceManager):
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
+            'Throttling',
             'Client.RequestLimitExceeded')))
 
     def __init__(self, data, options):

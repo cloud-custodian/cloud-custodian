@@ -17,6 +17,7 @@ import json
 from mock import Mock
 
 from c7n.config import Bag
+from c7n.exceptions import PolicyValidationError
 from c7n.resources import aws
 from c7n import output
 
@@ -47,6 +48,20 @@ class UtilTest(BaseTest):
         config = Bag(assume_role='arn:aws:iam::644160558196:role/custodian-mu')
         aws._default_account_id(config)
         self.assertEqual(config.account_id, '644160558196')
+
+    def test_validate(self):
+        self.assertRaises(
+            PolicyValidationError,
+            aws.shape_validate,
+            {'X': 1},
+            'AwsSecurityFindingFilters',
+            'securityhub')
+        self.assertEqual(
+            aws.shape_validate(
+                {'Id': [{'Value': 'abc', 'Comparison': 'EQUALS'}]},
+                'AwsSecurityFindingFilters',
+                'securityhub'),
+            None)
 
 
 class TracerTest(BaseTest):
