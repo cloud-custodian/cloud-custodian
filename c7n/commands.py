@@ -27,6 +27,7 @@ import time
 import six
 import yaml
 
+from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.utils import dumps, load_file, local_session
@@ -233,14 +234,15 @@ def validate(options):
 def run(options, policies):
     exit_code = 0
 
-    if options.assume_role:
+    # AWS - Sanity check that we have an assumable role before executing policies
+    # Todo - move this behind provider interface
+    if options.assume_role and [p for p in policies if p.provider_name == 'aws']:
         try:
-            session_factory = clouds['aws']().get_session_factory(options)
-            local_session(session_factory)
-        except Exception:
+            local_session(clouds['aws']().get_session_factory(options))
+        except ClientError as e:
             log.exception(
-                "Unable to assume %s, exiting" % (
-                    options.assume_role))
+                "Unable to assume %s, error %s" % (
+                    options.assume_role, e))
             sys.exit(1)
 
     for policy in policies:
