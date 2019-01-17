@@ -8,6 +8,23 @@ applied to all Azure resources by using ``azure.armresource`` as the resource ty
 
 Tags
 -----
+``Tag``
+  Add/Update tag on a resource
+
+  .. c7n-schema:: Tag
+      :module: c7n_azure.actions
+
+  ..code-block:: yaml
+
+        policies:
+          - name: azure-tag
+            resource: azure.resourcegroup
+            description: |
+              Tag all resource groups with 'mytag' with value 'myvalue'
+            actions:
+              - type: tag
+                tag: mytag
+                value: myvalue
 
 ``AutoTagUser``
   Create a tag listing name of user who created a resource based on scanning
