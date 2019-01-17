@@ -27,9 +27,10 @@ import time
 import six
 import yaml
 
+from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.utils import dumps, load_file
+from c7n.utils import dumps, load_file, local_session
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
@@ -232,6 +233,16 @@ def validate(options):
 @policy_command
 def run(options, policies):
     exit_code = 0
+
+    # AWS - Sanity check that we have an assumable role before executing policies
+    # Todo - move this behind provider interface
+    if options.assume_role and [p for p in policies if p.provider_name == 'aws']:
+        try:
+            local_session(clouds['aws']().get_session_factory(options))
+        except ClientError:
+            log.exception("Unable to assume role %s", options.assume_role)
+            sys.exit(1)
+
     for policy in policies:
         try:
             policy()
