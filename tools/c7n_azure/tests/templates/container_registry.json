@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "registries_cctestcontainerregistry_name": {
+            "defaultValue": "cctestcontainerregistry",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ContainerRegistry/registries",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+            },
+            "name": "[parameters('registries_cctestcontainerregistry_name')]",
+            "apiVersion": "2017-10-01",
+            "location": "westus",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "adminUserEnabled": false
+            },
+            "dependsOn": []
+        }
+    ]
+}

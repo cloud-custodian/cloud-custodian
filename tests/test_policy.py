@@ -21,7 +21,7 @@ import shutil
 import tempfile
 
 from c7n import policy, manager
-from c7n.exceptions import ResourceLimitExceeded
+from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
@@ -872,6 +872,16 @@ class GuardModeTest(BaseTest):
             {"name": "vpc", "resource": "vpc", "mode": {"type": "guard-duty"}},
             validate=True,
         )
+
+    def test_lambda_policy_validate_name(self):
+        name = "ec2-instance-guard-D8488F01-0E3E-4772-A3CB-E66EEBB9BDF4"
+        with self.assertRaises(PolicyValidationError) as e_cm:
+            self.load_policy(
+                {"name": name,
+                 "resource": "ec2",
+                 "mode": {"type": "guard-duty"}},
+                validate=True)
+        self.assertTrue("max length with prefix" in str(e_cm.exception))
 
     @mock.patch("c7n.mu.LambdaManager.publish")
     def test_ec2_guard_event_pattern(self, publish):
