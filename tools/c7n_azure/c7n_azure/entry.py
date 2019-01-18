@@ -35,6 +35,7 @@ import c7n_azure.resources.cognitive_service
 import c7n_azure.resources.data_factory
 import c7n_azure.resources.iot_hub
 import c7n_azure.resources.cdn
+import c7n_azure.resources.container_registry
 import c7n_azure.resources.container_service
 import c7n_azure.resources.datalake_store
 import c7n_azure.resources.redis

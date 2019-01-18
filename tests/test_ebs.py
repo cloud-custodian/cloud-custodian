@@ -18,17 +18,49 @@ import sys
 
 from botocore.exceptions import ClientError
 
-from .common import BaseTest, TestConfig as Config
+
+from c7n.exceptions import PolicyValidationError
+from c7n.executor import MainThreadExecutor
 from c7n.resources.ebs import (
     CopyInstanceTags,
     EncryptInstanceVolumes,
     CopySnapshot,
     Delete,
+    QueryParser
 )
-from c7n.executor import MainThreadExecutor
+
+from .common import BaseTest, TestConfig as Config
 
 
-logging.basicConfig(level=logging.DEBUG)
+class SnapshotQueryParse(BaseTest):
+
+    def test_query(self):
+        qfilters = [
+            {'Name': 'tag:Name', 'Values': ['Snapshot1']},
+            {'Name': 'status', 'Values': ['completed']}]
+        self.assertEqual(qfilters, QueryParser.parse(qfilters))
+
+    def test_invalid_query(self):
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, {})
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [None])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Name': 'status', 'Values': 'completed'}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Name': 'status', 'Values': ['Completed']}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Name': 'snapshot-id', 'Values': [1]}])
 
 
 class SnapshotAccessTest(BaseTest):
@@ -58,31 +90,31 @@ class SnapshotAccessTest(BaseTest):
 
 class SnapshotDetachTest(BaseTest):
 
-        def test_volume_detach(self):
-            factory = self.replay_flight_data('test_ebs_detach')
-            p = self.load_policy(
-                {
-                    'name': 'volume-detach',
-                    'resource': 'ebs',
-                    'filters': [{'VolumeId': 'vol-0850cf7c8e949c318'}],
-                    'actions': [
-                        {
-                            'type': 'detach'
-                        }
-                    ]
-                }, config=Config.empty(), session_factory=factory)
-            resources = p.run()
-            self.assertEqual(len(resources), 1)
+    def test_volume_detach(self):
+        factory = self.replay_flight_data('test_ebs_detach')
+        p = self.load_policy(
+            {
+                'name': 'volume-detach',
+                'resource': 'ebs',
+                'filters': [{'VolumeId': 'vol-0850cf7c8e949c318'}],
+                'actions': [
+                    {
+                        'type': 'detach'
+                    }
+                ]
+            }, config=Config.empty(), session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
-            client = factory(region="us-east-1").client('ec2')
-            volumelist = []
-            volumelist.append(resources[0]['VolumeId'])
-            response = client.describe_volumes(VolumeIds=volumelist)
+        client = factory(region="us-east-1").client('ec2')
+        volumelist = []
+        volumelist.append(resources[0]['VolumeId'])
+        response = client.describe_volumes(VolumeIds=volumelist)
 
-            for resp in response['Volumes']:
-                for attachment in resp['Attachments']:
-                    self.assertTrue(attachment['State'] == "detached" or
-                            attachment['State'] == "detaching")
+        for resp in response['Volumes']:
+            for attachment in resp['Attachments']:
+                self.assertTrue(attachment['State'] == "detached" or
+                                attachment['State'] == "detaching")
 
 
 class SnapshotCopyTest(BaseTest):

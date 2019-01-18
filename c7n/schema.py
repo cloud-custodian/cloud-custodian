@@ -208,10 +208,8 @@ def generate(resource_types=()):
                 # in json schema inheritance prevent us from doing this
                 # on a type specific basis http://goo.gl/8UyRvQ
                 'query': {
-                    'type': 'array', 'items': {
-                        'type': 'object',
-                        'minProperties': 1,
-                        'maxProperties': 1}}
+                    'type': 'array', 'items': {'type': 'object'}}
+
             },
         },
         'policy-mode': {
