@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Listeners": [
+            {
+                "ListenerArn": "arn:aws:globalaccelerator::644160558196:accelerator/1460ad64-e386-41e4-9715-d8bcc665963e/listener/56de20d3",
+                "PortRanges": [
+                    {
+                        "FromPort": 80,
+                        "ToPort": 80
+                    }
+                ],
+                "Protocol": "TCP",
+                "ClientAffinity": "NONE"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "2de8dcad-e966-42c9-8d99-d4640c93cfda",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 18 Jan 2019 18:19:36 GMT",
+                "x-amzn-requestid": "2de8dcad-e966-42c9-8d99-d4640c93cfda",
+                "content-length": "224",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

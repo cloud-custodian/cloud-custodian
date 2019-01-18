@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "AcceleratorAttributes": {
+            "FlowLogsEnabled": false
+        },
+        "ResponseMetadata": {
+            "RequestId": "1f7a939c-dbfd-4a6a-bcf3-5980070fc00e",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Tue, 08 Jan 2019 16:58:07 GMT",
+                "x-amzn-requestid": "1f7a939c-dbfd-4a6a-bcf3-5980070fc00e",
+                "content-length": "51",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

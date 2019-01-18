@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "Accelerators": [
+            {
+                "AcceleratorArn": "arn:aws:globalaccelerator::644160558196:accelerator/1460ad64-e386-41e4-9715-d8bcc665963e",
+                "Name": "test-custodian",
+                "IpAddressType": "IPV4",
+                "Enabled": true,
+                "IpSets": [
+                    {
+                        "IpFamily": "IPv4",
+                        "IpAddresses": [
+                            "13.248.152.148",
+                            "76.223.30.202"
+                        ]
+                    }
+                ],
+                "Status": "DEPLOYED",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 16,
+                    "minute": 27,
+                    "second": 50,
+                    "microsecond": 0
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 18,
+                    "hour": 10,
+                    "minute": 44,
+                    "second": 24,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "097e372c-c2d0-4e05-8ac2-30254a68817d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 18 Jan 2019 15:58:34 GMT",
+                "x-amzn-requestid": "097e372c-c2d0-4e05-8ac2-30254a68817d",
+                "content-length": "350",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
