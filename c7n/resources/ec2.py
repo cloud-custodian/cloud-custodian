@@ -819,11 +819,12 @@ class InstanceFinding(PostFinding):
                 "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
             ),
             "KeyName": r.get("KeyName"),
-            "VpcId": r["VpcId"],
-            "SubnetId": r["SubnetId"],
             "LaunchedAt": r["LaunchTime"].isoformat(),
         }
-
+        if "VpcId" in r:
+            details["VpcId"] = r["VpcId"]
+        if "SubnetId" in r:
+            details["SubnetId"] = r["SubnetId"]
         if "IamInstanceProfile" in r:
             details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
 
