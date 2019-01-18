@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGateways": [
+            {
+                "TransitGatewayId": "tgw-05e7c047df9e9d1ce",
+                "TransitGatewayArn": "arn:aws:ec2:us-east-1:644160558196:transit-gateway/tgw-05e7c047df9e9d1ce",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "Description": "test",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 16,
+                    "minute": 10,
+                    "second": 52,
+                    "microsecond": 0
+                },
+                "Options": {
+                    "AmazonSideAsn": 64512,
+                    "AutoAcceptSharedAttachments": "enable",
+                    "DefaultRouteTableAssociation": "enable",
+                    "AssociationDefaultRouteTableId": "tgw-rtb-0fa4bd52512d99611",
+                    "DefaultRouteTablePropagation": "enable",
+                    "PropagationDefaultRouteTableId": "tgw-rtb-0fa4bd52512d99611",
+                    "VpnEcmpSupport": "enable",
+                    "DnsSupport": "enable"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "config-agg"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "3573aae5-ade5-481a-88a0-6b8fcdf4bb75",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Wed, 16 Jan 2019 17:09:00 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

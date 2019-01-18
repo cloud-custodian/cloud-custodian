@@ -571,6 +571,27 @@ class NetworkAclTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class TransitGatewayTest(BaseTest):
+
+    def test_tgw_query(self):
+        factory = self.replay_flight_data('test_transit_gateway_query')
+        p = self.load_policy({
+            'name': 'test-tgw',
+            'resource': 'transit-gateway'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Description'], 'test')
+
+    def test_tgw_attachment(self):
+        factory = self.replay_flight_data('test_transit_gateway_attachment_query')
+        p = self.load_policy({
+            'name': 'test-tgw-att',
+            'resource': 'transit-attachment'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ResourceId'], 'vpc-f1516b97')
+
+
 class NetworkInterfaceTest(BaseTest):
 
     def test_and_or_nest(self):
