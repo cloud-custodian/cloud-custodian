@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "412eeec5-de22-4b29-aeb8-428e1c55bbaa",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "date": "Thu, 17 Jan 2019 15:40:40 GMT",
+                "x-amzn-requestid": "412eeec5-de22-4b29-aeb8-428e1c55bbaa",
+                "content-length": "988",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        },
+        "BackupPlan": {
+            "BackupPlanName": "test",
+            "Rules": [
+                {
+                    "RuleName": "dev",
+                    "TargetBackupVaultName": "Default",
+                    "ScheduleExpression": "cron(0 5 ? * * *)",
+                    "StartWindowMinutes": 480,
+                    "CompletionWindowMinutes": 10080,
+                    "Lifecycle": {
+                        "DeleteAfterDays": 21
+                    },
+                    "RecoveryPointTags": {
+                        "CostCenter": "Backup"
+                    },
+                    "RuleId": "1d5ef03b-d787-4a05-9e0a-04fdb2d4793c"
+                },
+                {
+                    "RuleName": "weekly-archive",
+                    "TargetBackupVaultName": "Default",
+                    "ScheduleExpression": "cron(0 5 ? * 7 *)",
+                    "StartWindowMinutes": 480,
+                    "CompletionWindowMinutes": 10080,
+                    "Lifecycle": {
+                        "MoveToColdStorageAfterDays": 90,
+                        "DeleteAfterDays": 180
+                    },
+                    "RuleId": "f9f067cb-c58d-4b8b-b38e-f2aa8e0a47b4"
+                }
+            ]
+        },
+        "BackupPlanId": "14c4daac-b199-45ce-8644-c541734ebd14",
+        "BackupPlanArn": "arn:aws:backup:us-east-1:644160558196:backup-plan:14c4daac-b199-45ce-8644-c541734ebd14",
+        "VersionId": "NTNlNjNkOGMtM2M4NS00NWMwLTk3YjMtNzk1NzNhMjRjMTZj",
+        "CreationDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 1,
+            "day": 17,
+            "hour": 6,
+            "minute": 1,
+            "second": 58,
+            "microsecond": 667000
+        }
+    }
+}

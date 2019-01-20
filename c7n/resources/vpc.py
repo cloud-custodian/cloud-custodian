@@ -1328,6 +1328,48 @@ class Route(ValueFilter):
         return results
 
 
+@resources.register('transit-gateway')
+class TransitGateway(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
+        dimension = None
+        name = id = 'TransitGatewayId'
+        filter_name = 'TransitGatewayIds'
+        filter_type = 'list'
+
+
+class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        merged_params = dict(params)
+        merged_params.setdefault('Filters', []).append(
+            {'Name': parent_key, 'Values': [parent_id]})
+        return merged_params
+
+
+@query.sources.register('transit-attachment')
+class TransitAttachmentSource(query.ChildDescribeSource):
+
+    resource_query_factory = TransitGatewayAttachmentQuery
+
+
+@resources.register('transit-attachment')
+class TransitGatewayAttachment(query.ChildResourceManager):
+
+    child_source = 'transit-attachment'
+
+    class resource_type(object):
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
+        parent_spec = ('transit-gateway', 'transit-gateway-id', None)
+        dimension = None
+        name = id = 'TransitGatewayAttachmentId'
+        filter_name = None
+        filter_type = None
+
+
 @resources.register('peering-connection')
 class PeeringConnection(query.QueryResourceManager):
 

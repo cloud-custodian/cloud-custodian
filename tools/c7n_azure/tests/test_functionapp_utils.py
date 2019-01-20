@@ -99,6 +99,27 @@ class FunctionAppUtilsTest(BaseTest):
         FunctionAppUtilities.deploy_function_app(parameters)
         self.assertEquals(parameters.service_plan['sku_tier'], 'Basic')
 
+    def test_get_function_name_replacements(self):
+        test_cases = [
+            ('test-function-name', 'test-function-name-suffix'),
+            ('test_function_name', 'test-function-name-suffix'),
+            ('test-function-name123', 'test-function-name123-suffix'),
+            ('test-function-name!@#$', 'test-function-name-----suffix')
+        ]
+
+        for test_case in test_cases:
+            self.assertEqual(test_case[1], FunctionAppUtilities.get_function_name(
+                policy_name=test_case[0], suffix='suffix'))
+
+    def test_validate_function_name_length_requirements(self):
+        with self.assertRaises(ValueError):
+            FunctionAppUtilities.validate_function_name(function_name=None)
+        with self.assertRaises(ValueError):
+            FunctionAppUtilities.validate_function_name(function_name='')
+        with self.assertRaises(ValueError):
+            FunctionAppUtilities.validate_function_name(
+                function_name='abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmn')
+
     def test_is_consumption_plan(self):
         params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights=None,
