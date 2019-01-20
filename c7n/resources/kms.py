@@ -99,6 +99,7 @@ class KeyRotationStatus(ValueFilter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('kms')
+
         def _key_rotation_status(resource):
             try:
                 resource['KeyRotationEnabled'] = client.get_key_rotation_status(
@@ -182,9 +183,10 @@ class GrantCount(Filter):
 
     def process(self, keys, event=None):
         client = local_session(self.manager.session_factory).client('kms')
-
+        results = []
         for k in keys:
-            self.process_key(client, k)
+            results.append(self.process_key(client, k))
+        return [r for r in results if r]
 
     def process_key(self, client, key):
         p = client.get_paginator('list_grants')

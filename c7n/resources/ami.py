@@ -86,14 +86,15 @@ class Deregister(BaseAction):
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
-        for i in images:
-            self.process_image(client, i)
-
-    def process_image(self, client, image):
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
 
-        retry(client.deregister_image, ImageId=image['ImageId'])
+        image_count = len(images)
+        images = [i for i in images if self.manager.ctx.options.account_id == i['OwnerId']]
+        if len(images) != image_count:
+            self.log.info("Implicitly filtered %d non owned images", image_count - len(images))
+        for i in images:
+            retry(client.deregister_image, ImageId=i['ImageId'])
 
 
 @actions.register('remove-launch-permissions')
