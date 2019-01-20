@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-import json
 
 from c7n.utils import local_session, type_schema
 from .core import Filter
 from c7n.manager import resources
-from c7n.exceptions import PolicyValidationError
 from c7n.resources import aws
 
 
@@ -26,51 +24,34 @@ class SecurityHubFindingFilter(Filter):
     """
     schema = type_schema(
         'finding',
-        filter_json={'type': 'string'}
-    )
+        # Many folks do an aggregator region, allow them to use that
+        # for filtering.
+        region={'type': 'string'},
+        query={'type': 'object'})
+
     permissions = ('securityhub:GetFindings',)
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client(
-            'securityhub', region_name='us-east-1')
-        annotation_key = 'c7n:finding-filter'
-        found = []
-        f = self.get_filter_parameters()
-
-        for resource in resources:
-            f['ResourceId'] = [
-                {
-                    "Value": self.manager.get_arns([resource])[0],
-                    "Comparison": "EQUALS",
-                }
-            ]
-
-            self.log.debug("filter=%s", f)
-            findings = client.get_findings(Filters=f).get("Findings")
-
-            if len(findings) > 0:
-                resource[annotation_key] = json.dumps(f)
-                found.append(resource)
-
-        return found
-
-    def get_filter_parameters(self):
-        f = {}
-        if self.data.get('filter_json'):
-            f = json.loads(self.data.get('filter_json'))
-        return f
+    annotation_key = 'c7n:finding-filter'
+    query_shape = 'AwsSecurityFindingFilters'
 
     def validate(self):
-        if self.data.get('filter_json'):
-            if aws.shape_validate(
-                    json.loads(self.data.get('filter_json')),
-                    'AwsSecurityFindingFilters', 'securityhub'):
-                raise PolicyValidationError(
-                    "finding requires json formated to the spec at\
-                    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/\
-                    securityhub.html#SecurityHub.Client.get_findings")
+        query = self.data.get('query')
+        if query:
+            aws.shape_validate(query, self.query_shape, 'securityhub')
 
-        return self
+    def process(self, resources, event=None):
+        client = local_session(
+            self.manager.session_factory).client(
+                'securityhub', region_name=self.data.get('region'))
+        found = []
+        params = dict(self.data.get('query', {}))
+
+        for r_arn, resource in zip(self.manager.get_arns(resources), resources):
+            params['ResourceId'] = [{"Value": r_arn, "Comparison": "EQUALS"}]
+            findings = client.get_findings(Filters=params).get("Findings")
+            if len(findings) > 0:
+                resource[self.annotation_key] = findings
+                found.append(resource)
+        return found
 
     @classmethod
     def register_resources(klass, registry, resource_class):

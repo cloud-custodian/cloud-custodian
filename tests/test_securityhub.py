@@ -238,10 +238,11 @@ class SecurityHubTest(BaseTest):
                 "resource": "ec2",
                 "filters": [{
                     "type": "finding",
-                    "filter_json": '{ "Type": [ {\
-                        "Value": "Software and Configuration Checks/AWS Security Best Practices",\
-                        "Comparison":"EQUALS"\
-                    }]}'
+                    "query": {
+                        "Type": [{
+                            "Value": "Software and Configuration Checks/AWS Security Best Practices", # NOQA
+                            "Comparison": "EQUALS"}]
+                    }
                 }],
             },
             config={"account_id": "101010101111"},
@@ -260,14 +261,14 @@ class SecurityHubTest(BaseTest):
                 "resource": "ec2",
                 "filters": [{
                     "type": "finding",
-                    "filter_json": '{ "Type": [ {\
-                        "Value": "Software and Configuration Checks/ForceValidationFailure",\
-                        "Comparison":"EQUALS"\
-                    }]}'
+                    "query": {"Type": [{
+                        "Value": "Software and Configuration Checks/ForceValidationFailure",
+                        "Comparison": "EQUALS"}]}
                 }],
             },
             config={"account_id": "101010101111"},
             session_factory=factory,
+            validate=False
         )
         self.assertRaises(PolicyValidationError, policy.validate())
         # test absert filter_json
@@ -291,10 +292,11 @@ class SecurityHubTest(BaseTest):
                 "resource": "app-elb",
                 "filters": [{
                     "type": "finding",
-                    "filter_json": '{ "Type": [ {\
-                        "Value": "Software and Configuration Checks/AWS Security Best Practices",\
-                        "Comparison":"EQUALS"\
-                    }]}'
+                    "query": {
+                        "Type": [{
+                            "Value": "Software and Configuration Checks/AWS Security Best Practices", # NOQA
+                            "Comparison": "EQUALS"
+                        }]}
                 }],
             },
             config={"account_id": "101010101111"},
