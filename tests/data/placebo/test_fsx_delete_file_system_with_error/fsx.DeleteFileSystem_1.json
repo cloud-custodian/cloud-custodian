@@ -1,0 +1,21 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Cannot take final backup while fs-0f00e6f29e714d930 is in CREATING",
+            "Code": "BadRequest"
+        },
+        "ResponseMetadata": {
+            "RequestId": "7b6b354a-d5cc-490e-a98c-e3ee36b9fe16",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Wed, 19 Dec 2018 19:56:24 GMT",
+                "x-amzn-requestid": "7b6b354a-d5cc-490e-a98c-e3ee36b9fe16",
+                "content-length": "102",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

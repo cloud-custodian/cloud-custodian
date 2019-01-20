@@ -819,17 +819,18 @@ class InstanceFinding(PostFinding):
                 "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
             ),
             "KeyName": r.get("KeyName"),
-            "VpcId": r["VpcId"],
-            "SubnetId": r["SubnetId"],
             "LaunchedAt": r["LaunchTime"].isoformat(),
         }
-
+        if "VpcId" in r:
+            details["VpcId"] = r["VpcId"]
+        if "SubnetId" in r:
+            details["SubnetId"] = r["SubnetId"]
         if "IamInstanceProfile" in r:
             details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
 
         instance = {
             "Type": "AwsEc2Instance",
-            "Id": "arn:aws:{}:{}:instance/{}".format(
+            "Id": "arn:aws:ec2:{}:{}:instance/{}".format(
                 self.manager.config.region,
                 self.manager.config.account_id,
                 r["InstanceId"]),
