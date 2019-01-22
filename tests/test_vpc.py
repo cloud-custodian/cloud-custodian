@@ -2127,6 +2127,38 @@ class SecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Tags"][0]["Value"], "FancyTestVPC")
 
+    def test_vpc_scenario_2(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-scenario-2",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "value_type": "resource_count",
+                        "value": 2,
+                        "op": "lt"
+                    },
+                    {
+                        "type": "internet-gateway",
+                        "value_type": "resource_count",
+                        "value": 1,
+                        "op": "gte"
+                    },
+                    {
+                        "type": "nat-gateway",
+                        "value_type": "resource_count",
+                        "value": 1,
+                        "op": "gte"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class EndpointTest(BaseTest):
 
