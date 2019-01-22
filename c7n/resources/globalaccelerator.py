@@ -22,7 +22,7 @@ actions = ActionRegistry('globalaccelerator.actions')
 
 
 @resources.register('global-accelerator')
-class AcceleratorInstance(QueryResourceManager):
+class GlobalAccelerator(QueryResourceManager):
 
     class resource_type(object):
         service = 'globalaccelerator'
@@ -141,7 +141,7 @@ class DeleteListener(BaseAction):
                 pass
 
 
-@AcceleratorInstance.action_registry.register('delete')
+@GlobalAccelerator.action_registry.register('delete')
 class DeleteAccelerator(BaseAction):
     '''Deletes global-accelerator(s)
 
@@ -173,7 +173,7 @@ class DeleteAccelerator(BaseAction):
                 pass
 
 
-@AcceleratorInstance.action_registry.register('modify-global-accelerator')
+@GlobalAccelerator.action_registry.register('modify-global-accelerator')
 class ModifyAccelerator(BaseAction):
     '''Modifies an accelerator instance based on specified parameter
     using UpdateAccelerator and UpdateAcceleratorAttributes.
