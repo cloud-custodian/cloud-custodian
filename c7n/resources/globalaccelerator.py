@@ -105,6 +105,8 @@ class DeleteEndpointGroup(BaseAction):
         client = local_session(self.manager.session_factory).client('globalaccelerator',
             region_name='us-west-2')
         for m in resources:
+            # this API doesn't really throw any exceptions, even if somehow the endpoint group
+            # doesn't exist
             client.delete_endpoint_group(
                 EndpointGroupArn=m['EndpointGroupArn'])
 
@@ -338,9 +340,11 @@ class ModifyAcceleratorEndpoint(BaseAction):
                 existing_endpoint_ids.add(endpoint_data['EndpointId'])
 
             for update in self.data.get('update-accelerator-endpoint'):
-                if 'property' in update and (
-                        endpoint_group_resource[update['property']] != update['value']):
-                    param[update['property']] = update['value']
+                if 'property' in update:
+                    update_prop = update['property']
+                    if update_prop in endpoint_group_resource and (
+                            endpoint_group_resource[update_prop] != update['value']):
+                        param[update_prop] = update['value']
 
                 elif 'EndpointConfigurations' in update:
                     for i in update['EndpointConfigurations']:
@@ -360,11 +364,9 @@ class ModifyAcceleratorEndpoint(BaseAction):
 
             param['EndpointGroupArn'] = endpoint_group_resource['EndpointGroupArn']
 
-            try:
-                client.update_endpoint_group(**param)
-            except (client.exceptions.EndpointGroupNotFoundException,
-                    client.exceptions.InvalidArgumentException) as e:
-                pass
+            # there's no exceptions to catch here. Bad update parameters are ignored and
+            # a non existant ARN wouldn't make it this far
+            client.update_endpoint_group(**param)
 
 
 @AcceleratorListener.action_registry.register('modify')
