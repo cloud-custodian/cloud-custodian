@@ -3,7 +3,12 @@
     "data": {
         "InternetGateways": [
             {
-                "Tags": [],
+                "Tags": [
+                    {
+                        "Value": "Fancy Internet Gateway",
+                        "Key": "Name"
+                    }
+                ],
                 "Attachments": [
                     {
                         "State": "available",

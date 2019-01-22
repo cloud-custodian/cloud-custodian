@@ -12,7 +12,12 @@
                     }
                 ],
                 "VpcId": "vpc-0c1be6284618ac4c1",
-                "Tags": [],
+                "Tags": [
+                    {
+                        "Value": "Fancy NAT Gateway",
+                        "Key": "Name"
+                    }
+                ],
                 "State": "available",
                 "NatGatewayId": "nat-0bdb87de14bdf340a",
                 "SubnetId": "subnet-03b1c10838dfbb431",
