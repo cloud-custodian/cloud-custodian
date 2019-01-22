@@ -135,8 +135,10 @@ class DeleteListener(BaseAction):
             try:
                 client.delete_listener(ListenerArn=m['ListenerArn'])
             # deleting a listener with endpoints is forbidden
-            except client.exceptions.AssociatedEndpointGroupFoundException:
-                pass
+            except client.exceptions.AssociatedEndpointGroupFoundException as e:
+                msg = "Can not delete listener with endpoint groups ListenerArn: %s error:%s" % (
+                    m['ListenerArn'], e)
+                self.log.warning(msg)
 
 
 @GlobalAccelerator.action_registry.register('delete')
