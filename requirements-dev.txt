@@ -8,7 +8,7 @@ placebo==0.8.1
 flake8==3.5.0
 redis
 ldap3
-sphinx-rtd-theme==0.4.1
+sphinx-rtd-theme==0.4.2
 nose-timer>=0.7.3
 twine
 fakeredis

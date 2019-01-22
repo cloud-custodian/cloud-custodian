@@ -127,6 +127,7 @@ class PostFinding(BaseAction):
 
     permissions = ('securityhub:BatchImportFindings',)
 
+    schema_alias = True
     schema = type_schema(
         "post-finding",
         required=["types"],
