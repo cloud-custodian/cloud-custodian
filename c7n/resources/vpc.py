@@ -205,6 +205,7 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
         }
         return vpc_group_ids
 
+
 @Vpc.filter_registry.register('subnet')
 class VpcSubnetFilter(RelatedResourceFilter):
     """Filter VPCs based on Subnet attributes
@@ -238,6 +239,7 @@ class VpcSubnetFilter(RelatedResourceFilter):
         }
         return vpc_subnet_ids
 
+
 @Vpc.filter_registry.register('nat-gateway')
 class VpcNatGatewayFilter(RelatedResourceFilter):
     """Filter VPCs based on NAT Gateway attributes
@@ -270,6 +272,7 @@ class VpcNatGatewayFilter(RelatedResourceFilter):
             if g.get('VpcId', '') in vpc_ids
         }
         return vpc_natgw_ids
+
 
 @Vpc.filter_registry.register('internet-gateway')
 class VpcInternetGatewayFilter(RelatedResourceFilter):

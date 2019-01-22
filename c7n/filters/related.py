@@ -19,6 +19,7 @@ import jmespath
 
 from .core import ValueFilter, OPERATORS
 
+
 class RelatedResourceFilter(ValueFilter):
 
     RelatedResource = None
