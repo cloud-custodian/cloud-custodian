@@ -165,12 +165,12 @@ class DeleteAccelerator(BaseAction):
             region_name='us-west-2')
 
         for m in resources:
-            if m['Enabled']:
-                continue
             try:
                 client.delete_accelerator(AcceleratorArn=m['AcceleratorArn'])
-            except client.exceptions.AcceleratorNotFoundException:
-                pass
+            except client.exceptions.AcceleratorNotDisabledException as e:
+                msg = "Can not delete enabled accelerator AcceleratorArn: %s error:%s" % (
+                    m['AcceleratorArn'], e)
+                self.log.warning(msg)
 
 
 @GlobalAccelerator.action_registry.register('modify-global-accelerator')
