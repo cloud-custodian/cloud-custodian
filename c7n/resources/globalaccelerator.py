@@ -20,6 +20,9 @@ from c7n.utils import local_session, type_schema
 
 actions = ActionRegistry('globalaccelerator.actions')
 
+# as of now the only region global accelerator is available is us-west-2
+available_ga_region = 'us-west-2'
+
 
 @resources.register('global-accelerator')
 class GlobalAccelerator(QueryResourceManager):
@@ -38,7 +41,7 @@ class GlobalAccelerator(QueryResourceManager):
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('globalaccelerator',
-            region_name='us-west-2')
+            region_name=available_ga_region)
 
         for r in resources:
             extra_ = self.retry(client.describe_accelerator_attributes,
@@ -103,7 +106,7 @@ class DeleteEndpointGroup(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('globalaccelerator',
-            region_name='us-west-2')
+            region_name=available_ga_region)
         for m in resources:
             # this API doesn't really throw any exceptions, even if somehow the endpoint group
             # doesn't exist
@@ -132,7 +135,7 @@ class DeleteListener(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('globalaccelerator',
-            region_name='us-west-2')
+            region_name=available_ga_region)
         for m in resources:
             try:
                 client.delete_listener(ListenerArn=m['ListenerArn'])
@@ -164,7 +167,7 @@ class DeleteAccelerator(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('globalaccelerator',
-            region_name='us-west-2')
+            region_name=available_ga_region)
 
         for m in resources:
             try:
@@ -245,7 +248,7 @@ class ModifyAccelerator(BaseAction):
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client(
-            'globalaccelerator', region_name='us-west-2')
+            'globalaccelerator', region_name=available_ga_region)
         update_iteration = (
             ('update-accelerator-attributes', c.update_accelerator_attributes),
             ('update-accelerator', c.update_accelerator))
@@ -329,7 +332,7 @@ class ModifyAcceleratorEndpoint(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('globalaccelerator',
-            region_name='us-west-2')
+            region_name=available_ga_region)
 
         for endpoint_group_resource in resources:
 
@@ -420,7 +423,7 @@ class ModifyAcceleratorListener(BaseAction):
     def process(self, resources):
 
         c = local_session(self.manager.session_factory).client('globalaccelerator',
-        region_name='us-west-2')
+        region_name=available_ga_region)
 
         for r in resources:
             param = {}

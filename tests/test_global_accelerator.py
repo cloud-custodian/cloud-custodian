@@ -14,6 +14,9 @@
 
 from .common import BaseTest
 
+# as of now the only region global accelerator is available is us-west-2
+available_ga_region = 'us-west-2'
+
 
 class TestEndpointInstance(BaseTest):
 
@@ -21,7 +24,7 @@ class TestEndpointInstance(BaseTest):
 
         session_factory = self.replay_flight_data('test_modify_endpoint_configuration_1')
         client = session_factory().client('globalaccelerator',
-            region_name='us-west-2')
+            region_name=available_ga_region)
         endpoint_group_arn = 'arn:aws:globalaccelerator::644160558196:accelerator/' \
             '1460ad64-e386-41e4-9715-d8bcc665963e/listener/56de20d3/endpoint-group/db9a1ad66002'
 
@@ -71,7 +74,7 @@ class TestEndpointInstance(BaseTest):
     def test_delete_endpoint_group(self):
 
         session_factory = self.replay_flight_data('test_delete_endpoint_groups_1')
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
         listener_arn = 'arn:aws:globalaccelerator::644160558196:accelerator/' \
             '1460ad64-e386-41e4-9715-d8bcc665963e/listener/56de20d3'
 
@@ -90,7 +93,7 @@ class TestEndpointInstance(BaseTest):
         p.run()
 
         session_factory = self.replay_flight_data('test_delete_endpoint_groups_2')
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
         result = client.list_endpoint_groups(ListenerArn=listener_arn)
         self.assertEqual(len(result['EndpointGroups']), 1)
 
@@ -101,7 +104,7 @@ class TestListener(BaseTest):
         accelerator_arn = 'arn:aws:globalaccelerator::644160558196:accelerator/' \
             '1460ad64-e386-41e4-9715-d8bcc665963e'
         session_factory = self.replay_flight_data('test_delete_listeners1')
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
         accelerator_arn = 'arn:aws:globalaccelerator::644160558196:accelerator/' \
             '1460ad64-e386-41e4-9715-d8bcc665963e'
         result = client.list_listeners(AcceleratorArn=accelerator_arn)
@@ -119,14 +122,14 @@ class TestListener(BaseTest):
         p.run()
 
         session_factory = self.replay_flight_data('test_delete_listeners_2')
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
         result = client.list_listeners(AcceleratorArn=accelerator_arn)
         self.assertEqual(len(result['Listeners']), 1)
 
     def test_modify_listener(self):
 
         session_factory = self.replay_flight_data('test_modify_listener_1')
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
         listener_arn = 'arn:aws:globalaccelerator::644160558196:accelerator/' \
             '1460ad64-e386-41e4-9715-d8bcc665963e/listener/56de20d3'
 
@@ -160,7 +163,7 @@ class TestListener(BaseTest):
         p.run()
 
         session_factory = self.replay_flight_data('test_modify_listener_2')
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
         result = client.describe_listener(ListenerArn=listener_arn)['Listener']
         self.assertEqual(result['ListenerArn'], listener_arn)
         self.assertEqual(result['ClientAffinity'], 'SOURCE_IP')
@@ -190,7 +193,7 @@ class TestAcceleratorInstance(BaseTest):
         session_factory = self.replay_flight_data(
             'test_global_accelerator_delete_instance'
         )
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
 
         result = client.list_accelerators(MaxResults=100)
         counts = self.count_enabled(result['Accelerators'])
@@ -220,7 +223,7 @@ class TestAcceleratorInstance(BaseTest):
         session_factory = self.replay_flight_data(
             'test_modify_global_accelerator_instance_with_bucket'
         )
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
         result = client.list_accelerators(MaxResults=100)
         self.assertEqual(len(result['Accelerators']), 1)
         accelerator_arn = 'arn:aws:globalaccelerator::644160558196:accelerator/' \
@@ -256,7 +259,7 @@ class TestAcceleratorInstance(BaseTest):
         session_factory = self.replay_flight_data(
             'test_modify_global_accelerator_instance_with_bucket_2'
         )
-        client = session_factory().client('globalaccelerator', region_name='us-west-2')
+        client = session_factory().client('globalaccelerator', region_name=available_ga_region)
 
         result = client.describe_accelerator(AcceleratorArn=accelerator_arn)['Accelerator']
         self.assertEqual(result['Enabled'], True)
