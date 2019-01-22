@@ -59,8 +59,7 @@ class AcceleratorListener(ChildResourceManager):
         detail_spec = (
             'describe_listener', 'ListenerArn',
             'ListenerArn', None)
-        id = 'ListenerArn'
-        name = None
+        id = name = 'ListenerArn'
         date = 'CreatedTime'
         dimension = None
         filter_name = None
@@ -76,8 +75,7 @@ class AcceleratorEndpointGroup(ChildResourceManager):
         detail_spec = (
             'describe_endpoint_group', 'EndpointGroupArn',
             'EndpointGroupArn', None)
-        id = 'EndpointGroupArn'
-        name = None
+        id = name = 'EndpointGroupArn'
         date = 'CreatedTime'
         dimension = None
         filter_name = None
