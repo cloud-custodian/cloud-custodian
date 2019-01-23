@@ -76,9 +76,9 @@ jobs:
       BUILD_REASON: $(Build.Reason)
       BUILD_BRANCH: $(Build.SourceBranchName)
 
-  - displayName: Upload Build Cache
+  - script: "tar cz ~/.cache/pip | aws s3 cp - s3://c7n-dev/cache/pip-cache.tgz"
+    displayName: Upload Build Cache
     condition: "eq(variables['python.version'], '3.6')"
-    script: tar cz ~/.cache/pip | aws s3 cp - s3://c7n-dev/cache/pip-cache.tgz
 
   - script: make sphinx
     displayName: "Docs Build"
