@@ -60,8 +60,8 @@ jobs:
   - script: tox --notest
     displayName: 'Install Dependencies'
 
-  - script: tox
-    displayName: 'Tox'
+#  - script: tox
+#    displayName: 'Tox'
 
   - script: python tools/dev/cicov.py
     displayName: 'Publish Code Coverage'
@@ -79,6 +79,10 @@ jobs:
   - script: "tar cz ~/.cache/pip | aws s3 cp - s3://c7n-dev/cache/pip-cache.tgz"
     displayName: Upload Build Cache
     condition: "eq(variables['python.version'], '3.6')"
+    env:
+      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+
 
   - script: make sphinx
     displayName: "Docs Build"
