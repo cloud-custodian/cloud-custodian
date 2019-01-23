@@ -50,12 +50,12 @@ class IsShadow(Filter):
     Shadow trails are created for multi-region trails as well for
     organizational trails.
     """
-    schema = type_schema('is-shadow', {'state': 'boolean'})
+    schema = type_schema('is-shadow', state={'type': 'boolean'})
     permissions = ('cloudtrail:DescribeTrails',)
     embedded = False
 
     def process(self, resources, event=None):
-        anded = lambda x: True
+        anded = lambda x: True # NOQA
         op = self.data.get('state', True) and anded or operator.__not__
         rcount = len(resources)
         trails = [t for t in resources if op(self.is_shadow(t))]
