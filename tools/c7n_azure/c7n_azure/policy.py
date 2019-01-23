@@ -140,7 +140,9 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'resource_group_name': rg_name
             })
 
-        function_app_name = self.policy_name + '-' + function_suffix
+        function_app_name = FunctionAppUtilities.get_function_name(self.policy_name,
+            function_suffix)
+        FunctionAppUtilities.validate_function_name(function_app_name)
 
         params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights=app_insights,
@@ -171,6 +173,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
+        # Make sure we have auth data for function provisioning
+        session = local_session(self.policy.session_factory)
+        session.get_functions_auth_string()
+
         if sys.version_info[0] < 3:
             self.log.error("Python 2.7 is not supported for deploying Azure Functions.")
             sys.exit(1)
@@ -181,9 +187,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""
         raise NotImplementedError("subclass responsibility")
-
-    def validate(self):
-        """Validate configuration settings for execution mode."""
 
     def build_functions_package(self, queue_name=None):
         self.log.info("Building function package for %s" % self.function_params.function_app_name)

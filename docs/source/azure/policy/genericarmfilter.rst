@@ -34,7 +34,7 @@ for a full list of metrics supported by Azure resources.
 
 
 Example Policies
------------------
+~~~~~~~~~~~~~~~~
 
 Find VMs with an average Percentage CPU greater than or equal to 75% over the last 12 hours
 
@@ -94,7 +94,7 @@ It can be used to filter resources on the presence, absence or value of a tag.
 
 
 Example Policies
-----------------
+~~~~~~~~~~~~~~~~
 
 This policy will delete all ARM resources with the tag 'Tag1' present
 
@@ -139,7 +139,7 @@ Filters Azure resources based on previously scheduled operations via tags.
 
 
 Example Policies
-----------------
+~~~~~~~~~~~~~~~~
 
 Find VMs that have been marked for stopping and stop them
 
@@ -204,7 +204,7 @@ an azure resource.
 
 
 Example Policies
-----------------
+~~~~~~~~~~~~~~~~
 
 Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus category and LoadBalancerAlertEvent category enabled.
 The use of value_type: swap is important for these examples because it swaps the value and the evaluated key so that it evaluates the value provided is in the logs.

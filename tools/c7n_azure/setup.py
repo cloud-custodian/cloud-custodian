@@ -51,6 +51,7 @@ setup(
                       "azure-mgmt-cosmosdb",
                       "azure-mgmt-compute",
                       "azure-mgmt-cdn",
+                      "azure-mgmt-containerregistry",
                       "azure-mgmt-containerservice",
                       "azure-mgmt-datalake-store",
                       "azure-mgmt-datafactory",
