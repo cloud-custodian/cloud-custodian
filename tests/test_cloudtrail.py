@@ -67,7 +67,6 @@ class CloudTrail(BaseTest):
             'actions': [{
                 'type': 'set-logging', 'enabled': False}]},
             session_factory=factory, config={'account_id': '644160558196'})
-                             
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -75,7 +74,7 @@ class CloudTrail(BaseTest):
         if self.recording:
             time.sleep(2)
 
-        stat = client.get_trail_status(Name='orgTrail')            
+        stat = client.get_trail_status(Name='orgTrail')
         self.assertEqual(stat['IsLogging'], False)
 
     def test_is_shadow(self):
