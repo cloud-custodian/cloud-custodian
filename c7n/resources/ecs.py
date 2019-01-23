@@ -136,7 +136,6 @@ class ECSServiceDescribeSource(ECSClusterResourceDescribeSource):
             results.extend(
                 client.describe_services(
                     cluster=cluster_id,
-                    include=['TAGS'],
                     services=service_set).get('services', []))
         ecs_tag_normalize(results)
         return results
@@ -269,7 +268,6 @@ class ECSTaskDescribeSource(ECSClusterResourceDescribeSource):
                 self.manager.retry(
                     client.describe_tasks,
                     cluster=cluster_id,
-                    include=['TAGS'],
                     tasks=task_set).get('tasks', []))
         ecs_tag_normalize(results)
         return results
@@ -433,7 +431,6 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
         for service_set in chunks(container_instances, self.manager.chunk_size):
             r = client.describe_container_instances(
                 cluster=cluster_id,
-                include=['TAGS'],
                 containerInstances=container_instances).get('containerInstances', [])
             # Many Container Instance API calls require the cluster_id, adding as a
             # custodian specific key in the resource
