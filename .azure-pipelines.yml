@@ -54,11 +54,17 @@ jobs:
   - script: python -m pip install --upgrade pip && pip install tox codecov awscli
     displayName: 'Install Test Runner'
 
-  - script: aws s3 cp s3://c7n-dev/cache/pip-cache.tgz - | tar -xz -C /
+  - script: "du -hs ~/.cache/pip"
+    displayName: Cache Size Before
+
+  - script: aws s3 cp s3://c7n-dev/cache/pip-cache.tgz - | tar -xvz -C /
     displayName: Download Build Cache
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
       AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+
+  - script: "du -hs ~/.cache/pip"
+    displayName: Cache Size After
 
   - script: tox --notest
     displayName: 'Install Dependencies'
