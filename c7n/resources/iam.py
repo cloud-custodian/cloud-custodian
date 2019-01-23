@@ -159,9 +159,7 @@ class UserRemoveTag(RemoveTag):
         client = local_session(self.manager.session_factory).client('iam')
         for u in users:
             try:
-                client.tag_user(
-                    UserName=u['UserName'],
-                    Tags=[t['Key'] for t in tags])
+                client.untag_user(UserName=u['UserName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
