@@ -38,7 +38,7 @@ class TestEndpointInstance(BaseTest):
         self.assertEqual(endpoint_descriptions[0]['Weight'], 100)
         p = self.load_policy(
             {
-                'name': 'modify-global-accelerator-endpoint',
+                'name': 'set-global-accelerator-endpoint',
                 'resource': 'global-accelerator-endpoint-group',
                 'filters': [
                     {
@@ -142,7 +142,7 @@ class TestListener(BaseTest):
 
         p = self.load_policy(
             {
-                'name': 'modify-global-accelerator-listener',
+                'name': 'set-global-accelerator-listener',
                 'resource': 'global-accelerator-listener',
                 'actions': [{'type': 'modify',
                     'update-accelerator-listener': [
@@ -235,14 +235,14 @@ class TestAcceleratorInstance(BaseTest):
         bucket_name = 'test-for-global-accelerator-bucket/test-custodian'
         p = self.load_policy(
             {
-                'name': 'modify-global-accelerator-attributes',
+                'name': 'set-global-accelerator-attributes',
                 'resource': 'global-accelerator',
                 'filters': [
                     {'type': 'value', 'key': 'Name', 'value': 'test-custodian'}
                 ],
                 'actions': [
                     {
-                        'type': 'modify-global-accelerator',
+                        'type': 'set-global-accelerator',
                         'update-accelerator': [{'property': 'Enabled', 'value': True}],
                         'update-accelerator-attributes': [
                             {'property': 'FlowLogsEnabled', 'value': True},

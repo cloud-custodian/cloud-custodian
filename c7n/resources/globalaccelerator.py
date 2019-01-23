@@ -178,7 +178,7 @@ class DeleteAccelerator(BaseAction):
                 self.log.warning(msg)
 
 
-@GlobalAccelerator.action_registry.register('modify-global-accelerator')
+@GlobalAccelerator.action_registry.register('set-global-accelerator')
 class ModifyAccelerator(BaseAction):
     '''Modifies an accelerator instance based on specified parameter
     using UpdateAccelerator and UpdateAcceleratorAttributes.
@@ -197,7 +197,7 @@ class ModifyAccelerator(BaseAction):
                 filters:
                   - enabled: true
                 actions:
-                  - type: modify-global-accelerator
+                  - type: set-global-accelerator
                     update:
                       - property: 'Enabled'
                         value: false
@@ -215,7 +215,7 @@ class ModifyAccelerator(BaseAction):
     '''
 
     schema = type_schema(
-        'modify-global-accelerator', **{
+        'set-global-accelerator', **{
             'update-accelerator-attributes': {
                 'type': 'array',
                 'items': {
@@ -283,7 +283,7 @@ class ModifyAcceleratorEndpoint(BaseAction):
 
     .. code-block:: yaml
         policies:
-          - name: modify-global-accelerator-endpoint-threshold
+          - name: set-global-accelerator-endpoint-threshold
             resource: global-accelerator-endpoint-group
             actions:
               - type: modify
@@ -382,7 +382,7 @@ class ModifyAcceleratorListener(BaseAction):
 
     .. code-block:: yaml
         policies:
-          - name: modify-global-accelerator-listener-protocol
+          - name: set-global-accelerator-listener-protocol
             resource: global-accelerator-listener
             actions:
               - type: modify
