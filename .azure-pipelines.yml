@@ -51,26 +51,14 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
-  - script: python -m pip install --upgrade pip && pip install tox codecov awscli
+  - script: python -m pip install --upgrade pip && pip install tox codecov
     displayName: 'Install Test Runner'
-
-  - script: "du -hs ~/.cache/pip"
-    displayName: Cache Size Before
-
-  - script: aws s3 cp s3://c7n-dev/cache/pip-cache.tgz - | tar -xvz -C /
-    displayName: Download Build Cache
-    env:
-      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-
-  - script: "du -hs ~/.cache/pip"
-    displayName: Cache Size After
 
   - script: tox --notest
     displayName: 'Install Dependencies'
 
-#  - script: tox
-#    displayName: 'Tox'
+  - script: tox
+    displayName: 'Tox'
 
   - script: python tools/dev/cicov.py
     displayName: 'Publish Code Coverage'
@@ -84,13 +72,6 @@ jobs:
       BUILD_COMMIT: $(Build.SourceVersion)
       BUILD_REASON: $(Build.Reason)
       BUILD_BRANCH: $(Build.SourceBranchName)
-
-  - script: "tar cz ~/.cache/pip | aws s3 cp - s3://c7n-dev/cache/pip-cache.tgz"
-    displayName: Upload Build Cache
-    condition: "eq(variables['python.version'], '3.6')"
-    env:
-      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
 
   - script: make sphinx
     displayName: "Docs Build"
