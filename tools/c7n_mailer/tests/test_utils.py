@@ -12,3 +12,41 @@ class FormatStruct(unittest.TestCase):
         expected = '{\n  "foo": "bar"\n}'
         actual = utils.format_struct({'foo': 'bar'})
         self.assertEqual(expected, actual)
+
+
+class ResourceFormat(unittest.TestCase):
+
+    def test_efs(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'Name': 'abc', 'FileSystemId': 'fsid', 'LifeCycleState': 'available'},
+                'efs'),
+            'name: abc  id: fsid  state: available')
+
+    def test_eip(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'PublicIp': '8.8.8.8', 'Domain': 'vpc', 'AllocationId': 'eipxyz'},
+                'network-addr'),
+            'ip: 8.8.8.8  id: eipxyz  scope: vpc')
+
+    def test_nat(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'NatGatewayId': 'nat-xyz', 'State': 'available', 'VpcId': 'vpc-123'},
+                'nat-gateway'),
+            'id: nat-xyz  state: available  vpc: vpc-123')
+
+    def test_igw(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'InternetGatewayId': 'igw-x', 'Attachments': []},
+                'internet-gateway'),
+            'id: igw-x  attachments: 0')
+
+    def test_alb(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'LoadBalancerName': 'dev', 'AvailabilityZones': [], 'Scheme': 'internal'},
+                'app-elb'),
+            'name: dev  zones: 0  scheme: internal')
