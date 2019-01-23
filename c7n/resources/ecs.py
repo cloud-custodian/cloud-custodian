@@ -45,6 +45,8 @@ def ecs_taggable(model, r):
         return True
     return len(path_parts) > 2
 
+def split_arn(rid):
+    return rid.rsplit(':', 1)[-1].split('/')
 
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
@@ -92,6 +94,15 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
         self.query.capture_parent_id = True
 
     def augment(self, resources):
+        if resources[-1] == "trailevent":
+            split_r = split_arn(resources[0])
+            if split_r[0] not in NEW_ARN_STYLE:
+                print("BAD")
+                return "BAD"
+            client = local_session(self.manager.session_factory).client('ecs')
+            return self.process_cluster_resources(client, split_r[1], 
+                [split_r[2]])
+        
         parent_child_map = {}
         for pid, r in resources:
             parent_child_map.setdefault(pid, []).append(r)
@@ -143,6 +154,8 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        supports_trailevents = True
+        filter_name = None
 
     @property
     def source_type(self):
@@ -273,6 +286,8 @@ class Task(query.ChildResourceManager):
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        supports_trailevents = True
+        filter_name = None
 
     @property
     def source_type(self):
@@ -399,6 +414,8 @@ class ContainerInstance(query.ChildResourceManager):
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        supports_trailevents = True
+        filter_name = None
 
     @property
     def source_type(self):

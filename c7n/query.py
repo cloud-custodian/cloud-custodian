@@ -91,6 +91,11 @@ class ResourceQuery(object):
         """Get resources by identities
         """
         m = self.resolve(resource_manager.resource_type)
+        if isinstance(resource_manager, ChildResourceManager):
+            if getattr(m, 'supports_trailevents', False):
+                identities.append("trailevent")
+                return identities
+                
         params = {}
         client_filter = False
 
