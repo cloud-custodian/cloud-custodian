@@ -86,7 +86,6 @@ jobs:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
       AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
 
-
   - script: make sphinx
     displayName: "Docs Build"
     condition: "eq(variables['python.version'], '3.7')"
