@@ -5,6 +5,9 @@ variables:
 - group: CustodianCoreCI
 
 jobs:
+- checkout: self  # self represents the repo where the initial Pipelines YAML file was found
+  clean: true  # whether to fetch clean each time
+  fetchDepth: 2
 
 - job: 'Lint'
   pool:
