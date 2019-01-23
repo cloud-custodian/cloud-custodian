@@ -54,6 +54,9 @@ jobs:
   - script: python -m pip install --upgrade pip && pip install tox codecov awscli
     displayName: 'Install Test Runner'
 
+#  - displayName: Download Build Cache
+#    script: aws s3 cp s3://c7n-dev/cache/pip-cache.tgz - | tar -xz -C /
+
   - script: tox --notest
     displayName: 'Install Dependencies'
 
@@ -72,6 +75,10 @@ jobs:
       BUILD_COMMIT: $(Build.SourceVersion)
       BUILD_REASON: $(Build.Reason)
       BUILD_BRANCH: $(Build.SourceBranchName)
+
+  - displayName: Upload Build Cache
+    condition: "eq(variables['python.version'], '3.6')"
+    script: tar cz ~/.cache/pip | aws s3 cp - s3://c7n-dev/cache/pip-cache.tgz
 
   - script: make sphinx
     displayName: "Docs Build"
