@@ -74,7 +74,6 @@ class SQS(QueryResourceManager):
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('sqs')
-
         def _augment(r):
             try:
                 queue = self.retry(
