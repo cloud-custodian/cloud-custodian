@@ -47,6 +47,11 @@ class ResourceFormat(unittest.TestCase):
     def test_alb(self):
         self.assertEqual(
             utils.resource_format(
-                {'LoadBalancerName': 'dev', 'AvailabilityZones': [], 'Scheme': 'internal'},
+                {'LoadBalancerArn':
+                    'arn:aws:elasticloadbalancing:us-east-1:367930536793:'
+                    'loadbalancer/app/dev/1234567890',
+                 'AvailabilityZones': [], 'Scheme': 'internal'},
                 'app-elb'),
-            'name: dev  zones: 0  scheme: internal')
+            'arn: arn:aws:elasticloadbalancing:us-east-1:367930536793:'
+            'loadbalancer/app/dev/1234567890'
+            '  zones: 0  scheme: internal')

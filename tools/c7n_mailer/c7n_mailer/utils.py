@@ -302,8 +302,8 @@ def resource_format(resource, resource_type):
             resource['VpcId']
         )
     elif resource_type == "app-elb":
-        return "name: %s  zones: %s  scheme: %s" % (
-            resource['LoadBalancerName'],
+        return "arn: %s  zones: %s  scheme: %s" % (
+            resource['LoadBalancerArn'],
             len(resource['AvailabilityZones']),
             resource['Scheme'])
     elif resource_type == "nat-gateway":
