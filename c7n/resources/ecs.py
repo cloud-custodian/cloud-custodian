@@ -96,9 +96,10 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
     def augment(self, resources):
         if resources[-1] == "trailevent":
             split_r = split_arn(resources[0])
-            if split_r[0] not in NEW_ARN_STYLE:
-                print("BAD")
-                return "BAD"
+            if len(split_r) < 3:
+                self.manager.log.warning(
+                        'Warning: cloudtrail mode requires new ARN format')
+                return []
             client = local_session(self.manager.session_factory).client('ecs')
             return self.process_cluster_resources(client, split_r[1], 
                 [split_r[2]])
