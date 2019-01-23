@@ -13,14 +13,19 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import logging
+import operator
+
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import ValueFilter
+from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate
+
+log = logging.getLogger('c7n.resources.cloudtrail')
 
 
 @resources.register('cloudtrail')
@@ -35,6 +40,35 @@ class CloudTrail(QueryResourceManager):
         name = 'Name'
         dimension = None
         config_type = "AWS::CloudTrail::Trail"
+
+
+@CloudTrail.filter_registry.register('is-shadow')
+class IsShadow(Filter):
+    """Identify shadow trails (secondary copies), shadow trails
+    can't be modified directly, the origin trail needs to be modified.
+
+    Shadow trails are created for multi-region trails as well for
+    organizational trails.
+    """
+    schema = type_schema('is-shadow', {'state': 'boolean'})
+    permissions = ('cloudtrail:DescribeTrails',)
+    embedded = False
+
+    def process(self, resources, event=None):
+        anded = lambda x: True
+        op = self.data.get('state', True) and anded or operator.__not__
+        rcount = len(resources)
+        trails = [t for t in resources if op(self.is_shadow(t))]
+        if len(trails) != rcount and self.embedded:
+            self.log.info("implicitly filtering shadow trails %d -> %d",
+                     rcount, len(trails))
+        return trails
+
+    def is_shadow(self, t):
+        if t.get('IsOrganizationTrail') and self.manager.config.account_id not in t['TrailARN']:
+            return True
+        if t.get('IsMultiRegionTrail') and t['HomeRegion'] not in t['TrailARN']:
+            return True
 
 
 @CloudTrail.filter_registry.register('status')
@@ -58,7 +92,7 @@ class Status(ValueFilter):
     permissions = ('cloudtrail:GetTrailStatus',)
     annotation_key = 'c7n:TrailStatus'
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         client = local_session(
             self.manager.session_factory).client('cloudtrail')
         for r in resources:
@@ -89,7 +123,7 @@ class UpdateTrail(Action):
               - LogFileValidationEnabled: false
            actions:
             - type: update-trail
-              attribute:
+              attributes:
                 KmsKeyId: arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef
                 EnableLogFileValidation: true
     """
@@ -112,11 +146,15 @@ class UpdateTrail(Action):
             self.manager.resource_type.service)
 
     def process(self, resources):
-        client = local_session(self.manager.session_factory)
+        client = local_session(self.manager.session_factory).client('cloudtrail')
+        shadow_check = IsShadow({'state': False}, self.manager)
+        shadow_check.embedded = True
+        resources = shadow_check.process(resources)
+
         for r in resources:
             client.update_trail(
                 Name=r['Name'],
-                **self.data.attributes)
+                **self.data['attributes'])
 
 
 @CloudTrail.action_registry.register('set-logging')
@@ -149,9 +187,12 @@ class SetLogging(Action):
             return ('cloudtrail:StopLogging',)
 
     def process(self, resources):
-        client = local_session(
-            self.manager.session_factory).client('cloudtrail')
+        client = local_session(self.manager.session_factory).client('cloudtrail')
+        shadow_check = IsShadow({'state': False}, self.manager)
+        shadow_check.embedded = True
+        resources = shadow_check.process(resources)
         enable = self.data.get('enabled', True)
+
         for r in resources:
             if enable:
                 client.start_logging(Name=r['Name'])
