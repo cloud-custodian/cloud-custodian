@@ -1,0 +1,86 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Findings": [
+            {
+                "Confidence": 100, 
+                "GeneratorId": "alb-tag-compliance", 
+                "Severity": {
+                    "Product": 0, 
+                    "Normalized": 1
+                }, 
+                "Title": "alb-tag-compliance", 
+                "Resources": [
+                    {
+                        "Region": "us-east-1", 
+                        "Type": "Other", 
+                        "Id": "arn:aws:elasticloadbalancing:us-east-1:101010101111:loadbalancer/app/test/cf1a839e5cc6d3f3", 
+                        "Details": {
+                            "Other": {
+                                "IpAddressType": "ipv4", 
+                                "VpcId": "vpc-d6fe6cb1", 
+                                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:101010101111:loadbalancer/app/test/cf1a839e5cc6d3f3", 
+                                "Tags": "[]", 
+                                "c7n:MatchedFilters": "[\n\"tag:Owner\", \n\"tag:CostCenter\", \n\"tag:Project\"\n]", 
+                                "c7n:resource-type": "app-elb", 
+                                "State": "{\n\"Code\": \"active\"\n}", 
+                                "DNSName": "internal-test-1051198124.us-east-1.elb.amazonaws.com", 
+                                "SecurityGroups": "[\n\"sg-aaf4fad1\"\n]", 
+                                "LoadBalancerName": "test", 
+                                "CreatedTime": "2019-01-12T23:13:59.380000+00:00", 
+                                "Scheme": "internal", 
+                                "Type": "application", 
+                                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K", 
+                                "AvailabilityZones": "[\n{\n\"SubnetId\": \"subnet-9c3b5eb1\", \n\"ZoneName\": \"us-east-1c\"\n}, \n{\n\"SubnetId\": \"subnet-a0297ce9\", \n\"ZoneName\": \"us-east-1d\"\n}\n]"
+                            }
+                        }
+                    }
+                ], 
+                "Compliance": {
+                    "Status": "FAILED"
+                }, 
+                "ProductArn": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default", 
+                "ProductFields": {
+                    "aws/securityhub/SeverityLabel": "LOW", 
+                    "resource": "app-elb", 
+                    "ProviderName": "CloudCustodian", 
+                    "ProviderVersion": "0.8.33.1", 
+                    "aws/securityhub/ProductName": "Default", 
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default/us-east-1/101010101111/a3b48d3af1b66c9e84112e11f16ce796/ec41109b859fcbbf4f322c9dd7d14f5a", 
+                    "aws/securityhub/CompanyName": "Personal"
+                }, 
+                "RecordState": "ACTIVE", 
+                "WorkflowState": "NEW", 
+                "CreatedAt": "2019-01-12T23:25:10.821569+00:00", 
+                "UpdatedAt": "2019-01-12T23:25:10.821569+00:00", 
+                "Remediation": {
+                    "Recommendation": {
+                        "Url": "https://www.example.com/policies/TaggingPolicy.html", 
+                        "Text": "Tag your instances in compliance with Tagging Policy"
+                    }
+                }, 
+                "Description": "Find all running instances that are not conformant to the tagging policy", 
+                "SchemaVersion": "2018-10-08", 
+                "Id": "us-east-1/101010101111/a3b48d3af1b66c9e84112e11f16ce796/ec41109b859fcbbf4f322c9dd7d14f5a", 
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ], 
+                "AwsAccountId": "101010101111"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "12cbcd69-16c7-11e9-8618-c57e6a455abc", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "12cbcd69-16c7-11e9-8618-c57e6a455abc", 
+                "content-length": "2477", 
+                "x-amz-apigw-id": "TakYpE_2IAMFZ5w=", 
+                "x-amzn-trace-id": "Root=1-5c3a8104-0f4e97602c696920001ad2c0;Sampled=0", 
+                "connection": "keep-alive", 
+                "date": "Sun, 13 Jan 2019 00:06:28 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

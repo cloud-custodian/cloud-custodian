@@ -1403,7 +1403,7 @@ class MarkForOp(Tag):
 
     schema = type_schema(
         'mark-for-op',
-        op={'enum': ['suspend', 'resume', 'delete']},
+        op={'type': 'string'},
         key={'type': 'string'},
         tag={'type': 'string'},
         message={'type': 'string'},
@@ -1419,6 +1419,10 @@ class MarkForOp(Tag):
         if not self.tz:
             raise PolicyValidationError(
                 "Invalid timezone specified %s on %s" % (self.tz, self.manager.data))
+        op = self.data.get('op')
+        if op not in self.manager.action_registry:
+            raise PolicyValidationError(
+                "Invalid op %s for asg on policy %s" % (op, self.manager.data))
         return self
 
     def process(self, asgs):

@@ -156,7 +156,7 @@ class ChildResourceQuery(ResourceQuery):
         # Have to query separately for each parent's children.
         results = []
         for parent_id in parent_ids:
-            merged_params = dict(params, **{parent_key: parent_id})
+            merged_params = self.get_parent_parameters(params, parent_id, parent_key)
             subset = self._invoke_client_enum(
                 client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
@@ -167,6 +167,9 @@ class ChildResourceQuery(ResourceQuery):
             elif subset:
                 results.extend(subset)
         return results
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        return dict(params, **{parent_key: parent_id})
 
 
 class QueryMeta(type):

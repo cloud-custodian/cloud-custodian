@@ -8,9 +8,9 @@ futures>=3.2.0
 jmespath>=0.9.3
 pyasn1>=0.4.2
 python-dateutil>=2.6.1
-PyYAML>=3.12
+PyYAML>=3.13
 requests>=2.12.5
-rsa==3.4.2
+rsa==4.0
 s3transfer>=0.1.10
 six>=1.10.0
 c7n>=0.8.22.0

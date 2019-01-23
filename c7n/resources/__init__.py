@@ -35,6 +35,7 @@ def load_resources():
     import c7n.resources.appelb
     import c7n.resources.asg
     import c7n.resources.awslambda
+    import c7n.resources.backup
     import c7n.resources.batch
     import c7n.resources.cfn
     import c7n.resources.cloudfront
