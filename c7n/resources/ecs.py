@@ -431,6 +431,7 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
         for service_set in chunks(container_instances, self.manager.chunk_size):
             r = client.describe_container_instances(
                 cluster=cluster_id,
+                include=['TAGS'],
                 containerInstances=container_instances).get('containerInstances', [])
             # Many Container Instance API calls require the cluster_id, adding as a
             # custodian specific key in the resource
