@@ -244,7 +244,6 @@ class IamUserTag(BaseTest):
              'maid_status': 'Resource does not meet policy: delete@2019/01/25'})
 
 
-
 class IAMMFAFilter(BaseTest):
 
     def test_iam_mfa_filter(self):
