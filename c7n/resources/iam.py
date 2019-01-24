@@ -149,6 +149,7 @@ class UserTag(Tag):
             except client.exceptions.NoSuchEntityException:
                 continue
 
+
 @User.action_registry.register('remove-tag')
 class UserRemoveTag(RemoveTag):
     """Remove tags from an iam user."""
@@ -162,6 +163,7 @@ class UserRemoveTag(RemoveTag):
                 client.untag_user(UserName=u['UserName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
+
 
 @User.action_registry.register('mark-for-op')
 class UserTagDelayedAction(TagDelayedAction):
