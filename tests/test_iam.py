@@ -71,10 +71,10 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 4)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(
             sorted([r["UserName"] for r in resources]),
-            ["Hazmat", "charmworld", "kaleb", "kapilt"],
+            ["Hazmat", "kapilt"],
         )
 
     def test_credential_access_key_multifilter_delete(self):
@@ -355,6 +355,7 @@ class IamUserTest(BaseTest):
             resources[0]['c7n:matched-keys'][0]['c7n:matched-type'], 'access')
 
     def test_iam_user_delete_some_access(self):
+        # TODO: this test could use a rewrite
         factory = self.replay_flight_data("test_iam_user_delete_options")
         p = self.load_policy(
             {
