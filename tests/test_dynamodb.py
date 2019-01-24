@@ -80,6 +80,27 @@ class DynamodbTest(BaseTest):
         tag_map = {t["Key"]: t["Value"] for t in tags["Tags"]}
         self.assertTrue("test_key" in tag_map)
 
+    def test_kms_key_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-kms-key-filters",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/dynamodb)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TableName"], "test-table-kms-filter")
+
     def test_dynamodb_mark(self):
         session_factory = self.replay_flight_data("test_dynamodb_mark")
         client = session_factory().client("dynamodb")

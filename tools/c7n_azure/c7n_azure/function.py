@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import sys
+
 from os.path import dirname, join
 
 # The working path for the Azure Function doesn't include this file's folder
@@ -38,14 +38,14 @@ def main(input):
         'auth_file': join(dirname(__file__), 'auth.json')
     }
 
-    events = None
+    event = None
 
     if type(input) is QueueMessage:
         if input.dequeue_count > max_dequeue_count:
             return
-        events = [input.get_json()]
+        event = input.get_json()
 
-    handler.run(events, context)
+    handler.run(event, context)
 
 
 # Need to manually initialize c7n_azure

@@ -30,8 +30,11 @@ import traceback
 
 import boto3
 
+from botocore.validate import ParamValidator
+
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
+from c7n.exceptions import PolicyValidationError
 from c7n.log import CloudWatchLogHandler
 
 # Import output registries aws provider extends.
@@ -115,6 +118,16 @@ def _default_account_id(options):
         options.account_id = utils.get_account_id_from_sts(session)
     except Exception:
         options.account_id = None
+
+
+def shape_validate(params, shape_name, service):
+    session = fake_session()._session
+    model = session.get_service_model(service)
+    shape = model.shape_for(shape_name)
+    validator = ParamValidator()
+    report = validator.validate(params, shape)
+    if report.has_errors():
+        raise PolicyValidationError(report.generate_report())
 
 
 @metrics_outputs.register('aws')
@@ -216,14 +229,14 @@ class XrayTracer(object):
     use_daemon = 'AWS_XRAY_DAEMON_ADDRESS' in os.environ
     service_name = 'custodian'
 
-    context = XrayContext()
-    if HAVE_XRAY:
+    @classmethod
+    def initialize(cls):
+        context = XrayContext()
         xray_recorder.configure(
-            emitter=use_daemon is False and emitter or None,
+            emitter=cls.use_daemon is False and cls.emitter or None,
             context=context,
             sampling=True,
-            context_missing='LOG_ERROR'
-        )
+            context_missing='LOG_ERROR')
         patch(['boto3', 'requests'])
         logging.getLogger('aws_xray_sdk.core').setLevel(logging.ERROR)
 
@@ -395,6 +408,9 @@ class AWS(object):
         """
         _default_region(options)
         _default_account_id(options)
+        if options.tracer and options.tracer.startswith('xray') and HAVE_XRAY:
+            XrayTracer.initialize()
+
         return options
 
     def get_session_factory(self, options):
@@ -468,12 +484,18 @@ class AWS(object):
             options)
 
 
-def get_service_region_map(regions, resource_types):
-    # we're not interacting with the apis just using the sdk meta information.
+def fake_session():
     session = boto3.Session(
         region_name='us-east-1',
         aws_access_key_id='never',
         aws_secret_access_key='found')
+    return session
+
+
+def get_service_region_map(regions, resource_types):
+    # we're not interacting with the apis just using the sdk meta information.
+
+    session = fake_session()
     normalized_types = []
     for r in resource_types:
         if r.startswith('aws.'):

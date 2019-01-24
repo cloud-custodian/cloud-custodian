@@ -16,6 +16,7 @@ import datetime
 import hashlib
 import logging
 import re
+import uuid
 from builtins import bytes
 from concurrent.futures import as_completed
 
@@ -27,6 +28,8 @@ from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
 from c7n.utils import chunks
+
+from c7n.utils import local_session
 
 
 class ResourceIdParser(object):
@@ -301,3 +304,33 @@ class PortsRangeHelper(object):
                     ports[p] = IsAllowed
 
         return ports
+
+
+class AppInsightsHelper(object):
+    log = logging.getLogger('custodian.azure.utils.AppInsightsHelper')
+
+    @staticmethod
+    def get_instrumentation_key(url):
+        data = url.split('//')[1]
+        try:
+            uuid.UUID(data)
+        except ValueError:
+            values = data.split('/')
+            if len(values) != 2:
+                AppInsightsHelper.log.warning("Bad format: '%s'" % url)
+            return AppInsightsHelper._get_instrumentation_key(values[0], values[1])
+        return data
+
+    @staticmethod
+    def _get_instrumentation_key(resource_group_name, resource_name):
+        from .session import Session
+        s = local_session(Session)
+        client = s.client('azure.mgmt.applicationinsights.ApplicationInsightsManagementClient')
+        try:
+            insights = client.components.get(resource_group_name, resource_name)
+            return insights.instrumentation_key
+        except Exception:
+            AppInsightsHelper.log.warning("Failed to retrieve App Insights instrumentation key."
+                                          "Resource Group name: %s, App Insights name: %s" %
+                                          (resource_group_name, resource_name))
+            return ''

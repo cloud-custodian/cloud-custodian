@@ -1,0 +1,60 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Findings": [
+            {
+                "GeneratorId": "account-finding", 
+                "Severity": {
+                    "Product": 10, 
+                    "Normalized": 10
+                }, 
+                "Title": "account-finding", 
+                "Resources": [
+                    {
+                        "Region": "us-east-1", 
+                        "Type": "Other", 
+                        "Id": "arn:aws:::101010101111:", 
+                        "Details": {
+                            "Other": {
+                                "account_name": "filiatra-primary"
+                            }
+                        }
+                    }
+                ], 
+                "ProductArn": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default", 
+                "ProductFields": {
+                    "aws/securityhub/SeverityLabel": "LOW", 
+                    "resource": "account", 
+                    "ProviderName": "CloudCustodian", 
+                    "ProviderVersion": "0.8.32.1", 
+                    "aws/securityhub/ProductName": "Default", 
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default/us-east-1/101010101111/26045b93824ce1bf9c19668e373efb5d/f463cba171cdbdb2206d5699283a6faf", 
+                    "aws/securityhub/CompanyName": "Personal"
+                }, 
+                "CreatedAt": "2018-12-02T23:43:03.954804+00:00", 
+                "UpdatedAt": "2018-12-02T23:43:03.954804+00:00", 
+                "RecordState": "ACTIVE", 
+                "SchemaVersion": "2018-10-08", 
+                "Id": "us-east-1/101010101111/26045b93824ce1bf9c19668e373efb5d/f463cba171cdbdb2206d5699283a6faf", 
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ], 
+                "AwsAccountId": "101010101111"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8ab04d60-f6ba-11e8-b3f6-ff85ad7e0c31", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8ab04d60-f6ba-11e8-b3f6-ff85ad7e0c31", 
+                "content-length": "1364", 
+                "x-amz-apigw-id": "RUJT1HTqIAMFoPw=", 
+                "x-amzn-trace-id": "Root=1-5c04bc18-00cbd50a4c50298fdeffb082;Sampled=0", 
+                "connection": "keep-alive", 
+                "date": "Mon, 03 Dec 2018 05:16:08 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

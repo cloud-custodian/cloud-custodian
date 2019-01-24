@@ -1,0 +1,73 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Findings": [
+            {
+                "GeneratorId": "rds-finding", 
+                "Severity": {
+                    "Product": 10, 
+                    "Normalized": 10
+                }, 
+                "Title": "rds-finding", 
+                "Resources": [
+                    {
+                        "Details": {
+                            "Other": {
+                                "Engine": "mariadb", 
+                                "VpcId": "vpc-d6fe6cb1", 
+                                "PubliclyAccessible": "False", 
+                                "DBName": "testme", 
+                                "AvailabilityZone": "us-east-1a", 
+                                "InstanceCreateTime": "2018-11-05T03:25:12.384000+00:00", 
+                                "StorageEncrypted": "False", 
+                                "AllocatedStorage": "20", 
+                                "EngineVersion": "10.3.8", 
+                                "DBInstanceClass": "db.t2.micro", 
+                                "DBSubnetGroupName": "default"
+                            }
+                        }, 
+                        "Region": "us-east-1", 
+                        "Type": "Other", 
+                        "Id": "arn:aws:rds:us-east-1:101010101111:db:testme", 
+                        "Tags": {
+                            "workload-type": "other"
+                        }
+                    }
+                ], 
+                "ProductArn": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default", 
+                "ProductFields": {
+                    "aws/securityhub/SeverityLabel": "LOW", 
+                    "resource": "rds", 
+                    "ProviderName": "CloudCustodian", 
+                    "ProviderVersion": "0.8.32.1", 
+                    "aws/securityhub/ProductName": "Default", 
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default/us-east-1/101010101111/abdd674a66f46edf33193a20feb7753d/715936d037ae32530ce08602967a9bfd", 
+                    "aws/securityhub/CompanyName": "Personal"
+                }, 
+                "CreatedAt": "2018-12-03T06:01:08.468701+00:00", 
+                "UpdatedAt": "2018-12-03T06:01:08.468701+00:00", 
+                "RecordState": "ACTIVE", 
+                "SchemaVersion": "2018-10-08", 
+                "Id": "us-east-1/101010101111/abdd674a66f46edf33193a20feb7753d/715936d037ae32530ce08602967a9bfd", 
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ], 
+                "AwsAccountId": "101010101111"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7b9874c0-f6c1-11e8-b750-83c302355dca", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7b9874c0-f6c1-11e8-b750-83c302355dca", 
+                "content-length": "3684", 
+                "x-amz-apigw-id": "RUQlpGHFIAMFehg=", 
+                "x-amzn-trace-id": "Root=1-5c04c7bd-7735f7cc6767c02ab3d2cbae;Sampled=0", 
+                "connection": "keep-alive", 
+                "date": "Mon, 03 Dec 2018 06:05:49 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

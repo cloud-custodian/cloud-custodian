@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "orgTrail",
+                "S3BucketName": "c7n-vpc-flow-logs",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/orgTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": false,
+                "IsOrganizationTrail": true
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "eb7e5f92-ea5b-4a4a-b5e4-2cbef4d30dad",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "eb7e5f92-ea5b-4a4a-b5e4-2cbef4d30dad",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "756",
+                "date": "Wed, 23 Jan 2019 01:27:00 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

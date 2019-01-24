@@ -35,6 +35,7 @@ def load_resources():
     import c7n.resources.appelb
     import c7n.resources.asg
     import c7n.resources.awslambda
+    import c7n.resources.backup
     import c7n.resources.batch
     import c7n.resources.cfn
     import c7n.resources.cloudfront
@@ -46,6 +47,7 @@ def load_resources():
     import c7n.resources.cw
     import c7n.resources.directory
     import c7n.resources.directconnect
+    import c7n.resources.dlm
     import c7n.resources.dms
     import c7n.resources.dynamodb
     import c7n.resources.datapipeline
@@ -62,6 +64,7 @@ def load_resources():
     import c7n.resources.emr
     import c7n.resources.gamelift
     import c7n.resources.glacier
+    import c7n.resources.globalaccelerator
     import c7n.resources.glue
     import c7n.resources.health
     import c7n.resources.hsm
@@ -91,14 +94,11 @@ def load_resources():
     import c7n.resources.support
     import c7n.resources.vpc
     import c7n.resources.waf
-    import c7n.resources.globalaccelerator
+    import c7n.resources.fsx
 
     # Load external plugins (private sdks etc)
     from c7n.manager import resources
     resources.load_plugins()
     resources.notify(resources.EVENT_FINAL)
-
-    # super cheese tech debt / fix me pls
-    from c7n.actions import securityhub
 
     LOADED = True

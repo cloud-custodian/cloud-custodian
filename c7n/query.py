@@ -61,9 +61,9 @@ class ResourceQuery(object):
     def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
         if client.can_paginate(enum_op):
             p = client.get_paginator(enum_op)
-            results = p.paginate(**params)
             if retry:
                 p.PAGE_ITERATOR_CLS = RetryPageIterator
+            results = p.paginate(**params)
             data = results.build_full_result()
         else:
             op = getattr(client, enum_op)
@@ -156,7 +156,7 @@ class ChildResourceQuery(ResourceQuery):
         # Have to query separately for each parent's children.
         results = []
         for parent_id in parent_ids:
-            merged_params = dict(params, **{parent_key: parent_id})
+            merged_params = self.get_parent_parameters(params, parent_id, parent_key)
             subset = self._invoke_client_enum(
                 client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
@@ -167,6 +167,9 @@ class ChildResourceQuery(ResourceQuery):
             elif subset:
                 results.extend(subset)
         return results
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        return dict(params, **{parent_key: parent_id})
 
 
 class QueryMeta(type):
@@ -210,9 +213,11 @@ sources = PluginRegistry('sources')
 @sources.register('describe')
 class DescribeSource(object):
 
+    QueryFactory = ResourceQuery
+
     def __init__(self, manager):
         self.manager = manager
-        self.query = ResourceQuery(self.manager.session_factory)
+        self.query = self.QueryFactory(self.manager.session_factory)
 
     def get_resources(self, ids, cache=True):
         return self.query.get(self.manager, ids)
@@ -348,6 +353,7 @@ class QueryResourceManager(ResourceManager):
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
+            'Throttling',
             'Client.RequestLimitExceeded')))
 
     def __init__(self, data, options):

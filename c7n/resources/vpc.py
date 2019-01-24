@@ -100,6 +100,7 @@ class FlowLogFilter(Filter):
            'set-op': {'enum': ['or', 'and'], 'default': 'or'},
            'status': {'enum': ['active']},
            'deliver-status': {'enum': ['success', 'failure']},
+           'destination': {'type': 'string'},
            'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
@@ -123,6 +124,7 @@ class FlowLogFilter(Filter):
         log_group = self.data.get('log-group')
         traffic_type = self.data.get('traffic-type')
         destination_type = self.data.get('destination-type')
+        destination = self.data.get('destination')
         status = self.data.get('status')
         delivery_status = self.data.get('deliver-status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
@@ -131,7 +133,6 @@ class FlowLogFilter(Filter):
         results = []
         # looping over vpc resources
         for r in resources:
-
             if r[m.id] not in resource_map:
                 # we didn't find a flow log for this vpc
                 if enabled:
@@ -146,8 +147,10 @@ class FlowLogFilter(Filter):
             if enabled:
                 fl_matches = []
                 for fl in flogs:
-                    dest_match = (destination_type is None) or op(
+                    dest_type_match = (destination_type is None) or op(
                         fl['LogDestinationType'], destination_type)
+                    dest_match = (destination is None) or op(
+                        fl['LogDestination'], destination)
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
                     delivery_status_match = (delivery_status is None) or op(
                         fl['DeliverLogsStatus'], delivery_status.upper())
@@ -158,8 +161,8 @@ class FlowLogFilter(Filter):
                     log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
 
                     # combine all conditions to check if flow log matches the spec
-                    fl_match = (status_match and traffic_type_match and
-                                log_group_match and dest_match and delivery_status_match)
+                    fl_match = (status_match and traffic_type_match and dest_match and
+                                log_group_match and dest_type_match and delivery_status_match)
                     fl_matches.append(fl_match)
 
                 if set_op == 'or':
@@ -1208,6 +1211,12 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "Groups[].GroupId"
 
 
+@NetworkInterface.filter_registry.register('vpc')
+class InterfaceVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpress = "VpcId"
+
+
 @NetworkInterface.action_registry.register('modify-security-groups')
 class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Remove security groups from an interface.
@@ -1320,6 +1329,48 @@ class Route(ValueFilter):
                 r.setdefault('c7n:matched-routes', []).extend(matched)
                 results.append(r)
         return results
+
+
+@resources.register('transit-gateway')
+class TransitGateway(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
+        dimension = None
+        name = id = 'TransitGatewayId'
+        filter_name = 'TransitGatewayIds'
+        filter_type = 'list'
+
+
+class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        merged_params = dict(params)
+        merged_params.setdefault('Filters', []).append(
+            {'Name': parent_key, 'Values': [parent_id]})
+        return merged_params
+
+
+@query.sources.register('transit-attachment')
+class TransitAttachmentSource(query.ChildDescribeSource):
+
+    resource_query_factory = TransitGatewayAttachmentQuery
+
+
+@resources.register('transit-attachment')
+class TransitGatewayAttachment(query.ChildResourceManager):
+
+    child_source = 'transit-attachment'
+
+    class resource_type(object):
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
+        parent_spec = ('transit-gateway', 'transit-gateway-id', None)
+        dimension = None
+        name = id = 'TransitGatewayAttachmentId'
+        filter_name = None
+        filter_type = None
 
 
 @resources.register('peering-connection')
@@ -1707,6 +1758,14 @@ class VpcEndpoint(query.QueryResourceManager):
         id_prefix = "vpce-"
 
 
+@VpcEndpoint.filter_registry.register('cross-account')
+class EndpointCrossAccountFilter(CrossAccountAccessFilter):
+
+    policy_attribute = 'PolicyDocument'
+    annotation_key = 'c7n:CrossAccountViolations'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+
 @VpcEndpoint.filter_registry.register('security-group')
 class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
@@ -1717,6 +1776,12 @@ class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
 class EndpointSubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetIds[]"
+
+
+@VpcEndpoint.filter_registry.register('vpc')
+class EndpointVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
 
 
 @resources.register('key-pair')

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from googleapiclient.errors import HttpError
+
 from c7n.actions import Action as BaseAction
 from c7n.utils import local_session, chunks
 
@@ -38,6 +40,9 @@ class MethodAction(Action):
     # implicitly filter resources by state, (attr_name, (valid_enum))
     attr_filter = ()
 
+    # error codes that can be safely ignored
+    ignore_errors_codes = ()
+
     def validate(self):
         if not self.method_spec:
             raise NotImplementedError("subclass must define method_spec")
@@ -63,7 +68,7 @@ class MethodAction(Action):
             resources = self.filter_resources(resources)
         m = self.manager.get_model()
         session = local_session(self.manager.session_factory)
-        client = session.client(m.service, m.version, m.component)
+        client = self.get_client(session, m)
         for resource_set in chunks(resources, self.chunk_size):
             self.process_resource_set(client, m, resource_set)
 
@@ -73,9 +78,21 @@ class MethodAction(Action):
         annotation_key = self.method_spec.get('annotation_key')
         for r in resources:
             params = self.get_resource_params(model, r)
-            result = client.execute_command(op_name, params)
+            result = self.invoke_api(client, op_name, params)
             if result_key and annotation_key:
                 r[annotation_key] = result.get(result_key)
 
+    def invoke_api(self, client, op_name, params):
+        try:
+            return client.execute_command(op_name, params)
+        except HttpError as e:
+            if e.resp.status in self.ignore_error_codes:
+                return e
+            raise
+
     def get_resource_params(self, m, r):
         raise NotImplementedError("subclass responsibility")
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)

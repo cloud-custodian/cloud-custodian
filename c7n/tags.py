@@ -952,3 +952,54 @@ def universal_retry(method, ResourceARNList, **kw):
 
         time.sleep(delay)
         ResourceARNList = list(throttles)
+
+
+def coalesce_copy_user_tags(resource, copy_tags, user_tags):
+    """
+    Returns a list of tags from resource and user supplied in
+    the format: [{'Key': 'key', 'Value': 'value'}]
+
+    Due to drift on implementation on copy-tags/tags used throughout
+    the code base, the following options are supported:
+
+        copy_tags (Tags to copy from the resource):
+          - list of str, e.g. ['key1', 'key2', '*']
+          - bool
+
+        user_tags (User supplied tags to apply):
+          - dict of key-value pairs, e.g. {Key: Value, Key2: Value}
+          - list of dict e.g. [{'Key': k, 'Value': v}]
+
+    In the case that there is a conflict in a user supplied tag
+    and an existing tag on the resource, the user supplied tags will
+    take priority.
+
+    Additionally, a value of '*' in copy_tags can be used to signify
+    to copy all tags from the resource.
+    """
+
+    assert isinstance(copy_tags, bool) or isinstance(copy_tags, list)
+    assert isinstance(user_tags, dict) or isinstance(user_tags, list)
+
+    r_tags = resource.get('Tags', [])
+
+    if isinstance(copy_tags, list):
+        if '*' in copy_tags:
+            copy_keys = set([t['Key'] for t in r_tags])
+        else:
+            copy_keys = set(copy_tags)
+
+    if isinstance(copy_tags, bool):
+        if copy_tags is True:
+            copy_keys = set([t['Key'] for t in r_tags])
+        else:
+            copy_keys = set()
+
+    if isinstance(user_tags, dict):
+        user_tags = [{'Key': k, 'Value': v} for k, v in user_tags.items()]
+
+    user_keys = set([t['Key'] for t in user_tags])
+    tags_diff = list(copy_keys.difference(user_keys))
+    resource_tags_to_copy = [t for t in r_tags if t['Key'] in tags_diff]
+    user_tags.extend(resource_tags_to_copy)
+    return user_tags

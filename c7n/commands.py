@@ -27,14 +27,13 @@ import time
 import six
 import yaml
 
+from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.reports import report as do_report
-from c7n.utils import dumps, load_file
+from c7n.utils import dumps, load_file, local_session
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
-from c7n import schema
 
 
 log = logging.getLogger('custodian.commands')
@@ -173,6 +172,7 @@ def _print_no_policies_warning(options, policies):
 
 
 def validate(options):
+    from c7n import schema
     load_resources()
     if len(options.configs) < 1:
         log.error('no config files specified')
@@ -233,6 +233,16 @@ def validate(options):
 @policy_command
 def run(options, policies):
     exit_code = 0
+
+    # AWS - Sanity check that we have an assumable role before executing policies
+    # Todo - move this behind provider interface
+    if options.assume_role and [p for p in policies if p.provider_name == 'aws']:
+        try:
+            local_session(clouds['aws']().get_session_factory(options))
+        except ClientError:
+            log.exception("Unable to assume role %s", options.assume_role)
+            sys.exit(1)
+
     for policy in policies:
         try:
             policy()
@@ -249,6 +259,7 @@ def run(options, policies):
 
 @policy_command
 def report(options, policies):
+    from c7n.reports import report as do_report
     if len(policies) == 0:
         log.error('Error: must supply at least one policy')
         sys.exit(1)
@@ -299,6 +310,7 @@ def schema_completer(prefix):
     For the given prefix so far, return the possible options.  Note that
     filtering via startswith happens after this list is returned.
     """
+    from c7n import schema
     load_resources()
     components = prefix.split('.')
 
@@ -340,6 +352,7 @@ def schema_completer(prefix):
 
 def schema_cmd(options):
     """ Print info about the resources, actions and filters available. """
+    from c7n import schema
     if options.json:
         schema.json_dump(options.resource)
         return

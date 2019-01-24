@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.actions import Action
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
@@ -43,6 +43,12 @@ class EKSSubnetFilter(SubnetFilter):
 class EKSSGFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "resourcesVpcConfig.securityGroupIds[]"
+
+
+@EKS.filter_registry.register('vpc')
+class EKSVpcFilter(VpcFilter):
+
+    RelatedIdsExpression = 'resourcesVpcConfig.vpcId'
 
 
 @EKS.action_registry.register('delete')
