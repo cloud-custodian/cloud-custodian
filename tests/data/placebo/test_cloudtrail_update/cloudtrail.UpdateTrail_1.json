@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "skunk-trails",
+        "S3BucketName": "custodian-skunk-trails",
+        "IncludeGlobalServiceEvents": true,
+        "IsMultiRegionTrail": true,
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails",
+        "LogFileValidationEnabled": true,
+        "IsOrganizationTrail": false,
+        "ResponseMetadata": {
+            "RequestId": "0a06344a-0fd8-4d5a-b517-6df03f4f05f4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0a06344a-0fd8-4d5a-b517-6df03f4f05f4",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "257",
+                "date": "Wed, 23 Jan 2019 00:40:25 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
