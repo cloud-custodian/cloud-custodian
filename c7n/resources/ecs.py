@@ -95,14 +95,15 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
 
     def augment(self, resources):
         if resources[-1] == "trailevent":
-            split_r = split_arn(resources[0])
-            if len(split_r) < 3:
-                self.manager.log.warning(
-                        'Warning: cloudtrail mode requires new ARN format')
-                return []
-            client = local_session(self.manager.session_factory).client('ecs')
-            return self.process_cluster_resources(client, split_r[1], 
-                [split_r[2]])
+            res = []
+            for r in resources[:-1]:
+                split_r = split_arn(r)
+                if len(split_r) < 3:
+                    self.manager.log.warning(
+                        'Warning: ECS cloudtrail mode requires new ARN format')
+                    return []
+                res.append((split_r[1], split_r[2]))
+            resources = res
         
         parent_child_map = {}
         for pid, r in resources:
@@ -413,8 +414,6 @@ class ContainerInstance(query.ChildResourceManager):
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
-        supports_trailevents = True
-        filter_name = None
 
     @property
     def source_type(self):
