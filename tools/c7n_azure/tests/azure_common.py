@@ -60,7 +60,7 @@ class AzureVCRBaseTest(VCRTestCase):
     def _get_vcr(self, **kwargs):
         myvcr = super(VCRTestCase, self)._get_vcr(**kwargs)
         myvcr.register_matcher('azurematcher', self.azure_matcher)
-        myvcr.match_on = ['azurematcher']
+        myvcr.match_on = ['azurematcher', 'method']
 
         # Block recording when using fake token (tox runs)
         if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":

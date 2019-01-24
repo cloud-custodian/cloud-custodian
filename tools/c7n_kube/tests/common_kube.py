@@ -98,7 +98,7 @@ class KubeTest(TestUtils):
     def _get_vcr(self, **kwargs):
         myvcr = vcr.VCR(**kwargs)
         myvcr.register_matcher('kubematcher', self._kube_matcher)
-        myvcr.match_on = ['kubematcher']
+        myvcr.match_on = ['kubematcher', 'method']
         return myvcr
 
     def _get_cassette_library_dir(self):
