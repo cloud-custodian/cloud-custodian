@@ -95,7 +95,7 @@ class ResourceQuery(object):
             if getattr(m, 'supports_trailevents', False):
                 identities.append("trailevent")
                 return identities
-                
+
         params = {}
         client_filter = False
 

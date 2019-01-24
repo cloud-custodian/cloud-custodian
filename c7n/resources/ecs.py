@@ -45,8 +45,10 @@ def ecs_taggable(model, r):
         return True
     return len(path_parts) > 2
 
+
 def split_arn(rid):
     return rid.rsplit(':', 1)[-1].split('/')
+
 
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
@@ -104,7 +106,7 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
                     return []
                 res.append((split_r[1], split_r[2]))
             resources = res
-        
+
         parent_child_map = {}
         for pid, r in resources:
             parent_child_map.setdefault(pid, []).append(r)
