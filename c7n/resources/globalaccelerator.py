@@ -17,6 +17,8 @@ from c7n.actions import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, ChildResourceManager
 from c7n.utils import local_session, type_schema
+from c7n.resources import aws
+import copy
 
 actions = ActionRegistry('globalaccelerator.actions')
 
@@ -183,9 +185,8 @@ class ModifyAccelerator(BaseAction):
     '''Modifies an accelerator instance based on specified parameter
     using UpdateAccelerator and UpdateAcceleratorAttributes.
 
-    'update-accelerator-attributes' and 'uppate-accelerator' are arrays with
-    key value pairs that should be set to the property and value you wish to
-    modify.
+    'update-accelerator-attributes' and 'uppate-accelerator' are
+    dictionaries with the values you wish to modify.
 
     :example:
 
@@ -199,8 +200,7 @@ class ModifyAccelerator(BaseAction):
                 actions:
                   - type: set-global-accelerator
                     update:
-                      - property: 'Enabled'
-                        value: false
+                      - 'Enabled': false
 
     .. code-block:: yaml
 
@@ -210,35 +210,16 @@ class ModifyAccelerator(BaseAction):
                 actions:
                   - type: update-accelerator-attributes
                     update:
-                      - property: 'FlowLogsEnabled'
-                        value: false
+                      - 'FlowLogsEnabled': false
     '''
 
     schema = type_schema(
         'set-global-accelerator', **{
             'update-accelerator-attributes': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'property': {'type': 'string', 'enum': [
-                            'FlowLogsEnabled',
-                            'FlowLogsS3Bucket',
-                            'FlowLogsS3Prefix']},
-                        'value': {}
-                    },
-                },
+                'type': 'object',
             },
             'update-accelerator': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'property': {'type': 'string', 'enum': [
-                            'Enabled']},
-                        'value': {}
-                    },
-                },
+                'type': 'object',
             }
         }
     )
@@ -246,31 +227,40 @@ class ModifyAccelerator(BaseAction):
     permissions = ('globalaccelerator:UpdateAccelerator',
         'globalaccelerator:UpdateAcceleratorAttributes')
 
+    def validate(self):
+        for (type_schema_action, shape_name) in (
+            ('update-accelerator-attributes', 'UpdateAcceleratorAttributesRequest'),
+            ('update-accelerator', 'UpdateAcceleratorRequest')
+        ):
+
+            if type_schema_action not in self.data:
+                continue
+
+            api_call_shape = copy.deepcopy(self.data[type_schema_action])
+            api_call_shape['AcceleratorArn'] = 'PlaceHolderARN'
+            aws.shape_validate(api_call_shape, shape_name, 'globalaccelerator')
+
     def process(self, resources):
         c = local_session(self.manager.session_factory).client(
             'globalaccelerator', region_name=available_ga_region)
+
         update_iteration = (
             ('update-accelerator-attributes', c.update_accelerator_attributes),
             ('update-accelerator', c.update_accelerator))
 
         for (key, update_method) in update_iteration:
-
             for r in resources:
-                param = {}
-                schema_attributes = []
+                api_call_param = {}
+                requested_change_param = self.data.get(key, [])
+                for update_prop, requested_val in requested_change_param.items():
+                    if r.get(update_prop) != requested_val:
+                        api_call_param[update_prop] = requested_val
 
-                if key in self.data:
-                    schema_attributes = self.data.get(key)
-
-                for update in schema_attributes:
-                    update_prop = update['property']
-                    if r.get(update_prop) != update['value']:
-                        param[update_prop] = update['value']
-
-                if not param:
+                if not api_call_param:
                     continue
-                param['AcceleratorArn'] = r['AcceleratorArn']
-                update_method(**param)
+                api_call_param['AcceleratorArn'] = r['AcceleratorArn']
+
+                update_method(**api_call_param)
 
 
 @AcceleratorEndpointGroup.action_registry.register('modify')
@@ -288,47 +278,26 @@ class ModifyAcceleratorEndpoint(BaseAction):
             actions:
               - type: modify
                 update:
-                  - property: 'ThresholdCount'
-                    value: 5
+                  - 'ThresholdCount': 5
     '''
 
-    update_accelerator_endpoint = {
-        'type': 'array',
-        'items': {
-            'type': 'object',
-            'properties': {
-                'property': {
-                    'type': 'string',
-                    'enum': [
-                        'TrafficDialPercentage',
-                        'HealthCheckPort',
-                        'HealthCheckProtocol',
-                        'HealthCheckPath',
-                        'HealthCheckIntervalSeconds',
-                        'ThresholdCount',
-                    ]
-                },
-                'value': {},
-                'EndpointConfigurations': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'object',
-                        'properties': {
-                            'property': {'type': 'string', 'enum': ['EndpointId', 'Weight']},
-                            'value': {},
-                        }
-                    },
-                },
-            },
-        },
-    }
     schema = type_schema(
         'modify', **{
-            'update-accelerator-endpoint': update_accelerator_endpoint
+            'update-accelerator-endpoint': {'type': 'object'}
         }
     )
 
     permissions = ('globalaccelerator:UpdateEndpointGroup')
+
+    def validate(self):
+
+        requested_change_param = self.data.get('update-accelerator-endpoint')
+        if not requested_change_param:
+            return
+
+        api_call_shape = copy.deepcopy(requested_change_param)
+        api_call_shape['EndpointGroupArn'] = 'PlaceHolderEndpointGroupArn'
+        aws.shape_validate(api_call_shape, 'UpdateEndpointGroupRequest', 'globalaccelerator')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('globalaccelerator',
@@ -336,40 +305,22 @@ class ModifyAcceleratorEndpoint(BaseAction):
 
         for endpoint_group_resource in resources:
 
-            existing_endpoint_ids = set(())
-            param = {}
+            api_call_param = {}
+            requested_change_param = self.data.get('update-accelerator-endpoint', [])
 
-            for endpoint_data in endpoint_group_resource['EndpointDescriptions']:
-                existing_endpoint_ids.add(endpoint_data['EndpointId'])
+            for update_prop, requested_val in requested_change_param.items():
+                if update_prop == 'EndpointConfigurations':
+                    api_call_param[update_prop] = requested_val
+                elif endpoint_group_resource.get(update_prop) != requested_val:
+                    api_call_param[update_prop] = requested_val
 
-            for update in self.data.get('update-accelerator-endpoint'):
-                if 'property' in update:
-                    update_prop = update['property']
-                    if update_prop in endpoint_group_resource and (
-                            endpoint_group_resource[update_prop] != update['value']):
-                        param[update_prop] = update['value']
-
-                elif 'EndpointConfigurations' in update:
-                    for i in update['EndpointConfigurations']:
-
-                        # the EndpointId has to be in the resource
-                        if i['EndpointId'] in existing_endpoint_ids:
-                            if 'EndpointConfigurations' not in param:
-                                param['EndpointConfigurations'] = []
-
-                            param['EndpointConfigurations'].append({
-                                'EndpointId': i['EndpointId'],
-                                'Weight': i['Weight']
-                            })
-
-            if not param:
+            if not api_call_param:
                 continue
-
-            param['EndpointGroupArn'] = endpoint_group_resource['EndpointGroupArn']
+            api_call_param['EndpointGroupArn'] = endpoint_group_resource['EndpointGroupArn']
 
             # there's no exceptions to catch here. Bad update parameters are ignored and
             # a non existant ARN wouldn't make it this far
-            client.update_endpoint_group(**param)
+            client.update_endpoint_group(**api_call_param)
 
 
 @AcceleratorListener.action_registry.register('modify')
@@ -387,38 +338,26 @@ class ModifyAcceleratorListener(BaseAction):
             actions:
               - type: modify
                 update:
-                  - property: Protocol
-                    value: TCP
+                  - Protocol: TCP
             filters:
                   - Health: UDP
     '''
     schema = type_schema('modify',
         **{'update-accelerator-listener': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'property': {'type': 'string', 'enum': [
-                        'PortRanges',
-                        'Protocol',
-                        'ClientAffinity',
-                    ]},
-                    'value': {},
-                    'PortRanges': {
-                        'type': 'arrary',
-                        'items': {
-                            'type': 'object',
-                            'properties': {
-                                'FromPort': {'type': 'string'},
-                                'ToPort': {'type': 'string'},
-                            }
-                        },
-                    },
-                },
-            },
+            'type': 'object',
         }})
 
     permissions = ('globalaccelerator:UpdateListener')
+
+    def validate(self):
+
+        requested_change_param = self.data.get('update-accelerator-listener')
+        if not requested_change_param:
+            return
+
+        api_call_shape = copy.deepcopy(requested_change_param)
+        api_call_shape['ListenerArn'] = 'PlaceHolderARN'
+        aws.shape_validate(api_call_shape, 'UpdateListenerRequest', 'globalaccelerator')
 
     def process(self, resources):
 
@@ -426,18 +365,18 @@ class ModifyAcceleratorListener(BaseAction):
         region_name=available_ga_region)
 
         for r in resources:
-            param = {}
-            for update in self.data.get('update-accelerator-listener'):
-                port_ranges = update.get('PortRanges', [])
-                if port_ranges:
-                    param['PortRanges'] = port_ranges
-                else:
-                    if r[update['property']] != update['value']:
-                        param[update['property']] = update['value']
-            if not param:
+            api_call_param = {}
+            requested_change_param = self.data.get('update-accelerator-listener')
+            for update_prop, requested_val in requested_change_param.items():
+                if r.get(update_prop) != requested_val:
+                    api_call_param[update_prop] = requested_val
+
+            if not api_call_param:
                 continue
-            param['ListenerArn'] = r['ListenerArn']
+            api_call_param['ListenerArn'] = r['ListenerArn']
+
             try:
-                c.update_listener(**param)
+                c.update_listener(**api_call_param)
             except c.exceptions.ListenerNotFoundException:
-                raise
+                msg = "Can not find listener to modify. ListenerArn: %s" % (r['ListenerArn'],)
+                self.log.warning(msg)

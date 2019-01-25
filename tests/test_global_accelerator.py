@@ -45,19 +45,15 @@ class TestEndpointInstance(BaseTest):
                         'type': 'value', 'key': 'HealthCheckProtocol', 'value': 'HTTPS',
                         'op': 'not-equal'
                     }, ],
-                'actions': [{'type': 'modify',
-                    'update-accelerator-endpoint': [
-                        {
-                            'property': 'ThresholdCount',
-                            'value': 4,
+                'actions': [
+                    {
+                        'type': 'modify',
+                        'update-accelerator-endpoint': {
+                            'ThresholdCount': 4,
+                            'EndpointConfigurations': [{'EndpointId': endpoint_id, 'Weight': 0}, ]
                         },
-                        {
-                            'EndpointConfigurations': [
-                                {'EndpointId': endpoint_id, 'Weight': 0},
-                            ]
-                        },
-                    ],
-                }],
+                    },
+                ],
             },
             session_factory=session_factory,
         )
@@ -144,19 +140,17 @@ class TestListener(BaseTest):
             {
                 'name': 'set-global-accelerator-listener',
                 'resource': 'global-accelerator-listener',
-                'actions': [{'type': 'modify',
-                    'update-accelerator-listener': [
-                        {
-                            'property': 'ClientAffinity',
-                            'value': 'SOURCE_IP',
-                        },
-                        {
+                'actions': [
+                    {
+                        'type': 'modify',
+                        'update-accelerator-listener': {
+                            'ClientAffinity': 'SOURCE_IP',
                             'PortRanges': [
-                                {'FromPort': 82, 'ToPort': 83}
-                            ]
+                                {'FromPort': 82, 'ToPort': 83},
+                            ],
                         },
-                    ],
-                }],
+                    },
+                ],
             },
             session_factory=session_factory,
         )
@@ -243,12 +237,12 @@ class TestAcceleratorInstance(BaseTest):
                 'actions': [
                     {
                         'type': 'set-global-accelerator',
-                        'update-accelerator': [{'property': 'Enabled', 'value': True}],
-                        'update-accelerator-attributes': [
-                            {'property': 'FlowLogsEnabled', 'value': True},
-                            {'property': 'FlowLogsS3Bucket', 'value': bucket_name},
-                            {'property': 'FlowLogsS3Prefix', 'value': 'us-west-2'},
-                        ],
+                        'update-accelerator': {'Enabled': True},
+                        'update-accelerator-attributes': {
+                            'FlowLogsEnabled': True,
+                            'FlowLogsS3Bucket': bucket_name,
+                            'FlowLogsS3Prefix': 'us-west-2',
+                        },
                     }
                 ],
             },
