@@ -77,6 +77,20 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_flow_logs_s3_destination(self):
+        factory = self.replay_flight_data('test_vpc_flow_log_s3_dest')
+        p = self.load_policy({
+            'name': 'flow-s3',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'flow-logs',
+                'enabled': True,
+                'destination': 'arn:aws:s3:::c7n-vpc-flow-logs'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
     def test_flow_logs_absent(self):
         # Test that ONLY vpcs with no flow logs are retained
         #
@@ -569,6 +583,27 @@ class NetworkAclTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TransitGatewayTest(BaseTest):
+
+    def test_tgw_query(self):
+        factory = self.replay_flight_data('test_transit_gateway_query')
+        p = self.load_policy({
+            'name': 'test-tgw',
+            'resource': 'transit-gateway'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Description'], 'test')
+
+    def test_tgw_attachment(self):
+        factory = self.replay_flight_data('test_transit_gateway_attachment_query')
+        p = self.load_policy({
+            'name': 'test-tgw-att',
+            'resource': 'transit-attachment'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ResourceId'], 'vpc-f1516b97')
 
 
 class NetworkInterfaceTest(BaseTest):

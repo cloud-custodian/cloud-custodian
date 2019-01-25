@@ -132,6 +132,32 @@ class AzurePolicyModeTest(BaseTest):
 
         self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
 
+    def test_init_azure_function_mode_invalid_policy_name(self):
+        p = self.load_policy({
+            'name': 'this-policy-name-is-going-to-be-too-long-since-the-maximum-size-is-60',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']}
+        })
+
+        function_mode = AzureFunctionMode(p)
+        with self.assertRaises(ValueError):
+            function_mode.get_function_app_params()
+
+    def test_init_azure_function_mode_invalid_characters_in_policy_name(self):
+        p = self.load_policy({
+            'name': 'invalid_policy_name1',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']}
+        })
+
+        function_mode = AzureFunctionMode(p)
+        params = function_mode.get_function_app_params()
+        self.assertRegexpMatches(params.function_app_name, "invalid-policy-name1-[a-zA-Z0-9]+")
+
     def test_init_azure_function_mode_with_resource_ids(self):
         ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
                 '/testrg/providers/microsoft.insights/components/testai'

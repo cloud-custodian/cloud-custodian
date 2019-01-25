@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "TableNames": [
+            "test-table-kms-filter"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "BPJ3UA8CBLRGUSL19D7MCPRHJ7VV4KQNSO5AEMVJF66Q9ASUAAJG",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Tue, 15 Jan 2019 23:11:07 GMT",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "40",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "BPJ3UA8CBLRGUSL19D7MCPRHJ7VV4KQNSO5AEMVJF66Q9ASUAAJG",
+                "x-amz-crc32": "3417179002"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

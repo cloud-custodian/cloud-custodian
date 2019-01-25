@@ -70,27 +70,26 @@ class ResizePlan(AzureBaseAction):
         }
     )
 
-    def process_resource_set(self, plans):
-        client = self.manager.get_client()  # type: azure.mgmt.web.WebSiteManagementClient
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()  # type: azure.mgmt.web.WebSiteManagementClient
 
-        for plan in plans:
-            model = models.AppServicePlan(location=plan['location'])
+    def _process_resource(self, resource):
+        model = models.AppServicePlan(location=resource['location'])
 
-            if 'size' in self.data:
-                size = self.data.get('size')
-                model.sku = models.SkuDescription()
-                model.sku.tier = ResizePlan.get_sku_name(size)
-                model.sku.name = size
+        if 'size' in self.data:
+            size = self.data.get('size')
+            model.sku = models.SkuDescription()
+            model.sku.tier = ResizePlan.get_sku_name(size)
+            model.sku.name = size
 
-            if 'count' in self.data:
-                model.target_worker_count = self.data.get('count')
+        if 'count' in self.data:
+            model.target_worker_count = self.data.get('count')
 
-            try:
-                client.app_service_plans.update(plan['resourceGroup'], plan['name'], model)
-            except models.DefaultErrorResponseException as e:
-                self.log.error("Failed to resize %s.  Inner exception: %s" %
-                               (plan['name'], e.inner_exception))
-                raise
+        try:
+            self.client.app_service_plans.update(resource['resourceGroup'], resource['name'], model)
+        except models.DefaultErrorResponseException as e:
+            self.log.error("Failed to resize %s.  Inner exception: %s" %
+                           (resource['name'], e.inner_exception))
 
     @staticmethod
     def get_sku_name(tier):
