@@ -19,7 +19,6 @@ import datetime
 import logging
 from email.utils import parseaddr
 
-from concurrent.futures import as_completed
 from datetime import timedelta
 
 import jmespath
@@ -37,7 +36,7 @@ from c7n.filters import FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
 from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema, chunks
+from c7n.utils import type_schema
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -45,10 +44,11 @@ class AzureBaseAction(BaseAction):
     session = None
     max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
     chunk_size = constants.DEFAULT_CHUNK_SIZE
+    log = logging.getLogger('custodian.azure.AzureBaseAction')
 
-    def process(self, resources):
+    def process(self, resources, event=None):
         self.session = self.manager.get_session()
-        results, exceptions = self.process_in_parallel(resources)
+        results, exceptions = self.process_in_parallel(resources, event)
 
         if len(exceptions) > 0:
             self.handle_exceptions(exceptions)
@@ -60,20 +60,57 @@ class AzureBaseAction(BaseAction):
         the stack trace"""
         raise exceptions[0]
 
-    def process_in_parallel(self, resources):
+    def process_in_parallel(self, resources, event):
         return ThreadHelper.execute_in_parallel(
             resources=resources,
-            execution_method=self.process_resource_set,
+            event=event,
+            execution_method=self._process_resources,
             executor_factory=self.executor_factory,
             log=self.log,
             max_workers=self.max_workers,
             chunk_size=self.chunk_size
         )
 
+    def _process_resources(self, resources, event):
+        self._prepare_processing()
+
+        for r in resources:
+            try:
+                self._process_resource(r)
+            except CloudError as e:
+                self.log.error("Failed to process resource.\n"
+                               "Type: {0}.\n"
+                               "Name: {1}.\n"
+                               "Error: {2}".format(r['type'], r['name'], e))
+
+    def _prepare_processing(self):
+        pass
+
     @abc.abstractmethod
-    def process_resource_set(self, resources):
+    def _process_resource(self, resource):
         raise NotImplementedError(
-            "Base action class does not implement behavior")
+            "Base action class does not implement this behavior")
+
+
+@six.add_metaclass(abc.ABCMeta)
+class AzureEventAction(EventAction, AzureBaseAction):
+
+    def _process_resources(self, resources, event):
+        self._prepare_processing()
+
+        for r in resources:
+            try:
+                self._process_resource(r, event)
+            except CloudError as e:
+                self.log.error("Failed to process resource.\n"
+                               "Type: {0}.\n"
+                               "Name: {1}.\n"
+                               "Error: {2}".format(r['type'], r['name'], e))
+
+    @abc.abstractmethod
+    def _process_resource(self, resource, event):
+        raise NotImplementedError(
+            "Base action class does not implement this behavior")
 
 
 class Tag(AzureBaseAction):
@@ -115,10 +152,11 @@ class Tag(AzureBaseAction):
 
         return self
 
-    def process_resource_set(self, resources):
-        for resource in resources:
-            new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
-            TagHelper.add_tags(self, resource, new_tags)
+    def _prepare_processing(self,):
+        self.new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
+
+    def _process_resource(self, resource):
+        TagHelper.add_tags(self, resource, self.new_tags)
 
 
 class RemoveTag(AzureBaseAction):
@@ -147,13 +185,14 @@ class RemoveTag(AzureBaseAction):
             raise FilterValidationError("Must specify tags")
         return self
 
-    def process_resource_set(self, resources):
-        for resource in resources:
-            tags_to_delete = self.data.get('tags')
-            TagHelper.remove_tags(self, resource, tags_to_delete)
+    def _prepare_processing(self,):
+        self.tags_to_delete = self.data.get('tags')
+
+    def _process_resource(self, resource):
+        TagHelper.remove_tags(self, resource, self.tags_to_delete)
 
 
-class AutoTagUser(EventAction):
+class AutoTagUser(AzureEventAction):
     """Attempts to tag a resource with the first user who created/modified it.
 
     .. code-block:: yaml
@@ -211,56 +250,26 @@ class AutoTagUser(EventAction):
 
         return self
 
-    def process(self, resources, event=None):
+    def _prepare_processing(self):
         self.session = self.manager.get_session()
         self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
         self.tag_key = self.data['tag']
         self.should_update = self.data.get('update', False)
 
-        futures = []
-        results = []
-        exceptions = []
+    def _process_resource(self, resource, event):
+        # if the auto-tag-user policy set update to False (or it's unset) then we
+        # will skip writing their UserName tag and not overwrite pre-existing values
+        if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
+            return
 
-        max_num_workers = 1 if ThreadHelper.disable_multi_threading \
-            else constants.DEFAULT_MAX_THREAD_WORKERS
+        user = self.default_user
+        if event:
+            user = self._get_user_from_event(event) or user
+        else:
+            user = self._get_user_from_resource_logs(resource) or user
 
-        with self.executor_factory(max_workers=max_num_workers) as w:
-            for resource_set in chunks(resources, constants.DEFAULT_CHUNK_SIZE):
-                futures.append(w.submit(self.process_resource_set, resource_set, event))
-
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error(
-                        "Execution failed with error: %s" % f.exception())
-                    exceptions.append(f.exception())
-                    continue
-                else:
-                    result = f.result()
-                    if result:
-                        results.extend(result)
-
-            return results, list(set(exceptions))
-
-    def process_resource_set(self, resources, event=None):
-        for resource in resources:
-            # if the auto-tag-user policy set update to False (or it's unset) then we
-            # will skip writing their UserName tag and not overwrite pre-existing values
-            if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
-                return
-
-            user = self.default_user
-            if event:
-                user = self._get_user_from_event(event) or user
-            else:
-                user = self._get_user_from_resource_logs(resource) or user
-
-            # issue tag action to label user
-            try:
-                TagHelper.add_tags(self, resource, {self.tag_key: user})
-            except CloudError as e:
-                # resources can be locked
-                if e.inner_exception.error == 'ScopeLocked':
-                    pass
+        # issue tag action to label user
+        TagHelper.add_tags(self, resource, {self.tag_key: user})
 
     def _get_user_from_event(self, event):
         principal_role = self.principal_role_jmes_path.search(event)
@@ -397,31 +406,29 @@ class TagTrim(AzureBaseAction):
             raise FilterValidationError("Space must be between 0 and 15")
         return self
 
-    def process_resource_set(self, resources):
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+    def _process_resource(self, resource):
+        tags = resource.get('tags', {})
 
-            if self.space and len(tags) + self.space <= self.max_tag_count:
-                return
+        if self.space and len(tags) + self.space <= self.max_tag_count:
+            return
 
-            # delete tags
-            keys = set(tags)
-            tags_to_preserve = self.preserve.intersection(keys)
-            candidates = keys - tags_to_preserve
+        # delete tags
+        keys = set(tags)
+        tags_to_preserve = self.preserve.intersection(keys)
+        candidates = keys - tags_to_preserve
 
-            if self.space:
-                # Free up slots to fit
-                remove = (len(candidates) -
-                          (self.max_tag_count - (self.space + len(tags_to_preserve))))
-                candidates = list(sorted(candidates))[:remove]
+        if self.space:
+            # Free up slots to fit
+            remove = (len(candidates) -
+                      (self.max_tag_count - (self.space + len(tags_to_preserve))))
+            candidates = list(sorted(candidates))[:remove]
 
-            if not candidates:
-                self.log.warning(
-                    "Could not find any candidates to trim %s" % resource['id'])
-                return
+        if not candidates:
+            self.log.warning(
+                "Could not find any candidates to trim %s" % resource['id'])
+            return
 
-            TagHelper.remove_tags(self, resource, candidates)
+        TagHelper.remove_tags(self, resource, candidates)
 
 
 class Notify(BaseNotify):
@@ -569,23 +576,21 @@ class TagDelayedAction(AzureBaseAction):
 
         return action_date_string
 
-    def process_resource_set(self, resources):
-        for resource in resources:
-            # get existing tags
-            tags = resource.get('tags', {})
+    def _process_resource(self, resource):
+        tags = resource.get('tags', {})
 
-            # add new tag
-            tags[self.tag] = self.msg
+        # add new tag
+        tags[self.tag] = self.msg
 
-            TagHelper.update_resource_tags(self, resource, tags)
+        TagHelper.update_resource_tags(self, resource, tags)
 
 
 class DeleteAction(AzureBaseAction):
     schema = type_schema('delete')
 
-    def process_resource_set(self, resources):
-        #: :type: azure.mgmt.resource.ResourceManagementClient
-        client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
-        for resource in resources:
-            client.resources.delete_by_id(resource['id'],
-                                          self.session.resource_api_version(resource['id']))
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
+
+    def _process_resource(self, resource):
+        self.client.resources.delete_by_id(resource['id'],
+                                      self.session.resource_api_version(resource['id']))
