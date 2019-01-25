@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from mock import patch
+from mock import patch, Mock
+import types
 
 from azure_common import BaseTest
 from c7n_azure.utils import Math
@@ -22,6 +23,7 @@ from c7n_azure.utils import StringUtils
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import PortsRangeHelper
 from c7n_azure.utils import AppInsightsHelper
+from c7n_azure.utils import custodian_azure_send_override
 
 
 RESOURCE_ID = (
@@ -178,3 +180,50 @@ class UtilsTest(BaseTest):
         self.assertEqual(AppInsightsHelper.get_instrumentation_key('azure://resourceGroup/name'),
                          GUID)
         mock_handler_run.assert_called_once_with('resourceGroup', 'name')
+
+    @patch('c7n_azure.utils.send_logger.debug')
+    def test_custodian_azure_send_override_200(self, logger):
+        mock = Mock()
+        mock.send = types.MethodType(custodian_azure_send_override, mock)
+
+        response_dict = {
+            'headers': {'x-ms-ratelimit-remaining-subscription-reads': '12000'},
+            'status_code': 200
+        }
+        mock.orig_send.return_value = type(str('response'), (), response_dict)
+        mock.send('')
+
+        self.assertEqual(mock.orig_send.call_count, 1)
+        self.assertEqual(logger.call_count, 2)
+
+    @patch('c7n_azure.utils.send_logger.debug')
+    @patch('c7n_azure.utils.send_logger.warning')
+    def test_custodian_azure_send_override_429(self, logger_debug, logger_warning):
+        mock = Mock()
+        mock.send = types.MethodType(custodian_azure_send_override, mock)
+
+        response_dict = {
+            'headers': {'Retry-After': 0},
+            'status_code': 429
+        }
+        mock.orig_send.return_value = type(str('response'), (), response_dict)
+        mock.send('')
+
+        self.assertEqual(mock.orig_send.call_count, 3)
+        self.assertEqual(logger_debug.call_count, 3)
+        self.assertEqual(logger_warning.call_count, 3)
+
+    @patch('c7n_azure.utils.send_logger.error')
+    def test_custodian_azure_send_override_429_long_retry(self, logger):
+        mock = Mock()
+        mock.send = types.MethodType(custodian_azure_send_override, mock)
+
+        response_dict = {
+            'headers': {'Retry-After': 60},
+            'status_code': 429
+        }
+        mock.orig_send.return_value = type(str('response'), (), response_dict)
+        mock.send('')
+
+        self.assertEqual(mock.orig_send.call_count, 1)
+        self.assertEqual(logger.call_count, 1)

@@ -16,6 +16,7 @@ import datetime
 import hashlib
 import logging
 import re
+import time
 import uuid
 from builtins import bytes
 from concurrent.futures import as_completed
@@ -99,36 +100,79 @@ def azure_name_value_pair(name, value):
     return NameValuePair(**{'name': name, 'value': value})
 
 
+send_logger = logging.getLogger('custodian.azure.utils.ServiceClient.send')
+
+
+def custodian_azure_send_override(self, request, headers=None, content=None, **kwargs):
+    """ Overrides ServiceClient.send() function to implement retries & log headers
+    """
+    retries = 0
+    max_retries = 3
+    while retries < max_retries:
+        response = self.orig_send(request, headers, content, **kwargs)
+
+        send_logger.debug(response.status_code)
+        for k, v in response.headers.items():
+            if k.startswith('x-ms-ratelimit'):
+                send_logger.debug(k + ':' + v)
+
+        # Retry codes from urllib3/util/retry.py
+        if response.status_code in [413, 429, 503]:
+            retry_after = None
+            for k in response.headers.keys():
+                if StringUtils.equal('retry-after', k):
+                    retry_after = int(response.headers[k])
+
+            if retry_after is not None and retry_after < constants.DEFAULT_MAX_RETRY_AFTER:
+                send_logger.warning('Received retriable error code %i. Retry-After: %i'
+                                    % (response.status_code, retry_after))
+                time.sleep(retry_after)
+                retries += 1
+            else:
+                send_logger.error("Received throttling error, retry time is %i"
+                                  "(retry only if < %i seconds)."
+                                  % (retry_after, constants.DEFAULT_MAX_RETRY_AFTER))
+                break
+        else:
+            break
+    return response
+
+
 class ThreadHelper:
 
     disable_multi_threading = False
 
     @staticmethod
-    def execute_in_parallel(resources, execution_method, executor_factory, log,
+    def execute_in_parallel(resources, event, execution_method, executor_factory, log,
                             max_workers=constants.DEFAULT_MAX_THREAD_WORKERS,
                             chunk_size=constants.DEFAULT_CHUNK_SIZE):
         futures = []
         results = []
         exceptions = []
 
-        max_num_workers = 1 if ThreadHelper.disable_multi_threading else max_workers
+        if ThreadHelper.disable_multi_threading:
+            try:
+                result = execution_method(resources, event)
+                if result:
+                    results.extend(result)
+            except Exception as e:
+                exceptions.append(e)
+        else:
+            with executor_factory(max_workers=max_workers) as w:
+                for resource_set in chunks(resources, chunk_size):
+                    futures.append(w.submit(execution_method, resource_set, event))
 
-        with executor_factory(max_workers=max_num_workers) as w:
-            for resource_set in chunks(resources, chunk_size):
-                futures.append(w.submit(execution_method, resource_set))
+                for f in as_completed(futures):
+                    if f.exception():
+                        log.error(
+                            "Execution failed with error: %s" % f.exception())
+                        exceptions.append(f.exception())
+                    else:
+                        result = f.result()
+                        if result:
+                            results.extend(result)
 
-            for f in as_completed(futures):
-                if f.exception():
-                    log.error(
-                        "Execution failed with error: %s" % f.exception())
-                    exceptions.append(f.exception())
-                    continue
-                else:
-                    result = f.result()
-                    if result:
-                        results.extend(result)
-
-            return results, list(set(exceptions))
+        return results, list(set(exceptions))
 
 
 class Math(object):

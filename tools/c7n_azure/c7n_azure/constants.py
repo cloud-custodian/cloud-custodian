@@ -52,3 +52,8 @@ Threading Variable
 """
 DEFAULT_MAX_THREAD_WORKERS = 3
 DEFAULT_CHUNK_SIZE = 20
+
+"""
+Custom Retry Code Variables
+"""
+DEFAULT_MAX_RETRY_AFTER = 30

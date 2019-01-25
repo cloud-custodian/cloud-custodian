@@ -16,6 +16,7 @@ import importlib
 import json
 import logging
 import os
+import types
 
 import jwt
 from azure.common.credentials import (BasicTokenAuthentication,
@@ -24,7 +25,7 @@ from azure.common.credentials import (BasicTokenAuthentication,
 from msrestazure.azure_active_directory import MSIAuthentication
 
 from c7n_azure import constants
-from c7n_azure.utils import ResourceIdParser, StringUtils
+from c7n_azure.utils import ResourceIdParser, StringUtils, custodian_azure_send_override
 
 try:
     from azure.cli.core._profile import Profile
@@ -147,7 +148,17 @@ class Session(object):
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
-        return klass(self.credentials, self.subscription_id)
+        client = klass(self.credentials, self.subscription_id)
+
+        # Override send() method to log request limits & custom retries
+        service_client = client._client
+        service_client.orig_send = service_client.send
+        service_client.send = types.MethodType(custodian_azure_send_override, service_client)
+
+        # Don't respect retry_after_header to implement custom retries
+        service_client.config.retry_policy.policy.respect_retry_after_header = False
+
+        return client
 
     def get_credentials(self):
         self._initialize_session()
