@@ -268,17 +268,17 @@ class ModifyAcceleratorEndpoint(BaseAction):
     '''Modifies an accelerator endpoint based on specified parameter
     using UpdateEndpointGroup.
 
-
     :example:
 
     .. code-block:: yaml
+
         policies:
           - name: set-global-accelerator-endpoint-threshold
             resource: global-accelerator-endpoint-group
             actions:
               - type: modify
                 update:
-                  - 'ThresholdCount': 5
+                  - ThresholdCount: 5
     '''
 
     schema = type_schema(
