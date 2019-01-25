@@ -287,7 +287,7 @@ class ModifyAcceleratorEndpoint(BaseAction):
         }
     )
 
-    permissions = ('globalaccelerator:UpdateEndpointGroup')
+    permissions = ('globalaccelerator:UpdateEndpointGroup', )
 
     def validate(self):
 
@@ -347,7 +347,7 @@ class ModifyAcceleratorListener(BaseAction):
             'type': 'object',
         }})
 
-    permissions = ('globalaccelerator:UpdateListener')
+    permissions = ('globalaccelerator:UpdateListener', )
 
     def validate(self):
 
