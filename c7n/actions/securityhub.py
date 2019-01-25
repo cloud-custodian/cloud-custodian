@@ -220,7 +220,7 @@ class PostFinding(BaseAction):
                                 'title', self.manager.ctx.policy.name)),
                         'value': '{}:{}'.format(
                             finding['Id'], created_at)},
-                        self.manager).process(resources)
+                        self.manager).process(resource_set)
                 else:
                     stats['Update'] += len(resource_set)
 

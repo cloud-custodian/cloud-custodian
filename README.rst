@@ -96,7 +96,7 @@ First a policy file needs to be created in YAML format, as an example::
       - encrypt-keys
 
   - name: ec2-require-non-public-and-encrypted-volumes
-    resource: ec2
+    resource: aws.ec2
     description: |
       Provision a lambda and cloud watch event target
       that looks at all new instances and terminates those with
@@ -106,14 +106,14 @@ First a policy file needs to be created in YAML format, as an example::
       events:
           - RunInstances
     filters:
-      - type: aws.ebs
+      - type: ebs
         key: Encrypted
         value: false
     actions:
       - terminate
 
   - name: tag-compliance
-    resource: ec2
+    resource: aws.ec2
     description: |
       Schedule a resource that does not meet tag compliance policies
       to be stopped in four days.
