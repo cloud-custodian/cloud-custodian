@@ -1,0 +1,22 @@
+{
+    "status_code": 204,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "f32040e8-206a-11e9-9f57-ede7b1e220da",
+            "HTTPStatusCode": 204,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "0",
+                "connection": "keep-alive",
+                "date": "Fri, 25 Jan 2019 06:32:12 GMT",
+                "x-amzn-requestid": "f32040e8-206a-11e9-9f57-ede7b1e220da",
+                "x-amz-apigw-id": "UDAJBFs9IAMFnHw=",
+                "x-amzn-trace-id": "Root=1-5c4aad6c-472aab7d50de0fd477c35ba1;Sampled=1",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 b725668ed5e7fee15df514227cc8801b.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "E6w02RinV1JGf6Je9B5ftnYCghClpLOItYJWLIjfrDrMxe9TvD5AlA=="
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
