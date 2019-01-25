@@ -30,6 +30,6 @@ setup(
         "jsonschema",
         "jsonpatch>=1.21",
         "argcomplete",
-        "tabulate"
+        "tabulate==0.8.2"
     ],
 )
