@@ -535,7 +535,6 @@ class IamGroupFilterUsage(BaseTest):
             ['arn:aws:iam::644160558196:group/Admins',
              'arn:aws:iam::644160558196:group/powerusers'])
 
-
     def test_iam_group_unused_users(self):
         session_factory = self.replay_flight_data("test_iam_group_unused_users")
         self.patch(IamGroupUsers, "executor_factory", MainThreadExecutor)
