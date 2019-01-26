@@ -43,7 +43,6 @@ def get_archive(config):
     archive = PythonPackageArchive(
         'c7n_mailer',
         # core deps
-        'redis', 'datadog', 'slackclient', 'requests')
         'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis',
         # transport datadog - recursive deps
         'datadog', 'simplejson', 'decorator',
