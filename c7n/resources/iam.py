@@ -55,6 +55,7 @@ class Group(QueryResourceManager):
         config_type = "AWS::IAM::Group"
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
     def get_resources(self, resource_ids, cache=True):
         """For IAM Groups on events, resource ids are Group Names."""
@@ -86,6 +87,7 @@ class Role(QueryResourceManager):
         config_type = "AWS::IAM::Role"
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
     def get_resources(self, resource_ids, cache=True):
         """For IAM Roles on events, resource ids are role names."""
@@ -113,6 +115,7 @@ class User(QueryResourceManager):
         config_type = "AWS::IAM::User"
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -150,6 +153,7 @@ class Policy(QueryResourceManager):
         filter_name = None
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
     arn_path_prefix = "aws:policy/"
 
@@ -188,6 +192,7 @@ class InstanceProfile(QueryResourceManager):
         dimension = None
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
 
 @resources.register('iam-certificate')
