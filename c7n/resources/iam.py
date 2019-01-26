@@ -38,6 +38,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
+from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
 from c7n.utils import local_session, type_schema, chunks, filter_empty
 
 
@@ -105,6 +106,7 @@ class User(QueryResourceManager):
     class resource_type(object):
         service = 'iam'
         type = 'user'
+        detail_spec = ('get_user', 'UserName', 'UserName', 'User')
         enum_spec = ('list_users', 'Users', None)
         filter_name = None
         id = name = 'UserName'
@@ -128,11 +130,54 @@ class DescribeUser(DescribeSource):
         for rid in resource_ids:
             try:
                 resources.append(client.get_user(UserName=rid).get('User'))
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'NoSuchEntityException':
-                    continue
-                raise
+            except client.exceptions.NoSuchEntityException:
+                continue
         return resources
+
+
+@User.action_registry.register('tag')
+class UserTag(Tag):
+    """Tag an iam user."""
+
+    permissions = ('iam:TagUser',)
+
+    def process_resource_set(self, users, tags):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in users:
+            try:
+                client.tag_user(UserName=u['UserName'], Tags=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
+@User.action_registry.register('remove-tag')
+class UserRemoveTag(RemoveTag):
+    """Remove tags from an iam user."""
+
+    permissions = ('iam:UntagUser',)
+
+    def process_resource_set(self, users, tags):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in users:
+            try:
+                client.untag_user(UserName=u['UserName'], TagKeys=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
+@User.action_registry.register('mark-for-op')
+class UserTagDelayedAction(TagDelayedAction):
+
+    # inherit __doc__ from base class
+
+    permissions = ('iam:TagUser',)
+
+    def process_resource_set(self, users, tags):
+        tagger = self.manager.action_registry['tag']({}, self.manager)
+        tagger.process_resource_set(users, tags)
+
+
+User.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('iam-policy')

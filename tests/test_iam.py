@@ -71,10 +71,10 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 4)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(
             sorted([r["UserName"] for r in resources]),
-            ["Hazmat", "charmworld", "kaleb", "kapilt"],
+            ["Hazmat", "kapilt"],
         )
 
     def test_credential_access_key_multifilter_delete(self):
@@ -210,6 +210,40 @@ class UserCredentialReportTest(BaseTest):
         )
 
 
+class IamUserTag(BaseTest):
+
+    def test_iam_user_actions(self):
+        factory = self.replay_flight_data('test_iam_user_tags')
+        p = self.load_policy({
+            'name': 'iam-tag',
+            'resource': 'iam-user',
+            'filters': [{
+                'tag:Role': 'Dev'}],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                 'tags': ['Role']},
+                {'type': 'mark-for-op',
+                 'op': 'delete',
+                 'days': 2}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client('iam')
+        if self.recording:
+            time.sleep(1)
+        user = client.get_user(UserName=resources[0]['UserName']).get('User')
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in user['Tags']},
+            {'Env': 'Dev',
+             'maid_status': 'Resource does not meet policy: delete@2019/01/25'})
+
+
 class IAMMFAFilter(BaseTest):
 
     def test_iam_mfa_filter(self):
@@ -320,6 +354,7 @@ class IamUserTest(BaseTest):
             resources[0]['c7n:matched-keys'][0]['c7n:matched-type'], 'access')
 
     def test_iam_user_delete_some_access(self):
+        # TODO: this test could use a rewrite
         factory = self.replay_flight_data("test_iam_user_delete_options")
         p = self.load_policy(
             {

@@ -57,18 +57,20 @@ def register_ec2_tags(filters, actions):
     actions.register('normalize-tag', NormalizeTag)
 
 
-def register_universal_tags(filters, actions):
+def register_universal_tags(filters, actions, compatibility=True):
     filters.register('marked-for-op', TagActionFilter)
     filters.register('tag-count', TagCountFilter)
 
-    actions.register('mark', UniversalTag)
-    actions.register('tag', UniversalTag)
+    if compatibility:
+        actions.register('mark', UniversalTag)
 
+    actions.register('tag', UniversalTag)
     actions.register('auto-tag-user', AutoTagUser)
     actions.register('mark-for-op', UniversalTagDelayedAction)
 
-    actions.register('unmark', UniversalUntag)
-    actions.register('untag', UniversalUntag)
+    if compatibility:
+        actions.register('unmark', UniversalUntag)
+        actions.register('untag', UniversalUntag)
     actions.register('remove-tag', UniversalUntag)
 
 
