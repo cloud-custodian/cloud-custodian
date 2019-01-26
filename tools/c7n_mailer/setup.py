@@ -26,7 +26,6 @@ requires = [
     "python-dateutil>=2.6",
     "ruamel.yaml==0.15.42",
     "datadog",
-    "slackclient",
     "sendgrid",
     "ldap3",
     "redis"]

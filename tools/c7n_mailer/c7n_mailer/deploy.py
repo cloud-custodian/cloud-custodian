@@ -46,11 +46,8 @@ def get_archive(config):
         'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis',
         # transport datadog - recursive deps
         'datadog', 'simplejson', 'decorator',
-        # transport slack - recursive deps
-        'slackclient', 'websocket',
         # requests (recursive deps), needed by datadog and slackclient
         'requests', 'urllib3', 'idna', 'chardet', 'certifi')
-
 
     for d in set(config['templates_folders']):
         if not os.path.exists(d):
