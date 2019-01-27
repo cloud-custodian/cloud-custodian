@@ -190,27 +190,25 @@ class ModifyAccelerator(BaseAction):
 
     :example:
 
-    .. code-block:: yaml
+    .. code-block: yaml
 
-            policies:
-              - name: disable-accelerator-protection
-                resource: global-accelerator-listener
-                filters:
-                  - enabled: true
-                actions:
-                  - type: set-global-accelerator
-                    update:
-                      - 'Enabled': false
+        policies:
+          - name: disable-accelerator-protection
+            resource: global-accelerator-listener
+            filters:
+              - enabled: true
+            actions:
+              - type: set-global-accelerator
+                update:
+                  - 'Enabled': false
 
-    .. code-block:: yaml
-
-            policies:
-              - name: disable-accelerator-flowlogs-protection
-                resource: global-accelerator-listener
-                actions:
-                  - type: update-accelerator-attributes
-                    update:
-                      - 'FlowLogsEnabled': false
+        policies:
+          - name: disable-accelerator-flowlogs-protection
+            resource: global-accelerator-listener
+            actions:
+              - type: update-accelerator-attributes
+                update:
+                  - 'FlowLogsEnabled': false
     '''
 
     schema = type_schema(
@@ -270,7 +268,7 @@ class ModifyAcceleratorEndpoint(BaseAction):
 
     :example:
 
-    .. code-block:: yaml
+    .. code-block: yaml
 
         policies:
           - name: set-global-accelerator-endpoint-threshold
@@ -328,10 +326,10 @@ class ModifyAcceleratorListener(BaseAction):
     '''Modifies an accelerator listener based on specified parameter
     using UpdateListener.
 
-
     :example:
 
-    .. code-block:: yaml
+    .. code-block: yaml
+
         policies:
           - name: set-global-accelerator-listener-protocol
             resource: global-accelerator-listener
