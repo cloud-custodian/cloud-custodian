@@ -866,10 +866,11 @@ class SGPermission(Filter):
       - type: ingress
         Ports: [22, 3389]
         Cidr:
-          values:
+          value:
             - "0.0.0.0/0"
             - "::/0"
           op: in
+
 
     """
 

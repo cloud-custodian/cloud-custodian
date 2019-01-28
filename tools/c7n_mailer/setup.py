@@ -22,13 +22,14 @@ requires = [
     "Jinja2",
     "boto3",
     "jsonschema",
+    "simplejson",  # datadog packaging dep
     "python-dateutil>=2.6",
     "ruamel.yaml==0.15.42",
     "datadog",
-    "slackclient",
     "sendgrid",
     "ldap3",
     "redis"]
+
 
 try:
     from concurrent import futures  # noqa F401
