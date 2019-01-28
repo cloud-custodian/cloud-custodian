@@ -164,6 +164,8 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        supports_trailevents = True
+        filter_name = None
 
     @property
     def source_type(self):
@@ -294,6 +296,8 @@ class Task(query.ChildResourceManager):
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        supports_trailevents = True
+        filter_name = None
 
     @property
     def source_type(self):
