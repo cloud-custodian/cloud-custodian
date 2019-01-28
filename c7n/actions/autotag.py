@@ -86,6 +86,9 @@ class AutoTagUser(EventAction):
         if self.manager.action_registry.get('tag') is None:
             raise PolicyValidationError(
                 "Resource does not support tagging %s" % (self.manager.data,))
+        if 'tag' not in self.data:
+            raise PolicyValidationError(
+                "auto-tag action requires 'tag'")
         return self
 
     def process(self, resources, event):

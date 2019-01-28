@@ -1,4 +1,4 @@
-# Copyright 2016-2017 Capital One Services, LLC
+# Copyright 2016-2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ from c7n.filters import FilterRegistry
 from c7n.filters.kms import KmsRelatedFilter
 from c7n import query
 from c7n.manager import resources
-from c7n.tags import TagDelayedAction, RemoveTag, TagActionFilter, Tag
+from c7n.tags import (
+    TagDelayedAction, RemoveTag, TagActionFilter, Tag, universal_augment,
+    register_universal_tags)
 from c7n.utils import (
     local_session, get_retry, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
@@ -60,39 +62,15 @@ class Table(query.QueryResourceManager):
         raise ValueError('invalid source %s' % source_type)
 
 
+register_universal_tags(Table.filter_registry, Table.action_registry, False)
+
+
 class DescribeTable(query.DescribeSource):
 
-    def augment(self, tables):
-        resources = super(DescribeTable, self).augment(tables)
-        return list(filter(None, _dynamodb_table_tags(
-            self.manager.get_model(),
-            resources,
-            self.manager.session_factory,
-            self.manager.executor_factory,
-            self.manager.retry,
-            self.manager.log)))
-
-
-def _dynamodb_table_tags(
-        model, tables, session_factory, executor_factory, retry, log):
-    """ Augment DynamoDB tables with their respective tags
-    """
-
-    def process_tags(table):
-        client = local_session(session_factory).client('dynamodb')
-        arn = table['TableArn']
-        try:
-            tag_list = retry(
-                client.list_tags_of_resource,
-                ResourceArn=arn)['Tags']
-        except ClientError as e:
-            log.warning("Exception getting DynamoDB tags  \n %s", e)
-            return None
-        table['Tags'] = tag_list or []
-        return table
-
-    with executor_factory(max_workers=2) as w:
-        return list(w.map(process_tags, tables))
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super(DescribeTable, self).augment(resources))
 
 
 class StatusFilter(object):
@@ -137,98 +115,6 @@ class KmsFilter(KmsRelatedFilter):
                       op: regex
     """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
-
-
-@Table.action_registry.register('mark-for-op')
-class TagDelayedAction(TagDelayedAction):
-    """Action to specify an action to occur at a later date
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: dynamo-mark-tag-compliance
-                resource: dynamodb-table
-                filters:
-                  - "tag:custodian_cleanup": absent
-                  - "tag:OwnerName": absent
-                actions:
-                  - type: mark-for-op
-                    tag: custodian_cleanup
-                    msg: "Cluster does not have valid OwnerName tag: {op}@{action_date}"
-                    op: delete
-                    days: 7
-    """
-    permission = ('dynamodb:TagResource',)
-    batch_size = 1
-
-    def process_resource_set(self, tables, tags):
-        client = local_session(self.manager.session_factory).client(
-            'dynamodb')
-        for t in tables:
-            arn = t['TableArn']
-            client.tag_resource(ResourceArn=arn, Tags=tags)
-
-
-@Table.action_registry.register('tag')
-class TagTable(Tag):
-    """Action to create tag(s) on a resource
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: dynamodb-tag-table
-                resource: dynamodb-table
-                filters:
-                  - "tag:target-tag": absent
-                actions:
-                  - type: tag
-                    key: target-tag
-                    value: target-tag-value
-    """
-
-    permissions = ('dynamodb:TagResource',)
-    batch_size = 1
-
-    def process_resource_set(self, tables, tags):
-        client = local_session(self.manager.session_factory).client('dynamodb')
-        for t in tables:
-            arn = t['TableArn']
-            client.tag_resource(ResourceArn=arn, Tags=tags)
-
-
-@Table.action_registry.register('remove-tag')
-class UntagTable(RemoveTag):
-    """Action to remove tag(s) on a resource
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: dynamodb-remove-tag
-                resource: dynamodb-table
-                filters:
-                  - "tag:OutdatedTag": present
-                actions:
-                  - type: remove-tag
-                    tags: ["OutdatedTag"]
-    """
-
-    concurrency = 2
-    batch_size = 5
-    permissions = ('dynamodb:UntagResource',)
-
-    def process_resource_set(self, tables, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('dynamodb')
-        for t in tables:
-            arn = t['TableArn']
-            client.untag_resource(
-                ResourceArn=arn, TagKeys=tag_keys)
 
 
 @Table.action_registry.register('delete')
