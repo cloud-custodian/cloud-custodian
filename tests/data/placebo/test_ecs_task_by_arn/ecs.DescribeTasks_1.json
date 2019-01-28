@@ -1,0 +1,155 @@
+{
+    "status_code": 200,
+    "data": {
+        "tasks": [
+            {
+                "taskArn": "arn:aws:ecs:us-east-1:644160558196:task/devx/21b23041dec947b996fcc7a8aa606d64",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/devx",
+                "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                "overrides": {
+                    "containerOverrides": [
+                        {
+                            "name": "webserver"
+                        }
+                    ]
+                },
+                "lastStatus": "STOPPED",
+                "desiredStatus": "STOPPED",
+                "cpu": "256",
+                "memory": "1024",
+                "containers": [
+                    {
+                        "containerArn": "arn:aws:ecs:us-east-1:644160558196:container/98fea76b-3966-4c85-97df-f133de0c903b",
+                        "taskArn": "arn:aws:ecs:us-east-1:644160558196:task/devx/21b23041dec947b996fcc7a8aa606d64",
+                        "name": "webserver",
+                        "lastStatus": "STOPPED",
+                        "reason": "CannotPullContainerError: API error (500): Get https://registry-1.docker.io/v2/: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)\n",
+                        "networkInterfaces": [
+                            {
+                                "attachmentId": "8755dae0-550b-4134-93a2-ae087d93561a",
+                                "privateIpv4Address": "10.0.42.109"
+                            }
+                        ],
+                        "healthStatus": "UNKNOWN"
+                    }
+                ],
+                "version": 4,
+                "stoppedReason": "Task failed to start",
+                "stopCode": "TaskFailedToStart",
+                "connectivity": "CONNECTED",
+                "connectivityAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 7,
+                    "minute": 59,
+                    "second": 15,
+                    "microsecond": 254000
+                },
+                "pullStartedAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 7,
+                    "minute": 59,
+                    "second": 28,
+                    "microsecond": 542000
+                },
+                "pullStoppedAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 8,
+                    "minute": 1,
+                    "second": 51,
+                    "microsecond": 542000
+                },
+                "executionStoppedAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 8,
+                    "minute": 1,
+                    "second": 51,
+                    "microsecond": 0
+                },
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 7,
+                    "minute": 59,
+                    "second": 11,
+                    "microsecond": 710000
+                },
+                "stoppingAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 8,
+                    "minute": 1,
+                    "second": 51,
+                    "microsecond": 542000
+                },
+                "stoppedAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 8,
+                    "minute": 2,
+                    "second": 24,
+                    "microsecond": 674000
+                },
+                "group": "family:task-public-no-vpc",
+                "launchType": "FARGATE",
+                "platformVersion": "1.3.0",
+                "attachments": [
+                    {
+                        "id": "8755dae0-550b-4134-93a2-ae087d93561a",
+                        "type": "ElasticNetworkInterface",
+                        "status": "DELETED",
+                        "details": [
+                            {
+                                "name": "subnetId",
+                                "value": "subnet-71bda45c"
+                            },
+                            {
+                                "name": "networkInterfaceId",
+                                "value": "eni-0ef479fe627e8ccf5"
+                            },
+                            {
+                                "name": "macAddress",
+                                "value": "12:11:c4:f4:0d:42"
+                            },
+                            {
+                                "name": "privateIPv4Address",
+                                "value": "10.0.42.109"
+                            }
+                        ]
+                    }
+                ],
+                "healthStatus": "UNKNOWN",
+                "tags": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "8056c0e7-22fd-11e9-9219-6f00e80aeaf6",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8056c0e7-22fd-11e9-9219-6f00e80aeaf6",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1791",
+                "date": "Mon, 28 Jan 2019 13:06:18 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,385 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/test-no-delete",
+                "serviceName": "test-no-delete",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 0,
+                "runningCount": 0,
+                "pendingCount": 0,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 0
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370488569269184",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                        "desiredCount": 0,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 23,
+                            "hour": 18,
+                            "minute": 18,
+                            "second": 26,
+                            "microsecond": 603000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 23,
+                            "hour": 18,
+                            "minute": 18,
+                            "second": 32,
+                            "microsecond": 754000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-07c118e47bb84cee7"
+                                ],
+                                "securityGroups": [
+                                    "sg-0fd0c04f0c434d68d"
+                                ],
+                                "assignPublicIp": "DISABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "c1d26fb2-cb6e-4c4a-8609-66e1a53114fc",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 28,
+                            "hour": 6,
+                            "minute": 22,
+                            "second": 50,
+                            "microsecond": 996000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "3a9c22d6-9e42-4427-b36b-cf38a2f21ab2",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 28,
+                            "hour": 0,
+                            "minute": 22,
+                            "second": 28,
+                            "microsecond": 49000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "2da58912-e3c1-4c60-beb6-98a3c2f7ac89",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 27,
+                            "hour": 18,
+                            "minute": 22,
+                            "second": 8,
+                            "microsecond": 836000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "8cb7aaa3-306e-413d-a356-07cc510ab1c7",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 27,
+                            "hour": 12,
+                            "minute": 22,
+                            "second": 0,
+                            "microsecond": 152000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "77f5517a-ab5d-4275-8d73-52dd5230b6f1",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 27,
+                            "hour": 6,
+                            "minute": 21,
+                            "second": 31,
+                            "microsecond": 53000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "18130125-85c6-4190-aa0d-a92d9b20362e",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 27,
+                            "hour": 0,
+                            "minute": 21,
+                            "second": 11,
+                            "microsecond": 305000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "9e6608a3-f523-4e80-b2af-ad44eaccda54",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 26,
+                            "hour": 18,
+                            "minute": 20,
+                            "second": 42,
+                            "microsecond": 883000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "9aa2d0a2-3ce3-4ab9-8ccd-233f3bd3a700",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 26,
+                            "hour": 12,
+                            "minute": 20,
+                            "second": 38,
+                            "microsecond": 481000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "7d0bc03a-a9c4-4c2c-99e1-f0c3bee8f99c",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 26,
+                            "hour": 6,
+                            "minute": 20,
+                            "second": 30,
+                            "microsecond": 437000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "aa0dee47-77a9-4939-ab5c-162c16119323",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 26,
+                            "hour": 0,
+                            "minute": 20,
+                            "second": 27,
+                            "microsecond": 520000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "1688028e-ce04-4a2d-a364-ecf9b534fa1a",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 25,
+                            "hour": 18,
+                            "minute": 20,
+                            "second": 9,
+                            "microsecond": 941000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "be7727cc-f829-47e0-9cdb-e5ba83103ebf",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 25,
+                            "hour": 12,
+                            "minute": 20,
+                            "second": 6,
+                            "microsecond": 445000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "bfe7213e-1ee3-4c9a-97f8-a1767a1ffede",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 25,
+                            "hour": 6,
+                            "minute": 19,
+                            "second": 47,
+                            "microsecond": 836000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "cc36d494-cd0f-462a-b8d3-57ae6ec31143",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 25,
+                            "hour": 0,
+                            "minute": 19,
+                            "second": 35,
+                            "microsecond": 402000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "6e4d3db3-88f5-494d-8b2b-470498e7c175",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 24,
+                            "hour": 18,
+                            "minute": 19,
+                            "second": 21,
+                            "microsecond": 142000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "1d36e2c5-9003-4e38-a6a7-bc0cbf11c068",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 24,
+                            "hour": 12,
+                            "minute": 19,
+                            "second": 12,
+                            "microsecond": 913000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "ddf8d57d-7915-4460-aab6-c80f967ce254",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 24,
+                            "hour": 6,
+                            "minute": 18,
+                            "second": 54,
+                            "microsecond": 199000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "e3ddbea2-234e-4522-bb37-847784291b4b",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 24,
+                            "hour": 0,
+                            "minute": 18,
+                            "second": 51,
+                            "microsecond": 527000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    },
+                    {
+                        "id": "83a56b20-b962-4b3d-93d9-6c17ee8f18e9",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 23,
+                            "hour": 18,
+                            "minute": 18,
+                            "second": 32,
+                            "microsecond": 760000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 23,
+                    "hour": 18,
+                    "minute": 18,
+                    "second": 26,
+                    "microsecond": 603000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-07c118e47bb84cee7"
+                        ],
+                        "securityGroups": [
+                            "sg-0fd0c04f0c434d68d"
+                        ],
+                        "assignPublicIp": "DISABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "tags": [
+                    {
+                        "key": "Env",
+                        "value": "Dev"
+                    },
+                    {
+                        "key": "Owner",
+                        "value": "1"
+                    }
+                ],
+                "enableECSManagedTags": true,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "b56edd9b-22fe-11e9-a152-0bf0ed8e028d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b56edd9b-22fe-11e9-a152-0bf0ed8e028d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "4171",
+                "date": "Mon, 28 Jan 2019 13:14:56 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
