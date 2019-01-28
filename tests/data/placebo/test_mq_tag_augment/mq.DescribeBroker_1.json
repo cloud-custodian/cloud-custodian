@@ -2,22 +2,22 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "3e41da00-2341-11e9-be5e-a3a418400a4d",
+            "RequestId": "ac556559-233f-11e9-a33d-9b8770f8fe81",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "application/json",
-                "content-length": "1830",
+                "content-length": "1760",
                 "connection": "keep-alive",
-                "date": "Mon, 28 Jan 2019 21:11:13 GMT",
-                "x-amzn-requestid": "3e41da00-2341-11e9-be5e-a3a418400a4d",
-                "x-amz-apigw-id": "UO5tvEkAIAMFeaw=",
+                "date": "Mon, 28 Jan 2019 20:59:59 GMT",
+                "x-amzn-requestid": "ac556559-233f-11e9-a33d-9b8770f8fe81",
+                "x-amz-apigw-id": "UO4EYFATIAMFkfg=",
                 "cache-control": "no-cache; no-store, must-revalidate, private",
                 "expires": "0",
-                "x-amzn-trace-id": "Root=1-5c4f6ff1-b294a63bed3b5b55eb6d98c6;Sampled=1",
+                "x-amzn-trace-id": "Root=1-5c4f6d4f-cfd606b84fed90806db0da4a;Sampled=1",
                 "pragma": "no-cache",
                 "x-cache": "Miss from cloudfront",
-                "via": "1.1 40c7f9ac0c01e97668f15d4b15f130a0.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "LQMESSQB-N5NFNKXAHduR0p4KqHG4WnXPlwrQCq7sWuxjgeiGdSgRA=="
+                "via": "1.1 956f08c47df12e572d602e89820e87f2.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "Vxe_foGOvKa3b5LhRKEaFcDvh1_su-ePbOkx46ePty7rZ9nkO7D14A=="
             },
             "RetryAttempts": 0
         },
@@ -79,8 +79,7 @@
             "subnet-3a334610"
         ],
         "Tags": {
-            "Env": "Dev",
-            "maid_status": "Resource does not meet policy: delete@2019/01/30"
+            "Name": "test"
         },
         "Users": [
             {

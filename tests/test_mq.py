@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-
+import time
 
 from .common import BaseTest
 
@@ -33,7 +33,7 @@ class MessageQueue(BaseTest):
                      'key': 'tag:NetworkLocation',
                      'value': 'Private'}]
             },
-            config={'region': 'us-east-2'},
+            config={'region': 'us-east-1'},
             session_factory=factory,
         )
         resources = p.run()
@@ -51,7 +51,7 @@ class MessageQueue(BaseTest):
                  'op': 'gt',
                  'value': 0,
                  'days': 1}]},
-            config={'region': 'us-east-2'},
+            config={'region': 'us-east-1'},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -67,7 +67,7 @@ class MessageQueue(BaseTest):
                 "filters": [{"BrokerName": "dev"}],
                 "actions": ["delete"],
             },
-            config={'region': 'us-east-2'},
+            config={'region': 'us-east-1'},
             session_factory=factory,
         )
         resources = p.run()
@@ -93,66 +93,35 @@ class MessageQueue(BaseTest):
             resources[0]['Tags'],
             [{'Key': 'Name', 'Value': 'test'}])
 
-    def test_mq_create_tag(self):
-        factory = self.replay_flight_data("test_mq_create_tag")
-        p = self.load_policy(
-            {
-                "name": "mq-create-tag",
-                "resource": "message-broker",
-                "filters": [{"BrokerName": "c7n-test"}],
-                "actions": [{"type": "tag", "tags": {"custodian_test": "successful"}}],
-            },
-            config={'region': 'us-east-1'},
-            session_factory=factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = factory().client("mq")
-        tags = client.list_tags(ResourceArn=resources[0]['BrokerArn'])['Tags']
-        resources[0]['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-        self.assertEqual(resources[0]['Tags'], [{'Key': 'custodian_test', 'Value': 'successful'}])
-
-    def test_mq_remove_tag(self):
-        factory = self.replay_flight_data("test_mq_remove_tag")
-        p = self.load_policy(
-            {
-                "name": "untag-mq",
-                "resource": "message-broker",
-                "filters": [{"tag:c7n": "tag"}],
-                "actions": [{"type": "remove-tag", "tags": ["c7n"]}],
-            },
-            config={'region': 'us-east-1'},
-            session_factory=factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = factory().client("mq")
-        tags = client.list_tags(ResourceArn=resources[0]["BrokerArn"])["Tags"]
-        self.assertEqual(len(tags), 0)
-
-    def test_mq_mark_for_op(self):
-        factory = self.replay_flight_data("test_mq_mark_for_op")
+    def test_mq_tag_untag_markforop(self):
+        factory = self.replay_flight_data("test_mq_tag_untag_markforop")
         p = self.load_policy(
             {
                 "name": "mark-unused-mq-delete",
                 "resource": "message-broker",
-                "filters": [{"BrokerName": "marktag"}],
+                'filters': [{'tag:Role': 'Dev'}],
                 "actions": [
-                    {
-                        "type": "mark-for-op",
-                        "tag": "custodian_cleanup",
-                        "msg": "Unused mq",
-                        "op": "delete",
-                        "days": 1,
-                    }
-                ],
-            },
+                    {'type': 'tag',
+                     'tags': {'Env': 'Dev'}},
+                    {'type': 'remove-tag',
+                     'tags': ['Role']},
+                    {'type': 'mark-for-op',
+                     'op': 'delete',
+                     'days': 2}]},
             config={'region': 'us-east-1'},
             session_factory=factory,
         )
         resources = p.run()
         self.assertTrue(len(resources), 1)
         client = factory().client("mq")
+        if self.recording:
+            time.sleep(1)
         tags = client.list_tags(ResourceArn=resources[0]["BrokerArn"])["Tags"]
         resources[0]['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-        self.assertEqual(resources[0]['Tags'], [{'Key': 'custodian_cleanup', 'Value': 'Unused mq'}])
+        self.assertNotEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Env': 'Dev',
+             'maid_status': 'Resource does not meet policy: delete@2019/01/30'})

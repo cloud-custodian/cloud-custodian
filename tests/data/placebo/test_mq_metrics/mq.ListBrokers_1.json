@@ -2,28 +2,41 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "9872069d-7b80-11e8-a9d3-5b3a88c46dc6",
+            "RequestId": "3e2a0bf3-2341-11e9-b613-f7fa98595295",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "application/json",
                 "content-length": "338",
                 "connection": "keep-alive",
-                "date": "Fri, 29 Jun 2018 09:41:27 GMT",
-                "x-amzn-requestid": "9872069d-7b80-11e8-a9d3-5b3a88c46dc6",
-                "x-amz-apigw-id": "JPS_OGDDCYcFzVw=",
-                "x-amzn-trace-id": "Root=1-5b35fec7-8052d018534f7cc85fd70f74",
+                "date": "Mon, 28 Jan 2019 21:11:13 GMT",
+                "x-amzn-requestid": "3e2a0bf3-2341-11e9-b613-f7fa98595295",
+                "x-amz-apigw-id": "UO5tuHbyoAMF2rw=",
+                "cache-control": "no-cache; no-store, must-revalidate, private",
+                "expires": "0",
+                "x-amzn-trace-id": "Root=1-5c4f6ff1-2f9be118cf0bf51b59f1cdf0;Sampled=1",
+                "pragma": "no-cache",
                 "x-cache": "Miss from cloudfront",
-                "via": "1.1 ec34e3a999b5ec4dd8e20b1dc77e2fa1.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "r-h0ur8ENkbpuOhMnuKAAHs4_ahGMxSQHGNBQF2bBsGCpETo2WOqyg=="
+                "via": "1.1 3205719ae9e3b8ac1c4de99b722229ee.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "U6RaDG0yBIbCSIfo51u7YDEoJ4HUD1yeqM2Vh_SrWtrbW0Sl5MgSjg=="
             },
             "RetryAttempts": 0
         },
         "BrokerSummaries": [
             {
-                "BrokerArn": "arn:aws:mq:us-east-2:644160558196:broker:dev:b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
-                "BrokerId": "b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
+                "BrokerArn": "arn:aws:mq:us-east-1:644160558196:broker:dev:b-9f765c8d-6164-4f28-b0c9-556de5077776",
+                "BrokerId": "b-9f765c8d-6164-4f28-b0c9-556de5077776",
                 "BrokerName": "dev",
                 "BrokerState": "RUNNING",
+                "Created": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 28,
+                    "hour": 17,
+                    "minute": 34,
+                    "second": 46,
+                    "microsecond": 507000
+                },
                 "DeploymentMode": "SINGLE_INSTANCE",
                 "HostInstanceType": "mq.t2.micro"
             }

@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "2bb50283-231c-11e9-bbbe-ed69515c4d1b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "87",
+                "connection": "keep-alive",
+                "date": "Mon, 28 Jan 2019 16:45:51 GMT",
+                "x-amzn-requestid": "2bb50283-231c-11e9-bbbe-ed69515c4d1b",
+                "x-amz-apigw-id": "UOS12FhbIAMF7SQ=",
+                "x-amzn-trace-id": "Root=1-5c4f31bf-eb699830d94298f051db1f08;Sampled=1",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 2551e3c0d0aa2d66ee9930d482b2497c.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "_4M44bFCKx4pJIjo5A2CdJwdWCUMph28FN_mdELQQtAsGlMwsrEZ3g=="
+            },
+            "RetryAttempts": 0
+        },
+        "Tags": {
+            "Env": "Dev",
+            "maid_status": "Resource does not meet policy: delete@2019/01/29"
+        }
+    }
+}

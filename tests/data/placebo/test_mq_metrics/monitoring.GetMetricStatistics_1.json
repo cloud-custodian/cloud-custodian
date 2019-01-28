@@ -6,26 +6,26 @@
             {
                 "Timestamp": {
                     "__class__": "datetime",
-                    "year": 2018,
-                    "month": 6,
-                    "day": 28,
-                    "hour": 9,
-                    "minute": 41,
+                    "year": 2019,
+                    "month": 1,
+                    "day": 27,
+                    "hour": 21,
+                    "minute": 11,
                     "second": 0,
                     "microsecond": 0
                 },
-                "Average": 5.522026045882309,
+                "Average": 3.0660761744534772,
                 "Unit": "Percent"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "98fbd099-7b80-11e8-80f8-9150c8220456",
+            "RequestId": "3e8a5432-2341-11e9-95b1-ad241005fa06",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "98fbd099-7b80-11e8-80f8-9150c8220456",
+                "x-amzn-requestid": "3e8a5432-2341-11e9-95b1-ad241005fa06",
                 "content-type": "text/xml",
-                "content-length": "511",
-                "date": "Fri, 29 Jun 2018 09:41:28 GMT"
+                "content-length": "512",
+                "date": "Mon, 28 Jan 2019 21:11:13 GMT"
             },
             "RetryAttempts": 0
         }

@@ -39,12 +39,14 @@ class MessageBroker(QueryResourceManager):
         metrics_namespace = 'AWS/AmazonMQ'
 
     def augment(self, resources):
+        super(MessageBroker, self).augment(resources)
         client = local_session(self.session_factory).client('mq')
         for r in resources:
-            tags = self.retry(client.list_tags,
-                ResourceArn=r['BrokerArn'])['Tags']
-            if tags:
+            try:
+                tags = self.retry(client.list_tags, ResourceArn=r['BrokerArn'])['Tags']
                 r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            except client.exceptions.ResourceNotFoundException:
+                continue
         return resources
 
 
@@ -109,16 +111,11 @@ class TagMessageBroker(Tag):
 
     def process_resource_set(self, mq, new_tags):
         client = local_session(self.manager.session_factory).client('mq')
-        tag_dict = {}
-        for t in new_tags:
-            tag_dict[t['Key']] = t['Value']
+        tag_dict = {t['Key']: t['Value'] for t in new_tags}
         for r in mq:
             try:
                 client.create_tags(ResourceArn=r['BrokerArn'], Tags=tag_dict)
-            except Exception as err:
-                self.log.exception(
-                    'Exception tagging mq %s: %s',
-                    r['BrokerArn'], err)
+            except client.exceptions.ResourceNotFound:
                 continue
 
 
@@ -147,10 +144,7 @@ class UntagMessageBroker(RemoveTag):
         for r in mq:
             try:
                 client.delete_tags(ResourceArn=r['BrokerArn'], TagKeys=tags)
-            except Exception as err:
-                self.log.exception(
-                    'Exception while removing tags from queue %s: %s',
-                    r['BrokerArn'], err)
+            except client.exceptions.ResourceNotFound:
                 continue
 
 
@@ -179,14 +173,9 @@ class MarkForOpMessageBroker(TagDelayedAction):
 
     def process_resource_set(self, mq, tags):
         client = local_session(self.manager.session_factory).client('mq')
-        tag_dict = {}
-        for t in tags:
-            tag_dict[t['Key']] = t['Value']
+        tag_dict = {t['Key']: t['Value'] for t in tags}
         for r in mq:
             try:
                 client.create_tags(ResourceArn=r['BrokerArn'], Tags=tag_dict)
-            except Exception as err:
-                self.log.exception(
-                    'Exception tagging mq %s: %s',
-                    r['BrokerArn'], err)
+            except client.exceptions.ResourceNotFound:
                 continue

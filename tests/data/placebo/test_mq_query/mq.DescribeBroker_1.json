@@ -2,65 +2,86 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "da4c6bfd-7b7d-11e8-90fa-29cd6ad27cbe",
+            "RequestId": "c9b510f7-233b-11e9-9ee0-393a9e846095",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "application/json",
-                "content-length": "1247",
+                "content-length": "1738",
                 "connection": "keep-alive",
-                "date": "Fri, 29 Jun 2018 09:21:49 GMT",
-                "x-amzn-requestid": "da4c6bfd-7b7d-11e8-90fa-29cd6ad27cbe",
-                "x-amz-apigw-id": "JPQHKERxCYcFcLg=",
-                "x-amzn-trace-id": "Root=1-5b35fa2d-1abf99cce0434290fcccf974",
+                "date": "Mon, 28 Jan 2019 20:32:10 GMT",
+                "x-amzn-requestid": "c9b510f7-233b-11e9-9ee0-393a9e846095",
+                "x-amz-apigw-id": "UOz_pFb5oAMF4Yg=",
+                "cache-control": "no-cache; no-store, must-revalidate, private",
+                "expires": "0",
+                "x-amzn-trace-id": "Root=1-5c4f66ca-85d1ddb8ccd13a54a9b8cf7c;Sampled=1",
+                "pragma": "no-cache",
                 "x-cache": "Miss from cloudfront",
-                "via": "1.1 edd2aa1fcea462364d4033aa6f41f580.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "7mtTV1vDmnxzoAv_FiiV7SNcUs59KLtyfdKq_rZS_MhopFINa_cOZQ=="
+                "via": "1.1 409a64e6cd31cf9171c6b6182a1b31e3.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "O2leMugXR7RFhOckCgTSGMZlc1RAbZ4X_TOBAsbk0aCsZAprD45IIg=="
             },
             "RetryAttempts": 0
         },
-        "AutoMinorVersionUpgrade": true,
-        "BrokerArn": "arn:aws:mq:us-east-2:644160558196:broker:dev:b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
-        "BrokerId": "b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
+        "AutoMinorVersionUpgrade": false,
+        "BrokerArn": "arn:aws:mq:us-east-1:644160558196:broker:dev:b-9f765c8d-6164-4f28-b0c9-556de5077776",
+        "BrokerId": "b-9f765c8d-6164-4f28-b0c9-556de5077776",
         "BrokerInstances": [
             {
-                "ConsoleURL": "https://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:8162",
+                "ConsoleURL": "https://b-9f765c8d-6164-4f28-b0c9-556de5077776-1.mq.us-east-1.amazonaws.com:8162",
                 "Endpoints": [
-                    "ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:61617",
-                    "amqp+ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:5671",
-                    "stomp+ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:61614",
-                    "mqtt+ssl://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:8883",
-                    "wss://b-ec204b6b-2cd7-464d-98fe-d80eaf273afb-1.mq.us-east-2.amazonaws.com:61619"
-                ]
+                    "ssl://b-9f765c8d-6164-4f28-b0c9-556de5077776-1.mq.us-east-1.amazonaws.com:61617",
+                    "amqp+ssl://b-9f765c8d-6164-4f28-b0c9-556de5077776-1.mq.us-east-1.amazonaws.com:5671",
+                    "stomp+ssl://b-9f765c8d-6164-4f28-b0c9-556de5077776-1.mq.us-east-1.amazonaws.com:61614",
+                    "mqtt+ssl://b-9f765c8d-6164-4f28-b0c9-556de5077776-1.mq.us-east-1.amazonaws.com:8883",
+                    "wss://b-9f765c8d-6164-4f28-b0c9-556de5077776-1.mq.us-east-1.amazonaws.com:61619"
+                ],
+                "IpAddress": "18.211.81.120"
             }
         ],
         "BrokerName": "dev",
         "BrokerState": "RUNNING",
         "Configurations": {
             "Current": {
-                "Id": "c-4cf667b5-6201-4625-86ac-4ff1e9b54fc2",
+                "Id": "c-4d858f47-5d7d-49f4-8e77-83e3e09e8186",
                 "Revision": 1
             },
             "History": []
         },
+        "Created": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 1,
+            "day": 28,
+            "hour": 17,
+            "minute": 34,
+            "second": 46,
+            "microsecond": 507000
+        },
         "DeploymentMode": "SINGLE_INSTANCE",
         "EngineType": "ActiveMQ",
-        "EngineVersion": "5.15.0",
+        "EngineVersion": "5.15.8",
         "HostInstanceType": "mq.t2.micro",
+        "Logs": {
+            "Audit": false,
+            "AuditLogGroup": "/aws/amazonmq/broker/b-9f765c8d-6164-4f28-b0c9-556de5077776/audit",
+            "General": false,
+            "GeneralLogGroup": "/aws/amazonmq/broker/b-9f765c8d-6164-4f28-b0c9-556de5077776/general"
+        },
         "MaintenanceWindowStartTime": {
-            "DayOfWeek": "SUNDAY",
-            "TimeOfDay": "11:00",
+            "DayOfWeek": "MONDAY",
+            "TimeOfDay": "06:00",
             "TimeZone": "UTC"
         },
         "PubliclyAccessible": true,
         "SecurityGroups": [
-            "sg-aa6c90c3"
+            "sg-6c7fa917"
         ],
         "SubnetIds": [
-            "subnet-b77a4ffd"
+            "subnet-3a334610"
         ],
+        "Tags": {},
         "Users": [
             {
-                "Username": "dev"
+                "Username": "c7n"
             }
         ]
     }
