@@ -945,7 +945,6 @@ class SGPermission(Filter):
         return found
 
     def process_cidrs(self, perm):
-        print(perm)
         found_v6 = found_v4 = None
         if 'CidrV6' in self.data:
             found_v6 = self._process_cidr('CidrV6', 'CidrIpv6', 'Ipv6Ranges', perm)
