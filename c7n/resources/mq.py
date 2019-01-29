@@ -19,7 +19,7 @@ from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 
 
 @resources.register('message-broker')
@@ -43,6 +43,9 @@ class MessageBroker(QueryResourceManager):
         for r in resources:
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
         return resources
+
+
+MessageBroker.filter_registry.register('mark-for-op', TagActionFilter)
 
 
 @MessageBroker.filter_registry.register('subnet')
