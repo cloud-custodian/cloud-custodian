@@ -37,5 +37,5 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-policystream = policystream:cli']},
-    install_requires=["c7n", "pyyaml", "boto3","jinja2"]
+    install_requires=["c7n", "pyyaml", "boto3", "jinja2"]
 )
