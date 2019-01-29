@@ -27,6 +27,7 @@ from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
+from c7n_azure.function_package import FunctionPackage
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.utils import local_session
@@ -117,10 +118,6 @@ class FunctionAppUtilities(object):
         function_app_name = policy_name + '-' + suffix
         return re.sub('[^A-Za-z0-9\\-]', '-', function_app_name)
 
-    @staticmethod
-    def _temporary_opener(name, flag, mode=0o777):
-        return os.open(name, flag | os.O_TEMPORARY, mode)
-
     @classmethod
     def publish_functions_package(cls, function_params, package):
         session = local_session(Session)
@@ -158,7 +155,7 @@ class FunctionAppUtilities(object):
             # and to open the file as stream vs using the path
             if os.name == 'nt':
                 fileToPublish = open(package.pkg.path, 'rb',
-                    opener=FunctionAppUtilities._temporary_opener)
+                    opener=FunctionPackage._temporary_opener)
             else:
                 fileToPublish = open(package.pkg.path, 'rb')
 
