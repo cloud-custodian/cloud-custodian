@@ -155,15 +155,15 @@ class FunctionAppUtilities(object):
             blob_name = '%s.zip' % function_params.function_app_name
             
             # Windows requires temporary flag to access file
-            # and opening the file as a stream vs path
+            # and to open the file as stream vs using the path
             if os.name == 'nt':
-                fileToPublish = open(package.pkg.path, 'rb', opener=FunctionAppUtilities._temporary_opener)
-                blob_client.create_blob_from_stream(
-                    FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, fileToPublish)
-                fileToPublish.close()                
+                fileToPublish = open(package.pkg.path, 'rb', opener=FunctionAppUtilities._temporary_opener)            
             else:
-                blob_client.create_blob_from_path(
-                    FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, package.pkg.path)
+                fileToPublish = open(package.pkg.path, 'rb')     
+
+            blob_client.create_blob_from_stream(
+                FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, fileToPublish)
+            fileToPublish.close()    
 
             # create blob url for package
             sas = blob_client.generate_blob_shared_access_signature(
