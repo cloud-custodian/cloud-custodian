@@ -162,8 +162,9 @@ class FunctionAppUtilities(object):
             else:
                 fileToPublish = open(package.pkg.path, 'rb')
 
+            count = os.path.getsize(package.pkg.path)
             blob_client.create_blob_from_stream(
-                FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, fileToPublish)
+                FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, fileToPublish, count)
             fileToPublish.close()
 
             # create blob url for package
