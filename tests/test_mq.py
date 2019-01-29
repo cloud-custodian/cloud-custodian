@@ -76,23 +76,6 @@ class MessageQueue(BaseTest):
         broker = client.describe_broker(BrokerId='dev')
         self.assertEqual(broker['BrokerState'], 'DELETION_IN_PROGRESS')
 
-    def test_mq_tag_augment(self):
-        factory = self.replay_flight_data("test_mq_tag_augment")
-        p = self.load_policy(
-            {
-                "name": "mq-create-tag",
-                "resource": "message-broker",
-                "filters": [{'tag:Name': 'test'}],
-            },
-            config={'region': 'us-east-1'},
-            session_factory=factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['Tags'],
-            [{'Key': 'Name', 'Value': 'test'}])
-
     def test_mq_tag_untag_markforop(self):
         factory = self.replay_flight_data("test_mq_tag_untag_markforop")
         p = self.load_policy(
@@ -117,12 +100,10 @@ class MessageQueue(BaseTest):
         if self.recording:
             time.sleep(1)
         tags = client.list_tags(ResourceArn=resources[0]["BrokerArn"])["Tags"]
-        self.assertEqual(len(tags), 2)
-        resources[0]['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-        self.assertNotEqual(
+        self.assertEqual(
             {t['Key']: t['Value'] for t in resources[0]['Tags']},
             {'Role': 'Dev'})
         self.assertEqual(
-            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            tags,
             {'Env': 'Dev',
              'maid_status': 'Resource does not meet policy: delete@2019/01/31'})

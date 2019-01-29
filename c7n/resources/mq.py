@@ -41,7 +41,7 @@ class MessageBroker(QueryResourceManager):
     def augment(self, resources):
         super(MessageBroker, self).augment(resources)
         for r in resources:
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['Tags'].items()]
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('Tags', {}).items()]
         return resources
 
 
