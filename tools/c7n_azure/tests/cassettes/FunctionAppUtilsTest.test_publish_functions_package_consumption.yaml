@@ -129,6 +129,29 @@ interactions:
 - request:
     body: null
     headers:
+      Connection: [keep-alive]
+      Content-Length: ['0']
+      User-Agent: [Azure-Storage/1.4.0-1.4.0 (Python CPython 3.6.5; Darwin 18.2.0)]
+      x-ms-blob-type: [BlockBlob]
+      x-ms-date: ['Tue, 08 Jan 2019 09:24:13 GMT']
+      x-ms-version: ['2018-03-28']
+    method: PUT
+    uri: https://cloudcustodiantest.blob.core.windows.net/cloud-custodian-packages/cloud-custodian-test.zip?comp=blocklist
+  response:
+    body: {string: ''}
+    headers:
+      Content-MD5: [1B2M2Y8AsgTpgAmY7PhCfg==]
+      Date: ['Tue, 08 Jan 2019 09:24:13 GMT']
+      ETag: ['"0x8D6754B0E25DEF2"']
+      Last-Modified: ['Tue, 08 Jan 2019 09:24:13 GMT']
+      Server: [Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0]
+      x-ms-request-id: [b47859c7-d01e-0098-1a33-a787b7000000]
+      x-ms-request-server-encrypted: ['true']
+      x-ms-version: ['2018-03-28']
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
       Accept: [application/json]
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
