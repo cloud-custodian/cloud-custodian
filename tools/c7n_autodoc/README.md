@@ -3,7 +3,7 @@
 
 ## What is c7n-autodoc?
 
-Automated Cloud Custodian policy documentation for your business parnters.
+Automated Cloud Custodian policy documentation for your business partners.
 
 ## Why use c7n-autodoc?
 
