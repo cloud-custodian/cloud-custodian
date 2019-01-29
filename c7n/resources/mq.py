@@ -45,7 +45,10 @@ class MessageBroker(QueryResourceManager):
         return resources
 
 
-MessageBroker.filter_registry.register('mark-for-op', TagActionFilter)
+@MessageBroker.filter_registry.register('mark-for-op')
+class MarkedForOp(TagActionFilter):
+
+    permissions = ('mq:ListBrokers',)
 
 
 @MessageBroker.filter_registry.register('subnet')
