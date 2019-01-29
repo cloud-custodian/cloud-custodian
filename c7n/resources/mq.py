@@ -174,4 +174,4 @@ class MarkForOpMessageBroker(TagDelayedAction):
 
     def process_resource_set(self, resources, tags):
         tagger = self.manager.action_registry['tag']({}, self.manager)
-        tagger.process_resource_set(self, resources, tags)
+        tagger.process_resource_set(resources, tags)
