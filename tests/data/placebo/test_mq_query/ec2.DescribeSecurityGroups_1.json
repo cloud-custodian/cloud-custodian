@@ -8,23 +8,19 @@
                 "IpPermissions": [
                     {
                         "IpProtocol": "-1",
-                        "IpRanges": [
-                            {
-                                "CidrIp": "108.56.181.242/32"
-                            }
-                        ],
+                        "IpRanges": [],
                         "Ipv6Ranges": [],
                         "PrefixListIds": [],
                         "UserIdGroupPairs": [
                             {
-                                "GroupId": "sg-6c7fa917",
+                                "GroupId": "sg-aa6c90c3",
                                 "UserId": "644160558196"
                             }
                         ]
                     }
                 ],
                 "OwnerId": "644160558196",
-                "GroupId": "sg-6c7fa917",
+                "GroupId": "sg-aa6c90c3",
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1",
@@ -44,17 +40,17 @@
                         "Value": "Private"
                     }
                 ],
-                "VpcId": "vpc-d2d616b5"
+                "VpcId": "vpc-5f6c9936"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "7026ed65-8a1d-4bcb-8f19-8c2c58af1277",
+            "RequestId": "de1d1361-5856-46ab-bcc9-74d35f693257",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "text/xml;charset=UTF-8",
                 "transfer-encoding": "chunked",
                 "vary": "Accept-Encoding",
-                "date": "Tue, 29 Jan 2019 18:05:55 GMT",
+                "date": "Fri, 29 Jun 2018 09:21:50 GMT",
                 "server": "AmazonEC2"
             },
             "RetryAttempts": 0
