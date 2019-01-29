@@ -107,7 +107,7 @@ class TagMessageBroker(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('mq:TagMessageBroker')
+    permissions = ('mq:TagMessageBroker',)
 
     def process_resource_set(self, mq, new_tags):
         client = local_session(self.manager.session_factory).client('mq')
@@ -137,7 +137,7 @@ class UntagMessageBroker(RemoveTag):
                     tags: ["OutdatedTag"]
     """
 
-    permissions = ('mq:UntagMessageBroker')
+    permissions = ('mq:UntagMessageBroker',)
 
     def process_resource_set(self, mq, tags):
         client = local_session(self.manager.session_factory).client('mq')
@@ -169,7 +169,7 @@ class MarkForOpMessageBroker(TagDelayedAction):
                     days: 7
     """
 
-    permissions = ('mq:TagMessageBroker')
+    permissions = ('mq:TagMessageBroker',)
 
     def process_resource_set(self, mq, tags):
         client = local_session(self.manager.session_factory).client('mq')
