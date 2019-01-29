@@ -2,19 +2,19 @@
     "status_code": 204,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "e588086b-233f-11e9-9d0c-4d19ba51bf04",
+            "RequestId": "c704ebca-23fc-11e9-87c8-f519dced1f97",
             "HTTPStatusCode": 204,
             "HTTPHeaders": {
                 "content-type": "application/json",
                 "content-length": "0",
                 "connection": "keep-alive",
-                "date": "Mon, 28 Jan 2019 21:01:35 GMT",
-                "x-amzn-requestid": "e588086b-233f-11e9-9d0c-4d19ba51bf04",
-                "x-amz-apigw-id": "UO4TYGNnIAMFuSg=",
-                "x-amzn-trace-id": "Root=1-5c4f6daf-c76202981e4ff7f0d243c462;Sampled=1",
+                "date": "Tue, 29 Jan 2019 19:33:38 GMT",
+                "x-amzn-requestid": "c704ebca-23fc-11e9-87c8-f519dced1f97",
+                "x-amz-apigw-id": "UR-W9HTroAMF9gw=",
+                "x-amzn-trace-id": "Root=1-5c50aa92-e12543242b4e0820386ea210;Sampled=1",
                 "x-cache": "Miss from cloudfront",
-                "via": "1.1 6419ba8f3bd94b651d416054d9416f1e.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "ZmPiICF-fY_ZSZU0_9GXvp0oWD4l9D1zQjilh40ARJpxUoOuhf6jQA=="
+                "via": "1.1 417c242b19212928b079740e6dd8f54c.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "8bK3XWt9KYDiLLSJEWyaGtvgz0wK_7s3D4KaHGVq6JByRLCtqT4iMg=="
             },
             "RetryAttempts": 0
         }

@@ -8,24 +8,24 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 1,
-                    "day": 27,
-                    "hour": 21,
-                    "minute": 11,
+                    "day": 28,
+                    "hour": 18,
+                    "minute": 6,
                     "second": 0,
                     "microsecond": 0
                 },
-                "Average": 3.0660761744534772,
+                "Average": 2.9882595841124857,
                 "Unit": "Percent"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "3e8a5432-2341-11e9-95b1-ad241005fa06",
+            "RequestId": "a49c71de-23f0-11e9-ae27-5f709a95d998",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "3e8a5432-2341-11e9-95b1-ad241005fa06",
+                "x-amzn-requestid": "a49c71de-23f0-11e9-ae27-5f709a95d998",
                 "content-type": "text/xml",
                 "content-length": "512",
-                "date": "Mon, 28 Jan 2019 21:11:13 GMT"
+                "date": "Tue, 29 Jan 2019 18:06:46 GMT"
             },
             "RetryAttempts": 0
         }

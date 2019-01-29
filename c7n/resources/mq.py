@@ -40,13 +40,8 @@ class MessageBroker(QueryResourceManager):
 
     def augment(self, resources):
         super(MessageBroker, self).augment(resources)
-        client = local_session(self.session_factory).client('mq')
         for r in resources:
-            try:
-                tags = self.retry(client.list_tags, ResourceArn=r['BrokerArn'])['Tags']
-                r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-            except client.exceptions.ResourceNotFoundException:
-                continue
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['Tags'].items()]
         return resources
 
 

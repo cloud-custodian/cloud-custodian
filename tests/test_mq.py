@@ -117,6 +117,7 @@ class MessageQueue(BaseTest):
         if self.recording:
             time.sleep(1)
         tags = client.list_tags(ResourceArn=resources[0]["BrokerArn"])["Tags"]
+        self.assertEqual(len(tags), 2)
         resources[0]['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
         self.assertNotEqual(
             {t['Key']: t['Value'] for t in resources[0]['Tags']},
@@ -124,4 +125,4 @@ class MessageQueue(BaseTest):
         self.assertEqual(
             {t['Key']: t['Value'] for t in resources[0]['Tags']},
             {'Env': 'Dev',
-             'maid_status': 'Resource does not meet policy: delete@2019/01/30'})
+             'maid_status': 'Resource does not meet policy: delete@2019/01/31'})
