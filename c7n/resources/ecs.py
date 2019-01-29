@@ -95,7 +95,8 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
     def get_resources(self, ids, cache=True):
         """Retrieve ecs resources for serverless policies or related resources
 
-        Requires task arns in new format.
+        Requires arns in new format.
+        https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
         """
         cluster_resources = {}
         for i in ids:
