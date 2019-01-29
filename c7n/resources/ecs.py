@@ -174,6 +174,9 @@ class Service(query.ChildResourceManager):
             source = 'describe-ecs-service'
         return source
 
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(Service, self).get_resources(ids, cache, augment=False)
+
 
 @Service.filter_registry.register('metrics')
 class ServiceMetrics(MetricsFilter):
@@ -305,6 +308,9 @@ class Task(query.ChildResourceManager):
         if source in ('describe', 'describe-child'):
             source = 'describe-ecs-task'
         return source
+
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(Task, self).get_resources(ids, cache, augment=False)
 
 
 @Task.filter_registry.register('task-definition')

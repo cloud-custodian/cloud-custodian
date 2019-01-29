@@ -56,8 +56,7 @@ class TestEcsService(BaseTest):
         p = self.load_policy({
             'name': 'ecs-svc', 'resource': 'ecs-service'},
             session_factory=session_factory)
-        source = p.resource_manager.get_source('describe-ecs-service')
-        svcs = source.get_resources(
+        svcs = p.resource_manager.get_resources(
             ["arn:aws:ecs:us-east-1:644160558196:service/test/test-no-delete"])
         self.assertEqual(len(svcs), 1)
         self.assertEqual(
@@ -66,7 +65,7 @@ class TestEcsService(BaseTest):
 
         self.assertRaises(
             PolicyExecutionError,
-            source.get_resources,
+            p.resource_manager.get_resources,
             ["arn:aws:ecs:us-east-1:644160558196:service/test-no-delete"])
 
     def test_ecs_service_resource(self):
@@ -223,8 +222,7 @@ class TestEcsTask(BaseTest):
         session_factory = self.replay_flight_data('test_ecs_task_by_arn')
         p = self.load_policy({
             'name': 'tasks', 'resource': 'ecs-task'}, session_factory=session_factory)
-        source = p.resource_manager.get_source('describe-ecs-task')
-        tasks = source.get_resources([
+        tasks = p.resource_manager.get_resources([
             'arn:aws:ecs:us-east-1:644160558196:task/devx/21b23041dec947b996fcc7a8aa606d64'])
         self.assertEqual(len(tasks), 1)
         self.assertEqual(tasks[0]['launchType'], 'FARGATE')
@@ -232,7 +230,7 @@ class TestEcsTask(BaseTest):
 
         self.assertRaises(
             PolicyExecutionError,
-            source.get_resources,
+            p.resource_manager.get_resources,
             ['arn:aws:ecs:us-east-1:644160558196:task/21b23041dec947b996fcc7a8aa606d64'])
 
     def test_task_resource(self):
