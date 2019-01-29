@@ -13,6 +13,7 @@
 # limitations under the License.
 import datetime
 import logging
+import os
 import re
 import time
 
@@ -116,6 +117,10 @@ class FunctionAppUtilities(object):
         function_app_name = policy_name + '-' + suffix
         return re.sub('[^A-Za-z0-9\\-]', '-', function_app_name)
 
+    @staticmethod
+    def _temporary_opener(name, flag, mode=0o777):
+        return os.open(name, flag | os.O_TEMPORARY, mode)
+
     @classmethod
     def publish_functions_package(cls, function_params, package):
         session = local_session(Session)
@@ -148,8 +153,17 @@ class FunctionAppUtilities(object):
 
             # upload package
             blob_name = '%s.zip' % function_params.function_app_name
-            blob_client.create_blob_from_path(
-                FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, package.pkg.path)
+            
+            # Windows requires temporary flag to access file
+            # and opening the file as a stream vs path
+            if os.name == 'nt':
+                fileToPublish = open(package.pkg.path, 'rb', opener=FunctionAppUtilities._temporary_opener)
+                blob_client.create_blob_from_stream(
+                    FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, fileToPublish)
+                fileToPublish.close()                
+            else:
+                blob_client.create_blob_from_path(
+                    FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, package.pkg.path)
 
             # create blob url for package
             sas = blob_client.generate_blob_shared_access_signature(
