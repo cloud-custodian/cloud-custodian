@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.exceptions import PolicyValidationError
 from .common import BaseTest, functional
 
 import time
@@ -20,8 +21,21 @@ import time
 
 class TestSsm(BaseTest):
 
+    def test_ec2_ssm_send_command_validate(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'ssm-instances',
+             'resource': 'aws.ec2',
+             'actions': [
+                 {'type': 'send-command',
+                  'command': {
+                    'DocumentName': 'AWS-RunShellScript'}}]},
+            validate=True)
+
     def test_ssm_send_command(self):
         factory = self.replay_flight_data('test_ssm_send_command')
+
         p = self.load_policy({
             'name': 'ssm-instances',
             'resource': 'ssm-managed-instance',
