@@ -404,7 +404,6 @@ class QueryResourceManager(ResourceManager):
                     "%s.%s" % (self.__class__.__module__,
                                self.__class__.__name__),
                     len(resources)))
-                resource_count = len(resources)
 
         if resources is None:
             if query is None:
@@ -413,9 +412,9 @@ class QueryResourceManager(ResourceManager):
                 resources = self.source.resources(query)
             with self.ctx.tracer.subsegment('resource-augment'):
                 resources = self.augment(resources)
-            resource_count = len(resources)
             self._cache.save(cache_key, resources)
 
+        resource_count = len(resources)
         with self.ctx.tracer.subsegment('filter'):
             resources = self.filter_resources(resources)
 
