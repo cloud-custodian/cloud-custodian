@@ -199,6 +199,20 @@ class PythonPackageArchive(object):
                 1024.0 * 1024.0)))
         return self
 
+    @staticmethod
+    def _temporary_opener(name, flag, mode=0o777):
+        return os.open(name, flag | os.O_TEMPORARY, mode)
+
+    def open(self):
+        """Return a file stream based on current platform"""
+        # Windows requires TEMPORARY flag if you want to open files created by tempfile library
+        if os.name == 'nt':
+            fileStream = open(self.path, 'rb',
+                opener=self._temporary_opener)
+        else:
+            fileStream = open(self.path, 'rb')
+        return fileStream
+
     def remove(self):
         """Dispose of the temp file for garbage collection."""
         if self._temp_archive_file:
