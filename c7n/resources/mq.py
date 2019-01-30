@@ -45,7 +45,7 @@ class MessageBroker(QueryResourceManager):
         return resources
 
 
-@MessageBroker.filter_registry.register('mark-for-op')
+@MessageBroker.filter_registry.register('marked-for-op')
 class MarkedForOp(TagActionFilter):
 
     permissions = ('mq:ListBrokers',)
