@@ -33,7 +33,7 @@ class Kafka(QueryResourceManager):
         filter_name = 'ClusterNameFilter'
         filter_type = 'scalar'
 
-        
+
 @Kafka.filter_registry.register('security-group')
 class KafkaSGFilter(SecurityGroupFilter):
 
@@ -51,7 +51,7 @@ class Delete(Action):
 
     schema = type_schema('delete')
     permissions = ('kafka:DeleteCluster',)
-    
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kafka')
 

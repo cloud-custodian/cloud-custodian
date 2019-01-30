@@ -34,7 +34,7 @@ class KafkaTest(BaseTest):
 
         if self.recording:
             time.sleep(5)
-    
-        client = factory().client('kafka')        
+
+        client = factory().client('kafka')
         cluster = client.describe_cluster(ClusterArn=resources[0]['ClusterArn']).get('ClusterInfo')
         self.assertEqual(cluster['State'], 'DELETING')
