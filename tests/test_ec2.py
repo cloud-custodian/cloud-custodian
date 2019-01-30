@@ -195,6 +195,30 @@ class TestDisableApiTermination(BaseTest):
         )
 
 
+class TestSsm(BaseTest):
+
+    def test_ssm_status(self):
+        session_factory = self.replay_flight_data('test_ec2_ssm_filter')
+        policy = self.load_policy({
+            'name': 'ec2-ssm',
+            'resource': 'aws.ec2',
+            'filters': [
+                {'type': 'ssm',
+                 'key': 'PlatformName',
+                 'value': 'Ubuntu'},
+                {'type': 'ssm',
+                 'key': 'PingStatus',
+                 'value': 'Online'}]},
+            session_factory=session_factory,
+            config={'region': 'us-east-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue('c7n:SsmState' in resources[0])
+        self.assertEqual(
+            [r['InstanceId'] for r in resources],
+            ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
+
+
 class TestHealthEventsFilter(BaseTest):
 
     def test_ec2_health_events_filter(self):

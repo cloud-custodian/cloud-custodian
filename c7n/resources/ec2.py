@@ -809,6 +809,56 @@ class SingletonFilter(Filter, StateTransitionFilter):
         return False
 
 
+@EC2.filter_registry.register('ssm')
+class SsmStatus(ValueFilter):
+    """Filter ec2 instances by their ssm status information.
+
+    :Example:
+
+    Find ubuntu 18.04 instances are active with ssm.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-recover-instances
+            resource: ec2
+            filters:
+              - type: ssm
+                key: PingStatus
+                value: Online
+              - type: ssm
+                key: PlatformName
+                value: Ubuntu
+              - type: ssm
+                key: PlatformVersion
+                value: 18.04
+    """
+    schema = type_schema('ssm', rinherit=ValueFilter.schema)
+    permissions = ('ssm:DescribeInstanceInformation',)
+    annotation = 'c7n:SsmState'
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ssm')
+        results = []
+        for resource_set in utils.chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+        for r in resources:
+            if self.match(r[self.annotation]):
+                results.append(r)
+        return results
+
+    def process_resource_set(self, client, resources):
+        instance_ids = [i['InstanceId'] for i in resources]
+        info_map = {
+            info['InstanceId']: info for info in
+            client.describe_instance_information(
+                Filters=[{'Key': 'InstanceIds', 'Values': instance_ids}]).get(
+                    'InstanceInformationList', [])}
+        for r in resources:
+            r[self.annotation] = info_map.get(r['InstanceId'], {})
+
+
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
     def format_resource(self, r):
