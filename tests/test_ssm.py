@@ -30,12 +30,11 @@ class TestSsm(BaseTest):
              'actions': [
                  {'type': 'send-command',
                   'command': {
-                    'DocumentName': 'AWS-RunShellScript'}}]},
+                      'DocumentName': 'AWS-RunShellScript'}}]},
             validate=True)
 
     def test_ssm_send_command(self):
         factory = self.replay_flight_data('test_ssm_send_command')
-
         p = self.load_policy({
             'name': 'ssm-instances',
             'resource': 'ssm-managed-instance',
@@ -55,12 +54,12 @@ class TestSsm(BaseTest):
 
         if self.recording:
             time.sleep(5)
-            
+
         result = factory().client('ssm').get_command_invocation(
             InstanceId=resources[0]['InstanceId'],
             CommandId=resources[0]['c7n:SendCommand'][0])
         self.assertEqual(result['Status'], 'Success')
-        
+
     @functional
     def test_ssm_parameter_not_secure(self):
         session_factory = self.replay_flight_data("test_ssm_parameter_not_secure")

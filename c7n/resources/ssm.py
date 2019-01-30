@@ -53,7 +53,7 @@ class ManagedInstance(QueryResourceManager):
     permissions = ('ssm:DescribeInstanceInformation',)
 
 
-@EC2.action_registry.register('send-command')    
+@EC2.action_registry.register('send-command')
 @ManagedInstance.action_registry.register('send-command')
 class SendCommand(Action):
     """Run an SSM Automation Document on an instance.
@@ -103,7 +103,7 @@ class SendCommand(Action):
         # that aren't in ssm.
         if self.manager.type != 'ec2':
             return
-        
+
         found = False
         for f in self.manager.iter_filters():
             if f.type == 'ssm':
@@ -117,7 +117,7 @@ class SendCommand(Action):
         client = local_session(self.manager.session_factory).client('ssm')
         for resource_set in chunks(resources, 50):
             self.process_resource_set(client, resource_set)
-    
+
     def process_resource_set(self, client, resources):
         command = dict(self.data['command'])
         command['InstanceIds'] = [
