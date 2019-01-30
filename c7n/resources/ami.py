@@ -126,7 +126,7 @@ class RemoveLaunchPermissions(BaseAction):
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
         for i in images:
-            self.process(client, i)
+            self.process_image(client, i)
 
     def process_image(self, client, image):
         client.reset_image_attribute(

@@ -232,7 +232,7 @@ class Notify(BaseNotify):
     def send_sns(self, message):
         topic = self.data['transport']['topic'].format(**message)
         user_attributes = self.data['transport'].get('attributes')
-        if topic.startswith('arn:aws:sns'):
+        if topic.startswith('arn:'):
             region = region = topic.split(':', 5)[3]
             topic_arn = topic
         else:
