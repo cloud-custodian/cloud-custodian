@@ -402,7 +402,13 @@ class QueryResourceManager(ResourceManager):
                     "%s.%s" % (self.__class__.__module__,
                                self.__class__.__name__),
                     len(resources)))
-                return self.filter_resources(resources)
+                resource_count = len(resources)
+                with self.ctx.tracer.subsegment('filter'):
+                    resources = self.filter_resources(resources)
+                # Check if we're out of a policies execution limits.
+                if self.data == self.ctx.policy.data:
+                    self.check_resource_limit(len(resources), resource_count)
+                return resources
 
         if query is None:
             query = {}
