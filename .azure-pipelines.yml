@@ -85,6 +85,7 @@ jobs:
     condition: succeededOrFailed()
 
 - job: 'TestWindows'
+  displayName: 'Test Windows'
   condition: "succeeded()"
   pool:
     vmImage: 'vs2017-win2016'
