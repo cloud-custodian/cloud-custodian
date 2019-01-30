@@ -83,3 +83,40 @@ jobs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version)'
     condition: succeededOrFailed()
+
+- job: 'Test Windows'
+  condition: "succeeded()"
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+        TOXENV: py36
+    maxParallel: 3
+
+  steps:
+  - checkout: self
+    fetchDepth: 2
+
+  - task: UsePythonVersion@0
+    displayName: "Set Python Version"
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: python -m pip install --upgrade pip && pip install tox
+    displayName: 'Install Test Runner'
+
+  - script: tox --notest
+    displayName: 'Install Dependencies'
+
+  - script: tox
+    displayName: 'Tox'
+
+  - task: PublishTestResults@2
+    displayName: "Publish Test Results Azure"
+    inputs:
+      testResultsFiles: '**/test-results.xml'
+      testRunTitle: 'Python $(python.version) Windows'
+    condition: succeededOrFailed()
