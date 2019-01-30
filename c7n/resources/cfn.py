@@ -145,9 +145,14 @@ class CloudFormationAddTag(Tag):
             self.manager.session_factory).client('cloudformation')
 
         def _tag_stacks(s):
+            params = []
+            for p in s.get('Parameters', []):
+                params.append({'ParameterKey': p['ParameterKey'],
+                               'UsePreviousValue': True})
             client.update_stack(
                 StackName=s['StackName'],
                 UsePreviousTemplate=True,
+                Parameters=params,
                 Tags=tags)
 
         with self.executor_factory(max_workers=2) as w:

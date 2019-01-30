@@ -19,6 +19,8 @@ import fnmatch
 import os
 import time
 
+from c7n.exceptions import PolicyExecutionError
+
 
 class TestEcsService(BaseTest):
 
@@ -47,6 +49,24 @@ class TestEcsService(BaseTest):
         self.assertEqual(
             resources[0]['Tags'],
             [{'Key': 'Name', 'Value': 'Dev'}])
+
+    def test_ecs_service_by_arn(self):
+        session_factory = self.replay_flight_data('test_ecs_service_by_arn')
+
+        p = self.load_policy({
+            'name': 'ecs-svc', 'resource': 'ecs-service'},
+            session_factory=session_factory)
+        svcs = p.resource_manager.get_resources(
+            ["arn:aws:ecs:us-east-1:644160558196:service/test/test-no-delete"])
+        self.assertEqual(len(svcs), 1)
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in svcs[0]['Tags']},
+            {'Env': 'Dev', 'Owner': '1'})
+
+        self.assertRaises(
+            PolicyExecutionError,
+            p.resource_manager.get_resources,
+            ["arn:aws:ecs:us-east-1:644160558196:service/test-no-delete"])
 
     def test_ecs_service_resource(self):
         session_factory = self.replay_flight_data("test_ecs_service")
@@ -197,6 +217,21 @@ class TestEcsTaskDefinition(BaseTest):
 
 
 class TestEcsTask(BaseTest):
+
+    def test_task_by_arn(self):
+        session_factory = self.replay_flight_data('test_ecs_task_by_arn')
+        p = self.load_policy({
+            'name': 'tasks', 'resource': 'ecs-task'}, session_factory=session_factory)
+        tasks = p.resource_manager.get_resources([
+            'arn:aws:ecs:us-east-1:644160558196:task/devx/21b23041dec947b996fcc7a8aa606d64'])
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual(tasks[0]['launchType'], 'FARGATE')
+        self.assertEqual(tasks[0]['lastStatus'], 'STOPPED')
+
+        self.assertRaises(
+            PolicyExecutionError,
+            p.resource_manager.get_resources,
+            ['arn:aws:ecs:us-east-1:644160558196:task/21b23041dec947b996fcc7a8aa606d64'])
 
     def test_task_resource(self):
         session_factory = self.replay_flight_data("test_ecs_task")

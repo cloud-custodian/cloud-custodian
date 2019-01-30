@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
@@ -91,6 +92,27 @@ class ECSClusterResourceDescribeSource(query.ChildDescribeSource):
             self.manager.session_factory, self.manager)
         self.query.capture_parent_id = True
 
+    def get_resources(self, ids, cache=True):
+        """Retrieve ecs resources for serverless policies or related resources
+
+        Requires arns in new format.
+        https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
+        """
+        cluster_resources = {}
+        for i in ids:
+            _, ident = i.rsplit(':', 1)
+            parts = ident.split('/', 2)
+            if len(parts) != 3:
+                raise PolicyExecutionError("New format ecs arn required")
+            cluster_resources.setdefault(parts[1], []).append(parts[2])
+
+        results = []
+        client = local_session(self.manager.session_factory).client('ecs')
+        for cid, resource_ids in cluster_resources.items():
+            results.extend(
+                self.process_cluster_resources(client, cid, resource_ids))
+        return results
+
     def augment(self, resources):
         parent_child_map = {}
         for pid, r in resources:
@@ -143,6 +165,8 @@ class Service(query.ChildResourceManager):
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        supports_trailevents = True
+        filter_name = None
 
     @property
     def source_type(self):
@@ -150,6 +174,9 @@ class Service(query.ChildResourceManager):
         if source in ('describe', 'describe-child'):
             source = 'describe-ecs-service'
         return source
+
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(Service, self).get_resources(ids, cache, augment=False)
 
 
 @Service.filter_registry.register('metrics')
@@ -273,6 +300,8 @@ class Task(query.ChildResourceManager):
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        supports_trailevents = True
+        filter_name = None
 
     @property
     def source_type(self):
@@ -280,6 +309,9 @@ class Task(query.ChildResourceManager):
         if source in ('describe', 'describe-child'):
             source = 'describe-ecs-task'
         return source
+
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(Task, self).get_resources(ids, cache, augment=False)
 
 
 @Task.filter_registry.register('task-definition')
