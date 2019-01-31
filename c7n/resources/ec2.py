@@ -1752,3 +1752,80 @@ class InstanceAttribute(ValueFilter):
             keys.remove('InstanceId')
             resource['c7n:attribute-%s' % attribute] = fetched_attribute[
                 keys[0]]
+
+
+@resources.register('launch-template-version')
+class LaunchTemplate(query.QueryResourceManager):
+
+    class resource_type(object):
+        name = 'LaunchTemplateName'
+        service = 'ec2'
+        date = 'CreateTime'
+        dimension = 'None'
+        enum_spec = (
+            'describe_launch_templates', 'LaunchTemplates', None)
+        filter_name = 'LaunchTemplateIds'
+        filter_type = 'list'
+
+    def augment(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        template_versions = []
+        for r in resources:
+            template_versions.extend(
+                client.describe_launch_template_versions(
+                    LaunchTemplateId=r['LaunchTemplateId']))
+        return template_versions
+
+    def get_resources(self, rids, cache=True):
+        # Launch template versions have a compound primary key
+        #
+        # Support one of four forms of resource ids:
+        #
+        #  - array of launch template ids
+        #  - array of tuples (launch template id, version id)
+        #  - array of dicts (with LaunchTemplateId and VersionNumber)
+        #  - array of dicts (with LaunchTemplateId and LatestVersionNumber)
+        #
+        # If an alias version is given $Latest, $Default, the alias will be
+        # preserved as an annotation on the returned object 'c7n:VersionAlias'
+        if not rids:
+            return []
+
+        t_versions = {}
+        if isinstance(rids[0], tuple):
+            for tid, tversion in rids:
+                t_versions.setdefault(tid, []).append(tversion)
+        elif isinstance(rids[0], dict):
+            for tinfo in rids:
+                t_versions.setdefault(
+                    tinfo['LaunchTemplateId'], []).append(
+                        tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
+        elif isinstance(rids[0], six.string_types):
+            for tid in rids:
+                t_versions[tid] = []
+
+        client = utils.local_session(self.session_factory).client('ec2')
+
+        results = []
+        # We may end up fetching duplicates on $Latest and $Version
+        for tid, tversions in t_versions.items():
+            for tversion, t in zip(
+                tversions, client.describe_launch_template_versions(
+                    LaunchTemplateId=tid, Versions=tversions).get(
+                        'LaunchTemplateVersions')):
+                if not tversion.isdigit():
+                    t['c7n:VersionAlias'] = tversion
+                results.append(t)
+        return results
+
+    def get_asg_templates(self, asgs):
+        templates = {}
+        for a in asgs:
+            if 'LaunchTemplate' not in a:
+                continue
+            t = a['LaunchTemplate']
+            templates.setdefault(
+                (t['LaunchTemplateId'], t['Version']), []).append(
+                    a['AutoScalingGroupName'])
+        return templates

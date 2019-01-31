@@ -88,6 +88,39 @@ class Snapshot(QueryResourceManager):
             query['OwnerIds'] = ['self']
         return super(Snapshot, self).resources(query=query)
 
+    def get_resources(self, ids, cache=True, augment=True):
+        if cache:
+            resources = self._get_cached_resources(ids)
+            if resources is not None:
+                return resources
+        while ids:
+            try:
+                return self.source.get_resources(ids)
+            except ClientError as e:
+                bad_snap = ErrorHandler.extract_bad_snapshot(e)
+                if bad_snap:
+                    ids.remove(bad_snap)
+                    continue
+                raise
+        return []
+
+
+class ErrorHandler(object):
+
+    @staticmethod
+    def extract_bad_snapshot(e):
+        """Handle various client side errors when describing snapshots"""
+        msg = e.response['Error']['Message']
+        error = e.response['Error']['Code']
+        e_snap_id = None
+        if error == 'InvalidSnapshot.NotFound':
+            e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
+            log.warning("Snapshot not found %s" % e_snap_id)
+        elif error == 'InvalidSnapshotID.Malformed':
+            e_snap_id = msg[msg.find('"') + 1:msg.rfind('"')]
+            log.warning("Snapshot id malformed %s" % e_snap_id)
+        return e_snap_id
+
 
 class QueryParser(object):
 
