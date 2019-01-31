@@ -205,6 +205,7 @@ class PythonPackageArchive(object):
 
     def open(self):
         """Return a file stream based on current platform"""
+        assert self._closed, "Archive not closed"
         # Windows requires TEMPORARY flag if you want to open files created by tempfile library
         if os.name == 'nt':
             fileStream = open(self.path, 'rb',
