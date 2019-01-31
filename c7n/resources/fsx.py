@@ -16,7 +16,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
-from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags
+from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
 from c7n.utils import local_session, type_schema
 
 
@@ -81,6 +81,11 @@ class DeleteBackup(BaseAction):
                 self.log.warning(
                     'Unable to delete backup for: %s - %s - %s' % (
                         r['FileSystemId'], r['BackupId'], e))
+
+
+FSxBackup.filter_registry.register('marked-for-op', TagActionFilter)
+
+FSx.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @FSxBackup.action_registry.register('mark-for-op')

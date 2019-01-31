@@ -98,7 +98,7 @@ class DeploymentUnitsTest(BaseTest):
         func_app = self._validate(func_unit, func_params)
 
         # verify settings are properly configured
-        self.assertEquals(func_app.kind, 'functionapp,linux')
+        self.assertEqual(func_app.kind, 'functionapp,linux')
         self.assertTrue(func_app.reserved)
 
     def test_function_app_dedicated(self):
@@ -136,14 +136,14 @@ class DeploymentUnitsTest(BaseTest):
         func_app = self._validate(func_unit, func_params)
 
         # verify settings are properly configured
-        self.assertEquals(func_app.kind, 'functionapp,linux,container')
+        self.assertEqual(func_app.kind, 'functionapp,linux,container')
         self.assertTrue(func_app.reserved)
 
         wc = self.session.client('azure.mgmt.web.WebSiteManagementClient')
 
         site_config = wc.web_apps.get_configuration(self.rg_name, func_app_name)
         self.assertTrue(site_config.always_on)
-        self.assertEquals(site_config.linux_fx_version, FUNCTION_DOCKER_VERSION)
+        self.assertEqual(site_config.linux_fx_version, FUNCTION_DOCKER_VERSION)
 
         app_settings = wc.web_apps.list_application_settings(self.rg_name, func_app_name)
         self.assertIsNotNone(app_settings.properties['MACHINEKEY_DecryptionKey'])

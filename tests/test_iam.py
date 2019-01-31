@@ -71,10 +71,10 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 4)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(
             sorted([r["UserName"] for r in resources]),
-            ["Hazmat", "charmworld", "kaleb", "kapilt"],
+            ["Hazmat", "kapilt"],
         )
 
     def test_credential_access_key_multifilter_delete(self):
@@ -110,6 +110,9 @@ class UserCredentialReportTest(BaseTest):
         self.assertEqual(len(keys), 1)
         dt = parser.parse(resources[0]['c7n:matched-keys'][0]['last_rotated'])
         self.assertNotEqual(keys[0]['CreateDate'], dt)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ["arn:aws:iam::644160558196:user/kapil"])
 
     def test_access_key_last_service(self):
         # Note we're reusing the old console users flight records
@@ -210,6 +213,40 @@ class UserCredentialReportTest(BaseTest):
         )
 
 
+class IamUserTag(BaseTest):
+
+    def test_iam_user_actions(self):
+        factory = self.replay_flight_data('test_iam_user_tags')
+        p = self.load_policy({
+            'name': 'iam-tag',
+            'resource': 'iam-user',
+            'filters': [{
+                'tag:Role': 'Dev'}],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                 'tags': ['Role']},
+                {'type': 'mark-for-op',
+                 'op': 'delete',
+                 'days': 2}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client('iam')
+        if self.recording:
+            time.sleep(1)
+        user = client.get_user(UserName=resources[0]['UserName']).get('User')
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in user['Tags']},
+            {'Env': 'Dev',
+             'maid_status': 'Resource does not meet policy: delete@2019/01/25'})
+
+
 class IAMMFAFilter(BaseTest):
 
     def test_iam_mfa_filter(self):
@@ -252,6 +289,9 @@ class IamRoleFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369']) # NOQA
 
     def test_iam_role_get_resources(self):
         session_factory = self.replay_flight_data("test_iam_role_get_resource")
@@ -320,6 +360,7 @@ class IamUserTest(BaseTest):
             resources[0]['c7n:matched-keys'][0]['c7n:matched-type'], 'access')
 
     def test_iam_user_delete_some_access(self):
+        # TODO: this test could use a rewrite
         factory = self.replay_flight_data("test_iam_user_delete_options")
         p = self.load_policy(
             {
@@ -423,6 +464,9 @@ class IamInstanceProfileFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::644160558196:instance-profile/root_joshua'])
 
     def test_iam_instance_profile_unused(self):
         session_factory = self.replay_flight_data("test_iam_instance_profile_unused")
@@ -521,6 +565,10 @@ class IamGroupFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::644160558196:group/Admins',
+             'arn:aws:iam::644160558196:group/powerusers'])
 
     def test_iam_group_unused_users(self):
         session_factory = self.replay_flight_data("test_iam_group_unused_users")

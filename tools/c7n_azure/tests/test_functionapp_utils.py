@@ -97,7 +97,7 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_name='cloud-custodian-test')
 
         FunctionAppUtilities.deploy_function_app(parameters)
-        self.assertEquals(parameters.service_plan['sku_tier'], 'Basic')
+        self.assertEqual(parameters.service_plan['sku_tier'], 'Basic')
 
     def test_get_function_name_replacements(self):
         test_cases = [

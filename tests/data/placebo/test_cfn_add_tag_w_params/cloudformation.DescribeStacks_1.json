@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/mosdef2/387d82a0-23f5-11e9-98e5-128a65397f5a",
+                "StackName": "mosdef2",
+                "Description": "A sample template",
+                "Parameters": [
+                    {
+                        "ParameterKey": "UserName",
+                        "ParameterValue": "m1.small"
+                    }
+                ],
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 29,
+                    "hour": 18,
+                    "minute": 39,
+                    "second": 44,
+                    "microsecond": 569000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 29,
+                    "hour": 18,
+                    "minute": 48,
+                    "second": 41,
+                    "microsecond": 771000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "UPDATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Tags": [
+                    {
+                        "Key": "Author",
+                        "Value": "Kapil"
+                    }
+                ],
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "e9940725-23f6-11e9-a2ce-4597e04b9a84",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e9940725-23f6-11e9-a2ce-4597e04b9a84",
+                "content-type": "text/xml",
+                "content-length": "16472",
+                "vary": "Accept-Encoding",
+                "date": "Tue, 29 Jan 2019 18:51:39 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

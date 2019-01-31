@@ -1670,6 +1670,46 @@ class SecurityGroupTest(BaseTest):
         manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
+    def test_description_ingress(self):
+        p = self.load_policy(
+            {
+                "name": "ingress-access",
+                "resource": "security-group",
+                "filters": [
+                    {"type": "ingress",
+                     "Description": {
+                         "value": "Approved",
+                         "op": "not-equal",
+                     },
+                     "Cidr": {"value": "0.0.0.0/0"}, "Ports": [22]}
+                ],
+            }
+        )
+
+        resources = [{
+            "Description": "allows inbound 0.0.0.0/0:22",
+            "GroupName": "ssh",
+            "IpPermissions": [
+                {
+                    "FromPort": 22,
+                    "IpProtocol": "tcp",
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0",
+                            "Description": "ssh",
+                        }
+                    ],
+                    "Ipv6Ranges": []
+                }
+            ],
+            "OwnerId": "644160558196",
+            "GroupId": "sg-0b090df1c1f95bc13",
+            "IpPermissionsEgress": [],
+            "VpcId": "vpc-f1516b97"
+        }]
+        manager = p.load_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
     def test_ports_ingress(self):
         p = self.load_policy(
             {
