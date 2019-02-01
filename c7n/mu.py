@@ -430,22 +430,8 @@ class LambdaManager(object):
                 result = self.client.update_function_configuration(**new_config)
                 changed = True
 
-            # tag dance
-            base_arn = old_config['FunctionArn']
-            if base_arn.count(':') > 6:  # trim version/alias
-                base_arn = base_arn.rsplit(':', 1)[0]
-
-            old_tags = self.client.list_tags(Resource=base_arn)['Tags']
-            tags_to_add, tags_to_remove = self.diff_tags(old_tags, new_tags)
-
-            if tags_to_add:
-                log.debug("Updating function tags: %s" % func.name)
-                self.client.tag_resource(
-                    Resource=base_arn, Tags=tags_to_add)
-            if tags_to_remove:
-                log.debug("Removing function stale tags: %s" % func.name)
-                self.client.untag_resource(
-                    Resource=base_arn, TagKeys=tags_to_remove)
+            if self._update_tags(existing, new_config):
+                changed = True
 
             if not changed:
                 result = old_config
@@ -457,6 +443,25 @@ class LambdaManager(object):
             changed = True
 
         return result, changed
+
+    def _update_tags(self, existing, new_tags):
+        # tag dance
+        base_arn = old_config['FunctionArn']
+        if base_arn.count(':') > 6:  # trim version/alias
+            base_arn = base_arn.rsplit(':', 1)[0]
+
+        tags_to_add, tags_to_remove = self.diff_tags(
+            existing.get('Tags', {}), new_tags)
+        changed = False
+        if tags_to_add:
+            log.debug("Updating function tags: %s" % func.name)
+            self.client.tag_resource(Resource=base_arn, Tags=tags_to_add)
+            changed = True
+        if tags_to_remove:
+            log.debug("Removing function stale tags: %s" % func.name)
+            self.client.untag_resource(Resource=base_arn, TagKeys=tags_to_remove)
+            changed = True
+        return changed
 
     def _upload_func(self, s3_uri, func, archive):
         from boto3.s3.transfer import S3Transfer, TransferConfig
@@ -581,6 +586,10 @@ class AbstractLambdaFunction:
     def tags(self):
         """ """
 
+    @abc.abstractproperty
+    def layers(self):
+        """ """
+
     @abc.abstractmethod
     def get_events(self, session_factory):
         """event sources that should be bound to this lambda."""
@@ -603,6 +612,9 @@ class AbstractLambdaFunction:
             'DeadLetterConfig': self.dead_letter_config,
             'VpcConfig': LAMBDA_EMPTY_VALUES['VpcConfig'],
             'Tags': self.tags}
+
+        if self.layers:
+            conf['Layers'] = self.layers
 
         if self.environment['Variables']:
             conf['Environment'] = self.environment
@@ -663,6 +675,10 @@ class LambdaFunction(AbstractLambdaFunction):
     @property
     def role(self):
         return self.func_data['role']
+
+    @property
+    def layers(self):
+        return self.func_data.get('layers', ())
 
     @property
     def security_groups(self):
@@ -778,6 +794,10 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def tags(self):
         return self.policy.data['mode'].get('tags', {})
+
+    @property
+    def layers(self):
+        return self.policy.data['mode'].get('layers', ())
 
     @property
     def packages(self):
