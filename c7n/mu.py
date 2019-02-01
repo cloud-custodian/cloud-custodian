@@ -431,7 +431,10 @@ class LambdaManager(object):
                           func.name, ", ".join(sorted(config_changed)))
                 result = self.client.update_function_configuration(**new_config)
                 changed = True
-
+            if self._update_concurrency(
+                    existing, func,
+                    config_changed and result['FunctionArn'] or old_config['FunctionArn']):
+                changed = True
             if not changed:
                 result = old_config
         else:
@@ -439,9 +442,25 @@ class LambdaManager(object):
             params = func.get_config()
             params.update({'Publish': True, 'Code': code_ref, 'Role': role})
             result = self.client.create_function(**params)
+            self._update_concurrency(None, func, result['FunctionArn'])
             changed = True
 
         return result, changed
+
+    def _update_concurrency(self, existing, func, func_arn):
+        e_concurrency = None
+        if existing:
+            e_concurrency = existing.get('Concurrency', {}).get(
+                'ReservedConcurrentExecutions')
+        if e_concurrency == func.concurrency:
+            return
+        elif e_concurrency and func.concurrency is None:
+            self.client.delete_function_concurrency(
+                FunctionName=func_arn)
+            return True
+        self.client.put_function_concurrency(
+            FunctionName=func_arn,
+            ReservedConcurrentExecutions=func.concurrency)
 
     def _update_tags(self, existing, new_tags):
         # tag dance
@@ -589,6 +608,10 @@ class AbstractLambdaFunction:
     def layers(self):
         """ """
 
+    @abc.abstractproperty
+    def concurrency(self):
+        """ """
+
     @abc.abstractmethod
     def get_events(self, session_factory):
         """event sources that should be bound to this lambda."""
@@ -678,6 +701,10 @@ class LambdaFunction(AbstractLambdaFunction):
     @property
     def layers(self):
         return self.func_data.get('layers', ())
+
+    @property
+    def concurrency(self):
+        return self.func_data.get('concurrency')
 
     @property
     def security_groups(self):
@@ -793,6 +820,10 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def tags(self):
         return self.policy.data['mode'].get('tags', {})
+
+    @property
+    def concurrency(self):
+        return self.policy.data['mode'].get('concurrency')
 
     @property
     def layers(self):
