@@ -421,16 +421,15 @@ class LambdaManager(object):
 
             new_config = func.get_config()
             new_config['Role'] = role
-            new_tags = new_config.pop('Tags', {})
+
+            if self._update_tags(existing, new_config.pop('Tags', {})):
+                changed = True
 
             config_changed = self.delta_function(old_config, new_config)
             if config_changed:
                 log.debug("Updating function: %s config %s",
                           func.name, ", ".join(sorted(config_changed)))
                 result = self.client.update_function_configuration(**new_config)
-                changed = True
-
-            if self._update_tags(existing, new_config):
                 changed = True
 
             if not changed:
@@ -454,11 +453,11 @@ class LambdaManager(object):
             existing.get('Tags', {}), new_tags)
         changed = False
         if tags_to_add:
-            log.debug("Updating function tags: %s" % func.name)
+            log.debug("Updating function tags: %s" % base_arn)
             self.client.tag_resource(Resource=base_arn, Tags=tags_to_add)
             changed = True
         if tags_to_remove:
-            log.debug("Removing function stale tags: %s" % func.name)
+            log.debug("Removing function stale tags: %s" % base_arn)
             self.client.untag_resource(Resource=base_arn, TagKeys=tags_to_remove)
             changed = True
         return changed
