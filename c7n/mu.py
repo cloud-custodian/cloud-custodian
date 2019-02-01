@@ -446,7 +446,7 @@ class LambdaManager(object):
 
     def _update_tags(self, existing, new_tags):
         # tag dance
-        base_arn = old_config['FunctionArn']
+        base_arn = existing['Configuration']['FunctionArn']
         if base_arn.count(':') > 6:  # trim version/alias
             base_arn = base_arn.rsplit(':', 1)[0]
 
