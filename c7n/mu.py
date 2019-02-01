@@ -431,9 +431,7 @@ class LambdaManager(object):
                           func.name, ", ".join(sorted(config_changed)))
                 result = self.client.update_function_configuration(**new_config)
                 changed = True
-            if self._update_concurrency(
-                    existing, func,
-                    config_changed and result['FunctionArn'] or old_config['FunctionArn']):
+            if self._update_concurrency(existing, func):
                 changed = True
             if not changed:
                 result = old_config
@@ -442,24 +440,26 @@ class LambdaManager(object):
             params = func.get_config()
             params.update({'Publish': True, 'Code': code_ref, 'Role': role})
             result = self.client.create_function(**params)
-            self._update_concurrency(None, func, result['FunctionArn'])
+            self._update_concurrency(None, func)
             changed = True
 
         return result, changed
 
-    def _update_concurrency(self, existing, func, func_arn):
+    def _update_concurrency(self, existing, func):
         e_concurrency = None
         if existing:
             e_concurrency = existing.get('Concurrency', {}).get(
                 'ReservedConcurrentExecutions')
         if e_concurrency == func.concurrency:
             return
-        elif e_concurrency and func.concurrency is None:
+        elif e_concurrency is not None and func.concurrency is None:
+            log.debug("Removing function: %s concurrency", func.name)
             self.client.delete_function_concurrency(
-                FunctionName=func_arn)
+                FunctionName=func.name)
             return True
+        log.debug("Updating function: %s concurrency", func.name)
         self.client.put_function_concurrency(
-            FunctionName=func_arn,
+            FunctionName=func.name,
             ReservedConcurrentExecutions=func.concurrency)
 
     def _update_tags(self, existing, new_tags):

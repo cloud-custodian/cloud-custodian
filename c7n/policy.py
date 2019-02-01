@@ -345,8 +345,10 @@ class LambdaMode(ServerlessExecutionMode):
             'execution-options': {'type': 'object'},
             'function-prefix': {'type': 'string'},
             'member-role': {'type': 'string'},
-            'packages': {'type': 'array'},
+            'packages': {'type': 'array', 'items': {'type': 'string'}},
             # Lambda passthrough config
+            'layers': {'type': 'array', 'items': {'type': 'string'}},
+            'concurrency': {'type': 'integer'},
             'runtime': {'enum': ['python2.7', 'python3.6', 'python3.7']},
             'role': {'type': 'string'},
             'timeout': {'type': 'number'},
@@ -491,7 +493,7 @@ class LambdaMode(ServerlessExecutionMode):
                 manager = mu.LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                mu.PolicyLambda(self.policy), 'current',
+                mu.PolicyLambda(self.policy),
                 role=self.policy.options.assume_role)
 
     def get_logs(self, start, end):
