@@ -106,10 +106,8 @@ class InstanceDescribe(DescribeSource):
             try:
                 tags = client.list_tags_for_resource(
                     ResourceArn=arn).get('TagList', ())
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
+            except client.exceptions.ResourceNotFoundFault:
+                continue
             r['Tags'] = tags
 
 
@@ -200,19 +198,11 @@ class ModifyReplicationInstance(BaseAction):
             params['ReplicationInstanceArn'] = r['ReplicationInstanceArn']
             try:
                 client.modify_replication_instance(**params)
-            except ClientError as e:
-                ecode = e.response['Error']['Code']
-                if ecode in (
-                        'InvalidResourceStateFault',
-                        'ResourceAlreadyExistsFault',
-                        'ResourceNotFoundFault'):
-                    continue
-                elif ecode == 'UpgradeDependencyFailureFault':
-                    self.log.exception(
-                        'Exception modifying instance %s :%s' % (
-                            r['ReplicationInstanceArn'], e))
-                    continue
-                raise
+            except (client.exceptions.InvalidResourceStateFault,
+                    client.exceptions.ResourceNotFoundFault,
+                    client.exceptions.ResourceAlreadyExistsFault,
+                    client.exceptions.UpgradeDependencyFailureFault):
+                continue
 
 
 @ReplicationInstance.action_registry.register('tag')
@@ -244,10 +234,8 @@ class InstanceTag(Tag):
                 client.add_tags_to_resource(
                     ResourceArn=r['ReplicationInstanceArn'],
                     Tags=tags_list)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
+            except client.exceptions.ResourceNotFoundFault:
+                continue
 
 
 @ReplicationInstance.action_registry.register('remove-tag')
@@ -277,10 +265,8 @@ class InstanceRemoveTag(RemoveTag):
                 client.remove_tags_from_resource(
                     ResourceArn=r['ReplicationInstanceArn'],
                     TagKeys=tags)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
+            except client.exceptions.ResourceNotFoundFault:
+                continue
 
 
 @ReplicationInstance.action_registry.register('mark-for-op')
@@ -313,10 +299,8 @@ class InstanceMarkForOp(TagDelayedAction):
                 client.add_tags_to_resource(
                     ResourceArn=r['ReplicationInstanceArn'],
                     Tags=tags_list)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
+            except client.exceptions.ResourceNotFoundFault:
+                continue
 
 
 @DmsEndpoints.action_registry.register('modify-endpoint')
@@ -417,13 +401,10 @@ class ModifyDmsEndpoint(BaseAction):
             params['EngineName'] = params.get('EngineName', e['EngineName'])
             try:
                 client.modify_endpoint(**params)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'InvalidResourceStateFault',
-                        'ResourceAlreadyExistsFault',
-                        'ResourceNotFoundFault'):
-                    continue
-                raise
+            except (client.exceptions.InvalidResourceStateFault,
+                    client.exceptions.ResourceAlreadyExistsFault,
+                    client.exceptions.ResourceNotFoundFault):
+                continue
 
 
 @DmsEndpoints.action_registry.register('delete')
@@ -453,8 +434,5 @@ class DeleteDmsEndpoint(BaseAction):
             EndpointArn = e['EndpointArn']
             try:
                 client.delete_endpoint(EndpointArn=EndpointArn)
-            except ClientError as e:
-                self.log.exception(
-                    'Exception deleting endpoint %s :%s' % (
-                        EndpointArn, e))
+            except client.exceptions.ResourceNotFoundFault:
                 continue
