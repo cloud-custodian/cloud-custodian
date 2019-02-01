@@ -199,6 +199,10 @@ class PythonPackageArchive(object):
                 1024.0 * 1024.0)))
         return self
 
+    @staticmethod
+    def _temporary_opener(name, flag, mode=0o777):
+        return os.open(name, flag | os.O_TEMPORARY, mode)
+
     def remove(self):
         """Dispose of the temp file for garbage collection."""
         if self._temp_archive_file:
@@ -213,7 +217,16 @@ class PythonPackageArchive(object):
     def get_bytes(self):
         """Return the entire zip file as a byte string. """
         assert self._closed, "Archive not closed"
-        return open(self._temp_archive_file.name, 'rb').read()
+        return self.get_stream().read()
+
+    def get_stream(self):
+        """Return the entire zip file as a stream. """
+        assert self._closed, "Archive not closed"
+        # Windows requires TEMPORARY flag if you want to open files created by tempfile library
+        if os.name == 'nt':
+            return open(self._temp_archive_file.name, 'rb', opener=self._temporary_opener)
+        else:
+            return open(self._temp_archive_file.name, 'rb')
 
     def get_reader(self):
         """Return a read-only :py:class:`~zipfile.ZipFile`."""
