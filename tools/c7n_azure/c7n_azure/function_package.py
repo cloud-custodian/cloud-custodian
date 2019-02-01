@@ -213,10 +213,6 @@ class FunctionPackage(object):
 
         return True
 
-    @staticmethod
-    def _temporary_opener(name, flag, mode=0o777):
-        return os.open(name, flag | os.O_TEMPORARY, mode)
-
     def publish(self, deployment_creds):
         self.close()
 
@@ -226,11 +222,7 @@ class FunctionPackage(object):
 
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
-        # Windows requires TEMPORARY flag if you want to open files created by tempfile library
-        if os.name == 'nt':
-            zip_file = open(self.pkg.path, 'rb', opener=FunctionPackage._temporary_opener).read()
-        else:
-            zip_file = open(self.pkg.path, 'rb').read()
+        zip_file = self.pkg.get_bytes()
 
         try:
             r = requests.post(zip_api_url, data=zip_file, timeout=300, verify=self.enable_ssl_cert)

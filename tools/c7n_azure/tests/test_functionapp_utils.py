@@ -157,8 +157,11 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name='cloud-custodian-test')
 
+        package = FunctionPackage("TestPolicy")
+        package.close()
+
         FunctionAppUtilities.publish_functions_package(
-            parameters, FunctionPackage("TestPolicy"))
+            parameters, package)
 
         # verify app setting updated
         wc = self.session.client('azure.mgmt.web.WebSiteManagementClient')
