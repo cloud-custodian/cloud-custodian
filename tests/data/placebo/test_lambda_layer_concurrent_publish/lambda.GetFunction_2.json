@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "dc9289d3-2654-11e9-9181-cb69d6f77555",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 01 Feb 2019 19:09:13 GMT",
+                "content-type": "application/json",
+                "content-length": "2061",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "dc9289d3-2654-11e9-9181-cb69d6f77555"
+            },
+            "RetryAttempts": 0
+        },
+        "Configuration": {
+            "FunctionName": "test-foo-bar",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+            "Runtime": "python2.7",
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+            "Handler": "index.handler",
+            "CodeSize": 168,
+            "Description": "test",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2019-02-01T19:09:07.498+0000",
+            "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
+            "Version": "$LATEST",
+            "VpcConfig": {
+                "SubnetIds": [],
+                "SecurityGroupIds": [],
+                "VpcId": ""
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "d0494a7d-d3cd-4c4b-8c13-a3353beb6b63",
+            "Layers": [
+                {
+                    "Arn": "arn:aws:lambda:us-east-1:644160558196:layer:CustodianLayer:2",
+                    "CodeSize": 5835287
+                }
+            ]
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.amazonaws.com/snapshots/644160558196/test-foo-bar-7652b6ee-8609-4f73-a652-23c40c366520?versionId=rZIRhHoDg4eUvcXta41IBBBKCchrgaWw&X-Amz-Security-Token=FQoGZXIvYXdzEGMaDE7G%2BW%2FVNk7lbfbsOyK3A6fTLq1qrQrQ9iqIxf00vxr51pE%2Bf4CE3UtUwqBwVh156MeeYzY5mrG%2FY9C5Rd99wgev%2F0I8xlKhQF3fAn8d09yfJFR21LlcCBVrMLGHgzA%2FQYG9JVnR6V5Z4ULSX8UKXbN2pjSrW%2FZyyv5y%2FJDhGz5zZRRLotAAzfixeiJYmHXgiA14KRfnoEjAdaC5T5MgpBDqJBKJ1lgpraeiBfvnf5Q%2BoJ3eOVcsmX2wxl72snNp26NbsDQm%2BhgGmvsK%2B5%2BCdfox5MbKurxNcuTwIby2fVN8YXL%2Fvt0aq0SQKOZTioAyIOMjGtlwAMhYiabCywU2N2QoPhbXfNKdn%2FKu1FnyeMeXRoVlK1W%2FlMFC2h%2BKJNeodxM2iwERI3m289kBjzr%2BsJnGgR8Q8KgBeH%2FqwPyW7rYVs3hmNtq6wCrub89XAjVPW5S4V0bb8b4rFTykqjPBivDr2onxy8XdgUaczfkSJ3H9KWWm%2BeQ7sEfrVtzgBibiZSwkgpSUVZZIzNz4FZOcRk4ZnrJkO3DJiTKwK8nCyA%2FlmKw9w9t7pA1%2FVtM0%2Fqq238N3CpOHIGP8Af6tyNZ8gBHTE8ywUa8o5YPS4gU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190201T190913Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY36CF6MZX2%2F20190201%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=31f5ac37bdcf76f80df335c7a60ccfd85710bf79da8d002d4b0e3186f742aa5c"
+        },
+        "Concurrency": {
+            "ReservedConcurrentExecutions": 5
+        }
+    }
+}

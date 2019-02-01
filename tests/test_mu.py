@@ -77,6 +77,19 @@ class Publish(BaseTest):
         result = mgr.publish(func)
         self.assertEqual(result["CodeSize"], 169)
 
+    def test_publish_a_lambda_with_layer_and_concurrency(self):
+        factory = self.replay_flight_data('test_lambda_layer_concurrent_publish')
+        mgr = LambdaManager(factory)
+        layers = ['arn:aws:lambda:us-east-1:644160558196:layer:CustodianLayer:2']
+        func = self.make_func(
+            concurrency=5,
+            layers=layers)
+        self.addCleanup(mgr.remove, func)
+        result = mgr.publish(func)
+        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
+        state = mgr.get(func.name)
+        self.assertEqual(state['Concurrency']['ReservedConcurrentExecutions'], 5)
+
     def test_can_switch_runtimes(self):
         session_factory = self.replay_flight_data("test_can_switch_runtimes")
         func = self.make_func()

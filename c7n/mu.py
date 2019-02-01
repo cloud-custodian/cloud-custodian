@@ -365,6 +365,11 @@ class LambdaManager(object):
     def delta_function(old_config, new_config):
         changed = []
         for k in new_config:
+            # Layers need special handling as they have extra info on describe.
+            if k == 'Layers' and k in old_config and new_config[k]:
+                if sorted(new_config[k]) != sorted([
+                    l['Arn'] for l in old_config[k]]):
+                    changed.append(k)
             # Vpc needs special handling as a dict with lists
             if k == 'VpcConfig' and k in old_config and new_config[k]:
                 if set(old_config[k]['SubnetIds']) != set(

@@ -1,0 +1,22 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "d919dde2-2654-11e9-9172-e955e0242689",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "date": "Fri, 01 Feb 2019 19:09:07 GMT",
+                "content-type": "application/json",
+                "content-length": "107",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d919dde2-2654-11e9-9172-e955e0242689",
+                "x-amzn-errortype": "ResourceNotFoundException"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
