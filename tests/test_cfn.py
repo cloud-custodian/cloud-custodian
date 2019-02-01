@@ -74,7 +74,7 @@ class TestCFN(BaseTest):
                 "resource": "cfn",
                 "filters": [{"StackName": "mosdef2"}],
                 "actions": [
-                    {"type": "tag", "tags": {'Env': 'Dev'}}
+                    {"type": "tag", "tags": {'App': 'Ftw'}}
                 ],
             },
             session_factory=session_factory,
@@ -82,9 +82,11 @@ class TestCFN(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("cloudformation")
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        self.assertEqual(rtags, {'Env': 'Dev'})
         tags = {t['Key']: t['Value'] for t in client.describe_stacks(
             StackName=resources[0]["StackName"])["Stacks"][0]["Tags"]}
-        self.assertEqual(tags, {'Env': 'Dev'})
+        self.assertEqual(tags, {'Env': 'Dev', 'App': 'Ftw'})
 
     def test_cfn_add_tag(self):
         session_factory = self.replay_flight_data("test_cfn_add_tag")

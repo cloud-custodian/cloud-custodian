@@ -26,11 +26,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 1,
-                    "day": 29,
-                    "hour": 18,
-                    "minute": 51,
-                    "second": 40,
-                    "microsecond": 115000
+                    "day": 30,
+                    "hour": 20,
+                    "minute": 16,
+                    "second": 37,
+                    "microsecond": 763000
                 },
                 "RollbackConfiguration": {},
                 "StackStatus": "UPDATE_IN_PROGRESS",
@@ -38,6 +38,10 @@
                 "DisableRollback": false,
                 "NotificationARNs": [],
                 "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Ftw"
+                    },
                     {
                         "Key": "Env",
                         "Value": "Dev"
@@ -50,13 +54,13 @@
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "e9c5291a-23f6-11e9-8a67-cbe15c822cf9",
+            "RequestId": "f29d5977-24cb-11e9-877a-c398f938be5e",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "e9c5291a-23f6-11e9-8a67-cbe15c822cf9",
+                "x-amzn-requestid": "f29d5977-24cb-11e9-877a-c398f938be5e",
                 "content-type": "text/xml",
-                "content-length": "1400",
-                "date": "Tue, 29 Jan 2019 18:51:39 GMT"
+                "content-length": "1497",
+                "date": "Wed, 30 Jan 2019 20:16:37 GMT"
             },
             "RetryAttempts": 0
         }

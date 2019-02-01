@@ -3,13 +3,13 @@
     "data": {
         "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/mosdef2/387d82a0-23f5-11e9-98e5-128a65397f5a",
         "ResponseMetadata": {
-            "RequestId": "e9a62eec-23f6-11e9-9333-3feb7299e7ae",
+            "RequestId": "f27e8701-24cb-11e9-b642-754098a9759f",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "e9a62eec-23f6-11e9-9333-3feb7299e7ae",
+                "x-amzn-requestid": "f27e8701-24cb-11e9-b642-754098a9759f",
                 "content-type": "text/xml",
                 "content-length": "377",
-                "date": "Tue, 29 Jan 2019 18:51:39 GMT"
+                "date": "Wed, 30 Jan 2019 20:16:37 GMT"
             },
             "RetryAttempts": 0
         }
