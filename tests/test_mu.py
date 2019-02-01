@@ -85,11 +85,22 @@ class Publish(BaseTest):
             concurrency=5,
             layers=layers)
         self.addCleanup(mgr.remove, func)
+
         result = mgr.publish(func)
         self.assertEqual(result['Layers'][0]['Arn'], layers[0])
         state = mgr.get(func.name)
         self.assertEqual(state['Concurrency']['ReservedConcurrentExecutions'], 5)
 
+        func = self.make_func(layers=layers)
+        output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
+        result = mgr.publish(func)
+        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
+
+        lines = output.getvalue().strip().split("\n")
+        self.assertFalse('Updating function: test-foo-bar config Layers' in lines)
+        self.assertTrue('Removing function: test-foo-bar concurrency' in lines)
+
+        
     def test_can_switch_runtimes(self):
         session_factory = self.replay_flight_data("test_can_switch_runtimes")
         func = self.make_func()

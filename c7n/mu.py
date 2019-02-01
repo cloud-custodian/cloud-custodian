@@ -371,7 +371,7 @@ class LambdaManager(object):
                         l['Arn'] for l in old_config[k]]):
                     changed.append(k)
             # Vpc needs special handling as a dict with lists
-            if k == 'VpcConfig' and k in old_config and new_config[k]:
+            elif k == 'VpcConfig' and k in old_config and new_config[k]:
                 if set(old_config[k]['SubnetIds']) != set(
                         new_config[k]['SubnetIds']):
                     changed.append(k)
@@ -413,7 +413,7 @@ class LambdaManager(object):
 
         changed = False
         if existing:
-            old_config = existing['Configuration']
+            result = old_config = existing['Configuration']
             if archive.get_checksum() != old_config['CodeSha256']:
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
@@ -438,8 +438,6 @@ class LambdaManager(object):
                 changed = True
             if self._update_concurrency(existing, func):
                 changed = True
-            if not changed:
-                result = old_config
         else:
             log.info('Publishing custodian policy lambda function %s', func.name)
             params = func.get_config()

@@ -2,14 +2,14 @@
     "status_code": 201,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "d931d2b4-2654-11e9-90fc-5d82a83147ba",
+            "RequestId": "a3f1f0ad-2672-11e9-a537-1966109a85c7",
             "HTTPStatusCode": 201,
             "HTTPHeaders": {
-                "date": "Fri, 01 Feb 2019 19:09:10 GMT",
+                "date": "Fri, 01 Feb 2019 22:42:26 GMT",
                 "content-type": "application/json",
                 "content-length": "807",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "d931d2b4-2654-11e9-90fc-5d82a83147ba"
+                "x-amzn-requestid": "a3f1f0ad-2672-11e9-a537-1966109a85c7"
             },
             "RetryAttempts": 0
         },
@@ -22,9 +22,9 @@
         "Description": "test",
         "Timeout": 3,
         "MemorySize": 128,
-        "LastModified": "2019-02-01T19:09:07.498+0000",
+        "LastModified": "2019-02-01T22:42:23.185+0000",
         "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
-        "Version": "20",
+        "Version": "27",
         "VpcConfig": {
             "SubnetIds": [],
             "SecurityGroupIds": [],
@@ -33,7 +33,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "9507be4a-745c-47ed-a7e5-d3c77a5e34c3",
+        "RevisionId": "649d521c-a641-4094-8a7b-51d30875317b",
         "Layers": [
             {
                 "Arn": "arn:aws:lambda:us-east-1:644160558196:layer:CustodianLayer:2",
