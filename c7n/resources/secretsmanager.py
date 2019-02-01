@@ -38,6 +38,7 @@ class SecretsManager(QueryResourceManager):
 class CrossAccountAccessFilter(iamaccess.CrossAccountAccessFilter):
 
     policy_annotation = "c7n:AccessPolicy"
+    permissions = ("secretsmanager:GetResourcePolicy",)
 
     def process(self, resources, event=None):
         self.client = local_session(self.manager.session_factory).client('secretsmanager')
@@ -49,7 +50,6 @@ class CrossAccountAccessFilter(iamaccess.CrossAccountAccessFilter):
         r[self.policy_annotation] = p = self.client.get_resource_policy(
             SecretId=r['Name']).get('ResourcePolicy', None)
         return p
-
 
 
 @SecretsManager.action_registry.register('tag')
