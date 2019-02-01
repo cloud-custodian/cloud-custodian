@@ -1,0 +1,23 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AttachedPolicies": [
+            {
+                "PolicyName": "my-iam-policy",
+                "PolicyArn": "arn:aws:iam::123456789012:policy/my-iam-policy"
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4811612a-872f-11e6-acfe-07a6295c8f0a", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4811612a-872f-11e6-acfe-07a6295c8f0a", 
+                "date": "Fri, 30 Sep 2016 16:59:42 GMT", 
+                "content-length": "323", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

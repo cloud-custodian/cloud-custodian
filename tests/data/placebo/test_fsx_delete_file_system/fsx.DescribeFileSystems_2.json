@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 43,
+                    "second": 9,
+                    "microsecond": 463000
+                },
+                "FileSystemId": "fs-0f2c3ee3a00358df4",
+                "FileSystemType": "WINDOWS",
+                "Lifecycle": "DELETING",
+                "StorageCapacity": 300,
+                "VpcId": "vpc-d2d616b5",
+                "SubnetIds": [
+                    "subnet-efbcccb7"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-0a103301d1d1b5d2c"
+                ],
+                "DNSName": "fs-0f2c3ee3a00358df4.test.com",
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:file-system/fs-0f2c3ee3a00358df4",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test"
+                    }
+                ],
+                "WindowsConfiguration": {
+                    "ActiveDirectoryId": "d-9067141d9e",
+                    "ThroughputCapacity": 8,
+                    "WeeklyMaintenanceStartTime": "6:10:30",
+                    "DailyAutomaticBackupStartTime": "03:00",
+                    "AutomaticBackupRetentionDays": 7,
+                    "CopyTagsToBackups": false
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "6bc01e90-c147-454e-8fae-b7e87f01def8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Wed, 19 Dec 2018 20:47:45 GMT",
+                "x-amzn-requestid": "6bc01e90-c147-454e-8fae-b7e87f01def8",
+                "content-length": "764",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

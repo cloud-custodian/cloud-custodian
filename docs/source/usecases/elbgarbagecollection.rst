@@ -28,7 +28,6 @@ and configured.
       actions:
         - type: mark-for-op
           tag: maid_status
-          msg: "Unused ELB No Instances: {op}@{action_date}"
           op: delete
           days: 14
         - type: notify
@@ -37,16 +36,16 @@ and configured.
           subject: "ELB - No Instances Attached - [custodian {{ account }} - {{ region }}]"
           violation_desc: "No Instances Are Attached To The Following ELB(s):"
           action_desc: |
-             "Actions Taken: The unused ELBs have been marked for deletion in 14 if they
-             remain unused. If you still need the ELBs listed below, please attach instances
-             to them, otherwise please delete them if not needed anymore."
+            Actions Taken: The unused ELBs have been marked for deletion in 14 if they
+            remain unused. If you still need the ELBs listed below, please attach instances
+            to them, otherwise please delete them if not needed anymore.
           to:
-             - CloudCustodian@Company.com
-             - resource-owner
+            - CloudCustodian@Company.com
+            - resource-owner
           transport:
-               type: sqs
-               queue: https://sqs.us-east-1.amazonaws.com/12345678900/cloud-custodian-mailer
-               region: us-east-1
+            type: sqs
+            queue: https://sqs.us-east-1.amazonaws.com/12345678900/cloud-custodian-mailer
+            region: us-east-1
 
     - name: elb-unmark-if-in-use
       resource: elb
@@ -56,7 +55,7 @@ and configured.
       filters:
         - "tag:maid_status": not-null
         - not:
-              - Instances: []
+          - Instances: []
       actions:
         - type: remove-tag
           tags: [maid_status]
@@ -78,9 +77,9 @@ and configured.
           violation_desc: "No Instances Are Attached To ELB for over 14 days:"
           action_desc: "Actions Taken:  The ELB has been deleted"
           to:
-             - CloudCustodian@Company.com
-             - resource-owner
+            - CloudCustodian@Company.com
+            - resource-owner
           transport:
-               type: sqs
-               queue: https://sqs.us-east-1.amazonaws.com/12345678900/cloud-custodian-mailer
-               region: us-east-1
+            type: sqs
+            queue: https://sqs.us-east-1.amazonaws.com/12345678900/cloud-custodian-mailer
+            region: us-east-1

@@ -22,6 +22,7 @@ import time
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
+import six
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -79,10 +80,75 @@ class Snapshot(QueryResourceManager):
     action_registry = ActionRegistry('ebs-snapshot.actions')
 
     def resources(self, query=None):
+        qfilters = QueryParser.parse(self.data.get('query', []))
         query = query or {}
+        if qfilters:
+            query['Filters'] = qfilters
         if query.get('OwnerIds') is None:
             query['OwnerIds'] = ['self']
         return super(Snapshot, self).resources(query=query)
+
+
+class QueryParser(object):
+
+    QuerySchema = {
+        'description': six.string_types,
+        'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
+        'owner-id': six.string_types,
+        'progress': six.string_types,
+        'snapshot-id': six.string_types,
+        'start-time': six.string_types,
+        'status': ('pending', 'completed', 'error'),
+        'tag': six.string_types,
+        'tag-key': six.string_types,
+        'volume-id': six.string_types,
+        'volume-size': six.string_types,
+    }
+
+    @classmethod
+    def parse(cls, data):
+        filters = []
+
+        if not isinstance(data, (tuple, list)):
+            raise PolicyValidationError(
+                "EBS Query invalid format, must be array of dicts %s" % (
+                    data))
+        for d in data:
+            if not isinstance(d, dict):
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid %s" % data)
+            if "Name" not in d or "Values" not in d:
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid Missing Key, Values in %s" % data)
+            key = d['Name']
+            values = d['Values']
+
+            if key not in cls.QuerySchema and not key.startswith('tag:'):
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid Key:%s Valid: %s" % (
+                        key, ", ".join(cls.QuerySchema.keys())))
+
+            vtype = cls.QuerySchema.get(key)
+            if vtype is None and key.startswith('tag'):
+                vtype = six.string_types
+
+            if not isinstance(values, list):
+                raise PolicyValidationError(
+                    "EBS Query Filter Invalid Values, must be array %s" % (data,))
+
+            for v in values:
+                if isinstance(vtype, tuple) and vtype != six.string_types:
+                    if v not in vtype:
+                        raise PolicyValidationError(
+                            "EBS Query Filter Invalid Value: %s Valid: %s" % (
+                                v, ", ".join(vtype)))
+                elif not isinstance(v, vtype):
+                    raise PolicyValidationError(
+                        "EBS Query Filter Invalid Value Type %s" % (data,))
+
+            filters.append(d)
+
+        return filters
 
 
 @Snapshot.filter_registry.register('age')
@@ -399,6 +465,43 @@ class EBS(QueryResourceManager):
     action_registry = actions
 
 
+@EBS.action_registry.register('detach')
+class VolumeDetach(BaseAction):
+
+    """
+    Detach an EBS volume from an Instance.
+
+    If 'Force' Param is True, then we'll do a forceful detach
+    of the Volume. The default value for 'Force' is False.
+
+     :example:
+
+     .. code-block:: yaml
+
+             policies:
+               - name: instance-ebs-volumes
+                 resource: ebs
+                 filters:
+                   VolumeId :  volumeid
+                 actions:
+                   - detach
+
+
+    """
+
+    schema = type_schema('detach', force={'type': 'boolean'})
+    permissions = ('ec2:DetachVolume',)
+
+    def process(self, volumes, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vol in volumes:
+            for attachment in vol.get('Attachments', []):
+                client.detach_volume(InstanceId=attachment['InstanceId'],
+                                VolumeId=attachment['VolumeId'],
+                                Force=self.data.get('force', False))
+
+
 @filters.register('instance')
 class AttachedInstanceFilter(ValueFilter):
     """Filter volumes based on filtering on their attached instance
@@ -517,7 +620,7 @@ class HealthFilter(HealthEventFilter):
         paginator = client.get_paginator('describe_events')
         events = list(itertools.chain(
             *[p['events']for p in paginator.paginate(filter=f)]))
-        entities = self.process_event(events)
+        entities = self.process_event(client, events)
 
         event_map = {e['arn']: e for e in events}
         config = local_session(self.manager.session_factory).client('config')
@@ -738,11 +841,6 @@ class EncryptInstanceVolumes(BaseAction):
         'ec2:DeleteTags')
 
     def validate(self):
-        key = self.data.get('key')
-        if not key:
-            raise ValueError(
-                "action:encrypt-instance-volume "
-                "requires kms keyid/alias specified")
         self.verbose = self.data.get('verbose', False)
         return self
 

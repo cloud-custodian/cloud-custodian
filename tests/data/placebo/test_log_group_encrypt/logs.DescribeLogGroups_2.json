@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "c7n-encrypted",
+                "creationTime": 1543060513793,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:c7n-encrypted:*",
+                "storedBytes": 0,
+                "kmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/6f13fc53-8da0-46f2-9c69-c1f9fbf471d7"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "ce6d5fb6-efdf-11e8-9c10-b9fb0527d232",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ce6d5fb6-efdf-11e8-9c10-b9fb0527d232",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "274",
+                "date": "Sat, 24 Nov 2018 11:55:14 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

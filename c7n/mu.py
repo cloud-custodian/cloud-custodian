@@ -30,18 +30,16 @@ import time
 import tempfile
 import zipfile
 
-from boto3.s3.transfer import S3Transfer, TransferConfig
-from botocore.exceptions import ClientError
-
 from concurrent.futures import ThreadPoolExecutor
 
 # Static event mapping to help simplify cwe rules creation
+from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
 
 
-log = logging.getLogger('custodian.lambda')
+log = logging.getLogger('custodian.serverless')
 
 
 class PythonPackageArchive(object):
@@ -63,11 +61,13 @@ class PythonPackageArchive(object):
 
     """
 
+    zip_compression = zipfile.ZIP_DEFLATED
+
     def __init__(self, *modules):
         self._temp_archive_file = tempfile.NamedTemporaryFile()
         self._zip_file = zipfile.ZipFile(
             self._temp_archive_file, mode='w',
-            compression=zipfile.ZIP_DEFLATED)
+            compression=self.zip_compression)
         self._closed = False
         self.add_modules(None, *modules)
 
@@ -94,7 +94,7 @@ class PythonPackageArchive(object):
                 # https://docs.python.org/3/reference/import.html#module-path
                 for directory in module.__path__:
                     self.add_directory(directory, ignore)
-                if not hasattr(module, '__file__'):
+                if getattr(module, '__file__', None) is None:
 
                     # Likely a namespace package. Try to add *.pth files so
                     # submodules are importable under Python 2.7.
@@ -182,6 +182,8 @@ class PythonPackageArchive(object):
         assert not self._closed, "Archive closed"
         if not isinstance(dest, zipfile.ZipInfo):
             dest = zinfo(dest)  # see for some caveats
+        # Ensure we apply the compression
+        dest.compress_type = self.zip_compression
         self._zip_file.writestr(dest, contents)
 
     def close(self):
@@ -192,7 +194,7 @@ class PythonPackageArchive(object):
         self._closed = True
         self._zip_file.close()
         log.debug(
-            "Created custodian lambda archive size: %0.2fmb",
+            "Created custodian serverless archive size: %0.2fmb",
             (os.path.getsize(self._temp_archive_file.name) / (
                 1024.0 * 1024.0)))
         return self
@@ -206,7 +208,7 @@ class PythonPackageArchive(object):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
         with open(self._temp_archive_file.name, 'rb') as fh:
-            return encoder(checksum(fh, hasher()))
+            return encoder(checksum(fh, hasher())).decode('ascii')
 
     def get_bytes(self):
         """Return the entire zip file as a byte string. """
@@ -294,15 +296,16 @@ class LambdaManager(object):
                     e, func.alias)
         return result
 
+    add = publish
+
     def remove(self, func, alias=None):
         for e in func.get_events(self.session_factory):
             e.remove(func)
         log.info("Removing lambda function %s", func.name)
         try:
             self.client.delete_function(FunctionName=func.name)
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                raise
+        except self.client.exceptions.ResourceNotFoundException:
+            pass
 
     def metrics(self, funcs, start, end, period=5 * 60):
 
@@ -337,18 +340,16 @@ class LambdaManager(object):
         try:
             logs.describe_log_groups(
                 logGroupNamePrefix=group_name)
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                return
-            raise
+        except logs.exceptions.ResourceNotFoundException:
+            pass
+
         try:
             log_streams = logs.describe_log_streams(
                 logGroupName=group_name,
                 orderBy="LastEventTime", limit=3, descending=True)
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                return
-            raise
+        except logs.exceptions.ResourceNotFoundException:
+            return
+
         start = _timestamp_from_string(start)
         end = _timestamp_from_string(end)
         for s in reversed(log_streams['logStreams']):
@@ -356,30 +357,29 @@ class LambdaManager(object):
                 logGroupName=group_name,
                 logStreamName=s['logStreamName'],
                 startTime=start,
-                endTime=end,
-            )
+                endTime=end)
             for e in result['events']:
                 yield e
 
     @staticmethod
     def delta_function(old_config, new_config):
-        found = False
+        changed = []
         for k in new_config:
             # Vpc needs special handling as a dict with lists
             if k == 'VpcConfig' and k in old_config and new_config[k]:
                 if set(old_config[k]['SubnetIds']) != set(
                         new_config[k]['SubnetIds']):
-                    found = True
+                    changed.append(k)
                 elif set(old_config[k]['SecurityGroupIds']) != set(
                         new_config[k]['SecurityGroupIds']):
-                    found = True
+                    changed.append(k)
             elif k not in old_config:
                 if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
                     continue
-                found = True
+                changed.append(k)
             elif new_config[k] != old_config[k]:
-                found = True
-        return found
+                changed.append(k)
+        return changed
 
     @staticmethod
     def diff_tags(old_tags, new_tags):
@@ -409,13 +409,13 @@ class LambdaManager(object):
         changed = False
         if existing:
             old_config = existing['Configuration']
-            if archive.get_checksum() != old_config[
-                    'CodeSha256'].encode('ascii'):
+            if archive.get_checksum() != old_config['CodeSha256']:
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
                 params.update(code_ref)
                 result = self.client.update_function_code(**params)
                 changed = True
+
             # TODO/Consider also set publish above to false, and publish
             # after configuration change?
 
@@ -423,8 +423,10 @@ class LambdaManager(object):
             new_config['Role'] = role
             new_tags = new_config.pop('Tags', {})
 
-            if self.delta_function(old_config, new_config):
-                log.debug("Updating function: %s config" % func.name)
+            config_changed = self.delta_function(old_config, new_config)
+            if config_changed:
+                log.debug("Updating function: %s config %s",
+                          func.name, ", ".join(sorted(config_changed)))
                 result = self.client.update_function_configuration(**new_config)
                 changed = True
 
@@ -437,11 +439,11 @@ class LambdaManager(object):
             tags_to_add, tags_to_remove = self.diff_tags(old_tags, new_tags)
 
             if tags_to_add:
-                log.debug("Adding/updating tags: %s config" % func.name)
+                log.debug("Updating function tags: %s" % func.name)
                 self.client.tag_resource(
                     Resource=base_arn, Tags=tags_to_add)
             if tags_to_remove:
-                log.debug("Removing tags: %s config" % func.name)
+                log.debug("Removing function stale tags: %s" % func.name)
                 self.client.untag_resource(
                     Resource=base_arn, TagKeys=tags_to_remove)
 
@@ -457,6 +459,7 @@ class LambdaManager(object):
         return result, changed
 
     def _upload_func(self, s3_uri, func, archive):
+        from boto3.s3.transfer import S3Transfer, TransferConfig
         _, bucket, key_prefix = parse_s3(s3_uri)
         key = "%s/%s" % (key_prefix, func.name)
         transfer = S3Transfer(
@@ -596,11 +599,13 @@ class AbstractLambdaFunction:
             'Handler': self.handler,
             'Timeout': self.timeout,
             'TracingConfig': self.tracing_config,
-            'Environment': self.environment,
             'KMSKeyArn': self.kms_key_arn,
             'DeadLetterConfig': self.dead_letter_config,
             'VpcConfig': LAMBDA_EMPTY_VALUES['VpcConfig'],
             'Tags': self.tags}
+
+        if self.environment['Variables']:
+            conf['Environment'] = self.environment
 
         if self.subnets and self.security_groups:
             conf['VpcConfig'] = {
@@ -732,7 +737,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python2.7')
+        return self.policy.data['mode'].get('runtime', 'python3.7')
 
     @property
     def memory_size(self):
@@ -854,22 +859,26 @@ class CloudWatchEventSource(object):
         'terminate-success': 'EC2 Instance Terminate Successful',
         'terminate-failure': 'EC2 Instance Terminate Unsuccessful'}
 
-    def __init__(self, data, session_factory, prefix="custodian-"):
+    def __init__(self, data, session_factory):
         self.session_factory = session_factory
-        self.session = session_factory()
-        self.client = self.session.client('events')
+        self._session = None
+        self._client = None
         self.data = data
-        self.prefix = prefix
 
-    def _make_notification_id(self, function_name):
-        if not function_name.startswith(self.prefix):
-            return "%s%s" % (self.prefix, function_name)
-        return function_name
+    @property
+    def session(self):
+        if not self._session:
+            self._session = self.session_factory()
+        return self._session
+
+    @property
+    def client(self):
+        if not self._client:
+            self._client = self.session.client('events')
+        return self._client
 
     def get(self, rule_name):
-        return resource_exists(
-            self.client.describe_rule,
-            Name=self._make_notification_id(rule_name))
+        return resource_exists(self.client.describe_rule, Name=rule_name)
 
     @staticmethod
     def delta(src, tgt):
@@ -956,7 +965,7 @@ class CloudWatchEventSource(object):
         rule = self.get(func.name)
 
         if rule and self.delta(rule, params):
-            log.debug("Updating cwe rule for %s" % self)
+            log.debug("Updating cwe rule for %s" % func.name)
             response = self.client.put_rule(**params)
         elif not rule:
             log.debug("Creating cwe rule for %s" % (self))
@@ -964,17 +973,17 @@ class CloudWatchEventSource(object):
         else:
             response = {'RuleArn': rule['Arn']}
 
+        client = self.session.client('lambda')
         try:
-            self.session.client('lambda').add_permission(
+            client.add_permission(
                 FunctionName=func.name,
                 StatementId=func.name,
                 SourceArn=response['RuleArn'],
                 Action='lambda:InvokeFunction',
                 Principal='events.amazonaws.com')
             log.debug('Added lambda invoke cwe rule permission')
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceConflictException':
-                raise
+        except client.exceptions.ResourceConflictException:
+            pass
 
         # Add Targets
         found = False
@@ -1090,9 +1099,8 @@ class BucketLambdaNotification(object):
             params['SourceArn'] = 'arn:aws:s3:::%' % self.bucket['Name']
         try:
             lambda_client.add_permission(**params)
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceConflictException':
-                raise
+        except lambda_client.exceptions.ResourceConflictException:
+            pass
 
         notifies.setdefault('LambdaFunctionConfigurations', []).append(n_params)
         s3.put_bucket_notification_configuration(
@@ -1112,9 +1120,8 @@ class BucketLambdaNotification(object):
                 FunctionName=func['FunctionName'],
                 StatementId=self.bucket['Name'])
             log.debug("Removed lambda permission result: %s" % response)
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                raise
+        except lambda_client.exceptions.ResourceNotFoundException:
+            pass
 
         notifies['LambdaFunctionConfigurations'].remove(found)
         s3.put_bucket_notification_configuration(
@@ -1151,9 +1158,8 @@ class CloudWatchLogSubscription(object):
                 log.debug("Added lambda ipo nvoke log group permission")
                 # iam eventual consistency and propagation
                 time.sleep(self.iam_delay)
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceConflictException':
-                    raise
+            except lambda_client.exceptions.ResourceConflictException:
+                pass
             # Consistent put semantics / ie no op if extant
             self.client.put_subscription_filter(
                 logGroupName=group['logGroupName'],
@@ -1169,18 +1175,16 @@ class CloudWatchLogSubscription(object):
                     FunctionName=func.name,
                     StatementId=group['logGroupName'][1:].replace('/', '-'))
                 log.debug("Removed lambda permission result: %s" % response)
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                    raise
+            except lambda_client.exceptions.ResourceNotFoundException:
+                pass
 
             try:
                 response = self.client.delete_subscription_filter(
                     logGroupName=group['logGroupName'], filterName=func.name)
                 log.debug("Removed subscription filter from: %s",
                           group['logGroupName'])
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                    raise
+            except lambda_client.exceptions.ResourceNotFoundException:
+                pass
 
 
 class SQSSubscription(object):
@@ -1277,9 +1281,8 @@ class SNSSubscription(object):
                 log.debug("Added permission for sns to invoke lambda")
                 # iam eventual consistency and propagation
                 time.sleep(self.iam_delay)
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceConflictException':
-                    raise
+            except lambda_client.exceptions.ResourceConflictException:
+                pass
 
             # Subscribe the lambda to the topic, idempotent
             sns_client = session.client('sns')
@@ -1307,6 +1310,7 @@ class SNSSubscription(object):
 
             class Done(Exception):
                 pass
+
             try:
                 for page in paginator.paginate(TopicArn=topic_arn):
                     for subscription in page['Subscriptions']:
@@ -1317,10 +1321,8 @@ class SNSSubscription(object):
                                 SubscriptionArn=subscription['SubscriptionArn'])
                             log.debug("Unsubscribed %s from %s" %
                                 (func.name, topic_name))
-                        except ClientError as e:
-                            code = e.response['Error']['Code']
-                            if code != 'ResourceNotFoundException':
-                                raise
+                        except sns_client.exceptions.NotFoundException:
+                            pass
                         raise Done  # break out of both for loops
             except Done:
                 pass
@@ -1402,7 +1404,7 @@ class ConfigRule(object):
         )
 
         if isinstance(func, PolicyLambda):
-            manager = func.policy.get_resource_manager()
+            manager = func.policy.load_resource_manager()
             if hasattr(manager.get_model(), 'config_type'):
                 config_type = manager.get_model().config_type
             else:
@@ -1451,16 +1453,16 @@ class ConfigRule(object):
         elif rule:
             log.debug("Config rule up to date")
             return
+        client = self.session.client('lambda')
         try:
-            self.session.client('lambda').add_permission(
+            client.add_permission(
                 FunctionName=func.name,
                 StatementId=func.name,
                 SourceAccount=func.arn.split(':')[4],
                 Action='lambda:InvokeFunction',
                 Principal='config.amazonaws.com')
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceConflictException':
-                raise
+        except client.exceptions.ResourceConflictException:
+            pass
 
         log.debug("Adding config rule for %s" % func.name)
         return self.client.put_config_rule(ConfigRule=params)
@@ -1473,6 +1475,5 @@ class ConfigRule(object):
         try:
             self.client.delete_config_rule(
                 ConfigRuleName=func.name)
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                raise
+        except self.client.exceptions.NoSuchConfigRuleException:
+            pass

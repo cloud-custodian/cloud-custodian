@@ -19,7 +19,7 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import logging
@@ -39,6 +39,9 @@ from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
 from c7n.utils import (
     local_session, type_schema, chunks, get_retry, worker)
+
+
+from .ec2 import deserialize_user_data
 
 log = logging.getLogger('custodian.asg')
 
@@ -419,6 +422,7 @@ class NotEncryptedFilter(Filter, LaunchConfigFilterBase):
                   - type: not-encrypted
                     exclude_image: true
     """
+
     schema = type_schema('not-encrypted', exclude_image={'type': 'boolean'})
     permissions = (
         'ec2:DescribeImages',
@@ -709,6 +713,7 @@ class VpcIdFilter(ValueFilter):
 
 
 @filters.register('progagated-tags')
+@filters.register('propagated-tags')
 class PropagatedTagFilter(Filter):
     """Filter ASG based on propagated tags
 
@@ -732,6 +737,7 @@ class PropagatedTagFilter(Filter):
     """
     schema = type_schema(
         'progagated-tags',
+        aliases=('propagated-tags',),
         keys={'type': 'array', 'items': {'type': 'string'}},
         match={'type': 'boolean'},
         propagate={'type': 'boolean'})
@@ -818,6 +824,64 @@ class CapacityDelta(Filter):
         return [a for a in asgs
                 if len(a['Instances']) < a['DesiredCapacity'] or
                 len(a['Instances']) < a['MinSize']]
+
+
+@filters.register('user-data')
+class UserDataFilter(ValueFilter, LaunchConfigFilterBase):
+    """Filter on ASG's whose launch configs have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: lc_userdata
+                resource: asg
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+
+    def __init__(self, data, manager):
+        super(UserDataFilter, self).__init__(data, manager)
+        self.data['key'] = '"c7n:user-data"'
+
+    def get_permissions(self):
+        return self.manager.get_resource_manager('asg').get_permissions()
+
+    def process(self, asgs, event=None):
+        '''
+        Get list of autoscaling groups whose launch configs match the user-data filter.
+        Note: Since this is an autoscaling filter, this won't match unused launch configs.
+        :param launch_configs: List of launch configurations
+        :param event: Event
+        :return: List of ASG's with matching launch configs
+        '''
+
+        self.data['key'] = '"c7n:user-data"'
+        results = []
+        super(UserDataFilter, self).initialize(asgs)
+
+        for asg in asgs:
+            launch_config = self.configs.get(asg['LaunchConfigurationName'])
+            if self.annotation not in launch_config:
+                if not launch_config['UserData']:
+                    asg[self.annotation] = None
+                else:
+                    asg[self.annotation] = deserialize_user_data(
+                        launch_config['UserData'])
+            if self.match(asg):
+                results.append(asg)
+            return results
 
 
 @actions.register('resize')
@@ -1339,7 +1403,7 @@ class MarkForOp(Tag):
 
     schema = type_schema(
         'mark-for-op',
-        op={'enum': ['suspend', 'resume', 'delete']},
+        op={'type': 'string'},
         key={'type': 'string'},
         tag={'type': 'string'},
         message={'type': 'string'},
@@ -1350,15 +1414,19 @@ class MarkForOp(Tag):
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
     def validate(self):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise PolicyValidationError(
                 "Invalid timezone specified %s on %s" % (self.tz, self.manager.data))
+        op = self.data.get('op')
+        if op not in self.manager.action_registry:
+            raise PolicyValidationError(
+                "Invalid op %s for asg on policy %s" % (op, self.manager.data))
         return self
 
     def process(self, asgs):
-        self.tz = zoneinfo.gettz(
+        self.tz = tzutil.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('message', self.default_template)
@@ -1630,8 +1698,6 @@ class LaunchConfig(query.QueryResourceManager):
 class DescribeLaunchConfig(query.DescribeSource):
 
     def augment(self, resources):
-        for r in resources:
-            r.pop('UserData', None)
         return resources
 
 

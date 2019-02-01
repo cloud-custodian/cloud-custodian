@@ -14,10 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
-import mock
+import os
 
 from azure_common import BaseTest
 from c7n_azure.function_package import FunctionPackage
+from c7n_azure.constants import ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,\
+    FUNCTION_TIME_TRIGGER_MODE, FUNCTION_EVENT_TRIGGER_MODE
+from mock import patch
 
 
 class FunctionPackageTest(BaseTest):
@@ -29,54 +32,108 @@ class FunctionPackageTest(BaseTest):
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': 'azure-periodic',
+                {'type': FUNCTION_TIME_TRIGGER_MODE,
                  'schedule': '0 1 0 0 0'}
         })
 
-        packer = FunctionPackage(p.data)
-        packer.pkg = mock.MagicMock()
+        packer = FunctionPackage(p.data['name'])
 
-        packer._add_function_config()
+        config = packer.get_function_config(p.data)
 
-        binding = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
+        binding = json.loads(config)
 
         self.assertEqual(binding['bindings'][0]['type'], 'timerTrigger')
-        self.assertEqual(binding['bindings'][0]['name'], 'timer')
+        self.assertEqual(binding['bindings'][0]['name'], 'input')
         self.assertEqual(binding['bindings'][0]['schedule'], '0 1 0 0 0')
 
-    def test_add_function_config_eventhub(self):
+    def test_add_function_config_events(self):
         p = self.load_policy({
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': 'azure-stream'}
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
         })
 
-        packer = FunctionPackage(p.data)
-        packer.pkg = mock.MagicMock()
+        packer = FunctionPackage(p.data['name'])
 
-        packer._add_function_config()
+        config = packer.get_function_config(p.data)
 
-        binding = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
+        binding = json.loads(config)
 
-        self.assertEqual(binding['bindings'][0]['type'], 'eventHubTrigger')
+        self.assertEqual(binding['bindings'][0]['type'], 'queueTrigger')
+        self.assertEqual(binding['bindings'][0]['connection'], 'AzureWebJobsStorage')
 
     def test_add_policy(self):
         p = self.load_policy({
             'name': 'test-azure-public-ip',
             'resource': 'azure.publicip',
             'mode':
-                {'type': 'azure-stream'}
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
         })
 
-        packer = FunctionPackage(p.data)
-        packer.pkg = mock.MagicMock()
+        packer = FunctionPackage(p.data['name'])
 
-        packer._add_policy()
+        policy = json.loads(packer._get_policy(p.data))
 
-        policy = json.loads(packer.pkg.add_contents.call_args[1]['contents'])
-
-        self.assertEqual(policy,
+        self.assertEqual(policy['policies'][0],
                          {u'resource': u'azure.publicip',
                           u'name': u'test-azure-public-ip',
-                          u'mode': {u'type': u'azure-stream'}})
+                          u'mode': {u'type': u'azure-event-grid',
+                                    u'events': [u'VmWrite']}})
+
+    def test_event_package_files(self):
+        p = self.load_policy({
+            'name': 'test-azure-package',
+            'resource': 'azure.resourcegroup',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
+        })
+
+        packer = FunctionPackage(p.data['name'])
+
+        packer._add_functions_required_files(p.data, 'test-queue')
+        files = packer.pkg._zip_file.filelist
+
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'test-azure-package/function.py'))
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'test-azure-package/__init__.py'))
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'test-azure-package/function.json'))
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'test-azure-package/config.json'))
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'host.json'))
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'extensions.csproj'))
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'bin/extensions.dll'))
+
+    def test_env_var_disables_cert_validation(self):
+        p = self.load_policy({
+            'name': 'test-azure-package',
+            'resource': 'azure.resourcegroup',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
+        })
+
+        with patch.dict(os.environ,
+                        {
+                            ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION: 'YES'
+                        }, clear=True):
+            packer = FunctionPackage(p.data['name'])
+            self.assertFalse(packer.enable_ssl_cert)
+
+    def def_cert_validation_on_by_default(self):
+        p = self.load_policy({
+            'name': 'test-azure-package',
+            'resource': 'azure.resourcegroup',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']},
+        })
+
+        packer = FunctionPackage(p.data['name'])
+        self.assertTrue(packer.enable_ssl_cert)
+
+    @staticmethod
+    def _file_exists(files, name):
+        file_exists = [True for item in files if item.filename == name][0]
+        return file_exists or False

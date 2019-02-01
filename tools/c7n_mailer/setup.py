@@ -13,19 +13,23 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from io import open
+from os import path
 from setuptools import setup, find_packages
-import os
 
 # *Any* updates here should also go into c7n_mailer/deploy.py for lambda packaging.
 requires = [
     "Jinja2",
     "boto3",
     "jsonschema",
-    "ruamel.yaml<0.15",
+    "simplejson",  # datadog packaging dep
+    "python-dateutil>=2.6",
+    "ruamel.yaml==0.15.42",
     "datadog",
-    "slackclient",
     "sendgrid",
-    "ldap3"]
+    "ldap3",
+    "redis"]
+
 
 try:
     from concurrent import futures  # noqa F401
@@ -34,22 +38,27 @@ except ImportError:
     # https://github.com/agronholm/pythonfutures/issues/41
     requires += ['futures']
 
-description = ""
-if os.path.exists('README.md'):
-    description = open('README.md').read()
+# read the contents of your README file
+this_directory = path.abspath(path.dirname(__file__))
+readme = path.join(this_directory, 'README.md')
+long_description = ''
+if path.exists(readme):
+    with open(readme, encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(
     name="c7n_mailer",
-    version='0.3.1',
+    version='0.4.1',
     description="Cloud Custodian - Reference Mailer",
-    long_description=description,
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
     url="https://github.com/capitalone/cloud-custodian",
     license="Apache-2.0",
-    packages=find_packages('c7n_mailer'),
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
             'c7n-mailer = c7n_mailer.cli:main',
@@ -57,4 +66,5 @@ setup(
         ]
     },
     install_requires=requires,
+    package_data={str(''): [str('msg-templates/*.j2')]},
 )

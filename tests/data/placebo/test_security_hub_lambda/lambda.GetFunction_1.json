@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "fd749481-0a2e-11e9-b4b9-df5dc33668dc",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 27 Dec 2018 23:27:34 GMT",
+                "content-type": "application/json",
+                "content-length": "1828",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "fd749481-0a2e-11e9-b4b9-df5dc33668dc"
+            },
+            "RetryAttempts": 0
+        },
+        "Configuration": {
+            "FunctionName": "check",
+            "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:check",
+            "Runtime": "python2.7",
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+            "Handler": "lambda_function.lambda_handler",
+            "CodeSize": 301,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2018-11-26T19:01:38.558+0000",
+            "CodeSha256": "D8RkghLf4BvG73/MkNcD780zBP/urgq4HCwGd9ixmGU=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "d384566d-3528-4b18-bcca-e4c4a7389501"
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://awslambda-us-east-2-tasks.s3.us-east-2.amazonaws.com/snapshots/644160558196/check-39b4d582-5bd6-425c-a61f-79c0dd21a00e?versionId=APglqTvtERzZCXz8wfQ6dAanMKurGjie&X-Amz-Security-Token=FQoGZXIvYXdzEAcaDPP%2FokypCVFRg7XiFyK3A8oSuLC0YQZCL0%2Be2a1eP3lVjpdIfsFRvx8fsYmo4yemG%2BVOixThpqDoewT1eNzQRW2GfgbESBQZQwiPMuq6t%2F0iwLIarHbHjP%2FQf7JbitjiTB2AV8gxY4xGL3Oh%2FelZGo7cdIwTXoZeQHu6xbgF0rX5lVOKKrXlfFr%2BXj79S5vwe770q2UUzQTu88MMGHjOVH4qN3pVJLKgXNxgecrRAJdWcfAqjf6JTVR8LbEDzghAmq5WeJlircDAvMtiHo8Yv0tZ%2BhV%2B7a9b4Duc6geL5JgiejnnuhvaM%2FJgzC4gHQW34l7BAuDgIWyn4klrjIXbRS1IOAKCBoxiTXSFP7oPKHuyoWE1PJef7YwpiVCqPmc5DnjDJ%2BG6KUo0Yv5TPDv07f%2BMv6RCw8Emd6%2BQRDn69ChUmSuohEqkx5qsGNoOtlteIAzbfN1G4jzjs%2BZe1xT0y9JzAO4sLaoqUBEujvWNQ8wH8b%2FcPI1yYxNBuWBm4oTu3SWgx0UKOFAZQpztxjP8cw%2FzEUvRXwvwcDy7%2BJUodUxIQIm0X4KuEOxSIoN%2BrzQI2r71QoL35aIm3aZWdqwicmXspFFgITso5JKV4QU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20181227T232734Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIARQRML75E6Z2MTKLI%2F20181227%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=90e672ef43f92e7b43553d771a3a3de3a8dc199f74feedf6150f8584fdae1d5e"
+        },
+        "Tags": {
+            "Dev": "Test"
+        }
+    }
+}

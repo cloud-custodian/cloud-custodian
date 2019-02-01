@@ -14,12 +14,21 @@
 
 import logging
 import sys
+
 from os.path import dirname, join
 
 # The working path for the Azure Function doesn't include this file's folder
 sys.path.append(dirname(dirname(__file__)))
 
 from c7n_azure import handler, entry
+
+try:
+    import azure.functions as func
+    from azure.functions_worker.bindings.queue import QueueMessage
+except ImportError:
+    pass
+
+max_dequeue_count = 3
 
 def main(input):
     logging.info("Running Azure Cloud Custodian Policy")
@@ -28,7 +37,16 @@ def main(input):
         'config_file': join(dirname(__file__), 'config.json'),
         'auth_file': join(dirname(__file__), 'auth.json')
     }
-    handler.run(None, context)
+
+    event = None
+
+    if type(input) is QueueMessage:
+        if input.dequeue_count > max_dequeue_count:
+            return
+        event = input.get_json()
+
+    handler.run(event, context)
+
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()

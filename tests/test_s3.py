@@ -612,6 +612,7 @@ class BucketDelete(BaseTest):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.DeleteBucket, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
+
         session_factory = self.replay_flight_data("test_s3_delete_bucket_with_failure")
         session = session_factory()
         client = session.client("s3")
@@ -650,7 +651,7 @@ class BucketDelete(BaseTest):
         self.assertIn(bname, buckets)
 
         # Make sure file got written
-        denied_file = os.path.join(p.resource_manager.log_dir, "denied.json")
+        denied_file = os.path.join(p.ctx.log_dir, "denied.json")
         self.assertIn(bname, open(denied_file).read())
         #
         # Now delete it for real
@@ -860,7 +861,7 @@ class S3ConfigSource(ConfigTest):
             session_factory=session_factory,
         )
 
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         resource_a = manager.get_resources([bname])[0]
         results = self.wait_for_config(session, queue_url, bname)
         resource_b = s3.ConfigS3(manager).load_resource(results[0])
@@ -1886,7 +1887,7 @@ class S3Test(BaseTest):
         )
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.RemovePolicyStatement, "executor_factory", MainThreadExecutor)
-        self.patch(MainThreadExecutor, "async", False)
+        self.patch(MainThreadExecutor, "c7n_async", False)
 
         bname = "custodian-policy-test"
         statement = {
@@ -2541,7 +2542,7 @@ class S3Test(BaseTest):
         result = client.head_object(Bucket=bname, Key="testing-abc")
         self.assertTrue(result["ServerSideEncryption"] == "aws:kms")
         data = json.load(
-            open(os.path.join(p.ctx.output_path, "action-encryptextantkeys"))
+            open(os.path.join(p.ctx.output.root_dir, "action-encryptextantkeys"))
         )
         self.assertEqual([{"Count": 2, "Remediated": 0, "Bucket": bname}], data)
 

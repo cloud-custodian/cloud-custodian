@@ -33,6 +33,7 @@ from rq.queue import Queue, FailedQueue
 from rq.worker import Worker
 import tabulate
 
+from c7n.config import Bag
 from c7n import utils
 from c7n_salactus import worker, db
 
@@ -249,7 +250,7 @@ def save(dbpath):
 @cli.command()
 # todo check redis version if >=4 support this
 # @click.option('--async/--sync', default=False)
-def reset(async=None):
+def reset(c7n_async=None):
     """Delete all persistent cluster state.
     """
     click.echo('Delete db? Are you Sure? [yn] ', nl=False)
@@ -574,7 +575,7 @@ def watch(limit):
         if limit:
             progress = progress[:limit]
 
-        progress.insert(0, utils.Bag(totals))
+        progress.insert(0, Bag(totals))
         format_plain(
             progress, None,
             explicit_only=True,

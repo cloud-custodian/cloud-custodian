@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.actions import AzureBaseAction
+from c7n_azure.filters import AzureOffHour, AzureOnHour
 from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
+
 from c7n.filters.core import ValueFilter, type_schema
 from c7n.filters.related import RelatedResourceFilter
-from c7n.actions import BaseAction
 
 
 @resources.register('vm')
@@ -26,12 +27,22 @@ class VirtualMachine(ArmResourceManager):
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
         enum_spec = ('virtual_machines', 'list_all', None)
+        diagnostic_settings_enabled = False
         default_report_fields = (
             'name',
             'location',
             'resourceGroup',
             'properties.hardwareProfile.vmSize',
         )
+
+    @staticmethod
+    def register(registry, _):
+        # Additional filters/actions registered for this resource type
+        VirtualMachine.filter_registry.register("offhour", AzureOffHour)
+        VirtualMachine.filter_registry.register("onhour", AzureOnHour)
+
+
+resources.subscribe(resources.EVENT_FINAL, VirtualMachine.register)
 
 
 @VirtualMachine.filter_registry.register('instance-view')
@@ -60,52 +71,49 @@ class NetworkInterfaceFilter(RelatedResourceFilter):
     RelatedIdsExpression = "properties.networkProfile.networkInterfaces[0].id"
 
 
+@VirtualMachine.action_registry.register('poweroff')
+class VmPowerOffAction(AzureBaseAction):
+
+    schema = type_schema('poweroff')
+
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.virtual_machines.power_off(resource['resourceGroup'], resource['name'])
+
+
 @VirtualMachine.action_registry.register('stop')
-class VmStopAction(BaseAction):
+class VmStopAction(AzureBaseAction):
 
     schema = type_schema('stop')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmStopAction, self).__init__(data, manager, log_dir)
+    def _prepare_processing(self,):
         self.client = self.manager.get_client()
 
-    def stop(self, resource_group, vm_name):
-        self.client.virtual_machines.power_off(resource_group, vm_name)
-
-    def process(self, vms):
-        for vm in vms:
-            self.stop(vm['resourceGroup'], vm['name'])
+    def _process_resource(self, resource):
+        self.client.virtual_machines.deallocate(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('start')
-class VmStartAction(BaseAction):
+class VmStartAction(AzureBaseAction):
 
     schema = type_schema('start')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmStartAction, self).__init__(data, manager, log_dir)
+    def _prepare_processing(self,):
         self.client = self.manager.get_client()
 
-    def start(self, resource_group, vm_name):
-        self.client.virtual_machines.start(resource_group, vm_name)
-
-    def process(self, vms):
-        for vm in vms:
-            self.start(vm['resourceGroup'], vm['name'])
+    def _process_resource(self, resource):
+        self.client.virtual_machines.start(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('restart')
-class VmRestartAction(BaseAction):
+class VmRestartAction(AzureBaseAction):
 
     schema = type_schema('restart')
 
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(VmRestartAction, self).__init__(data, manager, log_dir)
+    def _prepare_processing(self,):
         self.client = self.manager.get_client()
 
-    def restart(self, resource_group, vm_name):
-        self.client.virtual_machines.restart(resource_group, vm_name)
-
-    def process(self, vms):
-        for vm in vms:
-            self.restart(vm['resourceGroup'], vm['name'])
+    def _process_resource(self, resource):
+        self.client.virtual_machines.restart(resource['resourceGroup'], resource['name'])

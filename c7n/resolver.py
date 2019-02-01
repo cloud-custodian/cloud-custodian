@@ -55,7 +55,11 @@ class URIResolver(object):
         if parsed.query:
             params.update(dict(parse_qsl(parsed.query)))
         result = client.get_object(**params)
-        return result['Body'].read()
+        body = result['Body'].read()
+        if isinstance(body, str):
+            return body
+        else:
+            return body.decode('utf-8')
 
 
 class ValuesFrom(object):

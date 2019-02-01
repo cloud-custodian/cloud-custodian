@@ -35,6 +35,7 @@ def load_resources():
     import c7n.resources.appelb
     import c7n.resources.asg
     import c7n.resources.awslambda
+    import c7n.resources.backup
     import c7n.resources.batch
     import c7n.resources.cfn
     import c7n.resources.cloudfront
@@ -46,6 +47,7 @@ def load_resources():
     import c7n.resources.cw
     import c7n.resources.directory
     import c7n.resources.directconnect
+    import c7n.resources.dlm
     import c7n.resources.dms
     import c7n.resources.dynamodb
     import c7n.resources.datapipeline
@@ -67,6 +69,7 @@ def load_resources():
     import c7n.resources.hsm
     import c7n.resources.iam
     import c7n.resources.iot
+    import c7n.resources.kafka
     import c7n.resources.kinesis
     import c7n.resources.kms
     import c7n.resources.ml
@@ -87,9 +90,11 @@ def load_resources():
     import c7n.resources.sns
     import c7n.resources.storagegw
     import c7n.resources.sqs
+    import c7n.resources.ssm
     import c7n.resources.support
     import c7n.resources.vpc
     import c7n.resources.waf
+    import c7n.resources.fsx
 
     # Load external plugins (private sdks etc)
     from c7n.manager import resources

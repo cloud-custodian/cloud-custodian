@@ -17,14 +17,12 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws/request"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
-	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ec2metadata"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/sqs"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/aws/ssm"
 	"github.com/capitalone/cloud-custodian/tools/omnissm/pkg/omnissm"
@@ -43,7 +41,7 @@ func init() {
 	}
 }
 
-func processDeferredActionMessage(msg *sqs.Message) error {
+func processDeferredActionMessage(ctx context.Context, msg *sqs.Message) error {
 	var dMsg struct {
 		Type  omnissm.DeferredActionType
 		Value json.RawMessage
@@ -57,58 +55,60 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &resourceTags); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		if err := omni.SSM.AddTagsToResource(&resourceTags); err != nil {
+		if err := omni.SSM.AddTagsToResource(ctx, &resourceTags); err != nil {
+			if awsErr, ok := errors.Cause(err).(awserr.Error); ok {
+				if awsErr.Code() == "InvalidResourceId" {
+					log.Warn().Err(err).Msg("instance no longer exists")
+					return nil
+				}
+			}
+			return err
+		} else {
+			log.Info().Msg("tags added to resource successfully")
+			entry, err, ok := omni.Registrations.GetByManagedId(ctx, resourceTags.ManagedId)
+			if err != nil {
+				return err
+			}
+			if !ok {
+				return errors.Errorf("registration entry not found: %#v", resourceTags.ManagedId)
+			}
+			entry.IsTagged = 1
+			if err := omni.Registrations.Update(ctx, entry); err != nil {
+				return err
+			}
+		}
+	case omnissm.RequestActivation:
+		var req omnissm.RegistrationRequest
+		if err := json.Unmarshal(dMsg.Value, &req); err != nil {
+			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
+		}
+		resp, err := omni.RequestActivation(ctx, &req)
+		if err != nil {
 			return err
 		}
-		log.Info().Msg("tags added to resource successfully")
-		entry, err, ok := omni.Registrations.GetByManagedId(resourceTags.ManagedId)
+		if resp.Existing() {
+			log.Info().Interface("entry", resp).Msg("existing registration entry found")
+		} else {
+			log.Info().Interface("entry", resp).Msg("new registration entry created")
+		}
+	case omnissm.DeregisterInstance:
+		var entry omnissm.RegistrationEntry
+		if err := json.Unmarshal(dMsg.Value, &entry); err != nil {
+			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
+		}
+		_, err, ok := omni.Registrations.Get(ctx, entry.Id)
 		if err != nil {
+			// Get failure here means the instance will not be deregistered,
+			// needs to be cleaned up by another process
 			return err
 		}
 		if !ok {
-			return errors.Errorf("registration entry not found: %#v", resourceTags.ManagedId)
+			return errors.Errorf("registration entry not found: %#v", entry.Id)
 		}
-		entry.IsTagged = true
-		if err := omni.Registrations.Update(entry); err != nil {
-			return err
+		if !ssm.IsManagedInstance(entry.ManagedId) {
+			return errors.Errorf("registration managed id is invalid: %#v", entry.ManagedId)
 		}
-	case omnissm.CreateActivation:
-		var doc ec2metadata.Document
-		if err := json.Unmarshal(dMsg.Value, &doc); err != nil {
-			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
-		}
-		activation, err := omni.SSM.CreateActivation(doc.Name())
-		if err != nil {
-			return err
-		}
-		entry := &omnissm.RegistrationEntry{
-			Id:         doc.Hash(),
-			CreatedAt:  time.Now().UTC(),
-			AccountId:  doc.AccountId,
-			Region:     doc.Region,
-			InstanceId: doc.InstanceId,
-			Activation: *activation,
-		}
-		if err := omni.Registrations.Put(entry); err != nil {
-			if omni.SQS != nil && request.IsErrorThrottle(err) || request.IsErrorRetryable(err) {
-				sqsErr := omni.SQS.Send(&omnissm.DeferredActionMessage{
-					Type:  omnissm.PutRegistrationEntry,
-					Value: entry,
-				})
-				if sqsErr != nil {
-					return sqsErr
-				}
-				return errors.Wrapf(err, "deferred action to SQS queue: %#v", omni.Config.QueueName)
-			}
-			return err
-		}
-		log.Info().Interface("entry", entry).Msg("new registration entry created")
-	case omnissm.DeregisterManagedInstance:
-		var managedId string
-		if err := json.Unmarshal(dMsg.Value, &managedId); err != nil {
-			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
-		}
-		if err := omni.SSM.DeregisterManagedInstance(managedId); err != nil {
+		if err := omni.DeregisterInstance(ctx, &entry); err != nil {
 			return err
 		}
 	case omnissm.PutInventory:
@@ -116,19 +116,25 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &inv); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		if err := omni.SSM.PutInventory(&inv); err != nil {
+		if err := omni.SSM.PutInventory(ctx, &inv); err != nil {
+			if awsErr, ok := errors.Cause(err).(awserr.Error); ok {
+				if awsErr.Code() == "InvalidResourceId" {
+					log.Warn().Err(err).Msg("instance no longer exists")
+					return nil
+				}
+			}
 			return err
 		}
 		log.Info().Msg("custom inventory successful")
-		entry, err, ok := omni.Registrations.GetByManagedId(inv.ManagedId)
+		entry, err, ok := omni.Registrations.GetByManagedId(ctx, inv.ManagedId)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			return errors.Errorf("registration entry not found: %#v", inv.ManagedId)
 		}
-		entry.IsInventoried = true
-		if err := omni.Registrations.Update(entry); err != nil {
+		entry.IsInventoried = 1
+		if err := omni.Registrations.Update(ctx, entry); err != nil {
 			return err
 		}
 	case omnissm.PutRegistrationEntry:
@@ -136,10 +142,19 @@ func processDeferredActionMessage(msg *sqs.Message) error {
 		if err := json.Unmarshal(dMsg.Value, &entry); err != nil {
 			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
 		}
-		if err := omni.Registrations.Put(&entry); err != nil {
+		if err := omni.Registrations.Put(ctx, &entry); err != nil {
 			return err
 		}
 		log.Info().Interface("entry", entry).Msg("new registration entry created")
+	case omnissm.DeleteRegistrationEntry:
+		var id string
+		if err := json.Unmarshal(dMsg.Value, &id); err != nil {
+			return errors.Wrap(err, "cannot unmarshal DeferredActionMessage.Value")
+		}
+		if err := omni.Registrations.Delete(ctx, id); err != nil {
+			return err
+		}
+		log.Info().Msgf("Successfully deleted registration entry: %#v", id)
 	default:
 	}
 	return nil
@@ -153,7 +168,7 @@ func main() {
 		go func() {
 			defer close(messages)
 			for {
-				resp, err := omni.SQS.Receive()
+				resp, err := omni.SQS.Receive(ctx)
 				if err != nil {
 					log.Info().Err(err).Msg("cannot receive from SQS queue")
 					continue
@@ -174,10 +189,10 @@ func main() {
 				if !ok {
 					return nil
 				}
-				if err := processDeferredActionMessage(m); err != nil {
+				if err := processDeferredActionMessage(ctx, m); err != nil {
 					log.Info().Err(err).Interface("message", m).Msg("processing DeferredActionMessage failed")
 				}
-				if err := omni.SQS.Delete(m.ReceiptHandle); err != nil {
+				if err := omni.SQS.Delete(ctx, m.ReceiptHandle); err != nil {
 					log.Info().Err(err).Interface("message", m).Msg("removing from SQS queue failed")
 				}
 			case <-ctx.Done():

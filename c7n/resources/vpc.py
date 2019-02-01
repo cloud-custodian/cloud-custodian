@@ -99,6 +99,9 @@ class FlowLogFilter(Filter):
            'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
            'set-op': {'enum': ['or', 'and'], 'default': 'or'},
            'status': {'enum': ['active']},
+           'deliver-status': {'enum': ['success', 'failure']},
+           'destination': {'type': 'string'},
+           'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
            'log-group': {'type': 'string'}})
 
@@ -120,14 +123,16 @@ class FlowLogFilter(Filter):
         enabled = self.data.get('enabled', False)
         log_group = self.data.get('log-group')
         traffic_type = self.data.get('traffic-type')
+        destination_type = self.data.get('destination-type')
+        destination = self.data.get('destination')
         status = self.data.get('status')
+        delivery_status = self.data.get('deliver-status')
         op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
         set_op = self.data.get('set-op', 'or')
 
         results = []
         # looping over vpc resources
         for r in resources:
-
             if r[m.id] not in resource_map:
                 # we didn't find a flow log for this vpc
                 if enabled:
@@ -142,7 +147,13 @@ class FlowLogFilter(Filter):
             if enabled:
                 fl_matches = []
                 for fl in flogs:
+                    dest_type_match = (destination_type is None) or op(
+                        fl['LogDestinationType'], destination_type)
+                    dest_match = (destination is None) or op(
+                        fl['LogDestination'], destination)
                     status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
+                    delivery_status_match = (delivery_status is None) or op(
+                        fl['DeliverLogsStatus'], delivery_status.upper())
                     traffic_type_match = (
                         traffic_type is None) or op(
                         fl['TrafficType'],
@@ -150,7 +161,8 @@ class FlowLogFilter(Filter):
                     log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
 
                     # combine all conditions to check if flow log matches the spec
-                    fl_match = status_match and traffic_type_match and log_group_match
+                    fl_match = (status_match and traffic_type_match and dest_match and
+                                log_group_match and dest_type_match and delivery_status_match)
                     fl_matches.append(fl_match)
 
                 if set_op == 'or':
@@ -491,7 +503,7 @@ class SecurityGroupApplyPatch(BaseAction):
                    'ec2:DeleteTags')
 
     def validate(self):
-        diff_filters = [n for n in self.manager.filters if isinstance(
+        diff_filters = [n for n in self.manager.iter_filters() if isinstance(
             n, SecurityGroupDiffFilter)]
         if not len(diff_filters):
             raise PolicyValidationError(
@@ -854,17 +866,18 @@ class SGPermission(Filter):
       - type: ingress
         Ports: [22, 3389]
         Cidr:
-          values:
+          value:
             - "0.0.0.0/0"
             - "::/0"
           op: in
+
 
     """
 
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference'))
+    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference', 'Description'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
@@ -907,6 +920,8 @@ class SGPermission(Filter):
                     only_found = True
             if self.only_ports and not only_found:
                 found = found is None or found and True or False
+            if self.only_ports and only_found:
+                found = False
         return found
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
@@ -940,6 +955,22 @@ class SGPermission(Filter):
         if not cidr_match:
             return None
         return match_op(cidr_match)
+
+    def process_description(self, perm):
+        if 'Description' not in self.data:
+            return None
+
+        d = dict(self.data['Description'])
+        d['key'] = 'Description'
+
+        vf = ValueFilter(d)
+        vf.annotate = False
+
+        for k in ('Ipv6Ranges', 'IpRanges', 'UserIdGroupPairs', 'PrefixListIds'):
+            if k not in perm or not perm[k]:
+                continue
+            return vf(perm[k][0])
+        return False
 
     def process_self_reference(self, perm, sg_id):
         found = None
@@ -987,6 +1018,7 @@ class SGPermission(Filter):
             perm_matches = {}
             for idx, f in enumerate(self.vfilters):
                 perm_matches[idx] = bool(f(perm))
+            perm_matches['description'] = self.process_description(perm)
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
@@ -1197,6 +1229,12 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
     RelatedIdsExpression = "Groups[].GroupId"
 
 
+@NetworkInterface.filter_registry.register('vpc')
+class InterfaceVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpress = "VpcId"
+
+
 @NetworkInterface.action_registry.register('modify-security-groups')
 class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Remove security groups from an interface.
@@ -1309,6 +1347,48 @@ class Route(ValueFilter):
                 r.setdefault('c7n:matched-routes', []).extend(matched)
                 results.append(r)
         return results
+
+
+@resources.register('transit-gateway')
+class TransitGateway(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
+        dimension = None
+        name = id = 'TransitGatewayId'
+        filter_name = 'TransitGatewayIds'
+        filter_type = 'list'
+
+
+class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        merged_params = dict(params)
+        merged_params.setdefault('Filters', []).append(
+            {'Name': parent_key, 'Values': [parent_id]})
+        return merged_params
+
+
+@query.sources.register('transit-attachment')
+class TransitAttachmentSource(query.ChildDescribeSource):
+
+    resource_query_factory = TransitGatewayAttachmentQuery
+
+
+@resources.register('transit-attachment')
+class TransitGatewayAttachment(query.ChildResourceManager):
+
+    child_source = 'transit-attachment'
+
+    class resource_type(object):
+        service = 'ec2'
+        enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
+        parent_spec = ('transit-gateway', 'transit-gateway-id', None)
+        dimension = None
+        name = id = 'TransitGatewayAttachmentId'
+        filter_name = None
+        filter_type = None
 
 
 @resources.register('peering-connection')
@@ -1696,6 +1776,14 @@ class VpcEndpoint(query.QueryResourceManager):
         id_prefix = "vpce-"
 
 
+@VpcEndpoint.filter_registry.register('cross-account')
+class EndpointCrossAccountFilter(CrossAccountAccessFilter):
+
+    policy_attribute = 'PolicyDocument'
+    annotation_key = 'c7n:CrossAccountViolations'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+
 @VpcEndpoint.filter_registry.register('security-group')
 class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
 
@@ -1706,6 +1794,12 @@ class EndpointSecurityGroupFilter(net_filters.SecurityGroupFilter):
 class EndpointSubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "SubnetIds[]"
+
+
+@VpcEndpoint.filter_registry.register('vpc')
+class EndpointVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
 
 
 @resources.register('key-pair')
@@ -1753,8 +1847,12 @@ class CreateFlowLogs(BaseAction):
             'state': {'type': 'boolean'},
             'DeliverLogsPermissionArn': {'type': 'string'},
             'LogGroupName': {'type': 'string'},
-            'TrafficType': {'type': 'string',
-                            'enum': ['ACCEPT', 'REJECT', 'ALL']}
+            'LogDestination': {'type': 'string'},
+            'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
+            'TrafficType': {
+                'type': 'string',
+                'enum': ['ACCEPT', 'REJECT', 'ALL']
+            }
         }
     }
 
@@ -1771,16 +1869,18 @@ class CreateFlowLogs(BaseAction):
                 raise PolicyValidationError(
                     'DeliverLogsPermissionArn required when '
                     'creating flow-logs on %s' % (self.manager.data,))
-            if not self.data.get('LogGroupName'):
-                raise ValueError(
-                    'LogGroupName required when creating flow-logs on %s' % (
-                        self.manager.data))
+            if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
+                raise PolicyValidationError(
+                    'Either LogGroupName or LogDestination required')
+            if (self.data.get('LogDestinationType') == 's3' and
+               not self.data.get('LogDestination')):
+                raise PolicyValidationError(
+                    'LogDestination required when LogDestinationType is s3')
         return self
 
     def delete_flow_logs(self, client, rids):
         flow_logs = client.describe_flow_logs(
             Filters=[{'Name': 'resource-id', 'Values': rids}])['FlowLogs']
-
         try:
             results = client.delete_flow_logs(
                 FlowLogIds=[f['FlowLogId'] for f in flow_logs])

@@ -13,21 +13,34 @@
 # limitations under the License.
 
 import importlib
-import os
-import logging
 import json
-from azure.cli.core.cloud import AZURE_PUBLIC_CLOUD
-from azure.cli.core._profile import Profile
-from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
-from c7n_azure.utils import ResourceIdParser
+import logging
+import os
+import types
+
+import jwt
+from azure.common.credentials import (BasicTokenAuthentication,
+                                      ServicePrincipalCredentials)
+
+from msrestazure.azure_active_directory import MSIAuthentication
+
+from c7n_azure import constants
+from c7n_azure.utils import ResourceIdParser, StringUtils, custodian_azure_send_override
+
+try:
+    from azure.cli.core._profile import Profile
+except Exception:
+    Profile = None
 
 
 class Session(object):
 
-    def __init__(self, subscription_id=None, authorization_file=None):
+    def __init__(self, subscription_id=None, authorization_file=None,
+                 resource=constants.RESOURCE_ACTIVE_DIRECTORY):
         """
         :param subscription_id: If provided overrides environment variables.
-
+        :param authorization_file: Path to file populated from 'get_functions_auth_string'
+        :param resource: Resource endpoint for OAuth token.
         """
 
         self.log = logging.getLogger('custodian.azure.session')
@@ -36,6 +49,9 @@ class Session(object):
         self.credentials = None
         self.subscription_id = None
         self.tenant_id = None
+        self.resource_namespace = resource
+        self._is_token_auth = False
+        self._is_cli_auth = False
         self.authorization_file = authorization_file
 
     def _initialize_session(self):
@@ -54,10 +70,17 @@ class Session(object):
             return
 
         tenant_auth_variables = [
-            'AZURE_TENANT_ID', 'AZURE_SUBSCRIPTION_ID',
-            'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET'
+            constants.ENV_TENANT_ID, constants.ENV_SUB_ID,
+            constants.ENV_CLIENT_ID, constants.ENV_CLIENT_SECRET
         ]
-        token_auth_variables = ['AZURE_ACCESS_TOKEN', 'AZURE_SUBSCRIPTION_ID']
+
+        token_auth_variables = [
+            constants.ENV_ACCESS_TOKEN, constants.ENV_SUB_ID
+        ]
+
+        msi_auth_variables = [
+            constants.ENV_USE_MSI, constants.ENV_SUB_ID
+        ]
 
         if self.authorization_file:
             self.credentials, self.subscription_id = self.load_auth_file(self.authorization_file)
@@ -67,29 +90,42 @@ class Session(object):
             # Token authentication
             self.credentials = BasicTokenAuthentication(
                 token={
-                    'access_token': os.environ['AZURE_ACCESS_TOKEN']
+                    'access_token': os.environ[constants.ENV_ACCESS_TOKEN]
                 })
-            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
+            self.subscription_id = os.environ[constants.ENV_SUB_ID]
             self.log.info("Creating session with Token Authentication")
+            self._is_token_auth = True
 
         elif all(k in os.environ for k in tenant_auth_variables):
             # Tenant (service principal) authentication
             self.credentials = ServicePrincipalCredentials(
-                client_id=os.environ['AZURE_CLIENT_ID'],
-                secret=os.environ['AZURE_CLIENT_SECRET'],
-                tenant=os.environ['AZURE_TENANT_ID']
-            )
-            self.subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
-            self.tenant_id = os.environ['AZURE_TENANT_ID']
+                client_id=os.environ[constants.ENV_CLIENT_ID],
+                secret=os.environ[constants.ENV_CLIENT_SECRET],
+                tenant=os.environ[constants.ENV_TENANT_ID],
+                resource=self.resource_namespace)
+            self.subscription_id = os.environ[constants.ENV_SUB_ID]
+            self.tenant_id = os.environ[constants.ENV_TENANT_ID]
             self.log.info("Creating session with Service Principal Authentication")
 
+        elif all(k in os.environ for k in msi_auth_variables):
+            # MSI authentication
+            if constants.ENV_CLIENT_ID in os.environ:
+                self.credentials = MSIAuthentication(
+                    client_id=os.environ[constants.ENV_CLIENT_ID],
+                    resource=self.resource_namespace)
+            else:
+                self.credentials = MSIAuthentication(
+                    resource=self.resource_namespace)
+
+            self.subscription_id = os.environ[constants.ENV_SUB_ID]
+            self.log.info("Creating session with MSI Authentication")
         else:
             # Azure CLI authentication
+            self._is_cli_auth = True
             (self.credentials,
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
-                resource=AZURE_PUBLIC_CLOUD.endpoints.active_directory_resource_id)
-            self._is_cli_auth = True
+                resource=self.resource_namespace)
             self.log.info("Creating session with Azure CLI Authentication")
 
         # Let provided id parameter override everything else
@@ -101,12 +137,40 @@ class Session(object):
         if self.credentials is None:
             self.log.error('Unable to locate credentials for Azure session.')
 
+    def get_session_for_resource(self, resource):
+        return Session(
+            subscription_id=self.subscription_id_override,
+            authorization_file=self.authorization_file,
+            resource=resource)
+
     def client(self, client):
         self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
-        return klass(self.credentials, self.subscription_id)
+        client = klass(self.credentials, self.subscription_id)
+
+        # Override send() method to log request limits & custom retries
+        service_client = client._client
+        service_client.orig_send = service_client.send
+        service_client.send = types.MethodType(custodian_azure_send_override, service_client)
+
+        # Don't respect retry_after_header to implement custom retries
+        service_client.config.retry_policy.policy.respect_retry_after_header = False
+
+        return client
+
+    def get_credentials(self):
+        self._initialize_session()
+        return self.credentials
+
+    def get_subscription_id(self):
+        self._initialize_session()
+        return self.subscription_id
+
+    def get_function_target_subscription_id(self):
+        self._initialize_session()
+        return os.environ.get(constants.ENV_FUNCTION_SUB_ID, self.subscription_id)
 
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
@@ -114,21 +178,33 @@ class Session(object):
         namespace = ResourceIdParser.get_namespace(resource_id)
         resource_type = ResourceIdParser.get_resource_type(resource_id)
 
-        if resource_type in self._provider_cache:
-            return self._provider_cache[resource_type]
+        cache_id = namespace + resource_type
+
+        if cache_id in self._provider_cache:
+            return self._provider_cache[cache_id]
 
         resource_client = self.client('azure.mgmt.resource.ResourceManagementClient')
         provider = resource_client.providers.get(namespace)
 
         rt = next((t for t in provider.resource_types
-            if t.resource_type == str(resource_type).split('/')[-1]), None)
+            if StringUtils.equal(t.resource_type, resource_type)), None)
+
         if rt and rt.api_versions:
             versions = [v for v in rt.api_versions if 'preview' not in v.lower()]
             api_version = versions[0] if versions else rt.api_versions[0]
-            self._provider_cache[resource_type] = api_version
+            self._provider_cache[cache_id] = api_version
             return api_version
 
+    def get_tenant_id(self):
+        self._initialize_session()
+        if self._is_token_auth:
+            decoded = jwt.decode(self.credentials['token']['access_token'], verify=False)
+            return decoded['tid']
+
+        return self.tenant_id
+
     def get_bearer_token(self):
+        self._initialize_session()
         if self._is_cli_auth:
             return self.credentials._token_retriever()[1]
         return self.credentials.token['access_token']
@@ -139,22 +215,56 @@ class Session(object):
             return (ServicePrincipalCredentials(
                 client_id=data['credentials']['client_id'],
                 secret=data['credentials']['secret'],
-                tenant=data['credentials']['tenant']
+                tenant=data['credentials']['tenant'],
+                resource=self.resource_namespace
             ), data['subscription'])
 
-    def get_auth_string(self):
-        if type(self.credentials) is not ServicePrincipalCredentials:
+    def get_functions_auth_string(self):
+        """
+        Build auth json string for deploying
+        Azure Functions.  Look for dedicated
+        Functions environment variables or
+        fall back to normal Service Principal
+        variables.
+
+        """
+
+        self._initialize_session()
+
+        function_auth_variables = [
+            constants.ENV_FUNCTION_TENANT_ID,
+            constants.ENV_FUNCTION_CLIENT_ID,
+            constants.ENV_FUNCTION_CLIENT_SECRET
+        ]
+
+        function_subscription_id = self.get_function_target_subscription_id()
+
+        # Use dedicated function env vars if available
+        if all(k in os.environ for k in function_auth_variables):
+            auth = {
+                'credentials':
+                    {
+                        'client_id': os.environ[constants.ENV_FUNCTION_CLIENT_ID],
+                        'secret': os.environ[constants.ENV_FUNCTION_CLIENT_SECRET],
+                        'tenant': os.environ[constants.ENV_FUNCTION_TENANT_ID]
+                    },
+                'subscription': function_subscription_id
+            }
+
+        elif type(self.credentials) is ServicePrincipalCredentials:
+            auth = {
+                'credentials':
+                    {
+                        'client_id': os.environ[constants.ENV_CLIENT_ID],
+                        'secret': os.environ[constants.ENV_CLIENT_SECRET],
+                        'tenant': os.environ[constants.ENV_TENANT_ID]
+                    },
+                'subscription': function_subscription_id
+            }
+
+        else:
             raise NotImplementedError(
-                "Writing auth file only supported for Service Principal credentials.")
+                "Service Principal credentials are the only "
+                "supported auth mechanism for deploying functions.")
 
-        auth = {
-            'credentials':
-                {
-                    'client_id': os.environ['AZURE_CLIENT_ID'],
-                    'secret': os.environ['AZURE_CLIENT_SECRET'],
-                    'tenant': os.environ['AZURE_TENANT_ID']
-                },
-            'subscription': self.subscription_id
-        }
-
-        return json.dumps(auth)
+        return json.dumps(auth, indent=2)

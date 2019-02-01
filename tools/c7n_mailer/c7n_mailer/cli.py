@@ -3,11 +3,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import functools
 import logging
+from os import path
 
 import boto3
 import jsonschema
 from c7n_mailer import deploy, utils
-from c7n_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure import deploy as azure_deploy
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from ruamel import yaml
 
@@ -19,6 +21,7 @@ CONFIG_SCHEMA = {
         'queue_url': {'type': 'string'},
         'from_address': {'type': 'string'},
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
+        'org_domain': {'type': 'string'},
 
         # Standard Lambda Function Config
         'region': {'type': 'string'},
@@ -33,6 +36,52 @@ CONFIG_SCHEMA = {
         'lambda_description': {'type': 'string'},
         'lambda_tags': {'type': 'object'},
         'lambda_schedule': {'type': 'string'},
+
+        # Azure Function Config
+        'function_properties': {
+            'type': 'object',
+            'appInsights': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'storageAccount': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string'}
+                     }
+                ]
+            },
+            'servicePlan': {
+                'type': 'object',
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                        'properties': {
+                            'name': 'string',
+                            'location': 'string',
+                            'resourceGroupName': 'string',
+                            'skuTier': 'string',
+                            'skuName': 'string'}
+                     }
+                ]
+            },
+        },
+        'function_schedule': {'type': 'string'},
+        'function_skuCode': {'type': 'string'},
+        'function_sku': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
@@ -108,6 +157,8 @@ def get_c7n_mailer_parser():
     parser.add_argument('--debug', action='store_true', help=debug_help_msg)
     max_num_processes_help_msg = 'will run the mailer in parallel, integer of max processes allowed'
     parser.add_argument('--max-num-processes', type=int, help=max_num_processes_help_msg)
+    templates_folder_help_msg = 'message templates folder location'
+    parser.add_argument('-t', '--templates', help=templates_folder_help_msg)
     group = parser.add_mutually_exclusive_group(required=True)
     update_lambda_help_msg = 'packages your c7n_mailer, uploads the zip to aws lambda as a function'
     group.add_argument('--update-lambda', action='store_true', help=update_lambda_help_msg)
@@ -135,10 +186,17 @@ def main():
     args_dict = vars(args)
     logger = get_logger(debug=args_dict.get('debug', False))
 
+    module_dir = path.dirname(path.abspath(__file__))
+    default_templates = [path.abspath(path.join(module_dir, 'msg-templates')),
+                         path.abspath(path.join(module_dir, '..', 'msg-templates')),
+                         path.abspath('.')]
+    templates = args_dict.get('templates', None)
+    if templates:
+        default_templates.append(path.abspath(path.expanduser(path.expandvars(templates))))
+
+    mailer_config['templates_folders'] = default_templates
+
     if args_dict.get('update_lambda'):
-        if is_azure_cloud(mailer_config):
-            print('\n** Lambda support not available for Azure queues **\n')
-            return
         if args_dict.get('debug'):
             print('\n** --debug is only supported with --run, not --update-lambda **\n')
             return
@@ -146,7 +204,11 @@ def main():
             print('\n** --max-num-processes is only supported '
                   'with --run, not --update-lambda **\n')
             return
-        deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
+
+        if is_azure_cloud(mailer_config):
+            azure_deploy.provision(mailer_config)
+        else:
+            deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
 
     if args_dict.get('run'):
         max_num_processes = args_dict.get('max_num_processes')

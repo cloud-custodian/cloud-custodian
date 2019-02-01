@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "disks_cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e_name": {
+            "defaultValue": "cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
+            "type": "String"
+        },
+        "disks_cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c_name": {
+            "defaultValue": "cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e'.",
+            "type": "Microsoft.Compute/disks",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "name": "[parameters('disks_cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e_name')]",
+            "apiVersion": "2018-04-01",
+            "location": "southcentralus",
+            "tags": {
+                "testtag": "testvalue"
+            },
+            "scale": null,
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 1023
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c'.",
+            "type": "Microsoft.Compute/disks",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "name": "[parameters('disks_cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c_name')]",
+            "apiVersion": "2018-04-01",
+            "location": "southcentralus",
+            "tags": {
+                "testtag": "testvalue"
+            },
+            "scale": null,
+            "properties": {
+                "osType": "Linux",
+                "creationData": {
+                    "createOption": "FromImage",
+                    "imageReference": {
+                        "id": "/Subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/UbuntuServer/Skus/16.04.0-LTS/Versions/16.04.201802220"
+                    }
+                },
+                "diskSizeGB": 30
+            },
+            "dependsOn": []
+        }
+    ]
+}

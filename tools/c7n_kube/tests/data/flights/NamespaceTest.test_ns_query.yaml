@@ -1,0 +1,20 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Content-Type: [application/json]
+      User-Agent: [Swagger-Codegen/7.0.0/python]
+    method: GET
+    uri: https://ghost/api/v1/namespaces
+  response:
+    body: {string: '{"kind":"NamespaceList","apiVersion":"v1","metadata":{"selfLink":"/api/v1/namespaces","resourceVersion":"108688"},"items":[{"metadata":{"name":"default","selfLink":"/api/v1/namespaces/default","uid":"e4a71ece-0dc4-11e9-95a0-42010a800051","resourceVersion":"24","creationTimestamp":"2019-01-01T12:58:11Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-public","selfLink":"/api/v1/namespaces/kube-public","uid":"e4b0bd24-0dc4-11e9-95a0-42010a800051","resourceVersion":"34","creationTimestamp":"2019-01-01T12:58:11Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-system","selfLink":"/api/v1/namespaces/kube-system","uid":"e4afd241-0dc4-11e9-95a0-42010a800051","resourceVersion":"114","creationTimestamp":"2019-01-01T12:58:11Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"kube-system\",\"namespace\":\"\"}}\n"}},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}}]}
+
+        '}
+    headers:
+      Audit-Id: [d7f5cc51-dd50-4ac5-b81b-37b311d6598e]
+      Content-Length: ['1082']
+      Content-Type: [application/json]
+      Date: ['Wed, 02 Jan 2019 02:30:33 GMT']
+    status: {code: 200, message: OK}
+version: 1

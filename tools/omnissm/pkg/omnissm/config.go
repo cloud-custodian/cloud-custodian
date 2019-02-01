@@ -15,6 +15,7 @@
 package omnissm
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	version "github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
@@ -31,11 +33,13 @@ const DefaultSSMServiceRole = "service-role/AmazonEC2RunCommandRoleForManagedIns
 type Config struct {
 	*aws.Config
 
+	Context context.Context
+
 	// A whitelist of accounts allowed to register with SSM
 	AccountWhitelist []string `yaml:"accountWhitelist"`
 
 	// This or AssumeRoles must be specified.
-	AssumeRoleName string
+	AssumeRoleName string `yaml:"assumeRole"`
 
 	// A mapping of IAM roles to assume with the provided accounts
 	AssumeRoles map[string]string `yaml:"assumeRoles"`
@@ -56,6 +60,9 @@ type Config struct {
 	// The DynamodDb table used for storing instance regisrations.
 	RegistrationsTable string `yaml:"registrationsTable"`
 
+	// The SNS topic published to when resources are registered (optional).
+	ResourceRegisteredSNSTopic string `yaml:"resourceRegisteredSNSTopic"`
+
 	// The SNS topic published to when resources are deleted (optional).
 	ResourceDeletedSNSTopic string `yaml:"resourceDeletedSNSTopic"`
 
@@ -73,15 +80,43 @@ type Config struct {
 	// This is optional and x-ray is currently only supported when using lambda.
 	XRayTracingEnabled string `yaml:"xrayTracingEnabled"`
 
+	// The number of days to wait to clean up registered ssm instances that have a
+	// PingStatus of ConnectionLost
+	CleanupAfterDays float64 `yaml:"cleanupAfterDays"`
+
+	// Version constraints for allowable client requests during registration. If
+	// constraints are empty, all versions are allowed. Version string should
+	// conform with github.com/hashicorp/go-version format, i.e. comma-separated
+	// rules like ">= 1.1.0, < 2.0.0"
+	ClientVersionConstraints string `yaml:"clientVersionConstraints"`
+
+	// The name of a JSON file containing an ImageWhitelist structure. If the
+	// value is not an empty string, the registration handler will attempt to
+	// read the named file on lambda startup and construct a whitelist of valid
+	// image IDs for each AccountId/RegionName pair. Instances presenting an
+	// identity document with an image ID not present in the whitelist will not
+	// be allowed to register.
+	AMIWhitelistFile string `yaml:"amiWhitelistFile"`
+
 	authorizedAccountIds map[string]struct{}
 	resourceTags         map[string]struct{}
 	roleMap              map[string]string
+	versionConstraint    version.Constraints
 }
 
 func NewConfig() *Config {
 	c := &Config{}
 	MergeConfig(c, ReadConfigFromEnv())
 	return c
+}
+
+type ImageWhitelist struct {
+	Images []struct {
+		AccountId   string `json:"AccountId"`
+		RegionName  string `json:"RegionName"`
+		ImageId     string `json:"ImageId"`
+		ReleaseDate string `json:"ReleaseDate"`
+	} `json:"Images"`
 }
 
 // ReadConfig loads configuration values from a yaml file.
@@ -104,6 +139,7 @@ func ReadConfig(path string) (*Config, error) {
 		return nil, errors.Wrap(err, "cannot unmarshal")
 	}
 	MergeConfig(&c, ReadConfigFromEnv())
+	c.setDefaults()
 	return &c, nil
 }
 
@@ -118,16 +154,17 @@ func splitNonEmpty(s string, sep string) []string {
 func ReadConfigFromEnv() *Config {
 	maxRetries, _ := strconv.Atoi(os.Getenv("OMNISSM_MAX_RETRIES"))
 	c := &Config{
-		AccountWhitelist:        splitNonEmpty(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
-		InstanceRole:            os.Getenv("OMNISSM_INSTANCE_ROLE"),
-		MaxRetries:              maxRetries,
-		RegistrationsTable:      os.Getenv("OMNISSM_REGISTRATIONS_TABLE"),
-		QueueName:               os.Getenv("OMNISSM_SPILLOVER_QUEUE"),
-		ResourceDeletedSNSTopic: os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC"),
-		ResourceTags:            splitNonEmpty(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
-		S3DownloadRole:          os.Getenv("OMNISSM_S3_DOWNLOAD_ROLE"),
-		SNSPublishRole:          os.Getenv("OMNISSM_SNS_PUBLISH_ROLE"),
-		XRayTracingEnabled:      os.Getenv("_X_AMZN_TRACE_ID"),
+		AccountWhitelist:           splitNonEmpty(os.Getenv("OMNISSM_ACCOUNT_WHITELIST"), ","),
+		InstanceRole:               os.Getenv("OMNISSM_INSTANCE_ROLE"),
+		MaxRetries:                 maxRetries,
+		RegistrationsTable:         os.Getenv("OMNISSM_REGISTRATIONS_TABLE"),
+		QueueName:                  os.Getenv("OMNISSM_SPILLOVER_QUEUE"),
+		ResourceRegisteredSNSTopic: os.Getenv("OMNISSM_RESOURCE_REGISTERED_SNS_TOPIC"),
+		ResourceDeletedSNSTopic:    os.Getenv("OMNISSM_RESOURCE_DELETED_SNS_TOPIC"),
+		ResourceTags:               splitNonEmpty(os.Getenv("OMNISSM_RESOURCE_TAGS"), ","),
+		S3DownloadRole:             os.Getenv("OMNISSM_S3_DOWNLOAD_ROLE"),
+		SNSPublishRole:             os.Getenv("OMNISSM_SNS_PUBLISH_ROLE"),
+		XRayTracingEnabled:         os.Getenv("_X_AMZN_TRACE_ID"),
 	}
 	return c
 }
@@ -149,6 +186,9 @@ func MergeConfig(config *Config, other *Config) {
 	if other.RegistrationsTable != "" {
 		config.RegistrationsTable = other.RegistrationsTable
 	}
+	if other.ResourceRegisteredSNSTopic != "" {
+		config.ResourceRegisteredSNSTopic = other.ResourceRegisteredSNSTopic
+	}
 	if other.ResourceDeletedSNSTopic != "" {
 		config.ResourceDeletedSNSTopic = other.ResourceDeletedSNSTopic
 	}
@@ -162,6 +202,9 @@ func MergeConfig(config *Config, other *Config) {
 	if other.SNSPublishRole != "" {
 		config.SNSPublishRole = other.SNSPublishRole
 	}
+	if other.ClientVersionConstraints != "" {
+		config.ClientVersionConstraints = other.ClientVersionConstraints
+	}
 	config.setDefaults()
 }
 
@@ -174,6 +217,12 @@ func (c *Config) setDefaults() {
 	}
 	if len(c.ResourceTags) == 0 {
 		c.ResourceTags = []string{"App", "OwnerContact", "Name"}
+	}
+	if c.ClientVersionConstraints != "" {
+		cs, err := version.NewConstraint(c.ClientVersionConstraints)
+		if err == nil {
+			c.versionConstraint = cs
+		}
 	}
 	if c.roleMap == nil {
 		c.roleMap = make(map[string]string)
@@ -194,6 +243,19 @@ func (c *Config) setDefaults() {
 		c.resourceTags[t] = struct{}{}
 	}
 	c.Config = aws.NewConfig().WithMaxRetries(c.MaxRetries)
+}
+
+func (c *Config) RequestVersionValid(vs string) bool {
+	if c.versionConstraint == nil {
+		return true
+	} else if vs == "" {
+		return false
+	}
+	v, err := version.NewVersion(vs)
+	if err != nil {
+		return false
+	}
+	return c.versionConstraint.Check(v)
 }
 
 func (c *Config) HasAssumeRole(accountId string) (roleArn string, ok bool) {

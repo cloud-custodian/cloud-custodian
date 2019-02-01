@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import six
+from c7n_azure.actions import Notify
+from c7n_azure.provider import resources
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
 from c7n.utils import local_session
-from c7n_azure.provider import resources
-from c7n_azure.actions import Notify
 
 
 class ResourceQuery(object):
@@ -95,11 +95,14 @@ class QueryResourceManager(ResourceManager):
     def get_source(self, source_type):
         return sources.get(source_type)(self)
 
+    def get_session(self):
+        return local_session(self.session_factory)
+
     def get_client(self, service=None):
         if not service:
-            return local_session(self.session_factory).client(
+            return self.get_session().client(
                 "%s.%s" % (self.resource_type.service, self.resource_type.client))
-        return local_session(self.session_factory).client(service)
+        return self.get_session().client(service)
 
     def get_cache_key(self, query):
         return {'source_type': self.source_type, 'query': query}

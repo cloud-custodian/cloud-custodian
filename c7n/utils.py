@@ -13,9 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from botocore.exceptions import ClientError
-
-import boto3
 import copy
 import csv
 from datetime import datetime, timedelta
@@ -32,6 +29,7 @@ import six
 import sys
 
 
+from c7n.exceptions import ClientError
 from c7n import ipaddress
 
 # Try to place nice in lambda exec environment
@@ -95,12 +93,7 @@ def load_file(path, format=None, vars=None):
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
-            try:
-                return yaml_load(contents)
-            except yaml.YAMLError as e:
-                log.error('Error while loading yaml file %s', path)
-                log.error('Skipping this file.  Error message below:\n%s', e)
-                return None
+            return yaml_load(contents)
         elif format == 'json':
             return loads(contents)
 
@@ -124,6 +117,13 @@ def dumps(data, fh=None, indent=0):
 
 def format_event(evt):
     return json.dumps(evt, indent=2)
+
+
+def filter_empty(d):
+    for k, v in list(d.items()):
+        if not v:
+            del d[k]
+    return d
 
 
 def type_schema(
@@ -255,20 +255,22 @@ CONN_CACHE = threading.local()
 
 def local_session(factory):
     """Cache a session thread local for up to 45m"""
-    s = getattr(CONN_CACHE, 'session', None)
-    t = getattr(CONN_CACHE, 'time', 0)
+    factory_region = getattr(factory, 'region', 'global')
+    s = getattr(CONN_CACHE, factory_region, {}).get('session')
+    t = getattr(CONN_CACHE, factory_region, {}).get('time')
+
     n = time.time()
     if s is not None and t + (60 * 45) > n:
         return s
     s = factory()
-    CONN_CACHE.session = s
-    CONN_CACHE.time = n
+
+    setattr(CONN_CACHE, factory_region, {'session': s, 'time': n})
     return s
 
 
 def reset_session_cache():
-    setattr(CONN_CACHE, 'session', None)
-    setattr(CONN_CACHE, 'time', 0)
+    for k in [k for k in dir(CONN_CACHE) if not k.startswith('_')]:
+        setattr(CONN_CACHE, k, {})
 
 
 def annotation(i, k):
@@ -451,20 +453,39 @@ def reformat_schema(model):
     return ret
 
 
-_profile_session = None
+# from botocore.utils avoiding runtime dependency for botocore for other providers.
+# license apache 2.0
+def set_value_from_jmespath(source, expression, value, is_first=True):
+    # This takes a (limited) jmespath-like expression & can set a value based
+    # on it.
+    # Limitations:
+    # * Only handles dotted lookups
+    # * No offsets/wildcards/slices/etc.
+    bits = expression.split('.', 1)
+    current_key, remainder = bits[0], bits[1] if len(bits) > 1 else ''
+
+    if not current_key:
+        raise ValueError(expression)
+
+    if remainder:
+        if current_key not in source:
+            # We've got something in the expression that's not present in the
+            # source (new key). If there's any more bits, we'll set the key
+            # with an empty dictionary.
+            source[current_key] = {}
+
+        return set_value_from_jmespath(
+            source[current_key],
+            remainder,
+            value,
+            is_first=False
+        )
+
+    # If we're down to a single key, set it.
+    source[current_key] = value
 
 
-def get_profile_session(options):
-    global _profile_session
-    if _profile_session:
-        return _profile_session
-
-    profile = getattr(options, 'profile', None)
-    _profile_session = boto3.Session(profile_name=profile)
-    return _profile_session
-
-
-def format_string_values(obj, *args, **kwargs):
+def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwargs):
     """
     Format all string values in an object.
     Return the updated object
@@ -480,7 +501,10 @@ def format_string_values(obj, *args, **kwargs):
             new.append(format_string_values(item, *args, **kwargs))
         return new
     elif isinstance(obj, six.string_types):
-        return obj.format(*args, **kwargs)
+        try:
+            return obj.format(*args, **kwargs)
+        except err_fallback:
+            return obj
     else:
         return obj
 

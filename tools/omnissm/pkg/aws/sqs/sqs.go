@@ -58,12 +58,12 @@ func New(config *Config) (*SQS, error) {
 	return s, nil
 }
 
-func (s *SQS) Send(m json.Marshaler) error {
+func (s *SQS) Send(ctx context.Context, m json.Marshaler) error {
 	data, err := json.Marshal(m)
 	if err != nil {
 		return errors.Wrap(err, "cannot marshal SQS message")
 	}
-	_, err = s.SQSAPI.SendMessageWithContext(context.TODO(), &sqs.SendMessageInput{
+	_, err = s.SQSAPI.SendMessageWithContext(ctx, &sqs.SendMessageInput{
 		MessageBody: aws.String(string(data)),
 		QueueUrl:    aws.String(s.config.QueueURL),
 	})
@@ -91,8 +91,8 @@ func parseUnixTime(s string) time.Time {
 	return time.Unix(0, ms*int64(time.Millisecond))
 }
 
-func (s *SQS) Receive() ([]*Message, error) {
-	resp, err := s.SQSAPI.ReceiveMessageWithContext(context.TODO(), &sqs.ReceiveMessageInput{
+func (s *SQS) Receive(ctx context.Context) ([]*Message, error) {
+	resp, err := s.SQSAPI.ReceiveMessageWithContext(ctx, &sqs.ReceiveMessageInput{
 
 		AttributeNames:      aws.StringSlice([]string{"All"}),
 		QueueUrl:            aws.String(s.config.QueueURL),
@@ -122,8 +122,8 @@ func (s *SQS) Receive() ([]*Message, error) {
 	return messages, nil
 }
 
-func (s *SQS) Delete(receiptHandle string) error {
-	_, err := s.SQSAPI.DeleteMessageWithContext(context.TODO(), &sqs.DeleteMessageInput{
+func (s *SQS) Delete(ctx context.Context, receiptHandle string) error {
+	_, err := s.SQSAPI.DeleteMessageWithContext(ctx, &sqs.DeleteMessageInput{
 		QueueUrl:      aws.String(s.config.QueueURL),
 		ReceiptHandle: aws.String(receiptHandle),
 	})

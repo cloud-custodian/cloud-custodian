@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "date": "Wed, 31 Oct 2018 09:22:45 GMT",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "572",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "4340079332613737098",
+    "name": "operation-1540977764506-57982d8429991-7d47f0de-7fe8d4c4",
+    "operationType": "delete",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/snapshot-1",
+    "targetId": "6553779127071329555",
+    "status": "PENDING",
+    "user": "kapilt@gmail.com",
+    "progress": 0,
+    "insertTime": "2018-10-31T02:22:45.548-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1540977764506-57982d8429991-7d47f0de-7fe8d4c4"
+  }
+}

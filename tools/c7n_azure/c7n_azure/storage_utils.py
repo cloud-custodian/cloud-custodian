@@ -14,12 +14,10 @@
 
 from collections import namedtuple
 
-from c7n.utils import local_session
-from c7n_azure.session import Session
-from c7n_azure.utils import ResourceIdParser
-
-from azure.storage.queue import QueueService
+from azure.storage.common import TokenCredential
 from azure.storage.blob import BlockBlobService
+from azure.storage.queue import QueueService
+from c7n_azure.constants import RESOURCE_STORAGE
 from six.moves.urllib.parse import urlparse
 
 try:
@@ -31,21 +29,52 @@ except ImportError:
 class StorageUtilities(object):
 
     @staticmethod
-    def get_blob_client_by_uri(storage_uri):
-        storage = StorageUtilities.get_storage_from_uri(storage_uri)
+    def get_blob_client_by_uri(storage_uri, session):
+        storage = StorageUtilities.get_storage_from_uri(storage_uri, session)
 
-        blob_service = BlockBlobService(account_name=storage.storage_name, account_key=storage.key)
+        blob_service = BlockBlobService(
+            account_name=storage.storage_name,
+            token_credential=storage.token)
         blob_service.create_container(storage.container_name)
         return blob_service, storage.container_name, storage.file_prefix
 
     @staticmethod
-    def get_queue_client_by_uri(queue_uri):
-        storage = StorageUtilities.get_storage_from_uri(queue_uri)
+    def get_blob_client_from_storage_account(resource_group, name, session, sas_generation=False):
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_account = storage_client.storage_accounts.get_properties(resource_group, name)
 
-        queue_service = QueueService(account_name=storage.storage_name, account_key=storage.key)
+        # sas tokens can only be generated from clients created from account keys
+        primary_key = token = None
+        if sas_generation:
+            storage_keys = storage_client.storage_accounts.list_keys(resource_group, name)
+            primary_key = storage_keys.keys[0].value
+        else:
+            token = StorageUtilities.get_storage_token(session)
+
+        return BlockBlobService(
+            account_name=storage_account.name,
+            account_key=primary_key,
+            token_credential=token
+        )
+
+    @staticmethod
+    def get_queue_client_by_uri(queue_uri, session):
+        storage = StorageUtilities.get_storage_from_uri(queue_uri, session)
+
+        queue_service = QueueService(
+            account_name=storage.storage_name,
+            token_credential=storage.token)
         queue_service.create_queue(storage.container_name)
 
         return queue_service, storage.container_name
+
+    @staticmethod
+    def create_queue_from_storage_account(storage_account, name, session):
+        token = StorageUtilities.get_storage_token(session)
+        queue_service = QueueService(
+            account_name=storage_account.name,
+            token_credential=token)
+        return queue_service.create_queue(name)
 
     @staticmethod
     def put_queue_message(queue_service, queue_name, content):
@@ -63,28 +92,14 @@ class StorageUtilities(object):
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
     @staticmethod
-    def get_storage_account_by_name(storage_account_name):
-        s = local_session(Session)
-        client = s.client('azure.mgmt.storage.StorageManagementClient')
-        accounts = list(client.storage_accounts.list())
-        matching_account = [a for a in accounts if a.name == storage_account_name]
-        if not matching_account:
-            return None
-
-        return matching_account[0]
-
-    @staticmethod
-    def get_storage_keys(storage_account_id):
-        s = local_session(Session)
-        client = s.client('azure.mgmt.storage.StorageManagementClient')
-        resource_group = ResourceIdParser.get_resource_group(storage_account_id)
-        resource_name = ResourceIdParser.get_resource_name(storage_account_id)
-        keys = client.storage_accounts.list_keys(resource_group, resource_name)
-        return keys.keys
+    def get_storage_token(session):
+        if session.resource_namespace != RESOURCE_STORAGE:
+            session = session.get_session_for_resource(RESOURCE_STORAGE)
+        return TokenCredential(session.get_bearer_token())
 
     @staticmethod
     @lru_cache()
-    def get_storage_from_uri(storage_uri):
+    def get_storage_from_uri(storage_uri, session):
         parts = urlparse(storage_uri)
         storage_name = str(parts.netloc).partition('.')[0]
 
@@ -95,13 +110,12 @@ class StorageUtilities(object):
         else:
             prefix = ""
 
-        account = StorageUtilities.get_storage_account_by_name(storage_name)
-        key = StorageUtilities.get_storage_keys(account.id)[0].value
+        token = StorageUtilities.get_storage_token(session)
 
-        Storage = namedtuple('Storage', 'container_name, storage_name, key, file_prefix')
+        Storage = namedtuple('Storage', 'container_name, storage_name, token, file_prefix')
 
         return Storage(
             container_name=container_name,
             storage_name=storage_name,
-            key=key,
+            token=token,
             file_prefix=prefix)

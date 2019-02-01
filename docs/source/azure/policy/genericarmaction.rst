@@ -3,8 +3,27 @@
 Generic Actions
 ================
 
+These actions can be applied to a specific resource type, such as ``azure.vm``.
+
 Tags
 -----
+``Tag``
+  Add/Update tag on a resource
+
+  .. c7n-schema:: Tag
+      :module: c7n_azure.actions
+
+  .. code-block:: yaml
+
+        policies:
+          - name: azure-tag
+            resource: azure.resourcegroup
+            description: |
+              Tag all resource groups with 'mytag' with value 'myvalue'
+            actions:
+              - type: tag
+                tag: mytag
+                value: myvalue
 
 ``AutoTagUser``
   Create a tag listing name of user who created a resource based on scanning
@@ -13,17 +32,17 @@ Tags
   .. c7n-schema:: AutoTagUser
       :module: c7n_azure.actions
 
-      .. code-block:: yaml
+  .. code-block:: yaml
 
-            policies:
-              - name: azure-auto-tag-creator
-                resource: azure.resourcegroup
-                description: |
-                  Tag all existing resource groups with the 'CreatorEmail' tag
-                actions:
-                 - type: auto-tag-user
-                   tag: CreatorEmail
-                   days: 10
+        policies:
+          - name: azure-auto-tag-creator
+            resource: azure.resourcegroup
+            description: |
+              Tag all existing resource groups with the 'CreatorEmail' tag
+            actions:
+              - type: auto-tag-user
+                tag: CreatorEmail
+                days: 10
 
 ``RemoveTag``
       Remove a set of tags.
@@ -85,7 +104,8 @@ Tags
                     - downtime
                     - custodian_status
 
-
+Others
+-------
 
 ``DeleteAction``
       Perform delete operation on any ARM resource. Can be used with 
@@ -109,8 +129,9 @@ Tags
                 actions:
                  - type: delete
 
+      The delete action also works with a specified resource type:
 
-        .. code-block:: yaml
+      .. code-block:: yaml
 
           - policies:
               - name: delete-test-nsg

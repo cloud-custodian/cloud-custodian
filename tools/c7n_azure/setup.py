@@ -12,12 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from io import open
+from os import path
 from setuptools import setup, find_packages
+
+# read the contents of your README file
+this_directory = path.abspath(path.dirname(__file__))
+readme = path.join(this_directory, 'readme.md')
+long_description = ''
+if path.exists(readme):
+    with open(readme, encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(
     name="c7n_azure",
-    version='0.1',
+    version='0.5',
     description="Cloud Custodian - Azure Support",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     include_package_data=True,
     classifiers=[
         "Topic :: System :: Systems Administration",
@@ -32,14 +44,42 @@ setup(
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
     },
-    install_requires=["azure-mgmt",
+    install_requires=["azure-mgmt-authorization",
+                      "azure-mgmt-applicationinsights",
+                      "azure-mgmt-batch",
+                      "azure-mgmt-cognitiveservices",
+                      "azure-mgmt-cosmosdb",
+                      "azure-mgmt-compute",
+                      "azure-mgmt-cdn",
+                      "azure-mgmt-containerregistry",
+                      "azure-mgmt-containerservice",
+                      "azure-mgmt-datalake-store",
+                      "azure-mgmt-datafactory",
+                      "azure-mgmt-iothub",
+                      "azure-mgmt-keyvault",
+                      "azure-mgmt-network",
+                      "azure-mgmt-redis",
+                      "azure-mgmt-resource",
+                      "azure-mgmt-sql",
+                      "azure-mgmt-storage",
+                      "azure-mgmt-web",
+                      "azure-mgmt-monitor",
+                      "azure-mgmt-policyinsights",
+                      "azure-mgmt-subscription",
+                      "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
+                      "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
+                      "distlib",
+                      "requests",
+                      "PyJWT",
                       "c7n",
                       "requests",
-                      "azure-cli-core",
-                      "adal~=0.5.0",
+                      "azure-cli-core<=2.0.40",
+                      "adal~=1.0.0",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
-
+    package_data={str(''): [str('function_binding_resources/bin/*.dll'),
+                            str('function_binding_resources/*.csproj'),
+                            str('function_binding_resources/bin/*.json')]}
 )

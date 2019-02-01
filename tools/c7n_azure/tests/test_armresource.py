@@ -13,18 +13,23 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template
-from datetime import datetime
-from mock import patch
+from azure_common import BaseTest, arm_template, TEST_DATE
 from jsonschema.exceptions import ValidationError
+from mock import patch
 
 
 class ArmResourceTest(BaseTest):
 
-    TEST_DATE = datetime(2018, 6, 1, 0, 0, 0)
-
     def setUp(self):
         super(ArmResourceTest, self).setUp()
+
+    def test_arm_resource_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-armresource',
+                'resource': 'azure.armresource'
+            }, validate=True)
+            self.assertTrue(p)
 
     @arm_template('vm.json')
     def test_find_by_name(self):
@@ -44,6 +49,9 @@ class ArmResourceTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_metric_filter_find(self, utcnow_mock):
+        """IMPORTANT: If this test is failing, you might need to update
+                      TEST_DATE and capture new cassette.
+        """
         p = self.load_policy({
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
@@ -65,6 +73,9 @@ class ArmResourceTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_metric_filter_find_average(self, utcnow_mock):
+        """IMPORTANT: If this test is failing, you might need to update
+                      TEST_DATE and capture new cassette.
+        """
         p = self.load_policy({
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
@@ -86,6 +97,9 @@ class ArmResourceTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_metric_filter_not_find(self, utcnow_mock):
+        """IMPORTANT: If this test is failing, you might need to update
+                      TEST_DATE and capture new cassette.
+        """
         p = self.load_policy({
             'name': 'test-azure-metric',
             'resource': 'azure.vm',
@@ -107,6 +121,9 @@ class ArmResourceTest(BaseTest):
     @arm_template('vm.json')
     @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
     def test_metric_filter_not_find_average(self, utcnow_mock):
+        """IMPORTANT: If this test is failing, you might need to update
+                      TEST_DATE and capture new cassette.
+        """
         p = self.load_policy({
             'name': 'test-azure-metric',
             'resource': 'azure.vm',

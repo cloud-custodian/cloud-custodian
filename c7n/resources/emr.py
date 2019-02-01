@@ -20,7 +20,7 @@ import six
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
@@ -47,9 +47,9 @@ class EMRCluster(QueryResourceManager):
         enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'
         id = 'Id'
-        dimension = 'ClusterId'
         date = "Status.Timeline.CreationDateTime"
         filter_name = None
+        dimension = None
 
     action_registry = actions
     filter_registry = filters
@@ -120,6 +120,14 @@ class EMRCluster(QueryResourceManager):
         return result
 
 
+@EMRCluster.filter_registry.register('metrics')
+class EMRMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        # Job flow id is legacy name for cluster id
+        return [{'Name': 'JobFlowId', 'Value': resource['Id']}]
+
+
 @actions.register('mark-for-op')
 class TagDelayedAction(TagDelayedAction):
     """Action to specify an action to occur at a later date
@@ -149,7 +157,7 @@ class TagDelayedAction(TagDelayedAction):
         client = local_session(
             self.manager.session_factory).client('emr')
         for r in resources:
-            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
+            self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
 
 
 @actions.register('tag')
@@ -178,7 +186,7 @@ class TagTable(Tag):
     def process_resource_set(self, resources, tags):
         client = local_session(self.manager.session_factory).client('emr')
         for r in resources:
-            self.retry(client.add_tags(ResourceId=r['Id'], Tags=tags))
+            self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
 
 
 @actions.register('remove-tag')

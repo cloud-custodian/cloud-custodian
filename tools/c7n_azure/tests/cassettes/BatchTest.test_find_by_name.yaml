@@ -1,0 +1,43 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      User-Agent: [python/3.6.4 (Windows-10-10.0.17134-SP0) requests/2.19.1 msrest/0.5.1
+          msrest_azure/0.4.33 azure-mgmt-batch/5.0.1 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Batch/batchAccounts?api-version=2017-09-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXM3yx4ePHywP9m+P9vLtvdnDw+2swcH2fa9g73zew92
+        7892HuR367yp1vU0/7yu1qvmbptNsrqsru6u6uqymOV1c/eLYlpXTXXejp9k7XR+d4J/j6fTar1s
+        m7vTaZs37Uejj5bZglD5yP7dXq/w98a3qVlZTTOgS02v6MV1s0cfUuervG6LvPno0S/+KJPWp8vZ
+        qiqWLbWUTsb6wphhjrMfrOt8PK0WAuCyaAhssbx43WYtMHm9nk7zfJbP6Hv6t6B+89lJVec/sa7a
+        7KNHezvA5uplXVR10V573+zu0Ferqir9v7NpW1zm36kmx8sZ/ft6Os9n69K8co+brNvqdVvV2QX1
+        /4s/auRXHfzZNzRj07Jaz7ana4I+K7JldOIUibvUBj8VA33Xvkp0KbOm/b3y69fXyylht7eze7C9
+        82B75+Gb3YNHe/uP7u2O7+0f3H+4t/dTH/0SIclxaWbwi2pGw/yIp/l1Xl8W0/yjX/JLvv9L/h8Y
+        2Z1OpwIAAA==
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 09 Jul 2018 18:26:20 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Server: [Microsoft-HTTPAPI/2.0]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [2e9318a8-2a2c-41a6-9132-75ae7f224951]
+      x-ms-ratelimit-remaining-subscription-reads: ['14999']
+      x-ms-request-id: [9a81e0a3-b646-43d0-883a-833e5d73ceda]
+      x-ms-routing-request-id: ['WESTUS2:20180709T182621Z:2e9318a8-2a2c-41a6-9132-75ae7f224951']
+    status: {code: 200, message: OK}
+version: 1

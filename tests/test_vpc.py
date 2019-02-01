@@ -77,6 +77,20 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_flow_logs_s3_destination(self):
+        factory = self.replay_flight_data('test_vpc_flow_log_s3_dest')
+        p = self.load_policy({
+            'name': 'flow-s3',
+            'resource': 'vpc',
+            'filters': [{
+                'type': 'flow-logs',
+                'enabled': True,
+                'destination': 'arn:aws:s3:::c7n-vpc-flow-logs'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['VpcId'], 'vpc-d2d616b5')
+
     def test_flow_logs_absent(self):
         # Test that ONLY vpcs with no flow logs are retained
         #
@@ -263,6 +277,11 @@ class NetworkLocationTest(BaseTest):
                 {
                     "reason": "SecurityGroupLocationAbsent",
                     "security-groups": {sg_id: None, web_sg_id: "web"},
+                },
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "security-groups": {sg_id: None},
+                    "resource": "web"
                 }
             ],
         )
@@ -406,7 +425,11 @@ class NetworkLocationTest(BaseTest):
                     "security-groups": {db_sg_id: "db", web_sg_id: "web"},
                     "subnets": {web_sub_id: "web"},
                 },
-            ],
+                {
+                    "reason": "SecurityGroupMismatch",
+                    "resource": "web",
+                    "security-groups": {db_sg_id: "db"}
+                }]
         )
 
     @functional
@@ -458,7 +481,12 @@ class NetworkLocationTest(BaseTest):
         matched = resources.pop()
         self.assertEqual(
             matched["c7n:NetworkLocation"],
-            [{"reason": "ResourceLocationAbsent", "resource": None}],
+            [
+                {"reason": "ResourceLocationAbsent",
+                "resource": None},
+                {"security-groups": {web_sg_id: "web"},
+                "resource": None,
+                "reason": "SecurityGroupMismatch"}],
         )
 
     @functional
@@ -555,6 +583,27 @@ class NetworkAclTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TransitGatewayTest(BaseTest):
+
+    def test_tgw_query(self):
+        factory = self.replay_flight_data('test_transit_gateway_query')
+        p = self.load_policy({
+            'name': 'test-tgw',
+            'resource': 'transit-gateway'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Description'], 'test')
+
+    def test_tgw_attachment(self):
+        factory = self.replay_flight_data('test_transit_gateway_attachment_query')
+        p = self.load_policy({
+            'name': 'test-tgw-att',
+            'resource': 'transit-attachment'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ResourceId'], 'vpc-f1516b97')
 
 
 class NetworkInterfaceTest(BaseTest):
@@ -1407,8 +1456,182 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    @functional
+    def test_only_ports_and_cidr_ingress(self):
+        factory = self.replay_flight_data("test_only_ports_and_cidr_ingress")
+        client = factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+        sg_id = client.create_security_group(
+            GroupName="c7n-only-ports-and-cidr-test", VpcId=vpc_id,
+            Description="cloud-custodian test SG"
+        )["GroupId"]
+        self.addCleanup(client.delete_security_group, GroupId=sg_id)
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=0,
+            ToPort=62000,
+            CidrIp="10.2.0.0/16",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=80,
+            ToPort=80,
+            CidrIp="0.0.0.0/0",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=1234,
+            ToPort=4321,
+            CidrIp="0.0.0.0/0",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=443,
+            ToPort=443,
+            CidrIp="0.0.0.0/0",
+        )
+        client.authorize_security_group_ingress(
+            GroupId=sg_id,
+            IpProtocol="tcp",
+            FromPort=8080,
+            ToPort=8080,
+            CidrIp="0.0.0.0/0",
+        )
+        p = self.load_policy(
+            {
+                "name": "sg-find",
+                "resource": "security-group",
+                "filters": [
+                    {"VpcId": vpc_id},
+                    {"GroupName": "c7n-only-ports-and-cidr-test"},
+                    {
+                        "type": "ingress",
+                        "OnlyPorts": [80, 443],
+                        "Cidr": {"value": "0.0.0.0/0"}
+                    }
+                ],
+                "actions": [
+                    {"type": "remove-permissions", "ingress": "matched"}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["GroupId"], sg_id)
+        self.assertEqual(resources[0]['IpPermissions'], [
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 80,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 80,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 8080,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 8080,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 0,
+                u'IpRanges': [{u'CidrIp': '10.2.0.0/16'}],
+                u'ToPort': 62000,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 1234,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 4321,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 443,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 443,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            }
+        ])
+        self.assertEqual(
+            resources[0]['c7n:MatchedFilters'], [u'VpcId', u'GroupName']
+        )
+        self.assertEqual(
+            resources[0]['MatchedIpPermissions'],
+            [
+                {
+                    u'FromPort': 8080,
+                    u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                    u'PrefixListIds': [],
+                    u'ToPort': 8080,
+                    u'IpProtocol': 'tcp',
+                    u'UserIdGroupPairs': [],
+                    u'Ipv6Ranges': []
+                },
+                {
+                    u'FromPort': 1234,
+                    u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                    u'PrefixListIds': [],
+                    u'ToPort': 4321,
+                    u'IpProtocol': 'tcp',
+                    u'UserIdGroupPairs': [],
+                    u'Ipv6Ranges': []
+                }
+            ]
+        )
+        group_info = client.describe_security_groups(
+            GroupIds=[sg_id]
+        )["SecurityGroups"][0]
+        self.assertEqual(group_info.get("IpPermissions", []), [
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 80,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 80,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 0,
+                u'IpRanges': [{u'CidrIp': '10.2.0.0/16'}],
+                u'ToPort': 62000,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            },
+            {
+                u'PrefixListIds': [],
+                u'FromPort': 443,
+                u'IpRanges': [{u'CidrIp': '0.0.0.0/0'}],
+                u'ToPort': 443,
+                u'IpProtocol': 'tcp',
+                u'UserIdGroupPairs': [],
+                u'Ipv6Ranges': []
+            }
+        ])
 
     def test_multi_attribute_ingress(self):
         p = self.load_policy(
@@ -1444,7 +1667,47 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    def test_description_ingress(self):
+        p = self.load_policy(
+            {
+                "name": "ingress-access",
+                "resource": "security-group",
+                "filters": [
+                    {"type": "ingress",
+                     "Description": {
+                         "value": "Approved",
+                         "op": "not-equal",
+                     },
+                     "Cidr": {"value": "0.0.0.0/0"}, "Ports": [22]}
+                ],
+            }
+        )
+
+        resources = [{
+            "Description": "allows inbound 0.0.0.0/0:22",
+            "GroupName": "ssh",
+            "IpPermissions": [
+                {
+                    "FromPort": 22,
+                    "IpProtocol": "tcp",
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0",
+                            "Description": "ssh",
+                        }
+                    ],
+                    "Ipv6Ranges": []
+                }
+            ],
+            "OwnerId": "644160558196",
+            "GroupId": "sg-0b090df1c1f95bc13",
+            "IpPermissionsEgress": [],
+            "VpcId": "vpc-f1516b97"
+        }]
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_ports_ingress(self):
@@ -1479,7 +1742,7 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_self_reference_ingress_false_positives(self):
@@ -1524,7 +1787,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1541,7 +1804,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         p = self.load_policy(
@@ -1560,8 +1823,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
-
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         resources = [
@@ -1608,7 +1870,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1627,7 +1889,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 0)
 
         p = self.load_policy(
@@ -1645,7 +1907,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
         p = self.load_policy(
@@ -1663,7 +1925,7 @@ class SecurityGroupTest(BaseTest):
                 ],
             }
         )
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_egress_ipv6(self):
@@ -1713,7 +1975,7 @@ class SecurityGroupTest(BaseTest):
             "OwnerId": "644160558196",
             "GroupId": "sg-b744bafc"
         }]
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
     def test_permission_expansion(self):
@@ -1981,6 +2243,27 @@ class EndpointTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-6c7fa917"])
 
+    def test_endpoint_cross_account(self):
+        session_factory = self.replay_flight_data('test_vpce_cross_account')
+        p = self.load_policy(
+            {
+                'name': 'vpc-endpoint-cross-account',
+                'resource': 'vpc-endpoint',
+                'filters': [
+                    {'type': 'cross-account'}
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        violations = resources[0]['c7n:CrossAccountViolations']
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]['Principal'], '*')
+        self.assertEqual(violations[0]['Action'], '*')
+        self.assertEqual(violations[0]['Resource'], '*')
+        self.assertEqual(violations[0]['Effect'], 'Allow')
+
 
 class NATGatewayTest(BaseTest):
 
@@ -2043,7 +2326,8 @@ class FlowLogsTest(BaseTest):
                 "name": "c7n-create-vpc-flow-logs",
                 "resource": "vpc",
                 "filters": [
-                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": False}
+                    {"tag:Name": "FlowLogTest"},
+                    {"type": "flow-logs", "enabled": False}
                 ],
                 "actions": [
                     {
@@ -2067,22 +2351,81 @@ class FlowLogsTest(BaseTest):
         ]
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
 
-    def test_vpc_delete_flow_logs(self):
-        session_factory = self.replay_flight_data("test_vpc_delete_flow_logs")
+    def test_vpc_flow_log_destination(self):
+        session_factory = self.replay_flight_data('test_vpc_flow_filter_destination')
+        p = self.load_policy(
+            {'name': 'c7n-flow-log-s3',
+             'resource': 'vpc',
+             'filters': [{
+                 'type': 'flow-logs',
+                 'enabled': True,
+                 'destination-type': 's3',
+                 'deliver-status': 'success'}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:flow-logs'][0]['LogDestination'],
+                         'arn:aws:s3:::c7n-vpc-flow-logs')
+
+    def test_vpc_set_flow_logs_s3(self):
+        session_factory = self.replay_flight_data("test_vpc_set_flow_logs_s3")
         p = self.load_policy(
             {
-                "name": "c7n-delete-vpc-flow-logs",
+                "name": "c7n-vpc-flow-logs-s3",
                 "resource": "vpc",
                 "filters": [
-                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": True}
+                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": False}
                 ],
-                "actions": [{"type": "set-flow-log", "state": False}],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "LogDestinationType": "s3",
+                        "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
+                        "DeliverLogsPermissionArn":
+                            "arn:aws:iam::644160558196:role/testing-vpc-flow-log-role",
+                    }
+                ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], "vpc-7af45101")
+        self.assertEqual(resources[0]["VpcId"], "vpc-d2d616b5")
+        client = session_factory(region="us-east-1").client("ec2")
+        logs = client.describe_flow_logs(
+            Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+        )[
+            "FlowLogs"
+        ]
+        self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
+
+    def test_vpc_delete_flow_logs(self):
+        session_factory = self.replay_flight_data("test_vpc_delete_flow_logs")
+        p = self.load_policy(
+            {
+                "name": "c7n-delete-vpc-flow-logs",
+                "resource": "aws.vpc",
+                "filters": [
+                    {
+                        "tag:Name": "FlowLogTest"
+                    },
+                    {
+                        "type": "flow-logs",
+                        "enabled": True
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "state": False,
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], "vpc-d2d616b5")
         client = session_factory(region="us-east-1").client("ec2")
         logs = client.describe_flow_logs(
             Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]

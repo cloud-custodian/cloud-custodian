@@ -86,7 +86,7 @@ be looking to incorporate them into a new c7n-org subcommand.
 - For **Azure**, the script `azuresubs.py` generates a config file
   from the Azure Resource Management API
 
-    - Please see the [Additional Azure Instructions](http://capitalone.github.io/cloud-custodian/docs/azure/multiplesubs.html) 
+    - Please see the [Additional Azure Instructions](#Additional-Azure-Instructions) 
     - for initial setup and other important info
 
 - For **GCP**, the script `gcpprojects.py` generates a config file from
@@ -172,4 +172,4 @@ subscriptions.
 
 For instructions on creating a service principal and granting access
 across subscriptions, visit the [Azure authentication docs
-page](http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html).
+page](https://cloudcustodian.io/docs/azure/authentication.html).

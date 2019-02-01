@@ -51,13 +51,13 @@ func New(config *Config) *S3 {
 	return s
 }
 
-func (s *S3) GetObject(path string) ([]byte, error) {
+func (s *S3) GetObject(ctx context.Context, path string) ([]byte, error) {
 	u, err := ParseURL(path)
 	if err != nil {
 		return nil, err
 	}
-	s.getRate.Wait(context.TODO())
-	resp, err := s.S3API.GetObjectWithContext(context.TODO(), &s3.GetObjectInput{
+	s.getRate.Wait(ctx)
+	resp, err := s.S3API.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(u.Bucket),
 		Key:    aws.String(u.Path),
 	})

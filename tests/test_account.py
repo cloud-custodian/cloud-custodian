@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
@@ -22,6 +23,7 @@ from jsonschema.exceptions import ValidationError
 import datetime
 from dateutil import parser
 import json
+import time
 
 from .test_offhours import mock_datetime_now
 from .common import TestConfig as Config, functional
@@ -30,6 +32,55 @@ TRAIL = "nosetest"
 
 
 class AccountTests(BaseTest):
+
+    def test_missing(self):
+        session_factory = self.replay_flight_data(
+            'test_account_missing_resource_ec2')
+        p = self.load_policy({
+            'name': 'missing-resource',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'missing',
+                'policy': {
+                    'resource': 'aws.ec2'}
+            }]}, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(sorted(list(resources[0].keys())),
+                         sorted(['account_id', 'account_name']))
+
+    def test_missing_multi_region(self):
+        # missing filter needs some special handling as it embeds
+        # a resource policy inside an account. We treat the account
+        # as a global resource, while the resources are typically regional
+        # specific. By default missing fires if any region executed against
+        # is missing the regional resource.
+        cfg = Config.empty(regions=["eu-west-1", "us-west-2"])
+
+        session_factory = self.replay_flight_data('test_account_missing_region_resource')
+
+        class SessionFactory(object):
+
+            def __init__(self, options):
+                self.region = options.region
+
+            def __call__(self, region=None, assume=None):
+                return session_factory(region=self.region)
+
+        self.patch(clouds['aws'], 'get_session_factory',
+                   lambda x, *args: SessionFactory(*args))
+
+        p = self.load_policy({
+            'name': 'missing-lambda',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'missing',
+                'policy': {
+                    'resource': 'aws.lambda'}
+            }]},
+            session_factory=session_factory, config=cfg)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_root_mfa_enabled(self):
         session_factory = self.replay_flight_data("test_account_root_mfa")
@@ -58,6 +109,51 @@ class AccountTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_s3_public_block_filter_missing(self):
+        session_factory = self.replay_flight_data('test_account_filter_s3_public_block_missing')
+        p = self.load_policy({
+            'name': 'account-s3-public-block',
+            'resource': 'account',
+            'filters': [{
+                'type': 's3-public-block',
+                'key': 'BlockPublicPolicy',
+                'value': 'empty'}]},
+            config={'account_id': '644160558196'},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:s3-public-block'], {})
+
+    def test_s3_set_public_block_action(self):
+        session_factory = self.replay_flight_data('test_account_action_s3_public_block')
+        p = self.load_policy({
+            'name': 'account-s3-public-block',
+            'resource': 'account',
+            'filters': [{
+                'type': 's3-public-block',
+                'key': 'BlockPublicPolicy',
+                'value': False}],
+            'actions': [{
+                'type': 'set-s3-public-block',
+                'BlockPublicPolicy': True}]},
+            config={'account_id': '644160558196'},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(2)
+
+        client = session_factory().client('s3control')
+        block = client.get_public_access_block(
+            AccountId='644160558196')['PublicAccessBlockConfiguration']
+        self.assertEqual(
+            block,
+            {'BlockPublicAcls': True,
+             'BlockPublicPolicy': True,
+             'IgnorePublicAcls': False,
+             'RestrictPublicBuckets': False})
 
     def test_cloudtrail_enabled(self):
         session_factory = self.replay_flight_data("test_account_trail")

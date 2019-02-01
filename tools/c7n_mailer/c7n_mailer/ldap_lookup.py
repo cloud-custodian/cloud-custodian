@@ -117,8 +117,16 @@ class LdapLookup(object):
     def get_dict_from_ldap_object(self, ldap_user_object):
         ldap_user_metadata = {attr.key: attr.value for attr in ldap_user_object}
         ldap_user_metadata['dn'] = ldap_user_object.entry_dn
-        ldap_user_metadata[self.email_key] = ldap_user_metadata[self.email_key].lower()
-        ldap_user_metadata[self.uid_key] = ldap_user_metadata[self.uid_key].lower()
+
+        email_key = ldap_user_metadata.get(self.email_key, None)
+        uid_key = ldap_user_metadata.get(self.uid_key, None)
+
+        if not email_key or not uid_key:
+            return {}
+        else:
+            ldap_user_metadata['self.email_key'] = email_key.lower()
+            ldap_user_metadata['self.uid_key'] = uid_key.lower()
+
         return ldap_user_metadata
 
     # eg, uid = bill_lumbergh
@@ -146,8 +154,11 @@ class LdapLookup(object):
             ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])
             if self.cache_engine:
                 self.log.debug('Writing user: %s metadata to cache engine.' % uid)
-                self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
-                self.caching.set(uid, ldap_user_metadata)
+                if ldap_user_metadata.get('dn'):
+                    self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
+                    self.caching.set(uid, ldap_user_metadata)
+                else:
+                    self.caching.set(uid, {})
         else:
             if self.cache_engine:
                 self.caching.set(uid, {})

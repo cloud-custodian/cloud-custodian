@@ -1,0 +1,124 @@
+{
+    "status_code": 200,
+    "data": {
+        "Vpcs": [
+            {
+                "CidrBlock": "10.0.42.0/24",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-f1516b97",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-98ba93f0",
+                        "CidrBlock": "10.0.42.0/24",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FancyTestVPC"
+                    },
+                    {
+                        "Key": "tagfancykey",
+                        "Value": "tagfanncyvalue"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "10.0.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-f8c6d983",
+                "InstanceTenancy": "default",
+                "Ipv6CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-caff12a6",
+                        "Ipv6CidrBlock": "2600:1f18:2466:4b00::/56",
+                        "Ipv6CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-c9ff12a5",
+                        "CidrBlock": "10.0.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "IpV6"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "10.205.0.0/18",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-03005fb9b8740263d",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0f6765530d80dc044",
+                        "CidrBlock": "10.205.0.0/18",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "testing-vpc"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "172.31.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-d2d616b5",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-33669f5a",
+                        "CidrBlock": "172.31.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FlowLogTest"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "bfbb5fae-9425-4e93-84aa-c112df46baa3",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "4418",
+                "vary": "Accept-Encoding",
+                "date": "Tue, 20 Nov 2018 12:26:46 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

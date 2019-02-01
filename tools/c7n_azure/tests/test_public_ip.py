@@ -12,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
 
 
 class PublicIpAddressTest(BaseTest):
     def setUp(self):
         super(PublicIpAddressTest, self).setUp()
+
+    def test_public_ip_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-public-ip',
+                'resource': 'azure.publicip'
+            }, validate=True)
+            self.assertTrue(p)
 
     @arm_template('vm.json')
     def test_find_by_name(self):

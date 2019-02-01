@@ -263,7 +263,7 @@ class PolicyLambdaProvision(BaseTest):
             {
                 "resource": "s3",
                 "name": "s3-bucket-policy",
-                "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
+                "mode": {"type": "cloudtrail", "events": ["CreateBucket"], 'runtime': 'python2.7'},
                 "filters": [
                     {
                         "type": "missing-policy-statement",
@@ -286,6 +286,7 @@ class PolicyLambdaProvision(BaseTest):
                 "mode": {
                     "type": "cloudtrail",
                     "memory": 256,
+                    'runtime': 'python2.7',
                     "events": [
                         "CreateBucket",
                         {
@@ -306,12 +307,13 @@ class PolicyLambdaProvision(BaseTest):
             Config.empty(),
         )
 
-        output = self.capture_logging("custodian.lambda", level=logging.DEBUG)
+        output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
         result2 = mgr.publish(PolicyLambda(p), "Dev", role=ROLE)
 
         lines = output.getvalue().strip().split("\n")
         self.assertTrue("Updating function custodian-s3-bucket-policy code" in lines)
-        self.assertTrue("Updating function: custodian-s3-bucket-policy config" in lines)
+        self.assertTrue(
+            "Updating function: custodian-s3-bucket-policy config MemorySize" in lines)
         self.assertEqual(result["FunctionName"], result2["FunctionName"])
         # drive by coverage
         functions = [
@@ -731,13 +733,12 @@ class PolicyLambdaProvision(BaseTest):
             {
                 "DeadLetterConfig": {},
                 "Description": "cloud-custodian lambda policy",
-                "Environment": {"Variables": {}},
                 "FunctionName": "custodian-hello",
                 "Handler": "custodian_policy.run",
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python2.7",
+                "Runtime": "python3.7",
                 "Tags": {},
                 "Timeout": 60,
                 "TracingConfig": {"Mode": "PassThrough"},

@@ -4,6 +4,7 @@ A mailer implementation for Custodian. Outbound mail delivery is still somewhat
 organization-specific, so this at the moment serves primarily as an example
 implementation.
 
+> The Cloud Custodian Mailer can now be easily run in a Docker container. Click [here](https://hub.docker.com/r/troylar/c7n-mailer/) for details.
 
 ## Message Relay
 
@@ -17,7 +18,7 @@ should be cross-account enabled for sending between accounts.
 Our goal in starting out with the Custodian mailer is to install the mailer,
 and run a policy that triggers an email to your inbox.
 
-1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop.
+1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/troylar/c7n-mailer/))
 1. In your text editor, create a `mailer.yml` file to hold your mailer config.
 1. In the AWS console, create a new standard SQS queue (quick create is fine).
    Copy the queue URL to `queue_url` in `mailer.yml`.
@@ -137,6 +138,8 @@ policies:
           - slack://foo@bar.com
           - slack://#custodian-test
           - slack://webhook/#c7n-webhook-test
+          - slack://tag/resource_tag
+          - https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
         transport:
           type: sqs
           queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
@@ -146,17 +149,22 @@ Slack messages support use of a unique template field specified by `slack_templa
 existing functionality for messages also specifying an email template in the `template` field. This field is optional, however,
 and if not specified, the mailer will use the default value `slack_default`.
 
-Slack integration for the mailer supports three flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used.
+Slack integration for the mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
 
-| Required? | Key                  | Type             | Notes                               |
+| Requires&nbsp;`slack_token` | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
-|           | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
-|           | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
-|           | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
-|           | `slack://webhook/#c7n-webhook-test` | string      | Send to a Slack webhook; appended with the target channel. |
+| No        | `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX` | string | **(PREFERRED)** Send to an [incoming webhook](https://api.slack.com/incoming-webhooks) (the channel is defined in the webhook) |
+| Yes       | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
+| Yes       | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
+| Yes       | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
+| No        | `slack://webhook/#c7n-webhook-test` | string      | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
+| Yes       | `slack://tag/resource-tag`| string      | Send to target found in resource tag. Example of value in tag: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX |
 
+Slack delivery can also be set via a resource's tag name. For example, using "slack://tag/slack_channel" will look for a tag name of 'slack_channel', and if matched on a resource will deliver the message to the value of that resource's tag:
 
-The `slack_token` field is required for any of the first three Slack notify forms. However, a token is not required for use of the webhook.
+`slack_channel:https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX`
+
+Delivery via tag has been tested with webhooks but should support all delivery methods.
 
 ### Now run:
 
@@ -226,6 +234,22 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
 
+#### Standard Azure Functions Config
+
+| Required? | Key                            | Type             | Notes                                                                 |
+|:---------:|:-------------------------------|:-----------------|:----------------------------------------------------------------------|
+|           | `function_properties`          | object           | Contains `appInsights`, `storageAccount` and `servicePlan` objects    |
+|           | `appInsights`                  | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `storageAccount`               | object           | Contains `name`, `location` and `resource_group_name` properties      |
+|           | `servicePlan`                  | object           | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties      |
+|           | `name`                         | string           | |
+|           | `location`                     | string           | Default: `west us 2`|
+|           | `resource_group_name`          | string           | Default `cloud-custodian`|
+|           | `skuTier`                      | string           | Default: `Basic` |
+|           | `skuName`                      | string           | Default: `B1`    |
+
+
+
 
 #### Mailer Infrastructure Config
 
@@ -237,7 +261,7 @@ schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 |           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
 |           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
 |           | `ldap_bind_password`       | string           | ldap bind password     |
-|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone want to se this to false)     |
+|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
 |           | `ldap_email_attribute`     | string           |                                     |
 |           | `ldap_email_key`           | string           | eg 'mail'     |
 |           | `ldap_manager_attribute`   | string           | eg 'manager'    |
@@ -357,10 +381,17 @@ For reference purposes, the JSON Schema of the `notify` action:
 
 ## Using on Azure
 
-Requires `c7n_azure` package.  See [Installing Azure Plugin](http://capitalone.github.io/cloud-custodian/docs/azure/gettingstarted.html#install-cloud-custodian)
+Requires:
 
-The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.  
+- `c7n_azure` package.  See [Installing Azure Plugin](https://cloudcustodian.io/docs/azure/gettingstarted.html#azure-install-cc)
+- SendGrid account. See [Using SendGrid with Azure](https://docs.microsoft.com/en-us/azure/sendgrid-dotnet-how-to-send-email)
+- [Azure Storage Queue](https://azure.microsoft.com/en-us/services/storage/queues/)
+
+The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.
 Configuration for this scenario requires only minor changes from AWS deployments.
+
+You will need to grant `Queue Data Contributor` role on the Queue for the identity
+mailer is running under.
 
 The notify action in your policy will reflect transport type `asq` with the URL
 to an Azure Storage Queue.  For example:
@@ -395,14 +426,38 @@ The mailer will transmit all messages found on the queue on each execution, and 
 sending 3 times in the event of a failure calling SendGrid.  After the retries the queue
 message will be discarded.
 
+#### Deploying Azure Functions
+
+The `--update-lambda` CLI option will also deploy Azure Functions if you have an Azure
+mailer configuration.
+
+`c7n-mailer --config mailer.yml --update-lambda`
+
+where `mailer.yml` may look like:
+
+```yml
+queue_url: asq://storage.queue.core.windows.net/custodian
+from_address: foo@mail.com
+sendgrid_api_key: <key>
+function_properties:
+  servicePlan:
+    name: 'testmailer1'
+    resourceGroupName: custodianmailer1
+    skuTier: Basic
+    skuName: B1
+    location: WestUS2
+```
+
 ## Writing an email template
 
 Templates are authored in [jinja2](http://jinja.pocoo.org/docs/dev/templates/).
 Drop a file with the `.j2` extension into the
-[`msg-templates`](./msg-templates) directory, and send a pull request to this
+[`c7n_mailer/msg-templates`](./c7n_mailer/msg-templates) directory, and send a pull request to this
 repo. You can then reference it in the `notify` action as the `template`
 variable by file name minus extension. Templates ending with `.html.j2` are
 sent as HTML-formatted emails, all others are sent as plain text.
+
+You can use `-t` or `--templates` cli argument to pass custom folder with your templates.
 
 The following variables are available when rendering templates:
 
@@ -462,7 +517,7 @@ the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS.
 * With no additional arguments, it will render the template specified by the policy the
   message is for, and actually send mail from the local machine as ``c7n-mailer`` would.
   This only works with SES, not SMTP.
-* With the ``-t`` | ``--template-print`` argument, it will log the email addresses that would
+* With the ``-T`` | ``--template-print`` argument, it will log the email addresses that would
   receive mail, and print the rendered message body template to STDOUT.
 * With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
   that would be sent, for each message that would be sent, to STDOUT.

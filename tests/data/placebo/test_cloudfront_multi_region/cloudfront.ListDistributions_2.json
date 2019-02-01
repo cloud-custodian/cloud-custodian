@@ -1,0 +1,126 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "74907bc4-9ccb-11e8-b128-5353f973601a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "74907bc4-9ccb-11e8-b128-5353f973601a",
+                "content-type": "text/xml",
+                "content-length": "2420",
+                "vary": "Accept-Encoding",
+                "date": "Fri, 10 Aug 2018 18:30:27 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "DistributionList": {
+            "Marker": "",
+            "MaxItems": 100,
+            "IsTruncated": false,
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Id": "E3U7J4TIDRMINY",
+                    "ARN": "arn:aws:cloudfront::644160558196:distribution/E3U7J4TIDRMINY",
+                    "Status": "Deployed",
+                    "LastModifiedTime": {
+                        "__class__": "datetime",
+                        "year": 2018,
+                        "month": 7,
+                        "day": 31,
+                        "hour": 20,
+                        "minute": 33,
+                        "second": 32,
+                        "microsecond": 39000
+                    },
+                    "DomainName": "d1lsmfj2r7hkch.cloudfront.net",
+                    "Aliases": {
+                        "Quantity": 0
+                    },
+                    "Origins": {
+                        "Quantity": 1,
+                        "Items": [
+                            {
+                                "Id": "S3-ktravis-test-oscon",
+                                "DomainName": "ktravis-test-oscon.s3.amazonaws.com",
+                                "OriginPath": "",
+                                "CustomHeaders": {
+                                    "Quantity": 0
+                                },
+                                "S3OriginConfig": {
+                                    "OriginAccessIdentity": ""
+                                }
+                            }
+                        ]
+                    },
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": "S3-ktravis-test-oscon",
+                        "ForwardedValues": {
+                            "QueryString": false,
+                            "Cookies": {
+                                "Forward": "none"
+                            },
+                            "Headers": {
+                                "Quantity": 0
+                            },
+                            "QueryStringCacheKeys": {
+                                "Quantity": 0
+                            }
+                        },
+                        "TrustedSigners": {
+                            "Enabled": false,
+                            "Quantity": 0
+                        },
+                        "ViewerProtocolPolicy": "allow-all",
+                        "MinTTL": 0,
+                        "AllowedMethods": {
+                            "Quantity": 2,
+                            "Items": [
+                                "HEAD",
+                                "GET"
+                            ],
+                            "CachedMethods": {
+                                "Quantity": 2,
+                                "Items": [
+                                    "HEAD",
+                                    "GET"
+                                ]
+                            }
+                        },
+                        "SmoothStreaming": false,
+                        "DefaultTTL": 86400,
+                        "MaxTTL": 31536000,
+                        "Compress": false,
+                        "LambdaFunctionAssociations": {
+                            "Quantity": 0
+                        },
+                        "FieldLevelEncryptionId": ""
+                    },
+                    "CacheBehaviors": {
+                        "Quantity": 0
+                    },
+                    "CustomErrorResponses": {
+                        "Quantity": 0
+                    },
+                    "Comment": "",
+                    "PriceClass": "PriceClass_All",
+                    "Enabled": false,
+                    "ViewerCertificate": {
+                        "CloudFrontDefaultCertificate": true,
+                        "MinimumProtocolVersion": "TLSv1",
+                        "CertificateSource": "cloudfront"
+                    },
+                    "Restrictions": {
+                        "GeoRestriction": {
+                            "RestrictionType": "none",
+                            "Quantity": 0
+                        }
+                    },
+                    "WebACLId": "",
+                    "HttpVersion": "HTTP2",
+                    "IsIPV6Enabled": true
+                }
+            ]
+        }
+    }
+}
