@@ -169,7 +169,6 @@ class UpdateApi(BaseAction):
             client.update_rest_api(
                 restApiId=r['id'],
                 patchOperations=self.data['patch'])
->>>>>>> upstream
 
 
 @resources.register('rest-stage')
