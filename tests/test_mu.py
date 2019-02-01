@@ -100,7 +100,6 @@ class Publish(BaseTest):
         self.assertFalse('Updating function: test-foo-bar config Layers' in lines)
         self.assertTrue('Removing function: test-foo-bar concurrency' in lines)
 
-        
     def test_can_switch_runtimes(self):
         session_factory = self.replay_flight_data("test_can_switch_runtimes")
         func = self.make_func()
