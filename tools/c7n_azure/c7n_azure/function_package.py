@@ -222,7 +222,7 @@ class FunctionPackage(object):
 
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
-        zip_file = self.pkg.open().read()
+        zip_file = self.pkg.get_bytes()
 
         try:
             r = requests.post(zip_api_url, data=zip_file, timeout=300, verify=self.enable_ssl_cert)

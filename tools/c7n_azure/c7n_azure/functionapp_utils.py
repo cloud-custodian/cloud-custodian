@@ -149,7 +149,7 @@ class FunctionAppUtilities(object):
 
             # upload package
             blob_name = '%s.zip' % function_params.function_app_name
-            packageToPublish = package.pkg.open()
+            packageToPublish = package.pkg.get_stream()
             count = os.path.getsize(package.pkg.path)
 
             blob_client.create_blob_from_stream(
