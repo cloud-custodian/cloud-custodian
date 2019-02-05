@@ -73,7 +73,7 @@ class Tag(Tag):
 
     permissions = ('cloudhsmv2:TagResource',)
 
-    def process_resource_set(self, client, clusters, tags): 
+    def process_resource_set(self, client, clusters, tags):
         for c in clusters:
             try:
                 client.tag_resource(ResourceId=c['ClusterId'], TagList=tags)

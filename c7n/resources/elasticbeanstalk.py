@@ -180,7 +180,6 @@ class RemoveTag(tags.RemoveTag):
                 TagsToRemove=tag_keys)
 
 
-
 @ElasticBeanstalkEnvironment.action_registry.register('terminate')
 class Terminate(BaseAction):
     """ Terminate an ElasticBeanstalk Environment.
