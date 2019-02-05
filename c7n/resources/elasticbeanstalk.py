@@ -14,22 +14,14 @@
 
 import logging
 
-from botocore.exceptions import ClientError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import utils
 from c7n import tags
-from c7n.utils import get_retry, local_session, type_schema
-from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
+from c7n.utils import local_session, type_schema
+from c7n.actions import BaseAction
 
 log = logging.getLogger('custodian.elasticbeanstalk')
-
-env_filters = FilterRegistry('elasticbeanstalk-environment.filters')
-env_actions = ActionRegistry('elasticbeanstalk-environment.actions')
-
-env_filters.register('tag-count', tags.TagCountFilter)
-env_filters.register('marked-for-op', tags.TagActionFilter)
 
 
 @resources.register('elasticbeanstalk')
@@ -68,19 +60,19 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
         filter_name = 'EnvironmentNames'
         filter_type = 'list'
 
-    filter_registry = env_filters
-    action_registry = env_actions
-    retry = staticmethod(get_retry(('ThrottlingException',)))
     permissions = ('elasticbeanstalk:ListTagsForResource',)
 
     def augment(self, envs):
-        filter(None, _eb_env_tags(
-            envs, self.session_factory, self.executor_factory, self.retry
-        ))
-        return envs
+        return _eb_env_tags(envs, self.session_factory, self.retry)
 
 
-def _eb_env_tags(envs, session_factory, executor_factory, retry):
+ElasticBeanstalkEnvironment.filter_registry.register(
+    'tag-count', tags.TagCountFilter)
+ElasticBeanstalkEnvironment.filter_registry.register(
+    'marked-for-op', tags.TagActionFilter)
+
+
+def _eb_env_tags(envs, session_factory, retry):
     """Augment ElasticBeanstalk Environments with their tags."""
 
     client = local_session(session_factory).client('elasticbeanstalk')
@@ -99,7 +91,7 @@ def _eb_env_tags(envs, session_factory, executor_factory, retry):
     return list(map(process_tags, envs))
 
 
-@env_actions.register('mark-for-op')
+@ElasticBeanstalkEnvironment.action_registry.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Mark an ElasticBeanstalk Environment for specific custodian action
 
@@ -125,7 +117,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     """
 
 
-@env_actions.register('tag')
+@ElasticBeanstalkEnvironment.action_registry.register('tag')
 class Tag(tags.Tag):
     """Tag an ElasticBeanstalk Environment with a key/value
 
@@ -157,7 +149,7 @@ class Tag(tags.Tag):
                 TagsToAdd=ts)
 
 
-@env_actions.register('remove-tag')
+@ElasticBeanstalkEnvironment.action_registry.register('remove-tag')
 class RemoveTag(tags.RemoveTag):
     """Removes a tag or set of tags from ElasticBeanstalk Environments
 
@@ -188,7 +180,8 @@ class RemoveTag(tags.RemoveTag):
                 TagsToRemove=tag_keys)
 
 
-@env_actions.register('terminate')
+
+@ElasticBeanstalkEnvironment.action_registry.register('terminate')
 class Terminate(BaseAction):
     """ Terminate an ElasticBeanstalk Environment.
 
