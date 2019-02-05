@@ -902,34 +902,15 @@ def _describe_target_group_tags(target_groups, session_factory,
 
 def _add_target_group_tags(target_groups, session_factory, ts):
     client = local_session(session_factory).client('elbv2')
-    client.add_tags(
-        ResourceArns=[
-            target_group['TargetGroupArn'] for target_group in target_groups
-        ],
-        Tags=ts)
 
 
 def _remove_target_group_tags(target_groups, session_factory, tag_keys):
-    client = local_session(session_factory).client('elbv2')
-    client.remove_tags(
-        ResourceArns=[
-            target_group['TargetGroupArn'] for target_group in target_groups
-        ],
-        TagKeys=tag_keys)
+    pass
 
 
 @AppELBTargetGroup.action_registry.register('mark-for-op')
 class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
     """Action to specify a delayed action on an ELB target group"""
-
-    batch_size = 1
-    permissions = ("elasticloadbalancing:AddTags",)
-
-    def process_resource_set(self, resource_set, ts):
-        _add_target_group_tags(
-            resource_set,
-            self.manager.session_factory,
-            ts)
 
 
 @AppELBTargetGroup.action_registry.register('tag')
@@ -954,11 +935,10 @@ class AppELBTargetGroupTagAction(tags.Tag):
     batch_size = 1
     permissions = ("elasticloadbalancing:AddTags",)
 
-    def process_resource_set(self, resource_set, ts):
-        _add_target_group_tags(
-            resource_set,
-            self.manager.session_factory,
-            ts)
+    def process_resource_set(self, client, resource_set, ts):
+        client.add_tags(
+            ResourceArns=[tgroup['TargetGroupArn'] for tgroup in resource_set],
+            Tags=ts)
 
 
 @AppELBTargetGroup.action_registry.register('remove-tag')
@@ -982,11 +962,10 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
     batch_size = 1
     permissions = ("elasticloadbalancing:RemoveTags",)
 
-    def process_resource_set(self, resource_set, tag_keys):
-        _remove_target_group_tags(
-            resource_set,
-            self.manager.session_factory,
-            tag_keys)
+    def process_resource_set(self, client, resource_set, tag_keys):
+        client.remove_tags(
+            ResourceArns=[tgroup['TargetGroupArn'] for tgroup in resource_set],
+            TagKeys=tag_keys)
 
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
