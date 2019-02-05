@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from c7n.manager import resources
-from c7n.filters import FilterRegistry, iamaccess
+from c7n.filters import iamaccess
 from c7n.query import QueryResourceManager
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
@@ -20,8 +20,7 @@ from c7n.utils import local_session
 
 @resources.register('secrets-manager')
 class SecretsManager(QueryResourceManager):
-    filter_registry = FilterRegistry('secrets-manager.filters')
-    filter_registry.register('marked-for-op', TagActionFilter)
+
     permissions = ('secretsmanager:ListSecretVersionIds',)
 
     class resource_type(object):
@@ -32,6 +31,9 @@ class SecretsManager(QueryResourceManager):
         name = 'Name'
         dimension = None
         filter_name = None
+
+
+SecretsManager.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @SecretsManager.filter_registry.register('cross-account')
@@ -71,13 +73,12 @@ class TagSecretsManagerResource(Tag):
 
     permissions = ('secretsmanager:TagResource',)
 
-    def process_resource_set(self, resources, new_tags):
-        client = local_session(self.manager.session_factory).client('secretsmanager')
+    def process_resource_set(self, client, resources, new_tags):
         for r in resources:
             tags = {t['Key']: t['Value'] for t in r['Tags']}
             for t in new_tags:
                 tags[t['Key']] = t['Value']
-            formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.iteritems()]
+            formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
             client.tag_resource(SecretId=r['ARN'], Tags=formatted_tags)
 
 
@@ -99,8 +100,7 @@ class RemoveTagSecretsManagerResource(RemoveTag):
 
     permissions = ('secretsmanager:UntagResource',)
 
-    def process_resource_set(self, resources, keys):
-        client = local_session(self.manager.session_factory).client('secretsmanager')
+    def process_resource_set(self, client, resources, keys):
         for r in resources:
             client.untag_resource(SecretId=r['ARN'], TagKeys=keys)
 
@@ -119,14 +119,3 @@ class MarkSecretForOp(TagDelayedAction):
                   op: delete
                   days: 1
     """
-
-    permissions = ('secretsmanager:TagResource',)
-
-    def process_resource_set(self, resources, new_tags):
-        client = local_session(self.manager.session_factory).client('secretsmanager')
-        for r in resources:
-            tags = {t['Key']: t['Value'] for t in r['Tags']}
-            for t in new_tags:
-                tags[t['Key']] = t['Value']
-            formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.iteritems()]
-            client.tag_resource(SecretId=r['ARN'], Tags=formatted_tags)

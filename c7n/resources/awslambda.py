@@ -96,22 +96,6 @@ class ConfigLambda(query.ConfigSource):
         return resource
 
 
-def tag_function(session_factory, functions, tags, log):
-    client = local_session(session_factory).client('lambda')
-    tag_dict = {}
-    for t in tags:
-        tag_dict[t['Key']] = t['Value']
-    for f in functions:
-        arn = f['FunctionArn']
-        try:
-            client.tag_resource(Resource=arn, Tags=tag_dict)
-        except Exception as err:
-            log.exception(
-                'Exception tagging lambda function %s: %s',
-                f['FunctionName'], err)
-            continue
-
-
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
@@ -357,11 +341,6 @@ class TagDelayedAction(TagDelayedAction):
                     days: 7
     """
 
-    permissions = ('lambda:TagResource',)
-
-    def process_resource_set(self, functions, tags):
-        tag_function(self.manager.session_factory, functions, tags, self.log)
-
 
 @actions.register('tag')
 class Tag(Tag):
@@ -384,8 +363,14 @@ class Tag(Tag):
 
     permissions = ('lambda:TagResource',)
 
-    def process_resource_set(self, functions, tags):
-        tag_function(self.manager.session_factory, functions, tags, self.log)
+    def process_resource_set(self, client, functions, tags):
+        for f in functions:
+            try:
+                client.tag_resource(
+                    Resource=f['FunctionArn'],
+                    Tags={t['Key']: t['Value'] for t in tags})
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 @actions.register('remove-tag')
@@ -408,11 +393,10 @@ class RemoveTag(RemoveTag):
 
     permissions = ('lambda:UntagResource',)
 
-    def process_resource_set(self, functions, tag_keys):
-        client = local_session(self.manager.session_factory).client('lambda')
+    def process_resource_set(self, client, functions, tag_keys):
         for f in functions:
-            arn = f['FunctionArn']
-            client.untag_resource(Resource=arn, TagKeys=tag_keys)
+            client.untag_resource(
+                Resource=f['FunctionArn'], TagKeys=tag_keys)
 
 
 @actions.register('set-concurrency')

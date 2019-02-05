@@ -125,6 +125,7 @@ def _common_tag_processer(executor_factory, batch_size, concurrency, client,
 
         for f in as_completed(futures):
             if f.exception():
+                raise f.exception()
                 log.error(
                     "Exception with tags: %s on resources: %s \n %s" % (
                         tags,

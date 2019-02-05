@@ -52,14 +52,6 @@ class ReplicationInstance(QueryResourceManager):
     def get_arns(self, resources):
         return [r['ReplicationInstanceArn'] for r in resources]
 
-    def get_tags(self, resources):
-        client = local_session(self.session_factory).client('dms')
-        for r in resources:
-            r['Tags'] = self.manager.retry(
-                client.list_tags_for_resource(
-                    ResourceArn=r['ReplicationInstanceArn'])['TagList'])
-        return resources
-
 
 @resources.register('dms-endpoint')
 class DmsEndpoints(QueryResourceManager):
@@ -103,11 +95,10 @@ class InstanceDescribe(DescribeSource):
         for arn, r in zip(self.manager.get_arns(resources), resources):
             self.manager.log.info("arn %s" % arn)
             try:
-                tags = client.list_tags_for_resource(
-                    ResourceArn=arn).get('TagList', ())
+                r['Tags'] = client.list_tags_for_resource(
+                    ResourceArn=arn).get('TagList', [])
             except client.exceptions.ResourceNotFoundFault:
                 continue
-            r['Tags'] = tags
 
 
 @ReplicationInstance.filter_registry.register('kms-key')
@@ -225,14 +216,13 @@ class InstanceTag(Tag):
     """
     permissions = ('dms:AddTagsToResource',)
 
-    def process_resource_set(self, resources, tags):
+    def process_resource_set(self, client, resources, tags):
         client = local_session(self.manager.session_factory).client('dms')
-        tags_list = [{(k, v) for (k, v) in tags.items()}]
         for r in resources:
             try:
                 client.add_tags_to_resource(
                     ResourceArn=r['ReplicationInstanceArn'],
-                    Tags=tags_list)
+                    Tags=tags)
             except client.exceptions.ResourceNotFoundFault:
                 continue
 
@@ -257,8 +247,7 @@ class InstanceRemoveTag(RemoveTag):
     """
     permissions = ('dms:RemoveTagsFromResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('dms')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             try:
                 client.remove_tags_from_resource(
@@ -288,18 +277,6 @@ class InstanceMarkForOp(TagDelayedAction):
                       op: delete
                       days: 7
     """
-    permissions = ('dms:AddTagsToResource',)
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('dms')
-        tags_list = [{(k, v) for (k, v) in tags.items()}]
-        for r in resources:
-            try:
-                client.add_tags_to_resource(
-                    ResourceArn=r['ReplicationInstanceArn'],
-                    Tags=tags_list)
-            except client.exceptions.ResourceNotFoundFault:
-                continue
 
 
 @DmsEndpoints.action_registry.register('modify-endpoint')

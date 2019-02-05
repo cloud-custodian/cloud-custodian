@@ -402,28 +402,24 @@ class DescribeDaxCluster(query.DescribeSource):
         return list(filter(None, _dax_cluster_tags(
             resources,
             self.manager.session_factory,
-            self.manager.executor_factory,
             self.manager.retry,
             self.manager.log)))
 
 
-def _dax_cluster_tags(tables, session_factory, executor_factory, retry, log):
+def _dax_cluster_tags(tables, session_factory, retry, log):
     client = local_session(session_factory).client('dax')
 
     def process_tags(r):
-        tags = []
         try:
-            tags = retry(
+            r['Tags'] = retry(
                 client.list_tags, ResourceName=r['ClusterArn'])['Tags']
+            return r
         except (client.exceptions.ClusterNotFoundFault,
                 client.exceptions.InvalidARNFault,
                 client.exceptions.InvalidClusterStateFault):
             return None
-        r['Tags'] = tags
-        return r
 
-    with executor_factory(max_workers=2) as w:
-        return filter(None, list(w.map(process_tags, tables)))
+    return filter(None, list(map(process_tags, tables)))
 
 
 @DynamoDbAccelerator.filter_registry.register('security-group')
@@ -452,8 +448,7 @@ class DaxTagging(Tag):
     """
     permissions = ('dax:TagResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('dax')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             try:
                 client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
@@ -482,14 +477,12 @@ class DaxRemoveTagging(RemoveTag):
     """
     permissions = ('dax:UntagResource',)
 
-    def process_resource_set(self, resources, tag_keys):
-        client = local_session(self.manager.session_factory).client('dax')
+    def process_resource_set(self, client, resources, tag_keys):
         for r in resources:
             try:
                 client.untag_resource(
                     ResourceName=r['ClusterArn'], TagKeys=tag_keys)
             except (client.exceptions.ClusterNotFoundFault,
-                    client.exceptions.InvalidARNFault,
                     client.exceptions.TagNotFoundFault,
                     client.exceptions.InvalidClusterStateFault) as e:
                 self.log.warning('Exception removing tags on %s: \n%s', r['ClusterName'], e)
@@ -516,17 +509,6 @@ class DaxMarkForOp(TagDelayedAction):
                 op: delete
                 days: 7
     """
-    permission = ('dax:TagResource',)
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('dax')
-        for r in resources:
-            try:
-                client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
-            except (client.exceptions.ClusterNotFoundFault,
-                    client.exceptions.InvalidARNFault,
-                    client.exceptions.InvalidClusterStateFault) as e:
-                self.log.warning('Exception marking %s: \n%s', r['ClusterName'], e)
 
 
 @DynamoDbAccelerator.action_registry.register('delete')
