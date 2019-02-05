@@ -38,12 +38,6 @@ from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 log = logging.getLogger('custodian.app-elb')
 
-filters = FilterRegistry('app-elb.filters')
-actions = ActionRegistry('app-elb.actions')
-
-filters.register('tag-count', tags.TagCountFilter)
-filters.register('marked-for-op', tags.TagActionFilter)
-
 
 @resources.register('app-elb')
 class AppELB(QueryResourceManager):
@@ -146,11 +140,14 @@ def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
         list(w.map(_process_tags, chunks(albs, 20)))
 
 
-filters.register('shield-enabled', IsShieldProtected)
-actions.register('set-shield', SetShieldProtection)
+AppELB.filter_registry.register('tag-count', tags.TagCountFilter)
+AppELB.filter_registry.register('marked-for-op', tags.TagActionFilter)
+AppELB.filter_registry.register('shield-enabled', IsShieldProtected)
+AppELB.filter_registry.register('network-location', net_filters.NetworkLocation)
+AppELB.action_registry.register('set-shield', SetShieldProtection)
 
 
-@filters.register('metrics')
+@AppELB.filter_registry.register('metrics')
 class AppElbMetrics(MetricsFilter):
     """Filter app load balancer by metric values.
 
@@ -167,25 +164,22 @@ class AppElbMetrics(MetricsFilter):
                 resource[self.model.id].rsplit('/')[-1])}]
 
 
-@filters.register('security-group')
+@AppELB.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "SecurityGroups[]"
 
 
-@filters.register('subnet')
+@AppELB.filter_registry.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "AvailabilityZones[].SubnetId"
 
 
-@filters.register('vpc')
+@AppELB.filter_registry.register('vpc')
 class VpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
-
-
-filters.register('network-location', net_filters.NetworkLocation)
 
 
 @AppELB.filter_registry.register('waf-enabled')
@@ -300,7 +294,7 @@ class SetWaf(BaseAction):
                     WebACLId=target_acl_id, ResourceArn=r[arn_key])
 
 
-@actions.register('set-s3-logging')
+@AppELB.filter_registry.register('set-s3-logging')
 class SetS3Logging(BaseAction):
     """Action to enable/disable S3 logging for an application loadbalancer.
 
@@ -366,7 +360,7 @@ class SetS3Logging(BaseAction):
                 LoadBalancerArn=elb_arn, Attributes=attributes)
 
 
-@actions.register('mark-for-op')
+@AppELB.action_registry.register('mark-for-op')
 class AppELBMarkForOpAction(tags.TagDelayedAction):
     """Action to create a delayed action on an ELB to start at a later date
 
@@ -391,7 +385,7 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
     batch_size = 1
 
 
-@actions.register('tag')
+@AppELB.action_registry.register('tag')
 class AppELBTagAction(tags.Tag):
     """Action to create tag/tags on an ELB
 
@@ -419,7 +413,7 @@ class AppELBTagAction(tags.Tag):
             Tags=ts)
 
 
-@actions.register('remove-tag')
+@AppELB.action_registry.register('remove-tag')
 class AppELBRemoveTagAction(tags.RemoveTag):
     """Action to remove tag/tags from an ELB
 
@@ -446,7 +440,7 @@ class AppELBRemoveTagAction(tags.RemoveTag):
             TagKeys=tag_keys)
 
 
-@actions.register('delete')
+@AppELB.action_registry.register('delete')
 class AppELBDeleteAction(BaseAction):
     """Action to delete an ELB
 
@@ -541,7 +535,7 @@ class AppELBAttributeFilterBase(object):
             list(w.map(_process_attributes, albs))
 
 
-@filters.register('is-logging')
+@AppELB.filter_registry.register('is-logging')
 class IsLoggingFilter(Filter, AppELBAttributeFilterBase):
     """ Matches AppELBs that are logging to S3.
         bucket and prefix are optional
@@ -584,7 +578,7 @@ class IsLoggingFilter(Filter, AppELBAttributeFilterBase):
                 ]
 
 
-@filters.register('is-not-logging')
+@AppELB.filter_registry.register('is-not-logging')
 class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
     """ Matches AppELBs that are NOT logging to S3.
         or do not match the optional bucket and/or prefix.
@@ -640,7 +634,7 @@ class AppELBTargetGroupFilterBase(object):
                 self.target_group_map[load_balancer_arn].append(target_group)
 
 
-@filters.register('listener')
+@AppELB.filter_registry.register('listener')
 class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
     """Filter ALB based on matching listener attributes
 
@@ -703,7 +697,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
         return found_listeners
 
 
-@actions.register('modify-listener')
+@AppELB.action_registry.register('modify-listener')
 class AppELBModifyListenerPolicy(BaseAction):
     """Action to modify the policy for an App ELB
 
@@ -765,7 +759,7 @@ class AppELBModifyListenerPolicy(BaseAction):
                 **args)
 
 
-@filters.register('healthcheck-protocol-mismatch')
+@AppELB.filter_registry.register('healthcheck-protocol-mismatch')
 class AppELBHealthCheckProtocolMismatchFilter(Filter,
                                               AppELBTargetGroupFilterBase):
     """Filter AppELBs with mismatched health check protocols
@@ -800,7 +794,7 @@ class AppELBHealthCheckProtocolMismatchFilter(Filter,
         return [alb for alb in albs if _healthcheck_protocol_mismatch(alb)]
 
 
-@filters.register('target-group')
+@AppELB.filter_registry.register('target-group')
 class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
     """Filter ALB based on matching target group value"""
 
@@ -816,7 +810,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
         return self.match(target_groups)
 
 
-@filters.register('default-vpc')
+@AppELB.filter_registry.register('default-vpc')
 class AppELBDefaultVpcFilter(DefaultVpcBase):
     """Filter all ELB that exist within the default vpc
 
