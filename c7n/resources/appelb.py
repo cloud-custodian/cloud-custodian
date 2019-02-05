@@ -56,8 +56,6 @@ class AppELB(QueryResourceManager):
         date = 'CreatedTime'
         config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
 
-    filter_registry = filters
-    action_registry = actions
     retry = staticmethod(get_retry(('Throttling',)))
 
     @classmethod
@@ -294,7 +292,7 @@ class SetWaf(BaseAction):
                     WebACLId=target_acl_id, ResourceArn=r[arn_key])
 
 
-@AppELB.filter_registry.register('set-s3-logging')
+@AppELB.action_registry.register('set-s3-logging')
 class SetS3Logging(BaseAction):
     """Action to enable/disable S3 logging for an application loadbalancer.
 

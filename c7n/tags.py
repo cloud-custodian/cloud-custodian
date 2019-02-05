@@ -389,6 +389,7 @@ class Tag(Action):
     )
     schema_alias = True
     permissions = ('ec2:CreateTags',)
+    id_key = None
 
     def validate(self):
         if self.data.get('key') and self.data.get('tag'):
@@ -398,8 +399,6 @@ class Tag(Action):
         return self
 
     def process(self, resources):
-        self.id_key = self.manager.get_model().id
-
         # Legacy
         msg = self.data.get('msg')
         msg = self.data.get('value') or msg
@@ -428,9 +427,10 @@ class Tag(Action):
             self.process_resource_set, self.id_key, resources, tags, self.log)
 
     def process_resource_set(self, client, resource_set, tags):
+        mid = self.manager.get_model().id
         self.manager.retry(
             client.create_tags,
-            Resources=[v[self.id_key] for v in resource_set],
+            Resources=[v[mid] for v in resource_set],
             Tags=tags,
             DryRun=self.manager.config.dryrun)
 

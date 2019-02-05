@@ -449,9 +449,10 @@ class DaxTagging(Tag):
     permissions = ('dax:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
+        mid = self.manager.resource_type.id
         for r in resources:
             try:
-                client.tag_resource(ResourceName=r[self.id_key], Tags=tags)
+                client.tag_resource(ResourceName=r[mid], Tags=tags)
             except (client.exceptions.ClusterNotFoundFault,
                     client.exceptions.InvalidARNFault,
                     client.exceptions.InvalidClusterStateFault) as e:

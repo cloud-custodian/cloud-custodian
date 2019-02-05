@@ -140,8 +140,7 @@ class UntagMessageBroker(RemoveTag):
 
     permissions = ('mq:UntagMessageBroker',)
 
-    def process_resource_set(self, mq, tags):
-        client = local_session(self.manager.session_factory).client('mq')
+    def process_resource_set(self, client, mq, tags):
         for r in mq:
             try:
                 client.delete_tags(ResourceArn=r['BrokerArn'], TagKeys=tags)
