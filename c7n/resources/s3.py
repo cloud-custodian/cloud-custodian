@@ -2181,7 +2181,7 @@ class BucketTag(Tag):
                     value: us-east-1
     """
 
-    def process_resource_set(self, resource_set, tags):
+    def process_resource_set(self, client, resource_set, tags):
         modify_bucket_tags(self.manager.session_factory, resource_set, tags)
 
 
@@ -2209,9 +2209,6 @@ class MarkBucketForOp(TagDelayedAction):
     schema = type_schema(
         'mark-for-op', rinherit=TagDelayedAction.schema)
 
-    def process_resource_set(self, resource_set, tags):
-        modify_bucket_tags(self.manager.session_factory, resource_set, tags)
-
 
 @actions.register('unmark')
 class RemoveBucketTag(RemoveTag):
@@ -2234,7 +2231,7 @@ class RemoveBucketTag(RemoveTag):
     schema = type_schema(
         'unmark', aliases=('remove-tag',), tags={'type': 'array'})
 
-    def process_resource_set(self, resource_set, tags):
+    def process_resource_set(self, client, resource_set, tags):
         modify_bucket_tags(
             self.manager.session_factory, resource_set, remove_tags=tags)
 

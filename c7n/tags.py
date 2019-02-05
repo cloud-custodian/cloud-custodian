@@ -612,12 +612,13 @@ class TagDelayedAction(Action):
         op={'type': 'string'})
     schema_alias = True
 
-    permissions = ('ec2:CreateTags',)
-
     batch_size = 200
     concurrency = 2
 
     default_template = 'Resource does not meet policy: {op}@{action_date}'
+
+    def get_permissions(self):
+        return self.manager.action_registry['tag'].permissions
 
     def validate(self):
         op = self.data.get('op')
