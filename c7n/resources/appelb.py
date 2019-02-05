@@ -146,20 +146,6 @@ def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
         list(w.map(_process_tags, chunks(albs, 20)))
 
 
-def _add_appelb_tags(albs, session_factory, ts):
-    client = local_session(session_factory).client('elbv2')
-    client.add_tags(
-        ResourceArns=[alb['LoadBalancerArn'] for alb in albs],
-        Tags=ts)
-
-
-def _remove_appelb_tags(albs, session_factory, tag_keys):
-    client = local_session(session_factory).client('elbv2')
-    client.remove_tags(
-        ResourceArns=[alb['LoadBalancerArn'] for alb in albs],
-        TagKeys=tag_keys)
-
-
 filters.register('shield-enabled', IsShieldProtected)
 actions.register('set-shield', SetShieldProtection)
 
@@ -403,13 +389,6 @@ class AppELBMarkForOpAction(tags.TagDelayedAction):
     """
 
     batch_size = 1
-    permissions = ("elasticloadbalancing:AddTags",)
-
-    def process_resource_set(self, resource_set, ts):
-        _add_appelb_tags(
-            resource_set,
-            self.manager.session_factory,
-            ts)
 
 
 @actions.register('tag')
@@ -434,11 +413,10 @@ class AppELBTagAction(tags.Tag):
     batch_size = 1
     permissions = ("elasticloadbalancing:AddTags",)
 
-    def process_resource_set(self, resource_set, ts):
-        _add_appelb_tags(
-            resource_set,
-            self.manager.session_factory,
-            ts)
+    def process_resource_set(self, client, resource_set, ts):
+        client.add_tags(
+            ResourceArns=[alb['LoadBalancerArn'] for alb in resource_set],
+            Tags=ts)
 
 
 @actions.register('remove-tag')
@@ -462,11 +440,10 @@ class AppELBRemoveTagAction(tags.RemoveTag):
     batch_size = 1
     permissions = ("elasticloadbalancing:RemoveTags",)
 
-    def process_resource_set(self, resource_set, tag_keys):
-        _remove_appelb_tags(
-            resource_set,
-            self.manager.session_factory,
-            tag_keys)
+    def process_resource_set(self, client, resource_set, tag_keys):
+        client.remove_tags(
+            ResourceArns=[alb['LoadBalancerArn'] for alb in resource_set],
+            TagKeys=tag_keys)
 
 
 @actions.register('delete')

@@ -196,24 +196,6 @@ class MarkForOpQueue(TagDelayedAction):
                     days: 7
     """
 
-    permissions = ('sqs:TagQueue',)
-
-    def process_resource_set(self, queues, tags):
-        client = local_session(self.manager.session_factory).client(
-            'sqs')
-        tag_dict = {}
-        for t in tags:
-            tag_dict[t['Key']] = t['Value']
-        for queue in queues:
-            queue_url = queue['QueueUrl']
-            try:
-                client.tag_queue(QueueUrl=queue_url, Tags=tag_dict)
-            except Exception as err:
-                self.log.exception(
-                    'Exception tagging queue %s: %s',
-                    queue['QueueArn'], err)
-                continue
-
 
 @SQS.action_registry.register('tag')
 class TagQueue(Tag):
@@ -236,20 +218,13 @@ class TagQueue(Tag):
 
     permissions = ('sqs:TagQueue',)
 
-    def process_resource_set(self, queues, tags):
-        client = local_session(self.manager.session_factory).client(
-            'sqs')
-        tag_dict = {}
-        for t in tags:
-            tag_dict[t['Key']] = t['Value']
+    def process_resource_set(self, client, queues, tags):
+        tag_dict = {t['Key']: t['Value'] for t in tags}
         for queue in queues:
             queue_url = queue['QueueUrl']
             try:
                 client.tag_queue(QueueUrl=queue_url, Tags=tag_dict)
-            except Exception as err:
-                self.log.exception(
-                    'Exception tagging queue %s: %s',
-                    queue['QueueArn'], err)
+            except client.exceptions.QueueDoesNotExist:
                 continue
 
 
@@ -273,17 +248,12 @@ class UntagQueue(RemoveTag):
 
     permissions = ('sqs:UntagQueue',)
 
-    def process_resource_set(self, queues, tags):
-        client = local_session(self.manager.session_factory).client(
-            'sqs')
+    def process_resource_set(self, client, queues, tags):
         for queue in queues:
             queue_url = queue['QueueUrl']
             try:
                 client.untag_queue(QueueUrl=queue_url, TagKeys=tags)
-            except Exception as err:
-                self.log.exception(
-                    'Exception while removing tags from queue %s: %s',
-                    queue['QueueArn'], err)
+            except client.exceptions.QueueDoesNotExist:
                 continue
 
 
