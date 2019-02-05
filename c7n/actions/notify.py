@@ -46,14 +46,14 @@ class BaseNotify(EventAction):
         return p
 
     def pack(self, message, encode_ascii=True):
-        #encode_ascii=False
         dumped = utils.dumps(message)
         compressed = zlib.compress(dumped.encode('utf8'))
         b64encoded = base64.b64encode(compressed)
-        if not encode_ascii: 
+        if not encode_ascii:
             return str(b64encoded)
         else:
             return b64encoded.decode('ascii')
+
 
 class Notify(BaseNotify):
     """
@@ -141,7 +141,7 @@ class Notify(BaseNotify):
                      'properties': {
                          'queue': {'type': 'string'},
                          'type': {'enum': ['sqs']},
-                         'encode_ascii' : {'type': 'boolean'}}},
+                         'encode_ascii': {'type': 'boolean'}}},
                     {'type': 'object',
                      'required': ['type', 'topic'],
                      'properties': {
@@ -162,8 +162,8 @@ class Notify(BaseNotify):
         if self.data.get('transport', {}).get('type') == 'sns' and \
                 self.data.get('transport').get('attributes') and \
                 'mtype' in self.data.get('transport').get('attributes').keys():
-                    raise PolicyValidationError(
-                        "attribute: mtype is a reserved attribute for sns transport")
+            raise PolicyValidationError(
+                "attribute: mtype is a reserved attribute for sns transport")
         return self
 
     def get_permissions(self):
