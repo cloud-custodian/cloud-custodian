@@ -456,7 +456,8 @@ class Notify(BaseNotify):
                      'required': ['type', 'queue'],
                      'properties': {
                          'queue': {'type': 'string'},
-                         'type': {'enum': ['asq']}
+                         'type': {'enum': ['asq']},
+                         'encode_ascii' : {'type': 'boolean'}
                      }}],
             },
         }
@@ -491,7 +492,9 @@ class Notify(BaseNotify):
 
     def send_to_azure_queue(self, queue_uri, message, session):
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri, session)
-        return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
+        encode_ascii = True if 'encode_ascii' not in self.data['transport'] else self.data['transport']['encode_ascii']
+
+        return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message, encode_ascii)).id
 
 
 DEFAULT_TAG = "custodian_status"

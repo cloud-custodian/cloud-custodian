@@ -45,12 +45,15 @@ class BaseNotify(EventAction):
             p.setdefault('cc', []).extend(ValuesFrom(cc_from, self.manager).get_values())
         return p
 
-    def pack(self, message):
+    def pack(self, message, encode_ascii=True):
+        #encode_ascii=False
         dumped = utils.dumps(message)
         compressed = zlib.compress(dumped.encode('utf8'))
         b64encoded = base64.b64encode(compressed)
-        return b64encoded.decode('ascii')
-
+        if not encode_ascii: 
+            return str(b64encoded)
+        else:
+            return b64encoded.decode('ascii')
 
 class Notify(BaseNotify):
     """
@@ -137,7 +140,8 @@ class Notify(BaseNotify):
                      'required': ['type', 'queue'],
                      'properties': {
                          'queue': {'type': 'string'},
-                         'type': {'enum': ['sqs']}}},
+                         'type': {'enum': ['sqs']},
+                         'encode_ascii' : {'type': 'boolean'}}},
                     {'type': 'object',
                      'required': ['type', 'topic'],
                      'properties': {
