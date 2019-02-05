@@ -900,14 +900,6 @@ def _describe_target_group_tags(target_groups, session_factory,
         list(w.map(_process_tags, chunks(target_groups, 20)))
 
 
-def _add_target_group_tags(target_groups, session_factory, ts):
-    client = local_session(session_factory).client('elbv2')
-
-
-def _remove_target_group_tags(target_groups, session_factory, tag_keys):
-    pass
-
-
 @AppELBTargetGroup.action_registry.register('mark-for-op')
 class AppELBTargetGroupMarkForOpAction(tags.TagDelayedAction):
     """Action to specify a delayed action on an ELB target group"""
