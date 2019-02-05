@@ -117,6 +117,7 @@ def _common_tag_processer(executor_factory, batch_size, concurrency, client,
                           process_resource_set, id_key, resources, tags,
                           log):
 
+    error = None
     with executor_factory(max_workers=concurrency) as w:
         futures = []
         for resource_set in utils.chunks(resources, size=batch_size):
@@ -125,12 +126,15 @@ def _common_tag_processer(executor_factory, batch_size, concurrency, client,
 
         for f in as_completed(futures):
             if f.exception():
-                raise f.exception()
+                error = f.exception()
                 log.error(
                     "Exception with tags: %s on resources: %s \n %s" % (
                         tags,
                         ", ".join([r[id_key] for r in resource_set]),
                         f.exception()))
+
+    if error:
+        raise error
 
 
 class TagTrim(Action):
