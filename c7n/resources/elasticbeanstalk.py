@@ -83,27 +83,20 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
 def _eb_env_tags(envs, session_factory, executor_factory, retry):
     """Augment ElasticBeanstalk Environments with their tags."""
 
+    client = local_session(session_factory).client('elasticbeanstalk')
+
     def process_tags(eb_env):
-        client = local_session(session_factory).client('elasticbeanstalk')
         try:
-            tag_list = retry(
+            eb_env['Tags'] = retry(
                 client.list_tags_for_resource,
-                ResourceArn=eb_env['EnvironmentArn']
-            )['ResourceTags']
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                log.warning(
-                    "Exception getting elasticbeanstalk-environment tags for "
-                    "environment name: %s\n %s", eb_env['EnvironmentName'], e
-                )
-            return None
-        eb_env['Tags'] = tag_list
+                ResourceArn=eb_env['EnvironmentArn'])['ResourceTags']
+        except client.exceptions.ResourceNotFoundException:
+            return
         return eb_env
 
     # Handle API rate-limiting, which is a problem for accounts with many
     # EB Environments
-    with executor_factory(max_workers=1) as w:
-        return list(w.map(process_tags, envs))
+    return list(map(process_tags, envs))
 
 
 @env_actions.register('mark-for-op')
@@ -130,23 +123,6 @@ class TagDelayedAction(tags.TagDelayedAction):
                     op: terminate
                     days: 7
     """
-    schema = type_schema('mark-for-op', rinherit=tags.TagDelayedAction.schema)
-    permissions = ('elasticbeanstalk:UpdateTagsForResource',)
-
-    batch_size = 5
-
-    def process(self, envs):
-        return super(TagDelayedAction, self).process(envs)
-
-    def process_resource_set(self, envs, tags):
-        client = local_session(
-            self.manager.session_factory
-        ).client('elasticbeanstalk')
-        for env in envs:
-            client.update_tags_for_resource(
-                ResourceArn=env['EnvironmentArn'],
-                TagsToAdd=tags
-            )
 
 
 @env_actions.register('tag')
@@ -174,15 +150,11 @@ class Tag(tags.Tag):
     batch_size = 5
     permissions = ('elasticbeanstalk:UpdateTagsForResource',)
 
-    def process_resource_set(self, envs, ts):
-        client = local_session(
-            self.manager.session_factory
-        ).client('elasticbeanstalk')
+    def process_resource_set(self, client, envs, ts):
         for env in envs:
             client.update_tags_for_resource(
                 ResourceArn=env['EnvironmentArn'],
-                TagsToAdd=ts
-            )
+                TagsToAdd=ts)
 
 
 @env_actions.register('remove-tag')
@@ -209,15 +181,11 @@ class RemoveTag(tags.RemoveTag):
     batch_size = 5
     permissions = ('elasticbeanstalk:UpdateTagsForResource',)
 
-    def process_resource_set(self, envs, tag_keys):
-        client = local_session(
-            self.manager.session_factory
-        ).client('elasticbeanstalk')
+    def process_resource_set(self, client, envs, tag_keys):
         for env in envs:
             client.update_tags_for_resource(
                 ResourceArn=env['EnvironmentArn'],
-                TagsToRemove=tag_keys
-            )
+                TagsToRemove=tag_keys)
 
 
 @env_actions.register('terminate')

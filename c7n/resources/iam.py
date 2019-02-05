@@ -144,8 +144,7 @@ class UserTag(Tag):
 
     permissions = ('iam:TagUser',)
 
-    def process_resource_set(self, users, tags):
-        client = local_session(self.manager.session_factory).client('iam')
+    def process_resource_set(self, client, users, tags):
         for u in users:
             try:
                 client.tag_user(UserName=u['UserName'], Tags=tags)
@@ -159,8 +158,7 @@ class UserRemoveTag(RemoveTag):
 
     permissions = ('iam:UntagUser',)
 
-    def process_resource_set(self, users, tags):
-        client = local_session(self.manager.session_factory).client('iam')
+    def process_resource_set(self, client, users, tags):
         for u in users:
             try:
                 client.untag_user(UserName=u['UserName'], TagKeys=tags)
@@ -170,14 +168,7 @@ class UserRemoveTag(RemoveTag):
 
 @User.action_registry.register('mark-for-op')
 class UserTagDelayedAction(TagDelayedAction):
-
-    # inherit __doc__ from base class
-
-    permissions = ('iam:TagUser',)
-
-    def process_resource_set(self, users, tags):
-        tagger = self.manager.action_registry['tag']({}, self.manager)
-        tagger.process_resource_set(users, tags)
+    pass
 
 
 User.filter_registry.register('marked-for-op', TagActionFilter)

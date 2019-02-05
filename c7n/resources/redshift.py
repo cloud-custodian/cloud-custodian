@@ -327,12 +327,13 @@ class Snapshot(BaseAction):
     permissions = ('redshift:CreateClusterSnapshot',)
 
     def process(self, clusters):
-        with self.executor_factory(max_workers=3) as w:
+        client = local_session(self.manager.session_factory).client('redshift')
+        with self.executor_factory(max_workers=2) as w:
             futures = []
             for cluster in clusters:
                 futures.append(w.submit(
                     self.process_cluster_snapshot,
-                    cluster))
+                    client, cluster))
             for f in as_completed(futures):
                 if f.exception():
                     self.log.error(
@@ -340,14 +341,14 @@ class Snapshot(BaseAction):
                         f.exception())
         return clusters
 
-    def process_cluster_snapshot(self, cluster):
-        c = local_session(self.manager.session_factory).client('redshift')
+    def process_cluster_snapshot(self, client, cluster):
         cluster_tags = cluster.get('Tags')
-        c.create_cluster_snapshot(
+        client.create_cluster_snapshot(
             SnapshotIdentifier=snapshot_identifier(
                 'Backup',
                 cluster['ClusterIdentifier']),
-            ClusterIdentifier=cluster['ClusterIdentifier'], Tags=cluster_tags)
+            ClusterIdentifier=cluster['ClusterIdentifier'],
+            Tags=cluster_tags)
 
 
 @actions.register('enable-vpc-routing')
@@ -469,15 +470,6 @@ class TagDelayedAction(tags.TagDelayedAction):
                     msg: "Unencrypted Redshift cluster: {op}@{action_date}"
     """
 
-    schema = type_schema('mark-for-op', rinherit=tags.TagDelayedAction.schema)
-    permissions = ('redshift.CreateTags',)
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('redshift')
-        for r in resources:
-            arn = self.manager.generate_arn(r['ClusterIdentifier'])
-            client.create_tags(ResourceName=arn, Tags=tags)
-
 
 @actions.register('tag')
 class Tag(tags.Tag):
@@ -532,8 +524,7 @@ class RemoveTag(tags.RemoveTag):
     batch_size = 5
     permissions = ('redshift:DeleteTags',)
 
-    def process_resource_set(self, resources, tag_keys):
-        client = local_session(self.manager.session_factory).client('redshift')
+    def process_resource_set(self, client, resources, tag_keys):
         for r in resources:
             arn = self.manager.generate_arn(r['ClusterIdentifier'])
             client.delete_tags(ResourceName=arn, TagKeys=tag_keys)
@@ -756,16 +747,6 @@ class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
                     days: 7
     """
 
-    schema = type_schema('mark-for-op', rinherit=tags.TagDelayedAction.schema)
-    permissions = ('redshift:CreateTags',)
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('redshift')
-        for r in resources:
-            arn = self.manager.generate_arn(
-                r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
-            client.create_tags(ResourceName=arn, Tags=tags)
-
 
 @RedshiftSnapshot.action_registry.register('tag')
 class RedshiftSnapshotTag(tags.Tag):
@@ -790,8 +771,7 @@ class RedshiftSnapshotTag(tags.Tag):
     batch_size = 5
     permissions = ('redshift:CreateTags',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('redshift')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             arn = self.manager.generate_arn(
                 r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
@@ -821,8 +801,7 @@ class RedshiftSnapshotRemoveTag(tags.RemoveTag):
     batch_size = 5
     permissions = ('redshift:DeleteTags',)
 
-    def process_resource_set(self, resources, tag_keys):
-        client = local_session(self.manager.session_factory).client('redshift')
+    def process_resource_set(self, client, resources, tag_keys):
         for r in resources:
             arn = self.manager.generate_arn(
                 r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])

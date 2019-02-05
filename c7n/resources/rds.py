@@ -1418,25 +1418,17 @@ class RDSSubnetGroup(QueryResourceManager):
 
 
 def _db_subnet_group_tags(subnet_groups, session_factory, executor_factory, retry):
+    client = local_session(session_factory).client('rds')
 
-    def process_tags(subnet_group):
-        client = local_session(session_factory).client('rds')
-
-        arn = subnet_group['DBSubnetGroupArn']
-        tag_list = None
-
+    def process_tags(g):
         try:
-            tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'InvalidParameterValue':
-                log.warning("Exception getting db subnet group tags\n %s", e)
+            g['Tags'] = client.list_tags_for_resource(
+                ResourceName=g['DBSubnetGroupArn'])['TagList']
+            return g
+        except client.exceptions.DBSubnetGroupNotFoundFault:
             return None
 
-        subnet_group['Tags'] = tag_list or []
-        return subnet_group
-
-    with executor_factory(max_workers=1) as w:
-        list(w.map(process_tags, subnet_groups))
+    return list(filter(None, map(process_tags, subnet_groups)))
 
 
 @RDSSubnetGroup.action_registry.register('delete')
