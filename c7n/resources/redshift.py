@@ -494,8 +494,7 @@ class Tag(tags.Tag):
     batch_size = 5
     permissions = ('redshift:CreateTags',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('redshift')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             arn = self.manager.generate_arn(r['ClusterIdentifier'])
             client.create_tags(ResourceName=arn, Tags=tags)
