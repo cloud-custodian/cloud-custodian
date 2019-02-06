@@ -13,14 +13,14 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from botocore.exceptions import ClientError
-
 import json
+
+from c7n.actions import RemovePolicyBase, Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.actions import RemovePolicyBase, Action
+from c7n import tags
 from c7n.utils import local_session, type_schema
 
 
@@ -36,8 +36,59 @@ class ECR(QueryResourceManager):
         filter_name = 'repositoryNames'
         filter_type = 'list'
 
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('ecr')
+        results = []
+        for r in resources:
+            try:
+                r['Tags'] = client.list_tags_for_resource(
+                    resourceArn=r['repositoryArn']).get('tags')
+                results.append(r)
+            except client.exceptions.RepositoryNotFoundException:
+                continue
 
-ErrPolicyNotFound = 'RepositoryPolicyNotFoundException'
+        return results
+
+
+@ECR.action_registry.register('tag')
+class ECRTag(tags.Tag):
+
+    permissions = ('ecr:TagResource',)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(
+            self.manager.session_factory).client('ecr')
+        for r in resources:
+            try:
+                client.tag_resource(resourceArn=r['repositoryArn'], tags=tags)
+            except client.exceptions.RepositoryNotFoundException:
+                pass
+
+
+@ECR.action_registry.register('remove-tag')
+class ECRRemoveTags(tags.RemoveTag):
+
+    permissions = ('ecr:UntagResource',)
+
+    def process_resource_set(self, resources, tags):
+        client = local_session(
+            self.manager.session_factory).client('ecr')
+        for r in resources:
+            try:
+                client.untag_resource(resourceArn=r['repositoryArn'], tagKeys=tags)
+            except client.exceptions.RepositoryNotFoundException:
+                pass
+
+
+@ECR.action_registry.register('mark-for-op')
+class ECRMarkForOp(tags.TagDelayedAction):
+
+    def process_resource_set(self, resources, tags):
+        tagger = self.manager.action_registry.get('tag')({}, self.manager)
+        tagger.process_resource_set(resources, tags)
+
+
+ECR.filter_registry.register('marked-for-op', tags.TagActionFilter)
 
 
 @ECR.filter_registry.register('cross-account')
@@ -61,19 +112,18 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
 
     def process(self, resources, event=None):
 
+        client = local_session(self.manager.session_factory).client('ecr')
+
         def _augment(r):
-            client = local_session(self.manager.session_factory).client('ecr')
             try:
                 r['Policy'] = client.get_repository_policy(
                     repositoryName=r['repositoryName'])['policyText']
-            except ClientError as e:
-                if e.response['Error']['Code'] == ErrPolicyNotFound:
-                    return None
-                raise
+            except client.exceptions.RepositoryPolicyNotFoundException:
+                return None
             return r
 
         self.log.debug("fetching policy for %d repos" % len(resources))
-        with self.executor_factory(max_workers=3) as w:
+        with self.executor_factory(max_workers=2) as w:
             resources = list(filter(None, w.map(_augment, resources)))
 
         return super(ECRCrossAccountAccessFilter, self).process(
@@ -234,7 +284,7 @@ class SetLifecycle(Action):
                         registryId=r['registryId'],
                         repositoryName=r['repositoryName'])
                     continue
-                except client.exceptions.RepositoryPolicyNotFoundException:
+                except client.exceptions.LifecyclePolicyNotFoundException:
                     pass
             client.put_lifecycle_policy(
                 registryId=r['registryId'],
@@ -278,13 +328,8 @@ class RemovePolicyStatement(RemovePolicyBase):
             try:
                 resource['Policy'] = client.get_repository_policy(
                     repositoryName=resource['repositoryName'])['policyText']
-            except ClientError as e:
-                if e.response['Error']['Code'] != ErrPolicyNotFound:
-                    raise
-                resource['Policy'] = None
-
-        if not resource['Policy']:
-            return
+            except client.exceptions.RepositoryPolicyNotFoundException:
+                return
 
         p = json.loads(resource['Policy'])
         statements, found = self.process_policy(

@@ -1,14 +1,14 @@
 {
     "status_code": 200,
     "data": {
-        "repositories": [],
+        "tags": [],
         "ResponseMetadata": {
-            "RequestId": "a6d1d276-294d-11e9-8ed9-ff55339fda5b",
+            "RequestId": "a6f8e2dc-294d-11e9-ad8d-89f33dbd3d1f",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "a6d1d276-294d-11e9-8ed9-ff55339fda5b",
+                "x-amzn-requestid": "a6f8e2dc-294d-11e9-ad8d-89f33dbd3d1f",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "19"
+                "content-length": "11"
             },
             "RetryAttempts": 0
         }
