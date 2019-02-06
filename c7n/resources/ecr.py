@@ -55,9 +55,7 @@ class ECRTag(tags.Tag):
 
     permissions = ('ecr:TagResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('ecr')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             try:
                 client.tag_resource(resourceArn=r['repositoryArn'], tags=tags)
@@ -70,9 +68,7 @@ class ECRRemoveTags(tags.RemoveTag):
 
     permissions = ('ecr:UntagResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('ecr')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             try:
                 client.untag_resource(resourceArn=r['repositoryArn'], tagKeys=tags)
@@ -82,10 +78,7 @@ class ECRRemoveTags(tags.RemoveTag):
 
 @ECR.action_registry.register('mark-for-op')
 class ECRMarkForOp(tags.TagDelayedAction):
-
-    def process_resource_set(self, resources, tags):
-        tagger = self.manager.action_registry.get('tag')({}, self.manager)
-        tagger.process_resource_set(resources, tags)
+    pass
 
 
 ECR.filter_registry.register('marked-for-op', tags.TagActionFilter)
