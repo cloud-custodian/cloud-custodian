@@ -1358,7 +1358,8 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 interfaces.append(eni)
 
         # Filter out RequesterManaged ENIs, as modifying them will fail with a ClientError
-        interfaces_to_modify = filter(lambda x: 'RequesterManaged' not in x or not x['RequesterManaged'], interfaces)
+        interfaces_to_modify = filter(lambda x: 'RequesterManaged' not in x or
+                                                not x['RequesterManaged'], interfaces)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces_to_modify)
 
