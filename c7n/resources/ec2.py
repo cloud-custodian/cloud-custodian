@@ -1357,9 +1357,12 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                         'c7n:NetworkLocation']
                 interfaces.append(eni)
 
-        groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
+        # Filter out RequesterManaged ENIs, as modifying them will fail with a ClientError
+        interfaces_to_modify = filter(lambda x: 'RequesterManaged' not in x or not x['RequesterManaged'], interfaces)
 
-        for idx, i in enumerate(interfaces):
+        groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces_to_modify)
+
+        for idx, i in enumerate(interfaces_to_modify):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=i['NetworkInterfaceId'],
                 Groups=groups[idx])
