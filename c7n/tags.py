@@ -1109,10 +1109,13 @@ def universal_retry(method, ResourceARNList, **kw):
         throttles = set()
 
         for f_arn in failures:
-            if failures[f_arn]['ErrorCode'] == 'ThrottlingException':
+            error_code = failures[f_arn]['ErrorCode']
+            if error_code == 'ThrottlingException':
                 throttles.add(f_arn)
+            elif error_code == 'ResourceNotFoundException':
+                continue
             else:
-                errors[f_arn] = failures[f_arn]['ErrorCode']
+                errors[f_arn] = error_code
 
         if errors:
             raise Exception("Resource Tag Errors %s" % (errors))
