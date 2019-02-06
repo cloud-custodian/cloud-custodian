@@ -76,12 +76,8 @@ class ECRRemoveTags(tags.RemoveTag):
                 pass
 
 
-@ECR.action_registry.register('mark-for-op')
-class ECRMarkForOp(tags.TagDelayedAction):
-    pass
-
-
 ECR.filter_registry.register('marked-for-op', tags.TagActionFilter)
+ECR.action_registry.register('mark-for-op', tags.TagDelayedAction)
 
 
 @ECR.filter_registry.register('cross-account')
@@ -119,8 +115,7 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
         with self.executor_factory(max_workers=2) as w:
             resources = list(filter(None, w.map(_augment, resources)))
 
-        return super(ECRCrossAccountAccessFilter, self).process(
-            resources, event)
+        return super(ECRCrossAccountAccessFilter, self).process(resources, event)
 
 
 LIFECYCLE_RULE_SCHEMA = {
