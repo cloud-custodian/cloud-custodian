@@ -128,10 +128,7 @@ def _common_tag_processer(executor_factory, batch_size, concurrency, client,
             if f.exception():
                 error = f.exception()
                 log.error(
-                    "Exception with tags: %s on resources: %s \n %s" % (
-                        tags,
-                        ", ".join([r[id_key] for r in resource_set]),
-                        f.exception()))
+                    "Exception with tags: %s  %s", tags, f.exception())
 
     if error:
         raise error
