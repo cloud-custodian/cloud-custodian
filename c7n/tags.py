@@ -186,7 +186,7 @@ class TagTrim(Action):
         self.space = self.data.get('space', 3)
 
         client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+            self.manager.session_factory).client(self.manager.resource_type.service)
 
         futures = {}
         mid = self.manager.get_model().id

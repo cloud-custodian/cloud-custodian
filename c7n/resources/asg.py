@@ -792,9 +792,7 @@ class GroupTagTrim(TagTrim):
     max_tag_count = 10
     permissions = ('autoscaling:DeleteTags',)
 
-    def process_tag_removal(self, resource, candidates):
-        client = local_session(
-            self.manager.session_factory).client('autoscaling')
+    def process_tag_removal(self, client, resource, candidates):
         tags = []
         for t in candidates:
             tags.append(

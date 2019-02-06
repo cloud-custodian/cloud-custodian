@@ -557,8 +557,7 @@ class TagTrim(tags.TagTrim):
     max_tag_count = 10
     permissions = ('redshift:DeleteTags',)
 
-    def process_tag_removal(self, resource, candidates):
-        client = local_session(self.manager.session_factory).client('redshift')
+    def process_tag_removal(self, client, resource, candidates):
         arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
         client.delete_tags(ResourceName=arn, TagKeys=candidates)
 

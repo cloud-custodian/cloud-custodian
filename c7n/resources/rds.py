@@ -469,9 +469,7 @@ class TagTrim(tags.TagTrim):
 
     permissions = ('rds:RemoveTagsFromResource',)
 
-    def process_tag_removal(self, resource, candidates):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+    def process_tag_removal(self, client, resource, candidates):
         arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
