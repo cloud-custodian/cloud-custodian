@@ -37,7 +37,6 @@ from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
-from c7n.query import RetryPageIterator
 from c7n import utils
 
 DEFAULT_TAG = "maid_status"
@@ -94,6 +93,8 @@ def universal_augment(self, resources):
     client = utils.local_session(
         self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 
+    # Lazy for non circular :-(
+    from c7n.query import RetryPageIterator
     paginator = client.get_paginator('get_resources')
     paginator.PAGE_ITERATOR_CLS = RetryPageIterator
     resource_type = getattr(self.get_model(), 'resource_type', None)
