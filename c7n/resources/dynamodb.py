@@ -415,7 +415,6 @@ def _dax_cluster_tags(tables, session_factory, retry, log):
                 client.list_tags, ResourceName=r['ClusterArn'])['Tags']
             return r
         except (client.exceptions.ClusterNotFoundFault,
-                client.exceptions.InvalidARNFault,
                 client.exceptions.InvalidClusterStateFault):
             return None
 

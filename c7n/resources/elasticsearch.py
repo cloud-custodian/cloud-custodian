@@ -162,7 +162,6 @@ class ElasticSearchAddTag(Tag):
     permissions = ('es:AddTags',)
 
     def process_resource_set(self, client, domains, tags):
-        client = local_session(self.manager.session_factory).client('es')
         for d in domains:
             try:
                 client.add_tags(ARN=d['ARN'], TagList=tags)
