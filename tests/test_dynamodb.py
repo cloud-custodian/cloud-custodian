@@ -59,9 +59,10 @@ class DynamodbTest(BaseTest):
              'Status': 'ENABLED'})
         mock_time.assert_called_once_with(30)
 
-        # While we have a config and describe formatted table, let's verify they are equivalent
-        # but account for some fundamental deltas.
-        # size and count aren't in config, datetimes we normalize but are still tz delta on recording.
+        # While we have a config and describe formatted table, let's
+        # verify they are equivalent but account for some fundamental
+        # deltas.  size and count aren't in config, datetimes we
+        # normalize but are still tz delta on recording.
         for k in ('ItemCount', 'CreationDateTime', 'TableSizeBytes', 'BillingModeSummary'):
             describe_table.pop(k, None)
             config_table.pop(k, None)
