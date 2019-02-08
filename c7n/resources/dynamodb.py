@@ -14,9 +14,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
+import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
+from datetime import datetime
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.filters import FilterRegistry
@@ -51,21 +53,51 @@ class Table(query.QueryResourceManager):
         config_type = 'AWS::DynamoDB::Table'
 
     filter_registry = filters
-    retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('dynamodb:ListTagsOfResource')
 
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeTable(self)
         elif source_type == 'config':
-            return query.ConfigSource(self)
+            return ConfigTable(self)
         raise ValueError('invalid source %s' % source_type)
 
 
 register_universal_tags(Table.filter_registry, Table.action_registry, False)
 
 
+class ConfigTable(query.ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigTable, self).load_resource(item)
+        resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime']/1000.0)
+        if 'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']:
+            resource['BillingModeSummary'][
+                'LastUpdateToPayPerRequestDateTime'] = datetime.fromtimestamp(
+                    resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime']/1000.0)
+
+        sse_info = resource.pop('Ssedescription', None)
+        if sse_info is None:
+            return resource
+        resource['SSEDescription'] = sse_info
+        for k, r in (('KmsmasterKeyArn', 'KMSMasterKeyArn'),
+                     ('Ssetype', 'SSEType')):
+            if k in sse_info:
+                sse_info[r] = sse_info.pop(k)
+        return resource
+
+
 class DescribeTable(query.DescribeSource):
+
+    def get_resources(self, *args, **kw):
+        # Dynamodb tables aren't taggable while pending creation, even
+        # attempting to fetch tags for a table will return not found errors.
+        # In order to resolve on several user reported issues  #3361, #3171, #3514
+        # When subscribing to create table events, sleep for 30s
+        if (self.manager.ctx.policy.execution_mode == 'cloudtrail' and
+            'CreateTable' in self.manager.data['mode']['events']):
+            time.sleep(30)
+        return super(DescribeTable, self).get_resources(*args, **kw)
 
     def augment(self, resources):
         return universal_augment(

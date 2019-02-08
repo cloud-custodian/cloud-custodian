@@ -292,7 +292,7 @@ class ConfigSource(object):
             if not revisions:
                 continue
             results.append(self.load_resource(revisions[0]))
-        return filter(None, results)
+        return list(filter(None, results))
 
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):
