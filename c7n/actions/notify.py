@@ -237,8 +237,10 @@ class Notify(BaseNotify):
             topic_arn = topic
         else:
             region = message['region']
-            topic_arn = "arn:aws:sns:%s:%s:%s" % (
-                message['region'], message['account_id'], topic)
+            topic_arn = utils.generate_arn(
+                service='sns', resource=topic,
+                account_id=message['account_id'],
+                region=message['region'])
         client = self.manager.session_factory(
             region=region, assume=self.assume_role).client('sns')
         attrs = {
@@ -268,7 +270,7 @@ class Notify(BaseNotify):
         elif queue.startswith('https://sqs.'):
             region = queue.split('.', 2)[1]
             queue_url = queue
-        elif queue.startswith('arn:aws:sqs'):
+        elif queue.startswith('arn:'):
             queue_arn_split = queue.split(':', 5)
             region = queue_arn_split[3]
             owner_id = queue_arn_split[4]

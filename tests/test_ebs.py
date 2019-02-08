@@ -26,7 +26,7 @@ from c7n.resources.ebs import (
     EncryptInstanceVolumes,
     CopySnapshot,
     Delete,
-    QueryParser
+    SnapshotQueryParser as QueryParser
 )
 
 from .common import BaseTest, TestConfig as Config
