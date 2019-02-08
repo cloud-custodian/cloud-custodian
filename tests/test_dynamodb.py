@@ -25,9 +25,11 @@ import mock
 
 class DynamodbTest(BaseTest):
 
-    @mock.patch('c7n.resources.dynamodb.time.sleep')
-    def test_dynamodb_sleep_get_resources(self, mock_time):
-        mock_time.return_value = None
+    @mock.patch('c7n.resources.dynamodb.DescribeTable.get_waiter')
+    def test_dynamodb_sleep_get_resources(self, mock_get_waiter):
+
+        mock_waiter = mock.MagicMock()
+        mock_get_waiter.return_value = (mock_waiter, {})
         session_factory = self.replay_flight_data('test_dynamodb_sleep')
         p = self.load_policy(
             {'name': 'bobby-drop',
@@ -39,7 +41,7 @@ class DynamodbTest(BaseTest):
 
         resources = p.resource_manager.get_resources(['test-table-kms-filter'])
         self.assertEqual(len(resources), 1)
-        mock_time.assert_called_once_with(30)
+        self.assertEqual(len(mock_waiter.mock_calls), 1)
 
         describe_table = resources[0]
         # Run another policy so we can assert there is no sleep
@@ -57,7 +59,7 @@ class DynamodbTest(BaseTest):
             {'KMSMasterKeyArn': 'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5', # NOQA
              'SSEType': 'KMS',
              'Status': 'ENABLED'})
-        mock_time.assert_called_once_with(30)
+        self.assertEqual(len(mock_waiter.mock_calls), 1)
 
         # While we have a config and describe formatted table, let's
         # verify they are equivalent but account for some fundamental
