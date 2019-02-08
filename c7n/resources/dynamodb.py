@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import time
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -70,11 +69,11 @@ class ConfigTable(query.ConfigSource):
 
     def load_resource(self, item):
         resource = super(ConfigTable, self).load_resource(item)
-        resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime']/1000.0)
+        resource['CreationDateTime'] = datetime.fromtimestamp(resource['CreationDateTime'] / 1000.0)
         if 'LastUpdateToPayPerRequestDateTime' in resource['BillingModeSummary']:
             resource['BillingModeSummary'][
                 'LastUpdateToPayPerRequestDateTime'] = datetime.fromtimestamp(
-                    resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime']/1000.0)
+                    resource['BillingModeSummary']['LastUpdateToPayPerRequestDateTime'] / 1000.0)
 
         sse_info = resource.pop('Ssedescription', None)
         if sse_info is None:
@@ -96,14 +95,14 @@ class DescribeTable(query.DescribeSource):
         # When subscribing to create table events, wait for the table to exist
         # leaving at least a 15s margin before our configured timeout.
         if (self.manager.ctx.policy.execution_mode == 'cloudtrail' and
-            'CreateTable' in self.manager.data['mode']['events']):
+                'CreateTable' in self.manager.data['mode']['events']):
             waiter, waiter_config = self.get_waiter()
             for tid in ids:
                 waiter.wait(tid, WaiterConfig=waiter_config)
         return super(DescribeTable, self).get_resources(ids, *args, **kw)
 
     def get_waiter(self):
-        timeout =  self.manager.data['mode'].get('timeout', 60)
+        timeout = self.manager.data['mode'].get('timeout', 60)
         waiter_config = {'Delay': 15, 'MaxAttempts': int((timeout - 15) / 15)}
         return local_session(
             self.manager.session_factory).client(
