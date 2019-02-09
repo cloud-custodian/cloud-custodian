@@ -141,7 +141,7 @@ class Arn(namedtuple('_Arn', (
         parts = arn.split(':', 5)
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api'):
-            pass
+            parts.append(None)
         elif '/' in parts[-1]:
             parts.extend(reversed(parts.pop(-1).split('/', 1)))
         elif ':' in parts[-1]:
