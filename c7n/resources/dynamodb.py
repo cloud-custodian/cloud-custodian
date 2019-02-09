@@ -13,14 +13,11 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import logging
-
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from datetime import datetime
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
-from c7n.filters import FilterRegistry
 from c7n.filters.kms import KmsRelatedFilter
 from c7n import query
 from c7n.manager import resources
@@ -28,12 +25,8 @@ from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag, universal_augment,
     register_universal_tags)
 from c7n.utils import (
-    local_session, get_retry, chunks, type_schema, snapshot_identifier)
+    local_session, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
-
-
-filters = FilterRegistry('dynamodb-table.filters')
-filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('dynamodb-table')
@@ -51,8 +44,7 @@ class Table(query.QueryResourceManager):
         dimension = 'TableName'
         config_type = 'AWS::DynamoDB::Table'
 
-    filter_registry = filters
-    permissions = ('dynamodb:ListTagsOfResource')
+    permissions = ('dynamodb:ListTagsOfResource',)
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -422,11 +414,7 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         dimension = None
         date = None
 
-    retry = staticmethod(get_retry(('Throttled',)))
-    filter_registry = FilterRegistry('dynamodb-dax.filters')
-    filters.register('marked-for-op', TagActionFilter)
     permissions = ('dax:ListTags',)
-    log = logging.getLogger('custodian.dax')
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -460,6 +448,9 @@ def _dax_cluster_tags(tables, session_factory, retry, log):
             return None
 
     return filter(None, list(map(process_tags, tables)))
+
+
+DynamoDbAccelerator.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @DynamoDbAccelerator.filter_registry.register('security-group')
