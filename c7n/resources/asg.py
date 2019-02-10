@@ -26,11 +26,9 @@ import logging
 import itertools
 import time
 
-from c7n.actions import Action, ActionRegistry
+from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import (
-    FilterRegistry, ValueFilter, AgeFilter, Filter,
-    OPERATORS)
+from c7n.filters import ValueFilter, AgeFilter, Filter, OPERATORS
 from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
@@ -42,14 +40,6 @@ from c7n.utils import local_session, type_schema, chunks, get_retry
 from .ec2 import deserialize_user_data
 
 log = logging.getLogger('custodian.asg')
-
-filters = FilterRegistry('asg.filters')
-actions = ActionRegistry('asg.actions')
-
-filters.register('offhour', OffHour)
-filters.register('onhour', OnHour)
-filters.register('tag-count', TagCountFilter)
-filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('asg')
@@ -76,10 +66,14 @@ class ASG(query.QueryResourceManager):
             'list:LoadBalancerNames',
         )
 
-    filter_registry = filters
-    action_registry = actions
-
     retry = staticmethod(get_retry(('ResourceInUse', 'Throttling',)))
+
+
+ASG.filter_registry.register('offhour', OffHour)
+ASG.filter_registry.register('onhour', OnHour)
+ASG.filter_registry.register('tag-count', TagCountFilter)
+ASG.filter_registry.register('marked-for-op', TagActionFilter)
+ASG.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
 class LaunchInfo(object):
@@ -183,7 +177,7 @@ class LaunchInfo(object):
         return sg_ids
 
 
-@filters.register('security-group')
+@ASG.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = ""
@@ -198,7 +192,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
         return super(SecurityGroupFilter, self).process(asgs, event)
 
 
-@filters.register('subnet')
+@ASG.filter_registry.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = ""
@@ -211,10 +205,7 @@ class SubnetFilter(net_filters.SubnetFilter):
         return subnet_ids
 
 
-filters.register('network-location', net_filters.NetworkLocation)
-
-
-@filters.register('launch-config')
+@ASG.filter_registry.register('launch-config')
 class LaunchConfigFilter(ValueFilter):
     """Filter asg by launch config attributes.
 
@@ -372,7 +363,7 @@ class ConfigValidFilter(Filter):
         return errors
 
 
-@filters.register('valid')
+@ASG.filter_registry.register('valid')
 class ValidConfigFilter(ConfigValidFilter):
     """Filters autoscale groups to find those that are structurally valid.
 
@@ -399,7 +390,7 @@ class ValidConfigFilter(ConfigValidFilter):
         return not bool(errors)
 
 
-@filters.register('invalid')
+@ASG.filter_registry.register('invalid')
 class InvalidConfigFilter(ConfigValidFilter):
     """Filter autoscale groups to find those that are structurally invalid.
 
@@ -435,7 +426,7 @@ class InvalidConfigFilter(ConfigValidFilter):
             return True
 
 
-@filters.register('not-encrypted')
+@ASG.filter_registry.register('not-encrypted')
 class NotEncryptedFilter(Filter):
     """Check if an ASG is configured to have unencrypted volumes.
 
@@ -543,7 +534,7 @@ class NotEncryptedFilter(Filter):
             snap_ids, cache=False)
 
 
-@filters.register('image-age')
+@ASG.filter_registry.register('image-age')
 class ImageAgeFilter(AgeFilter):
     """Filter asg by image age (in days).
 
@@ -581,7 +572,7 @@ class ImageAgeFilter(AgeFilter):
             self.date_attribute, "2000-01-01T01:01:01.000Z"))
 
 
-@filters.register('image')
+@ASG.filter_registry.register('image')
 class ImageFilter(ValueFilter):
     """Filter asg by image
 
@@ -622,7 +613,7 @@ class ImageFilter(ValueFilter):
         return self.match(image)
 
 
-@filters.register('vpc-id')
+@ASG.filter_registry.register('vpc-id')
 class VpcIdFilter(ValueFilter):
     """Filters ASG based on the VpcId
 
@@ -675,8 +666,8 @@ class VpcIdFilter(ValueFilter):
         return super(VpcIdFilter, self).process(asgs)
 
 
-@filters.register('progagated-tags')
-@filters.register('propagated-tags')
+@ASG.filter_registry.register('progagated-tags') # compatibility
+@ASG.filter_registry.register('propagated-tags')
 class PropagatedTagFilter(Filter):
     """Filter ASG based on propagated tags
 
@@ -730,7 +721,7 @@ class PropagatedTagFilter(Filter):
         return results
 
 
-@actions.register('tag-trim')
+@ASG.action_registry.register('tag-trim')
 class GroupTagTrim(TagTrim):
     """Action to trim the number of tags to avoid hitting tag limits
 
@@ -764,7 +755,7 @@ class GroupTagTrim(TagTrim):
         client.delete_tags(Tags=tags)
 
 
-@filters.register('capacity-delta')
+@ASG.filter_registry.register('capacity-delta')
 class CapacityDelta(Filter):
     """Filter returns ASG that have less instances than desired or required
 
@@ -788,7 +779,7 @@ class CapacityDelta(Filter):
                     a['Instances']) < a['MinSize']]
 
 
-@filters.register('user-data')
+@ASG.filter_registry.register('user-data')
 class UserDataFilter(ValueFilter):
     """Filter on ASG's whose launch configs have matching userdata.
     Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
@@ -843,7 +834,7 @@ class UserDataFilter(ValueFilter):
         return results
 
 
-@actions.register('resize')
+@ASG.action_registry.register('resize')
 class Resize(Action):
     """Action to resize the min/max/desired instances in an ASG
 
@@ -995,9 +986,9 @@ class Resize(Action):
                 log.debug('nothing to resize')
 
 
-@actions.register('remove-tag')
-@actions.register('untag')
-@actions.register('unmark')
+@ASG.action_registry.register('remove-tag')
+@ASG.action_registry.register('untag') # compatibility
+@ASG.action_registry.register('unmark') # compatibility
 class RemoveTag(Action):
     """Action to remove tag/tags from an ASG
 
@@ -1052,8 +1043,8 @@ class RemoveTag(Action):
         self.manager.retry(client.delete_tags, Tags=tags)
 
 
-@actions.register('tag')
-@actions.register('mark')
+@ASG.action_registry.register('tag')
+@ASG.action_registry.register('mark')
 class Tag(Action):
     """Action to add a tag to an ASG
 
@@ -1128,7 +1119,7 @@ class Tag(Action):
         self.manager.retry(client.create_or_update_tags, Tags=tags)
 
 
-@actions.register('propagate-tags')
+@ASG.action_registry.register('propagate-tags')
 class PropagateTags(Action):
     """Propagate tags to an asg instances.
 
@@ -1242,7 +1233,7 @@ class PropagateTags(Action):
                     'ec2').get_resources(instance_ids)}
 
 
-@actions.register('rename-tag')
+@ASG.action_registry.register('rename-tag')
 class RenameTag(Action):
     """Rename a tag on an AutoScaleGroup.
 
@@ -1339,7 +1330,7 @@ class RenameTag(Action):
             Tags=[{'Key': destination_tag, 'Value': source['Value']}])
 
 
-@actions.register('mark-for-op')
+@ASG.action_registry.register('mark-for-op')
 class MarkForOp(Tag):
     """Action to create a delayed action for a later date
 
@@ -1423,7 +1414,7 @@ class MarkForOp(Tag):
         return action_date_string
 
 
-@actions.register('suspend')
+@ASG.action_registry.register('suspend')
 class Suspend(Action):
     """Action to suspend ASG processes and instances
 
@@ -1505,7 +1496,7 @@ class Suspend(Action):
             raise
 
 
-@actions.register('resume')
+@ASG.action_registry.register('resume')
 class Resume(Action):
     """Resume a suspended autoscale group and its instances
 
@@ -1584,7 +1575,7 @@ class Resume(Action):
             AutoScalingGroupName=asg['AutoScalingGroupName'])
 
 
-@actions.register('delete')
+@ASG.action_registry.register('delete')
 class Delete(Action):
     """Action to delete an ASG
 
