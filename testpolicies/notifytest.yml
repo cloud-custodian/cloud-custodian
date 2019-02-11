@@ -1,0 +1,12 @@
+policies:
+  - name: gcp-notify-with-attributes
+    resource: gcp.function
+    actions:
+      - type: notify
+        template: default
+        subject: 'testing the c7n mailer'
+        to:
+          - testuser@foobar.com
+        transport:
+          type: pubsub
+          topic: gcp-notify-test1
