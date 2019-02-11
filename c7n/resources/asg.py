@@ -666,7 +666,7 @@ class VpcIdFilter(ValueFilter):
         return super(VpcIdFilter, self).process(asgs)
 
 
-@ASG.filter_registry.register('progagated-tags') # compatibility
+@ASG.filter_registry.register('progagated-tags')  # compatibility
 @ASG.filter_registry.register('propagated-tags')
 class PropagatedTagFilter(Filter):
     """Filter ASG based on propagated tags
@@ -987,8 +987,8 @@ class Resize(Action):
 
 
 @ASG.action_registry.register('remove-tag')
-@ASG.action_registry.register('untag') # compatibility
-@ASG.action_registry.register('unmark') # compatibility
+@ASG.action_registry.register('untag')  # compatibility
+@ASG.action_registry.register('unmark')  # compatibility
 class RemoveTag(Action):
     """Action to remove tag/tags from an ASG
 
