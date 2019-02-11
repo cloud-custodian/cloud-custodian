@@ -39,7 +39,9 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
-from c7n.utils import local_session, type_schema, chunks, filter_empty
+from c7n.utils import local_session, type_schema, chunks, filter_empty, QueryParser
+
+from c7n.resources.aws import Arn
 
 
 @resources.register('iam-group')
@@ -201,6 +203,13 @@ class Policy(QueryResourceManager):
 
 class DescribePolicy(DescribeSource):
 
+    def resources(self, query=None):
+        qfilters = PolicyQueryParser.parse(self.manager.data.get('query', []))
+        query = query or {}
+        if qfilters:
+            query = {t['Name']: t['Value'] for t in qfilters}
+        return super(DescribePolicy, self).resources(query=query)
+
     def get_resources(self, resource_ids, cache=True):
         client = local_session(self.manager.session_factory).client('iam')
         results = []
@@ -212,6 +221,18 @@ class DescribePolicy(DescribeSource):
                 if e.response['Error']['Code'] == 'NoSuchEntityException':
                     continue
         return results
+
+
+class PolicyQueryParser(QueryParser):
+
+    QuerySchema = {
+        'Scope': ('All', 'AWS', 'Local'),
+        'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
+        'PathPrefix': six.string_types,
+        'OnlyAttached': bool
+    }
+    multi_value = False
+    value_key = 'Value'
 
 
 @resources.register('iam-profile')
@@ -703,13 +724,20 @@ class PolicyDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
+
+        rcount = len(resources)
+        resources = [r for r in resources if Arn.parse(r['Arn']).account_id != 'aws']
+        if len(resources) != rcount:
+            self.log.warning("Implicitly filtering AWS managed policies: %d -> %d",
+                             rcount, len(resources))
+
         for r in resources:
-            if not r['Arn'].startswith("arn:aws:iam::aws:policy"):
-                self.log.debug('Deleting policy %s' % r['PolicyName'])
-                client.delete_policy(
-                    PolicyArn=r['Arn'])
-            else:
-                self.log.debug('Cannot delete AWS managed policy %s' % r['PolicyName'])
+            if r.get('DefaultVersionId', '') != 'v1':
+                versions = [v['VersionId'] for v in client.list_policy_versions(
+                    PolicyArn=r['Arn']).get('Versions') if not v.get('IsDefaultVersion')]
+                for v in versions:
+                    client.delete_policy_version(PolicyArn=r['Arn'], VersionId=v)
+            client.delete_policy(PolicyArn=r['Arn'])
 
 
 ###############################
@@ -1220,7 +1248,7 @@ class UserFinding(OtherResourcePostFinding):
     def format_resource(self, r):
         if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.iter_filters())):
             details = {
-                "UserName": "arn:aws::{}:user/{}".format(
+                "UserName": "arn:aws:iam:{}:user/{}".format(
                     self.manager.config.account_id, r["c7n:AccessKeys"][0]["UserName"]
                 ),
                 "Status": r["c7n:AccessKeys"][0]["Status"],

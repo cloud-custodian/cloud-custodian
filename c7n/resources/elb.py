@@ -33,7 +33,7 @@ from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
-from c7n.utils import local_session, chunks, type_schema, get_retry, worker
+from c7n.utils import local_session, chunks, type_schema, get_retry, REGION_PARTITION_MAP
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -83,7 +83,8 @@ class ELB(QueryResourceManager):
                 'elasticloadbalancing:DescribeTags')
 
     def get_arn(self, r):
-        return "arn:aws:elasticloadbalancing:%s:%s:loadbalancer/%s" % (
+        return "arn:%s:elasticloadbalancing:%s:%s:loadbalancer/%s" % (
+            REGION_PARTITION_MAP.get(self.config.region, 'aws'),
             self.config.region,
             self.config.account_id,
             r[self.resource_type.id])
@@ -261,7 +262,6 @@ class SetSslListenerPolicy(BaseAction):
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_elb, load_balancers))
 
-    @worker
     def process_elb(self, elb):
         if not is_ssl(elb):
             return
@@ -662,7 +662,6 @@ class SSLPolicyFilter(Filter):
 
         return active_policy_attribute_tuples
 
-    @worker
     def process_elb_policy_set(self, elb_policy_set):
         results = []
         client = local_session(self.manager.session_factory).client('elb')

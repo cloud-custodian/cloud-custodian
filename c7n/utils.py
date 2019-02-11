@@ -29,7 +29,7 @@ import six
 import sys
 
 
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n import ipaddress
 
 # Try to place nice in lambda exec environment
@@ -313,12 +313,22 @@ def parse_s3(s3_path):
     return s3_path, bucket, key_prefix
 
 
+REGION_PARTITION_MAP = {
+    'us-gov-east-1': 'aws-us-gov',
+    'us-gov-west-1': 'aws-us-gov',
+    'cn-north-1': 'aws-cn',
+    'cn-northwest-1': 'aws-cn'
+}
+
+
 def generate_arn(
         service, resource, partition='aws',
         region=None, account_id=None, resource_type=None, separator='/'):
     """Generate an Amazon Resource Name.
     See http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html.
     """
+    if region and region in REGION_PARTITION_MAP:
+        partition = REGION_PARTITION_MAP[region]
     arn = 'arn:%s:%s:%s:%s:' % (
         partition, service, region if region else '', account_id if account_id else '')
     if resource_type:
@@ -539,3 +549,67 @@ class FormatDate(object):
         if increments:
             fmt = self.date_increment.sub("", fmt)
         return d.__format__(fmt)
+
+
+class QueryParser(object):
+
+    QuerySchema = {}
+    type_name = ''
+    multi_value = True
+    value_key = 'Values'
+
+    @classmethod
+    def parse(cls, data):
+        filters = []
+        if not isinstance(data, (tuple, list)):
+            raise PolicyValidationError(
+                "%s Query invalid format, must be array of dicts %s" % (
+                    cls.type_name,
+                    data))
+        for d in data:
+            if not isinstance(d, dict):
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid %s" % (cls.type_name, data))
+            if "Name" not in d or cls.value_key not in d:
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid: Missing Key or Values in %s" % (
+                        cls.type_name, data))
+
+            key = d['Name']
+            values = d[cls.value_key]
+
+            if not cls.multi_value and isinstance(values, list):
+                raise PolicyValidationError(
+                    "%s QUery Filter Invalid Key: Value:%s Must be single valued" % (
+                        cls.type_name, key, values))
+            elif not cls.multi_value:
+                values = [values]
+
+            if key not in cls.QuerySchema and not key.startswith('tag:'):
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid Key:%s Valid: %s" % (
+                        cls.type_name, key, ", ".join(cls.QuerySchema.keys())))
+
+            vtype = cls.QuerySchema.get(key)
+            if vtype is None and key.startswith('tag'):
+                vtype = six.string_types
+
+            if not isinstance(values, list):
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid Values, must be array %s" % (
+                        cls.type_name, data,))
+
+            for v in values:
+                if isinstance(vtype, tuple) and vtype != six.string_types:
+                    if v not in vtype:
+                        raise PolicyValidationError(
+                            "%s Query Filter Invalid Value: %s Valid: %s" % (
+                                cls.type_name, v, ", ".join(vtype)))
+                elif not isinstance(v, vtype):
+                    raise PolicyValidationError(
+                        "%s Query Filter Invalid Value Type %s" % (
+                            cls.type_name, data,))
+
+            filters.append(d)
+
+        return filters

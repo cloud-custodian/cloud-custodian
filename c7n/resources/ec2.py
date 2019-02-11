@@ -883,7 +883,8 @@ class InstanceFinding(PostFinding):
 
         instance = {
             "Type": "AwsEc2Instance",
-            "Id": "arn:aws:ec2:{}:{}:instance/{}".format(
+            "Id": "arn:{}:ec2:{}:{}:instance/{}".format(
+                utils.REGION_PARTITION_MAP.get(self.manager.config.region, 'aws'),
                 self.manager.config.region,
                 self.manager.config.account_id,
                 r["InstanceId"]),
@@ -1413,7 +1414,9 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
                 AlarmDescription='Auto Recover {}'.format(i['InstanceId']),
                 ActionsEnabled=True,
                 AlarmActions=[
-                    'arn:aws:automate:{}:ec2:recover'.format(
+                    'arn:{}:automate:{}:ec2:recover'.format(
+                        utils.REGION_PARTITION_MAP.get(
+                            self.manager.config.region, 'aws'),
                         i['Placement']['AvailabilityZone'][:-1])
                 ],
                 MetricName='StatusCheckFailed_System',
