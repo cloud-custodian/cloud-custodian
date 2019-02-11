@@ -101,7 +101,7 @@ class Notify(BaseNotify):
                 self.data.get('template', 'default'), len(batch)))
 
     def send_data_message(self, message):
-        return PubSubUtilities.send_pubsub(self.session, self.data, message)
+        return PubSubUtilities.publish_message(self.session, self.data, message)
 
 
 gcp_resources.subscribe(

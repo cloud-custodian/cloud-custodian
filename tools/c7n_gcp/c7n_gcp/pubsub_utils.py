@@ -23,8 +23,48 @@ DEFAULT_REGION = 'us-central1'
 
 
 class PubSubUtilities(object):
+    """Utility Class for C&N GCP Pub Sub functionality
+    """
+
+    @staticmethod
+    def publish_message(session, data, message):
+        """Publish message to a GCP pub/sub topic
+         """
+        topic = PubSubUtilities.ensure_topic(session, data)
+
+        client = session.client('pubsub', 'v1', 'projects.topics')
+
+        try:
+            return client.execute_command('publish', {
+                'topic': topic,
+                'body': {
+                    'messages': {
+                        'data': PubSubUtilities.pack(message)
+                    }
+                }
+            })
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+
+    @staticmethod
+    def receive_message(session, data, topic=None, subscription=None):
+        """Receive messsage(s) from subscribed topic"""
+        pass
+
+    @staticmethod
+    def pack(message):
+        """ Returns base64 encoded message for Pub Sub publish method body
+        """
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
     @staticmethod
     def get_topic_param(session, data, topic=None, project=None):
+        """Returns Rest API URI formatted with topic and project in it
+        """
         return 'projects/{}/topics/{}'.format(
             project or session.get_default_project(),
             topic or data['transport']['topic'])
@@ -54,34 +94,36 @@ class PubSubUtilities(object):
         return topic
 
     @staticmethod
-    def send_pubsub(session, data, message):
-        """Publish message to GCP pub/sub topic
-         """
-
-        topic = PubSubUtilities.ensure_topic(session, data)
-
+    def ensure_iam(session, data, publisher=None):
+        """ Ensures that the correct Iam Permissions are setup for a topic
+        """
+        topic = PubSubUtilities.get_topic_param(session, data)
         client = session.client('pubsub', 'v1', 'projects.topics')
+        policy = client.execute_command('getIamPolicy', {'resource': topic})
+        policy.pop('etag')
+        found = False
+        for binding in policy.get('bindings', {}):
+            if binding['role'] != 'roles/pubsub.publisher':
+                continue
+            if publisher in binding['members']:
+                return
+            found = binding
 
-        try:
-            return client.execute_command('publish', {
-                'topic': topic,
-                'body': {
-                    'messages': {
-                        'data': PubSubUtilities.pack(message)
-                    }
-                }
-            })
-        except HttpError as e:
-            if e.resp.status != 404:
-                raise
+        if not found:
+            policy.setdefault(
+                'bindings', {'members': [publisher], 'role': 'roles/pubsub.publisher'})
+        else:
+            found['members'].append(publisher)
+
+        client.execute_command('setIamPolicy', {'resource': topic, 'body': {'policy': policy}})
 
     @staticmethod
-    def receive_pubsub(session, data, message):
-        pass
+    def add(session, data):
+        PubSubUtilities.ensure_topic(session, data)
 
     @staticmethod
-    def pack(message):
-        dumped = utils.dumps(message)
-        compressed = zlib.compress(dumped.encode('utf8'))
-        b64encoded = base64.b64encode(compressed)
-        return b64encoded.decode('ascii')
+    def remove(session, data):
+        if not data.get('topic').startswith(data.prefix):
+            return
+        client = session.client('topic', 'v1', 'projects.topics')
+        client.execute_command('delete', {'topic': PubSubUtilities.get_topic_param(session, data)})
