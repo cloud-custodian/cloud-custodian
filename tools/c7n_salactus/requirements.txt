@@ -15,7 +15,7 @@ jmespath>=0.9.0
 jsonschema>=2.5.1
 MarkupSafe==1.1.0
 python-dateutil>=2.5.3
-PyYAML>=3.11
+PyYAML>=4.2b4
 redis>=2.10.5
 rq-dashboard>=0.3.7
 rq>=0.6.0

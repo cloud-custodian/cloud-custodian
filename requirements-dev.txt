@@ -2,22 +2,22 @@
 coverage>=4.2
 nose==1.3.7
 mock==2.0.0
-Sphinx==1.8.3
+Sphinx==1.8.4
 Pygments==2.3.0
-placebo==0.8.1
-flake8==3.5.0
-redis
-ldap3
+placebo==0.8.2
+flake8==3.7.5
+redis==3.1.0
+ldap3==2.5.2
 sphinx-rtd-theme==0.4.2
 nose-timer>=0.7.3
-twine
-fakeredis
+twine==1.12.1
+fakeredis==1.0
 pytest<4.1.0
 pytest-xdist>=1.2.0
-pytest-cov
-tox
-psutil
-aws_xray_sdk
+pytest-cov==2.6.1
+tox==3.7.0
+psutil==5.5.0
+aws_xray_sdk==2.3.0
 six >= 1.12.0
 
 # Local package required for Sphinx docs
