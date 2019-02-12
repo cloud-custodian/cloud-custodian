@@ -29,6 +29,19 @@ class PubSubUtilities(object):
     @staticmethod
     def publish_message(session, data, message):
         """Publish message to a GCP pub/sub topic
+        Example Policy when run is stored in data variable
+        policies:
+    - name: gcp-notify-with-attributes
+        resource: gcp.function
+        actions:
+        - type: notify
+          template: default
+          subject: 'testing the c7n mailer'
+          to:
+             - testuser@foobar.com
+          transport:
+             type: pubsub
+             topic: brenttest
          """
         topic = PubSubUtilities.ensure_topic(session, data)
 
