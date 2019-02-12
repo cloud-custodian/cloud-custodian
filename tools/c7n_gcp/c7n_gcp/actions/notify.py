@@ -16,7 +16,6 @@ import logging
 from c7n.actions import BaseNotify
 from c7n import utils
 from c7n.resolver import ValuesFrom
-from googleapiclient.errors import HttpError
 from c7n_gcp.provider import resources as gcp_resources
 from c7n_gcp.pubsub_utils import PubSubUtilities
 

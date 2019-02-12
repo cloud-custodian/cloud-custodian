@@ -16,10 +16,10 @@
 from googleapiclient.errors import HttpError
 import base64
 import zlib
+from datetime import tzinfo, timedelta
 from c7n import utils
 
-
-DEFAULT_REGION = 'us-central1'
+MAX_MESSAGES = 200
 
 
 class PubSubUtilities(object):
@@ -48,8 +48,69 @@ class PubSubUtilities(object):
                 raise
 
     @staticmethod
-    def receive_message(session, data, topic=None, subscription=None):
-        """Receive messsage(s) from subscribed topic"""
+    def testreceive(session, subscription):
+        return PubSubUtilities.receive_messages(session, subscription)
+
+    @staticmethod
+    def receive_messages(session, subscription, max_messages=None):
+        """Receive messsage(s) from subscribed topic
+        """
+        subscriber_param = PubSubUtilities.get_subscription_param(session, subscription)
+
+        client = session.client('pubsub', 'v1', 'projects.subscriptions')
+        try:
+            return client.execute_command('pull', {
+                'subscription': subscriber_param,
+                'body': {
+                    'returnImmediately': True,
+                    'maxMessages': max_messages or MAX_MESSAGES
+
+                }
+            })
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+
+        pass
+
+    @staticmethod
+    def ack_messages(session, discard_datetime, subscription):
+        """Acknowledge and Discard messages up to datetime using seek api command
+        """
+        subscriber_param = PubSubUtilities.get_subscription_param(session, subscription)
+
+        client = session.client('pubsub', 'v1', 'projects.subscriptions')
+        try:
+            return client.execute_command('seek', {
+                'subscription': subscriber_param,
+                'body': {
+                    'time': discard_datetime
+                }
+            })
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+
+        pass
+
+    @staticmethod
+    def unpack(message):
+        """ Returns base64 encoded message for Pub Sub publish method body
+        """
+        b64decoded = base64.b64decode(message)
+        uncompressed = zlib.decompress(b64decoded)
+        return uncompressed
+
+    @staticmethod
+    def get_subscription_param(session, subscription, project=None):
+        """Returns Rest API URI formatted with topic and project in it
+        """
+        return 'projects/{}/subscriptions/{}'.format(
+            project or session.get_default_project(),
+            subscription)
+
+    @staticmethod
+    def ensure_subscription(session, data, topic=None, subscription=None):
         pass
 
     @staticmethod
@@ -127,3 +188,11 @@ class PubSubUtilities(object):
             return
         client = session.client('topic', 'v1', 'projects.topics')
         client.execute_command('delete', {'topic': PubSubUtilities.get_topic_param(session, data)})
+
+
+class SimpleUtc(tzinfo):
+    def tzname(self, **kwargs):
+        return "UTC"
+
+    def utcoffset(selfself, dt):
+        return timedelta(0)
