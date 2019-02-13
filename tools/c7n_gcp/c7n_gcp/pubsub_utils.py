@@ -24,24 +24,22 @@ MAX_MESSAGES = 200
 
 class PubSubUtilities(object):
     """Utility Class for C&N GCP Pub Sub functionality
+    An example use-case for this class is as follows:
+    Publish messages to GCP Pub/Sub Service:
+    C7N_GCP NotifyAction class uses this utility class to connect to Topics
+    and publish messages(send messages to the GCP Pub/Sub Service)
+
+    Receive messages from GCP Pub/Sub Service:
+    C7N_GCP-Mailer Processor class uses this utility class to connect to subscriptions
+    to receive messages.
     """
 
+    """
+    Class methods for Pub/Sub message handling
+    """
     @staticmethod
     def publish_message(session, data, message):
         """Publish message to a GCP pub/sub topic
-        Example Policy when run is stored in data variable
-        policies:
-    - name: gcp-notify-with-attributes
-        resource: gcp.function
-        actions:
-        - type: notify
-          template: default
-          subject: 'testing the c7n mailer'
-          to:
-             - testuser@foobar.com
-          transport:
-             type: pubsub
-             topic: brenttest
          """
         topic = PubSubUtilities.ensure_topic(session, data)
 
@@ -59,10 +57,6 @@ class PubSubUtilities(object):
         except HttpError as e:
             if e.resp.status != 404:
                 raise
-
-    @staticmethod
-    def testreceive(session, subscription):
-        return PubSubUtilities.receive_messages(session, subscription)
 
     @staticmethod
     def receive_messages(session, subscription, max_messages=None):
@@ -107,13 +101,25 @@ class PubSubUtilities(object):
         pass
 
     @staticmethod
+    def pack(message):
+        """ Returns base64 encoded message
+        """
+        dumped = utils.dumps(message)
+        compressed = zlib.compress(dumped.encode('utf8'))
+        b64encoded = base64.b64encode(compressed)
+        return b64encoded.decode('ascii')
+
+    @staticmethod
     def unpack(message):
-        """ Returns base64 encoded message for Pub Sub publish method body
+        """ Returns a message that been base64 decoded
         """
         b64decoded = base64.b64decode(message)
         uncompressed = zlib.decompress(b64decoded)
         return uncompressed
 
+    """
+    Class methods for handling Pub/Sub Subscriptions
+    """
     @staticmethod
     def get_subscription_param(session, subscription, project=None):
         """Returns Rest API URI formatted with topic and project in it
@@ -124,17 +130,33 @@ class PubSubUtilities(object):
 
     @staticmethod
     def ensure_subscription(session, data, topic=None, subscription=None):
+        """Verify the pub/sub topic exists.
+        If it does not, create it returns the topic qualified name.
+        """
+
+        client = session.client('pubsub', 'v1', 'projects.subscriptions')
+
+        topic = PubSubUtilities.ensure_topic(session, data)
+        subscription = PubSubUtilities.get_subscription_param(session, subscription)
+
+        try:
+            client.execute_command('get', {'subscription': subscription})
+        except HttpError as e:
+            if e.resp.status != 404:
+                raise
+        else:
+            return subscription
+
+        # bug in discovery doc.. apis say body must be empty but its required in the
+        # discovery api for create.
+        client.execute_command('create', {'name': subscription, 'body': {}})
+        return topic
+
         pass
 
-    @staticmethod
-    def pack(message):
-        """ Returns base64 encoded message for Pub Sub publish method body
-        """
-        dumped = utils.dumps(message)
-        compressed = zlib.compress(dumped.encode('utf8'))
-        b64encoded = base64.b64encode(compressed)
-        return b64encoded.decode('ascii')
-
+    """
+    Class methods for handling Pub/Sub Topics
+    """
     @staticmethod
     def get_topic_param(session, data, topic=None, project=None):
         """Returns Rest API URI formatted with topic and project in it
@@ -168,6 +190,17 @@ class PubSubUtilities(object):
         return topic
 
     @staticmethod
+    def add(session, data):
+        PubSubUtilities.ensure_topic(session, data)
+
+    @staticmethod
+    def remove(session, data):
+        if not data.get('topic').startswith(data.prefix):
+            return
+        client = session.client('topic', 'v1', 'projects.topics')
+        client.execute_command('delete', {'topic': PubSubUtilities.get_topic_param(session, data)})
+
+    @staticmethod
     def ensure_iam(session, data, publisher=None):
         """ Ensures that the correct Iam Permissions are setup for a topic
         """
@@ -191,21 +224,10 @@ class PubSubUtilities(object):
 
         client.execute_command('setIamPolicy', {'resource': topic, 'body': {'policy': policy}})
 
-    @staticmethod
-    def add(session, data):
-        PubSubUtilities.ensure_topic(session, data)
-
-    @staticmethod
-    def remove(session, data):
-        if not data.get('topic').startswith(data.prefix):
-            return
-        client = session.client('topic', 'v1', 'projects.topics')
-        client.execute_command('delete', {'topic': PubSubUtilities.get_topic_param(session, data)})
-
 
 class SimpleUtc(tzinfo):
     def tzname(self, **kwargs):
         return "UTC"
 
-    def utcoffset(selfself, dt):
+    def utcoffset(self, dt):
         return timedelta(0)
