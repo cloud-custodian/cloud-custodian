@@ -23,6 +23,7 @@ log = logging.getLogger('c7n_gcp.notify')
 
 
 class Notify(BaseNotify):
+    # TODO: Create Notify Unit Tests
     """Example:
         - name: gcp-notify-with-attributes
           resource: gcp-compute
