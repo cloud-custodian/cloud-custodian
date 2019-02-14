@@ -222,6 +222,12 @@ class UtilTest(BaseTest):
         self.assertEqual(
             utils.generate_arn("s3", "my_bucket"), "arn:aws:s3:::my_bucket"
         )
+
+        self.assertEqual(
+            utils.generate_arn("s3", "my_bucket", region="us-gov-west-1"),
+            "arn:aws-us-gov:s3:::my_bucket"
+        )
+
         self.assertEqual(
             utils.generate_arn(
                 "cloudformation",

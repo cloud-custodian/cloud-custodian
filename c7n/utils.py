@@ -329,6 +329,8 @@ def generate_arn(
     """
     if region and region in REGION_PARTITION_MAP:
         partition = REGION_PARTITION_MAP[region]
+    if service == 's3':
+        region = ''
     arn = 'arn:%s:%s:%s:%s:' % (
         partition, service, region if region else '', account_id if account_id else '')
     if resource_type:
