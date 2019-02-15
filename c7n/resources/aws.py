@@ -378,12 +378,20 @@ class S3Output(DirectoryOutput):
             self.key_prefix)
 
     def get_output_path(self, output_url):
-        if '{' not in output_url:
-            date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
+        date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
+        bucket_url = output_url.split('{')[0]
+        if 'account_id' in output_url:
+            account_id = boto3.client('sts').get_caller_identity().get('Account')
+            return self.join(
+                bucket_url, account_id, self.ctx.policy.name, date_path)
+        elif 'account' in output_url:
+            account = boto3.client('iam').list_account_aliases()['AccountAliases'][0]
+            return self.join(
+                bucket_url, account, self.ctx.policy.name, date_path)
+        else:
             return self.join(
                 output_url, self.ctx.policy.name, date_path)
-        return output_url.format(**self.get_output_vars())
-
+   
     @staticmethod
     def join(*parts):
         return "/".join([s.strip('/') for s in parts])
