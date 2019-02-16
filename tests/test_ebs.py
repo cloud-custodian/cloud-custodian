@@ -26,7 +26,8 @@ from c7n.resources.ebs import (
     EncryptInstanceVolumes,
     CopySnapshot,
     Delete,
-    QueryParser
+    ErrorHandler,
+    SnapshotQueryParser as QueryParser
 )
 
 from .common import BaseTest, TestConfig as Config
@@ -61,6 +62,33 @@ class SnapshotQueryParse(BaseTest):
         self.assertRaises(
             PolicyValidationError, QueryParser.parse, [
                 {'Name': 'snapshot-id', 'Values': [1]}])
+
+
+class SnapshotDescribeError(BaseTest):
+
+    def test_get_bad_snapshot_malformed(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+            "Error": {
+                "Message": 'Invalid id: "snap-malformedsnap"',
+                "Code": "InvalidSnapshotID.Malformed",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        snap = ErrorHandler.extract_bad_snapshot(e)
+        self.assertEqual(snap, "snap-malformedsnap")
+
+    def test_get_bad_snapshot_notfound(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+            "Error": {
+                "Message": "The snapshot 'snap-notfound' does not exist.",
+                "Code": "InvalidSnapshot.NotFound",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        snap = ErrorHandler.extract_bad_snapshot(e)
+        self.assertEqual(snap, "snap-notfound")
 
 
 class SnapshotAccessTest(BaseTest):

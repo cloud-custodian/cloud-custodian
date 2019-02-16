@@ -149,16 +149,6 @@ class TagDelayedAction(TagDelayedAction):
                     msg: "Cluster does not have required tags"
     """
 
-    permission = ('elasticmapreduce:AddTags',)
-    batch_size = 1
-    retry = staticmethod(get_retry(('ThrottlingException',)))
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('emr')
-        for r in resources:
-            self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
-
 
 @actions.register('tag')
 class TagTable(Tag):
@@ -183,8 +173,7 @@ class TagTable(Tag):
     batch_size = 1
     retry = staticmethod(get_retry(('ThrottlingException',)))
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('emr')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             self.retry(client.add_tags, ResourceId=r['Id'], Tags=tags)
 
@@ -211,12 +200,9 @@ class UntagTable(RemoveTag):
     batch_size = 5
     permissions = ('elasticmapreduce:RemoveTags',)
 
-    def process_resource_set(self, resources, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('emr')
+    def process_resource_set(self, client, resources, tag_keys):
         for r in resources:
-            client.remove_tags(
-                ResourceId=r['Id'], TagKeys=tag_keys)
+            client.remove_tags(ResourceId=r['Id'], TagKeys=tag_keys)
 
 
 @actions.register('terminate')

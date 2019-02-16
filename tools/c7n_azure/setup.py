@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.4',
+    version='0.5',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -75,8 +75,8 @@ setup(
                       "PyJWT",
                       "c7n",
                       "requests",
-                      "azure-cli-core<=2.0.40",
-                      "adal~=1.0.0",
+                      "azure-cli-core",
+                      "adal",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
     package_data={str(''): [str('function_binding_resources/bin/*.dll'),

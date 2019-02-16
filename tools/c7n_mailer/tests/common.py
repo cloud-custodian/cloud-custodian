@@ -193,6 +193,46 @@ SQS_MESSAGE_3 = {
     'resources': [RESOURCE_2]
 }
 
+SQS_MESSAGE_4 = {
+    'account': 'core-services-dev',
+    'account_id': '000000000000',
+    'region': 'us-east-1',
+    'action': {
+        'to': ['resource-owner', 'ldap_uid_tags'],
+        'cc': ['hello@example.com', 'cc@example.com'],
+        'email_ldap_username_manager': True,
+        'template': 'default.html',
+        'priority_header': '1',
+        'type': 'notify',
+        'transport': {'queue': 'xxx', 'type': 'sqs'},
+        'subject': '{{ account }} AWS EBS Volumes will be DELETED in 15 DAYS!'
+    },
+    'policy': {
+        'filters': [{'Attachments': []}, {'tag:maid_status': 'absent'}],
+        'resource': 'ebs',
+        'actions': [
+            {
+                'type': 'mark-for-op',
+                'days': 15,
+                'op': 'delete'
+            },
+            {
+                'to': ['resource-owner', 'ldap_uid_tags'],
+                'cc': ['hello@example.com', 'cc@example.com'],
+                'email_ldap_username_manager': True,
+                'template': 'default.html.j2',
+                'priority_header': '1',
+                'type': 'notify',
+                'subject': 'EBS Volumes will be DELETED in 15 DAYS!'
+            }
+        ],
+        'comments': 'We are deleting your EBS volumes.',
+        'name': 'ebs-mark-unattached-deletion'
+    },
+    'event': None,
+    'resources': [RESOURCE_1]
+}
+
 ASQ_MESSAGE = '''{
    "account":"subscription",
    "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",

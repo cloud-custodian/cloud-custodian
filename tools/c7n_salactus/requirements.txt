@@ -1,5 +1,5 @@
 argparse>=1.2.1
-setuptools-scm==2.1.0
+setuptools-scm==3.2.0
 arrow>=0.8.0
 boto3>=1.4.1
 botocore>=1.4.65
@@ -15,7 +15,7 @@ jmespath>=0.9.0
 jsonschema>=2.5.1
 MarkupSafe==1.1.0
 python-dateutil>=2.5.3
-PyYAML>=3.11
+PyYAML>=4.2b4
 redis>=2.10.5
 rq-dashboard>=0.3.7
 rq>=0.6.0

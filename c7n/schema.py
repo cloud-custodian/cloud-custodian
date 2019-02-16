@@ -206,7 +206,8 @@ def generate(resource_types=()):
                 # generalize server side query mechanisms, currently
                 # this only for ec2 instance queries. limitations
                 # in json schema inheritance prevent us from doing this
-                # on a type specific basis http://goo.gl/8UyRvQ
+                # on a type specific basis
+                # https://stackoverflow.com/questions/22689900/json-schema-allof-with-additionalproperties
                 'query': {
                     'type': 'array', 'items': {'type': 'object'}}
 

@@ -22,18 +22,13 @@ from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, RemovePolicyBase
-from c7n.filters import CrossAccountAccessFilter, FilterRegistry, ValueFilter
+from c7n.actions import BaseAction, RemovePolicyBase
+from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
-from c7n.tags import (
-    RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment)
-from c7n.utils import get_retry, local_session, type_schema, generate_arn
-
-filters = FilterRegistry('lambda.filters')
-actions = ActionRegistry('lambda.actions')
-filters.register('marked-for-op', TagActionFilter)
+from c7n.tags import universal_augment
+from c7n.utils import local_session, type_schema, generate_arn
 
 ErrAccessDenied = "AccessDeniedException"
 
@@ -50,10 +45,7 @@ class AWSLambda(query.QueryResourceManager):
         date = 'LastModified'
         dimension = 'FunctionName'
         config_type = "AWS::Lambda::Function"
-
-    filter_registry = filters
-    action_registry = actions
-    retry = staticmethod(get_retry(('Throttled',)))
+        universal_taggable = object()
 
     @property
     def generate_arn(self):
@@ -96,44 +88,28 @@ class ConfigLambda(query.ConfigSource):
         return resource
 
 
-def tag_function(session_factory, functions, tags, log):
-    client = local_session(session_factory).client('lambda')
-    tag_dict = {}
-    for t in tags:
-        tag_dict[t['Key']] = t['Value']
-    for f in functions:
-        arn = f['FunctionArn']
-        try:
-            client.tag_resource(Resource=arn, Tags=tag_dict)
-        except Exception as err:
-            log.exception(
-                'Exception tagging lambda function %s: %s',
-                f['FunctionName'], err)
-            continue
-
-
-@filters.register('security-group')
+@AWSLambda.filter_registry.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
 
 
-@filters.register('subnet')
+@AWSLambda.filter_registry.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "VpcConfig.SubnetIds[]"
 
 
-@filters.register('vpc')
+@AWSLambda.filter_registry.register('vpc')
 class VpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcConfig.VpcId"
 
 
-filters.register('network-location', net_filters.NetworkLocation)
+AWSLambda.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
-@filters.register('reserved-concurrency')
+@AWSLambda.filter_registry.register('reserved-concurrency')
 class ReservedConcurrency(ValueFilter):
 
     annotation_key = "c7n:FunctionInfo"
@@ -203,7 +179,7 @@ def get_lambda_policies(client, executor_factory, resources, log):
     return filter(None, results)
 
 
-@filters.register('event-source')
+@AWSLambda.filter_registry.register('event-source')
 class LambdaEventSource(ValueFilter):
     # this uses iam policy, it should probably use
     # event source mapping api
@@ -235,7 +211,7 @@ class LambdaEventSource(ValueFilter):
         return self.match(r)
 
 
-@filters.register('cross-account')
+@AWSLambda.filter_registry.register('cross-account')
 class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Filters lambda functions with cross-account permissions
 
@@ -271,7 +247,7 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
             resources, event)
 
 
-@actions.register('remove-statements')
+@AWSLambda.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy/permission statements from lambda functions.
 
@@ -336,86 +312,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                 StatementId=f['Sid'])
 
 
-@actions.register('mark-for-op')
-class TagDelayedAction(TagDelayedAction):
-    """Action to specify an action to occur at a later date
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: lambda-delete-unused
-                resource: lambda
-                filters:
-                  - "tag:custodian_cleanup": absent
-                actions:
-                  - type: mark-for-op
-                    tag: custodian_cleanup
-                    msg: "Unused lambda"
-                    op: delete
-                    days: 7
-    """
-
-    permissions = ('lambda:TagResource',)
-
-    def process_resource_set(self, functions, tags):
-        tag_function(self.manager.session_factory, functions, tags, self.log)
-
-
-@actions.register('tag')
-class Tag(Tag):
-    """Action to add tag(s) to Lambda Function(s)
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: lambda-add-owner-tag
-                resource: lambda
-                filters:
-                  - "tag:OwnerName": missing
-                actions:
-                  - type: tag
-                    key: OwnerName
-                    value: OwnerName
-    """
-
-    permissions = ('lambda:TagResource',)
-
-    def process_resource_set(self, functions, tags):
-        tag_function(self.manager.session_factory, functions, tags, self.log)
-
-
-@actions.register('remove-tag')
-class RemoveTag(RemoveTag):
-    """Action to remove tag(s) from Lambda Function(s)
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: lambda-remove-old-tag
-                resource: lambda
-                filters:
-                  - "tag:OldTagKey": present
-                actions:
-                  - type: remove-tag
-                    tags: [OldTagKey1, OldTagKey2]
-    """
-
-    permissions = ('lambda:UntagResource',)
-
-    def process_resource_set(self, functions, tag_keys):
-        client = local_session(self.manager.session_factory).client('lambda')
-        for f in functions:
-            arn = f['FunctionArn']
-            client.untag_resource(Resource=arn, TagKeys=tag_keys)
-
-
-@actions.register('set-concurrency')
+@AWSLambda.action_registry.register('set-concurrency')
 class SetConcurrency(BaseAction):
     """Set lambda function concurrency to the desired level.
 
@@ -470,7 +367,7 @@ class SetConcurrency(BaseAction):
                     ReservedConcurrentExecutions=fvalue)
 
 
-@actions.register('delete')
+@AWSLambda.action_registry.register('delete')
 class Delete(BaseAction):
     """Delete a lambda function (including aliases and older versions).
 

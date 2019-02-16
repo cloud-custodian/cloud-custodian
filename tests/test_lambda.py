@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 
 from botocore.exceptions import ClientError
-from .common import BaseTest, functional, TestConfig as Config
+from .common import BaseTest, functional
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
 from c7n.mu import PythonPackageArchive
@@ -313,48 +313,29 @@ class LambdaTagTest(BaseTest):
             {
                 "name": "lambda-tag",
                 "resource": "lambda",
-                "filters": [{"FunctionName": "CloudCustodian"}],
-                "actions": [{"type": "tag", "key": "xyz", "value": "abcdef"}],
+                "filters": [
+                    {"FunctionName": "CloudCustodian"},
+                    {"tag:Env": "Dev"},
+                ],
+                "actions": [
+                    {"type": "tag", "key": "xyz", "value": "abcdef"},
+                    {"type": "remove-tag", "tags": ["Env"]}
+                ]
             },
-            session_factory=session_factory,
-        )
+            session_factory=session_factory, config={
+                'account_id': '644160558196',
+                'region': 'us-west-2'})
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         arn = resources[0]["FunctionArn"]
-        tags = client.list_tags(Resource=arn)["Tags"]
-        self.assertTrue("xyz" in tags.keys())
 
-        policy = self.load_policy(
-            {
-                "name": "lambda-tag",
-                "resource": "lambda",
-                "filters": [{"FunctionName": "CloudCustodian"}],
-                "actions": [{"type": "remove-tag", "tags": ["xyz"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        arn = resources[0]["FunctionArn"]
-        tags = client.list_tags(Resource=arn)["Tags"]
-        self.assertFalse("xyz" in tags.keys())
+        after_tags = client.list_tags(Resource=arn)["Tags"]
+        before_tags = {
+            t['Key']: t['Value'] for t in resources[0]['Tags']}
 
-    def test_lambda_tags(self):
-        self.patch(AWSLambda, "executor_factory", MainThreadExecutor)
-        session_factory = self.replay_flight_data("test_lambda_tags")
-        policy = self.load_policy(
-            {
-                "name": "lambda-mark",
-                "resource": "lambda",
-                "filters": [{"tag:Language": "Python"}],
-            },
-            config=Config.empty(),
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["FunctionName"], "CloudCustodian")
+        self.assertEqual(before_tags, {'Env': 'Dev'})
+        self.assertEqual(after_tags, {'xyz': 'abcdef'})
 
     def test_mark_and_match(self):
         session_factory = self.replay_flight_data("test_lambda_mark_and_match")
@@ -373,25 +354,20 @@ class LambdaTagTest(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(),
+            config={'region': 'us-west-2',
+                    'account_id': '644160558196'},
             session_factory=session_factory,
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        arn = resources[0]["FunctionArn"]
-        tags = client.list_tags(Resource=arn)["Tags"]
-        self.assertTrue("custodian_next" in tags.keys())
 
-        policy = self.load_policy(
-            {
-                "name": "lambda-mark-filter",
-                "resource": "lambda",
-                "filters": [
-                    {"type": "marked-for-op", "tag": "custodian_next", "op": "delete"}
-                ],
-            },
-            config=Config.empty(),
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        arn = resources[0]["FunctionArn"]
+        after_tags = client.list_tags(Resource=arn)["Tags"]
+        before_tags = {
+            t['Key']: t['Value'] for t in resources[0]['Tags']}
+
+        self.assertEqual(before_tags, {'xyz': 'abcdef'})
+        self.assertEqual(
+            after_tags,
+            {'custodian_next': 'Resource does not meet policy: delete@2019/02/09',
+             'xyz': 'abcdef'})

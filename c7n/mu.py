@@ -199,6 +199,10 @@ class PythonPackageArchive(object):
                 1024.0 * 1024.0)))
         return self
 
+    @staticmethod
+    def _temporary_opener(name, flag, mode=0o777):
+        return os.open(name, flag | os.O_TEMPORARY, mode)
+
     def remove(self):
         """Dispose of the temp file for garbage collection."""
         if self._temp_archive_file:
@@ -213,7 +217,16 @@ class PythonPackageArchive(object):
     def get_bytes(self):
         """Return the entire zip file as a byte string. """
         assert self._closed, "Archive not closed"
-        return open(self._temp_archive_file.name, 'rb').read()
+        return self.get_stream().read()
+
+    def get_stream(self):
+        """Return the entire zip file as a stream. """
+        assert self._closed, "Archive not closed"
+        # Windows requires TEMPORARY flag if you want to open files created by tempfile library
+        if os.name == 'nt':
+            return open(self._temp_archive_file.name, 'rb', opener=self._temporary_opener)
+        else:
+            return open(self._temp_archive_file.name, 'rb')
 
     def get_reader(self):
         """Return a read-only :py:class:`~zipfile.ZipFile`."""
@@ -365,8 +378,13 @@ class LambdaManager(object):
     def delta_function(old_config, new_config):
         changed = []
         for k in new_config:
+            # Layers need special handling as they have extra info on describe.
+            if k == 'Layers' and k in old_config and new_config[k]:
+                if sorted(new_config[k]) != sorted([
+                        l['Arn'] for l in old_config[k]]):
+                    changed.append(k)
             # Vpc needs special handling as a dict with lists
-            if k == 'VpcConfig' and k in old_config and new_config[k]:
+            elif k == 'VpcConfig' and k in old_config and new_config[k]:
                 if set(old_config[k]['SubnetIds']) != set(
                         new_config[k]['SubnetIds']):
                     changed.append(k)
@@ -408,7 +426,7 @@ class LambdaManager(object):
 
         changed = False
         if existing:
-            old_config = existing['Configuration']
+            result = old_config = existing['Configuration']
             if archive.get_checksum() != old_config['CodeSha256']:
                 log.debug("Updating function %s code", func.name)
                 params = dict(FunctionName=func.name, Publish=True)
@@ -421,7 +439,9 @@ class LambdaManager(object):
 
             new_config = func.get_config()
             new_config['Role'] = role
-            new_tags = new_config.pop('Tags', {})
+
+            if self._update_tags(existing, new_config.pop('Tags', {})):
+                changed = True
 
             config_changed = self.delta_function(old_config, new_config)
             if config_changed:
@@ -429,34 +449,53 @@ class LambdaManager(object):
                           func.name, ", ".join(sorted(config_changed)))
                 result = self.client.update_function_configuration(**new_config)
                 changed = True
-
-            # tag dance
-            base_arn = old_config['FunctionArn']
-            if base_arn.count(':') > 6:  # trim version/alias
-                base_arn = base_arn.rsplit(':', 1)[0]
-
-            old_tags = self.client.list_tags(Resource=base_arn)['Tags']
-            tags_to_add, tags_to_remove = self.diff_tags(old_tags, new_tags)
-
-            if tags_to_add:
-                log.debug("Updating function tags: %s" % func.name)
-                self.client.tag_resource(
-                    Resource=base_arn, Tags=tags_to_add)
-            if tags_to_remove:
-                log.debug("Removing function stale tags: %s" % func.name)
-                self.client.untag_resource(
-                    Resource=base_arn, TagKeys=tags_to_remove)
-
-            if not changed:
-                result = old_config
+            if self._update_concurrency(existing, func):
+                changed = True
         else:
             log.info('Publishing custodian policy lambda function %s', func.name)
             params = func.get_config()
             params.update({'Publish': True, 'Code': code_ref, 'Role': role})
             result = self.client.create_function(**params)
+            self._update_concurrency(None, func)
             changed = True
 
         return result, changed
+
+    def _update_concurrency(self, existing, func):
+        e_concurrency = None
+        if existing:
+            e_concurrency = existing.get('Concurrency', {}).get(
+                'ReservedConcurrentExecutions')
+        if e_concurrency == func.concurrency:
+            return
+        elif e_concurrency is not None and func.concurrency is None:
+            log.debug("Removing function: %s concurrency", func.name)
+            self.client.delete_function_concurrency(
+                FunctionName=func.name)
+            return True
+        log.debug("Updating function: %s concurrency", func.name)
+        self.client.put_function_concurrency(
+            FunctionName=func.name,
+            ReservedConcurrentExecutions=func.concurrency)
+
+    def _update_tags(self, existing, new_tags):
+        # tag dance
+        base_arn = existing['Configuration']['FunctionArn']
+        if base_arn.count(':') > 6:  # trim version/alias
+            base_arn = base_arn.rsplit(':', 1)[0]
+
+        tags_to_add, tags_to_remove = self.diff_tags(
+            existing.get('Tags', {}), new_tags)
+        changed = False
+        if tags_to_add:
+            log.debug("Updating function tags: %s" % base_arn)
+            self.client.tag_resource(Resource=base_arn, Tags=tags_to_add)
+            changed = True
+        if tags_to_remove:
+            log.debug("Removing function stale tags: %s" % base_arn)
+            self.client.untag_resource(Resource=base_arn, TagKeys=tags_to_remove)
+            changed = True
+        return changed
 
     def _upload_func(self, s3_uri, func, archive):
         from boto3.s3.transfer import S3Transfer, TransferConfig
@@ -581,6 +620,14 @@ class AbstractLambdaFunction:
     def tags(self):
         """ """
 
+    @abc.abstractproperty
+    def layers(self):
+        """ """
+
+    @abc.abstractproperty
+    def concurrency(self):
+        """ """
+
     @abc.abstractmethod
     def get_events(self, session_factory):
         """event sources that should be bound to this lambda."""
@@ -603,6 +650,9 @@ class AbstractLambdaFunction:
             'DeadLetterConfig': self.dead_letter_config,
             'VpcConfig': LAMBDA_EMPTY_VALUES['VpcConfig'],
             'Tags': self.tags}
+
+        if self.layers:
+            conf['Layers'] = self.layers
 
         if self.environment['Variables']:
             conf['Environment'] = self.environment
@@ -663,6 +713,14 @@ class LambdaFunction(AbstractLambdaFunction):
     @property
     def role(self):
         return self.func_data['role']
+
+    @property
+    def layers(self):
+        return self.func_data.get('layers', ())
+
+    @property
+    def concurrency(self):
+        return self.func_data.get('concurrency')
 
     @property
     def security_groups(self):
@@ -778,6 +836,14 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def tags(self):
         return self.policy.data['mode'].get('tags', {})
+
+    @property
+    def concurrency(self):
+        return self.policy.data['mode'].get('concurrency')
+
+    @property
+    def layers(self):
+        return self.policy.data['mode'].get('layers', ())
 
     @property
     def packages(self):
@@ -920,7 +986,6 @@ class CloudWatchEventSource(object):
         if event_type == 'cloudtrail':
             payload['detail-type'] = ['AWS API Call via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
-
         if event_type == 'cloudtrail':
             if 'signin.amazonaws.com' in payload['detail']['eventSource']:
                 payload['detail-type'] = ['AWS Console Sign In via CloudTrail']
@@ -942,6 +1007,12 @@ class CloudWatchEventSource(object):
             for e in self.data.get('events', []):
                 events.append(self.ASG_EVENT_MAPPING.get(e, e))
             payload['detail-type'] = events
+        elif event_type == 'phd':
+            payload['source'] = ['aws.health']
+            payload['detail'] = {
+                'eventTypeCode': list(self.data['events'])}
+            if self.data.get('categories', []):
+                payload['detail']['eventTypeCategory'] = self.data['categories']
         elif event_type == 'periodic':
             pass
         else:
