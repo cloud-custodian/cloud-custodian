@@ -270,7 +270,7 @@ class SecurityHubTest(BaseTest):
             session_factory=factory,
             validate=False
         )
-        self.assertRaises(PolicyValidationError, policy.validate())
+        policy.validate()
 
     def test_alb_findings_filter(self):
         factory = self.replay_flight_data("test_security_hub_alb_findings_filter")
