@@ -37,5 +37,5 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-guardian = c7n_guardian.cli:cli']},
-    install_requires=["c7n", "click", "jsonschema", "pyyaml"]
+    install_requires=["c7n", "click", "jsonschema", "pyyaml>=4.2b4"]
 )
