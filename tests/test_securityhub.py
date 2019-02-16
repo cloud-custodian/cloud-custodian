@@ -15,7 +15,6 @@
 from .common import BaseTest
 
 import time
-from c7n.exceptions import PolicyValidationError
 
 LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23" # NOQA
 
