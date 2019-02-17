@@ -26,7 +26,7 @@ setup(
         "boto3>=1.9.94",
         "botocore>=1.12.94",
         "python-dateutil>=2.6,<3.0.0",
-        "pyyaml>=4.2b4",
+        "PyYAML>=4.2b4",
         "jsonschema",
         "jsonpatch>=1.21",
         "argcomplete",

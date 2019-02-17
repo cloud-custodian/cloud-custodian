@@ -28,7 +28,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, generate_arn
 
 from c7n.resources.iam import CredentialReport
 
@@ -577,14 +577,15 @@ class RequestLimitIncrease(BaseAction):
                 ccEmailAddresses=self.data.get('notify', []))
 
 
-def cloudtrail_policy(original, bucket_name, account_id):
+def cloudtrail_policy(original, bucket_name, account_id, bucket_region):
     '''add CloudTrail permissions to an S3 policy, preserving existing'''
     ct_actions = [
         {
             'Action': 's3:GetBucketAcl',
             'Effect': 'Allow',
             'Principal': {'Service': 'cloudtrail.amazonaws.com'},
-            'Resource': 'arn:aws:s3:::' + bucket_name,
+            'Resource': generate_arn(
+                service='s3', resource=bucket_name, region=bucket_region),
             'Sid': 'AWSCloudTrailAclCheck20150319',
         },
         {
@@ -595,9 +596,8 @@ def cloudtrail_policy(original, bucket_name, account_id):
             },
             'Effect': 'Allow',
             'Principal': {'Service': 'cloudtrail.amazonaws.com'},
-            'Resource': 'arn:aws:s3:::%s/AWSLogs/%s/*' % (
-                bucket_name, account_id
-            ),
+            'Resource': generate_arn(
+                service='s3', resource=bucket_name, region=bucket_region),
             'Sid': 'AWSCloudTrailWrite20150319',
         },
     ]
@@ -680,7 +680,7 @@ class EnableTrail(BaseAction):
         kms = self.data.get('kms', False)
         kms_key = self.data.get('kms-key', '')
 
-        s3client = session.client('s3')
+        s3client = session.client('s3', region_name=bucket_region)
         try:
             s3client.create_bucket(
                 Bucket=bucket_name,
@@ -697,7 +697,8 @@ class EnableTrail(BaseAction):
             current_policy = None
 
         policy_json = cloudtrail_policy(
-            current_policy, bucket_name, self.manager.config.account_id)
+            current_policy, bucket_name,
+            self.manager.config.account_id, bucket_region)
 
         s3client.put_bucket_policy(Bucket=bucket_name, Policy=policy_json)
         trails = client.describe_trails().get('trailList', ())
