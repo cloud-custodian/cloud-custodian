@@ -129,7 +129,7 @@ class PubSubUtilities(object):
             subscription)
 
     @staticmethod
-    def ensure_subscription(session, data, topic=None, subscription=None):
+    def ensure_subscription(session, data, subscription=None):
         """Verify the pub/sub topic exists.
         If it does not, create it returns the topic qualified name.
         """
