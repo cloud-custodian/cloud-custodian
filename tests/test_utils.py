@@ -150,7 +150,7 @@ class UtilTest(BaseTest):
 
     def test_group_by(self):
         sorter = lambda x: x  # NOQA E731
-        sorter = sys.version_info.major is 2 and sorted or sorter
+        sorter = sys.version_info.major == 2 and sorted or sorter
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(
             sorter(list(utils.group_by(items, "Type").keys())), [None, "a", "b"]

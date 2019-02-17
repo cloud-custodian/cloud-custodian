@@ -5,7 +5,7 @@ mock==2.0.0
 Sphinx==1.8.3
 Pygments==2.3.0
 placebo==0.8.1
-flake8==3.5.0
+flake8>=3.7.5
 redis
 ldap3
 sphinx-rtd-theme==0.4.2

@@ -206,7 +206,7 @@ class StateTransitionAge(AgeFilter):
                 op: ge
                 days: 7
     """
-    RE_PARSE_AGE = re.compile("\(.*?\)")
+    RE_PARSE_AGE = re.compile(r"\(.*?\)")
 
     # this filter doesn't use date_attribute, but needs to define it
     # to pass AgeFilter's validate method
