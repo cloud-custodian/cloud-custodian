@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from googleapiclient.errors import HttpError
 from c7n.actions import BaseNotify
 from c7n import utils
 from c7n.resolver import ValuesFrom
@@ -37,9 +36,9 @@ class Notify(BaseNotify):
              template: policy-template
              transport:
                type: pubsub
-               topic: your-notify-topic
+               topic: projects/yourproject/topics/yourtopic
     """
-    batch_size = 1000
+    batch_size = 900
 
     schema = {
         'type': 'object',
@@ -76,9 +75,10 @@ class Notify(BaseNotify):
             klass.action_registry.register('notify', Notify)
 
     def process(self, resources, event=None):
-        self.session = utils.local_session(self.manager.session_factory)
-        self.client = self.session.client('pubsub', 'v1', 'projects.topics')
-        project = self.session.get_default_project()
+        session = utils.local_session(self.manager.session_factory)
+        client = session.client('pubsub', 'v1', 'projects.topics')
+
+        project = session.get_default_project()
         message = {
             'event': event,
             'account_id': project,
@@ -91,30 +91,20 @@ class Notify(BaseNotify):
 
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = batch
-            self.publish_message(message)
+            self.publish_message(message, client)
 
     # Methods to handle GCP Pub Sub topic publishing
-    def publish_message(self, message):
+    def publish_message(self, message, client):
         """Publish message to a GCP pub/sub topic
          """
-        topic = self.get_topic_param()
-
-        try:
-            return self.client.execute_command('publish', {
-                'topic': topic,
-                'body': {
-                    'messages': {
-                        'data': self.pack(message)
-                    }
+        return client.execute_command('publish', {
+            'topic': self.data['transport']['topic'],
+            'body': {
+                'messages': {
+                    'data': self.pack(message)
                 }
-            })
-        except HttpError as e:
-            self.log.error(e)
-
-    def get_topic_param(self, topic=None, project=None):
-        return 'projects/{}/topics/{}'.format(
-            project or self.session.get_default_project(),
-            topic or self.data['transport']['topic'])
+            }
+        })
 
 
 gcp_resources.subscribe(
