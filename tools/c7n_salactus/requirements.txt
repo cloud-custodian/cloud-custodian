@@ -1,8 +1,8 @@
 argparse>=1.2.1
 setuptools-scm==3.2.0
 arrow>=0.8.0
-boto3>=1.4.1
-botocore>=1.4.65
+boto3>=1.9.94
+botocore>=1.12.94
 click==7.0
 docutils>=0.12
 Flask>=1.0.2

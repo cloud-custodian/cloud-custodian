@@ -3,7 +3,7 @@
 # Test & lint packages
 coverage>=4.2
 mock==2.0.0
-placebo==0.8.2
+placebo==0.9.0
 flake8==3.7.5
 pytest<4.1.0
 pytest-xdist>=1.2.0

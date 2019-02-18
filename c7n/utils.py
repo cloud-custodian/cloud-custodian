@@ -85,7 +85,7 @@ def load_file(path, format=None, vars=None):
         if vars:
             try:
                 contents = contents.format(**vars)
-            except IndexError as e:
+            except IndexError:
                 msg = 'Failed to substitute variable by positional argument.'
                 raise VarsSubstitutionError(msg)
             except KeyError as e:
@@ -524,7 +524,7 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
 class FormatDate(object):
     """a datetime wrapper with extended pyformat syntax"""
 
-    date_increment = re.compile('\+[0-9]+[Mdh]')
+    date_increment = re.compile(r'\+[0-9]+[Mdh]')
 
     def __init__(self, d=None):
         self._d = d
