@@ -1,4 +1,4 @@
-# Copyright 2018 Capital One Services, LLC
+# Copyright 2015-2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class Notify(BaseNotify):
                type: pubsub
                topic: your-notify-topic
     """
-    batch_size = 250
+    batch_size = 1000
 
     schema = {
         'type': 'object',
@@ -77,6 +77,7 @@ class Notify(BaseNotify):
 
     def process(self, resources, event=None):
         self.session = utils.local_session(self.manager.session_factory)
+        self.client = self.session.client('pubsub', 'v1', 'projects.topics')
         project = self.session.get_default_project()
         message = {
             'event': event,
@@ -90,24 +91,16 @@ class Notify(BaseNotify):
 
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = batch
-            receipt = self.send_data_message(message)
-            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                receipt, self.manager.data['name'],
-                self.data.get('template', 'default'), len(batch)))
-
-    def send_data_message(self, message):
-        return self.publish_message(message)
+            self.publish_message(message)
 
     # Methods to handle GCP Pub Sub topic publishing
     def publish_message(self, message):
         """Publish message to a GCP pub/sub topic
          """
-        topic = self.ensure_topic()
-
-        client = self.session.client('pubsub', 'v1', 'projects.topics')
+        topic = self.get_topic_param()
 
         try:
-            return client.execute_command('publish', {
+            return self.client.execute_command('publish', {
                 'topic': topic,
                 'body': {
                     'messages': {
@@ -116,37 +109,12 @@ class Notify(BaseNotify):
                 }
             })
         except HttpError as e:
-            if e.resp.status != 404:
-                raise
+            self.log.error(e)
 
     def get_topic_param(self, topic=None, project=None):
-        """Returns Rest API URI formatted with topic and project in it
-        """
         return 'projects/{}/topics/{}'.format(
             project or self.session.get_default_project(),
             topic or self.data['transport']['topic'])
-
-    def ensure_topic(self):
-        """Verify the pub/sub topic exists.
-        If it does not, create it
-
-        Returns the topic qualified name.
-        """
-        client = self.session.client('pubsub', 'v1', 'projects.topics')
-
-        topic = self.get_topic_param()
-        try:
-            client.execute_command('get', {'topic': topic})
-        except HttpError as e:
-            if e.resp.status != 404:
-                raise
-        else:
-            return topic
-
-        # bug in discovery doc.. apis say body must be empty but its required in the
-        # discovery api for create.
-        client.execute_command('create', {'name': topic, 'body': {}})
-        return topic
 
 
 gcp_resources.subscribe(
