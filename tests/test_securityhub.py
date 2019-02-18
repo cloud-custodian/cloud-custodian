@@ -608,3 +608,34 @@ class SecurityHubTest(BaseTest):
                 }
             }
         )
+
+    def test_support_case(self):
+        factory = self.replay_flight_data("test_security_hub_support_case")
+        policy = self.load_policy(
+            {
+                "name": "support-tag-compliance-import-findings",
+                "resource": "aws.support-case",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "status",
+                        "value": "not-null"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity_normalized": 1,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["caseId"], "case-101010101111-muen-2019-eadc0ea0c6ea6705")

@@ -29,3 +29,7 @@ class SupportCase(QueryResourceManager):
         name = 'displayId'
         date = 'timeCreated'
         dimension = None
+
+    @classmethod
+    def get_arns(self, resources):
+        return ["arn:::{caseId}".format(**r) for r in resources]

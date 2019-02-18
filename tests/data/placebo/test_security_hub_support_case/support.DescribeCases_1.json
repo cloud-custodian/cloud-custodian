@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "cases": [
+            {
+                "status": "unassigned", 
+                "recentCommunications": {
+                    "communications": [
+                        {
+                            "body": "Test Support Case\n\n\n", 
+                            "attachmentSet": [], 
+                            "caseId": "case-101010101111-muen-2019-eadc0ea0c6ea6705",
+                            "timeCreated": "2019-02-18T03:49:33.000Z", 
+                            "submittedBy": "coingraham@hidden.com (IAM) <coingraham@hidden.com>"
+                        }
+                    ]
+                }, 
+                "ccEmailAddresses": [
+                    "incidents@hidden.com"
+                ], 
+                "timeCreated": "2019-02-18T03:49:33.077Z", 
+                "caseId": "case-101010101111-muen-2019-eadc0ea0c6ea6705",
+                "severityCode": "low", 
+                "language": "en", 
+                "categoryCode": "general-guidance", 
+                "serviceCode": "aws-cloudformation", 
+                "submittedBy": "coingraham@hidden.com",
+                "displayId": "5800580171", 
+                "subject": "Test Support Case"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4f0c8cf0-3330-11e9-b741-5b28d1f82251", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4f0c8cf0-3330-11e9-b741-5b28d1f82251", 
+                "date": "Mon, 18 Feb 2019 03:50:19 GMT", 
+                "content-length": "693", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}
