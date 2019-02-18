@@ -1,21 +1,21 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "QueueUrls": [
+            "https://us-east-2.queue.amazonaws.com/644160558196/BrickHouse",
+            "https://us-east-2.queue.amazonaws.com/644160558196/omnissm-deferred-actions-queue",
             "https://us-east-2.queue.amazonaws.com/644160558196/test-sqs"
-        ], 
+        ],
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "6cecd032-6410-5daf-9536-8240b4c78414", 
+            "RequestId": "c31b29bf-e4df-53b5-93c9-7d6b2f12c06a",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "6cecd032-6410-5daf-9536-8240b4c78414", 
-                "content-length": "326", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Tue, 31 Oct 2017 19:27:19 GMT", 
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "c31b29bf-e4df-53b5-93c9-7d6b2f12c06a",
+                "date": "Wed, 06 Feb 2019 11:48:29 GMT",
+                "content-type": "text/xml",
+                "content-length": "510"
+            },
+            "RetryAttempts": 0
         }
     }
 }

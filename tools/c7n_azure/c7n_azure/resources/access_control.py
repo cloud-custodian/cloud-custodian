@@ -116,9 +116,9 @@ def is_scope(scope, scope_type):
 
     regex = ""
     if scope_type == "subscription":
-        regex = "^\/subscriptions\/[^\/]+$"
+        regex = r"^\/subscriptions\/[^\/]+$"
     elif scope_type == "resource-group":
-        regex = "^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
+        regex = r"^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
     else:
         return False
 

@@ -237,11 +237,20 @@ class ImageUnusedFilter(Filter):
 
     def _pull_asg_images(self):
         asgs = self.manager.get_resource_manager('asg').resources()
-        lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
+        image_ids = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
         lcfg_mgr = self.manager.get_resource_manager('launch-config')
-        return set([
-            lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
-            if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        if lcfgs:
+            image_ids.update([
+                lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
+                if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            image_ids.add(tversion['LaunchTemplateData'].get('ImageId'))
+        return image_ids
 
     def _pull_ec2_images(self):
         ec2_manager = self.manager.get_resource_manager('ec2')

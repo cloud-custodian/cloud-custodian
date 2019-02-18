@@ -110,12 +110,12 @@ class TagMessageBroker(Tag):
 
     permissions = ('mq:TagMessageBroker',)
 
-    def process_resource_set(self, mq, new_tags):
-        client = local_session(self.manager.session_factory).client('mq')
-        tag_dict = {t['Key']: t['Value'] for t in new_tags}
+    def process_resource_set(self, client, mq, new_tags):
         for r in mq:
             try:
-                client.create_tags(ResourceArn=r['BrokerArn'], Tags=tag_dict)
+                client.create_tags(
+                    ResourceArn=r['BrokerArn'],
+                    Tags={t['Key']: t['Value'] for t in new_tags})
             except client.exceptions.ResourceNotFound:
                 continue
 
@@ -140,8 +140,7 @@ class UntagMessageBroker(RemoveTag):
 
     permissions = ('mq:UntagMessageBroker',)
 
-    def process_resource_set(self, mq, tags):
-        client = local_session(self.manager.session_factory).client('mq')
+    def process_resource_set(self, client, mq, tags):
         for r in mq:
             try:
                 client.delete_tags(ResourceArn=r['BrokerArn'], TagKeys=tags)
@@ -169,9 +168,3 @@ class MarkForOpMessageBroker(TagDelayedAction):
                     op: delete
                     days: 7
     """
-
-    permissions = ('mq:TagMessageBroker',)
-
-    def process_resource_set(self, resources, tags):
-        tagger = self.manager.action_registry['tag']({}, self.manager)
-        tagger.process_resource_set(resources, tags)

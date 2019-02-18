@@ -20,7 +20,7 @@ import unittest
 import six
 from c7n_mailer.email_delivery import EmailDelivery
 from common import logger, get_ldap_lookup
-from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1
+from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1, SQS_MESSAGE_4
 from mock import patch, call
 
 from c7n_mailer.utils_email import is_email
@@ -55,6 +55,7 @@ class EmailTest(unittest.TestCase):
         template_abs_filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                                              'example.jinja')
         SQS_MESSAGE_1['action']['template'] = template_abs_filename
+        SQS_MESSAGE_4['action']['template'] = template_abs_filename
 
     def test_valid_email(self):
         self.assertFalse(is_email('foobar'))
@@ -271,3 +272,8 @@ class EmailTest(unittest.TestCase):
         )
 
         self.assertEqual(ldap_emails, ['milton@initech.com'])
+
+    def test_cc_email_functionality(self):
+        email = self.email_delivery.get_mimetext_message(
+            SQS_MESSAGE_4, SQS_MESSAGE_4['resources'], ['hello@example.com'])
+        self.assertEqual(email['Cc'], 'hello@example.com, cc@example.com')

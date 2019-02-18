@@ -53,9 +53,10 @@ class AutoTagUser(EventAction):
     attempting to tag it.
 
     References
-     - AWS Config (see REQUIRED_TAGS caveat) - http://goo.gl/oDUXPY
-     - CloudTrail User - http://goo.gl/XQhIG6
-    """
+
+     CloudTrail User
+     https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+    """ # NOQA
 
     schema_alias = True
     schema = utils.type_schema(

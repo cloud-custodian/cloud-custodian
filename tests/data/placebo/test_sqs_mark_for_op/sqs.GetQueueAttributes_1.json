@@ -1,31 +1,31 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "ApproximateNumberOfMessagesNotVisible": "0", 
-            "MessageRetentionPeriod": "345600", 
-            "ApproximateNumberOfMessagesDelayed": "0", 
-            "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1509478039", 
-            "ApproximateNumberOfMessages": "0", 
-            "ReceiveMessageWaitTimeSeconds": "0", 
-            "DelaySeconds": "0", 
-            "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1509478039", 
-            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:test-sqs"
-        }, 
+            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:omnissm-deferred-actions-queue",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1538614112",
+            "LastModifiedTimestamp": "1538614112",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "KmsMasterKeyId": "alias/cof/sqs/encrypted",
+            "KmsDataKeyReusePeriodSeconds": "300"
+        },
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "f54bf879-c4fa-5e35-9752-aa0b1422dfd3", 
+            "RequestId": "bcd6a82b-19d7-59c4-b42a-fcffd21a8926",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "f54bf879-c4fa-5e35-9752-aa0b1422dfd3", 
-                "content-length": "1162", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Tue, 31 Oct 2017 19:27:20 GMT", 
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "bcd6a82b-19d7-59c4-b42a-fcffd21a8926",
+                "date": "Wed, 06 Feb 2019 11:48:29 GMT",
+                "content-type": "text/xml",
+                "content-length": "1354"
+            },
+            "RetryAttempts": 0
         }
     }
 }

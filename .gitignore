@@ -32,3 +32,5 @@ results.xml
 .vscode/
 !.vscode/*.sample
 .pytest_cache/
+pyvenv.cfg
+junit

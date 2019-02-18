@@ -25,6 +25,7 @@ from .test_offhours import mock_datetime_now
 
 from dateutil import parser
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
@@ -46,7 +47,9 @@ from c7n.resources.iam import (
     IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
+    PolicyQueryParser
 )
+
 from c7n.executor import MainThreadExecutor
 
 
@@ -526,7 +529,44 @@ class IamPolicyFilterUsage(BaseTest):
         self.assertEqual(len(resources), 203)
 
 
-class IamPolicyHasAllowAll(BaseTest):
+class IamPolicy(BaseTest):
+
+    def test_iam_policy_delete(self):
+        factory = self.replay_flight_data('test_iam_policy_delete')
+        p = self.load_policy({
+            'name': 'delete-policy',
+            'resource': 'iam-policy',
+            'query': [{'Name': 'Scope', 'Value': 'Local'}],
+            'filters': [
+                {'AttachmentCount': 0},
+                {'type': 'value', 'key': 'DefaultVersionId', 'value': 'v1', 'op': 'ne'},
+            ],
+            'actions': ['delete']},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['PolicyName'], 'IamCreateRoleAndCreatePolicy')
+
+        if self.recording:
+            time.sleep(3)
+
+        client = factory().client('iam')
+        self.assertRaises(
+            client.exceptions.NoSuchEntityException,
+            client.get_policy,
+            PolicyArn=resources[0]['Arn'])
+
+    def test_iam_query_parser(self):
+        qfilters = [
+            {'Name': 'Scope', 'Value': 'Local'},
+            {'Name': 'OnlyAttached', 'Value': True}]
+
+        self.assertEqual(qfilters, PolicyQueryParser.parse(qfilters))
+        self.assertRaises(
+            PolicyValidationError,
+            PolicyQueryParser.parse,
+            {'Name': 'Scope', 'Value': ['All', 'Local']})
 
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")

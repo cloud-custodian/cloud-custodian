@@ -34,8 +34,5 @@ setup(
     author_email="ryanash@gmail.com",
     license="Apache-2.0",
     py_modules=["c7n_autodoc"],
-    entry_points={
-        'console_scripts': [
-            'c7n-policystream = policystream:cli']},
-    install_requires=["c7n", "pyyaml", "boto3", "jinja2"]
+    install_requires=["c7n", "pyyaml>=4.2b4", "boto3", "jinja2==2.10"]
 )

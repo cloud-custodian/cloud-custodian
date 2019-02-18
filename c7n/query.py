@@ -197,8 +197,10 @@ class QueryMeta(type):
                     register_ec2_tags(
                         attrs['filter_registry'], attrs['action_registry'])
             if getattr(m, 'universal_taggable', False):
+                compatibility = isinstance(m.universal_taggable, bool) and True or False
                 register_universal_tags(
-                    attrs['filter_registry'], attrs['action_registry'])
+                    attrs['filter_registry'], attrs['action_registry'],
+                    compatibility=compatibility)
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -292,7 +294,7 @@ class ConfigSource(object):
             if not revisions:
                 continue
             results.append(self.load_resource(revisions[0]))
-        return filter(None, results)
+        return list(filter(None, results))
 
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):

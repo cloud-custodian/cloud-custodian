@@ -55,9 +55,7 @@ class ECRTag(tags.Tag):
 
     permissions = ('ecr:TagResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('ecr')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             try:
                 client.tag_resource(resourceArn=r['repositoryArn'], tags=tags)
@@ -70,9 +68,7 @@ class ECRRemoveTags(tags.RemoveTag):
 
     permissions = ('ecr:UntagResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('ecr')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             try:
                 client.untag_resource(resourceArn=r['repositoryArn'], tagKeys=tags)
@@ -80,15 +76,8 @@ class ECRRemoveTags(tags.RemoveTag):
                 pass
 
 
-@ECR.action_registry.register('mark-for-op')
-class ECRMarkForOp(tags.TagDelayedAction):
-
-    def process_resource_set(self, resources, tags):
-        tagger = self.manager.action_registry.get('tag')({}, self.manager)
-        tagger.process_resource_set(resources, tags)
-
-
 ECR.filter_registry.register('marked-for-op', tags.TagActionFilter)
+ECR.action_registry.register('mark-for-op', tags.TagDelayedAction)
 
 
 @ECR.filter_registry.register('cross-account')
@@ -126,8 +115,7 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
         with self.executor_factory(max_workers=2) as w:
             resources = list(filter(None, w.map(_augment, resources)))
 
-        return super(ECRCrossAccountAccessFilter, self).process(
-            resources, event)
+        return super(ECRCrossAccountAccessFilter, self).process(resources, event)
 
 
 LIFECYCLE_RULE_SCHEMA = {

@@ -140,10 +140,7 @@ class CloudFormationAddTag(Tag):
     """
     permissions = ('cloudformation:UpdateStack',)
 
-    def process_resource_set(self, stacks, tags):
-        client = local_session(
-            self.manager.session_factory).client('cloudformation')
-
+    def process_resource_set(self, client, stacks, tags):
         for s in stacks:
             _tag_stack(client, s, add=tags)
 
@@ -198,9 +195,6 @@ class CloudFormationRemoveTag(RemoveTag):
                 tags: ['DesiredTag']
     """
 
-    def process_resource_set(self, stacks, keys):
-        client = local_session(
-            self.manager.session_factory).client('cloudformation')
-
+    def process_resource_set(self, client, stacks, keys):
         for s in stacks:
             _tag_stack(client, s, remove=keys)

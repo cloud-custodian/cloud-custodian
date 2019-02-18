@@ -34,6 +34,16 @@ class TestAMI(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_unused_ami_with_asg_launch_templates(self):
+        factory = self.replay_flight_data('test_unused_ami_launch_template')
+        p = self.load_policy(
+            {"name": "test-unused-ami", "resource": "ami", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ImageId'], 'ami-0515ff4f8f9dbeb31')
+
     def test_unused_ami_true(self):
         factory = self.replay_flight_data("test_unused_ami_true")
         p = self.load_policy(
