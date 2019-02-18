@@ -19,26 +19,26 @@ from c7n_gcp.provider import resources as gcp_resources
 
 
 class Notify(BaseNotify):
-    """Example:
-        - name: gcp-notify-with-attributes
-          resource: gcp-compute
+    """
+    Example::
+
+      policies:
+        - name: bad-instance-get
+          resource: gcp.compute
           filters:
            - Name: bad-instance
           actions:
            - type: notify
              to:
-              - event-user
-              - resource-creator
               - email@address
-             owner_absent_contact:
-              - other_email@address
              # which template for the email should we use
              template: policy-template
              transport:
                type: pubsub
                topic: projects/yourproject/topics/yourtopic
     """
-    batch_size = 900
+
+    batch_size = 1000
 
     schema = {
         'type': 'object',
