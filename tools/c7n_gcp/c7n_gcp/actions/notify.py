@@ -20,7 +20,6 @@ from c7n_gcp.provider import resources as gcp_resources
 
 
 class Notify(BaseNotify):
-    # TODO: Create Notify Unit Tests
     """Example:
         - name: gcp-notify-with-attributes
           resource: gcp-compute
