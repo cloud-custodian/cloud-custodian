@@ -20,10 +20,10 @@ from gcp_common import BaseTest
 class NotifyTest(BaseTest):
 
     def test_notify_schema_validate(self):
-        factory = self.record_flight_data('gcpnotifyvalidation')
+        factory = self.replay_flight_data('gcpnotifyvalidation')
         p = self.load_policy({
-            'name': 'test-notify-for-gcpfunctions',
-            'resource': 'gcp.functions',
+            'name': 'test-notify-for-gcpfunction',
+            'resource': 'gcp.function',
             'actions': [
                 {'type': 'notify',
                  'template': 'default',
