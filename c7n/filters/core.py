@@ -369,6 +369,7 @@ class ValueFilter(Filter):
             'op': {'enum': list(OPERATORS.keys())}}}
 
     annotate = True
+    required_keys = set(('value', 'key'))
 
     def __init__(self, data, manager=None):
         super(ValueFilter, self).__init__(data, manager)
@@ -409,10 +410,12 @@ class ValueFilter(Filter):
         if self.data.get('value_type') == 'resource_count':
             return self._validate_resource_count()
 
-        if 'key' not in self.data:
+        if 'key' not in self.data and 'key' in self.required_keys:
             raise PolicyValidationError(
                 "Missing 'key' in value filter %s" % self.data)
-        if 'value' not in self.data and 'value_from' not in self.data:
+        if ('value' not in self.data and
+                'value_from' not in self.data and
+                'value' in self.required_keys):
             raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:

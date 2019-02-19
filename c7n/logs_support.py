@@ -46,7 +46,7 @@ def _timestamp_from_string(date_text):
 
 def normalized_log_entries(raw_entries):
     '''Mimic the format returned by LambdaManager.logs()'''
-    entry_start = '([0-9:, \-]+) - .* - (\w+) - (.*)$'
+    entry_start = r'([0-9:, \-]+) - .* - (\w+) - (.*)$'
     entry = None
     # process start/end here - avoid parsing log entries twice
     for line in raw_entries:

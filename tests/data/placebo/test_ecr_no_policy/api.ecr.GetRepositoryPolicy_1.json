@@ -1,22 +1,19 @@
 {
-    "status_code": 400, 
+    "status_code": 400,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 400, 
-            "RequestId": "398d66c3-92ea-11e7-b052-2fc633e9ba9a", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "398d66c3-92ea-11e7-b052-2fc633e9ba9a", 
-                "content-length": "180", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Wed, 06 Sep 2017 10:00:34 GMT", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }, 
         "Error": {
-            "Message": "Repository policy does not exist for the repository with name 'test-ecr-no-policy' in the registry with id '644160558196'", 
+            "Message": "Repository policy does not exist for the repository with name 'test-ecr-no-policy' in the registry with id '644160558196'",
             "Code": "RepositoryPolicyNotFoundException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "a710b08c-294d-11e9-8d46-2793fca2ff40",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a710b08c-294d-11e9-8d46-2793fca2ff40",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "180"
+            },
+            "RetryAttempts": 0
         }
     }
 }

@@ -398,7 +398,7 @@ def cli(app, env, resources, cmdb, config, start, end, debug):
     start, end = parse_date(start), parse_date(end)
     log.info("Collecting app:%s env:%s metrics %s to %s", app, env, start, end)
 
-    MainThreadExecutor.async = False
+    MainThreadExecutor.c7n_async = False
     executor = debug and MainThreadExecutor or ThreadPoolExecutor
     indexer = get_indexer(accounts_config)
 

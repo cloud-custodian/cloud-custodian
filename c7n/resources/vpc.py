@@ -724,7 +724,8 @@ class Stale(Filter):
     a broken vpc peering connection. Note this applies to VPC
     Security groups only and will implicitly filter security groups.
 
-    AWS Docs - https://goo.gl/nSj7VG
+    AWS Docs:
+      https://docs.aws.amazon.com/vpc/latest/peering/vpc-peering-security-groups.html
 
     :example:
 
@@ -877,7 +878,7 @@ class SGPermission(Filter):
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference'))
+    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference', 'Description'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
@@ -956,6 +957,22 @@ class SGPermission(Filter):
             return None
         return match_op(cidr_match)
 
+    def process_description(self, perm):
+        if 'Description' not in self.data:
+            return None
+
+        d = dict(self.data['Description'])
+        d['key'] = 'Description'
+
+        vf = ValueFilter(d)
+        vf.annotate = False
+
+        for k in ('Ipv6Ranges', 'IpRanges', 'UserIdGroupPairs', 'PrefixListIds'):
+            if k not in perm or not perm[k]:
+                continue
+            return vf(perm[k][0])
+        return False
+
     def process_self_reference(self, perm, sg_id):
         found = None
         ref_match = self.data.get('SelfReference')
@@ -1002,6 +1019,7 @@ class SGPermission(Filter):
             perm_matches = {}
             for idx, f in enumerate(self.vfilters):
                 perm_matches[idx] = bool(f(perm))
+            perm_matches['description'] = self.process_description(perm)
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)

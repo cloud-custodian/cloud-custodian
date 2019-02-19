@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "FailedResourcesMap": {},
+        "ResponseMetadata": {
+            "RequestId": "81aed31c-2baf-11e9-b648-5d56999cc9d4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "81aed31c-2baf-11e9-b648-5d56999cc9d4",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "25",
+                "date": "Fri, 08 Feb 2019 14:40:39 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

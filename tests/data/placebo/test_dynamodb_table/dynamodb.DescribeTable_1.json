@@ -1,43 +1,72 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Table": {
-            "TableArn": "arn:aws:dynamodb:us-west-2:644160558196:table/rolltop", 
             "AttributeDefinitions": [
                 {
-                    "AttributeName": "customer_id", 
+                    "AttributeName": "test",
                     "AttributeType": "S"
                 }
-            ], 
-            "ProvisionedThroughput": {
-                "NumberOfDecreasesToday": 0, 
-                "WriteCapacityUnits": 5, 
-                "ReadCapacityUnits": 5
-            }, 
-            "TableSizeBytes": 0, 
-            "TableName": "rolltop", 
-            "TableStatus": "ACTIVE", 
+            ],
+            "TableName": "test-table-kms-filter",
             "KeySchema": [
                 {
-                    "KeyType": "HASH", 
-                    "AttributeName": "customer_id"
+                    "AttributeName": "test",
+                    "KeyType": "HASH"
                 }
-            ], 
-            "ItemCount": 0, 
+            ],
+            "TableStatus": "ACTIVE",
             "CreationDateTime": {
-                "hour": 7, 
-                "__class__": "datetime", 
-                "month": 6, 
-                "second": 39, 
-                "microsecond": 637000, 
-                "year": 2016, 
-                "day": 26, 
-                "minute": 20
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 1,
+                "day": 15,
+                "hour": 18,
+                "minute": 6,
+                "second": 37,
+                "microsecond": 198000
+            },
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 0,
+                "WriteCapacityUnits": 0
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/test-table-kms-filter",
+            "TableId": "561704a8-1a45-4a47-b2a6-71044bbe2807",
+            "BillingModeSummary": {
+                "BillingMode": "PAY_PER_REQUEST",
+                "LastUpdateToPayPerRequestDateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 15,
+                    "hour": 18,
+                    "minute": 6,
+                    "second": 37,
+                    "microsecond": 198000
+                }
+            },
+            "SSEDescription": {
+                "Status": "ENABLED",
+                "SSEType": "KMS",
+                "KMSMasterKeyArn": "arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5"
             }
-        }, 
+        },
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "JJVG5SPOKF7HD096BRKVUVNIBFVV4KQNSO5AEMVJF66Q9ASUAAJG"
+            "RequestId": "25MTFJSDO607HHVH5R12N164KVVV4KQNSO5AEMVJF66Q9ASUAAJG",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Sat, 26 Jan 2019 15:21:42 GMT",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "875",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "25MTFJSDO607HHVH5R12N164KVVV4KQNSO5AEMVJF66Q9ASUAAJG",
+                "x-amz-crc32": "1592222704"
+            },
+            "RetryAttempts": 0
         }
     }
 }

@@ -14,10 +14,6 @@
             }
         }, 
         "Tags": [
-            {
-                "Value": "test_value", 
-                "Key": "test_key"
-            }
         ]
     }
 }

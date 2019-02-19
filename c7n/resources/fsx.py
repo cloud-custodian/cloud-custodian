@@ -16,8 +16,9 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry
-from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags
+from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
 from c7n.utils import local_session, type_schema
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('fsx')
@@ -83,17 +84,16 @@ class DeleteBackup(BaseAction):
                         r['FileSystemId'], r['BackupId'], e))
 
 
+FSxBackup.filter_registry.register('marked-for-op', TagActionFilter)
+
+FSx.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @FSxBackup.action_registry.register('mark-for-op')
 @FSx.action_registry.register('mark-for-op')
 class MarkForOpFileSystem(TagDelayedAction):
-    concurrency = 2
-    batch_size = 5
-    permissions = ('fsx:TagResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('fsx')
-        for r in resources:
-            client.tag_resource(ResourceARN=r['ResourceARN'], Tags=tags)
+    permissions = ('fsx:TagResource',)
 
 
 @FSxBackup.action_registry.register('tag')
@@ -103,8 +103,7 @@ class TagFileSystem(Tag):
     batch_size = 5
     permissions = ('fsx:TagResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('fsx')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             client.tag_resource(ResourceARN=r['ResourceARN'], Tags=tags)
 
@@ -116,8 +115,7 @@ class UnTagFileSystem(RemoveTag):
     batch_size = 5
     permissions = ('fsx:UntagResource',)
 
-    def process_resource_set(self, resources, tag_keys):
-        client = local_session(self.manager.session_factory).client('fsx')
+    def process_resource_set(self, client, resources, tag_keys):
         for r in resources:
             client.untag_resource(ResourceARN=r['ResourceARN'], TagKeys=tag_keys)
 
@@ -320,3 +318,47 @@ class DeleteFileSystem(BaseAction):
                 )
             except client.exceptions.BadRequest as e:
                 self.log.warning('Unable to delete: %s - %s' % (r['FileSystemId'], e))
+
+
+@FSx.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: fsx-kms-key-filters
+                  resource: fsx
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/fsx)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KmsKeyId'
+
+
+@FSxBackup.filter_registry.register('kms-key')
+class KmsFilterFsxBackup(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: fsx-backup-kms-key-filters
+                  resource: fsx-backup
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/fsx)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KmsKeyId'
