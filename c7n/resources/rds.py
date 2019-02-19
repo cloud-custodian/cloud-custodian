@@ -474,12 +474,25 @@ class TagTrim(tags.TagTrim):
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
 
-def _eligible_start_stop(db, state="available"):
+START_STOP_ELIGIBLE_ENGINES = {
+    'postgres', 'sqlserver-ee',
+    'oracle-se2', 'mariadb', 'oracle-ee',
+    'sqlserver-ex', 'sqlserver-se', 'oracle-se',
+    'mysql', 'oracle-se1', 'sqlserver-web'}
 
+
+def _eligible_start_stop(db, state="available"):
+    # See conditions noted here
+    # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html
+    # Note that this doesn't really specify what happens for all the nosql engines
+    # that are available as rds engines.
     if db.get('DBInstanceStatus') != state:
         return False
 
-    if db.get('MultiAZ'):
+    if db.get('MultiAZ') and db['Engine'].startswith('sqlserver-'):
+        return False
+
+    if db['Engine'] not in START_STOP_ELIGIBLE_ENGINES:
         return False
 
     if db.get('ReadReplicaDBInstanceIdentifiers'):

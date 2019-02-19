@@ -72,6 +72,7 @@ def load_resources():
     import c7n.resources.kafka
     import c7n.resources.kinesis
     import c7n.resources.kms
+    import c7n.resources.lightsail
     import c7n.resources.ml
     import c7n.resources.mq
     import c7n.resources.opsworks
