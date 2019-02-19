@@ -87,6 +87,23 @@ class SchemaTest(BaseTest):
         self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
         self.assertEqual(policy, 'policy-ec2')
 
+    def test_semantic_mode_error(self):
+        data = {
+            'policies': [{
+                'name': 'test',
+                'resource': 'ec2',
+                'mode': {
+                    'type': 'periodic',
+                    'scheduled': 'oops'}}]}
+        errors = list(self.validator.iter_errors(data))
+        self.assertEqual(len(errors), 1)
+        error = specific_error(errors[0])
+        self.assertTrue(
+            len(errors[0].absolute_schema_path) < len(error.absolute_schema_path)
+        )
+        self.assertTrue("'scheduled' was unexpected" in str(error))
+        self.assertTrue(len(str(error)) < 2000)
+
     def test_semantic_error(self):
         data = {
             "policies": [
