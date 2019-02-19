@@ -1,21 +1,21 @@
 -r requirements.txt
 
 # Test & lint packages
-coverage>=4.2
+coverage==4.5.2
 mock==2.0.0
 placebo==0.9.0
-flake8==3.7.5
-pytest<4.1.0
-pytest-xdist>=1.2.0
+flake8==3.7.6
+pytest==4.3.0
+pytest-xdist==1.26.1
 pytest-cov==2.6.1
 twine==1.12.1
 tox==3.7.0
 nose==1.3.7
-nose-timer>=0.7.3
+nose-timer==0.7.4
 six >= 1.12.0
 
 # Optional feature testing in c7n
-psutil==5.5.0
+psutil==5.5.1
 aws_xray_sdk==2.3.0
 
 -r tools/c7n_sphinxext/requirements.txt
@@ -24,7 +24,7 @@ aws_xray_sdk==2.3.0
 -r tools/c7n_gcp/requirements.txt
 
 # Specific to testing mailer
-fakeredis==1.0
+fakeredis==1.0.2
 
 # Tools packages in editable setup
 # Local package required for Sphinx docs

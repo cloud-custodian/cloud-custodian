@@ -9,7 +9,7 @@ Flask>=1.0.2
 functools32==3.2.3-2
 futures==3.2.0
 ipaddress>=1.0.17
-itsdangerous==0.24
+itsdangerous==1.1.0
 Jinja2==2.10
 jmespath>=0.9.0
 jsonschema>=2.5.1
@@ -26,4 +26,4 @@ Werkzeug>=0.14.1
 wsgiref==0.1.2
 procname==0.3
 msgpack-python>=0.4.8
-lz4==2.1.2
+lz4==2.1.6
