@@ -886,7 +886,7 @@ class GuardModeTest(BaseTest):
     @mock.patch("c7n.mu.LambdaManager.publish")
     def test_ec2_guard_event_pattern(self, publish):
 
-        def assert_publish(policy_lambda, alias, role):
+        def assert_publish(policy_lambda, role):
             events = policy_lambda.get_events(mock.MagicMock())
             self.assertEqual(len(events), 1)
             pattern = json.loads(events[0].render_event_pattern())
@@ -910,7 +910,7 @@ class GuardModeTest(BaseTest):
     @mock.patch("c7n.mu.LambdaManager.publish")
     def test_iam_guard_event_pattern(self, publish):
 
-        def assert_publish(policy_lambda, alias, role):
+        def assert_publish(policy_lambda, role):
             events = policy_lambda.get_events(mock.MagicMock())
             self.assertEqual(len(events), 1)
             pattern = json.loads(events[0].render_event_pattern())

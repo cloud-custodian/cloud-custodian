@@ -44,6 +44,8 @@ from c7n import utils
 from c7n.utils import type_schema, filter_empty
 
 
+RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
+
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
@@ -125,7 +127,8 @@ class DescribeEC2(query.DescribeSource):
         various resources, it may also silently fail to do so unless a tag
         is used as a filter.
 
-        See footnote on http://goo.gl/YozD9Q for official documentation.
+        See footnote on for official documentation.
+        https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#Using_Tags_CLI
 
         Apriori we may be using custodian to ensure tags (including
         name), so there isn't a good default to ensure that we will
@@ -205,7 +208,7 @@ class StateTransitionAge(AgeFilter):
                 op: ge
                 days: 7
     """
-    RE_PARSE_AGE = re.compile("\(.*?\)")
+    RE_PARSE_AGE = re.compile(r"\(.*?\)")
 
     # this filter doesn't use date_attribute, but needs to define it
     # to pass AgeFilter's validate method
@@ -233,7 +236,9 @@ class StateTransitionFilter(object):
     filtering elements (filters or actions) to the instances states
     they are valid for.
 
-    For more details see http://goo.gl/TZH9Q5
+    For more details see
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
+
     """
     valid_origin_states = ()
 
@@ -809,6 +814,56 @@ class SingletonFilter(Filter, StateTransitionFilter):
         return False
 
 
+@EC2.filter_registry.register('ssm')
+class SsmStatus(ValueFilter):
+    """Filter ec2 instances by their ssm status information.
+
+    :Example:
+
+    Find ubuntu 18.04 instances are active with ssm.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-recover-instances
+            resource: ec2
+            filters:
+              - type: ssm
+                key: PingStatus
+                value: Online
+              - type: ssm
+                key: PlatformName
+                value: Ubuntu
+              - type: ssm
+                key: PlatformVersion
+                value: 18.04
+    """
+    schema = type_schema('ssm', rinherit=ValueFilter.schema)
+    permissions = ('ssm:DescribeInstanceInformation',)
+    annotation = 'c7n:SsmState'
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ssm')
+        results = []
+        for resource_set in utils.chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+        for r in resources:
+            if self.match(r[self.annotation]):
+                results.append(r)
+        return results
+
+    def process_resource_set(self, client, resources):
+        instance_ids = [i['InstanceId'] for i in resources]
+        info_map = {
+            info['InstanceId']: info for info in
+            client.describe_instance_information(
+                Filters=[{'Key': 'InstanceIds', 'Values': instance_ids}]).get(
+                    'InstanceInformationList', [])}
+        for r in resources:
+            r[self.annotation] = info_map.get(r['InstanceId'], {})
+
+
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
     def format_resource(self, r):
@@ -830,7 +885,8 @@ class InstanceFinding(PostFinding):
 
         instance = {
             "Type": "AwsEc2Instance",
-            "Id": "arn:aws:ec2:{}:{}:instance/{}".format(
+            "Id": "arn:{}:ec2:{}:{}:instance/{}".format(
+                utils.REGION_PARTITION_MAP.get(self.manager.config.region, 'aws'),
                 self.manager.config.region,
                 self.manager.config.account_id,
                 r["InstanceId"]),
@@ -893,8 +949,7 @@ class Start(BaseAction, StateTransitionFilter):
         if failures:
             fail_count = sum(map(len, failures.values()))
             msg = "Could not start %d of %d instances %s" % (
-                fail_count, len(instances),
-                utils.dumps(failures))
+                fail_count, len(instances), utils.dumps(failures))
             self.log.warning(msg)
             raise RuntimeError(msg)
 
@@ -904,12 +959,29 @@ class Start(BaseAction, StateTransitionFilter):
                      'Client.RequestLimitExceeded'),
         retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
-        try:
-            retry(client.start_instances, InstanceIds=instance_ids)
-        except ClientError as e:
-            if e.response['Error']['Code'] in retryable:
-                return True
-            raise
+        while instance_ids:
+            try:
+                retry(client.start_instances, InstanceIds=instance_ids)
+                break
+            except ClientError as e:
+                if e.response['Error']['Code'] in retryable:
+                    # we maxed out on our retries
+                    return True
+                elif e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    instance_ids.remove(extract_instance_id(e))
+                else:
+                    raise
+
+
+def extract_instance_id(state_error):
+    "Extract an instance id from an error"
+    instance_id = None
+    match = RE_ERROR_INSTANCE_ID.search(str(state_error))
+    if match:
+        instance_id = match.groupdict().get('instance_id')
+    if match is None or instance_id is None:
+        raise ValueError("Could not extract instance id from error: %s" % state_error)
+    return instance_id
 
 
 @actions.register('resize')
@@ -1048,17 +1120,12 @@ class Stop(BaseAction, StateTransitionFilter):
         return instances
 
     def _run_instances_op(self, op, instance_ids):
-        while True:
+        while instance_ids:
             try:
                 return self.manager.retry(op, InstanceIds=instance_ids)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
-                    msg = e.response['Error']['Message']
-                    e_instance_id = msg[msg.find("'") + 1:msg.rfind("'")]
-                    instance_ids.remove(e_instance_id)
-                    if not instance_ids:
-                        return
-                    continue
+                    instance_ids.remove(extract_instance_id(e))
                 raise
 
 
@@ -1360,7 +1427,9 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
                 AlarmDescription='Auto Recover {}'.format(i['InstanceId']),
                 ActionsEnabled=True,
                 AlarmActions=[
-                    'arn:aws:automate:{}:ec2:recover'.format(
+                    'arn:{}:automate:{}:ec2:recover'.format(
+                        utils.REGION_PARTITION_MAP.get(
+                            self.manager.config.region, 'aws'),
                         i['Placement']['AvailabilityZone'][:-1])
                 ],
                 MetricName='StatusCheckFailed_System',
@@ -1699,3 +1768,80 @@ class InstanceAttribute(ValueFilter):
             keys.remove('InstanceId')
             resource['c7n:attribute-%s' % attribute] = fetched_attribute[
                 keys[0]]
+
+
+@resources.register('launch-template-version')
+class LaunchTemplate(query.QueryResourceManager):
+
+    class resource_type(object):
+        name = 'LaunchTemplateName'
+        service = 'ec2'
+        date = 'CreateTime'
+        dimension = 'None'
+        enum_spec = (
+            'describe_launch_templates', 'LaunchTemplates', None)
+        filter_name = 'LaunchTemplateIds'
+        filter_type = 'list'
+
+    def augment(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        template_versions = []
+        for r in resources:
+            template_versions.extend(
+                client.describe_launch_template_versions(
+                    LaunchTemplateId=r['LaunchTemplateId']))
+        return template_versions
+
+    def get_resources(self, rids, cache=True):
+        # Launch template versions have a compound primary key
+        #
+        # Support one of four forms of resource ids:
+        #
+        #  - array of launch template ids
+        #  - array of tuples (launch template id, version id)
+        #  - array of dicts (with LaunchTemplateId and VersionNumber)
+        #  - array of dicts (with LaunchTemplateId and LatestVersionNumber)
+        #
+        # If an alias version is given $Latest, $Default, the alias will be
+        # preserved as an annotation on the returned object 'c7n:VersionAlias'
+        if not rids:
+            return []
+
+        t_versions = {}
+        if isinstance(rids[0], tuple):
+            for tid, tversion in rids:
+                t_versions.setdefault(tid, []).append(tversion)
+        elif isinstance(rids[0], dict):
+            for tinfo in rids:
+                t_versions.setdefault(
+                    tinfo['LaunchTemplateId'], []).append(
+                        tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
+        elif isinstance(rids[0], six.string_types):
+            for tid in rids:
+                t_versions[tid] = []
+
+        client = utils.local_session(self.session_factory).client('ec2')
+
+        results = []
+        # We may end up fetching duplicates on $Latest and $Version
+        for tid, tversions in t_versions.items():
+            for tversion, t in zip(
+                tversions, client.describe_launch_template_versions(
+                    LaunchTemplateId=tid, Versions=tversions).get(
+                        'LaunchTemplateVersions')):
+                if not tversion.isdigit():
+                    t['c7n:VersionAlias'] = tversion
+                results.append(t)
+        return results
+
+    def get_asg_templates(self, asgs):
+        templates = {}
+        for a in asgs:
+            if 'LaunchTemplate' not in a:
+                continue
+            t = a['LaunchTemplate']
+            templates.setdefault(
+                (t['LaunchTemplateId'], t['Version']), []).append(
+                    a['AutoScalingGroupName'])
+        return templates

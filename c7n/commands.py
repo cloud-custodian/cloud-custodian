@@ -62,7 +62,7 @@ def policy_command(f):
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
-            except IOError as e:
+            except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue

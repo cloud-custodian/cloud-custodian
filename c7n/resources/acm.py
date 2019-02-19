@@ -14,7 +14,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
+from c7n.tags import universal_augment
 
 
 @resources.register('acm-certificate')
@@ -32,3 +33,19 @@ class Certificate(QueryResourceManager):
             'CertificateArn', 'Certificate')
         config_type = "AWS::ACM::Certificate"
         filter_name = None
+        type = 'certificate'
+        universal_taggable = object()
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeCertificate(self)
+        elif source_type == 'config':
+            return ConfigSource(self)
+        raise ValueError("Unsupported source: %s for %s" % (
+            source_type, self.resource_type.config_type))
+
+
+class DescribeCertificate(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)

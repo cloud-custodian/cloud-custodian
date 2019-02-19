@@ -14,8 +14,8 @@
      :target: https://coveralls.io/github/capitalone/cloud-custodian?branch=master
      :alt: Coverage
 
-.. image:: https://requires.io/github/capitalone/cloud-custodian/requirements.svg?branch=master
-     :target: https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master
+.. image:: https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master
+     :target: https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master
      :alt: Requirements Status
 
 

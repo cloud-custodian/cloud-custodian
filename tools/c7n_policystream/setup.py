@@ -21,7 +21,7 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_policystream",
-    version='0.3.0',
+    version='0.3.1',
     description="Cloud Custodian - Git Commits as Logical Policy Changes",
     classifiers=[
         "Topic :: System :: Systems Administration",
@@ -37,5 +37,8 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-policystream = policystream:cli']},
-    install_requires=["c7n", "click", "pygit2", "python-dateutil", "jmespath", "requests", "pyyaml"]
+    install_requires=[
+        "c7n", "click", "pygit2",
+        "python-dateutil", "jmespath", "requests",
+        "pyyaml>=4.2b4"]
 )

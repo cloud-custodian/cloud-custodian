@@ -27,8 +27,11 @@ are.
 
 References
 
-- IAM Policy Evaluation - http://goo.gl/sH5Dt5
-- IAM Policy Reference - http://goo.gl/U0a06y
+- IAM Policy Evaluation
+  https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
+
+- IAM Policy Reference
+  https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals

@@ -18,7 +18,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 from mock import MagicMock, call
+
 from c7n.tags import universal_retry, coalesce_copy_user_tags
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
+
 from .common import BaseTest
 
 
@@ -154,3 +157,140 @@ class CoalesceCopyUserTags(BaseTest):
         copy_tags = []
         final_tags = coalesce_copy_user_tags(resource, copy_tags, user_tags)
         self.assertEqual(final_tags, [])
+
+
+class CopyRelatedResourceTag(BaseTest):
+    def test_copy_related_resource_tag_all(self):
+        session_factory = self.replay_flight_data("test_tags_copy_related_resource_tags_all")
+        p = self.load_policy(
+            {
+                "name": "copy-related-resource-tags-snapshots-volumes",
+                "resource": "ebs-snapshot",
+                "filters": [
+                    {
+                        "Tags": "empty"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "tags": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2', 'us-east-1')
+
+        snap = client.describe_snapshots(SnapshotIds=[resources[0]['SnapshotId']])['Snapshots']
+        vol = client.describe_volumes(VolumeIds=[resources[0]['VolumeId']])['Volumes']
+
+        self.assertEqual(snap[0]['Tags'], vol[0]['Tags'])
+
+    def test_copy_related_resource_tag_partial(self):
+        session_factory = self.replay_flight_data("test_tags_copy_related_resource_tag_partial")
+        p = self.load_policy(
+            {
+                "name": "copy-related-resource-tags-snapshots-volumes",
+                "resource": "ebs-snapshot",
+                "filters": [
+                    {
+                        "Tags": "empty"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "tags": [
+                            "tag1",
+                            "tag3"
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2', 'us-east-1')
+
+        snap = client.describe_snapshots(SnapshotIds=[resources[0]['SnapshotId']])['Snapshots']
+        vol = client.describe_volumes(VolumeIds=[resources[0]['VolumeId']])['Volumes']
+
+        vol_tags = {t['Key']: t['Value'] for t in vol[0]['Tags']}
+        snap_tags = {t['Key']: t['Value'] for t in snap[0]['Tags']}
+
+        self.assertFalse(vol_tags == snap_tags)
+
+        self.assertEqual(snap_tags['tag1'], vol_tags['tag1'])
+        self.assertEqual(snap_tags['tag3'], vol_tags['tag3'])
+
+        self.assertTrue(vol_tags['tag2'])
+        self.assertFalse(snap_tags.get('tag2'))
+
+    def test_copy_related_resource_tag_missing(self):
+        session_factory = self.replay_flight_data("test_tags_copy_related_resource_tag_missing")
+        p = self.load_policy(
+            {
+                "name": "copy-related-resource-tags-snapshots-volumes",
+                "resource": "ebs-snapshot",
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "skip_missing": False,
+                        "tags": [
+                            "*"
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+
+        with self.assertRaises(PolicyExecutionError):
+            p.run()
+
+    def test_copy_related_resource_tag_validate(self):
+        p = self.load_policy(
+            {
+                "name": "copy-related-resource-tags-snapshots-volumes",
+                "resource": "ebs-snapshot",
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "skip_missing": False,
+                        "tags": [
+                            "*"
+                        ]
+                    }
+                ]
+            }
+        )
+        self.assertFalse(p.validate())
+
+        policy = {
+            "name": "copy-related-resource-tags-snapshots-volumes",
+            "resource": "ebs-snapshot",
+            "actions": [
+                {
+                    "type": "copy-related-tag",
+                    "resource": "not-a-resource",
+                    "key": "VolumeId",
+                    "skip_missing": False,
+                    "tags": [
+                        "*"
+                    ]
+                }
+            ]
+        }
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)

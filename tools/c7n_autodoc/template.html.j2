@@ -1,0 +1,145 @@
+<html>
+  <head>
+    <title>Cloud Custodian Automated Policy Documentation</title>
+    <style>
+			.divTable {
+			  	display: table;
+			  	width: 90%;
+          font-size: 14px;
+			}
+			.divTableRow {
+			  	display: table-row;
+			}
+			.divTableHeading {
+			  	display: table-header-group;
+			  	background-color: #ddd;
+			}
+			.divTableCell, .divTableHead {
+			   	display: table-cell;
+			  	padding: 3px 10px;
+			  	border: 1px solid #999999;
+			}
+			.divTableHeading {
+			  	display: table-header-group;
+			  	background-color: #ddd;
+			  	font-weight: bold;
+			}
+			.divTableFoot {
+			  	display: table-footer-group;
+			  	font-weight: bold;
+			  	background-color: #ddd;
+			}
+			.divTableBody {
+			  	display: table-row-group;
+		  }
+      .category {
+          margin-left: 30px;
+      }
+      .list {
+          margin-block-start: 5px;
+          padding-inline-start: 17px;
+      }
+    </style>
+  </head>
+  <body>
+    <div> 
+      {% for category in c7n_data: %}
+        <h2>{{ category }}</h2>
+        <div class="category">
+        {% for resource_type in c7n_data[category]: %}
+          <h3>Resource type: {{ resource_type }}</h3>
+            <div> 
+              <div class="divTable">
+                <div class="divTableHeading">
+                  <div class="divTableHead">Name</div>
+                  <div class="divTableHead">Description</div>
+                  {% if environment_column: %}
+                    <div class="divTableHead">Environments</div>
+                  {% endif %}
+                  <div class="divTableHead">Mode</div>
+                  <div class="divTableHead">Filters</div>
+                  <div class="divTableHead">Actions</div>
+                  <div class="divTableHead">Policy File</div>
+                </div>
+                {% for policy_object in c7n_data[category][resource_type]: %}
+                  <div class="divTableRow">
+
+                    {# --- Name --- #}
+                    <div class="divTableCell">{{ policy_object['name'] }}</div>
+
+                    {# --- Description --- #}
+                    <div class="divTableCell">
+                    <div>{{ policy_object['description'] }}</div><br>
+                    {% for action in policy_object['actions']: %} 
+                      {% if action['violation_desc']: %} 
+                        <div><strong><u>Violation</u></strong> : {{ action['violation_desc']}}</div><br>
+                      {% endif %}
+                      {% if action['action_desc']: %} 
+                        <div><strong><u>Recommended Action</u></strong> : {{ action['action_desc']}}</div>
+                      {% endif %}
+                    {% endfor %} 
+                    </div>
+
+                    {# --- Description --- #}
+                    {% if environment_column: %}
+                      <div class="divTableCell">
+                      {% for tag in policy_object['tags']: %}
+                        {% if tag in environment_tags: %}
+                          <div>{{ environment_tags[tag] }}</div>
+                        {% endif %}
+                      {% endfor %} 
+                      </div>
+                    {% endif %}
+             
+                    {# --- Mode --- #}
+                    {% if policy_object['mode'] and policy_object['mode']['events']: %}
+                      <div class="divTableCell">{{ policy_object['mode']['type'] }} event(s) : <ul class="list">
+                      {% for event_obj in policy_object['mode']['events']: %}
+                        {% if event_obj is string: %}
+                          <li>{{ event_obj }}</li>
+                        {% else %}
+                          <li>{{ event_obj['event'] }}</li>
+                        {% endif %}
+                      {% endfor %}
+                      </div>
+                    {% elif policy_object['mode'] and policy_object['mode']['schedule']: %}
+                      <div class="divTableCell">schedule : {{ policy_object['mode']['schedule'] }}</div>
+                    {% else: %}
+                      <div class="divTableCell">poll</div>
+                    {% endif %}
+
+                    {# --- Filters --- #}
+                    <div class="divTableCell">{% print(policy_object['filters']) %}</div>
+
+                    {# --- Actions --- #}
+                    <div class="divTableCell" style="white-space:nowrap">
+                      <ul class="list">
+                      {% for action in policy_object['actions']: %} 
+                        {% if action is mapping: %}
+                          {% if action['type'] == 'notify' and 'subject' in action: %}
+                            <li>notify (email)</li>
+                          {% elif 'transport' in action: %}
+                            <li>notify ({{ action['transport']['type'] }})</li>
+                          {% else: %}
+                            <li>{{ action['type'] }}</li>
+                          {% endif %}
+                        {% elif action is string: %}
+                          <li>{{ action }}</li>
+                        {% endif %}
+                      {% endfor %}
+                      </ul>
+                    </div>
+
+                    {# --- Link --- #}
+                    <div class="divTableCell"><a href="{{ policy_object['file_url'] }}" target="_blank">Link</a></div>
+
+                  </div>
+                  {% endfor %}
+                </div> <!-- End divTable -->
+              </div> <!-- End resource_type -->
+              {% endfor %}
+            </div> <!-- End category -->
+          {% endfor %}
+    </div>
+  </body>
+</html>

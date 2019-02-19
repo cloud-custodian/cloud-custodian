@@ -262,29 +262,44 @@ class EmailDelivery(object):
         smtp_connection.sendmail(message['From'], to_addrs, message.as_string())
         smtp_connection.quit()
 
+    def set_mimetext_headers(self, message, subject, from_addr, to_addrs, cc_addrs, priority):
+        """Sets headers on Mimetext message"""
+
+        message['Subject'] = subject
+        message['From'] = from_addr
+        message['To'] = ', '.join(to_addrs)
+        if cc_addrs:
+            message['Cc'] = ', '.join(cc_addrs)
+
+        if priority and self.priority_header_is_valid(priority):
+            priority = PRIORITIES[str(priority)].copy()
+            for key in priority:
+                message[key] = priority[key]
+
+        return message
+
     def get_mimetext_message(self, sqs_message, resources, to_addrs):
         body = get_rendered_jinja(
             to_addrs, sqs_message, resources, self.logger,
             'template', 'default', self.config['templates_folders'])
+
         if not body:
             return None
+
         email_format = sqs_message['action'].get('template_format', None)
         if not email_format:
             email_format = sqs_message['action'].get(
                 'template', 'default').endswith('html') and 'html' or 'plain'
-        subject = get_message_subject(sqs_message)
-        from_addr = sqs_message['action'].get('from', self.config['from_address'])
-        message = MIMEText(body, email_format, 'utf-8')
-        message['From'] = from_addr
-        message['To'] = ', '.join(to_addrs)
-        message['Subject'] = subject
-        priority_header = sqs_message['action'].get('priority_header', None)
-        if priority_header and self.priority_header_is_valid(
-            sqs_message['action']['priority_header']
-        ):
-            priority_headers = PRIORITIES[str(priority_header)].copy()
-            for key in priority_headers:
-                message[key] = priority_headers[key]
+
+        message = self.set_mimetext_headers(
+            message=MIMEText(body, email_format, 'utf-8'),
+            subject=get_message_subject(sqs_message),
+            from_addr=sqs_message['action'].get('from', self.config['from_address']),
+            to_addrs=to_addrs,
+            cc_addrs=sqs_message['action'].get('cc', []),
+            priority=sqs_message['action'].get('priority_header', None),
+        )
+
         return message
 
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):

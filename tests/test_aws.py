@@ -42,6 +42,37 @@ class OutputXrayTracerTest(BaseTest):
             TraceSegmentDocuments=[doc.serialize()])
 
 
+class ArnTest(BaseTest):
+
+    def test_eb_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:elasticbeanstalk:us-east-1:123456789012:environment/My App/MyEnv')
+        self.assertEqual(arn.service, 'elasticbeanstalk')
+        self.assertEqual(arn.account_id, '123456789012')
+        self.assertEqual(arn.region, 'us-east-1')
+        self.assertEqual(arn.resource_type, 'environment')
+        self.assertEqual(arn.resource, 'My App/MyEnv')
+
+    def test_iam_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:iam::123456789012:user/David')
+        self.assertEqual(arn.service, 'iam')
+        self.assertEqual(arn.resource, 'David')
+        self.assertEqual(arn.resource_type, 'user')
+
+    def test_rds_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:rds:eu-west-1:123456789012:db:mysql-db')
+        self.assertEqual(arn.resource_type, 'db')
+        self.assertEqual(arn.resource, 'mysql-db')
+        self.assertEqual(arn.region, 'eu-west-1')
+
+    def test_s3_key_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:s3:::my_corporate_bucket/exampleobject.png')
+        self.assertEqual(arn.resource, 'my_corporate_bucket/exampleobject.png')
+
+
 class UtilTest(BaseTest):
 
     def test_default_account_id_assume(self):
