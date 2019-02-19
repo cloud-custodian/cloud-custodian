@@ -1,3 +1,5 @@
 Sphinx==1.8.4
-Pygments==2.3.1
+# Needs a pin as 2.3.1 has a bug with yaml
+# addressed in https://bitbucket.org/birkenfeld/pygments-main/pull-requests/797
+Pygments==2.3.0
 sphinx-rtd-theme==0.4.3
