@@ -94,6 +94,42 @@ class Role(QueryResourceManager):
         arn = 'Arn'
 
 
+@Role.action_registry.register('tag')
+class RoleTag(Tag):
+    """Tag an iam role."""
+
+    permissions = ('iam:TagRole',)
+
+    def process_resource_set(self, client, roles, tags):
+        for role in roles:
+            try:
+                client.tag_role(RoleName=role['RoleName'], Tags=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
+@Role.action_registry.register('remove-tag')
+class RoleRemoveTag(RemoveTag):
+    """Remove tags from an iam role."""
+
+    permissions = ('iam:UntagRole',)
+
+    def process_resource_set(self, client, roles, tags):
+        for role in roles:
+            try:
+                client.untag_role(RoleName=role['RoleName'], TagKeys=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
+@Role.action_registry.register('mark-for-op')
+class RoleTagDelayedAction(TagDelayedAction):
+    pass
+
+
+Role.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @resources.register('iam-user')
 class User(QueryResourceManager):
 
