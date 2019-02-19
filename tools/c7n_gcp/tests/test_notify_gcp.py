@@ -1,4 +1,4 @@
-# Copyright 2015-2019 Capital One Services, LLC
+# Copyright 2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,28 @@
 # limitations under the License.
 
 from gcp_common import BaseTest
+from c7n_gcp.client import Session
+
+import mock
 
 
 class NotifyTest(BaseTest):
 
     def test_pubsub_notify(self):
         factory = self.replay_flight_data("notify-action")
+
+        orig_client = Session.client
+        stub_client = mock.MagicMock()
+        calls = []
+
+        def client_factory(*args, **kw):
+            calls.append(args)
+            if len(calls) == 1:
+                return orig_client(*args, **kw)
+            return stub_client
+
+        self.patch(Session, 'client', client_factory)
+
         p = self.load_policy({
             'name': 'test-notify',
             'resource': 'gcp.pubsub-topic',
@@ -38,5 +54,21 @@ class NotifyTest(BaseTest):
                       'topic': 'projects/cloud-custodian/topics/gcptestnotifytopic'}
                  }
             ]}, session_factory=factory)
+
         resources = p.run()
+
         self.assertEqual(len(resources), 1)
+        stub_client.execute_command.assert_called_with(
+            'publish', {
+                'topic': 'projects/cloud-custodian/topics/gcptestnotifytopic',
+                'body': {
+                    'messages': {
+                        'data': ('eJzdUrtqAzEQ7PUVh+qcjd2EuEqVLl8QgpFXe2cFnVZIq8Bh/O/'
+                                 'RA58vkCqkSrHNDDuPZS9C4ic6lofOJWsfhFQAlBwfjc6YhBSZtFGu3'
+                                 '+2fdvLO/0wGHA25wilrC+DJGpgzcBHSqQkLxRi5d8RmmNtOpBSgUiP4jU'
+                                 '+nmE49kzdQ+MFYxhAz/SZWKj7QBwLHLVhKul+'
+                                 'ybOti3GapYtR8mpi4ivfagHPIRZBnXwXviRgnbxVXVOOgkuXaJRgKhuf'
+                                 'jGZXGUNh9wXPakuRWzbixa1pdc6qSVO1kihieNU3KuA3QJGsgDspFT4Hb'
+                                 'nW6B2iHadon/69K5trguxb+b/OPWq9/6i+/JcvDoDq+'
+                                 'K4Yz6ZfWVTbUcucwX+HoY5Q==')
+                    }}})
