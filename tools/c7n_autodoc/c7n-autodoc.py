@@ -116,7 +116,7 @@ def gather_file_data(mydir):
                     try:
                         category = ('Security & Governance' if category_regex.search(file_path)
                                     else 'Cost Controls')
-                        policies = yaml.load(stream)
+                        policies = yaml.safe_load(stream)
                         for policy in policies['policies']:
                             logging.info('Processing policy %s', policy['name'])
                             policy['file_url'] = get_file_url(file_path)
