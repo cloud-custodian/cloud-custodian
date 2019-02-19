@@ -513,26 +513,15 @@ class UpdateAgent(BaseAction):
     permissions = ('ecs:UpdateContainerAgent',)
 
     def process(self, resources):
-        for r in resources:
-            results = self.process_instance(
-                r.get('c7n:cluster'),
-                r.get('containerInstanceArn'))
-            return results
-
-    def process_instance(self, cluster, instance):
         client = local_session(self.manager.session_factory).client('ecs')
+        for r in resources:
+            self.process_instance(
+                client, r.get('c7n:cluster'), r.get('containerInstanceArn'))
+
+    def process_instance(self, client, cluster, instance):
         try:
             client.update_container_agent(
-                cluster=cluster,
-                containerInstance=instance)
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoUpdateAvailableException':
-                self.manager.log.warning(
-                    'No update available for Container Instance: %s, cluster: %s'
-                    % (instance, cluster))
-            elif e.response['Error']['Code'] == 'UpdateInProgressException':
-                self.manager.log.warning(
-                    'Container Instance Agent update already in progress: %s, cluster %s' %
-                    (instance, cluster))
-            else:
-                raise
+                cluster=cluster, containerInstance=instance)
+        except (client.exceptions.NoUpdateAvailableException,
+                client.exceptions.UpdateInProgressException):
+            return

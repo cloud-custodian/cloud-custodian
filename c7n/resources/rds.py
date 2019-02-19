@@ -469,9 +469,7 @@ class TagTrim(tags.TagTrim):
 
     permissions = ('rds:RemoveTagsFromResource',)
 
-    def process_tag_removal(self, resource, candidates):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+    def process_tag_removal(self, client, resource, candidates):
         arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
         client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
 
@@ -498,7 +496,7 @@ def _eligible_start_stop(db, state="available"):
 class Stop(BaseAction):
     """Stop an rds instance.
 
-    https://goo.gl/N3nw8k
+    https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html
     """
 
     schema = type_schema('stop')
@@ -520,9 +518,7 @@ class Stop(BaseAction):
 
 @actions.register('start')
 class Start(BaseAction):
-    """Stop an rds instance.
-
-    https://goo.gl/N3nw8k
+    """Start an rds instance.
     """
 
     schema = type_schema('start')
@@ -1418,25 +1414,17 @@ class RDSSubnetGroup(QueryResourceManager):
 
 
 def _db_subnet_group_tags(subnet_groups, session_factory, executor_factory, retry):
+    client = local_session(session_factory).client('rds')
 
-    def process_tags(subnet_group):
-        client = local_session(session_factory).client('rds')
-
-        arn = subnet_group['DBSubnetGroupArn']
-        tag_list = None
-
+    def process_tags(g):
         try:
-            tag_list = client.list_tags_for_resource(ResourceName=arn)['TagList']
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'InvalidParameterValue':
-                log.warning("Exception getting db subnet group tags\n %s", e)
+            g['Tags'] = client.list_tags_for_resource(
+                ResourceName=g['DBSubnetGroupArn'])['TagList']
+            return g
+        except client.exceptions.DBSubnetGroupNotFoundFault:
             return None
 
-        subnet_group['Tags'] = tag_list or []
-        return subnet_group
-
-    with executor_factory(max_workers=1) as w:
-        list(w.map(process_tags, subnet_groups))
+    return list(filter(None, map(process_tags, subnet_groups)))
 
 
 @RDSSubnetGroup.action_registry.register('delete')

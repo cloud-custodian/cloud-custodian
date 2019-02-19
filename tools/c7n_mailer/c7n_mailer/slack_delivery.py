@@ -123,9 +123,9 @@ class SlackDelivery(object):
 
         for address in email_addresses:
             if self.caching and self.caching.get(address):
-                    self.logger.debug('Got Slack metadata from cache for: %s' % address)
-                    list[address] = self.caching.get(address)
-                    continue
+                self.logger.debug('Got Slack metadata from cache for: %s' % address)
+                list[address] = self.caching.get(address)
+                continue
 
             response = requests.post(
                 url='https://slack.com/api/users.lookupByEmail',

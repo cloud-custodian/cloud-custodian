@@ -14,7 +14,7 @@
 
 from c7n.provider import clouds
 
-from collections import Counter
+from collections import Counter, namedtuple
 import contextlib
 import copy
 import datetime
@@ -128,6 +128,25 @@ def shape_validate(params, shape_name, service):
     report = validator.validate(params, shape)
     if report.has_errors():
         raise PolicyValidationError(report.generate_report())
+
+
+class Arn(namedtuple('_Arn', (
+        'arn', 'partition', 'service', 'region',
+        'account_id', 'resource', 'resource_type'))):
+
+    __slots__ = ()
+
+    @classmethod
+    def parse(cls, arn):
+        parts = arn.split(':', 5)
+        # a few resources use qualifiers without specifying type
+        if parts[2] in ('s3', 'apigateway', 'execute-api'):
+            parts.append(None)
+        elif '/' in parts[-1]:
+            parts.extend(reversed(parts.pop(-1).split('/', 1)))
+        elif ':' in parts[-1]:
+            parts.extend(reversed(parts.pop(-1).split(':', 1)))
+        return cls(*parts)
 
 
 @metrics_outputs.register('aws')
