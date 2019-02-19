@@ -553,3 +553,46 @@ class TestFSxBackup(BaseTest):
                 if len(b['Tags']) == 0:
                     tags = b['Tags']
         self.assertEqual(len(tags), 0)
+
+    def test_kms_key_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "fsx-kms-key-filters",
+                "resource": "fsx",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/fsx)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-kms-key']), 1)
+
+    def test_kms_key_filter_fsx_backup(self):
+        session_factory = self.replay_flight_data("test_kms_key_filter_fsx_backup")
+        p = self.load_policy(
+            {
+                "name": "kms_key_filter_fsx_backup",
+                "resource": "fsx-backup",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/fsx)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        for r in resources:
+            self.assertEqual(len(r['c7n:matched-kms-key']), 1)

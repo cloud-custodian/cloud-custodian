@@ -59,7 +59,7 @@ class Error(object):
 class CloudWatchLogHandler(logging.Handler):
     """Python Log Handler to Send to Cloud Watch Logs
 
-    http://goo.gl/eZGAEK
+    https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
     """
 
     batch_size = 20

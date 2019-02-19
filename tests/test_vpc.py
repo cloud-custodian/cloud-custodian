@@ -1049,6 +1049,22 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_match_resource_validator(self):
+
+        try:
+            self.load_policy(
+                {'name': 'related-sg',
+                 'resource': 'elb',
+                 'filters': [
+                     {'type': 'security-group',
+                      'match-resource': True,
+                      'key': "tag:Application",
+                      'op': 'not-equal',
+                      'operator': 'or'}]},
+                validate=True)
+        except PolicyValidationError:
+            self.fail("should pass validation")
+
     @functional
     def test_only_ports(self):
         factory = self.replay_flight_data("test_security_group_only_ports")
@@ -1667,6 +1683,46 @@ class SecurityGroupTest(BaseTest):
                 "VpcId": "vpc-1234abcd",
             }
         ]
+        manager = p.load_resource_manager()
+        self.assertEqual(len(manager.filter_resources(resources)), 1)
+
+    def test_description_ingress(self):
+        p = self.load_policy(
+            {
+                "name": "ingress-access",
+                "resource": "security-group",
+                "filters": [
+                    {"type": "ingress",
+                     "Description": {
+                         "value": "Approved",
+                         "op": "not-equal",
+                     },
+                     "Cidr": {"value": "0.0.0.0/0"}, "Ports": [22]}
+                ],
+            }
+        )
+
+        resources = [{
+            "Description": "allows inbound 0.0.0.0/0:22",
+            "GroupName": "ssh",
+            "IpPermissions": [
+                {
+                    "FromPort": 22,
+                    "IpProtocol": "tcp",
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0",
+                            "Description": "ssh",
+                        }
+                    ],
+                    "Ipv6Ranges": []
+                }
+            ],
+            "OwnerId": "644160558196",
+            "GroupId": "sg-0b090df1c1f95bc13",
+            "IpPermissionsEgress": [],
+            "VpcId": "vpc-f1516b97"
+        }]
         manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 

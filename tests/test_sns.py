@@ -525,7 +525,7 @@ class TestSNS(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertEquals(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         sns = session_factory().client('sns')
         attributes = sns.get_topic_attributes(TopicArn=topic)
         self.assertTrue(attributes['Attributes']['KmsMasterKeyId'], 'alias/aws/sns')
@@ -590,6 +590,6 @@ class TestSNS(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertEquals(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         attributes = sns.get_topic_attributes(TopicArn=topic)['Attributes']
         self.assertEqual(attributes.get('KmsMasterKeyId'), key_alias)

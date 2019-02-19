@@ -15,6 +15,62 @@ This creates a virtual env in your enlistment and installs all packages as edita
 
 Instead, you can do `pip install tools/c7n_azure/requirements.txt` to install test dependencies.
 
+Adding New Azure Resources
+==========================
+
+Install Azure Dependencies
+--------------------------
+
+Custodian interfaces with ARM resources using Azure's SDKs.
+Install the resources SDK in ``setup.py``.
+
+.. code-block:: python
+
+    install_requires=["azure-mgmt-authorization",
+                      ...
+                      "azure-mgmt-containerregistry",
+                      ...
+
+Create New Azure Resource
+-------------------------
+
+Create your new Azure Resource.
+
+- ``service``: The Azure SDK dependency added in step 1.
+- ``client``: Client class name of the Azure Resource SDK of the resource you added.
+- ``enum_spec``: Is a tuple of (enum_operation, list_operation, extra_args). The resource SDK client will have a list of operations this resource has.
+    Place the name of the property as the enum_operation. Next, put `list` as the operations.
+
+.. code-block:: python
+
+    from c7n_azure.provider import resources
+    from c7n_azure.resources.arm import ArmResourceManager
+
+
+    @resources.register('containerregistry')
+    class ContainerRegistry(ArmResourceManager):
+
+        class resource_type(ArmResourceManager.resource_type):
+            service = 'azure.mgmt.containerregistry'
+            client = 'ContainerRegistryManagementClient'
+            enum_spec = ('registries', 'list', None)
+            default_report_fields = (
+                'name',
+                'location',
+                'resourceGroup'
+            )
+
+
+Load New Azure Resource
+-----------------------
+
+Once the required dependecies are installed and created the new Azure Resource, custodian will
+load all registered resources. Import the resource in
+``entry.py``.
+
+.. code-block:: python
+
+    import c7n_azure.resources.container_registry
 
 Testing
 =======

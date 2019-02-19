@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": [
+            {
+                "Key": "Role",
+                "Value": "Dev"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7b8d8533-2952-11e9-a30d-13279ea71d7d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7b8d8533-2952-11e9-a30d-13279ea71d7d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "39"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

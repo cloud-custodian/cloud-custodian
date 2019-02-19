@@ -77,6 +77,29 @@ class Publish(BaseTest):
         result = mgr.publish(func)
         self.assertEqual(result["CodeSize"], 169)
 
+    def test_publish_a_lambda_with_layer_and_concurrency(self):
+        factory = self.replay_flight_data('test_lambda_layer_concurrent_publish')
+        mgr = LambdaManager(factory)
+        layers = ['arn:aws:lambda:us-east-1:644160558196:layer:CustodianLayer:2']
+        func = self.make_func(
+            concurrency=5,
+            layers=layers)
+        self.addCleanup(mgr.remove, func)
+
+        result = mgr.publish(func)
+        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
+        state = mgr.get(func.name)
+        self.assertEqual(state['Concurrency']['ReservedConcurrentExecutions'], 5)
+
+        func = self.make_func(layers=layers)
+        output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
+        result = mgr.publish(func)
+        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
+
+        lines = output.getvalue().strip().split("\n")
+        self.assertFalse('Updating function: test-foo-bar config Layers' in lines)
+        self.assertTrue('Removing function: test-foo-bar concurrency' in lines)
+
     def test_can_switch_runtimes(self):
         session_factory = self.replay_flight_data("test_can_switch_runtimes")
         func = self.make_func()
@@ -129,6 +152,45 @@ class PolicyLambdaProvision(BaseTest):
         event = event_data("event-config-rule-instance.json")
         resources = mode.run(event, None)
         self.assertEqual(len(resources), 1)
+
+    def test_phd_account_mode(self):
+        factory = self.replay_flight_data('test_phd_event_mode')
+        p = self.load_policy(
+            {'name': 'ec2-retire',
+             'resource': 'account',
+             'mode': {
+                 'categories': ['scheduledChange'],
+                 'events': ['AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED'],
+                 'type': 'phd'}}, session_factory=factory)
+        mode = p.get_execution_mode()
+        event = event_data('event-phd-ec2-retire.json')
+        resources = mode.run(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:HealthEvent' in resources[0])
+
+    def test_phd_mode(self):
+        factory = self.replay_flight_data('test_phd_event_mode')
+        p = self.load_policy(
+            {'name': 'ec2-retire',
+             'resource': 'ec2',
+             'mode': {
+                 'categories': ['scheduledChange'],
+                 'events': ['AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED'],
+                 'type': 'phd'}}, session_factory=factory)
+        mode = p.get_execution_mode()
+        event = event_data('event-phd-ec2-retire.json')
+        resources = mode.run(event, None)
+        self.assertEqual(len(resources), 1)
+
+        p_lambda = PolicyLambda(p)
+        events = p_lambda.get_events(factory)
+        self.assertEqual(
+            json.loads(events[0].render_event_pattern()),
+            {'detail': {
+                'eventTypeCategory': ['scheduledChange'],
+                'eventTypeCode': ['AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED']},
+             'source': ['aws.health']}
+        )
 
     def test_cwl_subscriber(self):
         self.patch(CloudWatchLogSubscription, "iam_delay", 0.01)

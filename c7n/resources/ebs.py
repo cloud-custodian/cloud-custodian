@@ -24,10 +24,10 @@ from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
 import six
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    CrossAccountAccessFilter, Filter, FilterRegistry, AgeFilter, ValueFilter,
+    CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
     ANNOTATION_KEY, OPERATORS)
 from c7n.filters.health import HealthEventFilter
 
@@ -41,14 +41,11 @@ from c7n.utils import (
     local_session,
     set_annotation,
     type_schema,
-    worker,
+    QueryParser,
 )
 from c7n.resources.ami import AMI
 
 log = logging.getLogger('custodian.ebs')
-
-filters = FilterRegistry('ebs.filters')
-actions = ActionRegistry('ebs.actions')
 
 
 @resources.register('ebs-snapshot')
@@ -76,11 +73,8 @@ class Snapshot(QueryResourceManager):
             'State',
         )
 
-    filter_registry = FilterRegistry('ebs-snapshot.filters')
-    action_registry = ActionRegistry('ebs-snapshot.actions')
-
     def resources(self, query=None):
-        qfilters = QueryParser.parse(self.data.get('query', []))
+        qfilters = SnapshotQueryParser.parse(self.data.get('query', []))
         query = query or {}
         if qfilters:
             query['Filters'] = qfilters
@@ -88,8 +82,41 @@ class Snapshot(QueryResourceManager):
             query['OwnerIds'] = ['self']
         return super(Snapshot, self).resources(query=query)
 
+    def get_resources(self, ids, cache=True, augment=True):
+        if cache:
+            resources = self._get_cached_resources(ids)
+            if resources is not None:
+                return resources
+        while ids:
+            try:
+                return self.source.get_resources(ids)
+            except ClientError as e:
+                bad_snap = ErrorHandler.extract_bad_snapshot(e)
+                if bad_snap:
+                    ids.remove(bad_snap)
+                    continue
+                raise
+        return []
 
-class QueryParser(object):
+
+class ErrorHandler(object):
+
+    @staticmethod
+    def extract_bad_snapshot(e):
+        """Handle various client side errors when describing snapshots"""
+        msg = e.response['Error']['Message']
+        error = e.response['Error']['Code']
+        e_snap_id = None
+        if error == 'InvalidSnapshot.NotFound':
+            e_snap_id = msg[msg.find("'") + 1:msg.rfind("'")]
+            log.warning("Snapshot not found %s" % e_snap_id)
+        elif error == 'InvalidSnapshotID.Malformed':
+            e_snap_id = msg[msg.find('"') + 1:msg.rfind('"')]
+            log.warning("Snapshot id malformed %s" % e_snap_id)
+        return e_snap_id
+
+
+class SnapshotQueryParser(QueryParser):
 
     QuerySchema = {
         'description': six.string_types,
@@ -105,50 +132,7 @@ class QueryParser(object):
         'volume-size': six.string_types,
     }
 
-    @classmethod
-    def parse(cls, data):
-        filters = []
-
-        if not isinstance(data, (tuple, list)):
-            raise PolicyValidationError(
-                "EBS Query invalid format, must be array of dicts %s" % (
-                    data))
-        for d in data:
-            if not isinstance(d, dict):
-                raise PolicyValidationError(
-                    "EBS Query Filter Invalid %s" % data)
-            if "Name" not in d or "Values" not in d:
-                raise PolicyValidationError(
-                    "EBS Query Filter Invalid Missing Key, Values in %s" % data)
-            key = d['Name']
-            values = d['Values']
-
-            if key not in cls.QuerySchema and not key.startswith('tag:'):
-                raise PolicyValidationError(
-                    "EBS Query Filter Invalid Key:%s Valid: %s" % (
-                        key, ", ".join(cls.QuerySchema.keys())))
-
-            vtype = cls.QuerySchema.get(key)
-            if vtype is None and key.startswith('tag'):
-                vtype = six.string_types
-
-            if not isinstance(values, list):
-                raise PolicyValidationError(
-                    "EBS Query Filter Invalid Values, must be array %s" % (data,))
-
-            for v in values:
-                if isinstance(vtype, tuple) and vtype != six.string_types:
-                    if v not in vtype:
-                        raise PolicyValidationError(
-                            "EBS Query Filter Invalid Value: %s Valid: %s" % (
-                                v, ", ".join(vtype)))
-                elif not isinstance(v, vtype):
-                    raise PolicyValidationError(
-                        "EBS Query Filter Invalid Value Type %s" % (data,))
-
-            filters.append(d)
-
-        return filters
+    type_name = 'EBS'
 
 
 @Snapshot.filter_registry.register('age')
@@ -331,7 +315,6 @@ class SnapshotDelete(BaseAction):
                             f.exception()))
         return snapshots
 
-    @worker
     def process_snapshot_set(self, client, snapshots_set):
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
@@ -353,7 +336,7 @@ class SnapshotDelete(BaseAction):
 class CopySnapshot(BaseAction):
     """Copy a snapshot across regions
 
-    http://goo.gl/CP3dq
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-copy-snapshot.html
 
     :example:
 
@@ -400,7 +383,6 @@ class CopySnapshot(BaseAction):
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.process_resource_set, chunks(resources, 20)))
 
-    @worker
     def process_resource_set(self, resource_set):
         client = self.manager.session_factory(
             region=self.data['target_region']).client('ec2')
@@ -461,9 +443,6 @@ class EBS(QueryResourceManager):
             'KmsKeyId'
         )
 
-    filter_registry = filters
-    action_registry = actions
-
 
 @EBS.action_registry.register('detach')
 class VolumeDetach(BaseAction):
@@ -502,7 +481,7 @@ class VolumeDetach(BaseAction):
                                 Force=self.data.get('force', False))
 
 
-@filters.register('instance')
+@EBS.filter_registry.register('instance')
 class AttachedInstanceFilter(ValueFilter):
     """Filter volumes based on filtering on their attached instance
 
@@ -546,14 +525,14 @@ class AttachedInstanceFilter(ValueFilter):
         return {i['InstanceId']: i for i in instances}
 
 
-@filters.register('kms-alias')
+@EBS.filter_registry.register('kms-alias')
 class KmsKeyAlias(ResourceKmsKeyAlias):
 
     def process(self, resources, event=None):
         return self.get_matching_aliases(resources)
 
 
-@filters.register('fault-tolerant')
+@EBS.filter_registry.register('fault-tolerant')
 class FaultTolerantSnapshots(Filter):
     """
     This filter will return any EBS volume that does/does not have a
@@ -589,7 +568,7 @@ class FaultTolerantSnapshots(Filter):
         return [r for r in resources if r['VolumeId'] in flagged]
 
 
-@filters.register('health-event')
+@EBS.filter_registry.register('health-event')
 class HealthFilter(HealthEventFilter):
 
     schema = type_schema(
@@ -643,7 +622,7 @@ class HealthFilter(HealthEventFilter):
         return {"VolumeId": rid}
 
 
-@actions.register('copy-instance-tags')
+@EBS.action_registry.register('copy-instance-tags')
 class CopyInstanceTags(BaseAction):
     """Copy instance tags to its attached volume.
 
@@ -780,7 +759,7 @@ class CopyInstanceTags(BaseAction):
         return copy_tags
 
 
-@actions.register('encrypt-instance-volumes')
+@EBS.action_registry.register('encrypt-instance-volumes')
 class EncryptInstanceVolumes(BaseAction):
     """Encrypt extant volumes attached to an instance
 
@@ -1060,7 +1039,7 @@ class EncryptInstanceVolumes(BaseAction):
                 self.log.debug("Instance: %s stopped" % instance_id)
 
 
-@actions.register('snapshot')
+@EBS.action_registry.register('snapshot')
 class CreateSnapshot(BaseAction):
     """Snapshot an EBS volume
 
@@ -1088,7 +1067,7 @@ class CreateSnapshot(BaseAction):
             retry(client.create_snapshot, VolumeId=vol_id)
 
 
-@actions.register('delete')
+@EBS.action_registry.register('delete')
 class Delete(BaseAction):
     """Delete an ebs volume.
 
@@ -1141,15 +1120,17 @@ class Delete(BaseAction):
             raise
 
 
-@filters.register('modifyable')
+@EBS.filter_registry.register('modifyable')
 class ModifyableVolume(Filter):
     """Check if an ebs volume is modifyable online.
 
-    Considerations - https://goo.gl/CBhfqV
+    Considerations:
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/limitations.html
 
     Consideration Summary
       - only current instance types are supported (one exception m3.medium)
-        Current Generation Instances (2017-2) https://goo.gl/iuNjPZ
+        Current Generation Instances (2017-2)
+        https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html#current-gen-instances
 
       - older magnetic volume types are not supported
       - shrinking volumes is not supported
@@ -1238,15 +1219,18 @@ class ModifyableVolume(Filter):
         return [r for r in results if r['VolumeId'] not in modifying]
 
 
-@actions.register('modify')
+@EBS.action_registry.register('modify')
 class ModifyVolume(BaseAction):
     """Modify an ebs volume online.
 
     **Note this action requires use of modifyable filter**
 
-    Intro Blog & Use Cases - https://goo.gl/E3u4Ue
-    Docs - https://goo.gl/DJM4T0
-    Considerations - https://goo.gl/CBhfqV
+    Intro Blog & Use Cases:
+     https://aws.amazon.com/blogs/aws/amazon-ebs-update-new-elastic-volumes-change-everything/
+    Docs:
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-modify-volume.html
+    Considerations:
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/limitations.html
 
     :example:
 

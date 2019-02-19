@@ -70,8 +70,8 @@ class ResizePlan(AzureBaseAction):
         }
     )
 
-    def _prepare_processing(self,):
-        self.client = self.manager.get_client()  # type: azure.mgmt.web.WebSiteManagementClient
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()  # type azure.mgmt.web.WebSiteManagementClient
 
     def _process_resource(self, resource):
         model = models.AppServicePlan(location=resource['location'])

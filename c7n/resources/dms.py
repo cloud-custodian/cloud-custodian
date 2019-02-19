@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
@@ -52,14 +51,6 @@ class ReplicationInstance(QueryResourceManager):
 
     def get_arns(self, resources):
         return [r['ReplicationInstanceArn'] for r in resources]
-
-    def get_tags(self, resources):
-        client = local_session(self.session_factory).client('dms')
-        for r in resources:
-            r['Tags'] = self.manager.retry(
-                client.list_tags_for_resource(
-                    ResourceArn=r['ReplicationInstanceArn'])['TagList'])
-        return resources
 
 
 @resources.register('dms-endpoint')
@@ -104,13 +95,10 @@ class InstanceDescribe(DescribeSource):
         for arn, r in zip(self.manager.get_arns(resources), resources):
             self.manager.log.info("arn %s" % arn)
             try:
-                tags = client.list_tags_for_resource(
-                    ResourceArn=arn).get('TagList', ())
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
-            r['Tags'] = tags
+                r['Tags'] = client.list_tags_for_resource(
+                    ResourceArn=arn).get('TagList', [])
+            except client.exceptions.ResourceNotFoundFault:
+                continue
 
 
 @ReplicationInstance.filter_registry.register('kms-key')
@@ -168,7 +156,8 @@ class ModifyReplicationInstance(BaseAction):
                 AutoMinorVersionUpgrade: True
                 PreferredMaintenanceWindow: mon:23:00-mon:23:59
 
-    AWS ModifyReplicationInstance Documentation: https://goo.gl/ePye9N
+    AWS ModifyReplicationInstance Documentation:
+      https://docs.aws.amazon.com/dms/latest/APIReference/API_ModifyReplicationInstance.html
     """
     schema = {
         'type': 'object',
@@ -200,19 +189,11 @@ class ModifyReplicationInstance(BaseAction):
             params['ReplicationInstanceArn'] = r['ReplicationInstanceArn']
             try:
                 client.modify_replication_instance(**params)
-            except ClientError as e:
-                ecode = e.response['Error']['Code']
-                if ecode in (
-                        'InvalidResourceStateFault',
-                        'ResourceAlreadyExistsFault',
-                        'ResourceNotFoundFault'):
-                    continue
-                elif ecode == 'UpgradeDependencyFailureFault':
-                    self.log.exception(
-                        'Exception modifying instance %s :%s' % (
-                            r['ReplicationInstanceArn'], e))
-                    continue
-                raise
+            except (client.exceptions.InvalidResourceStateFault,
+                    client.exceptions.ResourceNotFoundFault,
+                    client.exceptions.ResourceAlreadyExistsFault,
+                    client.exceptions.UpgradeDependencyFailureFault):
+                continue
 
 
 @ReplicationInstance.action_registry.register('tag')
@@ -236,18 +217,15 @@ class InstanceTag(Tag):
     """
     permissions = ('dms:AddTagsToResource',)
 
-    def process_resource_set(self, resources, tags):
+    def process_resource_set(self, client, resources, tags):
         client = local_session(self.manager.session_factory).client('dms')
-        tags_list = [{(k, v) for (k, v) in tags.items()}]
         for r in resources:
             try:
                 client.add_tags_to_resource(
                     ResourceArn=r['ReplicationInstanceArn'],
-                    Tags=tags_list)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
+                    Tags=tags)
+            except client.exceptions.ResourceNotFoundFault:
+                continue
 
 
 @ReplicationInstance.action_registry.register('remove-tag')
@@ -270,17 +248,14 @@ class InstanceRemoveTag(RemoveTag):
     """
     permissions = ('dms:RemoveTagsFromResource',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('dms')
+    def process_resource_set(self, client, resources, tags):
         for r in resources:
             try:
                 client.remove_tags_from_resource(
                     ResourceArn=r['ReplicationInstanceArn'],
                     TagKeys=tags)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
+            except client.exceptions.ResourceNotFoundFault:
+                continue
 
 
 @ReplicationInstance.action_registry.register('mark-for-op')
@@ -303,20 +278,6 @@ class InstanceMarkForOp(TagDelayedAction):
                       op: delete
                       days: 7
     """
-    permissions = ('dms:AddTagsToResource',)
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(self.manager.session_factory).client('dms')
-        tags_list = [{(k, v) for (k, v) in tags.items()}]
-        for r in resources:
-            try:
-                client.add_tags_to_resource(
-                    ResourceArn=r['ReplicationInstanceArn'],
-                    Tags=tags_list)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundFault':
-                    continue
-                raise
 
 
 @DmsEndpoints.action_registry.register('modify-endpoint')
@@ -337,7 +298,8 @@ class ModifyDmsEndpoint(BaseAction):
                 - type: modify-endpoint
                   SslMode: require
 
-    AWS ModifyEndpoint Documentation: https://goo.gl/eDFfuf
+    AWS ModifyEndpoint Documentation
+    https://docs.aws.amazon.com/dms/latest/APIReference/API_ModifyEndpoint.html
     """
     schema = {
         'type': 'object',
@@ -417,13 +379,10 @@ class ModifyDmsEndpoint(BaseAction):
             params['EngineName'] = params.get('EngineName', e['EngineName'])
             try:
                 client.modify_endpoint(**params)
-            except ClientError as e:
-                if e.response['Error']['Code'] in (
-                        'InvalidResourceStateFault',
-                        'ResourceAlreadyExistsFault',
-                        'ResourceNotFoundFault'):
-                    continue
-                raise
+            except (client.exceptions.InvalidResourceStateFault,
+                    client.exceptions.ResourceAlreadyExistsFault,
+                    client.exceptions.ResourceNotFoundFault):
+                continue
 
 
 @DmsEndpoints.action_registry.register('delete')
@@ -453,8 +412,5 @@ class DeleteDmsEndpoint(BaseAction):
             EndpointArn = e['EndpointArn']
             try:
                 client.delete_endpoint(EndpointArn=EndpointArn)
-            except ClientError as e:
-                self.log.exception(
-                    'Exception deleting endpoint %s :%s' % (
-                        EndpointArn, e))
+            except client.exceptions.ResourceNotFoundFault:
                 continue

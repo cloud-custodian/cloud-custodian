@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-04b2dfeb0d50b0db3",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 1,
+                    "hour": 15,
+                    "minute": 15,
+                    "second": 6,
+                    "microsecond": 0
+                },
+                "State": "completed",
+                "VolumeId": "vol-017e5d5334d2abaed",
+                "VolumeSize": 1,
+                "Tags": [
+                    {
+                        "Key": "TagKeyToCopy",
+                        "Value": "TagValueToCopy"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "74c107b8-15b6-47a1-a58a-ee9bd2cee69a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "863",
+                "date": "Fri, 01 Feb 2019 15:22:20 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
