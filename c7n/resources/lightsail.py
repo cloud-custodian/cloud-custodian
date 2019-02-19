@@ -54,4 +54,3 @@ class LoadBalancer(QueryResourceManager):
         date = 'createdAt'
         dimension = None
         filter_name = None
-
