@@ -158,8 +158,8 @@ class Notify(BaseNotify):
         if self.data.get('transport', {}).get('type') == 'sns' and \
                 self.data.get('transport').get('attributes') and \
                 'mtype' in self.data.get('transport').get('attributes').keys():
-                    raise PolicyValidationError(
-                        "attribute: mtype is a reserved attribute for sns transport")
+            raise PolicyValidationError(
+                "attribute: mtype is a reserved attribute for sns transport")
         return self
 
     def get_permissions(self):

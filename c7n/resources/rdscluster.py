@@ -68,11 +68,10 @@ class RDSCluster(QueryResourceManager):
         return self._generate_arn
 
     def augment(self, dbs):
-        filter(None, _rds_cluster_tags(
+        return list(filter(None, _rds_cluster_tags(
             self.get_model(),
             dbs, self.session_factory,
-            self.generate_arn, self.retry))
-        return dbs
+            self.generate_arn, self.retry)))
 
 
 def _rds_cluster_tags(model, dbs, session_factory, generator, retry):

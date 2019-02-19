@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5b1e4454-33b8-11e9-a629-67e6f57ac52e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5b1e4454-33b8-11e9-a629-67e6f57ac52e", 
+                "content-length": "46", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }, 
+        "tags": [
+            {
+                "value": "test-value", 
+                "key": "test"
+            }
+        ]
+    }
+}

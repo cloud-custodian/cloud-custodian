@@ -567,12 +567,12 @@ class SSLPolicyFilter(Filter):
                 self.manager.data,))
 
         if 'matching' in self.data:
-                # Sanity check that we can compile
-                try:
-                    re.compile(self.data['matching'])
-                except re.error as e:
-                    raise PolicyValidationError(
-                        "Invalid regex: %s %s" % (e, self.manager.data))
+            # Sanity check that we can compile
+            try:
+                re.compile(self.data['matching'])
+            except re.error as e:
+                raise PolicyValidationError(
+                    "Invalid regex: %s %s" % (e, self.manager.data))
 
         return self
 
