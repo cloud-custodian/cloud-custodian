@@ -247,29 +247,8 @@ class SecurityHubTest(BaseTest):
             config={"account_id": "101010101111"},
             session_factory=factory,
         )
-        policy.validate()
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-
-    def test_instance_findings_filter_fail_validate(self):
-        # Reuse recorded data
-        factory = self.replay_flight_data("test_security_hub_instance_findings_filter")
-        policy = self.load_policy(
-            {
-                "name": "ec2-findings-filter",
-                "resource": "ec2",
-                "filters": [{
-                    "type": "finding",
-                    "query": {"Type": [{
-                        "Value": "Software and Configuration Checks/ForceValidationFailure",
-                        "Comparison": "EQUALS"}]}
-                }],
-            },
-            config={"account_id": "101010101111"},
-            session_factory=factory,
-            validate=False
-        )
-        policy.validate()
 
     def test_alb_findings_filter(self):
         factory = self.replay_flight_data("test_security_hub_alb_findings_filter")
