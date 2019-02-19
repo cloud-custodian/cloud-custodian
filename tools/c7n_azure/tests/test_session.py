@@ -13,9 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+try:
+    from importlib import reload
+except Exception:
+    pass  # Python 2.7 has reload built-in
+
 import json
 import os
 import re
+import sys
 
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from msrestazure.azure_active_directory import MSIAuthentication
@@ -28,6 +34,10 @@ from mock import patch
 class SessionTest(BaseTest):
     def setUp(self):
         super(SessionTest, self).setUp()
+
+    def tearDown(self):
+        super(SessionTest, self).tearDown()
+        reload(sys.modules['c7n_azure.session'])
 
     def mock_init(self, client_id, secret, tenant, resource):
         pass
@@ -155,3 +165,14 @@ class SessionTest(BaseTest):
         s = Session()
         resource_session = s.get_session_for_resource(constants.RESOURCE_STORAGE)
         self.assertEqual(resource_session.resource_namespace, constants.RESOURCE_STORAGE)
+
+    @patch('c7n_azure.utils.custodian_azure_send_override')
+    def test_get_client_overrides(self, mock):
+        # Reload the module to re-import patched function
+        reload(sys.modules['c7n_azure.session'])
+        s = Session()
+        client = s.client('azure.mgmt.resource.ResourceManagementClient')
+        self.assertFalse(client._client.config.retry_policy.policy.respect_retry_after_header)
+        self.assertIsNotNone(client._client.orig_send)
+        client._client.send()
+        self.assertTrue(mock.called)

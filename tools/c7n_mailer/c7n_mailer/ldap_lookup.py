@@ -188,6 +188,7 @@ class LocalSqlite(object):
     def set(self, key, value):
         # note, the ? marks are required to ensure escaping into the database.
         self.sqlite.execute("INSERT INTO ldap_cache VALUES (?, ?)", (key, json.dumps(value)))
+        self.sqlite.commit()
 
 
 # redis can't write complex python objects like dictionaries as values (the way memcache can)

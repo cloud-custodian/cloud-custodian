@@ -1,6 +1,6 @@
 .. _azure_sqlserver:
 
-SQl Server
+SQL Server
 ==========
 
 Filters

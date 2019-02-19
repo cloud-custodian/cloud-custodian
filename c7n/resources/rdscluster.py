@@ -70,30 +70,26 @@ class RDSCluster(QueryResourceManager):
     def augment(self, dbs):
         filter(None, _rds_cluster_tags(
             self.get_model(),
-            dbs, self.session_factory, self.executor_factory,
+            dbs, self.session_factory,
             self.generate_arn, self.retry))
         return dbs
 
 
-def _rds_cluster_tags(model, dbs, session_factory, executor_factory, generator, retry):
+def _rds_cluster_tags(model, dbs, session_factory, generator, retry):
     """Augment rds clusters with their respective tags."""
+    client = local_session(session_factory).client('rds')
 
     def process_tags(db):
-        client = local_session(session_factory).client('rds')
-        arn = generator(db[model.id])
-        tag_list = None
         try:
-            tag_list = retry(client.list_tags_for_resource, ResourceName=arn)['TagList']
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'DBClusterNotFoundFault':
-                log.warning("Exception getting rdscluster tags\n %s", e)
+            db['Tags'] = retry(
+                client.list_tags_for_resource,
+                ResourceName=generator(db[model.id]))['TagList']
+            return db
+        except client.exceptions.DBClusterNotFoundFault:
             return None
-        db['Tags'] = tag_list or []
-        return db
 
     # Rds maintains a low api call limit, so this can take some time :-(
-    with executor_factory(max_workers=1) as w:
-        return list(w.map(process_tags, dbs))
+    return list(filter(None, map(process_tags, dbs)))
 
 
 @actions.register('mark-for-op')
@@ -114,20 +110,6 @@ class TagDelayedAction(tags.TagDelayedAction):
                     op: delete
                     days: 7
     """
-    schema = type_schema(
-        'mark-for-op', rinherit=tags.TagDelayedAction.schema)
-    permissions = ('rds:AddTagsToResource',)
-
-    batch_size = 5
-
-    def process(self, dbs):
-        return super(TagDelayedAction, self).process(dbs)
-
-    def process_resource_set(self, dbs, tags):
-        client = local_session(self.manager.session_factory).client('rds')
-        for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
-            client.add_tags_to_resource(ResourceName=arn, Tags=tags)
 
 
 @actions.register('tag')
@@ -154,9 +136,7 @@ class Tag(tags.Tag):
     batch_size = 5
     permissions = ('rds:AddTagsToResource',)
 
-    def process_resource_set(self, dbs, ts):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+    def process_resource_set(self, client, dbs, ts):
         for db in dbs:
             arn = self.manager.generate_arn(db['DBClusterIdentifier'])
             client.add_tags_to_resource(ResourceName=arn, Tags=ts)
@@ -185,13 +165,11 @@ class RemoveTag(tags.RemoveTag):
     batch_size = 5
     permissions = ('rds:RemoveTagsFromResource',)
 
-    def process_resource_set(self, dbs, tag_keys):
-        client = local_session(
-            self.manager.session_factory).client('rds')
+    def process_resource_set(self, client, dbs, tag_keys):
         for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
             client.remove_tags_from_resource(
-                ResourceName=arn, TagKeys=tag_keys)
+                ResourceName=self.manager.generate_arn(db['DBClusterIdentifier']),
+                TagKeys=tag_keys)
 
 
 @filters.register('security-group')

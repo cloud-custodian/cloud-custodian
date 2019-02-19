@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "Command": {
+            "CommandId": "139fedb0-4913-47da-bb53-c08364f07c22",
+            "DocumentName": "AWS-RunShellScript",
+            "DocumentVersion": "",
+            "Comment": "",
+            "ExpiresAfter": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 1,
+                "day": 30,
+                "hour": 11,
+                "minute": 16,
+                "second": 3,
+                "microsecond": 50000
+            },
+            "Parameters": {
+                "commands": [
+                    "wget https://pkg.osquery.io/deb/osquery_3.3.0_1.linux.amd64.deb",
+                    "dpkg -i osquery_3.3.0_1.linux.amd64.deb"
+                ]
+            },
+            "InstanceIds": [
+                "i-0ba3874e85bb97244"
+            ],
+            "Targets": [],
+            "RequestedDateTime": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 1,
+                "day": 30,
+                "hour": 9,
+                "minute": 16,
+                "second": 3,
+                "microsecond": 50000
+            },
+            "Status": "Pending",
+            "StatusDetails": "Pending",
+            "OutputS3BucketName": "",
+            "OutputS3KeyPrefix": "",
+            "MaxConcurrency": "50",
+            "MaxErrors": "0",
+            "TargetCount": 1,
+            "CompletedCount": 0,
+            "ErrorCount": 0,
+            "DeliveryTimedOutCount": 0,
+            "ServiceRole": "",
+            "NotificationConfig": {
+                "NotificationArn": "",
+                "NotificationEvents": [],
+                "NotificationType": ""
+            },
+            "CloudWatchOutputConfig": {
+                "CloudWatchLogGroupName": "",
+                "CloudWatchOutputEnabled": false
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "fe83472c-f294-4b3f-9652-5ea1e74981e4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fe83472c-f294-4b3f-9652-5ea1e74981e4",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "808",
+                "date": "Wed, 30 Jan 2019 14:16:02 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

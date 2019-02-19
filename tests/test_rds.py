@@ -476,15 +476,7 @@ class RDSTest(BaseTest):
                 "name": "rds-upgrade-available",
                 "resource": "rds",
                 "filters": [{"type": "upgrade-available", "major": True}],
-                "actions": [
-                    {
-                        "type": "mark-for-op",
-                        "tag": "custodian_upgrade",
-                        "days": 1,
-                        "msg": "Minor engine upgrade available: {op}@{action_date}",
-                        "op": "upgrade",
-                    }
-                ],
+                "actions": []
             },
             session_factory=session_factory,
         )

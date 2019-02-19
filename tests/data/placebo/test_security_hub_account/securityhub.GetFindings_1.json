@@ -28,14 +28,14 @@
                     "ProviderName": "CloudCustodian", 
                     "ProviderVersion": "0.8.32.1", 
                     "aws/securityhub/ProductName": "Default", 
-                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/369510138361/default/us-east-1/369510138361/26045b93824ce1bf9c19668e373efb5d/f463cba171cdbdb2206d5699283a6faf", 
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default/us-east-1/101010101111/26045b93824ce1bf9c19668e373efb5d/f463cba171cdbdb2206d5699283a6faf", 
                     "aws/securityhub/CompanyName": "Personal"
                 }, 
                 "CreatedAt": "2018-12-02T23:43:03.954804+00:00", 
                 "UpdatedAt": "2018-12-02T23:43:03.954804+00:00", 
                 "RecordState": "ACTIVE", 
                 "SchemaVersion": "2018-10-08", 
-                "Id": "us-east-1/369510138361/26045b93824ce1bf9c19668e373efb5d/f463cba171cdbdb2206d5699283a6faf", 
+                "Id": "us-east-1/101010101111/26045b93824ce1bf9c19668e373efb5d/f463cba171cdbdb2206d5699283a6faf", 
                 "Types": [
                     "Software and Configuration Checks/AWS Security Best Practices"
                 ], 

@@ -18,7 +18,7 @@ import functools
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import (RemoveTag, Tag, universal_augment)
-from c7n.utils import generate_arn, local_session
+from c7n.utils import generate_arn
 
 
 @resources.register('cloudhsm-cluster')
@@ -52,19 +52,6 @@ class CloudHSMCluster(QueryResourceManager):
         return self._generate_arn
 
 
-def tag_function(session_factory, clusters, tags, log):
-    client = local_session(session_factory).client('cloudhsmv2')
-    for c in clusters:
-        id = c['ClusterId']
-        try:
-            client.tag_resource(ResourceId=id, TagList=tags)
-        except Exception as err:
-            log.exception(
-                'Exception tagging cloudhsm cluster %s: %s',
-                c['ClusterId'], err)
-            continue
-
-
 @CloudHSMCluster.action_registry.register('tag')
 class Tag(Tag):
     """Action to add tag(s) to CloudHSM Cluster(s)
@@ -86,8 +73,12 @@ class Tag(Tag):
 
     permissions = ('cloudhsmv2:TagResource',)
 
-    def process_resource_set(self, clusters, tags):
-        tag_function(self.manager.session_factory, clusters, tags, self.log)
+    def process_resource_set(self, client, clusters, tags):
+        for c in clusters:
+            try:
+                client.tag_resource(ResourceId=c['ClusterId'], TagList=tags)
+            except client.exceptions.CloudHsmResourceNotFoundException:
+                continue
 
 
 @CloudHSMCluster.action_registry.register('remove-tag')
@@ -110,11 +101,9 @@ class RemoveTag(RemoveTag):
 
     permissions = ('cloudhsmv2:UntagResource',)
 
-    def process_resource_set(self, clusters, tag_keys):
-        client = local_session(self.manager.session_factory).client('cloudhsmv2')
+    def process_resource_set(self, client, clusters, tag_keys):
         for c in clusters:
-            id = c['ClusterId']
-            client.untag_resource(ResourceId=id, TagKeyList=tag_keys)
+            client.untag_resource(ResourceId=c['ClusterId'], TagKeyList=tag_keys)
 
 
 @resources.register('hsm')

@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.exceptions import ClientError
-from concurrent.futures import as_completed
 
 import json
 import logging
@@ -22,7 +21,7 @@ import logging
 from c7n.actions import RemovePolicyBase, BaseAction
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, RetryPageIterator
 from c7n.utils import local_session, type_schema
 from c7n.tags import universal_augment
 
@@ -59,8 +58,7 @@ class Key(QueryResourceManager):
         universal_taggable = True
 
     def augment(self, resources):
-        client = local_session(
-            self.session_factory).client('kms')
+        client = local_session(self.session_factory).client('kms')
 
         for r in resources:
             try:
@@ -100,9 +98,9 @@ class KeyRotationStatus(ValueFilter):
     permissions = ('kms:GetKeyRotationStatus',)
 
     def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('kms')
 
         def _key_rotation_status(resource):
-            client = local_session(self.manager.session_factory).client('kms')
             try:
                 resource['KeyRotationEnabled'] = client.get_key_rotation_status(
                     KeyId=resource['KeyId'])
@@ -143,9 +141,10 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
     permissions = ('kms:GetKeyPolicy',)
 
     def process(self, resources, event=None):
+        client = local_session(
+            self.manager.session_factory).client('kms')
+
         def _augment(r):
-            client = local_session(
-                self.manager.session_factory).client('kms')
             key_id = r.get('TargetKeyId', r.get('KeyId'))
             assert key_id, "Invalid key resources %s" % r
             r['Policy'] = client.get_key_policy(
@@ -183,12 +182,15 @@ class GrantCount(Filter):
     permissions = ('kms:ListGrants',)
 
     def process(self, keys, event=None):
-        with self.executor_factory(max_workers=3) as w:
-            return list(filter(None, (w.map(self.process_key, keys))))
-
-    def process_key(self, key):
         client = local_session(self.manager.session_factory).client('kms')
+        results = []
+        for k in keys:
+            results.append(self.process_key(client, k))
+        return [r for r in results if r]
+
+    def process_key(self, client, key):
         p = client.get_paginator('list_grants')
+        p.PAGE_ITERATOR_CLS = RetryPageIterator
         grant_count = 0
         for rp in p.paginate(KeyId=key['TargetKeyId']):
             grant_count += len(rp['Grants'])
@@ -314,26 +316,12 @@ class KmsKeyRotation(BaseAction):
                 state: True
     """
     permissions = ('kms:EnableKeyRotation',)
-    schema = type_schema(
-        'set-rotation',
-        state={'type': 'boolean'})
-
-    def set_rotation(self, key):
-        client = local_session(self.manager.session_factory).client('kms')
-        if self.data.get('state', True):
-            client.enable_key_rotation(KeyId=key['KeyId'])
-            return
-        client.disable_key_rotation(KeyId=key['KeyId'])
+    schema = type_schema('set-rotation', state={'type': 'boolean'})
 
     def process(self, keys):
+        client = local_session(self.manager.session_factory).client('kms')
         for k in keys:
-            futures = {}
-
-            with self.executor_factory(max_workers=2) as w:
-                futures[w.submit(self.set_rotation, k)] = k
-
-            for f in as_completed(futures):
-                if f.exception():
-                    key = futures[f]
-                    self.log.error('error setting key rotation on %s: %s' % (
-                        key['Arn'], f.exception()))
+            if self.data.get('state', True):
+                client.enable_key_rotation(KeyId=k['KeyId'])
+                continue
+            client.disable_key_rotation(KeyId=k['KeyId'])

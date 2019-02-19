@@ -28,7 +28,7 @@ from c7n.filters import FilterValidationError
 
 class TagsTest(BaseTest):
     # regex for identifying valid email addresses
-    EMAIL_REGEX = "[^@]+@[^@]+\.[^@]+"
+    EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 
     logger = logging.getLogger()
 
@@ -703,6 +703,101 @@ class TagsTest(BaseTest):
         self.assertEqual(after_tags['CreatorEmail'], 'cloud@custodian.com')
 
     @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_default_to_upn(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = {
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'DoesNotMatter'
+                    }
+                },
+                'claims': {
+                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn':
+                        'cloud@custodian.com',
+                    'claim1': 'myemail@contoso.com'
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], 'cloud@custodian.com')
+
+    @arm_template('vm.json')
+    def test_auto_tag_user_event_grid_find_email_in_claims(self):
+        policy = self.load_policy(
+            {
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'mode': {
+                    'type': 'azure-event-grid',
+                    'events': [
+                        {
+                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                            'event': 'write'
+                        }
+                    ]},
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': True}
+                ],
+            },
+            session_factory=None,
+            validate=True,
+        )
+
+        vm_id = self.get_vm_resource_id()
+
+        event = {
+            'subject': vm_id,
+            'data': {
+                'authorization': {
+                    'evidence': {
+                        'principalType': 'DoesNotMatter'
+                    }
+                },
+                'claims': {
+                    'claim1': 'notEmailAddress',
+                    'claim2': 'myemail@contoso.com'
+                },
+                'operationName': 'Microsoft.Compute/virtualMachines/write',
+            }
+        }
+
+        policy.push(event, None)
+
+        after_tags = self.get_tags()
+        self.assertEqual(after_tags['CreatorEmail'], 'myemail@contoso.com')
+
+    @arm_template('vm.json')
     def test_auto_tag_user_event_grid_unknown_principal_event(self):
         policy = self.load_policy(
             {
@@ -836,51 +931,6 @@ class TagsTest(BaseTest):
 
         after_tags = self.get_tags()
         self.assertEqual(after_tags['CreatorEmail'], AutoTagUser.default_user)
-
-    @arm_template('vm.json')
-    def test_auto_tag_user_event_grid_unsupported_principal_type(self):
-        policy = self.load_policy(
-            {
-                'name': 'test-azure-tag',
-                'resource': 'azure.vm',
-                'mode': {
-                    'type': 'azure-event-grid',
-                    'events': [
-                        {
-                            'resourceProvider': 'Microsoft.Compute/virtualMachines',
-                            'event': 'write'
-                        }
-                    ]},
-                'actions': [
-                    {'type': 'auto-tag-user',
-                     'tag': 'CreatorEmail',
-                     'update': True}
-                ],
-            },
-            session_factory=None,
-            validate=True,
-        )
-
-        vm_id = self.get_vm_resource_id()
-
-        event = {
-            'subject': vm_id,
-            'data': {
-                'authorization': {
-                    'evidence': {
-                        'principalType': 'UnknownType'
-                    }
-                },
-                'claims': {
-                },
-                'operationName': 'Microsoft.Compute/virtualMachines/write',
-            }
-        }
-
-        policy.push(event, None)
-
-        after_tags = self.get_tags()
-        self.assertNotIn('CreatorEmail', after_tags)
 
     def test_tag_trim_space_must_be_btwn_0_and_15(self):
         with self.assertRaises(FilterValidationError):

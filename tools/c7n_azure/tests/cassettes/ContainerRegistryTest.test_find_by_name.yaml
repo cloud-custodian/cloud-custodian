@@ -1,0 +1,45 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python/3.7.2 (Darwin-16.7.0-x86_64-i386-64bit) msrest/0.6.4 msrest_azure/0.6.0
+          containerregistrymanagementclient/2.6.0 Azure-SDK-For-Python]
+      accept-language: [en-US]
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerRegistry/registries?api-version=2017-10-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xR83b90aNf/NEyW9DfHz3JmmL60eijtshr++cvob+vV/j6i2JaV0113o5PqmWbFcu8
+        fpVfFE1bX9+t5Zcib+j9Ykat7zbrSTOti1VbVMvm7l726WR/Z/Zwe/fT6WR7/9MHn24ffLrzcHt2
+        P9udne/u7hzs3Ltb5021rqf553W1XjV3i8ts2eZNe5VPshX9vaqry2KW183d26FiAbTnhJUOMvis
+        rKYZ8KPPr+izNbBvs4sGRPl2XpYVffHdqi5nIAN1v8prIg5/XVYXxfJ1Xl8yrRzUcfaDdZ1P63FR
+        EbBpnXMHT7MWne/t7B5s7+5u7+692dt9tL/7aG93vHP/3qf7Dx/8FLWmHi6LhpoXy4vXrbzyej2d
+        5vksn9H32WxRLL9q8vp0mU1K+uhRW6/zX/JLRv9fmMmrxdebwKuFbUIY6QD7X3yjU3m1mBrQt5jP
+        ve2dT9/s7Tza3Xt0/9549+HO/YcP7v//ej7B6r+/JdHvr31cv/8ET6cAZSHpN9eEqo58uME3NuED
+        Xdw08Q+3d0iQP32zs/Po/qePdg7Gu3t7+5/ef/j1Jv48K5vYzNPby1lW4yXCHujaT2hYP1fzny1/
+        UBH959ug3Pbu+8+7AZBN6x+cF5OL+UVG6OmY41/SJzwD1CDPMN979OHXmvAI/NtN9u6bHVLZB4/2
+        Hozv7+3vP9jb+3qTDSkffXRe1PlVVpav1mXe2O+YETpfkq3+/i/5Jd//Jf8PxVDbELsHAAA=
+    headers:
+      Cache-Control: [no-cache]
+      Content-Encoding: [gzip]
+      Content-Length: ['680']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 16 Jan 2019 01:23:55 GMT']
+      Expires: ['-1']
+      Pragma: [no-cache]
+      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      x-ms-correlation-request-id: [cc756f8e-b661-41c1-a7c2-f54ea94ba8c5]
+      x-ms-original-request-ids: ['', '']
+      x-ms-ratelimit-remaining-subscription-reads: ['11998']
+      x-ms-request-id: [cc756f8e-b661-41c1-a7c2-f54ea94ba8c5]
+      x-ms-routing-request-id: ['WESTUS2:20190116T012356Z:cc756f8e-b661-41c1-a7c2-f54ea94ba8c5']
+    status: {code: 200, message: OK}
+version: 1

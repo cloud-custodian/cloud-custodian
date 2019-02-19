@@ -85,15 +85,16 @@ class Deregister(BaseAction):
     permissions = ('ec2:DeregisterImage',)
 
     def process(self, images):
-        with self.executor_factory(max_workers=10) as w:
-            list(w.map(self.process_image, images))
-
-    def process_image(self, image):
+        client = local_session(self.manager.session_factory).client('ec2')
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
 
-        client = local_session(self.manager.session_factory).client('ec2')
-        retry(client.deregister_image, ImageId=image['ImageId'])
+        image_count = len(images)
+        images = [i for i in images if self.manager.ctx.options.account_id == i['OwnerId']]
+        if len(images) != image_count:
+            self.log.info("Implicitly filtered %d non owned images", image_count - len(images))
+        for i in images:
+            retry(client.deregister_image, ImageId=i['ImageId'])
 
 
 @actions.register('remove-launch-permissions')
@@ -123,11 +124,11 @@ class RemoveLaunchPermissions(BaseAction):
     permissions = ('ec2:ResetImageAttribute',)
 
     def process(self, images):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_image, images))
-
-    def process_image(self, image):
         client = local_session(self.manager.session_factory).client('ec2')
+        for i in images:
+            self.process_image(client, i)
+
+    def process_image(self, client, image):
         client.reset_image_attribute(
             ImageId=image['ImageId'], Attribute="launchPermission")
 
@@ -236,11 +237,20 @@ class ImageUnusedFilter(Filter):
 
     def _pull_asg_images(self):
         asgs = self.manager.get_resource_manager('asg').resources()
-        lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
+        image_ids = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
         lcfg_mgr = self.manager.get_resource_manager('launch-config')
-        return set([
-            lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
-            if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        if lcfgs:
+            image_ids.update([
+                lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
+                if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            image_ids.add(tversion['LaunchTemplateData'].get('ImageId'))
+        return image_ids
 
     def _pull_ec2_images(self):
         ec2_manager = self.manager.get_resource_manager('ec2')

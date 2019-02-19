@@ -127,6 +127,7 @@ class PostFinding(BaseAction):
 
     permissions = ('securityhub:BatchImportFindings',)
 
+    schema_alias = True
     schema = type_schema(
         "post-finding",
         required=["types"],
@@ -139,6 +140,7 @@ class PostFinding(BaseAction):
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
+        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10},
         types={
             "type": "array",
             "items": {"type": "string", "enum": build_vocabulary()},
@@ -184,10 +186,10 @@ class PostFinding(BaseAction):
                 "securityhub", region_name=region_name)
 
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
-
+        batch_size = self.data.get('batch_size', 10)
         stats = Counter()
         for key, grouped_resources in self.group_resources(resources).items():
-            for resource_set in chunks(grouped_resources, 10):
+            for resource_set in chunks(grouped_resources, batch_size):
                 stats['Finding'] += 1
                 if key == self.NEW_FINDING:
                     finding_id = None
@@ -219,7 +221,7 @@ class PostFinding(BaseAction):
                                 'title', self.manager.ctx.policy.name)),
                         'value': '{}:{}'.format(
                             finding['Id'], created_at)},
-                        self.manager).process(resources)
+                        self.manager).process(resource_set)
                 else:
                     stats['Update'] += len(resource_set)
 
@@ -289,10 +291,15 @@ class PostFinding(BaseAction):
         if "compliance_status" in self.data:
             finding["Compliance"] = {"Status": self.data["compliance_status"]}
 
-        fields = {}
+        fields = {
+            'resource': policy.resource_type,
+            'ProviderName': 'CloudCustodian',
+            'ProviderVersion': version
+        }
+
         if "fields" in self.data:
             fields.update(self.data["fields"])
-        if not fields:
+        else:
             tags = {}
             for t in policy.tags:
                 if ":" in t:
@@ -300,10 +307,7 @@ class PostFinding(BaseAction):
                 else:
                     k, v = t, ""
                 tags[k] = v
-            fields = tags
-            fields["resource"] = policy.resource_type
-            fields["ProviderName"] = "CloudCustodian"
-            fields["ProviderVersion"] = version
+            fields.update(tags)
         if fields:
             finding["ProductFields"] = fields
 

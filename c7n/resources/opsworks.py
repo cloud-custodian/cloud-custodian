@@ -30,7 +30,8 @@ class StateTransitionFilter(object):
     they are valid for. Separate from ec2 class as uses ['status']
     instead of ['State']['Name'].
 
-    For more details see http://goo.gl/TZH9Q5
+    For more details see
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
     """
     valid_origin_states = ()
 
