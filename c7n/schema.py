@@ -121,6 +121,7 @@ def specific_error(error):
                 break
             elif 'type' in v and t in v['properties']['type']['enum']:
                 found = idx
+                break
 
         if found is not None:
             for e in error.context:
