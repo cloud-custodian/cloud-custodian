@@ -28,6 +28,7 @@ requires = [
     "datadog",
     "sendgrid",
     "ldap3",
+    "c7n",
     "redis"]
 
 

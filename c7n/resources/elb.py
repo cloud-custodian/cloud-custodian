@@ -33,7 +33,7 @@ from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
-from c7n.utils import local_session, chunks, type_schema, get_retry, REGION_PARTITION_MAP
+from c7n.utils import local_session, chunks, type_schema, get_retry, generate_arn
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -83,11 +83,12 @@ class ELB(QueryResourceManager):
                 'elasticloadbalancing:DescribeTags')
 
     def get_arn(self, r):
-        return "arn:%s:elasticloadbalancing:%s:%s:loadbalancer/%s" % (
-            REGION_PARTITION_MAP.get(self.config.region, 'aws'),
-            self.config.region,
-            self.config.account_id,
-            r[self.resource_type.id])
+        return generate_arn(
+            account_id=self.config.account_id,
+            service='elasticloadbalancing',
+            resource_type='loadbalancer',
+            resource=r[self.resource_type.id],
+            region=self.config.region)
 
     def get_arns(self, resources):
         return map(self.get_arn, resources)
@@ -218,14 +219,10 @@ class Delete(BaseAction):
     permissions = ('elasticloadbalancing:DeleteLoadBalancer',)
 
     def process(self, load_balancers):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_elb, load_balancers))
-
-    def process_elb(self, elb):
         client = local_session(self.manager.session_factory).client('elb')
-        self.manager.retry(
-            client.delete_load_balancer,
-            LoadBalancerName=elb['LoadBalancerName'])
+        for elb in load_balancers:
+            self.manager.retry(
+                client.delete_load_balancer, LoadBalancerName=elb['LoadBalancerName'])
 
 
 @actions.register('set-ssl-listener-policy')
@@ -259,14 +256,28 @@ class SetSslListenerPolicy(BaseAction):
         'elasticloadbalancing:SetLoadBalancerPoliciesOfListener')
 
     def process(self, load_balancers):
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_elb, load_balancers))
+        client = local_session(self.manager.session_factory).client('elb')
+        rid = self.manager.resource_type.id
+        error = None
 
-    def process_elb(self, elb):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {}
+            for lb in load_balancers:
+                futures[w.submit(self.process_elb, client, lb)] = lb
+
+            for f in as_completed(futures):
+                if f.exception():
+                    log.error(
+                        "set-ssl-listener-policy error on lb:%s error:%s",
+                        futures[f][rid], f.exception())
+                    error = f.exception()
+
+        if error is not None:
+            raise error
+
+    def process_elb(self, client, elb):
         if not is_ssl(elb):
             return
-
-        client = local_session(self.manager.session_factory).client('elb')
 
         # Create a custom policy with epoch timestamp.
         # to make it unique within the
@@ -645,11 +656,12 @@ class SSLPolicyFilter(Filter):
         (myelb,['Protocol-SSLv1','Protocol-SSLv2'])
         """
         active_policy_attribute_tuples = []
+        client = local_session(self.manager.session_factory).client('elb')
         with self.executor_factory(max_workers=2) as w:
             futures = []
             for elb_policy_set in chunks(elb_policy_tuples, 50):
                 futures.append(
-                    w.submit(self.process_elb_policy_set, elb_policy_set))
+                    w.submit(self.process_elb_policy_set, client, elb_policy_set))
 
             for f in as_completed(futures):
                 if f.exception():
@@ -662,9 +674,8 @@ class SSLPolicyFilter(Filter):
 
         return active_policy_attribute_tuples
 
-    def process_elb_policy_set(self, elb_policy_set):
+    def process_elb_policy_set(self, client, elb_policy_set):
         results = []
-        client = local_session(self.manager.session_factory).client('elb')
 
         for (elb, policy_names) in elb_policy_set:
             elb_name = elb['LoadBalancerName']
@@ -758,10 +769,11 @@ class ELBAttributeFilterBase(object):
     """
 
     def initialize(self, elbs):
+        client = local_session(
+            self.manager.session_factory).client('elb')
+
         def _process_attributes(elb):
             if 'Attributes' not in elb:
-                client = local_session(
-                    self.manager.session_factory).client('elb')
                 results = client.describe_load_balancer_attributes(
                     LoadBalancerName=elb['LoadBalancerName'])
                 elb['Attributes'] = results['LoadBalancerAttributes']
