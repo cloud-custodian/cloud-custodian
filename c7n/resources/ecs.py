@@ -21,6 +21,7 @@ from c7n.filters import MetricsFilter, ValueFilter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+from c7n.resources import aws
 
 
 def ecs_tag_normalize(resources):
@@ -245,6 +246,37 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
             - delete
 
     """
+
+
+@Service.action_registry.register('modify')
+class UpdateService(BaseAction):
+    """Update service(s)."""
+
+    permissions = ('ecs:UpdateService',)
+
+    def validate(self):
+        api_call_shape = self.data.get('modify')
+        if not api_call_shape:
+            return
+        api_call_shape['service'] = 'PlaceHolderService'
+        aws.shape_validate(api_call_shape, 'UpdateServiceRequest', 'ecs')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecs')
+        for r in resources:
+            api_call_param = {}
+            requested_change_param = self.data.get('modify')
+            for update_prop, requested_val in requested_change_param.items():
+                if r.get(update_prop) != requested_val:
+                    api_call_param[update_prop] = requested_val
+
+            if not api_call_param:
+                continue
+            api_call_param['service'] = r['serviceName']
+            if 'clusterArn' in r:
+                api_call_param['cluster'] = r['clusterArn']
+
+            client.update_service(**api_call_param)
 
 
 @Service.action_registry.register('delete')

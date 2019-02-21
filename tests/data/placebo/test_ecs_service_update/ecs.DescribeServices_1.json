@@ -1,0 +1,137 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/custodian-test-service",
+                "serviceName": "custodian-test-service",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 1,
+                "runningCount": 0,
+                "pendingCount": 1,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370486074077503",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                        "desiredCount": 1,
+                        "pendingCount": 1,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 24,
+                            "second": 58,
+                            "microsecond": 304000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 24,
+                            "second": 58,
+                            "microsecond": 304000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-037318c577d65d330"
+                                ],
+                                "securityGroups": [
+                                    "sg-01b57671d658a9301"
+                                ],
+                                "assignPublicIp": "ENABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "275070fc-569d-465a-af72-b6e41f6fca16",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 26,
+                            "second": 2,
+                            "microsecond": 266000
+                        },
+                        "message": "(service custodian-test-service) has started 1 tasks: (task f2779298-6971-4b93-bbe2-76455e580fea)."
+                    },
+                    {
+                        "id": "09160bf9-cb3d-4e57-a7ef-7de058641d67",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 25,
+                            "second": 6,
+                            "microsecond": 256000
+                        },
+                        "message": "(service custodian-test-service) has started 1 tasks: (task a1ef47c0-b351-4d57-a6cd-f46a779ef396)."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 21,
+                    "hour": 15,
+                    "minute": 24,
+                    "second": 58,
+                    "microsecond": 304000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-037318c577d65d330"
+                        ],
+                        "securityGroups": [
+                            "sg-01b57671d658a9301"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "enableECSManagedTags": false,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "eac4b09a-3616-11e9-b04e-615c77db5206",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "eac4b09a-3616-11e9-b04e-615c77db5206",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1840",
+                "date": "Thu, 21 Feb 2019 20:26:06 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
