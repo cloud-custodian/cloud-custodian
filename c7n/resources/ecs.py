@@ -21,6 +21,9 @@ from c7n.filters import MetricsFilter, ValueFilter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
+from c7n.actions import AutoTagUser
+
 
 
 def ecs_tag_normalize(resources):
@@ -525,3 +528,52 @@ class UpdateAgent(BaseAction):
         except (client.exceptions.NoUpdateAvailableException,
                 client.exceptions.UpdateInProgressException):
             return
+
+
+@ECSCluster.action_registry.register('tag')
+@TaskDefinition.action_registry.register('tag')
+@Service.action_registry.register('tag')
+@Task.action_registry.register('tag')
+@ContainerInstance.action_registry.register('tag')
+class TagEcsResource(Tag):
+    permissions = ('ecs:TagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
+        mid = self.manager.resource_type.id
+        for r in resources:
+            client.tag_resource(resourceArn=r[mid], tags=tags)
+
+
+@ECSCluster.action_registry.register('remove-tag')
+@TaskDefinition.action_registry.register('remove-tag')
+@Service.action_registry.register('remove-tag')
+@Task.action_registry.register('remove-tag')
+@ContainerInstance.action_registry.register('remove-tag')
+class RemoveTagEcsResource(RemoveTag):
+    permissions = ('ecs:UntagResource',)
+
+    def process_resource_set(self, client, resources, keys):
+        for r in resources:
+            client.untag_resource(resourceArn=r[self.id_key], tagKeys=keys)
+
+
+@ECSCluster.action_registry.register('mark-for-op')
+@TaskDefinition.action_registry.register('mark-for-op')
+@Service.action_registry.register('mark-for-op')
+@Task.action_registry.register('mark-for-op')
+@ContainerInstance.action_registry.register('mark-for-op')
+class MarkEcsResourceForOp(TagDelayedAction):
+    """Docstring"""
+
+ECSCluster.filter_registry.register('marked-for-op', TagActionFilter)
+TaskDefinition.filter_registry.register('marked-for-op', TagActionFilter)
+Service.filter_registry.register('marked-for-op', TagActionFilter)
+Task.filter_registry.register('marked-for-op', TagActionFilter)
+ContainerInstance.filter_registry.register('marked-for-op', TagActionFilter)
+
+ECSCluster.action_registry.register('auto-tag-user', AutoTagUser)
+TaskDefinition.action_registry.register('auto-tag-user', AutoTagUser)
+Service.action_registry.register('auto-tag-user', AutoTagUser)
+Task.action_registry.register('auto-tag-user', AutoTagUser)
+ContainerInstance.action_registry.register('auto-tag-user', AutoTagUser)
