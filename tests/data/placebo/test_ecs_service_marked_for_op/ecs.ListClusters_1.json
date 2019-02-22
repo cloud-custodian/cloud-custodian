@@ -12,13 +12,13 @@
             "arn:aws:ecs:us-east-1:644160558196:cluster/devx"
         ],
         "ResponseMetadata": {
-            "RequestId": "fae624ee-36c3-11e9-be70-b5a5acb15a01",
+            "RequestId": "b916cb8f-36da-11e9-a81d-11bdaf998fd2",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "fae624ee-36c3-11e9-be70-b5a5acb15a01",
+                "x-amzn-requestid": "b916cb8f-36da-11e9-a81d-11bdaf998fd2",
                 "content-type": "application/x-amz-json-1.1",
                 "content-length": "530",
-                "date": "Fri, 22 Feb 2019 17:04:55 GMT"
+                "date": "Fri, 22 Feb 2019 19:47:44 GMT"
             },
             "RetryAttempts": 0
         }

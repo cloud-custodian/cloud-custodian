@@ -9,7 +9,7 @@
                 "registeredContainerInstancesCount": 0,
                 "runningTasksCount": 0,
                 "pendingTasksCount": 0,
-                "activeServicesCount": 1,
+                "activeServicesCount": 0,
                 "statistics": [],
                 "tags": []
             },
@@ -69,7 +69,7 @@
                 "registeredContainerInstancesCount": 0,
                 "runningTasksCount": 0,
                 "pendingTasksCount": 0,
-                "activeServicesCount": 1,
+                "activeServicesCount": 0,
                 "statistics": [],
                 "tags": []
             },
@@ -84,8 +84,8 @@
                 "statistics": [],
                 "tags": [
                     {
-                        "key": "TestKey",
-                        "value": "TestValue"
+                        "key": "custodian_tag",
+                        "value": "Resource does not meet policy: tag@2019/02/23"
                     }
                 ]
             },
@@ -112,13 +112,13 @@
         ],
         "failures": [],
         "ResponseMetadata": {
-            "RequestId": "771d0693-3613-11e9-b625-d5221894e4c8",
+            "RequestId": "68bd569c-36da-11e9-8292-2ba4788c9af6",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "771d0693-3613-11e9-b625-d5221894e4c8",
+                "x-amzn-requestid": "68bd569c-36da-11e9-8292-2ba4788c9af6",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "2264",
-                "date": "Thu, 21 Feb 2019 20:01:23 GMT"
+                "content-length": "2306",
+                "date": "Fri, 22 Feb 2019 19:45:29 GMT"
             },
             "RetryAttempts": 0
         }

@@ -1,17 +1,15 @@
 {
     "status_code": 200,
     "data": {
-        "serviceArns": [
-            "arn:aws:ecs:us-east-1:644160558196:service/BrentCustodianTestService"
-        ],
+        "serviceArns": [],
         "ResponseMetadata": {
-            "RequestId": "fb28d395-36c3-11e9-a7b9-8da50371ee8d",
+            "RequestId": "b95e82bd-36da-11e9-8134-a1854afdcf9a",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "fb28d395-36c3-11e9-a7b9-8da50371ee8d",
+                "x-amzn-requestid": "b95e82bd-36da-11e9-8134-a1854afdcf9a",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "88",
-                "date": "Fri, 22 Feb 2019 17:04:56 GMT"
+                "content-length": "18",
+                "date": "Fri, 22 Feb 2019 19:47:44 GMT"
             },
             "RetryAttempts": 0
         }

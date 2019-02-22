@@ -3,117 +3,6 @@
     "data": {
         "services": [
             {
-                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/home-web",
-                "serviceName": "home-web",
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
-                "loadBalancers": [],
-                "serviceRegistries": [],
-                "status": "ACTIVE",
-                "desiredCount": 0,
-                "runningCount": 0,
-                "pendingCount": 0,
-                "launchType": "EC2",
-                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
-                "deploymentConfiguration": {
-                    "maximumPercent": 200,
-                    "minimumHealthyPercent": 0
-                },
-                "deployments": [
-                    {
-                        "id": "ecs-svc/9223370486003261141",
-                        "status": "PRIMARY",
-                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
-                        "desiredCount": 0,
-                        "pendingCount": 0,
-                        "runningCount": 0,
-                        "createdAt": {
-                            "__class__": "datetime",
-                            "year": 2019,
-                            "month": 2,
-                            "day": 22,
-                            "hour": 11,
-                            "minute": 5,
-                            "second": 14,
-                            "microsecond": 666000
-                        },
-                        "updatedAt": {
-                            "__class__": "datetime",
-                            "year": 2019,
-                            "month": 2,
-                            "day": 22,
-                            "hour": 11,
-                            "minute": 5,
-                            "second": 22,
-                            "microsecond": 139000
-                        },
-                        "launchType": "EC2",
-                        "networkConfiguration": {
-                            "awsvpcConfiguration": {
-                                "subnets": [
-                                    "subnet-06261c743949f093d"
-                                ],
-                                "securityGroups": [
-                                    "sg-034c1e48ec56c8bcb"
-                                ],
-                                "assignPublicIp": "DISABLED"
-                            }
-                        }
-                    }
-                ],
-                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
-                "events": [
-                    {
-                        "id": "0d21b349-4473-4a2a-bc62-a5c8d72ff6ce",
-                        "createdAt": {
-                            "__class__": "datetime",
-                            "year": 2019,
-                            "month": 2,
-                            "day": 22,
-                            "hour": 11,
-                            "minute": 5,
-                            "second": 22,
-                            "microsecond": 155000
-                        },
-                        "message": "(service home-web) has reached a steady state."
-                    }
-                ],
-                "createdAt": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 2,
-                    "day": 22,
-                    "hour": 11,
-                    "minute": 5,
-                    "second": 14,
-                    "microsecond": 666000
-                },
-                "placementConstraints": [],
-                "placementStrategy": [
-                    {
-                        "type": "spread",
-                        "field": "attribute:ecs.availability-zone"
-                    },
-                    {
-                        "type": "spread",
-                        "field": "instanceId"
-                    }
-                ],
-                "networkConfiguration": {
-                    "awsvpcConfiguration": {
-                        "subnets": [
-                            "subnet-06261c743949f093d"
-                        ],
-                        "securityGroups": [
-                            "sg-034c1e48ec56c8bcb"
-                        ],
-                        "assignPublicIp": "DISABLED"
-                    }
-                },
-                "schedulingStrategy": "REPLICA",
-                "enableECSManagedTags": true,
-                "propagateTags": "NONE"
-            },
-            {
                 "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/test-service-tags",
                 "serviceName": "test-service-tags",
                 "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
@@ -125,16 +14,16 @@
                 "pendingCount": 0,
                 "launchType": "FARGATE",
                 "platformVersion": "LATEST",
-                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/fargate-task-definition:2",
                 "deploymentConfiguration": {
                     "maximumPercent": 200,
                     "minimumHealthyPercent": 0
                 },
                 "deployments": [
                     {
-                        "id": "ecs-svc/9223370486077215775",
+                        "id": "ecs-svc/9223370485990186738",
                         "status": "PRIMARY",
-                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/fargate-task-definition:2",
                         "desiredCount": 0,
                         "pendingCount": 0,
                         "runningCount": 0,
@@ -142,21 +31,21 @@
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
-                            "day": 21,
+                            "day": 22,
                             "hour": 14,
-                            "minute": 32,
-                            "second": 40,
-                            "microsecond": 32000
+                            "minute": 43,
+                            "second": 9,
+                            "microsecond": 62000
                         },
                         "updatedAt": {
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
-                            "day": 21,
+                            "day": 22,
                             "hour": 14,
-                            "minute": 32,
-                            "second": 43,
-                            "microsecond": 176000
+                            "minute": 43,
+                            "second": 19,
+                            "microsecond": 8000
                         },
                         "launchType": "FARGATE",
                         "platformVersion": "1.3.0",
@@ -176,58 +65,16 @@
                 "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
                 "events": [
                     {
-                        "id": "176a4f4e-ca53-4697-9c15-83b9d85bb3d2",
+                        "id": "9e0e9d41-b07e-4345-b2e8-e32e50358b4a",
                         "createdAt": {
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
                             "day": 22,
-                            "hour": 8,
-                            "minute": 33,
-                            "second": 27,
-                            "microsecond": 416000
-                        },
-                        "message": "(service test-service-tags) has reached a steady state."
-                    },
-                    {
-                        "id": "f1ac1d86-c9e5-4def-bd2f-dde17bd16c9f",
-                        "createdAt": {
-                            "__class__": "datetime",
-                            "year": 2019,
-                            "month": 2,
-                            "day": 22,
-                            "hour": 2,
-                            "minute": 33,
-                            "second": 19,
-                            "microsecond": 536000
-                        },
-                        "message": "(service test-service-tags) has reached a steady state."
-                    },
-                    {
-                        "id": "fa0f4be6-f05c-49d3-8a6f-c2935fe21de8",
-                        "createdAt": {
-                            "__class__": "datetime",
-                            "year": 2019,
-                            "month": 2,
-                            "day": 21,
-                            "hour": 20,
-                            "minute": 32,
-                            "second": 59,
-                            "microsecond": 251000
-                        },
-                        "message": "(service test-service-tags) has reached a steady state."
-                    },
-                    {
-                        "id": "ece4a223-1da4-4ee0-bf29-952a1528d3aa",
-                        "createdAt": {
-                            "__class__": "datetime",
-                            "year": 2019,
-                            "month": 2,
-                            "day": 21,
                             "hour": 14,
-                            "minute": 32,
-                            "second": 43,
-                            "microsecond": 185000
+                            "minute": 43,
+                            "second": 19,
+                            "microsecond": 15000
                         },
                         "message": "(service test-service-tags) has reached a steady state."
                     }
@@ -236,11 +83,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 2,
-                    "day": 21,
+                    "day": 22,
                     "hour": 14,
-                    "minute": 32,
-                    "second": 40,
-                    "microsecond": 32000
+                    "minute": 43,
+                    "second": 9,
+                    "microsecond": 62000
                 },
                 "placementConstraints": [],
                 "placementStrategy": [],
@@ -256,19 +103,19 @@
                     }
                 },
                 "schedulingStrategy": "REPLICA",
-                "enableECSManagedTags": false,
+                "enableECSManagedTags": true,
                 "propagateTags": "NONE"
             }
         ],
         "failures": [],
         "ResponseMetadata": {
-            "RequestId": "5bc832aa-36c3-11e9-9b40-b17cd0a4a698",
+            "RequestId": "95a8aafd-36da-11e9-af04-8fa19e391a3a",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "5bc832aa-36c3-11e9-9b40-b17cd0a4a698",
+                "x-amzn-requestid": "95a8aafd-36da-11e9-af04-8fa19e391a3a",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "3606",
-                "date": "Fri, 22 Feb 2019 17:00:29 GMT"
+                "content-length": "1607",
+                "date": "Fri, 22 Feb 2019 19:46:45 GMT"
             },
             "RetryAttempts": 0
         }

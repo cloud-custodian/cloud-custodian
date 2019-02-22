@@ -9,7 +9,7 @@
                 "registeredContainerInstancesCount": 0,
                 "runningTasksCount": 0,
                 "pendingTasksCount": 0,
-                "activeServicesCount": 2,
+                "activeServicesCount": 0,
                 "statistics": [],
                 "tags": []
             },
@@ -69,7 +69,7 @@
                 "registeredContainerInstancesCount": 0,
                 "runningTasksCount": 0,
                 "pendingTasksCount": 0,
-                "activeServicesCount": 1,
+                "activeServicesCount": 0,
                 "statistics": [],
                 "tags": []
             },
@@ -80,7 +80,7 @@
                 "registeredContainerInstancesCount": 0,
                 "runningTasksCount": 0,
                 "pendingTasksCount": 0,
-                "activeServicesCount": 2,
+                "activeServicesCount": 1,
                 "statistics": [],
                 "tags": [
                     {
@@ -112,13 +112,13 @@
         ],
         "failures": [],
         "ResponseMetadata": {
-            "RequestId": "faf9107e-36c3-11e9-9cb3-63e7296b1368",
+            "RequestId": "b9326a72-36da-11e9-8918-b1133a8b2967",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "faf9107e-36c3-11e9-9cb3-63e7296b1368",
+                "x-amzn-requestid": "b9326a72-36da-11e9-8918-b1133a8b2967",
                 "content-type": "application/x-amz-json-1.1",
                 "content-length": "2306",
-                "date": "Fri, 22 Feb 2019 17:04:56 GMT"
+                "date": "Fri, 22 Feb 2019 19:47:44 GMT"
             },
             "RetryAttempts": 0
         }

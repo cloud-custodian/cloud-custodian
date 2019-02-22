@@ -2,17 +2,16 @@
     "status_code": 200,
     "data": {
         "serviceArns": [
-            "arn:aws:ecs:us-east-1:644160558196:service/test/home-web",
-            "arn:aws:ecs:us-east-1:644160558196:service/test/test-service-tags"
+            "arn:aws:ecs:us-east-1:644160558196:service/test/home-web"
         ],
         "ResponseMetadata": {
-            "RequestId": "14ae0ae4-36bd-11e9-8c8b-53368943200c",
+            "RequestId": "889d04b8-36db-11e9-a54b-07c4ec4b052f",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "14ae0ae4-36bd-11e9-8c8b-53368943200c",
+                "x-amzn-requestid": "889d04b8-36db-11e9-a54b-07c4ec4b052f",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "144",
-                "date": "Fri, 22 Feb 2019 16:15:33 GMT"
+                "content-length": "76",
+                "date": "Fri, 22 Feb 2019 19:53:32 GMT"
             },
             "RetryAttempts": 0
         }

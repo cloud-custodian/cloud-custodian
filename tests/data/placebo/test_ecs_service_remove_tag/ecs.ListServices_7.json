@@ -5,13 +5,13 @@
             "arn:aws:ecs:us-east-1:644160558196:service/test/test-service-tags"
         ],
         "ResponseMetadata": {
-            "RequestId": "77a8cb48-3613-11e9-997c-8195e43c62cb",
+            "RequestId": "68ec0798-36da-11e9-b439-2d95c0392e71",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "77a8cb48-3613-11e9-997c-8195e43c62cb",
+                "x-amzn-requestid": "68ec0798-36da-11e9-b439-2d95c0392e71",
                 "content-type": "application/x-amz-json-1.1",
                 "content-length": "85",
-                "date": "Thu, 21 Feb 2019 20:01:25 GMT"
+                "date": "Fri, 22 Feb 2019 19:45:29 GMT"
             },
             "RetryAttempts": 0
         }
