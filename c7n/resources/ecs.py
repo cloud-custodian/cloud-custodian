@@ -21,7 +21,6 @@ from c7n.filters import MetricsFilter, ValueFilter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
-from c7n.resources import aws
 
 
 def ecs_tag_normalize(resources):
@@ -250,22 +249,76 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
 
 @Service.action_registry.register('modify')
 class UpdateService(BaseAction):
-    """Update service(s)."""
+    """Action to update service
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: no-public-ips-services
+                resource: ecs-service
+                filters:
+                  - 'networkConfiguration.awsvpcConfiguration.assignPublicIp': 'ENABLED'
+                actions:
+                  - type: modify
+                    update:
+                      networkConfiguration:
+                        awsvpcConfiguration:
+                          assignPublicIp: DISABLED
+    """
+
+    schema = type_schema('modify',
+        update={
+            'cluster': {'type': 'string'},
+            'service': {'type': 'string'},
+            'desiredCount': {'type': 'integer'},
+            'taskDefinition': {'type': 'string'},
+            'deploymentConfiguration': {
+                'type': 'object',
+                'properties': {
+                    'maximumPercent': {'type': 'integer'},
+                    'minimumHealthyPercent': {'type': 'integer'},
+                }
+            },
+            'networkConfiguration': {
+                'type': 'object',
+                'properties': {
+                    'awsvpcConfiguration': {
+                        'type': 'object',
+                        'properties': {
+                            'subnets': {
+                                'type': 'array',
+                                'items': {
+                                    'type': 'string',
+                                }
+                            },
+                            'securityGroups': {
+                                'items': {
+                                    'type': 'string',
+                                }
+                            },
+                            'assignPublicIp': {
+                                'type': 'string',
+                                'enum': ['ENABLED', 'DISABLED'],
+                            }
+                        }
+                    }
+                }
+            },
+            'platformVersion': {'type': 'string'},
+            'forceNewDeployment': {'type': 'boolean', 'default': False},
+            'healthCheckGracePeriodSeconds': {'type': 'integer'},
+        }
+    )
 
     permissions = ('ecs:UpdateService',)
-
-    def validate(self):
-        api_call_shape = self.data.get('modify')
-        if not api_call_shape:
-            return
-        api_call_shape['service'] = 'PlaceHolderService'
-        aws.shape_validate(api_call_shape, 'UpdateServiceRequest', 'ecs')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         for r in resources:
             api_call_param = {}
-            requested_change_param = self.data.get('modify')
+            requested_change_param = self.data.get('update')
             for update_prop, requested_val in requested_change_param.items():
                 if r.get(update_prop) != requested_val:
                     api_call_param[update_prop] = requested_val
@@ -273,8 +326,7 @@ class UpdateService(BaseAction):
             if not api_call_param:
                 continue
             api_call_param['service'] = r['serviceName']
-            if 'clusterArn' in r:
-                api_call_param['cluster'] = r['clusterArn']
+            api_call_param['cluster'] = r['clusterArn']
 
             client.update_service(**api_call_param)
 

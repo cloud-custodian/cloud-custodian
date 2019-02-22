@@ -3,15 +3,15 @@
     "data": {
         "services": [
             {
-                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/custodian-test-service",
-                "serviceName": "custodian-test-service",
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/custodian-service-update-test",
+                "serviceName": "custodian-service-update-test",
                 "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
                 "loadBalancers": [],
                 "serviceRegistries": [],
                 "status": "ACTIVE",
                 "desiredCount": 1,
                 "runningCount": 0,
-                "pendingCount": 1,
+                "pendingCount": 0,
                 "launchType": "FARGATE",
                 "platformVersion": "LATEST",
                 "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
@@ -21,31 +21,31 @@
                 },
                 "deployments": [
                     {
-                        "id": "ecs-svc/9223370486074077503",
+                        "id": "ecs-svc/9223370485985801954",
                         "status": "PRIMARY",
                         "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
                         "desiredCount": 1,
-                        "pendingCount": 1,
+                        "pendingCount": 0,
                         "runningCount": 0,
                         "createdAt": {
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
-                            "day": 21,
+                            "day": 22,
                             "hour": 15,
-                            "minute": 24,
-                            "second": 58,
-                            "microsecond": 304000
+                            "minute": 56,
+                            "second": 13,
+                            "microsecond": 851000
                         },
                         "updatedAt": {
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
-                            "day": 21,
+                            "day": 22,
                             "hour": 15,
-                            "minute": 24,
-                            "second": 58,
-                            "microsecond": 304000
+                            "minute": 56,
+                            "second": 13,
+                            "microsecond": 851000
                         },
                         "launchType": "FARGATE",
                         "platformVersion": "1.3.0",
@@ -55,7 +55,48 @@
                                     "subnet-037318c577d65d330"
                                 ],
                                 "securityGroups": [
-                                    "sg-01b57671d658a9301"
+                                    "sg-0669346d29dd0345a"
+                                ],
+                                "assignPublicIp": "DISABLED"
+                            }
+                        }
+                    },
+                    {
+                        "id": "ecs-svc/9223370485985851249",
+                        "status": "ACTIVE",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                        "desiredCount": 1,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 22,
+                            "hour": 15,
+                            "minute": 55,
+                            "second": 24,
+                            "microsecond": 546000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 22,
+                            "hour": 15,
+                            "minute": 56,
+                            "second": 13,
+                            "microsecond": 853000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-037318c577d65d330"
+                                ],
+                                "securityGroups": [
+                                    "sg-0de05e481149cb1d7"
                                 ],
                                 "assignPublicIp": "ENABLED"
                             }
@@ -65,43 +106,29 @@
                 "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
                 "events": [
                     {
-                        "id": "275070fc-569d-465a-af72-b6e41f6fca16",
+                        "id": "55cee284-bf44-49c5-994b-ff6b93dc05e7",
                         "createdAt": {
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
-                            "day": 21,
+                            "day": 22,
                             "hour": 15,
-                            "minute": 26,
-                            "second": 2,
-                            "microsecond": 266000
+                            "minute": 55,
+                            "second": 29,
+                            "microsecond": 321000
                         },
-                        "message": "(service custodian-test-service) has started 1 tasks: (task f2779298-6971-4b93-bbe2-76455e580fea)."
-                    },
-                    {
-                        "id": "09160bf9-cb3d-4e57-a7ef-7de058641d67",
-                        "createdAt": {
-                            "__class__": "datetime",
-                            "year": 2019,
-                            "month": 2,
-                            "day": 21,
-                            "hour": 15,
-                            "minute": 25,
-                            "second": 6,
-                            "microsecond": 256000
-                        },
-                        "message": "(service custodian-test-service) has started 1 tasks: (task a1ef47c0-b351-4d57-a6cd-f46a779ef396)."
+                        "message": "(service custodian-service-update-test) has started 1 tasks: (task cfcef463-8e52-426a-bad4-2ad36512f942)."
                     }
                 ],
                 "createdAt": {
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 2,
-                    "day": 21,
+                    "day": 22,
                     "hour": 15,
-                    "minute": 24,
-                    "second": 58,
-                    "microsecond": 304000
+                    "minute": 55,
+                    "second": 24,
+                    "microsecond": 546000
                 },
                 "placementConstraints": [],
                 "placementStrategy": [],
@@ -111,9 +138,9 @@
                             "subnet-037318c577d65d330"
                         ],
                         "securityGroups": [
-                            "sg-01b57671d658a9301"
+                            "sg-0669346d29dd0345a"
                         ],
-                        "assignPublicIp": "ENABLED"
+                        "assignPublicIp": "DISABLED"
                     }
                 },
                 "schedulingStrategy": "REPLICA",
@@ -123,13 +150,13 @@
         ],
         "failures": [],
         "ResponseMetadata": {
-            "RequestId": "eac4b09a-3616-11e9-b04e-615c77db5206",
+            "RequestId": "4a658020-36e4-11e9-9388-3935932a7f11",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "eac4b09a-3616-11e9-b04e-615c77db5206",
+                "x-amzn-requestid": "4a658020-36e4-11e9-9388-3935932a7f11",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1840",
-                "date": "Thu, 21 Feb 2019 20:26:06 GMT"
+                "content-length": "2138",
+                "date": "Fri, 22 Feb 2019 20:56:13 GMT"
             },
             "RetryAttempts": 0
         }

@@ -102,23 +102,20 @@ class TestEcsService(BaseTest):
 
     def test_ecs_service_update(self):
         session_factory = self.replay_flight_data("test_ecs_service_update")
-        client = session_factory().client("ecs")
-        svc = client.describe_services(
-            cluster="arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
-            services=["custodian-test-service"]
-        )["services"][0]
+        test_service_name = 'custodian-service-update-test'
 
-        self.assertEqual(svc['networkConfiguration']['awsvpcConfiguration']['assignPublicIp'],
-            'ENABLED')
         p = self.load_policy(
             {
                 "name": "all-ecs-to-update",
                 "resource": "ecs-service",
-                "filters": [{"serviceName": "custodian-test-service"}],
+                "filters": [
+                    {"networkConfiguration.awsvpcConfiguration.assignPublicIp": "ENABLED"},
+                    {"serviceName": "custodian-test-service"}
+                ],
                 "actions": [
                     {
                         'type': 'modify',
-                        'modify': {
+                        'update': {
                             'networkConfiguration': {
                                 'awsvpcConfiguration': {
                                     'assignPublicIp': 'DISABLED',
@@ -131,9 +128,11 @@ class TestEcsService(BaseTest):
                 ],
             })
         p.run()
+
+        client = session_factory().client("ecs")
         svc_current = client.describe_services(
             cluster="arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
-            services=["custodian-test-service"]
+            services=[test_service_name]
         )["services"][0]
         self.assertEqual(svc_current['networkConfiguration'][
             'awsvpcConfiguration']['assignPublicIp'], 'DISABLED')
