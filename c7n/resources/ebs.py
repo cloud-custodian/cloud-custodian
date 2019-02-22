@@ -1064,7 +1064,15 @@ class CreateSnapshot(BaseAction):
         retry = get_retry(['Throttled'], max_attempts=5)
         for vol in volumes:
             vol_id = vol['VolumeId']
-            retry(client.create_snapshot, VolumeId=vol_id)
+            retry(self.process_volume, client=client, volume=vol_id)
+
+    def process_volume(self, client, volume):
+        try:
+            client.create_snapshot(VolumeId=volume)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'InvalidVolume.NotFound':
+                return
+            raise
 
 
 @EBS.action_registry.register('delete')
