@@ -203,6 +203,7 @@ class GuardDutyEnabled(MultiAttrFilter):
             '^Master': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
     }
 
+    annotation = "c7n:guard-duty"
     permissions = (
         'guardduty:GetMasterAccount',
         'guardduty:ListDetectors',
@@ -217,17 +218,23 @@ class GuardDutyEnabled(MultiAttrFilter):
         return super(GuardDutyEnabled, self).validate()
 
     def get_target(self, resource):
+        if self.annotation in resource:
+            return resource[self.annotation]
+
         client = local_session(self.manager.session_factory).client('guardduty')
         # detectors are singletons too.
         detector_ids = client.list_detectors().get('DetectorIds')
+
         if not detector_ids:
             return None
         else:
             detector_id = detector_ids.pop()
+
         detector = client.get_detector(DetectorId=detector_id)
         detector.pop('ResponseMetadata', None)
         master = client.get_master_account(DetectorId=detector_id).get('master')
-        return {'Detector': detector, 'Master': master}
+        resource[self.annotation] = r = {'Detector': detector, 'Master': master}
+        return r
 
 
 @filters.register('check-config')
