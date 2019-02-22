@@ -128,6 +128,9 @@ class PythonPackageArchive(object):
         """
         for root, dirs, files in os.walk(path):
             arc_prefix = os.path.relpath(root, os.path.dirname(path))
+            # py3 remove pyc cache dirs.
+            if '__pycache__' in dirs:
+                dirs.remove('__pycache__')
             for f in files:
                 dest_path = os.path.join(arc_prefix, f)
 
