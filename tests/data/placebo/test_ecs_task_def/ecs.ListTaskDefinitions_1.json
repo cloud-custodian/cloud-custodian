@@ -2,20 +2,25 @@
     "status_code": 200,
     "data": {
         "taskDefinitionArns": [
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1",
             "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
-            "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:1",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/first-run-job-definition:1",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/register-container-task:1",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/register-container-task:2",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/register-container-task:3",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/register-container-task:4",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/register-container-task:5",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/sleeper:1",
             "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1"
         ],
         "ResponseMetadata": {
-            "RequestId": "083b9917-fa5f-11e7-80d9-edbefe524002",
+            "RequestId": "1f9e6fae-36b8-11e9-9ee3-bf9d2d102ba4",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "server": "Server",
-                "date": "Tue, 16 Jan 2018 01:46:12 GMT",
+                "x-amzn-requestid": "1f9e6fae-36b8-11e9-9ee3-bf9d2d102ba4",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "237",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "083b9917-fa5f-11e7-80d9-edbefe524002"
+                "content-length": "769",
+                "date": "Fri, 22 Feb 2019 15:40:04 GMT"
             },
             "RetryAttempts": 0
         }

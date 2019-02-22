@@ -3,27 +3,117 @@
     "data": {
         "clusters": [
             {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+                "clusterName": "test-cluster",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 2,
+                "statistics": [],
+                "tags": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
+                "clusterName": "default-cluster",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test_Batch_c32711b6-e097-3656-b279-93b799200d60",
+                "clusterName": "test_Batch_c32711b6-e097-3656-b279-93b799200d60",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/BrentCloudCustodianTestCluster2",
+                "clusterName": "BrentCloudCustodianTestCluster2",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/devx",
+                "clusterName": "devx",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "Env",
+                        "value": "Dev"
+                    }
+                ]
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/BrentCustodianTestCluster",
+                "clusterName": "BrentCustodianTestCluster",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 1,
+                "statistics": [],
+                "tags": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
+                "clusterName": "test",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 2,
+                "statistics": [],
+                "tags": []
+            },
+            {
                 "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
                 "clusterName": "Default",
                 "status": "ACTIVE",
                 "registeredContainerInstancesCount": 0,
-                "runningTasksCount": 4,
+                "runningTasksCount": 0,
                 "pendingTasksCount": 0,
-                "activeServicesCount": 1,
-                "statistics": []
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "Env",
+                        "value": "Dev"
+                    },
+                    {
+                        "key": "Data",
+                        "value": "Magic"
+                    }
+                ]
             }
         ],
         "failures": [],
         "ResponseMetadata": {
-            "RequestId": "2cad2078-fa5f-11e7-8b0c-1b9f2ce83fe6",
+            "RequestId": "14224611-36bd-11e9-818f-01c17a55ed32",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "server": "Server",
-                "date": "Tue, 16 Jan 2018 01:47:13 GMT",
+                "x-amzn-requestid": "14224611-36bd-11e9-818f-01c17a55ed32",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "260",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "2cad2078-fa5f-11e7-8b0c-1b9f2ce83fe6"
+                "content-length": "2227",
+                "date": "Fri, 22 Feb 2019 16:15:32 GMT"
             },
             "RetryAttempts": 0
         }

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": [
+            {
+                "key": "custodian_tag",
+                "value": "Resource does not meet policy: tag@2019/02/23"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "5bfc8863-36c3-11e9-8949-5749d2d95554",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5bfc8863-36c3-11e9-8949-5749d2d95554",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "90",
+                "date": "Fri, 22 Feb 2019 17:00:29 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

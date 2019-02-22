@@ -2,72 +2,46 @@
     "status_code": 200,
     "data": {
         "taskDefinition": {
-            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1",
             "containerDefinitions": [
                 {
-                    "name": "Db",
-                    "image": "redis:latest",
+                    "name": "default",
+                    "image": "capitalone/cloud-custodian",
                     "cpu": 0,
-                    "portMappings": [
-                        {
-                            "containerPort": 6379,
-                            "hostPort": 6379,
-                            "protocol": "tcp"
-                        }
-                    ],
+                    "memory": 1,
+                    "portMappings": [],
                     "essential": true,
                     "environment": [],
-                    "mountPoints": [
-                        {
-                            "sourceVolume": "host-data",
-                            "containerPath": "/data"
-                        }
-                    ],
+                    "mountPoints": [],
                     "volumesFrom": [],
-                    "readonlyRootFilesystem": true,
-                    "dockerLabels": {
-                        "role": "db"
-                    },
                     "logConfiguration": {
                         "logDriver": "awslogs",
                         "options": {
-                            "awslogs-group": "/ecs/ecs-read-only-root",
+                            "awslogs-group": "/aws/batch/job",
                             "awslogs-region": "us-east-1",
-                            "awslogs-stream-prefix": "ecs"
+                            "awslogs-stream-prefix": "c7n"
                         }
                     }
                 }
             ],
-            "family": "ecs-read-only-root",
+            "family": "c7n",
             "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
-            "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
-            "networkMode": "awsvpc",
+            "networkMode": "host",
             "revision": 1,
-            "volumes": [
-                {
-                    "name": "host-data",
-                    "host": {}
-                }
-            ],
+            "volumes": [],
             "status": "ACTIVE",
             "requiresAttributes": [
                 {
-                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
-                },
-                {
                     "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-                },
-                {
-                    "name": "ecs.capability.task-eni"
                 },
                 {
                     "name": "com.amazonaws.ecs.capability.task-iam-role"
                 },
                 {
-                    "name": "ecs.capability.execution-role-awslogs"
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
                 },
                 {
-                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+                    "name": "com.amazonaws.ecs.capability.task-iam-role-network-host"
                 },
                 {
                     "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
@@ -75,25 +49,23 @@
             ],
             "placementConstraints": [],
             "compatibilities": [
-                "EC2",
-                "FARGATE"
-            ],
-            "requiresCompatibilities": [
-                "FARGATE"
-            ],
-            "cpu": "256",
-            "memory": "512"
+                "EC2"
+            ]
         },
+        "tags": [
+            {
+                "key": "TestKey",
+                "value": "TestValue"
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "08689ca3-fa5f-11e7-bb88-717c0fe1a433",
+            "RequestId": "1fda1931-36b8-11e9-b3f3-0f027ac5b310",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "server": "Server",
-                "date": "Tue, 16 Jan 2018 01:46:12 GMT",
+                "x-amzn-requestid": "1fda1931-36b8-11e9-b3f3-0f027ac5b310",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1400",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "08689ca3-fa5f-11e7-bb88-717c0fe1a433"
+                "content-length": "1012",
+                "date": "Fri, 22 Feb 2019 15:40:04 GMT"
             },
             "RetryAttempts": 0
         }

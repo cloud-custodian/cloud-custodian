@@ -84,16 +84,15 @@
             "cpu": "256",
             "memory": "512"
         },
+        "tags": [],
         "ResponseMetadata": {
-            "RequestId": "24f21e35-0a62-11e8-b355-f10ca148e0f9",
+            "RequestId": "699c5214-36ba-11e9-91ae-0115f9ab3100",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "server": "Server",
-                "date": "Mon, 05 Feb 2018 10:48:47 GMT",
+                "x-amzn-requestid": "699c5214-36ba-11e9-91ae-0115f9ab3100",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1400",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "24f21e35-0a62-11e8-b355-f10ca148e0f9"
+                "content-length": "1410",
+                "date": "Fri, 22 Feb 2019 15:56:26 GMT"
             },
             "RetryAttempts": 0
         }

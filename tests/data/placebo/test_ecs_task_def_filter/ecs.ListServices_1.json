@@ -2,18 +2,17 @@
     "status_code": 200,
     "data": {
         "serviceArns": [
-            "arn:aws:ecs:us-east-1:644160558196:service/home-web"
+            "arn:aws:ecs:us-east-1:644160558196:service/erik-test-service",
+            "arn:aws:ecs:us-east-1:644160558196:service/custodian-test-service"
         ],
         "ResponseMetadata": {
-            "RequestId": "2cdbd1e7-fa5f-11e7-8f13-0fd6cd46abc6",
+            "RequestId": "146235a6-36bd-11e9-8c8b-53368943200c",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "server": "Server",
-                "date": "Tue, 16 Jan 2018 01:47:13 GMT",
+                "x-amzn-requestid": "146235a6-36bd-11e9-8c8b-53368943200c",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "71",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "2cdbd1e7-fa5f-11e7-8f13-0fd6cd46abc6"
+                "content-length": "148",
+                "date": "Fri, 22 Feb 2019 16:15:32 GMT"
             },
             "RetryAttempts": 0
         }

@@ -2,51 +2,36 @@
     "status_code": 200,
     "data": {
         "taskDefinition": {
-            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/first-run-job-definition:1",
             "containerDefinitions": [
                 {
-                    "name": "webserver",
-                    "image": "nginx:latest",
+                    "name": "default",
+                    "image": "busybox",
                     "cpu": 0,
-                    "portMappings": [
-                        {
-                            "containerPort": 80,
-                            "hostPort": 80,
-                            "protocol": "tcp"
-                        }
-                    ],
+                    "memory": 1,
+                    "portMappings": [],
                     "essential": true,
                     "environment": [],
                     "mountPoints": [],
                     "volumesFrom": [],
-                    "dockerLabels": {
-                        "role": "webserver"
-                    },
                     "logConfiguration": {
                         "logDriver": "awslogs",
                         "options": {
-                            "awslogs-group": "/ecs/task-public-no-vpc",
+                            "awslogs-group": "/aws/batch/job",
                             "awslogs-region": "us-east-1",
-                            "awslogs-stream-prefix": "ecs"
+                            "awslogs-stream-prefix": "first-run-job-definition"
                         }
                     }
                 }
             ],
-            "family": "task-public-no-vpc",
-            "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
-            "networkMode": "awsvpc",
+            "family": "first-run-job-definition",
+            "networkMode": "host",
             "revision": 1,
             "volumes": [],
             "status": "ACTIVE",
             "requiresAttributes": [
                 {
                     "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-                },
-                {
-                    "name": "ecs.capability.task-eni"
-                },
-                {
-                    "name": "ecs.capability.execution-role-awslogs"
                 },
                 {
                     "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
@@ -57,25 +42,18 @@
             ],
             "placementConstraints": [],
             "compatibilities": [
-                "EC2",
-                "FARGATE"
-            ],
-            "requiresCompatibilities": [
-                "FARGATE"
-            ],
-            "cpu": "256",
-            "memory": "1024"
+                "EC2"
+            ]
         },
+        "tags": [],
         "ResponseMetadata": {
-            "RequestId": "087dd25b-fa5f-11e7-bb88-717c0fe1a433",
+            "RequestId": "205a93ed-36b8-11e9-9a02-850b02fc0e2e",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "server": "Server",
-                "date": "Tue, 16 Jan 2018 01:46:12 GMT",
+                "x-amzn-requestid": "205a93ed-36b8-11e9-9a02-850b02fc0e2e",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1114",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "087dd25b-fa5f-11e7-bb88-717c0fe1a433"
+                "content-length": "830",
+                "date": "Fri, 22 Feb 2019 15:40:05 GMT"
             },
             "RetryAttempts": 0
         }

@@ -147,8 +147,194 @@ class TestEcsService(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]["serviceName"], "home-web")
+
+    def test_ecs_service_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_service_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "tag-ecs-service",
+                "resource": "ecs-service",
+                "filters": [{"serviceName": "test-service-tags"}, {"tag:TestKey": "empty"}],
+                "actions": [{"type": "tag", "key": "TestKey", "value": "TestValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("ecs")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["serviceArn"])["tags"]
+        self.assertEqual(tags[0]["value"], "TestValue")
+
+    def test_ecs_service_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_service_remove_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "tag-ecs-service",
+                "resource": "ecs-service",
+                "filters": [{"serviceName": "test-service-tags"}, {"tag:TestKey": "present"}],
+                "actions": [{"type": "remove-tag", "tags": ["TestKey"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("ecs")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["serviceArn"])["tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_ecs_cluster_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_cluster_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "tag-ecs-cluster",
+                "resource": "ecs",
+                "filters": [{"clusterName": "test"}, {"tag:TestKey": "empty"}],
+                "actions": [{"type": "tag", "key": "TestKey", "value": "TestValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("ecs")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["clusterArn"])["tags"]
+        self.assertEqual(tags[0]["value"], "TestValue")
+
+    def test_ecs_cluster_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_cluster_remove_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "tag-ecs-cluster",
+                "resource": "ecs",
+                "filters": [{"clusterName": "test"}, {"tag:TestKey": "present"}],
+                "actions": [{"type": "remove-tag", "tags": ["TestKey"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("ecs")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["clusterArn"])["tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_ecs_cluster_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_cluster_mark_for_op"
+        )
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-untagged-delete",
+                "resource": "ecs",
+                "filters": [
+                    {"tag:TestKey": "absent"},
+                    {"tag:custodian_tag": "absent"},
+                    {"clusterName": "test"},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_tag",
+                        "op": "tag",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ecs")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["clusterArn"])["tags"]
+        self.assertTrue(tags[0]["key"], "custodian_tag")
+
+    def test_ecs_cluster_marked_for_op(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_cluster_marked_for_op"
+        )
+        p = self.load_policy(
+            {
+                "name": "ecs-untagged-tag",
+                "resource": "ecs",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_tag",
+                        "op": "tag",
+                        "skew": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['clusterName'], 'test')
+
+    def test_ecs_service_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_service_mark_for_op"
+        )
+        p = self.load_policy(
+            {
+                "name": "ecs-service-untagged-tag",
+                "resource": "ecs-service",
+                "filters": [
+                    {"tag:TestKey": "absent"},
+                    {"tag:custodian_tag": "absent"},
+                    {"serviceName": "test-service-tags"},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_tag",
+                        "op": "tag",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ecs")
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["serviceArn"])["tags"]
+        self.assertTrue(tags[0]["key"], "custodian_tag")
+
+    def test_ecs_service_marked_for_op(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_service_marked_for_op"
+        )
+        p = self.load_policy(
+            {
+                "name": "ecs-service-untagged-tag",
+                "resource": "ecs-service",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_tag",
+                        "op": "tag",
+                        "skew": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['serviceName'], 'test-service-tags')
 
 
 class TestEcsTaskDefinition(BaseTest):
@@ -160,13 +346,22 @@ class TestEcsTaskDefinition(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 10)
         images = set()
         for r in resources:
             for c in r["containerDefinitions"]:
                 images.add(c["image"])
         self.assertEqual(
-            sorted(images), ["nginx:latest", "postgres:latest", "redis:latest"]
+            sorted(images), [
+                '644160558196.dkr.ecr.us-east-1.amazonaws.com/' \
+                    'omnissm-register/omnissm-register:latest', 
+                'alpine:latest', 
+                'busybox', 
+                'capitalone/cloud-custodian', 
+                'library/ubuntu', 
+                'nginx:latest', 
+                'redis:latest'
+            ]
         )
 
     def test_task_definition_delete(self):
@@ -183,7 +378,8 @@ class TestEcsTaskDefinition(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]["containerDefinitions"][0]["image"], "postgres:latest"
+            resources[0]["containerDefinitions"][0]["image"], 
+            "capitalone/cloud-custodian"
         )
         self.assertEqual(resources[0]["status"], "ACTIVE")
         arns = session_factory().client("ecs").list_task_definitions(
@@ -214,6 +410,112 @@ class TestEcsTaskDefinition(BaseTest):
             ),
             1,
         )
+
+    def test_ecs_task_def_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_task_def_tag"
+        )
+        arn = "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1"
+        p = self.load_policy(
+            {
+                "name": "tag-ecs-task-def",
+                "resource": "ecs-task-definition",
+                "filters": [
+                    {"taskDefinitionArn": arn}, 
+                    {"tag:TestKey": "empty"}
+                ],
+                "actions": [{"type": "tag", "key": "TestKey", "value": "TestValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("ecs")
+        res = resources[0]["taskDefinitionArn"]
+        tags = client.list_tags_for_resource(resourceArn=res)["tags"]
+        self.assertEqual(tags[0]["value"], "TestValue")
+    
+    def test_ecs_task_def_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_task_def_remove_tag"
+        )
+        arn = "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1"
+        p = self.load_policy(
+            {
+                "name": "tag-ecs-task-def",
+                "resource": "ecs-task-definition",
+                "filters": [
+                    {"taskDefinitionArn": arn}, 
+                    {"tag:TestKey": "present"}
+                ],
+                "actions": [{"type": "remove-tag", "tags": ["TestKey"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("ecs")
+        res = resources[0]["taskDefinitionArn"]
+        tags = client.list_tags_for_resource(resourceArn=res)["tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_ecs_task_def_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_task_def_mark_for_op"
+        )
+        tdArn = 'arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1'
+        p = self.load_policy(
+            {
+                "name": "ecs-task-def-untagged-tag",
+                "resource": "ecs-task-definition",
+                "filters": [
+                    {"tag:TestKey": "present"},
+                    {"tag:custodian_tag": "absent"},
+                    {"taskDefinitionArn": tdArn},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_tag",
+                        "op": "tag",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ecs")
+        arn = resources[0]["taskDefinitionArn"]
+        tags = client.list_tags_for_resource(resourceArn=arn)["tags"]
+        self.assertTrue(tags[0]["key"], "custodian_tag")
+
+    def test_ecs_task_def_marked_for_op(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_task_def_marked_for_op"
+        )
+        p = self.load_policy(
+            {
+                "name": "ecs-task-def-untagged-tag",
+                "resource": "ecs-task-definition",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_tag",
+                        "op": "tag",
+                        "skew": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        tdArn = 'arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1'
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['taskDefinitionArn'], tdArn)
 
 
 class TestEcsTask(BaseTest):

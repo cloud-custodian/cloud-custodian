@@ -25,7 +25,6 @@ from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, 
 from c7n.actions import AutoTagUser
 
 
-
 def ecs_tag_normalize(resources):
     """normalize tag format on ecs resources to match common aws format."""
     for r in resources:
@@ -376,13 +375,10 @@ class TaskDefinition(query.QueryResourceManager):
         service = 'ecs'
         id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
-        detail_spec = (
-            'describe_task_definition', 'taskDefinition', None,
-            'taskDefinition')
         dimension = None
         filter_name = None
         filter_type = None
-
+    
     def get_resources(self, ids, cache=True):
         if cache:
             resources = self._get_cached_resources(ids)
@@ -394,6 +390,19 @@ class TaskDefinition(query.QueryResourceManager):
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
+    
+    def augment(self, resources):
+        results = []
+        for task_def_set in resources:
+            client = local_session(self.session_factory).client('ecs')
+            response = client.describe_task_definition(
+                taskDefinition=task_def_set,
+                include=['TAGS'])
+            r = response['taskDefinition']
+            r['tags'] = response['tags']
+            results.append(r)
+        ecs_tag_normalize(results)
+        return results
 
 
 @TaskDefinition.action_registry.register('delete')
@@ -458,6 +467,7 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
             for i in r:
                 i['c7n:cluster'] = cluster_id
             results.extend(r)
+        ecs_tag_normalize(results)
         return results
 
 
@@ -536,11 +546,31 @@ class UpdateAgent(BaseAction):
 @Task.action_registry.register('tag')
 @ContainerInstance.action_registry.register('tag')
 class TagEcsResource(Tag):
+    """Action to create tag(s) on an ECS resource
+    (ecs, ecs-task-definition, ecs-service
+        ecs-task, ecs-container-instance)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: tag-ecs-cluster
+                resource: ecs
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-value
+    """
     permissions = ('ecs:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
         tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
         mid = self.manager.resource_type.id
+        if mid == 'containerInstance':
+            mid = 'containerInstanceArn'
         for r in resources:
             client.tag_resource(resourceArn=r[mid], tags=tags)
 
@@ -551,6 +581,23 @@ class TagEcsResource(Tag):
 @Task.action_registry.register('remove-tag')
 @ContainerInstance.action_registry.register('remove-tag')
 class RemoveTagEcsResource(RemoveTag):
+    """Remove tag(s) from ECS resources
+    (ecs, ecs-task-definition, ecs-service
+        ecs-task, ecs-container-instance)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ecs-cluster-remove-tag
+                resource: ecs
+                filters:
+                  - "tag:BadTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["BadTag"]
+    """
     permissions = ('ecs:UntagResource',)
 
     def process_resource_set(self, client, resources, keys):
@@ -564,7 +611,25 @@ class RemoveTagEcsResource(RemoveTag):
 @Task.action_registry.register('mark-for-op')
 @ContainerInstance.action_registry.register('mark-for-op')
 class MarkEcsResourceForOp(TagDelayedAction):
-    """Docstring"""
+    """Mark ECS resources for deferred action
+    (ecs, ecs-task-definition, ecs-service, ecs-task
+        ecs-container-instance)
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ecs-service-invalid-tag-stop
+            resource: ecs-service
+            filters:
+              - "tag:InvalidTag": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
+
 
 ECSCluster.filter_registry.register('marked-for-op', TagActionFilter)
 TaskDefinition.filter_registry.register('marked-for-op', TagActionFilter)

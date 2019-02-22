@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "serviceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:service/test/test-service-tags"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "77a8cb48-3613-11e9-997c-8195e43c62cb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "77a8cb48-3613-11e9-997c-8195e43c62cb",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "85",
+                "date": "Thu, 21 Feb 2019 20:01:25 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

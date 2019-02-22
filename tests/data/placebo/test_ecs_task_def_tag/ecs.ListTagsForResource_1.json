@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": [
+            {
+                "key": "TestKey",
+                "value": "TestValue"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "431b8a09-3637-11e9-b04e-615c77db5206",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "431b8a09-3637-11e9-b04e-615c77db5206",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "48",
+                "date": "Fri, 22 Feb 2019 00:17:38 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

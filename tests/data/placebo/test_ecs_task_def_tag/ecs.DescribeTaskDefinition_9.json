@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinition": {
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/sleeper:1",
+            "containerDefinitions": [
+                {
+                    "name": "alpine",
+                    "image": "alpine:latest",
+                    "cpu": 0,
+                    "portMappings": [],
+                    "essential": true,
+                    "entryPoint": [
+                        "sh",
+                        "-c",
+                        "\"trap : TERM INT; (while true; do sleep 1000; done) & wait\""
+                    ],
+                    "environment": [],
+                    "mountPoints": [],
+                    "volumesFrom": []
+                }
+            ],
+            "family": "sleeper",
+            "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
+            "networkMode": "awsvpc",
+            "revision": 1,
+            "volumes": [],
+            "status": "ACTIVE",
+            "requiresAttributes": [
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+                },
+                {
+                    "name": "ecs.capability.task-eni"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role"
+                }
+            ],
+            "placementConstraints": [],
+            "compatibilities": [
+                "EC2"
+            ],
+            "requiresCompatibilities": [
+                "EC2"
+            ],
+            "cpu": "512",
+            "memory": "512"
+        },
+        "tags": [],
+        "ResponseMetadata": {
+            "RequestId": "4263d220-3637-11e9-874d-652550601f7c",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4263d220-3637-11e9-874d-652550601f7c",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "805",
+                "date": "Fri, 22 Feb 2019 00:17:36 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

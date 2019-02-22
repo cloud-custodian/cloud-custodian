@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test_Batch_c32711b6-e097-3656-b279-93b799200d60",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/BrentCloudCustodianTestCluster2",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/BrentCustodianTestCluster",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test",
+            "arn:aws:ecs:us-east-1:644160558196:cluster/devx"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "28a66712-36c2-11e9-a560-5d5a0975ff6b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "28a66712-36c2-11e9-a560-5d5a0975ff6b",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "530",
+                "date": "Fri, 22 Feb 2019 16:51:54 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

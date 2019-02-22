@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "serviceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:service/BrentCustodianTestService"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9085addc-360f-11e9-be70-b5a5acb15a01",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9085addc-360f-11e9-be70-b5a5acb15a01",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "88",
+                "date": "Thu, 21 Feb 2019 19:33:28 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

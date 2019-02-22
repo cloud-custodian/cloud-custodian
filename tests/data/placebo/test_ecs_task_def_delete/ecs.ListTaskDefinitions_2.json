@@ -3,15 +3,13 @@
     "data": {
         "taskDefinitionArns": [],
         "ResponseMetadata": {
-            "RequestId": "a538b1e6-fa60-11e7-b120-bdca8dfd59b4",
+            "RequestId": "0fb7a09f-36ba-11e9-aa66-973b51c364b9",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "server": "Server",
-                "date": "Tue, 16 Jan 2018 01:57:45 GMT",
+                "x-amzn-requestid": "0fb7a09f-36ba-11e9-aa66-973b51c364b9",
                 "content-type": "application/x-amz-json-1.1",
                 "content-length": "25",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "a538b1e6-fa60-11e7-b120-bdca8dfd59b4"
+                "date": "Fri, 22 Feb 2019 15:53:56 GMT"
             },
             "RetryAttempts": 0
         }

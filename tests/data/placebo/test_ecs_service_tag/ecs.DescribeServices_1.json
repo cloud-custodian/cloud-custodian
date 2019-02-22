@@ -1,0 +1,389 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/erik-test-service",
+                "serviceName": "erik-test-service",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 1,
+                "runningCount": 0,
+                "pendingCount": 0,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370486080506674",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                        "desiredCount": 1,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 37,
+                            "second": 49,
+                            "microsecond": 133000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 37,
+                            "second": 49,
+                            "microsecond": 133000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-037318c577d65d330"
+                                ],
+                                "securityGroups": [
+                                    "sg-0669346d29dd0345a"
+                                ],
+                                "assignPublicIp": "ENABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "7bfe62b0-0517-48d0-aec4-6c3f213643e1",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 14,
+                            "minute": 28,
+                            "second": 39,
+                            "microsecond": 290000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 70f551f3-eeaf-4133-8352-630a9bd1f586)."
+                    },
+                    {
+                        "id": "5e19d3b7-9fae-45b9-b84a-834c83309a82",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 14,
+                            "minute": 23,
+                            "second": 5,
+                            "microsecond": 44000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 5a2469bb-c6b1-4698-8dc2-b2d92ccb8361)."
+                    },
+                    {
+                        "id": "878b4c67-793e-4cf6-8a1f-52b4412afc5f",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 14,
+                            "minute": 17,
+                            "second": 24,
+                            "microsecond": 28000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 86125171-694d-49d5-97af-36f61db14e1d)."
+                    },
+                    {
+                        "id": "e502ec0b-0c26-4e90-8725-0a44a8e775ec",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 14,
+                            "minute": 11,
+                            "second": 46,
+                            "microsecond": 241000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 6b7a3191-09fa-44e3-b210-54c8557f8fdf)."
+                    },
+                    {
+                        "id": "a8ec324a-acd6-491a-9c97-a313f50cddbc",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 14,
+                            "minute": 6,
+                            "second": 2,
+                            "microsecond": 857000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 2fd595ae-aab1-4560-b883-5bc88bb037ae)."
+                    },
+                    {
+                        "id": "5183578b-a2bd-44ea-bdea-3128e1995c26",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 14,
+                            "minute": 0,
+                            "second": 24,
+                            "microsecond": 394000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 1633ab72-8895-4de3-9f2f-00935f6f9629)."
+                    },
+                    {
+                        "id": "14b70021-10e3-43d8-99bf-1a03543d99d3",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 55,
+                            "second": 17,
+                            "microsecond": 37000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 874db629-d5b3-4e1f-af6e-3073f1830ceb)."
+                    },
+                    {
+                        "id": "8df94cbc-0b82-4ef0-8324-62b79ce4a246",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 50,
+                            "second": 5,
+                            "microsecond": 252000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task dd3c34a5-758c-4835-9ad5-bf65072b5a49)."
+                    },
+                    {
+                        "id": "a1f48267-dce6-45d3-a06f-b51248ef2bce",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 49,
+                            "second": 1,
+                            "microsecond": 310000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task ae86270a-a3b4-46ea-9dc8-2615694fb777)."
+                    },
+                    {
+                        "id": "778d311c-37e0-47c9-9359-5d4052304384",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 47,
+                            "second": 53,
+                            "microsecond": 689000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 2f4cbfdb-e2ae-485f-9f07-ad80f3763d05)."
+                    },
+                    {
+                        "id": "f131e7cb-030c-4041-adc7-07b55c9ae244",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 46,
+                            "second": 57,
+                            "microsecond": 261000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 357b64b4-85f5-4e60-af63-3a01d5124aad)."
+                    },
+                    {
+                        "id": "4b05e0a1-984c-4bbc-bed4-4c1200a22eec",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 46,
+                            "second": 1,
+                            "microsecond": 641000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 129eea25-3320-422a-a96c-35dc4d2c05b2)."
+                    },
+                    {
+                        "id": "9605c27b-1426-45c5-9c15-630eae0e9971",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 45,
+                            "second": 0,
+                            "microsecond": 658000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task e05ce985-1fce-4246-9a0b-69e4fdd3efe2)."
+                    },
+                    {
+                        "id": "c079927e-e102-466a-9d7b-fd52e2b055c1",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 44,
+                            "second": 6,
+                            "microsecond": 13000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 5f4857a9-41fb-4189-a352-529e125f0b73)."
+                    },
+                    {
+                        "id": "c90a1c07-3393-4947-82ff-26d7fdcf737c",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 43,
+                            "second": 1,
+                            "microsecond": 211000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 1cd0dfa1-6fac-485a-9182-2a56363f12b2)."
+                    },
+                    {
+                        "id": "e279b781-f913-44b3-a703-1a33de28ecbb",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 42,
+                            "second": 8,
+                            "microsecond": 252000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 977a0c38-9771-485d-b605-40bce4e400a7)."
+                    },
+                    {
+                        "id": "beb8f92c-baa7-4814-b6ba-b3f8cd70b1cb",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 41,
+                            "second": 3,
+                            "microsecond": 163000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task b416a347-088d-4d4f-b69f-e0a130693494)."
+                    },
+                    {
+                        "id": "8a46be94-63be-4499-a889-b82c1ac0cf4d",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 40,
+                            "second": 2,
+                            "microsecond": 204000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 4413cbbd-ef88-49b8-989f-bdcc3e94f3ba)."
+                    },
+                    {
+                        "id": "1ea4bd70-c441-48d2-a429-fcdf739cd961",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 38,
+                            "second": 51,
+                            "microsecond": 984000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 833e607d-6ce5-4387-b774-a3aa0356fac3)."
+                    },
+                    {
+                        "id": "2c921a0f-c924-4194-b63f-20870d4405d3",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 21,
+                            "hour": 13,
+                            "minute": 37,
+                            "second": 54,
+                            "microsecond": 505000
+                        },
+                        "message": "(service erik-test-service) has started 1 tasks: (task 5c39bb0d-291e-419d-b8a0-6da32f4d92ce)."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 21,
+                    "hour": 13,
+                    "minute": 37,
+                    "second": 49,
+                    "microsecond": 133000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-037318c577d65d330"
+                        ],
+                        "securityGroups": [
+                            "sg-0669346d29dd0345a"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "enableECSManagedTags": false,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "90d2958c-360f-11e9-b990-bf2b2cf41e4d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "90d2958c-360f-11e9-b990-bf2b2cf41e4d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "5076",
+                "date": "Thu, 21 Feb 2019 19:33:28 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
