@@ -1774,10 +1774,11 @@ class InstanceAttribute(ValueFilter):
 class LaunchTemplate(query.QueryResourceManager):
 
     class resource_type(object):
+        id = 'LaunchTemplateId'
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
-        dimension = 'None'
+        dimension = None
         enum_spec = (
             'describe_launch_templates', 'LaunchTemplates', None)
         filter_name = 'LaunchTemplateIds'
@@ -1845,3 +1846,17 @@ class LaunchTemplate(query.QueryResourceManager):
                 (t['LaunchTemplateId'], t['Version']), []).append(
                     a['AutoScalingGroupName'])
         return templates
+
+
+@resources.register('ec2-reserved')
+class ReservedInstance(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        name = id = 'ReservedInstancesId'
+        date = 'Start'
+        enum_spec = (
+            'describe_reserved_instances', 'ReservedInstances', None)
+        filter_name = 'ReservedInstancesIds'
+        filter_type = 'list'
+        dimension = None
