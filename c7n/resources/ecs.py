@@ -270,8 +270,6 @@ class UpdateService(BaseAction):
 
     schema = type_schema('modify',
         update={
-            'cluster': {'type': 'string'},
-            'service': {'type': 'string'},
             'desiredCount': {'type': 'integer'},
             'taskDefinition': {'type': 'string'},
             'deploymentConfiguration': {
