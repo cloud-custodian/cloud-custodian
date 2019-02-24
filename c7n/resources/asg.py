@@ -1009,20 +1009,24 @@ class RemoveTag(Action):
     schema = type_schema(
         'remove-tag',
         aliases=('untag', 'unmark'),
+        tags={'type': 'array', 'items': {'type': 'string'}},
         key={'type': 'string'})
+
     permissions = ('autoscaling:DeleteTags',)
     batch_size = 1
 
     def process(self, asgs):
         error = False
-        key = self.data.get('key', DEFAULT_TAG)
+        tags = self.data.get('tags', [])
+        if not tags:
+            tags = [self.data.get('key', DEFAULT_TAG)]
         client = local_session(self.manager.session_factory).client('autoscaling')
 
         with self.executor_factory(max_workers=2) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, key)] = asg_set
+                    self.process_asg_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
@@ -1036,11 +1040,14 @@ class RemoveTag(Action):
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, key):
-        tags = [dict(
-            Key=key, ResourceType='auto-scaling-group',
-            ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        self.manager.retry(client.delete_tags, Tags=tags)
+    def process_asg_set(self, client, asgs, tags):
+        tag_set = []
+        for a in asgs:
+            for t in tags:
+                tag_set.append(dict(
+                    Key=t, ResourceType='auto-scaling-group',
+                    ResourceId=a['AutoScalingGroupName']))
+        self.manager.retry(client.delete_tags, Tags=tag_set)
 
 
 @ASG.action_registry.register('tag')

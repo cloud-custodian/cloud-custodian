@@ -82,6 +82,19 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_guard_duty_filter(self):
+        factory = self.replay_flight_data('test_account_guard_duty_filter')
+        p = self.load_policy({
+            'name': 'account',
+            'resource': 'account',
+            'filters': [{
+                'type': 'guard-duty',
+                'Detector.Status': 'ENABLED'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:guard-duty' in resources[0])
+
     def test_root_mfa_enabled(self):
         session_factory = self.replay_flight_data("test_account_root_mfa")
         p = self.load_policy(
