@@ -110,7 +110,7 @@ class TestEcsService(BaseTest):
                 "resource": "ecs-service",
                 "filters": [
                     {"networkConfiguration.awsvpcConfiguration.assignPublicIp": "ENABLED"},
-                    {"serviceName": "custodian-test-service"}
+                    {"serviceName": test_service_name}
                 ],
                 "actions": [
                     {
@@ -126,8 +126,11 @@ class TestEcsService(BaseTest):
                         }
                     }
                 ],
-            })
-        p.run()
+            },
+            session_factory=session_factory,
+        )
+        result = p.run()
+        self.assertEqual(len(result), 1)
 
         client = session_factory().client("ecs")
         svc_current = client.describe_services(

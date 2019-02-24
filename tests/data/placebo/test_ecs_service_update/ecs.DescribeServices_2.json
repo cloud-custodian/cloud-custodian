@@ -1,0 +1,242 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/home-web",
+                "serviceName": "home-web",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 0,
+                "runningCount": 0,
+                "pendingCount": 0,
+                "launchType": "EC2",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370485989738957",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                        "desiredCount": 0,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 22,
+                            "hour": 14,
+                            "minute": 50,
+                            "second": 36,
+                            "microsecond": 843000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 22,
+                            "hour": 14,
+                            "minute": 50,
+                            "second": 38,
+                            "microsecond": 511000
+                        },
+                        "launchType": "EC2",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-06261c743949f093d"
+                                ],
+                                "securityGroups": [
+                                    "sg-034c1e48ec56c8bcb"
+                                ],
+                                "assignPublicIp": "DISABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "4968ad70-938e-4d31-b188-9d320421f932",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 24,
+                            "hour": 14,
+                            "minute": 52,
+                            "second": 35,
+                            "microsecond": 535000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "bfbf2a27-a9fb-4c6e-8710-111d405f9bcb",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 24,
+                            "hour": 8,
+                            "minute": 52,
+                            "second": 31,
+                            "microsecond": 593000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "60c9c9f8-71db-4d57-9c27-e4f0c36a89cf",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 24,
+                            "hour": 2,
+                            "minute": 52,
+                            "second": 30,
+                            "microsecond": 717000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "08a06452-385f-409b-b4bd-532f3528827b",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 23,
+                            "hour": 20,
+                            "minute": 52,
+                            "second": 1,
+                            "microsecond": 701000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "0d573f33-a8af-4f99-94e8-d00028a51a92",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 23,
+                            "hour": 14,
+                            "minute": 51,
+                            "second": 41,
+                            "microsecond": 87000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "898b2f74-1ba3-48b9-bf06-bb6a33a1dfb3",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 23,
+                            "hour": 8,
+                            "minute": 51,
+                            "second": 39,
+                            "microsecond": 63000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "63ccb157-6828-47e9-a62e-ac04c3960ca7",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 23,
+                            "hour": 2,
+                            "minute": 51,
+                            "second": 30,
+                            "microsecond": 148000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "13aae678-50b0-4e96-8500-102207bf4d26",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 22,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 6,
+                            "microsecond": 300000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    },
+                    {
+                        "id": "32d958a4-46c6-4dec-bf9a-c86c2964cf48",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 22,
+                            "hour": 14,
+                            "minute": 50,
+                            "second": 38,
+                            "microsecond": 517000
+                        },
+                        "message": "(service home-web) has reached a steady state."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 22,
+                    "hour": 14,
+                    "minute": 50,
+                    "second": 36,
+                    "microsecond": 843000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [
+                    {
+                        "type": "spread",
+                        "field": "attribute:ecs.availability-zone"
+                    },
+                    {
+                        "type": "spread",
+                        "field": "instanceId"
+                    }
+                ],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-06261c743949f093d"
+                        ],
+                        "securityGroups": [
+                            "sg-034c1e48ec56c8bcb"
+                        ],
+                        "assignPublicIp": "DISABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "enableECSManagedTags": true,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "0793ef36-3877-11e9-be70-b5a5acb15a01",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0793ef36-3877-11e9-be70-b5a5acb15a01",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "2679",
+                "date": "Sun, 24 Feb 2019 20:59:08 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
