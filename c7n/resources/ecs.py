@@ -572,13 +572,15 @@ class TagEcsResource(Tag):
 
     def process_resource_set(self, client, resources, tags):
         mid = self.manager.resource_type.id
+        tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
+        old_arns = 0
         for r in resources:
             if not ecs_taggable(self.manager.resource_type, r):
-                raise PolicyExecutionError("New format ecs arn required: " + r[mid])
-
-        tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
-        for r in resources:
+                old_arns += 1
+                continue
             client.tag_resource(resourceArn=r[mid], tags=tags)
+        if old_arns != 0:
+            self.log.info("Couldn't tag %d resource(s). Needs new ARN format" % old_arns)
 
 
 @ECSCluster.action_registry.register('remove-tag')
@@ -605,10 +607,17 @@ class RemoveTagEcsResource(RemoveTag):
                     tags: ["BadTag"]
     """
     permissions = ('ecs:UntagResource',)
+    batch_size = 1
 
     def process_resource_set(self, client, resources, keys):
+        old_arns = 0
         for r in resources:
+            if not ecs_taggable(self.manager.resource_type, r):
+                old_arns += 1
+                continue
             client.untag_resource(resourceArn=r[self.id_key], tagKeys=keys)
+        if old_arns != 0:
+            self.log.info("Couldn't untag %d resource(s). Needs new ARN format" % old_arns)
 
 
 @ECSCluster.action_registry.register('mark-for-op')

@@ -150,46 +150,6 @@ class TestEcsService(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["serviceName"], "home-web")
 
-    def test_ecs_service_tag(self):
-        session_factory = self.replay_flight_data(
-            "test_ecs_service_tag"
-        )
-        p = self.load_policy(
-            {
-                "name": "tag-ecs-service",
-                "resource": "ecs-service",
-                "filters": [{"serviceName": "test-yes-tag"}, {"tag:TestKey": "empty"}],
-                "actions": [{"type": "tag", "key": "TestKey", "value": "TestValue"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        client = session_factory().client("ecs")
-        tags = client.list_tags_for_resource(resourceArn=resources[0]["serviceArn"])["tags"]
-        self.assertEqual(tags[0]["value"], "TestValue")
-
-    def test_ecs_service_remove_tag(self):
-        session_factory = self.replay_flight_data(
-            "test_ecs_service_remove_tag"
-        )
-        p = self.load_policy(
-            {
-                "name": "tag-ecs-service",
-                "resource": "ecs-service",
-                "filters": [{"serviceName": "test-yes-tag"}, {"tag:TestKey": "present"}],
-                "actions": [{"type": "remove-tag", "tags": ["TestKey"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        client = session_factory().client("ecs")
-        tags = client.list_tags_for_resource(resourceArn=resources[0]["serviceArn"])["tags"]
-        self.assertEqual(len(tags), 0)
-
     def test_ecs_service_taggable(self):
         session_factory = self.replay_flight_data(
             "test_ecs_service_taggable"
@@ -279,9 +239,9 @@ class TestEcsTaskDefinition(BaseTest):
             1,
         )
 
-    def test_ecs_task_def_tag(self):
+    def test_ecs_task_def_tags(self):
         session_factory = self.replay_flight_data(
-            "test_ecs_task_def_tag"
+            "test_ecs_task_def_tags"
         )
         arn = "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1"
         p = self.load_policy(
@@ -290,9 +250,13 @@ class TestEcsTaskDefinition(BaseTest):
                 "resource": "ecs-task-definition",
                 "filters": [
                     {"taskDefinitionArn": arn},
-                    {"tag:TestKey": "empty"}
+                    {"tag:Role": "present"}
                 ],
-                "actions": [{"type": "tag", "key": "TestKey", "value": "TestValue"}],
+                "actions": [
+                    {"type": "tag", "key": "TestKey", "value": "TestValue"},
+                    {"type": "tag", "key": "c7n-tag", "value": "present"},
+                    {"type": "remove-tag", "tags": ["Role"]}
+                ],
             },
             session_factory=session_factory,
         )
@@ -300,9 +264,10 @@ class TestEcsTaskDefinition(BaseTest):
         self.assertEqual(len(resources), 1)
 
         client = session_factory().client("ecs")
-        res = resources[0]["taskDefinitionArn"]
-        tags = client.list_tags_for_resource(resourceArn=res)["tags"]
-        self.assertEqual(tags[0]["value"], "TestValue")
+        tags = {t['key']: t['value'] for t in
+                client.list_tags_for_resource(
+                    resourceArn=resources[0]["taskDefinitionArn"]).get("tags")}
+        self.assertEqual(tags, {"TestKey": "TestValue", "c7n-tag": "present"})
 
 
 class TestEcsTask(BaseTest):
