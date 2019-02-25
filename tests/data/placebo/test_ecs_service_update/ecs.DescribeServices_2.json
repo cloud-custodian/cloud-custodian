@@ -3,59 +3,102 @@
     "data": {
         "services": [
             {
-                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/home-web",
-                "serviceName": "home-web",
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/custodian-service-update-test",
+                "serviceName": "custodian-service-update-test",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
                 "loadBalancers": [],
                 "serviceRegistries": [],
                 "status": "ACTIVE",
-                "desiredCount": 0,
+                "desiredCount": 1,
                 "runningCount": 0,
                 "pendingCount": 0,
-                "launchType": "EC2",
-                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
                 "deploymentConfiguration": {
                     "maximumPercent": 200,
                     "minimumHealthyPercent": 100
                 },
                 "deployments": [
                     {
-                        "id": "ecs-svc/9223370485989738957",
+                        "id": "ecs-svc/9223370485812826009",
                         "status": "PRIMARY",
-                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
-                        "desiredCount": 0,
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                        "desiredCount": 1,
                         "pendingCount": 0,
                         "runningCount": 0,
                         "createdAt": {
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
-                            "day": 22,
-                            "hour": 14,
-                            "minute": 50,
-                            "second": 36,
-                            "microsecond": 843000
+                            "day": 24,
+                            "hour": 15,
+                            "minute": 59,
+                            "second": 9,
+                            "microsecond": 796000
                         },
                         "updatedAt": {
                             "__class__": "datetime",
                             "year": 2019,
                             "month": 2,
-                            "day": 22,
-                            "hour": 14,
-                            "minute": 50,
-                            "second": 38,
-                            "microsecond": 511000
+                            "day": 24,
+                            "hour": 15,
+                            "minute": 59,
+                            "second": 9,
+                            "microsecond": 796000
                         },
-                        "launchType": "EC2",
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
                         "networkConfiguration": {
                             "awsvpcConfiguration": {
                                 "subnets": [
-                                    "subnet-06261c743949f093d"
+                                    "subnet-037318c577d65d330"
                                 ],
                                 "securityGroups": [
-                                    "sg-034c1e48ec56c8bcb"
+                                    "sg-0669346d29dd0345a"
                                 ],
                                 "assignPublicIp": "DISABLED"
+                            }
+                        }
+                    },
+                    {
+                        "id": "ecs-svc/9223370485813623167",
+                        "status": "ACTIVE",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                        "desiredCount": 1,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 24,
+                            "hour": 15,
+                            "minute": 45,
+                            "second": 52,
+                            "microsecond": 615000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 24,
+                            "hour": 15,
+                            "minute": 59,
+                            "second": 9,
+                            "microsecond": 799000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-037318c577d65d330"
+                                ],
+                                "securityGroups": [
+                                    "sg-0fedadd839cd77f33"
+                                ],
+                                "assignPublicIp": "ENABLED"
                             }
                         }
                     }
@@ -67,48 +110,39 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 2,
-                    "day": 22,
-                    "hour": 14,
-                    "minute": 50,
-                    "second": 36,
-                    "microsecond": 843000
+                    "day": 24,
+                    "hour": 15,
+                    "minute": 45,
+                    "second": 52,
+                    "microsecond": 615000
                 },
                 "placementConstraints": [],
-                "placementStrategy": [
-                    {
-                        "type": "spread",
-                        "field": "attribute:ecs.availability-zone"
-                    },
-                    {
-                        "type": "spread",
-                        "field": "instanceId"
-                    }
-                ],
+                "placementStrategy": [],
                 "networkConfiguration": {
                     "awsvpcConfiguration": {
                         "subnets": [
-                            "subnet-06261c743949f093d"
+                            "subnet-037318c577d65d330"
                         ],
                         "securityGroups": [
-                            "sg-034c1e48ec56c8bcb"
+                            "sg-0669346d29dd0345a"
                         ],
                         "assignPublicIp": "DISABLED"
                     }
                 },
                 "schedulingStrategy": "REPLICA",
-                "enableECSManagedTags": true,
+                "enableECSManagedTags": false,
                 "propagateTags": "NONE"
             }
         ],
         "failures": [],
         "ResponseMetadata": {
-            "RequestId": "0793ef36-3877-11e9-be70-b5a5acb15a01",
+            "RequestId": "08322bf5-3877-11e9-a560-5d5a0975ff6b",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "0793ef36-3877-11e9-be70-b5a5acb15a01",
+                "x-amzn-requestid": "08322bf5-3877-11e9-a560-5d5a0975ff6b",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "2679",
-                "date": "Sun, 24 Feb 2019 20:59:08 GMT"
+                "content-length": "4454",
+                "date": "Sun, 24 Feb 2019 20:59:09 GMT"
             },
             "RetryAttempts": 0
         }
