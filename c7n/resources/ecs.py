@@ -393,8 +393,8 @@ class TaskDefinition(query.QueryResourceManager):
 
     def augment(self, resources):
         results = []
+        client = local_session(self.session_factory).client('ecs')
         for task_def_set in resources:
-            client = local_session(self.session_factory).client('ecs')
             response = client.describe_task_definition(
                 taskDefinition=task_def_set,
                 include=['TAGS'])
@@ -568,6 +568,7 @@ class TagEcsResource(Tag):
                     value: target-value
     """
     permissions = ('ecs:TagResource',)
+    batch_size = 1
 
     def process_resource_set(self, client, resources, tags):
         mid = self.manager.resource_type.id
@@ -598,6 +599,7 @@ class RemoveTagEcsResource(RemoveTag):
                 resource: ecs
                 filters:
                   - "tag:BadTag": present
+                  - taggable
                 actions:
                   - type: remove-tag
                     tags: ["BadTag"]
@@ -656,14 +658,7 @@ class ECSTaggable(Filter):
                     - type: taggable
     """
     permissions = (None,)
-
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['taggable']}
-        }
-    }
+    schema = type_schema('taggable')
 
     def process(self, resources, event=None):
         return [r for r in resources if ecs_taggable(self.manager.resource_type, r)]
