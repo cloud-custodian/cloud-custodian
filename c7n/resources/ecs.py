@@ -656,7 +656,7 @@ class ECSTaggable(Filter):
                     - type: taggable
     """
     permissions = (None,)
-    
+
     schema = {
         'type': 'object',
         'additionalProperties': False,
