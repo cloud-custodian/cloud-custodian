@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "taskDefinition": {
-            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:3",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:4",
             "containerDefinitions": [
                 {
                     "name": "launch-me",
@@ -12,14 +12,22 @@
                     "essential": true,
                     "environment": [],
                     "mountPoints": [],
-                    "volumesFrom": []
+                    "volumesFrom": [],
+                    "logConfiguration": {
+                        "logDriver": "awslogs",
+                        "options": {
+                            "awslogs-group": "/ecs/launch-me",
+                            "awslogs-region": "us-east-1",
+                            "awslogs-stream-prefix": "ecs"
+                        }
+                    }
                 }
             ],
             "family": "launch-me",
             "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
             "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
-            "networkMode": "host",
-            "revision": 3,
+            "networkMode": "awsvpc",
+            "revision": 4,
             "volumes": [],
             "status": "INACTIVE",
             "requiresAttributes": [
@@ -27,30 +35,40 @@
                     "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
                 },
                 {
+                    "name": "ecs.capability.task-eni"
+                },
+                {
                     "name": "com.amazonaws.ecs.capability.task-iam-role"
                 },
                 {
-                    "name": "com.amazonaws.ecs.capability.task-iam-role-network-host"
+                    "name": "ecs.capability.execution-role-awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
                 }
             ],
             "placementConstraints": [],
             "compatibilities": [
-                "EC2"
+                "EC2",
+                "FARGATE"
             ],
             "requiresCompatibilities": [
-                "EC2"
+                "FARGATE"
             ],
-            "cpu": "128",
-            "memory": "128"
+            "cpu": "256",
+            "memory": "512"
         },
         "ResponseMetadata": {
-            "RequestId": "0f75672d-36ba-11e9-b731-39af55ee5ab0",
+            "RequestId": "63663b68-38ae-11e9-8eb6-817add818db6",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "0f75672d-36ba-11e9-b731-39af55ee5ab0",
+                "x-amzn-requestid": "63663b68-38ae-11e9-8eb6-817add818db6",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "831",
-                "date": "Fri, 22 Feb 2019 15:53:56 GMT"
+                "content-length": "1137",
+                "date": "Mon, 25 Feb 2019 03:35:24 GMT"
             },
             "RetryAttempts": 0
         }

@@ -547,18 +547,21 @@ class UpdateAgent(BaseAction):
 @ContainerInstance.action_registry.register('tag')
 class TagEcsResource(Tag):
     """Action to create tag(s) on an ECS resource
-    (ecs, ecs-task-definition, ecs-service
-        ecs-task, ecs-container-instance)
+    (ecs, ecs-task-definition, ecs-service, ecs-task, ecs-container-instance)
 
+    Requires arns in new format for tasks, services, and container-instances.
+    https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
+        
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: tag-ecs-cluster
-                resource: ecs
+              - name: tag-ecs-service
+                resource: ecs-service
                 filters:
                   - "tag:target-tag": absent
+                  - type: taggable
                 actions:
                   - type: tag
                     key: target-tag
@@ -567,10 +570,12 @@ class TagEcsResource(Tag):
     permissions = ('ecs:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
-        tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
         mid = self.manager.resource_type.id
-        if mid == 'containerInstance':
-            mid = 'containerInstanceArn'
+        for r in resources:
+            if not ecs_taggable(self.manager.resource_type, r):
+                raise PolicyExecutionError("New format ecs arn required: " + r[mid])
+       
+        tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
         for r in resources:
             client.tag_resource(resourceArn=r[mid], tags=tags)
 
@@ -582,8 +587,7 @@ class TagEcsResource(Tag):
 @ContainerInstance.action_registry.register('remove-tag')
 class RemoveTagEcsResource(RemoveTag):
     """Remove tag(s) from ECS resources
-    (ecs, ecs-task-definition, ecs-service
-        ecs-task, ecs-container-instance)
+    (ecs, ecs-task-definition, ecs-service, ecs-task, ecs-container-instance)
 
     :example:
 
@@ -612,8 +616,10 @@ class RemoveTagEcsResource(RemoveTag):
 @ContainerInstance.action_registry.register('mark-for-op')
 class MarkEcsResourceForOp(TagDelayedAction):
     """Mark ECS resources for deferred action
-    (ecs, ecs-task-definition, ecs-service, ecs-task
-        ecs-container-instance)
+    (ecs, ecs-task-definition, ecs-service, ecs-task, ecs-container-instance)
+
+    Requires arns in new format for tasks, services, and container-instances.
+    https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
 
     :example:
 
@@ -624,11 +630,41 @@ class MarkEcsResourceForOp(TagDelayedAction):
             resource: ecs-service
             filters:
               - "tag:InvalidTag": present
+              - type: taggable
             actions:
               - type: mark-for-op
                 op: delete
                 days: 1
     """
+
+
+@Service.filter_registry.register('taggable')
+@Task.filter_registry.register('taggable')
+@ContainerInstance.filter_registry.register('taggable')
+class ECSTaggable(ValueFilter):
+    """
+    Filter ECS resources to only those using long-arn format
+    https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name:
+                  resource: ecs-service
+                  filters:
+                    - type: taggable
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['taggable']}
+        }
+    }
+
+    def process(self, resources, event=None):
+        return [r for r in resources if ecs_taggable(self.manager.resource_type, r)]
 
 
 ECSCluster.filter_registry.register('marked-for-op', TagActionFilter)
