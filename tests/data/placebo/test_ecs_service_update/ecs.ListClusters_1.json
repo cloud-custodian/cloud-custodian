@@ -2,14 +2,7 @@
     "status_code": 200,
     "data": {
         "clusterArns": [
-            "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
-            "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
-            "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
-            "arn:aws:ecs:us-east-1:644160558196:cluster/test_Batch_c32711b6-e097-3656-b279-93b799200d60",
-            "arn:aws:ecs:us-east-1:644160558196:cluster/BrentCloudCustodianTestCluster2",
-            "arn:aws:ecs:us-east-1:644160558196:cluster/BrentCustodianTestCluster",
-            "arn:aws:ecs:us-east-1:644160558196:cluster/test",
-            "arn:aws:ecs:us-east-1:644160558196:cluster/devx"
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster"
         ],
         "ResponseMetadata": {
             "RequestId": "06bf8844-3877-11e9-9b45-0978c8e17a40",
