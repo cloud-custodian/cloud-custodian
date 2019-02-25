@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyExecutionError
-from c7n.filters import MetricsFilter, ValueFilter
+from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
@@ -403,7 +403,7 @@ class TaskDefinition(query.QueryResourceManager):
             results.append(r)
         ecs_tag_normalize(results)
         return results
-    
+
 
 @TaskDefinition.action_registry.register('delete')
 class DeleteTaskDefinition(BaseAction):
@@ -551,7 +551,7 @@ class TagEcsResource(Tag):
 
     Requires arns in new format for tasks, services, and container-instances.
     https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
-   
+
     :example:
 
     .. code-block:: yaml
@@ -641,7 +641,7 @@ class MarkEcsResourceForOp(TagDelayedAction):
 @Service.filter_registry.register('taggable')
 @Task.filter_registry.register('taggable')
 @ContainerInstance.filter_registry.register('taggable')
-class ECSTaggable(ValueFilter):
+class ECSTaggable(Filter):
     """
     Filter ECS resources to only those using long-arn format
     https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
@@ -655,6 +655,8 @@ class ECSTaggable(ValueFilter):
                   filters:
                     - type: taggable
     """
+    permissions = (None,)
+    
     schema = {
         'type': 'object',
         'additionalProperties': False,
