@@ -21,7 +21,7 @@ from c7n.filters import MetricsFilter, ValueFilter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
-from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
+from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser
 
 
@@ -378,7 +378,7 @@ class TaskDefinition(query.QueryResourceManager):
         dimension = None
         filter_name = None
         filter_type = None
-    
+
     def get_resources(self, ids, cache=True):
         if cache:
             resources = self._get_cached_resources(ids)
@@ -390,7 +390,7 @@ class TaskDefinition(query.QueryResourceManager):
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
-    
+
     def augment(self, resources):
         results = []
         for task_def_set in resources:
@@ -403,7 +403,7 @@ class TaskDefinition(query.QueryResourceManager):
             results.append(r)
         ecs_tag_normalize(results)
         return results
-
+    
 
 @TaskDefinition.action_registry.register('delete')
 class DeleteTaskDefinition(BaseAction):
@@ -551,7 +551,7 @@ class TagEcsResource(Tag):
 
     Requires arns in new format for tasks, services, and container-instances.
     https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
-        
+   
     :example:
 
     .. code-block:: yaml
@@ -574,7 +574,7 @@ class TagEcsResource(Tag):
         for r in resources:
             if not ecs_taggable(self.manager.resource_type, r):
                 raise PolicyExecutionError("New format ecs arn required: " + r[mid])
-       
+
         tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
         for r in resources:
             client.tag_resource(resourceArn=r[mid], tags=tags)

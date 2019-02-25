@@ -205,7 +205,7 @@ class TestEcsService(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['serviceName'], 'test-yes-tag')    
+        self.assertTrue(resources[0]['serviceName'], 'test-yes-tag')
         client = session_factory().client("ecs")
         services = client.list_services(cluster=cluster_arn)['serviceArns']
         self.assertEqual(len(services), 2)
@@ -227,7 +227,7 @@ class TestEcsTaskDefinition(BaseTest):
                 images.add(c["image"])
         self.assertEqual(
             sorted(images), [
-                'capitalone/cloud-custodian', 
+                'capitalone/cloud-custodian',
                 'redis:latest'
             ]
         )
@@ -246,7 +246,7 @@ class TestEcsTaskDefinition(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]["containerDefinitions"][0]["image"], 
+            resources[0]["containerDefinitions"][0]["image"],
             "capitalone/cloud-custodian"
         )
         self.assertEqual(resources[0]["status"], "ACTIVE")
@@ -289,7 +289,7 @@ class TestEcsTaskDefinition(BaseTest):
                 "name": "tag-ecs-task-def",
                 "resource": "ecs-task-definition",
                 "filters": [
-                    {"taskDefinitionArn": arn}, 
+                    {"taskDefinitionArn": arn},
                     {"tag:TestKey": "empty"}
                 ],
                 "actions": [{"type": "tag", "key": "TestKey", "value": "TestValue"}],
