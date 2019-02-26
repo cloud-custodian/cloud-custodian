@@ -189,7 +189,7 @@ class TestEcsTaskDefinition(BaseTest):
             for c in r["containerDefinitions"]:
                 images.add(c["image"])
         self.assertEqual(
-            sorted(images), ["capitalone/cloud-custodian", "nginx:latest", "postgres:latest"]
+            sorted(images), ["nginx:latest", "postgres:latest", "redis:latest"]
         )
 
     def test_task_definition_delete(self):

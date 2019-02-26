@@ -2,11 +2,11 @@
     "status_code": 200,
     "data": {
         "taskDefinition": {
-            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:4",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:2",
             "containerDefinitions": [
                 {
-                    "name": "launch-me",
-                    "image": "capitalone/cloud-custodian",
+                    "name": "db",
+                    "image": "postgres:latest",
                     "cpu": 0,
                     "portMappings": [],
                     "essential": true,
@@ -27,7 +27,7 @@
             "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
             "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
             "networkMode": "awsvpc",
-            "revision": 4,
+            "revision": 2,
             "volumes": [],
             "status": "INACTIVE",
             "requiresAttributes": [
@@ -58,17 +58,19 @@
             "requiresCompatibilities": [
                 "FARGATE"
             ],
-            "cpu": "256",
-            "memory": "512"
+            "cpu": "512",
+            "memory": "1024"
         },
         "ResponseMetadata": {
-            "RequestId": "63663b68-38ae-11e9-8eb6-817add818db6",
+            "RequestId": "a5065746-fa60-11e7-b383-5daadf5f6ea3",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "63663b68-38ae-11e9-8eb6-817add818db6",
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 01:57:45 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1137",
-                "date": "Mon, 25 Feb 2019 03:35:24 GMT"
+                "content-length": "1120",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "a5065746-fa60-11e7-b383-5daadf5f6ea3"
             },
             "RetryAttempts": 0
         }

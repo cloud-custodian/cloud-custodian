@@ -2,18 +2,20 @@
     "status_code": 200,
     "data": {
         "taskDefinitionArns": [
-            "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1",
             "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
-            "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:4"
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:2",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1"
         ],
         "ResponseMetadata": {
-            "RequestId": "6301fbd8-38ae-11e9-a139-9b70586268f6",
+            "RequestId": "a491c3a1-fa60-11e7-bc92-7706daa6f341",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "6301fbd8-38ae-11e9-a139-9b70586268f6",
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 01:57:44 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "222",
-                "date": "Mon, 25 Feb 2019 03:35:24 GMT"
+                "content-length": "237",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "a491c3a1-fa60-11e7-bc92-7706daa6f341"
             },
             "RetryAttempts": 0
         }

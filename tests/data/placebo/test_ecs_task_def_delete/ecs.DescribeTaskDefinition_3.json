@@ -2,32 +2,40 @@
     "status_code": 200,
     "data": {
         "taskDefinition": {
-            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:4",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
             "containerDefinitions": [
                 {
-                    "name": "launch-me",
-                    "image": "capitalone/cloud-custodian",
+                    "name": "webserver",
+                    "image": "nginx:latest",
                     "cpu": 0,
-                    "portMappings": [],
+                    "portMappings": [
+                        {
+                            "containerPort": 80,
+                            "hostPort": 80,
+                            "protocol": "tcp"
+                        }
+                    ],
                     "essential": true,
                     "environment": [],
                     "mountPoints": [],
                     "volumesFrom": [],
+                    "dockerLabels": {
+                        "role": "webserver"
+                    },
                     "logConfiguration": {
                         "logDriver": "awslogs",
                         "options": {
-                            "awslogs-group": "/ecs/launch-me",
+                            "awslogs-group": "/ecs/task-public-no-vpc",
                             "awslogs-region": "us-east-1",
                             "awslogs-stream-prefix": "ecs"
                         }
                     }
                 }
             ],
-            "family": "launch-me",
-            "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
+            "family": "task-public-no-vpc",
             "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
             "networkMode": "awsvpc",
-            "revision": 4,
+            "revision": 1,
             "volumes": [],
             "status": "ACTIVE",
             "requiresAttributes": [
@@ -36,9 +44,6 @@
                 },
                 {
                     "name": "ecs.capability.task-eni"
-                },
-                {
-                    "name": "com.amazonaws.ecs.capability.task-iam-role"
                 },
                 {
                     "name": "ecs.capability.execution-role-awslogs"
@@ -59,17 +64,18 @@
                 "FARGATE"
             ],
             "cpu": "256",
-            "memory": "512"
+            "memory": "1024"
         },
-        "tags": [],
         "ResponseMetadata": {
-            "RequestId": "634df887-38ae-11e9-80cd-6f6da611e7d1",
+            "RequestId": "a4d55c04-fa60-11e7-99a9-f9a4cf2359a7",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "634df887-38ae-11e9-80cd-6f6da611e7d1",
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 01:57:44 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1145",
-                "date": "Mon, 25 Feb 2019 03:35:24 GMT"
+                "content-length": "1114",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "a4d55c04-fa60-11e7-99a9-f9a4cf2359a7"
             },
             "RetryAttempts": 0
         }

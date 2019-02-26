@@ -2,58 +2,35 @@
     "status_code": 200,
     "data": {
         "taskDefinition": {
-            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/launch-me:2",
             "containerDefinitions": [
                 {
-                    "name": "Db",
-                    "image": "redis:latest",
+                    "name": "db",
+                    "image": "postgres:latest",
                     "cpu": 0,
-                    "portMappings": [
-                        {
-                            "containerPort": 6379,
-                            "hostPort": 6379,
-                            "protocol": "tcp"
-                        }
-                    ],
+                    "portMappings": [],
                     "essential": true,
                     "environment": [],
-                    "mountPoints": [
-                        {
-                            "sourceVolume": "host-data",
-                            "containerPath": "/data"
-                        }
-                    ],
+                    "mountPoints": [],
                     "volumesFrom": [],
-                    "readonlyRootFilesystem": true,
-                    "dockerLabels": {
-                        "role": "db"
-                    },
                     "logConfiguration": {
                         "logDriver": "awslogs",
                         "options": {
-                            "awslogs-group": "/ecs/ecs-read-only-root",
+                            "awslogs-group": "/ecs/launch-me",
                             "awslogs-region": "us-east-1",
                             "awslogs-stream-prefix": "ecs"
                         }
                     }
                 }
             ],
-            "family": "ecs-read-only-root",
+            "family": "launch-me",
             "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
             "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
             "networkMode": "awsvpc",
-            "revision": 1,
-            "volumes": [
-                {
-                    "name": "host-data",
-                    "host": {}
-                }
-            ],
+            "revision": 2,
+            "volumes": [],
             "status": "ACTIVE",
             "requiresAttributes": [
-                {
-                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
-                },
                 {
                     "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
                 },
@@ -81,18 +58,19 @@
             "requiresCompatibilities": [
                 "FARGATE"
             ],
-            "cpu": "256",
-            "memory": "512"
+            "cpu": "512",
+            "memory": "1024"
         },
-        "tags": [],
         "ResponseMetadata": {
-            "RequestId": "63319750-38ae-11e9-9388-3935932a7f11",
+            "RequestId": "a4cbbf0e-fa60-11e7-99a9-f9a4cf2359a7",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "63319750-38ae-11e9-9388-3935932a7f11",
+                "server": "Server",
+                "date": "Tue, 16 Jan 2018 01:57:44 GMT",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "1410",
-                "date": "Mon, 25 Feb 2019 03:35:24 GMT"
+                "content-length": "1118",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "a4cbbf0e-fa60-11e7-99a9-f9a4cf2359a7"
             },
             "RetryAttempts": 0
         }
