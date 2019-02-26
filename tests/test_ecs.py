@@ -183,16 +183,13 @@ class TestEcsTaskDefinition(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 3)
         images = set()
         for r in resources:
             for c in r["containerDefinitions"]:
                 images.add(c["image"])
         self.assertEqual(
-            sorted(images), [
-                'capitalone/cloud-custodian',
-                'redis:latest'
-            ]
+            sorted(images), ["capitalone/cloud-custodian", "nginx:latest", "postgres:latest"]
         )
 
     def test_task_definition_delete(self):

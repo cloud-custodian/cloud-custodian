@@ -399,7 +399,7 @@ class TaskDefinition(query.QueryResourceManager):
                 taskDefinition=task_def_set,
                 include=['TAGS'])
             r = response['taskDefinition']
-            r['tags'] = response['tags']
+            r['tags'] = response.get('tags', [])
             results.append(r)
         ecs_tag_normalize(results)
         return results
