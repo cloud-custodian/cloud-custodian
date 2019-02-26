@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinitionArns": [
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1",
+            "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "ddcffa1e-3937-11e9-8af8-93c4879e4edf",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ddcffa1e-3937-11e9-8af8-93c4879e4edf",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "157",
+                "date": "Mon, 25 Feb 2019 19:59:31 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

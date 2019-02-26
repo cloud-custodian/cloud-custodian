@@ -126,7 +126,7 @@ class LaunchInfo(object):
 
         lid = asg.get('LaunchTemplate')
         if lid is not None:
-            return (lid['LaunchTemplateId'], lid['LaunchTemplateVersion'])
+            return (lid['LaunchTemplateId'], lid['Version'])
 
         # we've noticed some corner cases where the asg name is the lc name, but not
         # explicitly specified as launchconfiguration attribute.

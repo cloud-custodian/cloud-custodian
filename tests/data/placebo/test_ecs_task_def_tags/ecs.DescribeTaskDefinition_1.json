@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinition": {
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1",
+            "containerDefinitions": [
+                {
+                    "name": "default",
+                    "image": "capitalone/cloud-custodian",
+                    "cpu": 0,
+                    "memory": 1,
+                    "portMappings": [],
+                    "essential": true,
+                    "environment": [],
+                    "mountPoints": [],
+                    "volumesFrom": [],
+                    "logConfiguration": {
+                        "logDriver": "awslogs",
+                        "options": {
+                            "awslogs-group": "/aws/batch/job",
+                            "awslogs-region": "us-east-1",
+                            "awslogs-stream-prefix": "c7n"
+                        }
+                    }
+                }
+            ],
+            "family": "c7n",
+            "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
+            "networkMode": "host",
+            "revision": 1,
+            "volumes": [],
+            "status": "ACTIVE",
+            "requiresAttributes": [
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role-network-host"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+                }
+            ],
+            "placementConstraints": [],
+            "compatibilities": [
+                "EC2"
+            ]
+        },
+        "tags": [
+            {
+                "key": "Role",
+                "value": "dev"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "de0dee09-3937-11e9-a54b-07c4ec4b052f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "de0dee09-3937-11e9-a54b-07c4ec4b052f",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1003",
+                "date": "Mon, 25 Feb 2019 19:59:31 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
