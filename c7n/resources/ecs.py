@@ -562,7 +562,7 @@ class TagEcsResource(Tag):
                 filters:
                   - "tag:target-tag": absent
                   - type: taggable
-                    value: true
+                    state: true
                 actions:
                   - type: tag
                     key: target-tag
@@ -580,7 +580,7 @@ class TagEcsResource(Tag):
                 old_arns += 1
                 continue
             client.tag_resource(resourceArn=r[mid], tags=tags)
-        if old_arns != 0:
+        if old_arns:
             self.log.warn("Couldn't tag %d resource(s). Needs new ARN format", old_arns)
 
 
@@ -644,7 +644,7 @@ class MarkEcsResourceForOp(TagDelayedAction):
             filters:
               - "tag:InvalidTag": present
               - type: taggable
-                value: true
+                state: true
             actions:
               - type: mark-for-op
                 op: delete
@@ -668,16 +668,16 @@ class ECSTaggable(Filter):
                   resource: ecs-service
                   filters:
                     - type: taggable
-                      value: true
+                      state: true
     """
 
-    schema = type_schema('taggable', value={'type': 'boolean'})
+    schema = type_schema('taggable', state={'type': 'boolean'})
 
     def get_permissions(self):
         return self.manager.get_permissions()
 
     def process(self, resources, event=None):
-        if not self.data.get('value'):
+        if not self.data.get('state'):
             return [r for r in resources if not ecs_taggable(self.manager.resource_type, r)]
         else:
             return [r for r in resources if ecs_taggable(self.manager.resource_type, r)]

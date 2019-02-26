@@ -160,7 +160,7 @@ class TestEcsService(BaseTest):
                 "name": "ecs-service-taggable",
                 "resource": "ecs-service",
                 "filters": [
-                    {"type": "taggable", "value": True},
+                    {"type": "taggable", "state": True},
                     {"clusterArn": cluster_arn}
                 ],
             },
