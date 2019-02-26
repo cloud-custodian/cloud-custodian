@@ -289,7 +289,8 @@ class UpdateService(BaseAction):
                                 'type': 'array',
                                 'items': {
                                     'type': 'string',
-                                }
+                                },
+                                'minItems': 1
                             },
                             'securityGroups': {
                                 'items': {
@@ -318,6 +319,27 @@ class UpdateService(BaseAction):
             api_call_param = {}
             requested_change_param = self.data.get('update')
             for update_prop, requested_val in requested_change_param.items():
+
+                if update_prop == 'networkConfiguration':
+
+                    if 'awsvpcConfiguration' not in requested_change_param['networkConfiguration']:
+                        continue
+                    api_call_param['networkConfiguration'] = {
+                        'awsvpcConfiguration': {},
+                    }
+                    api_network_call_param = api_call_param['networkConfiguration'][
+                        'awsvpcConfiguration']
+                    network_request = requested_change_param['networkConfiguration'][
+                        'awsvpcConfiguration']
+                    r_network_param = r['networkConfiguration']['awsvpcConfiguration']
+
+                    for network_update_prop, requested_network_val in network_request.items():
+                        api_network_call_param[network_update_prop] = requested_network_val
+
+                    if ('subnets' not in network_request) or (network_request['subnets'] is None):
+                        api_network_call_param['subnets'] = r_network_param['subnets']
+                    continue
+
                 if r.get(update_prop) != requested_val:
                     api_call_param[update_prop] = requested_val
 
