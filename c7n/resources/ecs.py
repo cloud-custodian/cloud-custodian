@@ -562,6 +562,7 @@ class TagEcsResource(Tag):
                 filters:
                   - "tag:target-tag": absent
                   - type: taggable
+                    value: true
                 actions:
                   - type: tag
                     key: target-tag
@@ -580,7 +581,7 @@ class TagEcsResource(Tag):
                 continue
             client.tag_resource(resourceArn=r[mid], tags=tags)
         if old_arns != 0:
-            self.log.info("Couldn't tag %d resource(s). Needs new ARN format" % old_arns)
+            self.log.warn("Couldn't tag %d resource(s). Needs new ARN format", old_arns)
 
 
 @ECSCluster.action_registry.register('remove-tag')
@@ -601,7 +602,8 @@ class RemoveTagEcsResource(RemoveTag):
                 resource: ecs
                 filters:
                   - "tag:BadTag": present
-                  - taggable
+                  - type: taggable
+                    value: true
                 actions:
                   - type: remove-tag
                     tags: ["BadTag"]
@@ -617,7 +619,7 @@ class RemoveTagEcsResource(RemoveTag):
                 continue
             client.untag_resource(resourceArn=r[self.id_key], tagKeys=keys)
         if old_arns != 0:
-            self.log.info("Couldn't untag %d resource(s). Needs new ARN format" % old_arns)
+            self.log.warn("Couldn't untag %d resource(s). Needs new ARN format", old_arns)
 
 
 @ECSCluster.action_registry.register('mark-for-op')
@@ -642,6 +644,7 @@ class MarkEcsResourceForOp(TagDelayedAction):
             filters:
               - "tag:InvalidTag": present
               - type: taggable
+                value: true
             actions:
               - type: mark-for-op
                 op: delete
@@ -654,7 +657,7 @@ class MarkEcsResourceForOp(TagDelayedAction):
 @ContainerInstance.filter_registry.register('taggable')
 class ECSTaggable(Filter):
     """
-    Filter ECS resources to only those using long-arn format
+    Filter ECS resources on arn-format
     https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
     :example:
 
@@ -665,12 +668,19 @@ class ECSTaggable(Filter):
                   resource: ecs-service
                   filters:
                     - type: taggable
+                      value: true
     """
-    permissions = (None,)
-    schema = type_schema('taggable')
+
+    schema = type_schema('taggable', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return self.manager.get_permissions()
 
     def process(self, resources, event=None):
-        return [r for r in resources if ecs_taggable(self.manager.resource_type, r)]
+        if not self.data.get('value'):
+            return [r for r in resources if not ecs_taggable(self.manager.resource_type, r)]
+        else:
+            return [r for r in resources if ecs_taggable(self.manager.resource_type, r)]
 
 
 ECSCluster.filter_registry.register('marked-for-op', TagActionFilter)

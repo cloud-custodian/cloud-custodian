@@ -159,7 +159,10 @@ class TestEcsService(BaseTest):
             {
                 "name": "ecs-service-taggable",
                 "resource": "ecs-service",
-                "filters": [{"type": "taggable"}, {"clusterArn": cluster_arn}],
+                "filters": [
+                    {"type": "taggable", "value": True},
+                    {"clusterArn": cluster_arn}
+                ],
             },
             session_factory=session_factory,
         )

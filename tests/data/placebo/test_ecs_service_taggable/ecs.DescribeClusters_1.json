@@ -3,28 +3,6 @@
     "data": {
         "clusters": [
             {
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
-                "clusterName": "test-cluster",
-                "status": "ACTIVE",
-                "registeredContainerInstancesCount": 0,
-                "runningTasksCount": 0,
-                "pendingTasksCount": 0,
-                "activeServicesCount": 0,
-                "statistics": [],
-                "tags": []
-            },
-            {
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
-                "clusterName": "default-cluster",
-                "status": "ACTIVE",
-                "registeredContainerInstancesCount": 0,
-                "runningTasksCount": 0,
-                "pendingTasksCount": 0,
-                "activeServicesCount": 0,
-                "statistics": [],
-                "tags": []
-            },
-            {
                 "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
                 "clusterName": "test",
                 "status": "ACTIVE",
@@ -37,26 +15,6 @@
                     {
                         "key": "custodian_tag",
                         "value": "Resource does not meet policy: tag@2019/02/23"
-                    }
-                ]
-            },
-            {
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
-                "clusterName": "Default",
-                "status": "ACTIVE",
-                "registeredContainerInstancesCount": 0,
-                "runningTasksCount": 0,
-                "pendingTasksCount": 0,
-                "activeServicesCount": 0,
-                "statistics": [],
-                "tags": [
-                    {
-                        "key": "Env",
-                        "value": "Dev"
-                    },
-                    {
-                        "key": "Data",
-                        "value": "Magic"
                     }
                 ]
             }
