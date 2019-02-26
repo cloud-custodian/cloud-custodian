@@ -132,7 +132,7 @@ class TestEcsService(BaseTest):
         session_factory = self.replay_flight_data("test_ecs_task_def_filter")
         p = self.load_policy(
             {
-                "name": "services-using-redis",
+                "name": "services-using-nginx",
                 "resource": "ecs-service",
                 "filters": [
                     {
@@ -140,7 +140,7 @@ class TestEcsService(BaseTest):
                         "key": "containerDefinitions[].image",
                         "op": "in",
                         "value_type": "swap",
-                        "value": "redis:latest",
+                        "value": "nginx:latest",
                     }
                 ],
             },
@@ -206,8 +206,7 @@ class TestEcsTaskDefinition(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]["containerDefinitions"][0]["image"],
-            "capitalone/cloud-custodian"
+            resources[0]["containerDefinitions"][0]["image"], "postgres:latest"
         )
         self.assertEqual(resources[0]["status"], "ACTIVE")
         arns = session_factory().client("ecs").list_task_definitions(
