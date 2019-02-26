@@ -316,39 +316,38 @@ class UpdateService(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         for r in resources:
-            api_call_param = {}
-            requested_change_param = self.data.get('update')
-            for update_prop, requested_val in requested_change_param.items():
+            call_param = {}
+            change_param = self.data.get('update')
+            for update_prop, request_val in change_param.items():
 
                 if update_prop == 'networkConfiguration':
 
-                    if 'awsvpcConfiguration' not in requested_change_param['networkConfiguration']:
+                    if 'awsvpcConfiguration' not in request_val:
                         continue
-                    api_call_param['networkConfiguration'] = {
+                    call_param['networkConfiguration'] = {
                         'awsvpcConfiguration': {},
                     }
-                    api_network_call_param = api_call_param['networkConfiguration'][
-                        'awsvpcConfiguration']
-                    network_request = requested_change_param['networkConfiguration'][
-                        'awsvpcConfiguration']
+                    network_call_param = call_param['networkConfiguration']['awsvpcConfiguration']
+                    network_request = change_param['networkConfiguration']['awsvpcConfiguration']
                     r_network_param = r['networkConfiguration']['awsvpcConfiguration']
 
-                    for network_update_prop, requested_network_val in network_request.items():
-                        api_network_call_param[network_update_prop] = requested_network_val
+                    for network_update_prop, request_network_val in network_request.items():
+                        network_call_param[network_update_prop] = request_network_val
 
                     if ('subnets' not in network_request) or (network_request['subnets'] is None):
-                        api_network_call_param['subnets'] = r_network_param['subnets']
+                        network_call_param['subnets'] = r_network_param['subnets']
                     continue
 
-                if r.get(update_prop) != requested_val:
-                    api_call_param[update_prop] = requested_val
+                if r.get(update_prop) != request_val:
+                    call_param[update_prop] = request_val
 
-            if not api_call_param:
+            if not call_param:
                 continue
-            api_call_param['service'] = r['serviceName']
-            api_call_param['cluster'] = r['clusterArn']
 
-            client.update_service(**api_call_param)
+            call_param['service'] = r['serviceName']
+            call_param['cluster'] = r['clusterArn']
+
+            client.update_service(**call_param)
 
 
 @Service.action_registry.register('delete')
