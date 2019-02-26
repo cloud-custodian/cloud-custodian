@@ -151,27 +151,21 @@ class TestEcsService(BaseTest):
         self.assertEqual(resources[0]["serviceName"], "home-web")
 
     def test_ecs_service_taggable(self):
-        session_factory = self.replay_flight_data(
-            "test_ecs_service_taggable"
-        )
-        cluster_arn = "arn:aws:ecs:us-east-1:644160558196:cluster/test"
-        p = self.load_policy(
-            {
-                "name": "ecs-service-taggable",
-                "resource": "ecs-service",
-                "filters": [
-                    {"type": "taggable", "state": True},
-                    {"clusterArn": cluster_arn}
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
+        services = [
+            {"serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/test-yes-tag",
+             "serviceName": "test-yes-tag",
+             "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test"},
+            {"serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test-no-tag",
+             "serviceName": "test-no-tag",
+             "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test"}]
+        p = self.load_policy({
+            "name": "ecs-service-taggable",
+            "resource": "ecs-service",
+            "filters": [
+                {"type": "taggable", "state": True}]})
+        resources = p.resource_manager.filter_resources(services)
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['serviceName'], 'test-yes-tag')
-        client = session_factory().client("ecs")
-        services = client.list_services(cluster=cluster_arn)['serviceArns']
-        self.assertEqual(len(services), 2)
 
 
 class TestEcsTaskDefinition(BaseTest):
