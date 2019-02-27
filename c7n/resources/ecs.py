@@ -336,11 +336,14 @@ class UpdateService(BaseAction):
                     for network_update_prop, request_network_val in network_request.items():
                         network_call_param[network_update_prop] = request_network_val
 
-                    if ('subnets' not in network_request) or (network_request['subnets'] is None):
-                        network_call_param['subnets'] = r_network_param['subnets']
-                    continue
+                    # If nothing is passed in use prior values
+                    for r_type, r_value in r_network_param.items():
+                        if (r_type not in network_request) or (network_request[r_type] is None):
+                            network_call_param[r_type] = r_network_param[r_type]
 
-                if r.get(update_prop) != request_val:
+                # Do not check for networkConfiguration or prior networkConfiguration attributes
+                # (with no new update information) will be wiped out
+                elif r.get(update_prop) != request_val:
                     call_param[update_prop] = request_val
 
             if not call_param:
