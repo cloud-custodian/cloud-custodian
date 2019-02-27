@@ -870,7 +870,7 @@ class InstanceFinding(PostFinding):
         ip_addresses = jmespath.search(
             "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
 
-        # limit to max 10 ip addresses, per service limits if the we have any
+        # limit to max 10 ip addresses, per security hub service limits
         ip_addresses = ip_addresses and ip_addresses[:10] or ip_addresses
         details = {
             "Type": r["InstanceType"],
