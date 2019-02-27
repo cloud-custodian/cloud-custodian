@@ -453,7 +453,10 @@ def schema_cmd(options):
         # Print schema
         print("\nSchema\n------\n")
         if hasattr(cls, 'schema'):
-            print(json.dumps(cls.schema, indent=4))
+            component_schema = dict(cls.schema)
+            component_schema.pop('additionalProperties', None)
+            component_schema.pop('type', None)
+            print(yaml.safe_dump(component_schema))
         else:
             # Shouldn't ever hit this, so exclude from cover
             print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover

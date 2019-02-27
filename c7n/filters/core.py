@@ -534,7 +534,7 @@ class ValueFilter(Filter):
 
         elif self.vtype == 'integer':
             try:
-                value = int(value.strip())
+                value = int(str(value).strip())
             except ValueError:
                 value = 0
         elif self.vtype == 'size':
