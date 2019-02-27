@@ -82,7 +82,7 @@ class Role(QueryResourceManager):
         service = 'iam'
         type = 'role'
         enum_spec = ('list_roles', 'Roles', None)
-        detail_spec = None
+        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
         filter_name = None
         id = name = 'RoleName'
         date = 'CreateDate'
@@ -91,17 +91,6 @@ class Role(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
-
-    def get_resources(self, resource_ids, cache=True):
-        """For IAM Roles on events, resource ids are role names."""
-        resources = []
-        client = local_session(self.session_factory).client('iam')
-        for rid in resource_ids:
-            try:
-                resources.append(client.get_role(RoleName=rid)['Role'])
-            except client.exceptions.NoSuchEntityException:
-                continue
-        return resources
 
 
 @resources.register('iam-user')
@@ -120,24 +109,6 @@ class User(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeUser(self)
-        return super(User, self).get_source(source_type)
-
-
-class DescribeUser(DescribeSource):
-
-    def get_resources(self, resource_ids, cache=True):
-        client = local_session(self.manager.session_factory).client('iam')
-        resources = []
-        for rid in resource_ids:
-            try:
-                resources.append(client.get_user(UserName=rid).get('User'))
-            except client.exceptions.NoSuchEntityException:
-                continue
-        return resources
 
 
 @User.action_registry.register('tag')
@@ -168,11 +139,7 @@ class UserRemoveTag(RemoveTag):
                 continue
 
 
-@User.action_registry.register('mark-for-op')
-class UserTagDelayedAction(TagDelayedAction):
-    pass
-
-
+User.action_registry.register('mark-for-op', TagDelayedAction)
 User.filter_registry.register('marked-for-op', TagActionFilter)
 
 

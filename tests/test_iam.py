@@ -281,7 +281,7 @@ class IamRoleFilterUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 1)
 
     def test_iam_role_unused(self):
         session_factory = self.replay_flight_data("test_iam_role_unused")
@@ -641,7 +641,7 @@ class IamManagedPolicyUsage(BaseTest):
 
     def test_iam_role_has_specific_managed_policy(self):
         session_factory = self.replay_flight_data(
-            "test_iam_role_has_specific_managed_policy"
+            "test_iam_role_no_specific_managed_policy"
         )
         self.patch(SpecificIamRoleManagedPolicy, "executor_factory", MainThreadExecutor)
         p = self.load_policy(
@@ -681,7 +681,7 @@ class IamManagedPolicyUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 7)
+        self.assertEqual(len(resources), 2)
 
 
 class IamInlinePolicyUsage(BaseTest):
@@ -756,7 +756,7 @@ class IamInlinePolicyUsage(BaseTest):
             "oneClick_lambda_basic_execution_1466943062384")
 
     def test_iam_role_no_inline_policy(self):
-        session_factory = self.replay_flight_data("test_iam_role_no_inline_policy")
+        session_factory = self.replay_flight_data("test_iam_role_has_inline_policy")
         self.patch(IamRoleInlinePolicy, "executor_factory", MainThreadExecutor)
         p = self.load_policy(
             {
@@ -767,7 +767,7 @@ class IamInlinePolicyUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 1)
         self.assertFalse(resources[0]["c7n:InlinePolicies"])
 
     def test_iam_group_has_inline_policy(self):
