@@ -497,9 +497,12 @@ class AppELBListenerFilterBase(object):
         client = local_session(self.manager.session_factory).client('elbv2')
         self.listener_map = defaultdict(list)
         for alb in albs:
-            results = client.describe_listeners(
-                LoadBalancerArn=alb['LoadBalancerArn'])
-            self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
+            try:
+                results = client.describe_listeners(
+                    LoadBalancerArn=alb['LoadBalancerArn'])
+                self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
+            except client.exception.LoadBalancerNotFoundException:
+                pass
 
 
 def parse_attribute_value(v):
