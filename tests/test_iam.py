@@ -311,6 +311,26 @@ class IamRoleFilterUsage(BaseTest):
 
 class IamUserTest(BaseTest):
 
+    def test_iam_user_check_permissions(self):
+        factory = self.replay_flight_data('test_iam_user_check_permissions')
+        p = self.load_policy({
+            'name': 'perm-check',
+            'resource': 'iam-user',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': [{'event': '', 'source': '', 'ids': 'ids'}],
+            },
+            'filters': [
+                {'UserName': 'kapil'},
+                {'type': 'check-permissions',
+                 'match': {'EvalDecision': 'allowed'},
+                 'actions': ['sqs:CreateUser']}]},
+            session_factory=factory)
+        resources = p.push({'detail': {
+            'eventName': '', 'eventSource': '', 'ids': ['kapil']}}, None)
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:perm-matches' in resources[0])
+
     @functional
     def test_iam_user_delete(self):
         # To get this test to work against live AWS I had to attach the
@@ -487,6 +507,26 @@ class IamInstanceProfileFilterUsage(BaseTest):
 
 
 class IamPolicyFilterUsage(BaseTest):
+
+    def test_iam_user_policy_permission(self):
+        session_factory = self.replay_flight_data('test_iam_policy_check_permission')
+        p = self.load_policy({
+            'name': 'iam-policy-check',
+            'resource': 'iam-policy',
+            'mode': {'type': 'cloudtrail', 'events': [
+                {'ids': 'ids', 'source': '', 'event': ''}]},
+            'filters': [
+                {'type': 'check-permissions',
+                 'match': 'allowed',
+                 'actions': ['ecr:PutImage']}]},
+            session_factory=session_factory)
+        resources = p.push({'detail': {
+            'eventName': '', 'eventSource': '',
+            'ids': ["arn:aws:iam::644160558196:policy/service-role/codebuild-policy"]}},
+            None)
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:policy' in resources[0])
+        self.assertTrue('c7n:perm-matches' in resources[0])
 
     def test_iam_policy_get_resources(self):
         session_factory = self.replay_flight_data("test_iam_policy_get_resource")

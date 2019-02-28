@@ -38,9 +38,7 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n import query
-
-from c7n import utils
+from c7n import query, utils
 from c7n.utils import type_schema, filter_empty
 
 

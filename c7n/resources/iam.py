@@ -17,6 +17,7 @@ from collections import OrderedDict
 import csv
 import datetime
 import functools
+import json
 import io
 from datetime import timedelta
 import itertools
@@ -160,8 +161,6 @@ class Policy(QueryResourceManager):
         global_resource = True
         arn = 'Arn'
 
-    arn_path_prefix = "aws:policy/"
-
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribePolicy(self)
@@ -235,6 +234,112 @@ class ServerCertificate(QueryResourceManager):
         dimension = None
         # Denotes this resource type exists across regions
         global_resource = True
+
+
+@User.filter_registry.register('check-permissions')
+@Group.filter_registry.register('check-permissions')
+@Role.filter_registry.register('check-permissions')
+@Policy.filter_registry.register('check-permissions')
+class CheckPermissions(Filter):
+    """Check IAM permissions associated with a resource.
+
+    :example:
+
+    Find users that can create other users
+
+    .. code-block:: yaml
+
+        policies:
+          - name: super-users
+            resource: iam-user
+            filters:
+              - type: check-permissions
+                match: allowed
+                actions:
+                 - iam:CreateUser
+    """
+
+    schema = type_schema(
+        'check-permissions', **{
+            'match': {'oneOf': [
+                {'enum': ['allowed', 'denied']},
+                {'$ref': '#/definitions/filters/valuekv'},
+                {'$ref': '#/definitions/filters/value'}]},
+            'match-operator': {'enum': ['and', 'or']},
+            'actions': {'type': 'array', 'items': {'type': 'string'}},
+            'required': ('actions', 'match')})
+
+    policy_annotation = 'c7n:policy'
+    eval_annotation = 'c7n:perm-matches'
+
+    def get_permissions(self):
+        if self.manager.type == 'iam-policy':
+            return ('iam:SimulateCustomPolicy',)
+        return ('iam:SimulatePrincipalPolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        actions = self.data['actions']
+        matcher = self.get_eval_matcher()
+        operator = self.data.get('match-operator', 'and') == 'and' and all or any
+
+        results = []
+        eval_cache = {}
+        for arn, r in zip(self.get_iam_arns(resources), resources):
+            if arn is None:
+                continue
+            if arn in eval_cache:
+                evaluations = eval_cache[arn]
+            else:
+                evaluations = self.get_evaluations(client, arn, r, actions)
+                eval_cache[arn] = evaluations
+
+            matches = []
+            matched = []
+            for e in evaluations:
+                match = matcher(e)
+                if match:
+                    matched.append(e)
+                matches.append(match)
+            if operator(matches):
+                r[self.eval_annotation] = matched
+                results.append(r)
+        return results
+
+    def get_iam_arns(self, resources):
+        return self.manager.get_arns(resources)
+
+    def get_evaluations(self, client, arn, r, actions):
+        if self.manager.type == 'iam-policy':
+            policy = r.get(self.policy_annotation)
+            if policy is None:
+                r['c7n:policy'] = policy = client.get_policy_version(
+                    PolicyArn=r['Arn'],
+                    VersionId=r['DefaultVersionId']).get('PolicyVersion', {})
+            evaluations = self.manager.retry(
+                client.simulate_custom_policy,
+                PolicyInputList=[json.dumps(policy['Document'])],
+                ActionNames=actions).get('EvaluationResults', ())
+        else:
+            evaluations = self.manager.retry(
+                client.simulate_principal_policy,
+                PolicySourceArn=arn,
+                ActionNames=actions).get('EvaluationResults', ())
+        return evaluations
+
+    def get_eval_matcher(self):
+        if isinstance(self.data['match'], six.string_types):
+            if self.data['match'] == 'denied':
+                values = ['explicitDeny', 'implicitDeny']
+            else:
+                values = ['allowed']
+            vf = ValueFilter({'type': 'value', 'key':
+                              'EvalDecision', 'value': values,
+                              'op': 'in'})
+        else:
+            vf = ValueFilter(self.data['match'])
+        vf.annotate = False
+        return vf
 
 
 class IamRoleUsage(Filter):
