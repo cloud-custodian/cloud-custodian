@@ -115,6 +115,22 @@ class AutoScalingTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Unencrypted"], ["Image", "LaunchConfig"])
 
+    def test_asg_non_encrypted_filter_with_templates(self):
+        factory = self.replay_flight_data("test_asg_non_encrypted_filter_with_templates")
+        p = self.load_policy(
+            {
+                "name": "asg-encrypted-with-launch-templates",
+                "resource": "asg",
+                "filters": [
+                    {"type": "not-encrypted"},
+                    {'LaunchTemplate': 'present'}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_asg_image_age_filter(self):
         factory = self.replay_flight_data("test_asg_image_age_filter")
         p = self.load_policy(
@@ -122,6 +138,22 @@ class AutoScalingTest(BaseTest):
                 "name": "asg-cfg-filter",
                 "resource": "asg",
                 "filters": [{"type": "image-age", "days": 90}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_asg_image_age_filter_template(self):
+        factory = self.replay_flight_data("test_asg_image_age_filter_template")
+        p = self.load_policy(
+            {
+                "name": "asg-cfg-filter",
+                "resource": "asg",
+                "filters": [
+                    {"type": "image-age", "days": 1, 'op': 'ge'},
+                    {"LaunchTemplate": "present"}
+                ],
             },
             session_factory=factory,
         )
@@ -539,6 +571,22 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+    def test_valid_asg_with_launch_templates(self):
+        factory = self.replay_flight_data("test_valid_asg_with_launch_templates")
+        p = self.load_policy(
+            {
+                "name": "asg-valid-templates",
+                "resource": "asg",
+                "filters": [
+                    {"type": "valid"},
+                    {"LaunchTemplate": "present"}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_asg_invalid_filter_good(self):
         factory = self.replay_flight_data("test_asg_invalid_filter_good")

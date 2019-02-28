@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "TargetGroups": [],
+        "ResponseMetadata": {
+            "RequestId": "6b008c5d-3acf-11e9-b4cf-1b8ccfe92cf2",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6b008c5d-3acf-11e9-b4cf-1b8ccfe92cf2",
+                "content-type": "text/xml",
+                "content-length": "319",
+                "date": "Wed, 27 Feb 2019 20:36:53 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
