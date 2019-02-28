@@ -173,7 +173,6 @@ class NetworkLocation(Filter):
         self.missing_ok = self.data.get('missing-ok', False)
 
         results = []
-
         for r in resources:
             resource_sgs = self.filter_ignored(
                 [related_sg[sid] for sid in self.sg.get_related_ids([r])])
@@ -204,6 +203,9 @@ class NetworkLocation(Filter):
 
     def process_resource(self, r, resource_sgs, resource_subnets, key):
         evaluation = []
+        sg_space = set()
+        subnet_space = set()
+
         if 'subnet' in self.compare and resource_subnets:
             subnet_values = {
                 rsub[self.subnet_model.id]: self.subnet.get_resource_value(key, rsub)
@@ -230,6 +232,7 @@ class NetworkLocation(Filter):
                     'security-groups': sg_values})
 
             sg_space = set(filter(None, sg_values.values()))
+
             if len(sg_space) > self.max_cardinality:
                 evaluation.append({
                     'reason': 'SecurityGroupLocationCardinality',
