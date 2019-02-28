@@ -867,15 +867,19 @@ class SsmStatus(ValueFilter):
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
     def format_resource(self, r):
+        ip_addresses = jmespath.search(
+            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
+
+        # limit to max 10 ip addresses, per security hub service limits
+        ip_addresses = ip_addresses and ip_addresses[:10] or ip_addresses
         details = {
             "Type": r["InstanceType"],
             "ImageId": r["ImageId"],
-            "IpV4Addresses": jmespath.search(
-                "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
-            ),
+            "IpV4Addresses": ip_addresses,
             "KeyName": r.get("KeyName"),
-            "LaunchedAt": r["LaunchTime"].isoformat(),
+            "LaunchedAt": r["LaunchTime"].isoformat()
         }
+
         if "VpcId" in r:
             details["VpcId"] = r["VpcId"]
         if "SubnetId" in r:
