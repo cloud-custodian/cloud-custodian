@@ -501,7 +501,7 @@ class AppELBListenerFilterBase(object):
                 results = client.describe_listeners(
                     LoadBalancerArn=alb['LoadBalancerArn'])
                 self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
-            except client.exception.LoadBalancerNotFoundException:
+            except client.exceptions.LoadBalancerNotFoundException:
                 continue
 
 
