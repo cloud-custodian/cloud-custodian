@@ -189,9 +189,6 @@ class VpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
-filters.register('network-location', net_filters.NetworkLocation)
-
-
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
@@ -510,6 +507,19 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     def process(self, resources, event=None):
         return super(InstanceOffHour, self).process(
             self.filter_instance_state(resources))
+
+
+@filters.register('network-location')
+class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
+
+    valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
+                           'stopped')
+
+    def process(self, resources, event=None):
+        resources = self.filter_instance_state(resources)
+        if not resources:
+            return []
+        return super(EC2NetworkLocation, self).process(resources)
 
 
 @filters.register('onhour')
