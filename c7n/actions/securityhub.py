@@ -349,7 +349,7 @@ class OtherResourcePostFinding(PostFinding):
                 v = str(v)
             else:
                 continue
-            details[k] = v
+            details[k] = v[:1024]
 
         details['c7n:resource-type'] = self.manager.type
         other = {
