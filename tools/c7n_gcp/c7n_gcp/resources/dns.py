@@ -31,3 +31,21 @@ class DnsManagedZone(QueryResourceManager):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
                         'managedZone': resource_info['name']})
+
+
+@resources.register('dns-policy')
+class DnsPolicy(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'dns'
+        version = 'v1beta2'
+        component = 'policies'
+        enum_spec = ('list', 'policies[]', None)
+        scope = 'project'
+        id = 'id'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'project': resource_info['project_id'],
+                        'policy': resource_info['name']})

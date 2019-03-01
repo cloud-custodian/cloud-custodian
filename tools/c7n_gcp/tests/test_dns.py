@@ -45,3 +45,35 @@ class DnsManagedZoneTest(BaseTest):
         managed_zone_resource = policy.resource_manager.get_resource(
             {'name': managed_zone_name, 'project_id': project_id})
         self.assertEqual(managed_zone_resource['name'], managed_zone_name)
+
+
+class DnsPolicyTest(BaseTest):
+
+    def test_policy_query(self):
+        project_id = 'cloud-custodian'
+        policy_name = 'custodian'
+        session_factory = self.replay_flight_data(
+            'policy-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-dns-policy-dryrun',
+             'resource': 'gcp.dns-policy'},
+            session_factory=session_factory)
+
+        policy_resources = policy.run()
+        self.assertEqual(policy_resources[0]['name'], policy_name)
+
+    def test_policy_get(self):
+        project_id = 'cloud-custodian'
+        policy_name = 'custodian'
+        session_factory = self.replay_flight_data(
+            'policy-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-dns-policy-dryrun',
+             'resource': 'gcp.dns-policy'},
+            session_factory=session_factory)
+
+        policy_resource = policy.resource_manager.get_resource(
+            {'name': policy_name, 'project_id': project_id})
+        self.assertEqual(policy_resource['name'], policy_name)
