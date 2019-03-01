@@ -297,7 +297,7 @@ class UpdateService(BaseAction):
                             'securityGroups': {
                                 'items': {
                                     'type': 'string',
-                                }
+                                },
                             },
                             'assignPublicIp': {
                                 'type': 'string',
@@ -317,42 +317,31 @@ class UpdateService(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
+        update = self.data.get('update')
+
         for r in resources:
-            call_param = {}
-            change_param = self.data.get('update')
-            for update_prop, request_val in change_param.items():
+            param = {}
 
-                if update_prop == 'networkConfiguration':
+            # Handle network separately as it requires atomic updating, and populating
+            # defaults from the resource.
+            net_update = update.get('networkConfiguration', {}).get('awsvpcConfiguration')
+            if net_update:
+                net_param = dict(r['networkConfiguration']['awsvpcConfiguration'])
+                param['networkConfiguration'] = {'awsvpcConfiguration': net_param}
+                for k, v in net_update.items():
+                    net_param[k] = v
 
-                    if 'awsvpcConfiguration' not in request_val:
-                        continue
-                    call_param['networkConfiguration'] = {
-                        'awsvpcConfiguration': {},
-                    }
-                    network_call_param = call_param['networkConfiguration']['awsvpcConfiguration']
-                    network_request = change_param['networkConfiguration']['awsvpcConfiguration']
-                    r_network_param = r['networkConfiguration']['awsvpcConfiguration']
+            for k, v in update.items():
+                if k == 'networkConfiguration':
+                    continue
+                elif r.get(k) != v:
+                    param[k] = v
 
-                    for network_update_prop, request_network_val in network_request.items():
-                        network_call_param[network_update_prop] = request_network_val
-
-                    # If nothing is passed in use prior values
-                    for r_type, r_value in r_network_param.items():
-                        if (r_type not in network_request) or (network_request[r_type] is None):
-                            network_call_param[r_type] = r_network_param[r_type]
-
-                # Do not check for networkConfiguration or prior networkConfiguration attributes
-                # (with no new update information) will be wiped out
-                elif r.get(update_prop) != request_val:
-                    call_param[update_prop] = request_val
-
-            if not call_param:
+            if not param:
                 continue
 
-            call_param['service'] = r['serviceName']
-            call_param['cluster'] = r['clusterArn']
-
-            client.update_service(**call_param)
+            client.update_service(
+                cluster=r['clusterArn'], service=r['serviceName'], **param)
 
 
 @Service.action_registry.register('delete')
