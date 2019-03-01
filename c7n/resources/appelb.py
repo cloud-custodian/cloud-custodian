@@ -500,9 +500,9 @@ class AppELBListenerFilterBase(object):
             try:
                 results = client.describe_listeners(
                     LoadBalancerArn=alb['LoadBalancerArn'])
-                self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
             except client.exceptions.LoadBalancerNotFoundException:
                 continue
+            self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
 
 
 def parse_attribute_value(v):
