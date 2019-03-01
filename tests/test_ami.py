@@ -38,7 +38,7 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_deregister_delete_snaps(self):
-        factory = self.record_flight_data('test_ami_deregister_delete_snap')
+        factory = self.replay_flight_data('test_ami_deregister_delete_snap')
         p = self.load_policy({
             'name': 'deregister-snap',
             'resource': 'ami',
