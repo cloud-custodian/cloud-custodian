@@ -14,3 +14,34 @@
 
 from gcp_common import BaseTest
 
+
+class DnsManagedZoneTest(BaseTest):
+
+    def test_managed_zone_query(self):
+        project_id = 'cloud-custodian'
+        managed_zone_name = 'custodian'
+        session_factory = self.replay_flight_data(
+            'managed-zone-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-dns-managed-zone-dryrun',
+             'resource': 'gcp.dns-managed-zone'},
+            session_factory=session_factory)
+
+        managed_zone_resources = policy.run()
+        self.assertEqual(managed_zone_resources[0]['name'], managed_zone_name)
+
+    def test_managed_zone_get(self):
+        project_id = 'cloud-custodian'
+        managed_zone_name = 'custodian'
+        session_factory = self.replay_flight_data(
+            'managed-zone-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-dns-managed-zone-dryrun',
+             'resource': 'gcp.dns-managed-zone'},
+            session_factory=session_factory)
+
+        managed_zone_resource = policy.resource_manager.get_resource(
+            {'name': managed_zone_name, 'project_id': project_id})
+        self.assertEqual(managed_zone_resource['name'], managed_zone_name)

@@ -13,3 +13,21 @@
 # limitations under the License.
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+
+
+@resources.register('dns-managed-zone')
+class DnsManagedZone(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'dns'
+        version = 'v1beta2'
+        component = 'managedZones'
+        enum_spec = ('list', 'managedZones[]', None)
+        scope = 'project'
+        id = 'id'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'project': resource_info['project_id'],
+                        'managedZone': resource_info['name']})
