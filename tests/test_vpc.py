@@ -1049,6 +1049,22 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_match_resource_validator(self):
+
+        try:
+            self.load_policy(
+                {'name': 'related-sg',
+                 'resource': 'elb',
+                 'filters': [
+                     {'type': 'security-group',
+                      'match-resource': True,
+                      'key': "tag:Application",
+                      'op': 'not-equal',
+                      'operator': 'or'}]},
+                validate=True)
+        except PolicyValidationError:
+            self.fail("should pass validation")
+
     @functional
     def test_only_ports(self):
         factory = self.replay_flight_data("test_security_group_only_ports")

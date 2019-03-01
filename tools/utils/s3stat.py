@@ -85,7 +85,8 @@ def main():
                 Bucket=b['Name'])['LocationConstraint']
             if bucket_region is None:
                 bucket_region = "us-east-1"
-            # special case per https://goo.gl/iXdpnl
+            # special case per
+            # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
             elif bucket_region == "EU":
                 bucket_region = "eu-west-1"
         except ClientError:

@@ -2,34 +2,35 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "d0ed812f-251f-11e8-90e4-c5853296b6f0",
+            "RequestId": "f1166076-2bae-11e9-93ed-07eb5dc12b91",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Sun, 11 Mar 2018 11:32:01 GMT",
+                "date": "Fri, 08 Feb 2019 14:36:38 GMT",
                 "content-type": "application/json",
-                "content-length": "620",
+                "content-length": "655",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "d0ed812f-251f-11e8-90e4-c5853296b6f0"
+                "x-amzn-requestid": "f1166076-2bae-11e9-93ed-07eb5dc12b91"
             },
             "RetryAttempts": 0
         },
         "Functions": [
             {
                 "FunctionName": "CloudCustodian",
-                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:CloudCustodian",
-                "Runtime": "go1.x",
-                "Role": "arn:aws:iam::644160558196:role/lambda_basic_execution",
-                "Handler": "hello",
-                "CodeSize": 1395524,
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:CloudCustodian",
+                "Runtime": "python3.7",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 299,
                 "Description": "",
                 "Timeout": 3,
                 "MemorySize": 128,
-                "LastModified": "2018-03-11T11:31:11.206+0000",
-                "CodeSha256": "k1Tv8J0D/hD4MBVvk0xbwJHIrmd/AKjzJ4E2xVjMfdc=",
+                "LastModified": "2019-02-08T14:27:40.518+0000",
+                "CodeSha256": "ZQukCqxtkqFgyF2cU41Avj99TKQ/hNihPtDtRcc08mI=",
                 "Version": "$LATEST",
                 "TracingConfig": {
                     "Mode": "PassThrough"
-                }
+                },
+                "RevisionId": "595da7b3-df74-4d70-bb9e-0df22c156c78"
             }
         ]
     }

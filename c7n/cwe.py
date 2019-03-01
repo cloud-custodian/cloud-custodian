@@ -79,6 +79,11 @@ class CloudWatchEvents(object):
             'ids': 'requestParameters.tableName',
             'source': 'dynamodb.amazonaws.com'},
 
+        'CreateFunction': {
+            'event': 'CreateFunction20150331',
+            'source': 'lambda.amazonaws.com',
+            'ids': 'requestParameters.functionName'},
+
         'RunInstances': {
             'ids': 'responseElements.instancesSet.items[].instanceId',
             'source': 'ec2.amazonaws.com'}}

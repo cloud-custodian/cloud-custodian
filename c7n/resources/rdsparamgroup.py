@@ -272,7 +272,8 @@ class Modify(BaseAction):
                     changed_params.append(param)
 
             # Can only do 20 elements at a time per docs, so if we have more than that we will
-            # break it into multiple requests: https://goo.gl/Z6oGNv
+            # break it into multiple requests:
+            # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rds.html#RDS.Client.modify_db_parameter_group
             for param_set in chunks(changed_params, 5):
                 self.do_modify(client, name, param_set)
 

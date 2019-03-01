@@ -3,6 +3,6 @@ boto3
 requests
 c7n
 pygit2
-pyyaml>=3.13
+PyYAML>=4.2b4
 sqlalchemy
 urllib3>=1.24.1

@@ -150,7 +150,7 @@ class UtilTest(BaseTest):
 
     def test_group_by(self):
         sorter = lambda x: x  # NOQA E731
-        sorter = sys.version_info.major is 2 and sorted or sorter
+        sorter = sys.version_info.major == 2 and sorted or sorter
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(
             sorter(list(utils.group_by(items, "Type").keys())), [None, "a", "b"]
@@ -222,6 +222,12 @@ class UtilTest(BaseTest):
         self.assertEqual(
             utils.generate_arn("s3", "my_bucket"), "arn:aws:s3:::my_bucket"
         )
+
+        self.assertEqual(
+            utils.generate_arn("s3", "my_bucket", region="us-gov-west-1"),
+            "arn:aws-us-gov:s3:::my_bucket"
+        )
+
         self.assertEqual(
             utils.generate_arn(
                 "cloudformation",

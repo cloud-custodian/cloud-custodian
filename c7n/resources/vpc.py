@@ -724,7 +724,8 @@ class Stale(Filter):
     a broken vpc peering connection. Note this applies to VPC
     Security groups only and will implicitly filter security groups.
 
-    AWS Docs - https://goo.gl/nSj7VG
+    AWS Docs:
+      https://docs.aws.amazon.com/vpc/latest/peering/vpc-peering-security-groups.html
 
     :example:
 

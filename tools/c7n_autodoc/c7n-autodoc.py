@@ -28,7 +28,7 @@ rendered_filename = "c7n-autodoc.html"
 file_url_base = 'https://github.com/your_project_path'
 
 # This regex will be used in a re.sub to go from local file path to URL
-file_url_regex = re.compile('.*\/my_dir\/my_dir2')
+file_url_regex = re.compile(r'.*\/my_dir\/my_dir2')
 
 # This is the local directory that will be crawled to find policy files
 # c7n_policy_directory = './aws/c7n/'
@@ -116,7 +116,7 @@ def gather_file_data(mydir):
                     try:
                         category = ('Security & Governance' if category_regex.search(file_path)
                                     else 'Cost Controls')
-                        policies = yaml.load(stream)
+                        policies = yaml.safe_load(stream)
                         for policy in policies['policies']:
                             logging.info('Processing policy %s', policy['name'])
                             policy['file_url'] = get_file_url(file_path)

@@ -78,6 +78,7 @@ CONFIG_SCHEMA = {
                     {'type': 'array', 'items': {'type': 'string'}},
                     {'type': 'string', 'minLength': 3}]},
                 'external_id': {'type': 'string'},
+                'vars': {'type': 'object'},
             }
         },
         'subscription': {
@@ -88,6 +89,7 @@ CONFIG_SCHEMA = {
                 'subscription_id': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'name': {'type': 'string'},
+                'vars': {'type': 'object'},
             }
         },
         'project': {
@@ -98,6 +100,7 @@ CONFIG_SCHEMA = {
                 'project_id': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'name': {'type': 'string'},
+                'vars': {'type': 'object'},
             }
         },
     },
@@ -504,7 +507,7 @@ def run_account(account, region, policies_config, output_path,
         for p in policies:
 
             # Variable expansion and non schema validation (not optional)
-            p.expand_variables(p.get_variables())
+            p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()
 
             log.debug(

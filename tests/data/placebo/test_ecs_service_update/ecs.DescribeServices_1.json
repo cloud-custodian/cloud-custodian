@@ -1,0 +1,109 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/custodian-service-update-test",
+                "serviceName": "custodian-service-update-test",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 1,
+                "runningCount": 0,
+                "pendingCount": 0,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 100
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370485813623167",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+                        "desiredCount": 1,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 24,
+                            "hour": 15,
+                            "minute": 45,
+                            "second": 52,
+                            "microsecond": 615000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 24,
+                            "hour": 15,
+                            "minute": 45,
+                            "second": 52,
+                            "microsecond": 615000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-037318c577d65d330"
+                                ],
+                                "securityGroups": [
+                                    "sg-0fedadd839cd77f33"
+                                ],
+                                "assignPublicIp": "ENABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 24,
+                    "hour": 15,
+                    "minute": 45,
+                    "second": 52,
+                    "microsecond": 615000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-037318c577d65d330"
+                        ],
+                        "securityGroups": [
+                            "sg-0fedadd839cd77f33"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "enableECSManagedTags": false,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "0791090b-3877-11e9-ba9a-c9740c001a09",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0791090b-3877-11e9-ba9a-c9740c001a09",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "3991",
+                "date": "Sun, 24 Feb 2019 20:59:08 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

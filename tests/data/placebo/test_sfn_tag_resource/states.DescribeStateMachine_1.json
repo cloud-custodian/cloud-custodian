@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "status": "ACTIVE", 
+        "definition": "{\n  \"StartAt\": \"HelloWorld\",\n  \"States\": {\n    \"HelloWorld\": {\n      \"Type\": \"Pass\",\n      \"Result\": \"Hello World!\",\n      \"End\": true\n    }\n  }\n}", 
+        "name": "test", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5af3d8dc-33b8-11e9-ab69-c500fe160541", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5af3d8dc-33b8-11e9-ab69-c500fe160541", 
+                "content-length": "406", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }, 
+        "roleArn": "arn:aws:iam::101010101111:role/service-role/StatesExecutionRole",
+        "stateMachineArn": "arn:aws:states:us-east-1:101010101111:stateMachine:test",
+        "creationDate": {
+            "hour": 21, 
+            "__class__": "datetime", 
+            "month": 2, 
+            "second": 53, 
+            "microsecond": 482000, 
+            "year": 2019, 
+            "day": 17, 
+            "minute": 5
+        }
+    }
+}

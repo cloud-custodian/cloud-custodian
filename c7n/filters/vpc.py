@@ -20,7 +20,15 @@ from .core import Filter, ValueFilter
 from .related import RelatedResourceFilter
 
 
-class SecurityGroupFilter(RelatedResourceFilter):
+class MatchResourceValidator(object):
+
+    def validate(self):
+        if self.data.get('match-resource'):
+            self.required_keys = set('key',)
+        return super(MatchResourceValidator, self).validate()
+
+
+class SecurityGroupFilter(MatchResourceValidator, RelatedResourceFilter):
     """Filter a resource by its associated security groups."""
     schema = type_schema(
         'security-group', rinherit=ValueFilter.schema,
@@ -32,7 +40,7 @@ class SecurityGroupFilter(RelatedResourceFilter):
     AnnotationKey = "matched-security-groups"
 
 
-class SubnetFilter(RelatedResourceFilter):
+class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
     """Filter a resource by its associated subnets."""
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
@@ -44,7 +52,7 @@ class SubnetFilter(RelatedResourceFilter):
     AnnotationKey = "matched-subnets"
 
 
-class VpcFilter(RelatedResourceFilter):
+class VpcFilter(MatchResourceValidator, RelatedResourceFilter):
     """Filter a resource by its associated vpc."""
     schema = type_schema(
         'vpc', rinherit=ValueFilter.schema,
