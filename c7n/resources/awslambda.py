@@ -27,6 +27,7 @@ from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
+from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, generate_arn
 
@@ -107,6 +108,13 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 AWSLambda.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
+@AWSLambda.filter_registry.register('check-permissions')
+class LambdaPermissions(CheckPermissions):
+
+    def get_iam_arns(self, resources):
+        return [r['Role'] for r in resources]
 
 
 @AWSLambda.filter_registry.register('reserved-concurrency')

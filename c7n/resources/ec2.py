@@ -39,6 +39,7 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.resources.iam import CheckPermissions
 from c7n.utils import type_schema, filter_empty
 
 
@@ -190,6 +191,28 @@ class VpcFilter(net_filters.VpcFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@filters.register('check-permissions')
+class ComputePermissions(CheckPermissions):
+
+    def get_iam_arns(self, resources):
+        profile_arn_map = {
+            r['IamInstanceProfile']['Arn']: r['IamInstanceProfile']['Id']
+            for r in resources if 'IamInstanceProfile' in r}
+
+        # py2 compat on dict ordering
+        profile_arns = list(profile_arn_map.items())
+        profile_role_map = {
+            arn: profile['Roles'][0]['Arn']
+            for arn, profile in zip(
+                [p[0] for p in profile_arns],
+                self.manager.get_resource_manager(
+                    'iam-profile').get_resources(
+                        [p[1] for p in profile_arns]))}
+        return [
+            profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
+            for r in resources]
 
 
 @filters.register('state-age')
