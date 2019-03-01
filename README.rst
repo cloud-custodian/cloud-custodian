@@ -149,9 +149,10 @@ You can run it with Docker as well
 
   # Run the policy
   $ docker run -it \
-      -v $(pwd)/policy.yml:/src/policy.yml \
+      -v $(pwd)/output:/output \
+      -v $(pwd)/policy.yml:/policy.yml \
       --env-file <(env | grep "^AWS") \
-      cloudcustodian/c7n run -v -s out /src/policies/policy.yml
+      cloudcustodian/c7n run -v -s /output /policy.yml
 
 Custodian supports a few other useful subcommands and options, including
 outputs to S3, Cloudwatch metrics, STS role assumption. Policies go together
