@@ -50,7 +50,7 @@ class TestEc2NetworkLocation(BaseTest):
                 'filters': [
                     {'State.Name': 'terminated'},
                     {'type': 'network-location',
-                     "key": "tag:some-value"},
+                     "key": "tag:some-value"}
                 ]
             },
             session_factory=factory
