@@ -14,8 +14,8 @@
      :target: https://coveralls.io/github/capitalone/cloud-custodian?branch=master
      :alt: Coverage
 
-.. image:: https://requires.io/github/capitalone/cloud-custodian/requirements.svg?branch=master
-     :target: https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master
+.. image:: https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master
+     :target: https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master
      :alt: Requirements Status
 
 
@@ -142,6 +142,17 @@ Given that, you can run Cloud Custodian with::
   # Run the policy
   $ custodian run -s out policy.yml
 
+You can run it with Docker as well
+
+  # Download the image
+  $ docker pull cloudcustodian/c7n
+
+  # Run the policy
+  $ docker run -it \
+      -v $(pwd)/output:/output \
+      -v $(pwd)/policy.yml:/policy.yml \
+      --env-file <(env | grep "^AWS") \
+      cloudcustodian/c7n run -v -s /output /policy.yml
 
 Custodian supports a few other useful subcommands and options, including
 outputs to S3, Cloudwatch metrics, STS role assumption. Policies go together

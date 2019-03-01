@@ -361,46 +361,46 @@ def get_fake_ldap_connection():
 
 
 def get_ldap_lookup(cache_engine=None, uid_regex=None):
-        if cache_engine == 'sqlite':
-            config = {
-                'cache_engine': 'sqlite',
-                'ldap_cache_file': ':memory:'
-            }
-        elif cache_engine == 'redis':
-            config = {
-                'cache_engine': 'redis',
-                'redis_host': 'localhost'
-            }
-        if uid_regex:
-            config['ldap_uid_regex'] = uid_regex
-        ldap_lookup = MockLdapLookup(config, logger)
-        michael_bolton = {
-            'dn': 'CN=Michael Bolton,cn=users,dc=initech,dc=com',
-            'mail': 'michael_bolton@initech.com',
-            'manager': 'CN=Milton,cn=users,dc=initech,dc=com',
-            'displayName': 'Michael Bolton'
+    if cache_engine == 'sqlite':
+        config = {
+            'cache_engine': 'sqlite',
+            'ldap_cache_file': ':memory:'
         }
-        milton = {
-            'uid': '123456',
-            'dn': 'CN=Milton,cn=users,dc=initech,dc=com',
-            'mail': 'milton@initech.com',
-            'manager': 'CN=cthulhu,cn=users,dc=initech,dc=com',
-            'displayName': 'Milton'
+    elif cache_engine == 'redis':
+        config = {
+            'cache_engine': 'redis',
+            'redis_host': 'localhost'
         }
-        bob_porter = {
-            'dn': 'CN=Bob Porter,cn=users,dc=initech,dc=com',
-            'mail': 'bob_porter@initech.com',
-            'manager': 'CN=Bob Slydell,cn=users,dc=initech,dc=com',
-            'displayName': 'Bob Porter'
-        }
-        ldap_lookup.base_dn = 'cn=users,dc=initech,dc=com'
-        ldap_lookup.uid_key = 'uid'
-        ldap_lookup.attributes.append('uid')
-        ldap_lookup.caching.set('michael_bolton', michael_bolton)
-        ldap_lookup.caching.set(bob_porter['dn'], bob_porter)
-        ldap_lookup.caching.set('123456', milton)
-        ldap_lookup.caching.set(milton['dn'], milton)
-        return ldap_lookup
+    if uid_regex:
+        config['ldap_uid_regex'] = uid_regex
+    ldap_lookup = MockLdapLookup(config, logger)
+    michael_bolton = {
+        'dn': 'CN=Michael Bolton,cn=users,dc=initech,dc=com',
+        'mail': 'michael_bolton@initech.com',
+        'manager': 'CN=Milton,cn=users,dc=initech,dc=com',
+        'displayName': 'Michael Bolton'
+    }
+    milton = {
+        'uid': '123456',
+        'dn': 'CN=Milton,cn=users,dc=initech,dc=com',
+        'mail': 'milton@initech.com',
+        'manager': 'CN=cthulhu,cn=users,dc=initech,dc=com',
+        'displayName': 'Milton'
+    }
+    bob_porter = {
+        'dn': 'CN=Bob Porter,cn=users,dc=initech,dc=com',
+        'mail': 'bob_porter@initech.com',
+        'manager': 'CN=Bob Slydell,cn=users,dc=initech,dc=com',
+        'displayName': 'Bob Porter'
+    }
+    ldap_lookup.base_dn = 'cn=users,dc=initech,dc=com'
+    ldap_lookup.uid_key = 'uid'
+    ldap_lookup.attributes.append('uid')
+    ldap_lookup.caching.set('michael_bolton', michael_bolton)
+    ldap_lookup.caching.set(bob_porter['dn'], bob_porter)
+    ldap_lookup.caching.set('123456', milton)
+    ldap_lookup.caching.set(milton['dn'], milton)
+    return ldap_lookup
 
 
 class MockLdapLookup(LdapLookup):

@@ -38,11 +38,11 @@ from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n import query
-
-from c7n import utils
+from c7n import query, utils
 from c7n.utils import type_schema, filter_empty
 
+
+RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
@@ -206,7 +206,7 @@ class StateTransitionAge(AgeFilter):
                 op: ge
                 days: 7
     """
-    RE_PARSE_AGE = re.compile("\(.*?\)")
+    RE_PARSE_AGE = re.compile(r"\(.*?\)")
 
     # this filter doesn't use date_attribute, but needs to define it
     # to pass AgeFilter's validate method
@@ -865,15 +865,19 @@ class SsmStatus(ValueFilter):
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
     def format_resource(self, r):
+        ip_addresses = jmespath.search(
+            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
+
+        # limit to max 10 ip addresses, per security hub service limits
+        ip_addresses = ip_addresses and ip_addresses[:10] or ip_addresses
         details = {
             "Type": r["InstanceType"],
             "ImageId": r["ImageId"],
-            "IpV4Addresses": jmespath.search(
-                "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
-            ),
+            "IpV4Addresses": ip_addresses,
             "KeyName": r.get("KeyName"),
-            "LaunchedAt": r["LaunchTime"].isoformat(),
+            "LaunchedAt": r["LaunchTime"].isoformat()
         }
+
         if "VpcId" in r:
             details["VpcId"] = r["VpcId"]
         if "SubnetId" in r:
@@ -947,8 +951,7 @@ class Start(BaseAction, StateTransitionFilter):
         if failures:
             fail_count = sum(map(len, failures.values()))
             msg = "Could not start %d of %d instances %s" % (
-                fail_count, len(instances),
-                utils.dumps(failures))
+                fail_count, len(instances), utils.dumps(failures))
             self.log.warning(msg)
             raise RuntimeError(msg)
 
@@ -958,12 +961,29 @@ class Start(BaseAction, StateTransitionFilter):
                      'Client.RequestLimitExceeded'),
         retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
-        try:
-            retry(client.start_instances, InstanceIds=instance_ids)
-        except ClientError as e:
-            if e.response['Error']['Code'] in retryable:
-                return True
-            raise
+        while instance_ids:
+            try:
+                retry(client.start_instances, InstanceIds=instance_ids)
+                break
+            except ClientError as e:
+                if e.response['Error']['Code'] in retryable:
+                    # we maxed out on our retries
+                    return True
+                elif e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    instance_ids.remove(extract_instance_id(e))
+                else:
+                    raise
+
+
+def extract_instance_id(state_error):
+    "Extract an instance id from an error"
+    instance_id = None
+    match = RE_ERROR_INSTANCE_ID.search(str(state_error))
+    if match:
+        instance_id = match.groupdict().get('instance_id')
+    if match is None or instance_id is None:
+        raise ValueError("Could not extract instance id from error: %s" % state_error)
+    return instance_id
 
 
 @actions.register('resize')
@@ -1102,17 +1122,12 @@ class Stop(BaseAction, StateTransitionFilter):
         return instances
 
     def _run_instances_op(self, op, instance_ids):
-        while True:
+        while instance_ids:
             try:
                 return self.manager.retry(op, InstanceIds=instance_ids)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
-                    msg = e.response['Error']['Message']
-                    e_instance_id = msg[msg.find("'") + 1:msg.rfind("'")]
-                    instance_ids.remove(e_instance_id)
-                    if not instance_ids:
-                        return
-                    continue
+                    instance_ids.remove(extract_instance_id(e))
                 raise
 
 
@@ -1761,10 +1776,11 @@ class InstanceAttribute(ValueFilter):
 class LaunchTemplate(query.QueryResourceManager):
 
     class resource_type(object):
+        id = 'LaunchTemplateId'
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
-        dimension = 'None'
+        dimension = None
         enum_spec = (
             'describe_launch_templates', 'LaunchTemplates', None)
         filter_name = 'LaunchTemplateIds'
@@ -1832,3 +1848,17 @@ class LaunchTemplate(query.QueryResourceManager):
                 (t['LaunchTemplateId'], t['Version']), []).append(
                     a['AutoScalingGroupName'])
         return templates
+
+
+@resources.register('ec2-reserved')
+class ReservedInstance(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        name = id = 'ReservedInstancesId'
+        date = 'Start'
+        enum_spec = (
+            'describe_reserved_instances', 'ReservedInstances', None)
+        filter_name = 'ReservedInstancesIds'
+        filter_type = 'list'
+        dimension = None

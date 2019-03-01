@@ -126,7 +126,7 @@ class LaunchInfo(object):
 
         lid = asg.get('LaunchTemplate')
         if lid is not None:
-            return (lid['LaunchTemplateId'], lid['LaunchTemplateVersion'])
+            return (lid['LaunchTemplateId'], lid['Version'])
 
         # we've noticed some corner cases where the asg name is the lc name, but not
         # explicitly specified as launchconfiguration attribute.
@@ -147,7 +147,8 @@ class LaunchInfo(object):
     def get_image_ids(self):
         image_ids = {}
         for cid, c in self.items():
-            image_ids.setdefault(c['ImageId'], []).append(cid)
+            if c.get('ImageId'):
+                image_ids.setdefault(c['ImageId'], []).append(cid)
         return image_ids
 
     def get_image_map(self):
@@ -298,7 +299,7 @@ class ConfigValidFilter(Filter):
     def get_snapshots(self):
         snaps = set()
         for cid, cfg in self.launch_info.items():
-            for bd in cfg['BlockDeviceMappings']:
+            for bd in cfg.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
                 snaps.add(bd['Ebs']['SnapshotId'].strip())
@@ -336,7 +337,7 @@ class ConfigValidFilter(Filter):
         if cfg is None:
             errors.append(('invalid-config', cfg_id))
             self.log.debug(
-                "asg:%s no launch config found" % asg['AutoScalingGroupName'])
+                "asg:%s no launch config or template found" % asg['AutoScalingGroupName'])
             asg['Invalid'] = errors
             return True
 
@@ -346,13 +347,13 @@ class ConfigValidFilter(Filter):
             if sg not in self.security_groups:
                 errors.append(('invalid-security-group', sg))
 
-        if cfg['KeyName'] and cfg['KeyName'].strip() not in self.key_pairs:
+        if cfg.get('KeyName') and cfg['KeyName'].strip() not in self.key_pairs:
             errors.append(('invalid-key-pair', cfg['KeyName']))
 
-        if cfg['ImageId'].strip() not in self.images:
+        if cfg.get('ImageId') and cfg['ImageId'].strip() not in self.images:
             errors.append(('invalid-image', cfg['ImageId']))
 
-        for bd in cfg['BlockDeviceMappings']:
+        for bd in cfg.get('BlockDeviceMappings', ()):
             if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
             snapshot_id = bd['Ebs']['SnapshotId'].strip()
@@ -500,7 +501,7 @@ class NotEncryptedFilter(Filter):
         snaps = {}
 
         for cid, c in self.launch_info.items():
-            image = self.images.get(c['ImageId'])
+            image = self.images.get(c.get('ImageId', ''))
             # image deregistered/unavailable or exclude_image set
             if image is not None:
                 image_block_devs = {
@@ -508,7 +509,7 @@ class NotEncryptedFilter(Filter):
                     image['BlockDeviceMappings'] if 'Ebs' in bd}
             else:
                 image_block_devs = set()
-            for bd in c['BlockDeviceMappings']:
+            for bd in c.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd:
                     continue
                 # Launch configs can shadow image devices, images have
@@ -567,7 +568,7 @@ class ImageAgeFilter(AgeFilter):
 
     def get_resource_date(self, asg):
         cfg = self.launch_info.get(asg)
-        ami = self.images.get(cfg['ImageId'], {})
+        ami = self.images.get(cfg.get('ImageId'), {})
         return parse(ami.get(
             self.date_attribute, "2000-01-01T01:01:01.000Z"))
 
@@ -601,8 +602,7 @@ class ImageFilter(ValueFilter):
         return super(ImageFilter, self).process(asgs, event)
 
     def __call__(self, i):
-        cfg = self.configs[i['LaunchConfigurationName']]
-        image = self.images.get(cfg['ImageId'], {})
+        image = self.launch_info.get(i).get('ImageId', None)
         # Finally, if we have no image...
         if not image:
             self.log.warning(
@@ -1009,20 +1009,24 @@ class RemoveTag(Action):
     schema = type_schema(
         'remove-tag',
         aliases=('untag', 'unmark'),
+        tags={'type': 'array', 'items': {'type': 'string'}},
         key={'type': 'string'})
+
     permissions = ('autoscaling:DeleteTags',)
     batch_size = 1
 
     def process(self, asgs):
         error = False
-        key = self.data.get('key', DEFAULT_TAG)
+        tags = self.data.get('tags', [])
+        if not tags:
+            tags = [self.data.get('key', DEFAULT_TAG)]
         client = local_session(self.manager.session_factory).client('autoscaling')
 
         with self.executor_factory(max_workers=2) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, key)] = asg_set
+                    self.process_asg_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
@@ -1036,11 +1040,14 @@ class RemoveTag(Action):
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, key):
-        tags = [dict(
-            Key=key, ResourceType='auto-scaling-group',
-            ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        self.manager.retry(client.delete_tags, Tags=tags)
+    def process_asg_set(self, client, asgs, tags):
+        tag_set = []
+        for a in asgs:
+            for t in tags:
+                tag_set.append(dict(
+                    Key=t, ResourceType='auto-scaling-group',
+                    ResourceId=a['AutoScalingGroupName']))
+        self.manager.retry(client.delete_tags, Tags=tag_set)
 
 
 @ASG.action_registry.register('tag')

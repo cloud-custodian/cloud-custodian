@@ -23,11 +23,12 @@ requires = [
     "boto3",
     "jsonschema",
     "simplejson",  # datadog packaging dep
-    "python-dateutil>=2.6",
-    "ruamel.yaml==0.15.42",
+    "python-dateutil>=2.8",
+    "ruamel.yaml==0.15.88",
     "datadog",
     "sendgrid",
     "ldap3",
+    "c7n",
     "redis"]
 
 

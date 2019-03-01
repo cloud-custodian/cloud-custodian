@@ -17,10 +17,12 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyExecutionError
-from c7n.filters import MetricsFilter, ValueFilter
+from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
 from c7n import query
+from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
+from c7n.actions import AutoTagUser
 
 
 def ecs_tag_normalize(resources):
@@ -247,6 +249,101 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     """
 
 
+@Service.action_registry.register('modify')
+class UpdateService(BaseAction):
+    """Action to update service
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: no-public-ips-services
+                resource: ecs-service
+                filters:
+                  - 'networkConfiguration.awsvpcConfiguration.assignPublicIp': 'ENABLED'
+                actions:
+                  - type: modify
+                    update:
+                      networkConfiguration:
+                        awsvpcConfiguration:
+                          assignPublicIp: DISABLED
+    """
+
+    schema = type_schema('modify',
+        update={
+            'desiredCount': {'type': 'integer'},
+            'taskDefinition': {'type': 'string'},
+            'deploymentConfiguration': {
+                'type': 'object',
+                'properties': {
+                    'maximumPercent': {'type': 'integer'},
+                    'minimumHealthyPercent': {'type': 'integer'},
+                }
+            },
+            'networkConfiguration': {
+                'type': 'object',
+                'properties': {
+                    'awsvpcConfiguration': {
+                        'type': 'object',
+                        'properties': {
+                            'subnets': {
+                                'type': 'array',
+                                'items': {
+                                    'type': 'string',
+                                },
+                                'minItems': 1
+                            },
+                            'securityGroups': {
+                                'items': {
+                                    'type': 'string',
+                                },
+                            },
+                            'assignPublicIp': {
+                                'type': 'string',
+                                'enum': ['ENABLED', 'DISABLED'],
+                            }
+                        }
+                    }
+                }
+            },
+            'platformVersion': {'type': 'string'},
+            'forceNewDeployment': {'type': 'boolean', 'default': False},
+            'healthCheckGracePeriodSeconds': {'type': 'integer'},
+        }
+    )
+
+    permissions = ('ecs:UpdateService',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecs')
+        update = self.data.get('update')
+
+        for r in resources:
+            param = {}
+
+            # Handle network separately as it requires atomic updating, and populating
+            # defaults from the resource.
+            net_update = update.get('networkConfiguration', {}).get('awsvpcConfiguration')
+            if net_update:
+                net_param = dict(r['networkConfiguration']['awsvpcConfiguration'])
+                param['networkConfiguration'] = {'awsvpcConfiguration': net_param}
+                for k, v in net_update.items():
+                    net_param[k] = v
+
+            for k, v in update.items():
+                if k == 'networkConfiguration':
+                    continue
+                elif r.get(k) != v:
+                    param[k] = v
+
+            if not param:
+                continue
+
+            client.update_service(
+                cluster=r['clusterArn'], service=r['serviceName'], **param)
+
+
 @Service.action_registry.register('delete')
 class DeleteService(BaseAction):
     """Delete service(s)."""
@@ -373,9 +470,6 @@ class TaskDefinition(query.QueryResourceManager):
         service = 'ecs'
         id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
-        detail_spec = (
-            'describe_task_definition', 'taskDefinition', None,
-            'taskDefinition')
         dimension = None
         filter_name = None
         filter_type = None
@@ -391,6 +485,19 @@ class TaskDefinition(query.QueryResourceManager):
         except ClientError as e:
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
+
+    def augment(self, resources):
+        results = []
+        client = local_session(self.session_factory).client('ecs')
+        for task_def_set in resources:
+            response = client.describe_task_definition(
+                taskDefinition=task_def_set,
+                include=['TAGS'])
+            r = response['taskDefinition']
+            r['tags'] = response.get('tags', [])
+            results.append(r)
+        ecs_tag_normalize(results)
+        return results
 
 
 @TaskDefinition.action_registry.register('delete')
@@ -455,6 +562,7 @@ class ECSContainerInstanceDescribeSource(ECSClusterResourceDescribeSource):
             for i in r:
                 i['c7n:cluster'] = cluster_id
             results.extend(r)
+        ecs_tag_normalize(results)
         return results
 
 
@@ -525,3 +633,159 @@ class UpdateAgent(BaseAction):
         except (client.exceptions.NoUpdateAvailableException,
                 client.exceptions.UpdateInProgressException):
             return
+
+
+@ECSCluster.action_registry.register('tag')
+@TaskDefinition.action_registry.register('tag')
+@Service.action_registry.register('tag')
+@Task.action_registry.register('tag')
+@ContainerInstance.action_registry.register('tag')
+class TagEcsResource(Tag):
+    """Action to create tag(s) on an ECS resource
+    (ecs, ecs-task-definition, ecs-service, ecs-task, ecs-container-instance)
+
+    Requires arns in new format for tasks, services, and container-instances.
+    https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: tag-ecs-service
+                resource: ecs-service
+                filters:
+                  - "tag:target-tag": absent
+                  - type: taggable
+                    state: true
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-value
+    """
+    permissions = ('ecs:TagResource',)
+    batch_size = 1
+
+    def process_resource_set(self, client, resources, tags):
+        mid = self.manager.resource_type.id
+        tags = [{'key': t['Key'], 'value': t['Value']} for t in tags]
+        old_arns = 0
+        for r in resources:
+            if not ecs_taggable(self.manager.resource_type, r):
+                old_arns += 1
+                continue
+            client.tag_resource(resourceArn=r[mid], tags=tags)
+        if old_arns:
+            self.log.warn("Couldn't tag %d resource(s). Needs new ARN format", old_arns)
+
+
+@ECSCluster.action_registry.register('remove-tag')
+@TaskDefinition.action_registry.register('remove-tag')
+@Service.action_registry.register('remove-tag')
+@Task.action_registry.register('remove-tag')
+@ContainerInstance.action_registry.register('remove-tag')
+class RemoveTagEcsResource(RemoveTag):
+    """Remove tag(s) from ECS resources
+    (ecs, ecs-task-definition, ecs-service, ecs-task, ecs-container-instance)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ecs-cluster-remove-tag
+                resource: ecs
+                filters:
+                  - "tag:BadTag": present
+                  - type: taggable
+                    value: true
+                actions:
+                  - type: remove-tag
+                    tags: ["BadTag"]
+    """
+    permissions = ('ecs:UntagResource',)
+    batch_size = 1
+
+    def process_resource_set(self, client, resources, keys):
+        old_arns = 0
+        for r in resources:
+            if not ecs_taggable(self.manager.resource_type, r):
+                old_arns += 1
+                continue
+            client.untag_resource(resourceArn=r[self.id_key], tagKeys=keys)
+        if old_arns != 0:
+            self.log.warn("Couldn't untag %d resource(s). Needs new ARN format", old_arns)
+
+
+@ECSCluster.action_registry.register('mark-for-op')
+@TaskDefinition.action_registry.register('mark-for-op')
+@Service.action_registry.register('mark-for-op')
+@Task.action_registry.register('mark-for-op')
+@ContainerInstance.action_registry.register('mark-for-op')
+class MarkEcsResourceForOp(TagDelayedAction):
+    """Mark ECS resources for deferred action
+    (ecs, ecs-task-definition, ecs-service, ecs-task, ecs-container-instance)
+
+    Requires arns in new format for tasks, services, and container-instances.
+    https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ecs-service-invalid-tag-stop
+            resource: ecs-service
+            filters:
+              - "tag:InvalidTag": present
+              - type: taggable
+                state: true
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
+
+
+@Service.filter_registry.register('taggable')
+@Task.filter_registry.register('taggable')
+@ContainerInstance.filter_registry.register('taggable')
+class ECSTaggable(Filter):
+    """
+    Filter ECS resources on arn-format
+    https://docs.aws.amazon.com/AmazonECS/latest/userguide/ecs-resource-ids.html
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name:
+                  resource: ecs-service
+                  filters:
+                    - type: taggable
+                      state: true
+    """
+
+    schema = type_schema('taggable', state={'type': 'boolean'})
+
+    def get_permissions(self):
+        return self.manager.get_permissions()
+
+    def process(self, resources, event=None):
+        if not self.data.get('state'):
+            return [r for r in resources if not ecs_taggable(self.manager.resource_type, r)]
+        else:
+            return [r for r in resources if ecs_taggable(self.manager.resource_type, r)]
+
+
+ECSCluster.filter_registry.register('marked-for-op', TagActionFilter)
+TaskDefinition.filter_registry.register('marked-for-op', TagActionFilter)
+Service.filter_registry.register('marked-for-op', TagActionFilter)
+Task.filter_registry.register('marked-for-op', TagActionFilter)
+ContainerInstance.filter_registry.register('marked-for-op', TagActionFilter)
+
+ECSCluster.action_registry.register('auto-tag-user', AutoTagUser)
+TaskDefinition.action_registry.register('auto-tag-user', AutoTagUser)
+Service.action_registry.register('auto-tag-user', AutoTagUser)
+Task.action_registry.register('auto-tag-user', AutoTagUser)
+ContainerInstance.action_registry.register('auto-tag-user', AutoTagUser)

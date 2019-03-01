@@ -831,13 +831,21 @@ class Policy(object):
         for a in self.resource_manager.actions:
             a.validate()
 
-    def get_variables(self):
+    def get_variables(self, variables=None):
+        """Get runtime variables for policy interpolation.
+
+        Runtime variables are merged with the passed in variables
+        if any.
+        """
         # Global policy variable expansion, we have to carry forward on
         # various filter/action local vocabularies. Where possible defer
         # by using a format string.
         #
         # See https://github.com/capitalone/cloud-custodian/issues/2330
-        return {
+        if not variables:
+            variables = {}
+
+        variables.update({
             # standard runtime variables for interpolation
             'account': '{account}',
             'account_id': self.options.account_id,
@@ -861,7 +869,8 @@ class Policy(object):
             'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
-        }
+        })
+        return variables
 
     def expand_variables(self, variables):
         """Expand variables in policy data.

@@ -23,7 +23,7 @@ import jmespath
 from mock import mock
 from jsonschema.exceptions import ValidationError
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
@@ -844,6 +844,48 @@ class TestReboot(BaseTest):
 
 class TestStart(BaseTest):
 
+    def test_invalid_state_extract(self):
+        self.assertEqual(
+            ec2.extract_instance_id(
+                ("An error occurred (IncorrectInstanceState) when calling "
+                 "the StartInstances operation: The instance 'i-abc123' is "
+                 "not in a state from which it can be started.")),
+            'i-abc123')
+        self.assertRaises(
+            ValueError,
+            ec2.extract_instance_id,
+            ("An error occurred (IncorrectInstanceState) when calling "
+             "the StartInstances operation: The instance is "
+             "not in a state from which it can be started."))
+
+    def test_ec2_start_handle_invalid_state(self):
+        policy = self.load_policy({
+            "name": "ec2-test-start",
+            "resource": "ec2",
+            "filters": [],
+            "actions": [{"type": "start"}],
+        })
+
+        client = mock.MagicMock()
+        client.start_instances.side_effect = ClientError(
+            {'Error': {
+                'Code': 'IncorrectInstanceState',
+                'Message': "The instance 'i-08270b9cfb568a1c4' is not in a state from which it can be started" # NOQA
+            }}, 'StartInstances')
+
+        start_action = policy.resource_manager.actions[0]
+        self.assertEqual(
+            start_action.process_instance_set(
+                client, [{'InstanceId': 'i-08270b9cfb568a1c4'}], 'm5.xlarge', 'us-east-1a'),
+            None)
+
+        client2 = mock.MagicMock()
+        client2.start_instances.side_effect = ValueError
+        self.assertRaises(
+            ValueError,
+            start_action.process_instance_set,
+            client2, [{'InstanceId': 'i-08270b9cfb568a1c4'}], 'm5.xlarge', 'us-east-1a')
+
     def test_ec2_start(self):
         session_factory = self.replay_flight_data("test_ec2_start")
         policy = self.load_policy(
@@ -1475,3 +1517,14 @@ class TestUserData(BaseTest):
         )
         resources = policy.run()
         self.assertGreater(len(resources), 0)
+
+
+class TestReservedInstance(BaseTest):
+
+    def test_reserved_instance_query(self):
+        factory = self.replay_flight_data('test_ec2_reserved_instance_query')
+        p = self.load_policy({
+            'name': 'ec2-reserved',
+            'resource': 'aws.ec2-reserved'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

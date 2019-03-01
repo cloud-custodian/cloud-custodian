@@ -25,8 +25,9 @@ repeatedly.
        resource: ec2
        filters:
          - type: offhour
-           tag: StopAfterHours
+           tag: CustodianOffHours
            default_tz: pt
+           offhour: 19
          - type: instance-age
            hours: 1
        actions:
@@ -36,9 +37,9 @@ repeatedly.
        resource: ec2
        filters:
          - type: onhour
-           tag: StartAfterHours
+           tag: CustodianOffHours
            default_tz: pt
-           onhour: 12
+           onhour: 7
          - type: value
            value: 1
            key: LaunchTime

@@ -17,7 +17,6 @@ Application Load Balancers
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
-import itertools
 import logging
 import six
 
@@ -498,8 +497,11 @@ class AppELBListenerFilterBase(object):
         client = local_session(self.manager.session_factory).client('elbv2')
         self.listener_map = defaultdict(list)
         for alb in albs:
-            results = client.describe_listeners(
-                LoadBalancerArn=alb['LoadBalancerArn'])
+            try:
+                results = client.describe_listeners(
+                    LoadBalancerArn=alb['LoadBalancerArn'])
+            except client.exceptions.LoadBalancerNotFoundException:
+                continue
             self.listener_map[alb['LoadBalancerArn']] = results['Listeners']
 
 
@@ -748,15 +750,13 @@ class AppELBModifyListenerPolicy(BaseAction):
             args['SslPolicy'] = self.data.get('sslpolicy')
         if 'certificate' in self.data:
             args['Certificates'] = [{'CertificateArn': self.data.get('certificate')}]
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_alb, load_balancers, itertools.repeat(args)))
-
-    def process_alb(self, alb, args):
         client = local_session(self.manager.session_factory).client('elbv2')
-        for matched_listener in alb.get('c7n:MatchedListeners', ()):
-            client.modify_listener(
-                ListenerArn=matched_listener['ListenerArn'],
-                **args)
+
+        for alb in load_balancers:
+            for matched_listener in alb.get('c7n:MatchedListeners', ()):
+                client.modify_listener(
+                    ListenerArn=matched_listener['ListenerArn'],
+                    **args)
 
 
 @AppELB.filter_registry.register('healthcheck-protocol-mismatch')
@@ -881,8 +881,9 @@ class AppELBTargetGroup(QueryResourceManager):
 
 def _describe_target_group_tags(target_groups, session_factory,
                                 executor_factory, retry):
+    client = local_session(session_factory).client('elbv2')
+
     def _process_tags(target_group_set):
-        client = local_session(session_factory).client('elbv2')
         target_group_map = {
             target_group['TargetGroupArn']:
                 target_group for target_group in target_group_set
