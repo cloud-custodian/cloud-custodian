@@ -81,6 +81,10 @@ FindingTypes = {
 }
 
 
+# Mostly undocumented value size limit
+SECHUB_VALUE_SIZE_LIMIT = 1024
+
+
 def build_vocabulary():
     vocab = []
     for ns, quals in FindingTypes.items():
@@ -349,7 +353,7 @@ class OtherResourcePostFinding(PostFinding):
                 v = str(v)
             else:
                 continue
-            details[k] = v[:1024]
+            details[k] = v[:SECHUB_VALUE_SIZE_LIMIT]
 
         details['c7n:resource-type'] = self.manager.type
         other = {
