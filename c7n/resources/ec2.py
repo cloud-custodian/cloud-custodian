@@ -211,6 +211,7 @@ class ComputePermissions(CheckPermissions):
             profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
             for r in resources]
 
+
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
     """Age an instance has been in the given state.
