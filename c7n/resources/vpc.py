@@ -16,13 +16,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import itertools
 import operator
 import zlib
-import functools
 import jmespath
 
-from botocore.exceptions import ClientError as BotoClientError
-
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -32,9 +29,8 @@ from c7n.filters.revisions import Diff
 from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr, generate_arn)
-from botocore.exceptions import ClientError
+from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
@@ -1620,7 +1616,7 @@ class AddressRelease(BaseAction):
         for aa in list(associated_addrs):
             try:
                 client.disassociate_address(AssociationId=aa['AssociationId'])
-            except BotoClientError as e:
+            except ClientError as e:
                 # If its already been diassociated ignore, else raise.
                 if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
                        aa['AssocationId'] in e.response['Error']['Message']):
@@ -1645,7 +1641,7 @@ class AddressRelease(BaseAction):
         for r in unassoc_addrs:
             try:
                 client.release_address(AllocationId=r['AllocationId'])
-            except BotoClientError as e:
+            except ClientError as e:
                 # If its already been released, ignore, else raise.
                 if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
                     raise
