@@ -192,8 +192,6 @@ class PolicyPermissions(BaseTest):
                 continue
             if getattr(rtype, 'type', None) is not None:
                 continue
-            if 'arn' in rtype.id.lower():
-                arn_ids.append(k)
             missing.append(k)
 
         self.assertEqual(
