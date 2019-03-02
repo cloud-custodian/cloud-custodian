@@ -190,9 +190,6 @@ class VpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
-filters.register('network-location', net_filters.NetworkLocation)
-
-
 @filters.register('check-permissions')
 class ComputePermissions(CheckPermissions):
 
@@ -213,7 +210,6 @@ class ComputePermissions(CheckPermissions):
         return [
             profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
             for r in resources]
-
 
 @filters.register('state-age')
 class StateTransitionAge(AgeFilter):
@@ -533,6 +529,19 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     def process(self, resources, event=None):
         return super(InstanceOffHour, self).process(
             self.filter_instance_state(resources))
+
+
+@filters.register('network-location')
+class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
+
+    valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
+                           'stopped')
+
+    def process(self, resources, event=None):
+        resources = self.filter_instance_state(resources)
+        if not resources:
+            return []
+        return super(EC2NetworkLocation, self).process(resources)
 
 
 @filters.register('onhour')

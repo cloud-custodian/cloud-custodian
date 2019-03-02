@@ -291,12 +291,13 @@ class UpdateService(BaseAction):
                                 'type': 'array',
                                 'items': {
                                     'type': 'string',
-                                }
+                                },
+                                'minItems': 1
                             },
                             'securityGroups': {
                                 'items': {
                                     'type': 'string',
-                                }
+                                },
                             },
                             'assignPublicIp': {
                                 'type': 'string',
@@ -316,19 +317,31 @@ class UpdateService(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
+        update = self.data.get('update')
+
         for r in resources:
-            api_call_param = {}
-            requested_change_param = self.data.get('update')
-            for update_prop, requested_val in requested_change_param.items():
-                if r.get(update_prop) != requested_val:
-                    api_call_param[update_prop] = requested_val
+            param = {}
 
-            if not api_call_param:
+            # Handle network separately as it requires atomic updating, and populating
+            # defaults from the resource.
+            net_update = update.get('networkConfiguration', {}).get('awsvpcConfiguration')
+            if net_update:
+                net_param = dict(r['networkConfiguration']['awsvpcConfiguration'])
+                param['networkConfiguration'] = {'awsvpcConfiguration': net_param}
+                for k, v in net_update.items():
+                    net_param[k] = v
+
+            for k, v in update.items():
+                if k == 'networkConfiguration':
+                    continue
+                elif r.get(k) != v:
+                    param[k] = v
+
+            if not param:
                 continue
-            api_call_param['service'] = r['serviceName']
-            api_call_param['cluster'] = r['clusterArn']
 
-            client.update_service(**api_call_param)
+            client.update_service(
+                cluster=r['clusterArn'], service=r['serviceName'], **param)
 
 
 @Service.action_registry.register('delete')

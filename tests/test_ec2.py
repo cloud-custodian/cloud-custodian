@@ -31,6 +31,34 @@ from c7n import tags, utils
 from .common import BaseTest
 
 
+class TestEc2NetworkLocation(BaseTest):
+    def test_ec2_network_location_terminated(self):
+        factory = self.replay_flight_data("test_ec2_network_location")
+        client = factory().client('ec2')
+        resp = client.describe_instances()
+
+        self.assertTrue(len(resp['Reservations'][0]['Instances']), 1)
+        self.assertTrue(
+            len(resp['Reservations'][0]['Instances'][0]['State']['Name']),
+            'terminated'
+        )
+
+        policy = self.load_policy(
+            {
+                'name': 'ec2-network-location',
+                'resource': 'ec2',
+                'filters': [
+                    {'State.Name': 'terminated'},
+                    {'type': 'network-location',
+                     "key": "tag:some-value"}
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
+
 class TestTagAugmentation(BaseTest):
 
     def test_tag_augment_empty(self):

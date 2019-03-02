@@ -119,8 +119,6 @@ class TestEcsService(BaseTest):
                             'networkConfiguration': {
                                 'awsvpcConfiguration': {
                                     'assignPublicIp': 'DISABLED',
-                                    'securityGroups': ['sg-0669346d29dd0345a'],
-                                    'subnets': ['subnet-037318c577d65d330']
                                 }
                             },
                         }
