@@ -615,3 +615,17 @@ class QueryParser(object):
             filters.append(d)
 
         return filters
+
+
+class UniqTracker(object):
+    seen = set()
+
+    def __call__(self, val):
+        val = str(val)
+        if not val:
+            val = "None"
+        if val in self.seen:
+            val = self.__call__(val + "_")
+        else:
+            self.seen.add(val)
+        return val
