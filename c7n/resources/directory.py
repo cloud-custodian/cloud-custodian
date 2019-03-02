@@ -31,6 +31,7 @@ class Directory(QueryResourceManager):
         dimension = None
         filter_name = 'DirectoryIds'
         filter_type = 'list'
+        type = "directory"
 
     permissions = ('ds:ListTagsForResource',)
 

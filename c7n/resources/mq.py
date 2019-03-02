@@ -32,6 +32,7 @@ class MessageBroker(QueryResourceManager):
             'describe_broker', 'BrokerId', 'BrokerId', None)
 
         id = 'BrokerId'
+        arn = 'BrokerArn'
         name = 'BrokerName'
         date = None
         dimension = 'Broker'

@@ -58,7 +58,7 @@ class ECSCluster(query.QueryResourceManager):
         batch_detail_spec = (
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
-        id = "clusterArn"
+        arn = id = "clusterArn"
         dimension = None
         filter_name = None
 
@@ -163,7 +163,7 @@ class Service(query.ChildResourceManager):
     class resource_type(object):
         service = 'ecs'
         name = 'serviceName'
-        id = 'serviceArn'
+        arn = id = 'serviceArn'
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
@@ -393,7 +393,7 @@ class Task(query.ChildResourceManager):
 
     class resource_type(object):
         service = 'ecs'
-        id = name = 'taskArn'
+        arn = id = name = 'taskArn'
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
@@ -468,7 +468,7 @@ class TaskDefinition(query.QueryResourceManager):
 
     class resource_type(object):
         service = 'ecs'
-        id = name = 'taskDefinitionArn'
+        arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
         dimension = None
         filter_name = None
@@ -538,6 +538,7 @@ class ContainerInstance(query.ChildResourceManager):
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
+        arn = "containerInstanceArn"
 
     @property
     def source_type(self):

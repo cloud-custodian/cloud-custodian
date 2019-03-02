@@ -26,7 +26,7 @@ class Kafka(QueryResourceManager):
     class resource_type(object):
         service = 'kafka'
         enum_spec = ('list_clusters', 'ClusterInfoList', None)
-        id = 'ClusterArn'
+        arn = id = 'ClusterArn'
         name = 'ClusterName'
         date = 'CreationTime'
         dimension = None

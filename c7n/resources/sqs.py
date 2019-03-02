@@ -37,6 +37,7 @@ class SQS(QueryResourceManager):
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         id = 'QueueUrl'
+        arn = "QueueArn"
         filter_name = 'QueueNamePrefix'
         filter_type = 'scalar'
         name = 'QueueUrl'
@@ -53,9 +54,6 @@ class SQS(QueryResourceManager):
         perms = super(SQS, self).get_permissions()
         perms.append('sqs:GetQueueAttributes')
         return perms
-
-    def get_arns(self, resources):
-        return [r['QueueArn'] for r in resources]
 
     def get_resources(self, ids, cache=True):
         ids_normalized = []

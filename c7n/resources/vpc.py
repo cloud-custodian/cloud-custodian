@@ -1358,6 +1358,7 @@ class TransitGateway(query.QueryResourceManager):
         enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
         dimension = None
         name = id = 'TransitGatewayId'
+        arn = "TransitGatewayArn"
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
 
@@ -1390,6 +1391,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         name = id = 'TransitGatewayAttachmentId'
         filter_name = None
         filter_type = None
+        arn = False
 
 
 @resources.register('peering-connection')
@@ -1406,6 +1408,7 @@ class PeeringConnection(query.QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "pcx-"
+        type = "vpc-peering-connection"
 
 
 @PeeringConnection.filter_registry.register('cross-account')
@@ -1582,28 +1585,6 @@ class NetworkAddress(query.QueryResourceManager):
         date = None
         dimension = None
         config_type = "AWS::EC2::EIP"
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.get_model().service,
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.resource_type.type,
-                separator='/')
-        return self._generate_arn
-
-    def get_arn(self, r):
-        return self.generate_arn(r[self.get_model().id])
-
-    def get_arns(self, resource_set):
-        arns = []
-        for r in resource_set:
-            _id = r[self.get_model().id]
-            arns.append(self.generate_arn(_id))
-        return arns
 
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)

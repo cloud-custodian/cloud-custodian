@@ -386,7 +386,7 @@ class Stream(query.QueryResourceManager):
         # Note max rate of 10 calls per second.
         detail_spec = (
             "describe_stream", "StreamArn", "StreamArn", "StreamDescription")
-        id = 'StreamArn'
+        arn = id = 'StreamArn'
 
         # TODO, we default to filtering by id, but the api takes table names, which
         # require additional client side filtering as multiple streams may be present

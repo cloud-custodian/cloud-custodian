@@ -35,6 +35,7 @@ class CodeRepository(QueryResourceManager):
             'batch_get_repositories', 'repositoryNames', 'repositoryName',
             'repositories', None)
         id = 'repositoryId'
+        arn = "Arn"
         name = 'repositoryName'
         date = 'creationDate'
         dimension = None
@@ -174,3 +175,4 @@ class CodeDeployPipeline(QueryResourceManager):
         name = id = 'name'
         date = 'created'
         filter_name = None
+        type = ""

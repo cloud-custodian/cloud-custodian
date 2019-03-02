@@ -33,6 +33,7 @@ class ReplicationInstance(QueryResourceManager):
         enum_spec = (
             'describe_replication_instances', 'ReplicationInstances', None)
         name = id = 'ReplicationInstanceIdentifier'
+        arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
         dimension = None
 
@@ -49,9 +50,6 @@ class ReplicationInstance(QueryResourceManager):
             return InstanceDescribe(self)
         return super(ReplicationInstance, self).get_source(source_type)
 
-    def get_arns(self, resources):
-        return [r['ReplicationInstanceArn'] for r in resources]
-
 
 @resources.register('dms-endpoint')
 class DmsEndpoints(QueryResourceManager):
@@ -60,7 +58,7 @@ class DmsEndpoints(QueryResourceManager):
         service = 'dms'
         enum_spec = ('describe_endpoints', 'Endpoints', None)
         detail_spec = None
-        id = 'EndpointArn'
+        arn = id = 'EndpointArn'
         name = 'EndpointIdentifier'
         date = None
         dimension = None

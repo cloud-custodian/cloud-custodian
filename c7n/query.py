@@ -370,6 +370,16 @@ class QueryResourceManager(ResourceManager):
         return sources.get(source_type)(self)
 
     @classmethod
+    def has_arn(cls):
+        if getattr(cls.resource_type, 'arn', None):
+            return True
+        elif getattr(cls.resource_type, 'type', None) is not None:
+            return True
+        elif cls.__dict__.get('get_arns'):
+            return True
+        return False
+
+    @classmethod
     def get_model(cls):
         return ResourceQuery.resolve(cls.resource_type)
 
@@ -500,6 +510,9 @@ class QueryResourceManager(ResourceManager):
 
         m = self.get_model()
         arn_key = getattr(m, 'arn', None)
+        if arn_key is False:
+            raise ValueError("%s do not have arns" % self.type)
+
         id_key = m.id
 
         for r in resources:

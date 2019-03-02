@@ -27,7 +27,7 @@ class SecretsManager(QueryResourceManager):
         service = 'secretsmanager'
         enum_spec = ('list_secrets', 'SecretList', None)
         detail_spec = ('describe_secret', 'SecretId', 'ARN', None)
-        id = 'ARN'
+        arn = id = 'ARN'
         name = 'Name'
         dimension = None
         filter_name = None

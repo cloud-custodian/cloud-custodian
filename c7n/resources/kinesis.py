@@ -222,7 +222,7 @@ class AnalyticsApp(QueryResourceManager):
         detail_spec = ('describe_application', 'ApplicationName',
                        'ApplicationName', 'ApplicationDetail')
         name = "ApplicationName"
-        id = "ApplicationARN"
+        arn = id = "ApplicationARN"
         dimension = None
         filter_name = None
         filter_type = None

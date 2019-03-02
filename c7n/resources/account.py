@@ -66,6 +66,10 @@ class Account(ResourceManager):
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
 
+    @classmethod
+    def has_arn(cls):
+        return True
+
     def get_arns(self, resources):
         return ["arn:::{account_id}".format(**r) for r in resources]
 

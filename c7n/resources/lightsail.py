@@ -23,7 +23,7 @@ class Instance(QueryResourceManager):
     class resource_type(object):
         service = 'lightsail'
         enum_spec = ('get_instances', 'instances', None)
-        id = 'arn'
+        arn = id = 'arn'
         name = 'name'
         date = 'createdAt'
         dimension = None
@@ -37,7 +37,7 @@ class Database(QueryResourceManager):
         service = 'lightsail'
         enum_spec = ('get_relational_databases', 'relationDatabases', None)
         name = 'name'
-        id = 'arn'
+        arn = id = 'arn'
         date = 'createdAt'
         dimension = None
         filter_name = None
@@ -50,7 +50,7 @@ class LoadBalancer(QueryResourceManager):
         service = 'lightsail'
         enum_spec = ('get_load_balancers', 'loadBalancers', None)
         name = 'name'
-        id = 'arn'
+        arn = id = 'arn'
         date = 'createdAt'
         dimension = None
         filter_name = None

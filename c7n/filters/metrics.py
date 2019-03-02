@@ -89,6 +89,7 @@ class MetricsFilter(Filter):
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
         'ecs': 'AWS/ECS',
+        'efs': 'AWS/EFS',
         'elasticache': 'AWS/ElastiCache',
         'ec2': 'AWS/EC2',
         'elb': 'AWS/ELB',
