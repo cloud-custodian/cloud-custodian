@@ -36,8 +36,9 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
-## Env serverless specific configuration options, these are part of "public" interface
-
+#
+# Env serverless specific configuration options, these are part of "public" interface
+#
 # We default to skipping events which denote they have errors
 C7N_SKIP_ERROR = os.environ.get('C7N_SKIP_ERROR', 'yes') == 'yes' and True or False
 
@@ -45,8 +46,9 @@ C7N_SKIP_ERROR = os.environ.get('C7N_SKIP_ERROR', 'yes') == 'yes' and True or Fa
 C7N_DEBUG_EVENT = os.environ.get('C7N_DEBUG_EVENT', 'yes') == 'yes' and True or False
 
 
-## Internal global variables
-
+#
+# Internal global variables
+#
 # Default global cache of execution account id for initial configuration setup.
 account_id = None
 
