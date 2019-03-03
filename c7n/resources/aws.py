@@ -36,7 +36,6 @@ from c7n.credentials import SessionFactory
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError
 from c7n.log import CloudWatchLogHandler
-from c7n.utils import parse_url_config
 
 # Import output registries aws provider extends.
 from c7n.output import (
