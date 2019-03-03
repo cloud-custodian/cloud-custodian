@@ -50,6 +50,9 @@ C7N_DEBUG_EVENT = os.environ.get('C7N_DEBUG_EVENT', 'yes') == 'yes' and True or 
 # Default global cache of execution account id for initial configuration setup.
 account_id = None
 
+# config.json policy data dict
+policy_config = None
+
 # On cold start load all resources, requires a pythonpath directory scan
 if 'AWS_EXECUTION_ENV' in os.environ:
     load_resources()
@@ -87,12 +90,24 @@ def init_config(policy_config, default_output_dir):
 
     exec_options = policy_config.get('execution-options', {})
 
-    # cli assume role doesn't translate to lambda, its used to provision the lambda
-    exec_options.pop('assume_role', None)
+    # Remove some configuration options that don't make sense to translate from
+    # cli to lambda automatically.
+    #  - assume role on cli doesn't translate, it is the default lambda role and
+    #    used to provision the lambda.
+    #  - profile doesnt translate to lambda its `home` dir setup dependent
+    #  - dryrun doesn't translate (and shouldn't be present)
+    #  - region doesn't translate from cli (the lambda is bound to a region), and
+    #    on the cli represents the region the lambda is provisioned in.
+    for k in ('assume_role', 'profile', 'region', 'dryrun', 'cache'):
+        exec_options.pop(k, None)
 
     # a cli local directory doesn't translate to lambda
     if not exec_options.get('output_dir', '').startswith('s3'):
         exec_options['output_dir'] = get_local_output_dir()
+
+    # we can source account id from the cli parameters to avoid the sts call
+    if exec_options.get('account_id'):
+        account_id = exec_options['account_id']
 
     # merge with policy specific configuration
     exec_options.update(
@@ -129,8 +144,10 @@ def dispatch_event(event, context):
         log.info("Processing event\n %s", format_event(event))
 
     # Policies file should always be valid in lambda so do loading naively
-    with open('config.json') as f:
-        policy_config = json.load(f)
+    global policy_config
+    if policy_config is None:
+        with open('config.json') as f:
+            policy_config = json.load(f)
 
     if not policy_config or not policy_config.get('policies'):
         return False
