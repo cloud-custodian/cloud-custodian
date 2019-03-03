@@ -187,9 +187,11 @@ class MetricsOutput(Metrics):
 
     def _put_metrics(self, ns, metrics):
         if self.destination == 'master':
-            watch = self.ctx.session_factory(assume=False).client('cloudwatch')
+            watch = self.ctx.session_factory(
+                assume=False).client('cloudwatch', region_name=self.region)
         else:
-            watch = utils.local_session(self.ctx.session_factory).client('cloudwatch')
+            watch = utils.local_session(
+                self.ctx.session_factory).client('cloudwatch', region_name=self.region)
         return self.retry(
             watch.put_metric_data, Namespace=ns, MetricData=metrics)
 

@@ -523,10 +523,12 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
 
 
 def parse_url_config(url):
+    if url and not '://' in url:
+        url += "://"
     conf = config.Bag()
     parsed = urlparse.urlparse(url)
-    for k in ('scheme', 'netloc', 'path', 'params', 'fragment'):
-        conf[k] = parsed
+    for k in ('scheme', 'netloc', 'path'):
+        conf[k] = getattr(parsed, k)
     for k, v in urlparse.parse_qs(parsed.query).items():
         conf[k] = v[0]
     conf['url'] = url
