@@ -529,7 +529,7 @@ def parse_url_config(url):
         conf[k] = parsed
     for k, v in urlparse.parse_qs(parsed.query).items():
         conf[k] = v[0]
-    conf['url']
+    conf['url'] = url
     return conf
 
 
