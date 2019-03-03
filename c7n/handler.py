@@ -74,7 +74,7 @@ def get_local_output_dir():
     return output_dir
 
 
-def init_config(policy_config, default_output_dir):
+def init_config(policy_config):
     """Get policy lambda execution configuration.
 
     cli parameters are serialized into the policy lambda config,

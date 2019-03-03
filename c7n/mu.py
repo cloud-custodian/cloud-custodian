@@ -866,7 +866,7 @@ class PolicyLambda(AbstractLambdaFunction):
     def get_archive(self):
         self.archive.add_contents(
             'config.json', json.dumps(
-                {'execution-options': dict(self.policy.config),
+                {'execution-options': dict(self.policy.options),
                  'policies': [self.policy.data]}, indent=2))
         self.archive.add_contents('custodian_policy.py', PolicyHandlerTemplate)
         self.archive.close()
