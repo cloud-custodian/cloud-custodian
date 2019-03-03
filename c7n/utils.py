@@ -523,7 +523,7 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
 
 
 def parse_url_config(url):
-    if url and not '://' in url:
+    if url and '://' not in url:
         url += "://"
     conf = config.Bag()
     parsed = urlparse.urlparse(url)

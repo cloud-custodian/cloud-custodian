@@ -120,22 +120,21 @@ class TracerTest(BaseTest):
 class OutputMetricsTest(BaseTest):
 
     def test_metrics_destination_dims(self):
-
         tmetrics = []
+
         class Metrics(aws.MetricsOutput):
 
             def _put_metrics(self, ns, metrics):
                 tmetrics.extend(metrics)
 
-        conf = Bag({'region': 'us-east-2',
-                    'scheme': 'aws',
-                    'netloc': 'master'})
-
+        conf = Bag({'region': 'us-east-2', 'scheme': 'aws', 'netloc': 'master'})
         ctx = Bag(session_factory=None, account_id='001100', region='us-east-1',
                   policy=Bag(name='test', resource_type='ec2'))
         moutput = Metrics(ctx, conf)
+
         moutput.put_metric('Calories', 400, 'Count', {'Scope': 'Policy', 'Food': 'Pizza'})
         moutput.flush()
+
         tmetrics[0].pop('Timestamp')
         self.assertEqual(tmetrics, [{
             'Dimensions': [{'Name': 'Policy', 'Value': 'test'},
@@ -145,7 +144,6 @@ class OutputMetricsTest(BaseTest):
             'MetricName': 'Calories',
             'Unit': 'Count',
             'Value': 400}])
-
 
     def test_metrics(self):
         session_factory = self.replay_flight_data('output-aws-metrics')
