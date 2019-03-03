@@ -36,6 +36,18 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 log = logging.getLogger('custodian.lambda')
 
+## Env serverless specific configuration options, these are part of "public" interface
+
+# We default to skipping events which denote they have errors
+C7N_SKIP_ERROR = os.environ.get('C7N_SKIP_ERROR', 'yes') == 'yes' and True or False
+
+# We default to logging the full event that triggered lambda execution
+C7N_DEBUG_EVENT = os.environ.get('C7N_DEBUG_EVENT', 'yes') == 'yes' and True or False
+
+
+## Internal global variables
+
+# Default global cache of execution account id for initial configuration setup.
 account_id = None
 
 # On cold start load all resources, requires a pythonpath directory scan
@@ -43,17 +55,77 @@ if 'AWS_EXECUTION_ENV' in os.environ:
     load_resources()
 
 
-def dispatch_event(event, context):
+def get_local_output_dir():
+    """Create a local output directory per execution.
 
+    We've seen occassional (1/100000) perm issues with lambda on temp
+    directory and changing unix execution users (2015-2018), so use a
+    per execution temp space. With firecracker lambdas this may be outdated.
+    """
+    output_dir = os.environ.get('C7N_OUTPUT_DIR', '/tmp/' + str(uuid.uuid4()))
+    if not os.path.exists(output_dir):
+        try:
+            os.mkdir(output_dir)
+        except OSError as error:
+            log.warning("Unable to make output directory: {}".format(error))
+    return output_dir
+
+
+def init_config(policy_config, default_output_dir):
+    """Get policy lambda execution configuration.
+
+    cli parameters are serialized into the policy lambda config,
+    we merge those with any policy specific execution options.
+
+    --assume role and -s output directory get special handling, as
+    to disambiguate any cli context.
+
+    account id is sourced from the config options or from api call
+    and cached as a global
+    """
     global account_id
 
+    exec_options = policy_config.get('execution-options', {})
+
+    # cli assume role doesn't translate to lambda, its used to provision the lambda
+    exec_options.pop('assume_role', None)
+
+    # a cli local directory doesn't translate to lambda
+    if not exec_options.get('output_dir', '').startswith('s3'):
+        exec_options['output_dir'] = get_local_output_dir()
+
+    # merge with policy specific configuration
+    exec_options.update(
+        policy_config['policies'][0].get('mode', {}).get('execution-options', {}))
+
+    # if using assume role in lambda ensure that the correct
+    # execution account is captured in options.
+    if 'assume_role' in exec_options:
+        account_id = exec_options['assume_role'].split(':')[4]
+    elif account_id is None:
+        session = boto3.Session()
+        account_id = get_account_id_from_sts(session)
+
+    # Historical compatibility with manually set execution options
+    # previously this was a boolean, its now a string value with the
+    # boolean flag triggering a string value of 'aws'
+    if 'metrics_enabled' in exec_options \
+       and isinstance(exec_options['metrics_enabled'], bool) \
+       and exec_options['metrics_enabled']:
+        exec_options['metrics_enabled'] = 'aws'
+
+    exec_options['account_id'] = account_id
+    return Config.empty(**exec_options)
+
+
+def dispatch_event(event, context):
     error = event.get('detail', {}).get('errorCode')
-    if error:
+    if error and C7N_SKIP_ERROR:
         log.debug("Skipping failed operation: %s" % error)
         return
 
-    event['debug'] = True
-    if event['debug']:
+    if C7N_DEBUG_EVENT:
+        event['debug'] = True
         log.info("Processing event\n %s", format_event(event))
 
     # Policies file should always be valid in lambda so do loading naively
@@ -63,42 +135,7 @@ def dispatch_event(event, context):
     if not policy_config or not policy_config.get('policies'):
         return False
 
-    # Initialize output directory, we've seen occassional perm issues with
-    # lambda on temp directory and changing unix execution users, so
-    # use a per execution temp space.
-    output_dir = os.environ.get(
-        'C7N_OUTPUT_DIR',
-        '/tmp/' + str(uuid.uuid4()))
-    if not os.path.exists(output_dir):
-        try:
-            os.mkdir(output_dir)
-        except OSError as error:
-            log.warning("Unable to make output directory: {}".format(error))
-
-    # TODO. This enshrines an assumption of a single policy per lambda.
-    options_overrides = policy_config[
-        'policies'][0].get('mode', {}).get('execution-options', {})
-
-    # if using assume role in lambda ensure that the correct
-    # execution account is captured in options.
-    if 'assume_role' in options_overrides:
-        account_id = options_overrides['assume_role'].split(':')[4]
-    elif account_id is None:
-        session = boto3.Session()
-        account_id = get_account_id_from_sts(session)
-
-    # Historical compatibility with manually set execution options
-    # previously this was a boolean, its now a string value with the
-    # boolean flag triggering a string value of 'aws'
-    if 'metrics_enabled' in options_overrides and isinstance(
-            options_overrides['metrics_enabled'], bool):
-        options_overrides['metrics_enabled'] = 'aws'
-
-    options_overrides['account_id'] = account_id
-
-    if 'output_dir' not in options_overrides:
-        options_overrides['output_dir'] = output_dir
-    options = Config.empty(**options_overrides)
+    options = init_config(policy_config)
 
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:
