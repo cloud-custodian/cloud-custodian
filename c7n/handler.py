@@ -40,11 +40,13 @@ log = logging.getLogger('custodian.lambda')
 # Env serverless specific configuration options, these are part of "public" interface
 #
 # We default to skipping events which denote they have errors
-C7N_SKIP_ERROR = os.environ.get('C7N_SKIP_ERROR', 'yes') == 'yes' and True or False
+C7N_SKIP_EVTERR = os.environ.get('C7N_SKIP_ERR_EVENT', 'yes') == 'yes' and True or False
 
 # We default to logging the full event that triggered lambda execution
 C7N_DEBUG_EVENT = os.environ.get('C7N_DEBUG_EVENT', 'yes') == 'yes' and True or False
 
+# We default to not catching policy errors in lambda, which will lead to retry behavior
+C7N_CATCH_ERR = os.environ.get('C7N_CATCH_ERR', 'no').strip().lower() == 'yes' and True or False
 
 #
 # Internal global variables
@@ -137,7 +139,7 @@ def init_config(policy_config):
 
 def dispatch_event(event, context):
     error = event.get('detail', {}).get('errorCode')
-    if error and C7N_SKIP_ERROR:
+    if error and C7N_SKIP_EVTERR:
         log.debug("Skipping failed operation: %s" % error)
         return
 
@@ -159,5 +161,11 @@ def dispatch_event(event, context):
     policies = PolicyCollection.from_data(policy_config, options)
     if policies:
         for p in policies:
-            p.push(event, context)
+            try:
+                p.push(event, context)
+            except Exception:
+                log.exception("error during policy execution")
+                if C7N_CATCH_ERR:
+                    continue
+                raise
     return True
