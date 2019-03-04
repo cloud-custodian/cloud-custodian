@@ -132,13 +132,14 @@ class OutputMetricsTest(BaseTest):
                   policy=Bag(name='test', resource_type='ec2'))
         moutput = Metrics(ctx, conf)
 
-        moutput.put_metric('Calories', 400, 'Count', {'Scope': 'Policy', 'Food': 'Pizza'})
+        moutput.put_metric('Calories', 400, 'Count', Scope='Policy', Food='Pizza')
         moutput.flush()
 
         tmetrics[0].pop('Timestamp')
         self.assertEqual(tmetrics, [{
             'Dimensions': [{'Name': 'Policy', 'Value': 'test'},
                            {'Name': 'ResType', 'Value': 'ec2'},
+                           {'Name': 'Food', 'Value': 'Pizza'},
                            {'Name': 'Region', 'Value': 'us-east-1'},
                            {'Name': 'Account', 'Value': '001100'}],
             'MetricName': 'Calories',
