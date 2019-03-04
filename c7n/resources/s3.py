@@ -1101,19 +1101,23 @@ class SetPolicyStatement(BucketActionBase):
     def process_bucket(self, bucket):
         policy = bucket.get('Policy') or '{}'
 
-        fmtargs = self.get_std_format_args(bucket)
+        target_statements = format_string_values(
+            {s['Sid']: s for s in self.data.get('statements', [])},
+            **self.get_std_format_args(bucket))
 
         policy = json.loads(policy)
-        current = {s['Sid']: s for s in policy.get('Statement', [])}
-        new = copy.deepcopy(current)
-        additional = {s['Sid']: s for s in self.data.get('statements', [])}
-        additional = format_string_values(additional, **fmtargs)
-        new.update(additional)
-        if new == current:
+        bucket_statements = policy.setdefault('Statement', [])
+
+        for s in bucket_statements:
+            if s.get('Sid') not in target_statements:
+                continue
+            if s == target_statements[s['Sid']]:
+                target_statements.pop(s['Sid'])
+
+        if not target_statements:
             return
 
-        statements = list(new.values())
-        policy['Statement'] = statements
+        bucket_statements.extend(target_statements.values())
         policy = json.dumps(policy)
 
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
