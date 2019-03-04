@@ -423,8 +423,16 @@ class DynamoDbAccelerator(query.QueryResourceManager):
             return query.ConfigSource(self)
         raise ValueError('invalid source %s' % source_type)
 
+    def get_resources(self, ids, cache=True, augment=True):
+        return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
 
 class DescribeDaxCluster(query.DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        """Retrieve dax resources for serverless policies or related resources
+        """
+        client = local_session(self.manager.session_factory).client('dax')
+        return client.describe_clusters(ClusterNames=ids).get('Clusters')
 
     def augment(self, clusters):
         resources = super(DescribeDaxCluster, self).augment(clusters)

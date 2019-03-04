@@ -492,3 +492,14 @@ class DynamoDbAccelerator(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ClusterName'], 'c7n-test')
+
+    def test_dax_get_resource(self):
+        session_factory = self.replay_flight_data('test_dax_get_resource')
+
+        p = self.load_policy({
+            'name': 'dax-cluster-gr', 'resource': 'dax'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(
+            ["c7n-test-cluster"])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['TotalNodes'], 1)
