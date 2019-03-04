@@ -426,6 +426,7 @@ class DynamoDbAccelerator(query.QueryResourceManager):
     def get_resources(self, ids, cache=True, augment=True):
         return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
 
+
 class DescribeDaxCluster(query.DescribeSource):
 
     def get_resources(self, ids, cache=True):
