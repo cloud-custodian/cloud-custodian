@@ -424,6 +424,9 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         raise ValueError('invalid source %s' % source_type)
 
     def get_resources(self, ids, cache=True, augment=True):
+        """Override in order to disable the augment for serverless policies.
+           list_tags on dax resources always fail until the cluster is finished creating.
+        """
         return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
 
 
