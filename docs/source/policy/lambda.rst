@@ -155,9 +155,9 @@ your lambda is going to need to perform the actions you want it to perform.
           - stop
 
 Then make sure that you've set up AWS Config. If you `go to the AWS Config console
-<https://eu-west-1.console.aws.amazon.com/config/home>` 
+<https://eu-west-1.console.aws.amazon.com/config/home>`_
 and see the welcome screen instead of the dashboard, go through `the setup procedure first
-<https://docs.aws.amazon.com/config/latest/developerguide/gs-console.html>`.
+<https://docs.aws.amazon.com/config/latest/developerguide/gs-console.html>`_.
 
 Now deploy the policy:
 
