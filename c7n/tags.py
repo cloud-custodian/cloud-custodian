@@ -35,7 +35,7 @@ import time
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError, ClientError
-from c7n.filters imporCop Filter, OPERATORS
+from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import utils
 
