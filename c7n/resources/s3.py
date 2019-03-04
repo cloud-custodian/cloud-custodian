@@ -75,7 +75,7 @@ from c7n import query
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, filter_empty,
-    dumps, format_string_values, get_account_alias_from_sts, UniqTracker)
+    dumps, format_string_values, get_account_alias_from_sts)
 
 
 log = logging.getLogger('custodian.s3')
@@ -1104,9 +1104,7 @@ class SetPolicyStatement(BucketActionBase):
         fmtargs = self.get_std_format_args(bucket)
 
         policy = json.loads(policy)
-        # allows for empty or identical Sid values in existing bucket policy
-        t = UniqTracker()
-        current = {t(s.get('Sid')): s for s in policy.get('Statement', [])}
+        current = {s['Sid']: s for s in policy.get('Statement', [])}
         new = copy.deepcopy(current)
         additional = {s['Sid']: s for s in self.data.get('statements', [])}
         additional = format_string_values(additional, **fmtargs)
