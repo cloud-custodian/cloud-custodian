@@ -440,7 +440,7 @@ class Tag(Action):
                 DryRun=self.manager.config.dryrun)
         except ClientError as e:
             if e.error['Code'] == 'InvalidSnapshot.NotFound':
-                continue
+                pass
 
     def interpolate_values(self, tags):
         params = {
