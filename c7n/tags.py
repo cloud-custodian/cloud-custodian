@@ -34,8 +34,8 @@ import time
 
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, AutoTagUser
-from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.filters import Filter, OPERATORS
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError, ClientError
+from c7n.filters imporCop Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import utils
 
@@ -432,11 +432,15 @@ class Tag(Action):
 
     def process_resource_set(self, client, resource_set, tags):
         mid = self.manager.get_model().id
-        self.manager.retry(
-            client.create_tags,
-            Resources=[v[mid] for v in resource_set],
-            Tags=tags,
-            DryRun=self.manager.config.dryrun)
+        try:
+            self.manager.retry(
+                client.create_tags,
+                Resources=[v[mid] for v in resource_set],
+                Tags=tags,
+                DryRun=self.manager.config.dryrun)
+        except ClientError as e:
+            if e.error['Code'] == 'InvalidSnapshot.NotFound':
+                continue
 
     def interpolate_values(self, tags):
         params = {
