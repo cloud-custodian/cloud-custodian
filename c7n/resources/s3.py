@@ -39,6 +39,7 @@ Actions:
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import copy
 import functools
 import json
 import itertools
@@ -1101,7 +1102,7 @@ class SetPolicyStatement(BucketActionBase):
         policy = bucket.get('Policy') or '{}'
 
         target_statements = format_string_values(
-            {s['Sid']: s for s in self.data.get('statements', [])},
+            copy.deepcopy({s['Sid']: s for s in self.data.get('statements', [])}),
             **self.get_std_format_args(bucket))
 
         policy = json.loads(policy)
