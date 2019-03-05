@@ -124,6 +124,7 @@ def init_config(policy_config):
     elif account_id is None:
         session = boto3.Session()
         account_id = get_account_id_from_sts(session)
+    exec_options['account_id'] = account_id
 
     # Historical compatibility with manually set execution options
     # previously this was a boolean, its now a string value with the
@@ -133,7 +134,6 @@ def init_config(policy_config):
        and exec_options['metrics_enabled']:
         exec_options['metrics_enabled'] = 'aws'
 
-    exec_options['account_id'] = account_id
     return Config.empty(**exec_options)
 
 
