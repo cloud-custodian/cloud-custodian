@@ -1,0 +1,36 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "compute#urlMap", 
+        "name": "lb", 
+        "defaultService": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendBuckets/newbucket",
+        "fingerprint": "GMqHBoGzLDY=", 
+        "creationTimestamp": "2019-03-05T04:30:37.636-08:00", 
+        "id": "1361403814964614402", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/lb"
+      }
+    ], 
+    "kind": "compute#urlMapList", 
+    "id": "projects/decoded-pier-228312/global/urlMaps", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "604", 
+    "transfer-encoding": "chunked", 
+    "expires": "Tue, 05 Mar 2019 12:40:15 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Tue, 05 Mar 2019 12:40:15 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps?alt=json",
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"YImFd31hoU8xJL-6lFwB5eFe_e8=/ERkA9A1vX3FdxQwbWfgCfVbjsDw=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

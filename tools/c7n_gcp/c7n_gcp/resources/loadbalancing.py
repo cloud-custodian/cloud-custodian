@@ -31,3 +31,19 @@ class LoadBalancingAddress(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_command('get', resource_info)
+
+
+@resources.register('loadbalancing-url-map')
+class LoadBalancingUrlMap(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'urlMaps'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', resource_info)

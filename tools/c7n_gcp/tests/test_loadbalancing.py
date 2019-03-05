@@ -42,3 +42,31 @@ class LoadBalancingAddressTest(BaseTest):
              'region': 'us-central1'})
         self.assertEqual(instance['kind'], 'compute#address')
         self.assertEqual(instance['address'], '35.193.10.19')
+
+
+class LoadBalancingUrlMapTest(BaseTest):
+
+    def test_loadbalancing_url_map_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-url-maps-query',
+                                          project_id=project_id)
+        p = self.load_policy(
+            {'name': 'all-lb-url-maps',
+             'resource': 'gcp.loadbalancing-url-map'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#urlMap')
+        self.assertEqual(resources[0]['fingerprint'], 'GMqHBoGzLDY=')
+
+    def test_loadbalancing_url_map_get(self):
+        factory = self.replay_flight_data('lb-url-maps-get')
+        p = self.load_policy(
+            {'name': 'one-lb-url-map',
+             'resource': 'gcp.loadbalancing-url-map'},
+            session_factory=factory)
+        instance = p.resource_manager.get_resource(
+            {'project': 'cloud-custodian',
+             'urlMap': 'lb'})
+        self.assertEqual(instance['kind'], 'compute#urlMap')
+        self.assertEqual(instance['fingerprint'], 'GMqHBoGzLDY=')
