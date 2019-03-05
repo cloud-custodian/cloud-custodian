@@ -87,7 +87,7 @@ JMESPath Filter
        key: SecurityGroups[].GroupId
        value_type: size
        value: 2
-       
+
      # Membership example using swap
      - type: value
        key: SecurityGroups[].GroupId
