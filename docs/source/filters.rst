@@ -38,6 +38,7 @@ scalar operators:
 - Special operators:
     - ``glob`` - Provides Glob matching support
     - ``regex`` - Provides Regex matching support but ignores case
+    - ``regex-case`` - Provides case sensitive Regex matching support
 
 `AgeFilter`
   Automatically filter resources older than a given date in Days (see `Dateutil Parser <http://dateutil.readthedocs.org/en/latest/parser.html#dateutil.parser.parse>`_)
