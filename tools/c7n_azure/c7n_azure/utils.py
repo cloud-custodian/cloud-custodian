@@ -18,7 +18,6 @@ import logging
 import re
 import time
 import uuid
-from builtins import bytes
 from concurrent.futures import as_completed
 
 import six
