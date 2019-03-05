@@ -79,10 +79,10 @@ class StringUtils(object):
         return components[0] + ''.join(x.title() for x in components[1:])
 
     @staticmethod
-    def naming_hash(string, length=8):
-        if isinstance(string, six.string_types):
-            string = string.encode('utf8')
-        return hashlib.sha256(string.hexdigest().lower()[:length]
+    def naming_hash(val, length=8):
+        if isinstance(val, six.string_types):
+            val = val.encode('utf8')
+        return hashlib.sha256(val).hexdigest().lower()[:length]
 
 
 def utcnow():
