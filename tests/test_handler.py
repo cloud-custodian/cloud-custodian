@@ -87,7 +87,7 @@ class HandleTest(BaseTest):
     @mock.patch('c7n.handler.PolicyCollection')
     def test_dispatch_err_event(self, mock_collection):
         self.patch(handler, 'policy_config', {
-            'execution-options': {'output_dir': 's3://xyz'},
+            'execution-options': {'output_dir': 's3://xyz', 'account_id': '004'},
             'policies': [{'resource': 'ec2', 'name': 'xyz'}]})
         mock_collection.from_data.return_value = []
         output = self.capture_logging('custodian.lambda', level=logging.DEBUG)
@@ -101,7 +101,7 @@ class HandleTest(BaseTest):
     @mock.patch('c7n.handler.PolicyCollection')
     def test_dispatch_err_handle(self, mock_collection):
         self.patch(handler, 'policy_config', {
-            'execution-options': {'output_dir': 's3://xyz'},
+            'execution-options': {'output_dir': 's3://xyz', 'account_id': '004'},
             'policies': [{'resource': 'ec2', 'name': 'xyz'}]})
         output = self.capture_logging('custodian.lambda', level=logging.WARNING)
         pmock = mock.MagicMock()
