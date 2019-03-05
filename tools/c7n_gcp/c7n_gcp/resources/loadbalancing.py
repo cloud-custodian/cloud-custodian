@@ -47,3 +47,18 @@ class LoadBalancingUrlMap(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_command('get', resource_info)
+
+
+@resources.register('loadbalancing-target-tcp-proxy')
+class LoadBalancingTargetTcpProxy(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'targetTcpProxies'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', resource_info)
