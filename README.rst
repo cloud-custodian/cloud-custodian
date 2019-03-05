@@ -143,7 +143,7 @@ Given that, you can run Cloud Custodian with::
   $ custodian run -s out policy.yml
 
 You can run it with Docker as well
-
+::
   # Download the image
   $ docker pull cloudcustodian/c7n
 
