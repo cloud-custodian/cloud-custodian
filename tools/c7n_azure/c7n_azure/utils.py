@@ -80,7 +80,9 @@ class StringUtils(object):
 
     @staticmethod
     def naming_hash(string, length=8):
-        return hashlib.sha256(bytes(string, 'utf-8')).hexdigest().lower()[:length]
+        if isinstance(string, six.string_types):
+            string = string.encode('utf8')
+        return hashlib.sha256(string.hexdigest().lower()[:length]
 
 
 def utcnow():
