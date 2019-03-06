@@ -34,6 +34,7 @@ from c7n.filters.health import HealthEventFilter
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager
+from c7n.tags import Tag
 from c7n.utils import (
     camelResource,
     chunks,
@@ -102,6 +103,16 @@ class Snapshot(QueryResourceManager):
 class ErrorHandler(object):
 
     @staticmethod
+    def remove_snapshot(rid, resource_set):
+        found = None
+        for r in resource_set:
+            if r['SnapshotId'] == rid:
+                found = r
+                break
+        if found:
+            resource_set.remove(found)
+
+    @staticmethod
     def extract_bad_snapshot(e):
         """Handle various client side errors when describing snapshots"""
         msg = e.response['Error']['Message']
@@ -133,6 +144,24 @@ class SnapshotQueryParser(QueryParser):
     }
 
     type_name = 'EBS'
+
+
+@Snapshot.action_registry.register('tag')
+class SnapshotTag(Tag):
+
+    permissions = ('ec2:CreateTags',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        while resource_set:
+            try:
+                return super(SnapshotTag, self).process_resource_set(
+                    client, resource_set, tags)
+            except ClientError as e:
+                bad_snap = ErrorHandler.extract_bad_snapshot(e)
+                if bad_snap:
+                    ErrorHandler.remove_snapshot(bad_snap, resource_set)
+                    continue
+                raise
 
 
 @Snapshot.filter_registry.register('age')

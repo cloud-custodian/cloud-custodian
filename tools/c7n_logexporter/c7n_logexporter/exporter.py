@@ -165,7 +165,7 @@ def _process_subscribe_group(client, group_name, subscription, distribution):
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
-@click.option('-r', '--region', default="us-east-1", multiple=False)
+@click.option('-r', '--region', multiple=False)
 @click.option('--merge', is_flag=True, default=False)
 @click.option('--debug', is_flag=True, default=False)
 def subscribe(config, accounts, region, merge, debug):
@@ -256,8 +256,9 @@ def subscribe(config, accounts, region, merge, debug):
 @click.option('--start', required=True)
 @click.option('--end')
 @click.option('-a', '--accounts', multiple=True)
+@click.option('-r', '--region', multiple=False)
 @click.option('--debug', is_flag=True, default=False)
-def run(config, start, end, accounts, debug):
+def run(config, start, end, accounts, region, debug):
     """run export across accounts and log groups specified in config."""
     config = validate.callback(config)
     destination = config.get('destination')
@@ -270,7 +271,8 @@ def run(config, start, end, accounts, debug):
             if accounts and account['name'] not in accounts:
                 continue
             futures[
-                w.submit(process_account, account, start, end, destination)] = account
+                w.submit(process_account, account, start,
+                         end, destination, region)] = account
         for f in as_completed(futures):
             account = futures[f]
             if f.exception():
@@ -303,8 +305,8 @@ def lambdafan(func):
 
 
 @lambdafan
-def process_account(account, start, end, destination, incremental=True):
-    session = get_session(account['role'])
+def process_account(account, start, end, destination, region, incremental=True):
+    session = get_session(account['role'], region)
     client = session.client('logs')
 
     paginator = client.get_paginator('describe_log_groups')
@@ -452,14 +454,15 @@ def filter_extant_exports(client, bucket, prefix, days, start, end=None):
 @cli.command()
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-a', '--accounts', multiple=True)
-def access(config, accounts=()):
+@click.option('-r', '--region', multiple=False)
+def access(config, region, accounts=()):
     """Check iam permissions for log export access in each account"""
     config = validate.callback(config)
     accounts_report = []
 
     def check_access(account):
         accounts_report.append(account)
-        session = get_session(account['role'])
+        session = get_session(account['role'], region)
         identity = session.client('sts').get_caller_identity()
         account['account_id'] = identity['Account']
         account.pop('groups')
@@ -507,7 +510,8 @@ def GetHumanSize(size, precision=2):
 @click.option('--day', required=True, help="calculate sizes for this day")
 @click.option('--group', required=True)
 @click.option('--human/--no-human', default=True)
-def size(config, accounts=(), day=None, group=None, human=True):
+@click.option('-r', '--region', multiple=False)
+def size(config, accounts=(), day=None, group=None, human=True, region=None):
     """size of exported records for a given day."""
     config = validate.callback(config)
     destination = config.get('destination')
@@ -518,7 +522,7 @@ def size(config, accounts=(), day=None, group=None, human=True):
         paginator = client.get_paginator('list_objects_v2')
         count = 0
         size = 0
-        session = get_session(account['role'])
+        session = get_session(account['role'], region)
         account_id = session.client('sts').get_caller_identity()['Account']
         prefix = destination.get('prefix', '').rstrip('/') + '/%s' % account_id
         prefix = "%s/%s/%s" % (prefix, group, day.strftime("%Y/%m/%d"))
@@ -563,8 +567,9 @@ def size(config, accounts=(), day=None, group=None, human=True):
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-g', '--group', required=True)
 @click.option('-a', '--accounts', multiple=True)
+@click.option('-r', '--region', multiple=False)
 @click.option('--dryrun/--no-dryrun', is_flag=True, default=False)
-def sync(config, group, accounts=(), dryrun=False):
+def sync(config, group, accounts=(), dryrun=False, region=None):
     """sync last recorded export to actual
 
     Use --dryrun to check status.
@@ -577,7 +582,7 @@ def sync(config, group, accounts=(), dryrun=False):
         if accounts and account['name'] not in accounts:
             continue
 
-        session = get_session(account['role'])
+        session = get_session(account['role'], region)
         account_id = session.client('sts').get_caller_identity()['Account']
         prefix = destination.get('prefix', '').rstrip('/') + '/%s' % account_id
         prefix = "%s/%s" % (prefix, group)
@@ -658,7 +663,8 @@ def sync(config, group, accounts=(), dryrun=False):
 @click.option('--config', type=click.Path(), required=True)
 @click.option('-g', '--group', required=True)
 @click.option('-a', '--accounts', multiple=True)
-def status(config, group, accounts=()):
+@click.option('-r', '--region', multiple=False)
+def status(config, group, accounts=(), region=None):
     """report current export state status"""
     config = validate.callback(config)
     destination = config.get('destination')
@@ -668,7 +674,7 @@ def status(config, group, accounts=()):
         if accounts and account['name'] not in accounts:
             continue
 
-        session = get_session(account['role'])
+        session = get_session(account['role'], region)
         account_id = session.client('sts').get_caller_identity()['Account']
         prefix = destination.get('prefix', '').rstrip('/') + '/%s' % account_id
         prefix = "%s/flow-log" % prefix
@@ -764,10 +770,12 @@ def get_exports(client, bucket, prefix, latest=True):
 @click.option('--end')
 @click.option('--role', help="sts role to assume for log group access")
 @click.option('--poll-period', type=float, default=300)
+@click.option('-r', '--region', multiple=False)
 # @click.option('--bucket-role', help="role to scan destination bucket")
 # @click.option('--stream-prefix)
 @lambdafan
-def export(group, bucket, prefix, start, end, role, poll_period=120, session=None, name=""):
+def export(group, bucket, prefix, start, end, role, poll_period=120,
+           session=None, name="", region=None):
     """export a given log group to s3"""
     start = start and isinstance(start, six.string_types) and parse(start) or start
     end = (end and isinstance(start, six.string_types) and
@@ -776,7 +784,7 @@ def export(group, bucket, prefix, start, end, role, poll_period=120, session=Non
     end = end.replace(tzinfo=tzlocal()).astimezone(tzutc())
 
     if session is None:
-        session = get_session(role)
+        session = get_session(role, region)
 
     client = session.client('logs')
 

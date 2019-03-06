@@ -309,6 +309,41 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(resources[0]['RoleId'], "AROAIGK7B2VUDZL4I73HK")
 
 
+class IamRoleTag(BaseTest):
+
+    def test_iam_role_actions(self):
+        factory = self.replay_flight_data('test_iam_role_tags')
+        p = self.load_policy({
+            'name': 'iam-role-tag',
+            'resource': 'iam-role',
+            'filters': [{
+                'tag:Role': 'Dev'}],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                 'tags': ['Application']}
+            ]
+        },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client('iam')
+        if self.recording:
+            time.sleep(1)
+        role = client.get_role(RoleName=resources[0]['RoleName']).get('Role')
+        self.assertEqual(
+            {'Role': 'Dev'},
+            {t['Key']: t['Value'] for t in resources[0]['Tags'] if t['Key'] == 'Role'})
+        self.assertEqual(
+            {'Dev'},
+            {t['Value'] for t in role['Tags'] if t['Key'] == 'Env'})
+        self.assertNotIn(
+            {'Application'},
+            {t['Key'] for t in role['Tags']})
+
+
 class IamUserTest(BaseTest):
 
     def test_iam_user_check_permissions(self):
