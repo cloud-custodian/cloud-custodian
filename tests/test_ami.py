@@ -16,6 +16,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import jmespath
 
 from c7n.exceptions import ClientError
+from c7n.resources.ami import ErrorHandler
+from c7n.query import DescribeSource
 from .common import BaseTest
 
 
@@ -36,6 +38,44 @@ class TestAMI(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_err_ami(self):
+        ami_id = 'ami-123f000eee1f9f654'
+        error_response = {"Error": {
+            "Message": "The image id '[%s]' does not exist" % (ami_id),
+            "Code": "InvalidAMIID.NotFound"}}
+
+        def base_get_resources(self, ids, cache=True):
+            raise ClientError(error_response, "DescribeSnapshots")
+
+        self.patch(DescribeSource, 'get_resources', base_get_resources)
+
+        p = self.load_policy({'name': 'bad-ami', 'resource': 'ami'})
+        self.assertEqual(p.resource_manager.get_resources([ami_id]), [])
+
+    def test_err_get_ami_invalid(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+            "Error": {
+                "Message": 'Invalid id: "ami123f000eee1f9f654"',
+                "Code": "InvalidAMIID.Malformed",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        ami = ErrorHandler.extract_bad_ami(e)
+        self.assertEqual(ami, "ami123f000eee1f9f654")
+
+    def test_err_get_ami_notfound(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+            "Error": {
+                "Message": "The image id '[ami-123f000eee1f9f654]' does not exist",
+                "Code": "InvalidAMIID.NotFound"
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        snap = ErrorHandler.extract_bad_ami(e)
+        self.assertEqual(snap, "ami-123f000eee1f9f654")
 
     def test_deregister_delete_snaps(self):
         factory = self.replay_flight_data('test_ami_deregister_delete_snap')

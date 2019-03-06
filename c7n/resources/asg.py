@@ -165,9 +165,14 @@ class LaunchInfo(object):
         # amis, it doesn't seem to have any upper bound on number of
         # ImageIds to pass (Tested with 1k+ ImageIds)
         #
+        # Explicitly use a describe source. Can't use a config source
+        # since it won't have state for third party ami, we auto
+        # propagate source normally. Can't use a cache either as their
+        # not in the account.
         return {i['ImageId']: i for i in
-                self.manager.get_resource_manager('ami').get_resources(
-                    list(self.get_image_ids()), cache=False)}
+                self.manager.get_resource_manager(
+                    'ami').get_source('describe').get_resources(
+                        list(self.get_image_ids()), cache=False)}
 
     def get_security_group_ids(self):
         # return set of security group ids for given asg
