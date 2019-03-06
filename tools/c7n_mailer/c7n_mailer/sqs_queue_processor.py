@@ -169,7 +169,8 @@ class MailerSqsQueueProcessor(object):
 
         # this section sends a notification to the resource owner via Slack
         if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
-                for e in sqs_message.get('action', ()).get('to')):
+                for e in sqs_message.get('action', ()).get('to', []) +
+                sqs_message.get('action', ()).get('owner_absent_contact', [])):
             from .slack_delivery import SlackDelivery
 
             if self.config.get('slack_token'):

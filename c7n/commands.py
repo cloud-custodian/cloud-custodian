@@ -27,9 +27,10 @@ import time
 import six
 import yaml
 
+from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.utils import dumps, load_file
+from c7n.utils import dumps, load_file, local_session
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
@@ -61,7 +62,7 @@ def policy_command(f):
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
-            except IOError as e:
+            except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
@@ -232,6 +233,16 @@ def validate(options):
 @policy_command
 def run(options, policies):
     exit_code = 0
+
+    # AWS - Sanity check that we have an assumable role before executing policies
+    # Todo - move this behind provider interface
+    if options.assume_role and [p for p in policies if p.provider_name == 'aws']:
+        try:
+            local_session(clouds['aws']().get_session_factory(options))
+        except ClientError:
+            log.exception("Unable to assume role %s", options.assume_role)
+            sys.exit(1)
+
     for policy in policies:
         try:
             policy()
@@ -442,7 +453,10 @@ def schema_cmd(options):
         # Print schema
         print("\nSchema\n------\n")
         if hasattr(cls, 'schema'):
-            print(json.dumps(cls.schema, indent=4))
+            component_schema = dict(cls.schema)
+            component_schema.pop('additionalProperties', None)
+            component_schema.pop('type', None)
+            print(yaml.safe_dump(component_schema))
         else:
             # Shouldn't ever hit this, so exclude from cover
             print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
@@ -473,6 +487,8 @@ def _metrics_get_endpoints(options):
 
 @policy_command
 def metrics_cmd(options, policies):
+    log.warning("metrics command is deprecated, and will be removed in future")
+    policies = [p for p in policies if p.provider_name == 'aws']
     start, end = _metrics_get_endpoints(options)
     data = {}
     for p in policies:

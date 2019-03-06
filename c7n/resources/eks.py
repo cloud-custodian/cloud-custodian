@@ -26,6 +26,7 @@ class EKS(QueryResourceManager):
     class resource_type(object):
         service = 'eks'
         enum_spec = ('list_clusters', 'clusters', None)
+        arn = 'arn'
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'

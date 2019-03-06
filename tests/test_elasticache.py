@@ -13,10 +13,25 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.resources.elasticache import _cluster_eligible_for_snapshot
+
 from .common import BaseTest, TestConfig as Config
 
 
 class TestElastiCacheCluster(BaseTest):
+
+    def test_eligibility_snapshot(self):
+        # so black box testing, due to use of private interface.
+
+        self.assertTrue(
+            _cluster_eligible_for_snapshot(
+                {'Engine': 'redis', 'CacheNodeType': 'cache.t2.medium'}))
+        self.assertFalse(
+            _cluster_eligible_for_snapshot(
+                {'Engine': 'redis', 'CacheNodeType': 'cache.t1.medium'}))
+        self.assertFalse(
+            _cluster_eligible_for_snapshot(
+                {'Engine': 'memcached', 'CacheNodeType': 'cache.t2.medium'}))
 
     def test_elasticache_security_group(self):
         session_factory = self.replay_flight_data("test_elasticache_security_group")

@@ -39,6 +39,8 @@ accounts:
   - us-east-1
   - us-west-2
   role: arn:aws:iam::123123123123:role/CloudCustodian
+  vars:
+    charge_code: xyz
   tags:
   - type:prod
   - division:some division
@@ -155,6 +157,35 @@ specifying `-p` or selecting groups of policies via their tags with
 
 See `c7n-org run --help` for more information.
 
+## Defining and using variables.
+
+Each account/subscription/project configuration in the config file can
+also define a variables section `vars` that can be used in policies
+definitions and are interpolated at execution time. These are in
+addition to the default runtime variables custodian provides like
+`account_id`, `now`, and `region`.
+
+Example of defining in c7n-org config file
+
+```yaml
+accounts:
+- account_id: '123123123123'
+  name: account-1
+  role: arn:aws:iam::123123123123:role/CloudCustodian
+  vars:
+    charge_code: xyz
+```
+
+Example of using in a policy file
+
+```yaml
+policies:
+ - name: ec2-check-tag
+   resource: aws.ec2
+   filters:
+      - "tag:CostCenter": {charge_code}
+```
+
 ## Other commands
 
 c7n-org also supports running arbitrary scripts on AWS against
@@ -172,4 +203,4 @@ subscriptions.
 
 For instructions on creating a service principal and granting access
 across subscriptions, visit the [Azure authentication docs
-page](http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html).
+page](https://cloudcustodian.io/docs/azure/authentication.html).

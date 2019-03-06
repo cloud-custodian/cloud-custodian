@@ -24,12 +24,13 @@ class HealthEventFilter(Filter):
     """Check if there are health events related to the resources
 
 
-
     Health events are stored as annotation on a resource.
     """
     schema = type_schema(
         'health-event',
         types={'type': 'array', 'items': {'type': 'string'}},
+        category={'type': 'array', 'items': {
+            'enum': ['issue', 'accountNotification', 'scheduledChange']}},
         statuses={'type': 'array', 'items': {
             'type': 'string',
             'enum': ['open', 'upcoming', 'closed']
@@ -38,9 +39,6 @@ class HealthEventFilter(Filter):
                    'health:DescribeEventDetails')
 
     def process(self, resources, event=None):
-        if not resources:
-            return resources
-
         client = local_session(self.manager.session_factory).client(
             'health', region_name='us-east-1')
         f = self.get_filter_parameters()

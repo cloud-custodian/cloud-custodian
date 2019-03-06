@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure.mgmt.storage.models import StorageAccount
 from azure_common import BaseTest
-from c7n_azure.azure_events import AzureEvents
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 from mock import mock
@@ -120,18 +119,44 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(function_mode.policy_name, p.data['name'])
 
         self.assertEqual(params.service_plan['name'], "cloud-custodian")
-        self.assertEqual(params.service_plan['location'], "westus2")
+        self.assertEqual(params.service_plan['location'], "eastus")
         self.assertEqual(params.service_plan['resource_group_name'], "cloud-custodian")
 
         self.assertEqual(params.app_insights['name'], 'cloud-custodian')
-        self.assertEqual(params.app_insights['location'], "westus2")
+        self.assertEqual(params.app_insights['location'], "eastus")
         self.assertEqual(params.app_insights['resource_group_name'], 'cloud-custodian')
 
         self.assertTrue(params.storage_account['name'].startswith('custodian'))
-        self.assertEqual(params.storage_account['location'], "westus2")
+        self.assertEqual(params.storage_account['location'], "eastus")
         self.assertEqual(params.storage_account['resource_group_name'], 'cloud-custodian')
 
         self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
+
+    def test_init_azure_function_mode_invalid_policy_name(self):
+        p = self.load_policy({
+            'name': 'this-policy-name-is-going-to-be-too-long-since-the-maximum-size-is-60',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']}
+        })
+
+        function_mode = AzureFunctionMode(p)
+        with self.assertRaises(ValueError):
+            function_mode.get_function_app_params()
+
+    def test_init_azure_function_mode_invalid_characters_in_policy_name(self):
+        p = self.load_policy({
+            'name': 'invalid_policy_name1',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['VmWrite']}
+        })
+
+        function_mode = AzureFunctionMode(p)
+        params = function_mode.get_function_app_params()
+        self.assertRegexpMatches(params.function_app_name, "invalid-policy-name1-[a-zA-Z0-9]+")
 
     def test_init_azure_function_mode_with_resource_ids(self):
         ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
@@ -171,43 +196,6 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(params.service_plan['resource_group_name'], "testrg")
 
         self.assertTrue(params.function_app_name.startswith('test-azure-serverless-mode-'))
-
-    def test_event_mode_is_subscribed_to_event_true(self):
-        p = self.load_policy({
-            'name': 'test-azure-event',
-            'resource': 'azure.vm',
-            'mode':
-                {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
-        })
-
-        subscribed_events = AzureEvents.get_event_operations(p.data['mode']['events'])
-        event = {
-            'data': {
-                'operationName': 'Microsoft.Compute/virtualMachines/write'
-            }
-        }
-
-        event_mode = AzureEventGridMode(p)
-        self.assertTrue(event_mode._is_subscribed_to_event(event, subscribed_events))
-
-    def test_event_mode_is_subscribed_to_event_false(self):
-        p = self.load_policy({
-            'name': 'test-azure-event',
-            'resource': 'azure.vm',
-            'mode':
-                {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
-        })
-
-        subscribed_events = AzureEvents.get_event_operations(p.data['mode']['events'])
-        event = {
-            'data': {
-                'operationName': 'Microsoft.Compute/virtualMachineScaleSets/write'
-            }
-        }
-        event_mode = AzureEventGridMode(p)
-        self.assertFalse(event_mode._is_subscribed_to_event(event, subscribed_events))
 
     def test_event_grid_mode_creates_advanced_filtered_subscription(self):
         p = self.load_policy({

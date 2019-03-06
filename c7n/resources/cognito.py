@@ -33,6 +33,7 @@ class CognitoIdentityPool(QueryResourceManager):
         name = 'IdentityPoolName'
         filter_name = None
         dimension = None
+        type = "identitypool"
 
 
 @CognitoIdentityPool.action_registry.register('delete')
@@ -81,6 +82,7 @@ class CognitoUserPool(QueryResourceManager):
         name = 'Name'
         filter_name = None
         dimension = None
+        type = "userpool"
 
 
 @CognitoUserPool.action_registry.register('delete')

@@ -17,6 +17,7 @@ from collections import OrderedDict
 import csv
 import datetime
 import functools
+import json
 import io
 from datetime import timedelta
 import itertools
@@ -38,7 +39,10 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks, filter_empty
+from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
+from c7n.utils import local_session, type_schema, chunks, filter_empty, QueryParser
+
+from c7n.resources.aws import Arn
 
 
 @resources.register('iam-group')
@@ -55,6 +59,7 @@ class Group(QueryResourceManager):
         config_type = "AWS::IAM::Group"
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
     def get_resources(self, resource_ids, cache=True):
         """For IAM Groups on events, resource ids are Group Names."""
@@ -78,7 +83,7 @@ class Role(QueryResourceManager):
         service = 'iam'
         type = 'role'
         enum_spec = ('list_roles', 'Roles', None)
-        detail_spec = None
+        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
         filter_name = None
         id = name = 'RoleName'
         date = 'CreateDate'
@@ -86,17 +91,35 @@ class Role(QueryResourceManager):
         config_type = "AWS::IAM::Role"
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
-    def get_resources(self, resource_ids, cache=True):
-        """For IAM Roles on events, resource ids are role names."""
-        resources = []
-        client = local_session(self.session_factory).client('iam')
-        for rid in resource_ids:
+
+@Role.action_registry.register('tag')
+class RoleTag(Tag):
+    """Tag an iam role."""
+
+    permissions = ('iam:TagRole',)
+
+    def process_resource_set(self, client, roles, tags):
+        for role in roles:
             try:
-                resources.append(client.get_role(RoleName=rid)['Role'])
+                client.tag_role(RoleName=role['RoleName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
-        return resources
+
+
+@Role.action_registry.register('remove-tag')
+class RoleRemoveTag(RemoveTag):
+    """Remove tags from an iam role."""
+
+    permissions = ('iam:UntagRole',)
+
+    def process_resource_set(self, client, roles, tags):
+        for role in roles:
+            try:
+                client.untag_role(RoleName=role['RoleName'], TagKeys=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
 
 
 @resources.register('iam-user')
@@ -105,6 +128,7 @@ class User(QueryResourceManager):
     class resource_type(object):
         service = 'iam'
         type = 'user'
+        detail_spec = ('get_user', 'UserName', 'UserName', 'User')
         enum_spec = ('list_users', 'Users', None)
         filter_name = None
         id = name = 'UserName'
@@ -113,26 +137,39 @@ class User(QueryResourceManager):
         config_type = "AWS::IAM::User"
         # Denotes this resource type exists across regions
         global_resource = True
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeUser(self)
-        return super(User, self).get_source(source_type)
+        arn = 'Arn'
 
 
-class DescribeUser(DescribeSource):
+@User.action_registry.register('tag')
+class UserTag(Tag):
+    """Tag an iam user."""
 
-    def get_resources(self, resource_ids, cache=True):
-        client = local_session(self.manager.session_factory).client('iam')
-        resources = []
-        for rid in resource_ids:
+    permissions = ('iam:TagUser',)
+
+    def process_resource_set(self, client, users, tags):
+        for u in users:
             try:
-                resources.append(client.get_user(UserName=rid).get('User'))
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'NoSuchEntityException':
-                    continue
-                raise
-        return resources
+                client.tag_user(UserName=u['UserName'], Tags=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
+@User.action_registry.register('remove-tag')
+class UserRemoveTag(RemoveTag):
+    """Remove tags from an iam user."""
+
+    permissions = ('iam:UntagUser',)
+
+    def process_resource_set(self, client, users, tags):
+        for u in users:
+            try:
+                client.untag_user(UserName=u['UserName'], TagKeys=tags)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
+User.action_registry.register('mark-for-op', TagDelayedAction)
+User.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('iam-policy')
@@ -150,8 +187,7 @@ class Policy(QueryResourceManager):
         filter_name = None
         # Denotes this resource type exists across regions
         global_resource = True
-
-    arn_path_prefix = "aws:policy/"
+        arn = 'Arn'
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -160,6 +196,13 @@ class Policy(QueryResourceManager):
 
 
 class DescribePolicy(DescribeSource):
+
+    def resources(self, query=None):
+        qfilters = PolicyQueryParser.parse(self.manager.data.get('query', []))
+        query = query or {}
+        if qfilters:
+            query = {t['Name']: t['Value'] for t in qfilters}
+        return super(DescribePolicy, self).resources(query=query)
 
     def get_resources(self, resource_ids, cache=True):
         client = local_session(self.manager.session_factory).client('iam')
@@ -172,6 +215,18 @@ class DescribePolicy(DescribeSource):
                 if e.response['Error']['Code'] == 'NoSuchEntityException':
                     continue
         return results
+
+
+class PolicyQueryParser(QueryParser):
+
+    QuerySchema = {
+        'Scope': ('All', 'AWS', 'Local'),
+        'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
+        'PathPrefix': six.string_types,
+        'OnlyAttached': bool
+    }
+    multi_value = False
+    value_key = 'Value'
 
 
 @resources.register('iam-profile')
@@ -188,6 +243,7 @@ class InstanceProfile(QueryResourceManager):
         dimension = None
         # Denotes this resource type exists across regions
         global_resource = True
+        arn = 'Arn'
 
 
 @resources.register('iam-certificate')
@@ -206,6 +262,112 @@ class ServerCertificate(QueryResourceManager):
         dimension = None
         # Denotes this resource type exists across regions
         global_resource = True
+
+
+@User.filter_registry.register('check-permissions')
+@Group.filter_registry.register('check-permissions')
+@Role.filter_registry.register('check-permissions')
+@Policy.filter_registry.register('check-permissions')
+class CheckPermissions(Filter):
+    """Check IAM permissions associated with a resource.
+
+    :example:
+
+    Find users that can create other users
+
+    .. code-block:: yaml
+
+        policies:
+          - name: super-users
+            resource: iam-user
+            filters:
+              - type: check-permissions
+                match: allowed
+                actions:
+                 - iam:CreateUser
+    """
+
+    schema = type_schema(
+        'check-permissions', **{
+            'match': {'oneOf': [
+                {'enum': ['allowed', 'denied']},
+                {'$ref': '#/definitions/filters/valuekv'},
+                {'$ref': '#/definitions/filters/value'}]},
+            'match-operator': {'enum': ['and', 'or']},
+            'actions': {'type': 'array', 'items': {'type': 'string'}},
+            'required': ('actions', 'match')})
+
+    policy_annotation = 'c7n:policy'
+    eval_annotation = 'c7n:perm-matches'
+
+    def get_permissions(self):
+        if self.manager.type == 'iam-policy':
+            return ('iam:SimulateCustomPolicy',)
+        return ('iam:SimulatePrincipalPolicy',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('iam')
+        actions = self.data['actions']
+        matcher = self.get_eval_matcher()
+        operator = self.data.get('match-operator', 'and') == 'and' and all or any
+
+        results = []
+        eval_cache = {}
+        for arn, r in zip(self.get_iam_arns(resources), resources):
+            if arn is None:
+                continue
+            if arn in eval_cache:
+                evaluations = eval_cache[arn]
+            else:
+                evaluations = self.get_evaluations(client, arn, r, actions)
+                eval_cache[arn] = evaluations
+
+            matches = []
+            matched = []
+            for e in evaluations:
+                match = matcher(e)
+                if match:
+                    matched.append(e)
+                matches.append(match)
+            if operator(matches):
+                r[self.eval_annotation] = matched
+                results.append(r)
+        return results
+
+    def get_iam_arns(self, resources):
+        return self.manager.get_arns(resources)
+
+    def get_evaluations(self, client, arn, r, actions):
+        if self.manager.type == 'iam-policy':
+            policy = r.get(self.policy_annotation)
+            if policy is None:
+                r['c7n:policy'] = policy = client.get_policy_version(
+                    PolicyArn=r['Arn'],
+                    VersionId=r['DefaultVersionId']).get('PolicyVersion', {})
+            evaluations = self.manager.retry(
+                client.simulate_custom_policy,
+                PolicyInputList=[json.dumps(policy['Document'])],
+                ActionNames=actions).get('EvaluationResults', ())
+        else:
+            evaluations = self.manager.retry(
+                client.simulate_principal_policy,
+                PolicySourceArn=arn,
+                ActionNames=actions).get('EvaluationResults', ())
+        return evaluations
+
+    def get_eval_matcher(self):
+        if isinstance(self.data['match'], six.string_types):
+            if self.data['match'] == 'denied':
+                values = ['explicitDeny', 'implicitDeny']
+            else:
+                values = ['allowed']
+            vf = ValueFilter({'type': 'value', 'key':
+                              'EvalDecision', 'value': values,
+                              'op': 'in'})
+        else:
+            vf = ValueFilter(self.data['match'])
+        vf.annotate = False
+        return vf
 
 
 class IamRoleUsage(Filter):
@@ -662,13 +824,20 @@ class PolicyDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
+
+        rcount = len(resources)
+        resources = [r for r in resources if Arn.parse(r['Arn']).account_id != 'aws']
+        if len(resources) != rcount:
+            self.log.warning("Implicitly filtering AWS managed policies: %d -> %d",
+                             rcount, len(resources))
+
         for r in resources:
-            if not r['Arn'].startswith("arn:aws:iam::aws:policy"):
-                self.log.debug('Deleting policy %s' % r['PolicyName'])
-                client.delete_policy(
-                    PolicyArn=r['Arn'])
-            else:
-                self.log.debug('Cannot delete AWS managed policy %s' % r['PolicyName'])
+            if r.get('DefaultVersionId', '') != 'v1':
+                versions = [v['VersionId'] for v in client.list_policy_versions(
+                    PolicyArn=r['Arn']).get('Versions') if not v.get('IsDefaultVersion')]
+                for v in versions:
+                    client.delete_policy_version(PolicyArn=r['Arn'], VersionId=v)
+            client.delete_policy(PolicyArn=r['Arn'])
 
 
 ###############################
@@ -741,10 +910,12 @@ class UnusedInstanceProfiles(IamRoleUsage):
 class CredentialReport(Filter):
     """Use IAM Credential report to filter users.
 
-    The IAM Credential report ( https://goo.gl/sbEPtM ) aggregates
-    multiple pieces of information on iam users. This makes it highly
-    efficient for querying multiple aspects of a user that would
-    otherwise require per user api calls.
+    The IAM Credential report aggregates multiple pieces of
+    information on iam users. This makes it highly efficient for
+    querying multiple aspects of a user that would otherwise require
+    per user api calls.
+
+    https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html
 
     For example if we wanted to retrieve all users with mfa who have
     never used their password but have active access keys from the
@@ -1177,7 +1348,7 @@ class UserFinding(OtherResourcePostFinding):
     def format_resource(self, r):
         if any(filter(lambda x: isinstance(x, UserAccessKey), self.manager.iter_filters())):
             details = {
-                "UserName": "arn:aws::{}:user/{}".format(
+                "UserName": "arn:aws:iam:{}:user/{}".format(
                     self.manager.config.account_id, r["c7n:AccessKeys"][0]["UserName"]
                 ),
                 "Status": r["c7n:AccessKeys"][0]["Status"],

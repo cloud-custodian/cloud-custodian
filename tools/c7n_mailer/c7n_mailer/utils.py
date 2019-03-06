@@ -284,6 +284,37 @@ def resource_format(resource, resource_type):
         return "QueueURL: %s QueueArn: %s " % (
             resource['QueueUrl'],
             resource['QueueArn'])
+    elif resource_type == "efs":
+        return "name: %s  id: %s  state: %s" % (
+            resource['Name'],
+            resource['FileSystemId'],
+            resource['LifeCycleState']
+        )
+    elif resource_type == "network-addr":
+        return "ip: %s  id: %s  scope: %s" % (
+            resource['PublicIp'],
+            resource['AllocationId'],
+            resource['Domain']
+        )
+    elif resource_type == "route-table":
+        return "id: %s  vpc: %s" % (
+            resource['RouteTableId'],
+            resource['VpcId']
+        )
+    elif resource_type == "app-elb":
+        return "arn: %s  zones: %s  scheme: %s" % (
+            resource['LoadBalancerArn'],
+            len(resource['AvailabilityZones']),
+            resource['Scheme'])
+    elif resource_type == "nat-gateway":
+        return "id: %s  state: %s  vpc: %s" % (
+            resource['NatGatewayId'],
+            resource['State'],
+            resource['VpcId'])
+    elif resource_type == "internet-gateway":
+        return "id: %s  attachments: %s" % (
+            resource['InternetGatewayId'],
+            len(resource['Attachments']))
     else:
         return "%s" % format_struct(resource)
 

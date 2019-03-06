@@ -21,7 +21,7 @@ import shutil
 import tempfile
 
 from c7n import policy, manager
-from c7n.exceptions import ResourceLimitExceeded
+from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
@@ -164,6 +164,50 @@ class PolicyPermissions(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_resource_arn_info(self):
+        missing = []
+        whitelist_missing = set((
+            'rest-stage', 'rest-resource', 'rest-vpclink'))
+        explicit = []
+        whitelist_explicit = set((
+            'rest-account', 'shield-protection', 'shield-attack',
+            'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
+            'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
+            'snowball-cluster', 'snowball', 'ssm-activation',
+            'support-case', 'transit-attachment'))
+
+        missing_method = []
+        for k, v in manager.resources.items():
+            rtype = getattr(v, 'resource_type', None)
+            if not v.has_arn():
+                missing_method.append(k)
+            if rtype is None:
+                continue
+            if v.__dict__.get('get_arns'):
+                continue
+            if getattr(rtype, 'arn', None) is False:
+                explicit.append(k)
+            if getattr(rtype, 'arn', None) is not None:
+                continue
+            if getattr(rtype, 'type', None) is not None:
+                continue
+            missing.append(k)
+
+        self.assertEqual(
+            set(missing).union(explicit),
+            set(missing_method))
+
+        missing = set(missing).difference(whitelist_missing)
+        if missing:
+            self.fail(
+                "%d resources %s are missing arn type info" % (
+                    len(missing), ", ".join(missing)))
+        explicit = set(explicit).difference(whitelist_explicit)
+        if explicit:
+            self.fail(
+                "%d resources %s dont have arn type info exempted" % (
+                    len(explicit), ", ".join(explicit)))
 
     def test_resource_permissions(self):
         self.capture_logging("c7n.cache")
@@ -310,6 +354,17 @@ class TestPolicyCollection(BaseTest):
 
 
 class TestPolicy(BaseTest):
+
+    def test_policy_variable_precedent(self):
+        p = self.load_policy({
+            'name': 'compute',
+            'resource': 'aws.ec2'},
+            config={'account_id': '00100100'})
+
+        v = p.get_variables({'account_id': 'foobar',
+                             'charge_code': 'oink'})
+        self.assertEqual(v['account_id'], '00100100')
+        self.assertEqual(v['charge_code'], 'oink')
 
     def test_policy_variable_interpolation(self):
 
@@ -873,10 +928,20 @@ class GuardModeTest(BaseTest):
             validate=True,
         )
 
+    def test_lambda_policy_validate_name(self):
+        name = "ec2-instance-guard-D8488F01-0E3E-4772-A3CB-E66EEBB9BDF4"
+        with self.assertRaises(PolicyValidationError) as e_cm:
+            self.load_policy(
+                {"name": name,
+                 "resource": "ec2",
+                 "mode": {"type": "guard-duty"}},
+                validate=True)
+        self.assertTrue("max length with prefix" in str(e_cm.exception))
+
     @mock.patch("c7n.mu.LambdaManager.publish")
     def test_ec2_guard_event_pattern(self, publish):
 
-        def assert_publish(policy_lambda, alias, role):
+        def assert_publish(policy_lambda, role):
             events = policy_lambda.get_events(mock.MagicMock())
             self.assertEqual(len(events), 1)
             pattern = json.loads(events[0].render_event_pattern())
@@ -900,7 +965,7 @@ class GuardModeTest(BaseTest):
     @mock.patch("c7n.mu.LambdaManager.publish")
     def test_iam_guard_event_pattern(self, publish):
 
-        def assert_publish(policy_lambda, alias, role):
+        def assert_publish(policy_lambda, role):
             events = policy_lambda.get_events(mock.MagicMock())
             self.assertEqual(len(events), 1)
             pattern = json.loads(events[0].render_event_pattern())

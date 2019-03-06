@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "entities": [
+            {
+                "entityArn": "arn:aws:health:us-east-1:011122335622:entity/AWaJRJhJu0WBdbGW_aBj",
+                "eventArn": "arn:aws:health:us-east-1::event/EC2/AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED/AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED3d776ac7-512d-4a3b-8ea4-73c33993a906",
+                "entityValue": "i-00ddbf07ce6372082",
+                "awsAccountId": "011122335622",
+                "lastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 18,
+                    "hour": 18,
+                    "minute": 21,
+                    "second": 5,
+                    "microsecond": 751000
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9853ef00-03fc-11e9-98cd-3130e04228c8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9853ef00-03fc-11e9-98cd-3130e04228c8",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "406",
+                "date": "Thu, 20 Dec 2018 02:11:43 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

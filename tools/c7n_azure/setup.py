@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.3',
+    version='0.5',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -51,6 +51,7 @@ setup(
                       "azure-mgmt-cosmosdb",
                       "azure-mgmt-compute",
                       "azure-mgmt-cdn",
+                      "azure-mgmt-containerregistry",
                       "azure-mgmt-containerservice",
                       "azure-mgmt-datalake-store",
                       "azure-mgmt-datafactory",
@@ -65,7 +66,7 @@ setup(
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
                       "azure-mgmt-subscription",
-                      "azure-mgmt-eventgrid>=2.0.0rc1",
+                      "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
                       "azure-graphrbac",
                       "azure-storage-blob",
                       "azure-storage-queue",
@@ -74,8 +75,8 @@ setup(
                       "PyJWT",
                       "c7n",
                       "requests",
-                      "azure-cli-core<=2.0.40",
-                      "adal~=1.0.0",
+                      "azure-cli-core",
+                      "adal",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1"],
     package_data={str(''): [str('function_binding_resources/bin/*.dll'),

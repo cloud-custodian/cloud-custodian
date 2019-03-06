@@ -60,7 +60,7 @@ class AzureVCRBaseTest(VCRTestCase):
     def _get_vcr(self, **kwargs):
         myvcr = super(VCRTestCase, self)._get_vcr(**kwargs)
         myvcr.register_matcher('azurematcher', self.azure_matcher)
-        myvcr.match_on = ['azurematcher']
+        myvcr.match_on = ['azurematcher', 'method']
 
         # Block recording when using fake token (tox runs)
         if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
@@ -145,7 +145,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         self._response = initial_response.response if \
             isinstance(initial_response, ClientRawResponse) else \
             initial_response
-        self._callbacks = []  # type: List[Callable]
+        self._callbacks = []  # type List[Callable]
         self._polling_method = msrest.polling.NoPolling()
 
         if isinstance(deserialization_callback, type) and \

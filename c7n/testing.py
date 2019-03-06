@@ -162,7 +162,8 @@ class TestUtils(unittest.TestCase):
             os.environ.update(original_environ)
 
         os.environ.clear()
-        for key, value in kwargs.items():
+
+        for key, value in list(kwargs.items()):
             if value is None:
                 del (kwargs[key])
         os.environ.update(kwargs)

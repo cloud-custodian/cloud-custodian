@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "2019-01-29T12:59:58.156Z",
+                "GroupName": "task-p-4374",
+                "IpPermissions": [],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-02ec691909b2a4753",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "3fae8ae5-2025-44a7-ab62-88819b62f13b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Wed, 27 Feb 2019 20:36:51 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

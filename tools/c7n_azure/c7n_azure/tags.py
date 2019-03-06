@@ -52,13 +52,7 @@ class TagHelper:
                                                managed_by=az_resource.managed_by,
                                                identity=az_resource.identity)
 
-            try:
-                client.resources.update_by_id(resource['id'], api_version, generic_resource)
-            except Exception as e:
-                TagHelper.log.error("Failed to update tags for the resource.\n"
-                                    "Type: {0}.\n"
-                                    "Name: {1}.\n"
-                                    "Error: {2}".format(resource['type'], resource['name'], e))
+            client.resources.update_by_id(resource['id'], api_version, generic_resource)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):

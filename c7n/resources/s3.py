@@ -458,7 +458,8 @@ def assemble_bucket(item):
         # As soon as we learn location (which generally works)
         if k == 'Location' and v is not None:
             b_location = v.get('LocationConstraint')
-            # Location == region for all cases but EU per https://goo.gl/iXdpnl
+            # Location == region for all cases but EU
+            # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
             if b_location is None:
                 b_location = "us-east-1"
             elif b_location == 'EU':
@@ -579,11 +580,14 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
     def get_accounts(self):
         """add in elb access by default
 
-        ELB Accounts by region http://goo.gl/a8MXxd
+        ELB Accounts by region
+         https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html
 
-        Redshift Accounts by region https://goo.gl/MKWPTT
+        Redshift Accounts by region
+         https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html#rs-db-auditing-cloud-trail-rs-acct-ids
 
-        Cloudtrail Accounts by region https://goo.gl/kWQk9D
+        Cloudtrail Accounts by region
+         https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-supported-regions.html
         """
         accounts = super(S3CrossAccountFilter, self).get_accounts()
         return accounts.union(
@@ -733,7 +737,7 @@ class BucketFinding(PostFinding):
         owner = r.get("Acl", {}).get("Owner", {})
         resource = {
             "Type": "AwsS3Bucket",
-            "Id": "arn:aws:::{}".format(r["Name"]),
+            "Id": "arn:aws:s3:::{}".format(r["Name"]),
             "Region": get_region(r),
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
             "Details": {"AwsS3Bucket": {"OwnerId": owner.get('ID', 'Unknown')}}
@@ -1097,19 +1101,23 @@ class SetPolicyStatement(BucketActionBase):
     def process_bucket(self, bucket):
         policy = bucket.get('Policy') or '{}'
 
-        fmtargs = self.get_std_format_args(bucket)
+        target_statements = format_string_values(
+            copy.deepcopy({s['Sid']: s for s in self.data.get('statements', [])}),
+            **self.get_std_format_args(bucket))
 
         policy = json.loads(policy)
-        current = {s['Sid']: s for s in policy.get('Statement', [])}
-        new = copy.deepcopy(current)
-        additional = {s['Sid']: s for s in self.data.get('statements', [])}
-        additional = format_string_values(additional, **fmtargs)
-        new.update(additional)
-        if new == current:
+        bucket_statements = policy.setdefault('Statement', [])
+
+        for s in bucket_statements:
+            if s.get('Sid') not in target_statements:
+                continue
+            if s == target_statements[s['Sid']]:
+                target_statements.pop(s['Sid'])
+
+        if not target_statements:
             return
 
-        statements = list(new.values())
-        policy['Statement'] = statements
+        bucket_statements.extend(target_statements.values())
         policy = json.dumps(policy)
 
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
@@ -1242,7 +1250,7 @@ class ToggleLogging(BucketActionBase):
 
     Target bucket ACL must allow for WRITE and READ_ACP Permissions
     Not specifying a target_prefix will default to the current bucket name.
-    http://goo.gl/PiWWU2
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/enable-logging-programming.html
 
     :example:
 
@@ -1283,7 +1291,7 @@ class ToggleLogging(BucketActionBase):
 
         for r in resources:
             client = bucket_client(session, r)
-            is_logging = bool(r['Logging'])
+            is_logging = bool(r.get('Logging'))
 
             if enabled and not is_logging:
                 variables = {
@@ -2022,7 +2030,7 @@ class LogTarget(Filter):
     def get_s3_bucket_locations(buckets, self_log=False):
         """return (bucket_name, prefix) for all s3 logging targets"""
         for b in buckets:
-            if b['Logging']:
+            if b.get('Logging'):
                 if self_log:
                     if b['Name'] != b['Logging']['TargetBucket']:
                         continue
@@ -2181,7 +2189,7 @@ class BucketTag(Tag):
                     value: us-east-1
     """
 
-    def process_resource_set(self, resource_set, tags):
+    def process_resource_set(self, client, resource_set, tags):
         modify_bucket_tags(self.manager.session_factory, resource_set, tags)
 
 
@@ -2209,9 +2217,6 @@ class MarkBucketForOp(TagDelayedAction):
     schema = type_schema(
         'mark-for-op', rinherit=TagDelayedAction.schema)
 
-    def process_resource_set(self, resource_set, tags):
-        modify_bucket_tags(self.manager.session_factory, resource_set, tags)
-
 
 @actions.register('unmark')
 class RemoveBucketTag(RemoveTag):
@@ -2234,7 +2239,7 @@ class RemoveBucketTag(RemoveTag):
     schema = type_schema(
         'unmark', aliases=('remove-tag',), tags={'type': 'array'})
 
-    def process_resource_set(self, resource_set, tags):
+    def process_resource_set(self, client, resource_set, tags):
         modify_bucket_tags(
             self.manager.session_factory, resource_set, remove_tags=tags)
 
@@ -2306,6 +2311,7 @@ class Inventory(ValueFilter):
             for f in as_completed(futures):
                 b = futures[f]
                 if f.exception():
+                    b.setdefault('c7n:DeniedMethods', []).append('GetInventoryConfiguration')
                     self.log.error(
                         "Error processing bucket: %s error: %s",
                         b['Name'], f.exception())
@@ -2567,7 +2573,8 @@ class DeleteBucket(ScanBucket):
 class Lifecycle(BucketActionBase):
     """Action applies a lifecycle policy to versioned S3 buckets
 
-    The schema to supply to the rule follows the schema here: goo.gl/yULzNc
+    The schema to supply to the rule follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.put_bucket_lifecycle_configuration
 
     To delete a lifecycle rule, supply Status=absent
 

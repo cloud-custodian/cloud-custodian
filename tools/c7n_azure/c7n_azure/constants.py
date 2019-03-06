@@ -3,10 +3,12 @@ Azure Functions
 """
 # Docker version from https://hub.docker.com/r/microsoft/azure-functions/
 FUNCTION_DOCKER_VERSION = 'DOCKER|mcr.microsoft.com/azure-functions/python:latest'
-FUNCTION_EXT_VERSION = 'beta'
+FUNCTION_EXT_VERSION = '~2'
 FUNCTION_EVENT_TRIGGER_MODE = 'azure-event-grid'
 FUNCTION_TIME_TRIGGER_MODE = 'azure-periodic'
 FUNCTION_KEY_URL = 'hostruntime/admin/host/systemkeys/_master?api-version=2018-02-01'
+FUNCTION_CONSUMPTION_BLOB_CONTAINER = 'cloud-custodian-packages'
+FUNCTION_PACKAGE_SAS_EXPIRY_DAYS = 365 * 10  # 10 years
 
 """
 Event Grid Mode
@@ -50,3 +52,8 @@ Threading Variable
 """
 DEFAULT_MAX_THREAD_WORKERS = 3
 DEFAULT_CHUNK_SIZE = 20
+
+"""
+Custom Retry Code Variables
+"""
+DEFAULT_MAX_RETRY_AFTER = 30

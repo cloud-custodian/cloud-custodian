@@ -20,8 +20,55 @@ from dateutil import tz as tzutil
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
 
+import mock
+
 
 class DynamodbTest(BaseTest):
+
+    @mock.patch('c7n.resources.dynamodb.DescribeTable.get_waiter')
+    def test_dynamodb_sleep_get_resources(self, mock_get_waiter):
+
+        mock_waiter = mock.MagicMock()
+        mock_get_waiter.return_value = (mock_waiter, {})
+        session_factory = self.replay_flight_data('test_dynamodb_sleep')
+        p = self.load_policy(
+            {'name': 'bobby-drop',
+             'resource': 'dynamodb-table',
+             'mode': {
+                 'type': 'cloudtrail',
+                 'events': ['CreateTable']}},
+            session_factory=session_factory)
+
+        resources = p.resource_manager.get_resources(['test-table-kms-filter'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(mock_waiter.mock_calls), 1)
+
+        describe_table = resources[0]
+        # Run another policy so we can assert there is no sleep
+        p = self.load_policy(
+            {'name': 'bobby-drop',
+             'resource': 'dynamodb-table',
+             'source': 'config',
+             'mode': {'type': 'config-rule'}},
+            session_factory=session_factory, config={'region': 'us-east-2'})
+        resources = p.resource_manager.get_resources(['test-table-kms-filter'])
+        self.assertEqual(len(resources), 1)
+        config_table = resources[0]
+        self.assertEqual(
+            resources[0]['SSEDescription'],
+            {'KMSMasterKeyArn': 'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5', # NOQA
+             'SSEType': 'KMS',
+             'Status': 'ENABLED'})
+        self.assertEqual(len(mock_waiter.mock_calls), 1)
+
+        # While we have a config and describe formatted table, let's
+        # verify they are equivalent but account for some fundamental
+        # deltas.  size and count aren't in config, datetimes we
+        # normalize but are still tz delta on recording.
+        for k in ('ItemCount', 'CreationDateTime', 'TableSizeBytes', 'BillingModeSummary', 'Tags'):
+            describe_table.pop(k, None)
+            config_table.pop(k, None)
+        self.assertEqual(describe_table, config_table)
 
     def test_resources(self):
         session_factory = self.replay_flight_data("test_dynamodb_table")
@@ -31,7 +78,7 @@ class DynamodbTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["TableName"], "rolltop")
+        self.assertEqual(resources[0]["TableName"], "test-table-kms-filter")
         self.assertEqual(resources[0]["TableStatus"], "ACTIVE")
 
     def test_invoke_action(self):
@@ -72,13 +119,35 @@ class DynamodbTest(BaseTest):
                 "filters": [{"tag:test_key": "test_value"}],
             },
             session_factory=session_factory,
-        )
+            config={'region': 'us-west-2', 'account_id': '644160558196'})
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
         arn = resources[0]["TableArn"]
         tags = client.list_tags_of_resource(ResourceArn=arn)
         tag_map = {t["Key"]: t["Value"] for t in tags["Tags"]}
         self.assertTrue("test_key" in tag_map)
+
+    def test_kms_key_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-kms-key-filters",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/dynamodb)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["TableName"], "test-table-kms-filter")
 
     def test_dynamodb_mark(self):
         session_factory = self.replay_flight_data("test_dynamodb_mark")
@@ -423,3 +492,14 @@ class DynamoDbAccelerator(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ClusterName'], 'c7n-test')
+
+    def test_dax_get_resource(self):
+        session_factory = self.replay_flight_data('test_dax_get_resource')
+
+        p = self.load_policy({
+            'name': 'dax-cluster-gr', 'resource': 'dax'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(
+            ["c7n-test-cluster"])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['TotalNodes'], 1)

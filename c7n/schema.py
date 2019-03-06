@@ -91,6 +91,7 @@ def specific_error(error):
         return error
 
     r = t = None
+
     if isinstance(error.instance, dict):
         t = error.instance.get('type')
         r = error.instance.get('resource')
@@ -118,20 +119,17 @@ def specific_error(error):
             if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
                 found = idx
                 break
+            elif 'type' in v and t in v['properties']['type']['enum']:
+                found = idx
+                break
+
         if found is not None:
-            # Try to walk back an element/type ref to the specific
-            # error
-            spath = list(error.context[0].absolute_schema_path)
-            spath.reverse()
-            slen = len(spath)
-            if 'oneOf' in spath:
-                idx = spath.index('oneOf')
-            elif 'anyOf' in spath:
-                idx = spath.index('anyOf')
-            vidx = slen - idx
             for e in error.context:
-                if e.absolute_schema_path[vidx] == found:
-                    return e
+                for el in reversed(e.absolute_schema_path):
+                    if isinstance(el, int):
+                        if el == found:
+                            return e
+                        break
     return error
 
 
@@ -212,12 +210,11 @@ def generate(resource_types=()):
                 # generalize server side query mechanisms, currently
                 # this only for ec2 instance queries. limitations
                 # in json schema inheritance prevent us from doing this
-                # on a type specific basis http://goo.gl/8UyRvQ
+                # on a type specific basis
+                # https://stackoverflow.com/questions/22689900/json-schema-allof-with-additionalproperties
                 'query': {
-                    'type': 'array', 'items': {
-                        'type': 'object',
-                        'minProperties': 1,
-                        'maxProperties': 1}}
+                    'type': 'array', 'items': {'type': 'object'}}
+
             },
         },
         'policy-mode': {

@@ -73,6 +73,37 @@ class SchemaTest(BaseTest):
         self.assertTrue(isinstance(result[0], ValueError))
         self.assertTrue("monday-morning" in str(result[0]))
 
+    def test_py3_policy_error(self):
+        data = {
+            'policies': [{
+                'name': 'policy-ec2',
+                'resource': 'ec2',
+                'actions': [
+                    {'type': 'terminate',
+                     'force': 'asdf'}]}]}
+        result = validate(data)
+        self.assertEqual(len(result), 2)
+        err, policy = result
+        self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
+        self.assertEqual(policy, 'policy-ec2')
+
+    def test_semantic_mode_error(self):
+        data = {
+            'policies': [{
+                'name': 'test',
+                'resource': 'ec2',
+                'mode': {
+                    'type': 'periodic',
+                    'scheduled': 'oops'}}]}
+        errors = list(self.validator.iter_errors(data))
+        self.assertEqual(len(errors), 1)
+        error = specific_error(errors[0])
+        self.assertTrue(
+            len(errors[0].absolute_schema_path) < len(error.absolute_schema_path)
+        )
+        self.assertTrue("'scheduled' was unexpected" in str(error))
+        self.assertTrue(len(str(error)) < 2000)
+
     def test_semantic_error(self):
         data = {
             "policies": [

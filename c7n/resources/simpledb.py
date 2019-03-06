@@ -30,6 +30,7 @@ class SimpleDB(QueryResourceManager):
         id = name = "DomainName"
         dimension = None
         filter_name = None
+        type = "domain"
 
     permissions = ('sdb:DomainMetadata',)
 

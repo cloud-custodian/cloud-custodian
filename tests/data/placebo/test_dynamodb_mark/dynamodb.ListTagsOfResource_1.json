@@ -4,17 +4,22 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "IF5IL5I0JQA7E3HIL0CA6F27ERVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+            "RequestId": "V1QVBPF0LUUBBM9MQIDKSNM13NVV4KQNSO5AEMVJF66Q9ASUAAJG", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "IF5IL5I0JQA7E3HIL0CA6F27ERVV4KQNSO5AEMVJF66Q9ASUAAJG", 
-                "content-length": "11", 
+                "x-amzn-requestid": "V1QVBPF0LUUBBM9MQIDKSNM13NVV4KQNSO5AEMVJF66Q9ASUAAJG", 
+                "content-length": "88", 
                 "server": "Server", 
                 "connection": "keep-alive", 
-                "x-amz-crc32": "1756070277", 
-                "date": "Fri, 08 Jun 2018 23:17:25 GMT", 
+                "x-amz-crc32": "547662945", 
+                "date": "Fri, 08 Jun 2018 23:17:26 GMT", 
                 "content-type": "application/x-amz-json-1.0"
             }
         }, 
-        "Tags": []
+        "Tags": [
+            {
+                "Value": "Resource does not meet policy: delete@2018/06/08", 
+                "Key": "test_tag"
+            }
+        ]
     }
 }

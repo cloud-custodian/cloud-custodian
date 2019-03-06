@@ -17,18 +17,107 @@ import logging
 import sys
 
 from botocore.exceptions import ClientError
+import mock
 
-from .common import BaseTest, TestConfig as Config
+from c7n.exceptions import PolicyValidationError
+from c7n.executor import MainThreadExecutor
 from c7n.resources.ebs import (
     CopyInstanceTags,
     EncryptInstanceVolumes,
     CopySnapshot,
     Delete,
+    ErrorHandler,
+    SnapshotQueryParser as QueryParser
 )
-from c7n.executor import MainThreadExecutor
+
+from .common import BaseTest, TestConfig as Config
 
 
-logging.basicConfig(level=logging.DEBUG)
+class SnapshotQueryParse(BaseTest):
+
+    def test_query(self):
+        qfilters = [
+            {'Name': 'tag:Name', 'Values': ['Snapshot1']},
+            {'Name': 'status', 'Values': ['completed']}]
+        self.assertEqual(qfilters, QueryParser.parse(qfilters))
+
+    def test_invalid_query(self):
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, {})
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [None])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Name': 'status', 'Values': 'completed'}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Name': 'status', 'Values': ['Completed']}])
+
+        self.assertRaises(
+            PolicyValidationError, QueryParser.parse, [
+                {'Name': 'snapshot-id', 'Values': [1]}])
+
+
+class SnapshotErrorHandler(BaseTest):
+
+    def test_tag_error(self):
+        snaps = [{'SnapshotId': 'aa'}]
+        error_response = {
+            "Error": {
+                "Message": "The snapshot 'aa' does not exist.",
+                "Code": "InvalidSnapshot.NotFound",
+            }
+        }
+        client = mock.MagicMock()
+        client.create_tags.side_effect = ClientError(error_response, 'CreateTags')
+
+        p = self.load_policy({
+            "name": "snap-copy",
+            "resource": "ebs-snapshot",
+            'actions': [{'type': 'tag', 'tags': {'bar': 'foo'}}]})
+        tagger = p.resource_manager.actions[0]
+        tagger.process_resource_set(client, snaps, [{'Key': 'bar', 'Value': 'foo'}])
+        client.create_tags.assert_called_once()
+
+    def test_remove_snapshot(self):
+        snaps = [{'SnapshotId': 'a'}, {'SnapshotId': 'b'}, {'SnapshotId': 'c'}]
+
+        t1 = list(snaps)
+        ErrorHandler.remove_snapshot('c', t1)
+        self.assertEqual([t['SnapshotId'] for t in t1], ['a', 'b'])
+
+        ErrorHandler.remove_snapshot('d', snaps)
+        self.assertEqual(len(snaps), 3)
+
+    def test_get_bad_snapshot_malformed(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+            "Error": {
+                "Message": 'Invalid id: "snap-malformedsnap"',
+                "Code": "InvalidSnapshotID.Malformed",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        snap = ErrorHandler.extract_bad_snapshot(e)
+        self.assertEqual(snap, "snap-malformedsnap")
+
+    def test_get_bad_snapshot_notfound(self):
+        operation_name = "DescribeSnapshots"
+        error_response = {
+            "Error": {
+                "Message": "The snapshot 'snap-notfound' does not exist.",
+                "Code": "InvalidSnapshot.NotFound",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        snap = ErrorHandler.extract_bad_snapshot(e)
+        self.assertEqual(snap, "snap-notfound")
 
 
 class SnapshotAccessTest(BaseTest):
@@ -58,31 +147,31 @@ class SnapshotAccessTest(BaseTest):
 
 class SnapshotDetachTest(BaseTest):
 
-        def test_volume_detach(self):
-            factory = self.replay_flight_data('test_ebs_detach')
-            p = self.load_policy(
-                {
-                    'name': 'volume-detach',
-                    'resource': 'ebs',
-                    'filters': [{'VolumeId': 'vol-0850cf7c8e949c318'}],
-                    'actions': [
-                        {
-                            'type': 'detach'
-                        }
-                    ]
-                }, config=Config.empty(), session_factory=factory)
-            resources = p.run()
-            self.assertEqual(len(resources), 1)
+    def test_volume_detach(self):
+        factory = self.replay_flight_data('test_ebs_detach')
+        p = self.load_policy(
+            {
+                'name': 'volume-detach',
+                'resource': 'ebs',
+                'filters': [{'VolumeId': 'vol-0850cf7c8e949c318'}],
+                'actions': [
+                    {
+                        'type': 'detach'
+                    }
+                ]
+            }, config=Config.empty(), session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
-            client = factory(region="us-east-1").client('ec2')
-            volumelist = []
-            volumelist.append(resources[0]['VolumeId'])
-            response = client.describe_volumes(VolumeIds=volumelist)
+        client = factory(region="us-east-1").client('ec2')
+        volumelist = []
+        volumelist.append(resources[0]['VolumeId'])
+        response = client.describe_volumes(VolumeIds=volumelist)
 
-            for resp in response['Volumes']:
-                for attachment in resp['Attachments']:
-                    self.assertTrue(attachment['State'] == "detached" or
-                            attachment['State'] == "detaching")
+        for resp in response['Volumes']:
+            for attachment in resp['Attachments']:
+                self.assertTrue(attachment['State'] == "detached" or
+                                attachment['State'] == "detaching")
 
 
 class SnapshotCopyTest(BaseTest):

@@ -16,7 +16,6 @@ from c7n.registry import PluginRegistry
 from c7n.provider import Provider, clouds
 
 from .client import Session
-from functools import partial
 
 import logging
 
@@ -37,7 +36,7 @@ class Kubernetes(Provider):
 
     def get_session_factory(self, options):
         """Get a credential/session factory for api usage."""
-        return partial(Session, config_file=options.get('config_file'))
+        return Session
 
 
 resources = Kubernetes.resources

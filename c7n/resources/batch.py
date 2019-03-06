@@ -30,6 +30,7 @@ class ComputeEnvironment(QueryResourceManager):
         filter_type = 'list'
         dimension = None
         id = name = "computeEnvironmentName"
+        arn = "computeEnvironmentArn"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
 
@@ -53,6 +54,7 @@ class JobDefinition(QueryResourceManager):
         service = 'batch'
         filter_name = 'jobDefinitions'
         filter_type = 'list'
+        arn = "jobDefinitionArn"
         dimension = None
         id = name = "jobDefinitionName"
         enum_spec = (

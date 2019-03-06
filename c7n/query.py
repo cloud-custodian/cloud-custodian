@@ -156,7 +156,7 @@ class ChildResourceQuery(ResourceQuery):
         # Have to query separately for each parent's children.
         results = []
         for parent_id in parent_ids:
-            merged_params = dict(params, **{parent_key: parent_id})
+            merged_params = self.get_parent_parameters(params, parent_id, parent_key)
             subset = self._invoke_client_enum(
                 client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
@@ -167,6 +167,9 @@ class ChildResourceQuery(ResourceQuery):
             elif subset:
                 results.extend(subset)
         return results
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        return dict(params, **{parent_key: parent_id})
 
 
 class QueryMeta(type):
@@ -194,8 +197,10 @@ class QueryMeta(type):
                     register_ec2_tags(
                         attrs['filter_registry'], attrs['action_registry'])
             if getattr(m, 'universal_taggable', False):
+                compatibility = isinstance(m.universal_taggable, bool) and True or False
                 register_universal_tags(
-                    attrs['filter_registry'], attrs['action_registry'])
+                    attrs['filter_registry'], attrs['action_registry'],
+                    compatibility=compatibility)
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -210,9 +215,11 @@ sources = PluginRegistry('sources')
 @sources.register('describe')
 class DescribeSource(object):
 
+    QueryFactory = ResourceQuery
+
     def __init__(self, manager):
         self.manager = manager
-        self.query = ResourceQuery(self.manager.session_factory)
+        self.query = self.QueryFactory(self.manager.session_factory)
 
     def get_resources(self, ids, cache=True):
         return self.query.get(self.manager, ids)
@@ -287,7 +294,7 @@ class ConfigSource(object):
             if not revisions:
                 continue
             results.append(self.load_resource(revisions[0]))
-        return filter(None, results)
+        return list(filter(None, results))
 
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):
@@ -348,6 +355,7 @@ class QueryResourceManager(ResourceManager):
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
+            'Throttling',
             'Client.RequestLimitExceeded')))
 
     def __init__(self, data, options):
@@ -360,6 +368,16 @@ class QueryResourceManager(ResourceManager):
 
     def get_source(self, source_type):
         return sources.get(source_type)(self)
+
+    @classmethod
+    def has_arn(cls):
+        if getattr(cls.resource_type, 'arn', None):
+            return True
+        elif getattr(cls.resource_type, 'type', None) is not None:
+            return True
+        elif cls.__dict__.get('get_arns'):
+            return True
+        return False
 
     @classmethod
     def get_model(cls):
@@ -388,27 +406,27 @@ class QueryResourceManager(ResourceManager):
         }
 
     def resources(self, query=None):
-        key = self.get_cache_key(query)
+        cache_key = self.get_cache_key(query)
+        resources = None
+
         if self._cache.load():
-            resources = self._cache.get(key)
+            resources = self._cache.get(cache_key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
                     "%s.%s" % (self.__class__.__module__,
                                self.__class__.__name__),
                     len(resources)))
-                return self.filter_resources(resources)
 
-        if query is None:
-            query = {}
-
-        with self.ctx.tracer.subsegment('resource-fetch'):
-            resources = self.source.resources(query)
-        with self.ctx.tracer.subsegment('resource-augment'):
-            resources = self.augment(resources)
+        if resources is None:
+            if query is None:
+                query = {}
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.resources(query)
+            with self.ctx.tracer.subsegment('resource-augment'):
+                resources = self.augment(resources)
+            self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
-        self._cache.save(key, resources)
-
         with self.ctx.tracer.subsegment('filter'):
             resources = self.filter_resources(resources)
 
@@ -489,9 +507,19 @@ class QueryResourceManager(ResourceManager):
 
     def get_arns(self, resources):
         arns = []
+
+        m = self.get_model()
+        arn_key = getattr(m, 'arn', None)
+        if arn_key is False:
+            raise ValueError("%s do not have arns" % self.type)
+
+        id_key = m.id
+
         for r in resources:
-            _id = r[self.get_model().id]
-            if 'arn' in _id[:3]:
+            _id = r[id_key]
+            if arn_key:
+                arns.append(r[arn_key])
+            elif 'arn' in _id[:3]:
                 arns.append(_id)
             else:
                 arns.append(self.generate_arn(_id))

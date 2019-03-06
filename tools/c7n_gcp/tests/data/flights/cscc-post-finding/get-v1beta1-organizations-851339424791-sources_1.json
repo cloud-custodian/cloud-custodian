@@ -1,0 +1,28 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 06 Jan 2019 11:14:28 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1979",
+    "-content-encoding": "gzip",
+    "content-location": "https://securitycenter.googleapis.com/v1beta1/organizations/851339424791/sources?alt=json"
+  },
+  "body": {
+    "sources": [
+      {
+        "name": "organizations/851339424791/sources/10006123093898971944",
+        "displayName": "CloudCustodian",
+        "description": "Cloud Management Rules Engine"
+      }
+    ],
+    "nextPageToken": "CnPdzLuqADHxCp-tlM_PWxVuAS9uXwya4NMtLQYpLBrlVZ9ihrwnfUBGVwRcbiZQUyo9AP7OZ1a7fY6ZsBQFJVdOjss_oZ7e1G4-xlo17XLCCH8H6-jC50CVLRK9k-S5OewBdry0SGVx_CbbZrXlRc9n7tHS"
+  }
+}

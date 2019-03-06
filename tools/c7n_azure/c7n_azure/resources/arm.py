@@ -69,7 +69,7 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('mark-for-op', TagDelayedAction)
                 klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
 
-                if resource is not 'resourcegroup':
+                if resource != 'resourcegroup':
                     klass.action_registry.register('delete', DeleteAction)
 
                 if hasattr(klass.resource_type, 'diagnostic_settings_enabled') \

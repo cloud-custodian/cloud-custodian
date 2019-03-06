@@ -16,21 +16,6 @@
                     "second": 26,
                     "microsecond": 0
                 }
-            },
-            {
-                "UserName": "kapil",
-                "AccessKeyId": "AKIAJYQQRLIX6ZMMRXQQ",
-                "Status": "Active",
-                "CreateDate": {
-                    "__class__": "datetime",
-                    "year": 2018,
-                    "month": 10,
-                    "day": 28,
-                    "hour": 14,
-                    "minute": 7,
-                    "second": 57,
-                    "microsecond": 0
-                }
             }
         ],
         "IsTruncated": false,

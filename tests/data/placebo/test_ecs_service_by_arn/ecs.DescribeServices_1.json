@@ -1,0 +1,133 @@
+{
+    "status_code": 200,
+    "data": {
+        "services": [
+            {
+                "serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/test-no-delete",
+                "serviceName": "test-no-delete",
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
+                "loadBalancers": [],
+                "serviceRegistries": [],
+                "status": "ACTIVE",
+                "desiredCount": 0,
+                "runningCount": 0,
+                "pendingCount": 0,
+                "launchType": "FARGATE",
+                "platformVersion": "LATEST",
+                "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                "deploymentConfiguration": {
+                    "maximumPercent": 200,
+                    "minimumHealthyPercent": 0
+                },
+                "deployments": [
+                    {
+                        "id": "ecs-svc/9223370488569269184",
+                        "status": "PRIMARY",
+                        "taskDefinition": "arn:aws:ecs:us-east-1:644160558196:task-definition/task-public-no-vpc:1",
+                        "desiredCount": 0,
+                        "pendingCount": 0,
+                        "runningCount": 0,
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 23,
+                            "hour": 18,
+                            "minute": 18,
+                            "second": 26,
+                            "microsecond": 603000
+                        },
+                        "updatedAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 23,
+                            "hour": 18,
+                            "minute": 18,
+                            "second": 32,
+                            "microsecond": 754000
+                        },
+                        "launchType": "FARGATE",
+                        "platformVersion": "1.3.0",
+                        "networkConfiguration": {
+                            "awsvpcConfiguration": {
+                                "subnets": [
+                                    "subnet-07c118e47bb84cee7"
+                                ],
+                                "securityGroups": [
+                                    "sg-0fd0c04f0c434d68d"
+                                ],
+                                "assignPublicIp": "DISABLED"
+                            }
+                        }
+                    }
+                ],
+                "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+                "events": [
+                    {
+                        "id": "9aa2d0a2-3ce3-4ab9-8ccd-233f3bd3a700",
+                        "createdAt": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 1,
+                            "day": 26,
+                            "hour": 12,
+                            "minute": 20,
+                            "second": 38,
+                            "microsecond": 481000
+                        },
+                        "message": "(service test-no-delete) has reached a steady state."
+                    }
+                ],
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 23,
+                    "hour": 18,
+                    "minute": 18,
+                    "second": 26,
+                    "microsecond": 603000
+                },
+                "placementConstraints": [],
+                "placementStrategy": [],
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-07c118e47bb84cee7"
+                        ],
+                        "securityGroups": [
+                            "sg-0fd0c04f0c434d68d"
+                        ],
+                        "assignPublicIp": "DISABLED"
+                    }
+                },
+                "schedulingStrategy": "REPLICA",
+                "tags": [
+                    {
+                        "key": "Env",
+                        "value": "Dev"
+                    },
+                    {
+                        "key": "Owner",
+                        "value": "1"
+                    }
+                ],
+                "enableECSManagedTags": true,
+                "propagateTags": "NONE"
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "b56edd9b-22fe-11e9-a152-0bf0ed8e028d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b56edd9b-22fe-11e9-a152-0bf0ed8e028d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "4171",
+                "date": "Mon, 28 Jan 2019 13:14:56 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

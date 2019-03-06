@@ -1,0 +1,39 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bb5b24dd-3faf-11e9-a6db-c562a0c3ba05", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bb5b24dd-3faf-11e9-a6db-c562a0c3ba05", 
+                "content-type": "text/xml", 
+                "content-length": "3500", 
+                "vary": "Accept-Encoding", 
+                "date": "Wed, 06 Mar 2019 01:32:40 GMT"
+            }
+        }, 
+        "IsTruncated": false, 
+        "Roles": [
+            {
+                "Description": "Allows EC2 instances to call AWS services on your behalf.", 
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                "MaxSessionDuration": 3600, 
+                "RoleId": "AROAIU73WBRLYMEMYAUCK", 
+                "CreateDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 24, 
+                    "microsecond": 0, 
+                    "year": 2019, 
+                    "day": 19, 
+                    "minute": 41
+                }, 
+                "RoleName": "test", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::955241386426:role/test"
+            }
+        ]
+    }
+}

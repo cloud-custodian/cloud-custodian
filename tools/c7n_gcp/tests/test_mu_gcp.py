@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import time
+import os
+import shutil
+import sys
+
+import mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.testing import functional
-from c7n_gcp import mu
-from gcp_common import BaseTest
+
+from c7n_gcp import handler, mu, policy
+
+from gcp_common import BaseTest, event_data
 
 
 HELLO_WORLD = """\
@@ -53,6 +61,44 @@ class FunctionTest(BaseTest):
         self.assertEqual(
             func_info['name'],
             'projects/custodian-1291/locations/us-central1/functions/custodian-dev')
+
+    @mock.patch('c7n.policy.PolicyCollection.from_data')
+    def test_handler_run(self, from_data):
+        func_cwd = self.get_temp_dir()
+        output_temp = self.get_temp_dir()
+        pdata = {
+            'name': 'dataset-created',
+            'resource': 'gcp.bq-dataset',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['datasetservice.insert']}}
+
+        with open(os.path.join(func_cwd, 'config.json'), 'w') as fh:
+            fh.write(json.dumps({'policies': [pdata]}))
+
+        event = event_data('bq-dataset-create.json')
+        p = self.load_policy(pdata)
+
+        self.patch(p, 'push', lambda evt, ctx: None)
+        self.patch(handler, 'get_tmp_output_dir', lambda: output_temp)
+        from_data.return_value = [p]
+        self.change_cwd(func_cwd)
+        self.assertEqual(handler.run(event), True)
+
+    def test_handler_tmp_dir(self):
+        # platform specific test ..
+        if sys.platform not in ('linux2', 'darwin'):
+            return
+        tmp_dir = handler.get_tmp_output_dir()
+        self.assertTrue(tmp_dir.startswith('/tmp'))
+        self.addCleanup(shutil.rmtree, tmp_dir)
+
+    def test_abstract_gcp_mode(self):
+        p = self.load_policy({'name': 'instance', 'resource': 'gcp.instance'})
+        exec_mode = policy.FunctionMode(p)
+        self.assertRaises(NotImplementedError, exec_mode.run)
+        self.assertRaises(NotImplementedError, exec_mode.provision)
+        self.assertEqual(None, exec_mode.validate())
 
     def test_periodic_validate_tz(self):
         self.assertRaises(
@@ -128,6 +174,22 @@ class FunctionTest(BaseTest):
         if self.recording:
             time.sleep(52)
         p.get_execution_mode().deprovision()
+
+    def test_api_subscriber_run(self):
+        factory = self.replay_flight_data('mu-api-subscriber-run')
+        p = self.load_policy({
+            'name': 'dataset-created',
+            'resource': 'gcp.bq-dataset',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['datasetservice.insert']}},
+            session_factory=factory)
+        exec_mode = p.get_execution_mode()
+        self.assertTrue(isinstance(exec_mode, policy.ApiAuditMode))
+        event = event_data('bq-dataset-create.json')
+        resources = exec_mode.run(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['labels'], {'env': 'dev'})
 
     @functional
     def test_api_subscriber(self):

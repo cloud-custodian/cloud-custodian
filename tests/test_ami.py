@@ -13,6 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import jmespath
+
+from c7n.exceptions import ClientError
 from .common import BaseTest
 
 
@@ -33,6 +36,33 @@ class TestAMI(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_deregister_delete_snaps(self):
+        factory = self.replay_flight_data('test_ami_deregister_delete_snap')
+        p = self.load_policy({
+            'name': 'deregister-snap',
+            'resource': 'ami',
+            'actions': [{
+                'type': 'deregister',
+                'delete-snapshots': True}]},
+            session_factory=factory, config={'account_id': '644160558196'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('ec2')
+        snap_ids = jmespath.search(
+            'BlockDeviceMappings[].Ebs.SnapshotId', resources[0])
+        self.assertRaises(
+            ClientError, client.describe_snapshots, SnapshotIds=snap_ids, OwnerIds=['self'])
+
+    def test_unused_ami_with_asg_launch_templates(self):
+        factory = self.replay_flight_data('test_unused_ami_launch_template')
+        p = self.load_policy(
+            {"name": "test-unused-ami", "resource": "ami", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ImageId'], 'ami-0515ff4f8f9dbeb31')
 
     def test_unused_ami_true(self):
         factory = self.replay_flight_data("test_unused_ami_true")

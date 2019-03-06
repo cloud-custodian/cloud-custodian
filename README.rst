@@ -3,7 +3,7 @@
      :alt: Join the chat at https://gitter.im/capitalone/cloud-custodian
 
 .. image:: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
-     :target: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
+     :target: https://dev.azure.com/cloud-custodian/cloud-custodian/_build
      :alt: Build Status
 
 .. image:: https://img.shields.io/badge/license-Apache%202-blue.svg
@@ -14,8 +14,8 @@
      :target: https://coveralls.io/github/capitalone/cloud-custodian?branch=master
      :alt: Coverage
 
-.. image:: https://requires.io/github/capitalone/cloud-custodian/requirements.svg?branch=master
-     :target: https://requires.io/github/capitalone/cloud-custodian/requirements/?branch=master
+.. image:: https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master
+     :target: https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master
      :alt: Requirements Status
 
 
@@ -96,7 +96,7 @@ First a policy file needs to be created in YAML format, as an example::
       - encrypt-keys
 
   - name: ec2-require-non-public-and-encrypted-volumes
-    resource: ec2
+    resource: aws.ec2
     description: |
       Provision a lambda and cloud watch event target
       that looks at all new instances and terminates those with
@@ -106,14 +106,14 @@ First a policy file needs to be created in YAML format, as an example::
       events:
           - RunInstances
     filters:
-      - type: aws.ebs
+      - type: ebs
         key: Encrypted
         value: false
     actions:
       - terminate
 
   - name: tag-compliance
-    resource: ec2
+    resource: aws.ec2
     description: |
       Schedule a resource that does not meet tag compliance policies
       to be stopped in four days.
@@ -142,6 +142,17 @@ Given that, you can run Cloud Custodian with::
   # Run the policy
   $ custodian run -s out policy.yml
 
+You can run it with Docker as well
+::
+  # Download the image
+  $ docker pull cloudcustodian/c7n
+
+  # Run the policy
+  $ docker run -it \
+      -v $(pwd)/output:/output \
+      -v $(pwd)/policy.yml:/policy.yml \
+      --env-file <(env | grep "^AWS") \
+      cloudcustodian/c7n run -v -s /output /policy.yml
 
 Custodian supports a few other useful subcommands and options, including
 outputs to S3, Cloudwatch metrics, STS role assumption. Policies go together

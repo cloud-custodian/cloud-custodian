@@ -1,0 +1,92 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Findings": [
+            {
+                "Confidence": 100, 
+                "GeneratorId": "ec2-tag-compliance", 
+                "Severity": {
+                    "Product": 0, 
+                    "Normalized": 1
+                }, 
+                "Title": "ec2-tag-compliance", 
+                "Resources": [
+                    {
+                        "Details": {
+                            "AwsEc2Instance": {
+                                "VpcId": "vpc-d6fe6cb1", 
+                                "IamInstanceProfileArn": "arn:aws:iam::101010101111:instance-profile/CloudCustodian", 
+                                "IpV4Addresses": [
+                                    "172.31.57.211"
+                                ], 
+                                "LaunchedAt": "2019-01-06T14:32:02+00:00", 
+                                "SubnetId": "subnet-d17b4bfb", 
+                                "ImageId": "ami-01f6d3ba372a49c97", 
+                                "Type": "t3.micro"
+                            }
+                        }, 
+                        "Region": "us-east-1", 
+                        "Type": "AwsEc2Instance", 
+                        "Id": "arn:aws:ec2:us-east-1:101010101111:instance/i-0f1c2ffaea36228b0", 
+                        "Tags": {
+                            "AutoPatch": "True", 
+                            "aws:cloud9:owner": "AROAILSBB76BHZCIJCYBM:filiatra-Isengard", 
+                            "Name": "aws-cloud9-new-env-19c056b13923480aa136eb13f0a3f8f5", 
+                            "aws:cloudformation:logical-id": "Instance", 
+                            "aws:cloudformation:stack-id": "arn:aws:cloudformation:us-east-1:101010101111:stack/aws-cloud9-new-env-19c056b13923480aa136eb13f0a3f8f5/40f7c880-1105-11e9-9c7f-0e3dd8dc9008", 
+                            "c7n:FindingId:ec2-tag-compliance": "us-east-1/101010101111/13d8e322927e29187270fb3e36c10472/79e9958694eb7cb5d6409eff335d83f3:2019-01-05T20:04:24.026671+00:00", 
+                            "aws:cloud9:environment": "19c056b13923480aa136eb13f0a3f8f5", 
+                            "aws:cloudformation:stack-name": "aws-cloud9-new-env-19c056b13923480aa136eb13f0a3f8f5", 
+                            "c7n:FindingId:ec2-findings-filter": "us-east-1/101010101111/8a62a79623d01cb31e9ca0d6d51b57ce/c18c653055970c99b1a3df90fd641660:2019-01-05T16:23:33.252215+00:00"
+                        }
+                    }
+                ], 
+                "Compliance": {
+                    "Status": "FAILED"
+                }, 
+                "ProductArn": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default", 
+                "ProductFields": {
+                    "aws/securityhub/SeverityLabel": "LOW", 
+                    "resource": "ec2", 
+                    "ProviderName": "CloudCustodian", 
+                    "ProviderVersion": "0.8.33.1", 
+                    "aws/securityhub/ProductName": "Default", 
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default/us-east-1/101010101111/13d8e322927e29187270fb3e36c10472/79e9958694eb7cb5d6409eff335d83f3", 
+                    "aws/securityhub/CompanyName": "Personal"
+                }, 
+                "RecordState": "ACTIVE", 
+                "WorkflowState": "NEW", 
+                "CreatedAt": "2019-01-05T20:04:24.026671+00:00", 
+                "UpdatedAt": "2019-01-06T20:48:25.290307+00:00", 
+                "Remediation": {
+                    "Recommendation": {
+                        "Url": "https://www.example.com/policies/TaggingPolicy.html", 
+                        "Text": "Tag your instances in compliance with Tagging Policy"
+                    }
+                }, 
+                "Description": "Find all running instances that are not conformant to the tagging policy", 
+                "SchemaVersion": "2018-10-08", 
+                "Id": "us-east-1/101010101111/13d8e322927e29187270fb3e36c10472/79e9958694eb7cb5d6409eff335d83f3", 
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices", 
+                    "Software and Configuration Checks/Industry and Regulatory Standards"
+                ], 
+                "AwsAccountId": "101010101111"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "666f3419-16bb-11e9-8b16-15ab7e5cb356", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "666f3419-16bb-11e9-8b16-15ab7e5cb356", 
+                "content-length": "2870", 
+                "x-amz-apigw-id": "TaYJQH-5IAMFnPw=", 
+                "x-amzn-trace-id": "Root=1-5c3a6d6e-8c2243d1e919634463ac3ac9;Sampled=0", 
+                "connection": "keep-alive", 
+                "date": "Sat, 12 Jan 2019 22:42:54 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

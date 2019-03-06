@@ -1,0 +1,19 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Repository policy does not exist for the repository with name 'test-ecr-no-policy' in the registry with id '644160558196'",
+            "Code": "RepositoryPolicyNotFoundException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "a710b08c-294d-11e9-8d46-2793fca2ff40",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a710b08c-294d-11e9-8d46-2793fca2ff40",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "180"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
