@@ -40,18 +40,28 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_err_ami(self):
+        factory = self.replay_flight_data("test_ami_not_found_err")
         ami_id = 'ami-123f000eee1f9f654'
+        good_ami_id = 'ami-041151726c89bed87'
         error_response = {"Error": {
             "Message": "The image id '[%s]' does not exist" % (ami_id),
             "Code": "InvalidAMIID.NotFound"}}
 
+        responses = [ClientError(error_response, "DescribeSnapshots")]
+
         def base_get_resources(self, ids, cache=True):
-            raise ClientError(error_response, "DescribeSnapshots")
+            if responses:
+                raise responses.pop()
+            return factory().client('ec2').describe_images(ImageIds=ids).get('Images')
 
         self.patch(DescribeSource, 'get_resources', base_get_resources)
 
-        p = self.load_policy({'name': 'bad-ami', 'resource': 'ami'})
-        self.assertEqual(p.resource_manager.get_resources([ami_id]), [])
+        p = self.load_policy(
+            {'name': 'bad-ami', 'resource': 'ami'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources([ami_id, good_ami_id])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ImageId'], good_ami_id)
 
     def test_err_get_ami_invalid(self):
         operation_name = "DescribeSnapshots"
