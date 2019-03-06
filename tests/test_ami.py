@@ -75,7 +75,18 @@ class TestAMI(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         snap = ErrorHandler.extract_bad_ami(e)
-        self.assertEqual(snap, "ami-123f000eee1f9f654")
+        self.assertEqual(snap, ["ami-123f000eee1f9f654"])
+
+        operation_name = "DescribeSnapshots"
+        error_response = {
+            "Error": {
+                "Message": "The image id '[ami-123f000eee1f9f654, ami-ffffff]' does not exist",
+                "Code": "InvalidAMIID.NotFound"
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        snap = ErrorHandler.extract_bad_ami(e)
+        self.assertEqual(snap, ["ami-123f000eee1f9f654", "ami-ffffff"])
 
     def test_deregister_delete_snaps(self):
         factory = self.replay_flight_data('test_ami_deregister_delete_snap')

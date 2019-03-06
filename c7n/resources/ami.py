@@ -69,7 +69,8 @@ class DescribeImageSource(DescribeSource):
             except ClientError as e:
                 bad_ami_id = ErrorHandler.extract_bad_ami(e)
                 if bad_ami_id:
-                    ids.remove(bad_ami_id)
+                    for b in bad_ami_id:
+                        ids.remove(b)
                     continue
                 raise
         return []
@@ -82,14 +83,16 @@ class ErrorHandler(object):
         """Handle various client side errors when describing images"""
         msg = e.response['Error']['Message']
         error = e.response['Error']['Code']
-        e_ami_id = None
+        e_ami_ids = None
         if error == 'InvalidAMIID.NotFound':
-            e_ami_id = msg[msg.find("'[") + 2:msg.rfind("]'")]
-            log.warning("Image not found %s" % e_ami_id)
+            e_ami_ids = [
+                e_ami_id.strip() for e_ami_id
+                in msg[msg.find("'[") + 2:msg.rfind("]'")].split(',')]
+            log.warning("Image not found %s" % e_ami_ids)
         elif error == 'InvalidAMIID.Malformed':
-            e_ami_id = msg[msg.find('"') + 1:msg.rfind('"')]
-            log.warning("Image id malformed %s" % e_ami_id)
-        return e_ami_id
+            e_ami_ids = msg[msg.find('"') + 1:msg.rfind('"')]
+            log.warning("Image id malformed %s" % e_ami_ids)
+        return e_ami_ids
 
 
 @AMI.action_registry.register('deregister')
