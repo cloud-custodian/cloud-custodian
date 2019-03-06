@@ -15,7 +15,7 @@
 try:
     from botocore.config import Config
 except ImportError:
-    from c7n.config import Bag as Config
+    from c7n.config import Bag as Config  # pragma: no cover
 
 from .core import EventAction
 from c7n import utils
