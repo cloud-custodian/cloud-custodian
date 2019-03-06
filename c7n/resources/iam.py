@@ -122,14 +122,6 @@ class RoleRemoveTag(RemoveTag):
                 continue
 
 
-@Role.action_registry.register('mark-for-op')
-class RoleTagDelayedAction(TagDelayedAction):
-    pass
-
-
-Role.filter_registry.register('marked-for-op', TagActionFilter)
-
-
 @resources.register('iam-user')
 class User(QueryResourceManager):
 

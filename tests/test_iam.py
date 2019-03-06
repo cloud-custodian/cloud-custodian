@@ -312,7 +312,7 @@ class IamRoleFilterUsage(BaseTest):
 class IamRoleTag(BaseTest):
 
     def test_iam_role_actions(self):
-        factory = self.record_flight_data('test_iam_role_tags')
+        factory = self.replay_flight_data('test_iam_role_tags')
         p = self.load_policy({
             'name': 'iam-role-tag',
             'resource': 'iam-role',
@@ -322,7 +322,7 @@ class IamRoleTag(BaseTest):
                 {'type': 'tag',
                  'tags': {'Env': 'Dev'}},
                 {'type': 'remove-tag',
-                 'tags': ['Role']}
+                 'tags': ['Application']}
             ]
         },
             session_factory=factory)
@@ -334,15 +334,14 @@ class IamRoleTag(BaseTest):
             time.sleep(1)
         role = client.get_role(RoleName=resources[0]['RoleName']).get('Role')
         self.assertEqual(
-            {t['Key']: t['Value'] for t in resources[0]['Tags']},
-            {'Role': 'Dev'})
+            {'Role': 'Dev'},
+            {t['Key']: t['Value'] for t in resources[0]['Tags'] if t['Key'] == 'Role'})
         self.assertEqual(
-            {t['Key']: t['Value'] for t in role['Tags']},
-            {'Env': 'Dev',
-             'maid_status': 'Resource does not meet policy: tag@2019/02/21'})
-        self.assertNotEqual(
-            {t['Key']: t['Value'] for t in role['Tags']},
-            {'Role': 'Dev'})
+            {'Dev'},
+            {t['Value'] for t in role['Tags'] if t['Key'] == 'Env'})
+        self.assertNotIn(
+            {'Application'},
+            {t['Key'] for t in role['Tags']})
 
 
 class IamUserTest(BaseTest):
