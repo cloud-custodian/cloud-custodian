@@ -67,9 +67,9 @@ class DescribeImageSource(DescribeSource):
             try:
                 return super(DescribeImageSource, self).get_resources(ids, cache)
             except ClientError as e:
-                bad_ami_id = ErrorHandler.extract_bad_ami(e)
-                if bad_ami_id:
-                    for b in bad_ami_id:
+                bad_ami_ids = ErrorHandler.extract_bad_ami(e)
+                if bad_ami_ids:
+                    for b in bad_ami_ids:
                         ids.remove(b)
                     continue
                 raise
@@ -90,7 +90,7 @@ class ErrorHandler(object):
                 in msg[msg.find("'[") + 2:msg.rfind("]'")].split(',')]
             log.warning("Image not found %s" % e_ami_ids)
         elif error == 'InvalidAMIID.Malformed':
-            e_ami_ids = msg[msg.find('"') + 1:msg.rfind('"')]
+            e_ami_ids = [msg[msg.find('"') + 1:msg.rfind('"')]]
             log.warning("Image id malformed %s" % e_ami_ids)
         return e_ami_ids
 

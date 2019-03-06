@@ -63,7 +63,7 @@ class TestAMI(BaseTest):
         }
         e = ClientError(error_response, operation_name)
         ami = ErrorHandler.extract_bad_ami(e)
-        self.assertEqual(ami, "ami123f000eee1f9f654")
+        self.assertEqual(ami, ["ami123f000eee1f9f654"])
 
     def test_err_get_ami_notfound(self):
         operation_name = "DescribeSnapshots"
