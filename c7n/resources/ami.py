@@ -54,6 +54,11 @@ class AMI(QueryResourceManager):
             query['Owners'] = ['self']
         return super(AMI, self).resources(query=query)
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeImageSource(self)
+        return super(AMI, self).get_source(source_type)
+
 
 class DescribeImageSource(DescribeSource):
 
@@ -67,6 +72,7 @@ class DescribeImageSource(DescribeSource):
                     ids.remove(bad_ami_id)
                     continue
                 raise
+        return []
 
 
 class ErrorHandler(object):
