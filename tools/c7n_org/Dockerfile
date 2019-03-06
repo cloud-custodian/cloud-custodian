@@ -1,5 +1,10 @@
-FROM pypy:2
-MAINTAINER Cloud Custodian Developers http://github.com/capitalone/cloud-custodian
+FROM python:3.7
+
+LABEL name="custodian" \
+      description="Cloud Management Rules Engine" \
+      repository="http://github.com/cloud-custodian/cloud-custodian" \
+      homepage="http://github.com/cloud-custodian/cloud-custodian" \
+      maintainer="Custodian Community <https://cloudcustodian.io>"
 
 # Note this must be run from the root directory of the checkout
 # as we install custodian w/ aws, azure, and gcp support from the same
