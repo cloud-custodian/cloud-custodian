@@ -13,3 +13,33 @@
 # limitations under the License.
 
 from gcp_common import BaseTest
+
+
+class CloudBillingAccountTest(BaseTest):
+
+    def test_billingaccount_query(self):
+        billingaccount_resource_name = 'billingAccounts/CU570D-1A4CU5-70D1A4'
+        session_factory = self.replay_flight_data(
+            'cloudbilling-account-query')
+
+        policy = self.load_policy(
+            {'name': 'billing-cloudbilling-account-dryrun',
+             'resource': 'gcp.cloudbilling-account'},
+            session_factory=session_factory)
+
+        billingaccount_resources = policy.run()
+        self.assertEqual(billingaccount_resources[0]['name'], billingaccount_resource_name)
+
+    def test_billingaccount_get(self):
+        billingaccount_resource_name = 'billingAccounts/CU570D-1A4CU5-70D1A4'
+        session_factory = self.replay_flight_data(
+            'cloudbilling-account-get')
+
+        policy = self.load_policy(
+            {'name': 'billing-cloudbilling-account-dryrun',
+             'resource': 'gcp.cloudbilling-account'},
+            session_factory=session_factory)
+
+        billingaccount_resource = policy.resource_manager.get_resource(
+            {'name': billingaccount_resource_name})
+        self.assertEqual(billingaccount_resource['name'], billingaccount_resource_name)

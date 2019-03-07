@@ -13,3 +13,20 @@
 # limitations under the License.
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+
+
+@resources.register('cloudbilling-account')
+class CloudBillingAccount(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'cloudbilling'
+        version = 'v1'
+        component = 'billingAccounts'
+        enum_spec = ('list', 'billingAccounts[]', None)
+        scope = None
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'name': resource_info['name']})
