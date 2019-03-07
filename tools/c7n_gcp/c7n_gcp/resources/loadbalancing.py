@@ -58,6 +58,23 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
         component = 'targetTcpProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', resource_info)
+
+
+@resources.register('loadbalancing-target-ssl-proxy')
+class LoadBalancingTargetSslProxy(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'targetSslProxies'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
