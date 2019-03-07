@@ -180,9 +180,11 @@ class MetricsOutput(Metrics):
                 continue
             d['Dimensions'].append({"Name": k, "Value": v})
         if self.region:
-            d['Dimensions'].append({'Name': 'Region', 'Value': self.ctx.region})
+            d['Dimensions'].append(
+                {'Name': 'Region', 'Value': self.ctx.options.region})
         if self.destination:
-            d['Dimensions'].append({'Name': 'Account', 'Value': self.ctx.account_id or ''})
+            d['Dimensions'].append(
+                {'Name': 'Account', 'Value': self.ctx.options.account_id or ''})
         return d
 
     def _put_metrics(self, ns, metrics):

@@ -128,7 +128,8 @@ class OutputMetricsTest(BaseTest):
                 tmetrics.extend(metrics)
 
         conf = Bag({'region': 'us-east-2', 'scheme': 'aws', 'netloc': 'master'})
-        ctx = Bag(session_factory=None, account_id='001100', region='us-east-1',
+        ctx = Bag(session_factory=None,
+                  options=Bag(account_id='001100', region='us-east-1'),
                   policy=Bag(name='test', resource_type='ec2'))
         moutput = Metrics(ctx, conf)
 
