@@ -247,6 +247,63 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
         return results
 
 
+@Snapshot.filter_registry.register('unused')
+class SnapshotUnusedFilter(Filter):
+    """Filters snapshots based on usage
+    true: snapshot is not used by launch-template, launch-config, or ami.
+    false: snapshot is being used by launch-template, launch-config, or ami.
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: snapshot-unused
+                resource: ebs-snapshot
+                filters:
+                  - type: unused
+                    value: true
+    """
+    schema = type_schema('unused', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return list(itertools.chain([
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ('asg', 'launch-config', 'ami')]))
+
+    def _pull_asg_snapshots(self):
+        asgs = self.manager.get_resource_manager('asg').resources()
+        snap_ids = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
+        lcfg_mgr = self.manager.get_resource_manager('launch-config')
+
+        if lcfgs:
+            for lc in lcfg_mgr.resources():
+                for b in lc.get('BlockDeviceMappings'):
+                    if 'Ebs' in b and 'SnapshotId' in b['Ebs']:
+                        snap_ids.add(b['Ebs']['SnapshotId'])
+        
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            for bd in tversion['LaunchTemplateData']['BlockDeviceMappings']:
+                if 'Ebs' in bd and 'SnapshotId' in bd['Ebs']:
+                    snap_ids.add(bd['Ebs']['SnapshotId'])
+        return snap_ids
+
+    def _pull_ami_snapshots(self):
+        amis = self.manager.get_resource_manager('ami').resources()
+        ami_snaps = set()
+        for i in amis:
+            for dev in i.get('BlockDeviceMappings'):
+                if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+                    ami_snaps.add(dev['Ebs']['SnapshotId'])
+        return ami_snaps
+
+    def process(self, resources, event=None):
+        snaps = self._pull_asg_snapshots().union(self._pull_ami_snapshots())
+        if self.data.get('value', True):
+            return [r for r in resources if r['SnapshotId'] not in snaps]
+        return [r for r in resources if r['SnapshotId'] in snaps]
+
+
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
     """

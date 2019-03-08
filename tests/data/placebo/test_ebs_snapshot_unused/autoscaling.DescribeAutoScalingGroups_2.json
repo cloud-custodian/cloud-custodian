@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "c7n-test",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:34881cd0-f726-4a32-bf6f-4ba4280c3b0f:autoScalingGroupName/c7n-test",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0f4a39147cc7881b9",
+                    "LaunchTemplateName": "c7n-test",
+                    "Version": "$Default"
+                },
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 18,
+                    "second": 26,
+                    "microsecond": 771000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3a334610",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "57d87c59-41cc-11e9-8e94-03cd555de4e3",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "57d87c59-41cc-11e9-8e94-03cd555de4e3",
+                "content-type": "text/xml",
+                "content-length": "1807",
+                "date": "Fri, 08 Mar 2019 18:02:30 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
