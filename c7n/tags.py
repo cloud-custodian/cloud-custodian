@@ -668,7 +668,7 @@ class TagDelayedAction(Action):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        days = self.data.get('days', 0)
+        days = self.data.get('days', None)
         hours = self.data.get('hours', 0)
         action_date = self.generate_timestamp(days, hours)
 
@@ -925,7 +925,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
         op = self.data.get('op', 'stop')
         tag = self.data.get('tag', DEFAULT_TAG)
-        days = self.data.get('days', 0)
+        days = self.data.get('days', None)
         hours = self.data.get('hours', 0)
         action_date = self.generate_timestamp(days, hours)
 
