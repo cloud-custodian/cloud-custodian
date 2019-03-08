@@ -730,6 +730,7 @@ class BucketActionBase(BaseAction):
                 results += filter(None, [f.result()])
             return results
 
+
 class BucketFilterBase(Filter):
     def get_std_format_args(self, bucket):
         return {
@@ -738,6 +739,7 @@ class BucketFilterBase(Filter):
             'bucket_name': bucket['Name'],
             'bucket_region': get_region(bucket)
         }
+
 
 @S3.action_registry.register("post-finding")
 class BucketFinding(PostFinding):
