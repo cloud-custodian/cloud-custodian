@@ -730,6 +730,14 @@ class BucketActionBase(BaseAction):
                 results += filter(None, [f.result()])
             return results
 
+class BucketFilterBase(Filter):
+    def get_std_format_args(self, bucket):
+        return {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'bucket_name': bucket['Name'],
+            'bucket_region': get_region(bucket)
+        }
 
 @S3.action_registry.register("post-finding")
 class BucketFinding(PostFinding):
@@ -750,7 +758,7 @@ class BucketFinding(PostFinding):
 
 
 @filters.register('has-statement')
-class HasStatementFilter(Filter):
+class HasStatementFilter(BucketFilterBase):
     """Find buckets with set of policy statements.
 
     :example:
@@ -820,7 +828,8 @@ class HasStatementFilter(Filter):
             if s.get('Sid') in required:
                 required.remove(s['Sid'])
 
-        required_statements = list(self.data.get('statements', []))
+        required_statements = format_string_values(list(self.data.get('statements', [])),
+                                                   **self.get_std_format_args(b))
         for required_statement in required_statements:
             for statement in statements:
                 found = 0
