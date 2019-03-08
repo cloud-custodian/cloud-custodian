@@ -163,9 +163,9 @@ Consult the documentation for additional information, or reach out on gitter.
 Get Involved
 ############
 
-Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
-
-Gitter - https://gitter.im/capitalone/cloud-custodian
+* Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
+* Reddit - https://reddit.com/r/cloudcustodian
+* Gitter - https://gitter.im/capitalone/cloud-custodian
 
 Additional Tools
 ################
