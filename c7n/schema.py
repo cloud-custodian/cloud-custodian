@@ -394,21 +394,29 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
 
 
 def summary(vocabulary):
-    print("resource count: %d" % len(vocabulary))
-    action_count = filter_count = 0
 
-    common_actions = set(['notify', 'invoke-lambda'])
-    common_filters = set(['value', 'and', 'or', 'event'])
+    # Strip out very common filters to avoid artificial inflation
+    common_actions = set([
+        'notify', 'invoke-lambda', 'post-finding', 'put-metric'])
+    common_filters = set([
+        'value', 'and', 'or', 'event', 'finding'])
 
-    for rv in vocabulary.values():
-        action_count += len(
+    providers = {}
+
+    for type_name, rv in vocabulary.items():
+        provider, name = type_name.split('.', 1)
+        stats = providers.setdefault(provider, Counter())
+        stats['resources'] += 1
+        stats['actions'] += len(
             set(rv.get('actions', ())).difference(common_actions))
-        filter_count += len(
+        stats['filters'] += len(
             set(rv.get('filters', ())).difference(common_filters))
-    print("unique actions: %d" % action_count)
-    print("common actions: %d" % len(common_actions))
-    print("unique filters: %d" % filter_count)
-    print("common filters: %s" % len(common_filters))
+
+    for provider, stats in providers.items():
+        print("%s:" % provider)
+        print(" resource count: %d" % stats['resources'])
+        print(" actions: %d" % stats['actions'])
+        print(" filters: %d" % stats['filters'])
 
 
 def json_dump(resource=None):
