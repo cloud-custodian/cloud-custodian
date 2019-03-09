@@ -394,29 +394,23 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
 
 
 def summary(vocabulary):
-
-    # Strip out very common filters to avoid artificial inflation
-    common_actions = set([
-        'notify', 'invoke-lambda', 'post-finding', 'put-metric'])
-    common_filters = set([
-        'value', 'and', 'or', 'event', 'finding'])
-
     providers = {}
 
     for type_name, rv in vocabulary.items():
         provider, name = type_name.split('.', 1)
-        stats = providers.setdefault(provider, Counter())
+        stats = providers.setdefault(provider, {
+            'resources': 0, 'actions': Counter(), 'filters': Counter()})
         stats['resources'] += 1
-        stats['actions'] += len(
-            set(rv.get('actions', ())).difference(common_actions))
-        stats['filters'] += len(
-            set(rv.get('filters', ())).difference(common_filters))
+        for a in rv.get('actions'):
+            stats['actions'][a] += 1
+        for f in rv.get('filters'):
+            stats['filters'][f] += 1
 
     for provider, stats in providers.items():
         print("%s:" % provider)
         print(" resource count: %d" % stats['resources'])
-        print(" actions: %d" % stats['actions'])
-        print(" filters: %d" % stats['filters'])
+        print(" actions: %d" % len(stats['actions']))
+        print(" filters: %d" % len(stats['filters']))
 
 
 def json_dump(resource=None):
