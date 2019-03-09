@@ -1764,6 +1764,7 @@ class VPNGatewayUnusedFilter(Filter):
 
     def _pull_vpn_gateways(self):
         vgw_manager = self.manager.get_resource_manager('vpn_gateway')
+        x = self.manager.get_resource_manager('route-table').resources()
         return set([v['VpnGatewayId'] for v in vgw_manager.resources()])
 
     def _pull_route_tables(self):
@@ -1779,7 +1780,7 @@ class VPNGatewayUnusedFilter(Filter):
         vgws = self._pull_vpn_gateways().union(self._get_propogating_vgws())
         if self.data.get('value', True):
             return [v for v in resources if v['VpnGatewayId'] not in vgws]
-        return [v for v in resources if r['VpnGatewayId'] in vgws]
+        return [v for v in resources if v['VpnGatewayId'] in vgws]
 
 
 @resources.register('vpc-endpoint')
