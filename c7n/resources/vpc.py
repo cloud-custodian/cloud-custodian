@@ -1739,6 +1739,49 @@ class VPNGateway(query.QueryResourceManager):
         id_prefix = "vgw-"
 
 
+@VPNGateway.filter_registry.register("unused")
+class VPNGatewayUnusedFilter(Filter):
+    """Filters VPN Gateways if they are listed as a target in any route table
+
+      true: VPN Gateway is listed as a target in a route table
+      false: VPN Gateway is not listed as a target in a route table
+
+      :example:
+
+      .. code-block:: yaml
+
+              policies:
+                - name: vpn-gateway-unused
+                  resource: vpn-gateway
+                  filters:
+                    - type: unused
+                      value: true
+      """
+
+    schema = type_schema('unused', value={'type': 'boolean'})
+
+    permissions = ('ec2:describe_vpn_gateways','ec2:describe_route_tables')
+
+    def _pull_vpn_gateways(self):
+        vgw_manager = self.manager.get_resource_manager('vpn_gateway')
+        return set([v['VpnGatewayId'] for v in vgw_manager.resources()])
+
+    def _pull_route_tables(self):
+        route_table_manager = self.manager.get_resource_manager('route-table')
+        return route_table_manager.resources()
+
+    def _get_propogating_vgws(self):
+        route_tables = self._pull_route_tables()
+        vgw_ids_lists = [[vgw['GatewayId'] for vgw in table['PropagatingVgws']] for table in route_tables]
+        return list(set().union(*vgw_ids_lists))
+
+    def process(self, resources, event=None):
+        vgws = self._pull_vpn_gateways().union(self._get_propogating_vgws())
+        if self.data.get('value', True):
+            return [v for v in resources if v['VpnGatewayId'] not in vgws]
+        return [v for v in resources if r['VpnGatewayId'] in vgws]
+
+
 @resources.register('vpc-endpoint')
 class VpcEndpoint(query.QueryResourceManager):
 
