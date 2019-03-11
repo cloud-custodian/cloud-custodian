@@ -1740,7 +1740,7 @@ class VPNGateway(query.QueryResourceManager):
 
 
 @VPNGateway.filter_registry.register("used")
-class VPNGatewayUnusedFilter(Filter):
+class VPNGatewayUsedFilter(Filter):
     """Filters VPN Gateways if they are being used
 
     A VPN Gateway is defined as being used if one of the following states
@@ -1760,7 +1760,8 @@ class VPNGatewayUnusedFilter(Filter):
     schema = type_schema('used')
 
     def process(self, resources, event=None):
-        return [v for v in resources if list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
+        return [v for v in resources
+                if list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
 
 
 @VPNGateway.filter_registry.register("unused")
@@ -1783,7 +1784,8 @@ class VPNGatewayUnusedFilter(Filter):
     schema = type_schema('unused')
 
     def process(self, resources, event=None):
-        return [v for v in resources if not list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
+        return [v for v in resources
+                if not list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
 
 
 @resources.register('vpc-endpoint')
