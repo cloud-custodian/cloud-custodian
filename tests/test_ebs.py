@@ -245,7 +245,7 @@ class SnapshotAmiSnapshotTest(BaseTest):
 
 
 class SnapshotUnusedTest(BaseTest):
-    
+
     def test_snapshot_unused(self):
         factory = self.replay_flight_data("test_ebs_snapshot_unused")
         p = self.load_policy(
@@ -269,7 +269,7 @@ class SnapshotUnusedTest(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 2)
-    
+
 
 class SnapshotTrimTest(BaseTest):
 
