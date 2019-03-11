@@ -1759,8 +1759,6 @@ class VPNGatewayUnusedFilter(Filter):
 
     schema = type_schema('used')
 
-    permissions = 'ec2:describe_vpn_gateways'
-
     def process(self, resources, event=None):
         return [v for v in resources if list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
 
@@ -1783,8 +1781,6 @@ class VPNGatewayUnusedFilter(Filter):
       """
 
     schema = type_schema('unused')
-
-    permissions = 'ec2:describe_vpn_gateways'
 
     def process(self, resources, event=None):
         return [v for v in resources if not list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
