@@ -30,7 +30,10 @@ class LoadBalancingAddress(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command('get', resource_info)
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'region': resource_info['region'],
+                'address': resource_info['name']})
 
 
 @resources.register('loadbalancing-url-map')
@@ -46,7 +49,9 @@ class LoadBalancingUrlMap(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command('get', resource_info)
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'urlMap': resource_info['name']})
 
 
 @resources.register('loadbalancing-target-tcp-proxy')
@@ -62,7 +67,9 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command('get', resource_info)
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'targetTcpProxy': resource_info['name']})
 
 
 @resources.register('loadbalancing-target-ssl-proxy')
@@ -78,4 +85,6 @@ class LoadBalancingTargetSslProxy(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command('get', resource_info)
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'targetSslProxy': resource_info['name']})

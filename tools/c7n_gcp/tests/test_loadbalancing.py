@@ -37,8 +37,8 @@ class LoadBalancingAddressTest(BaseTest):
              'resource': 'gcp.loadbalancing-address'},
             session_factory=factory)
         instance = p.resource_manager.get_resource(
-            {'project': 'cloud-custodian',
-             'address': 'new1',
+            {'project_id': 'cloud-custodian',
+             'name': 'new1',
              'region': 'us-central1'})
         self.assertEqual(instance['kind'], 'compute#address')
         self.assertEqual(instance['address'], '35.193.10.19')
@@ -66,8 +66,8 @@ class LoadBalancingUrlMapTest(BaseTest):
              'resource': 'gcp.loadbalancing-url-map'},
             session_factory=factory)
         instance = p.resource_manager.get_resource(
-            {'project': 'cloud-custodian',
-             'urlMap': 'lb'})
+            {'project_id': 'cloud-custodian',
+             'name': 'lb'})
         self.assertEqual(instance['kind'], 'compute#urlMap')
         self.assertEqual(instance['fingerprint'], 'GMqHBoGzLDY=')
 
@@ -94,8 +94,8 @@ class LoadBalancingTargetTcpProxyTest(BaseTest):
              'resource': 'gcp.loadbalancing-target-tcp-proxy'},
             session_factory=factory)
         instance = p.resource_manager.get_resource(
-            {'project': 'cloud-custodian',
-             'targetTcpProxy': 'newlb1-target-proxy'})
+            {'project_id': 'cloud-custodian',
+             'name': 'newlb1-target-proxy'})
         self.assertEqual(instance['kind'], 'compute#targetTcpProxy')
         self.assertEqual(instance['name'], 'newlb1-target-proxy')
 
@@ -122,7 +122,7 @@ class LoadBalancingTargetSslProxyTest(BaseTest):
              'resource': 'gcp.loadbalancing-target-ssl-proxy'},
             session_factory=factory)
         instance = p.resource_manager.get_resource(
-            {'project': 'cloud-custodian',
-             'targetSslProxy': 'lb2-target-proxy'})
+            {'project_id': 'cloud-custodian',
+             'name': 'lb2-target-proxy'})
         self.assertEqual(instance['kind'], 'compute#targetSslProxy')
         self.assertEqual(instance['name'], 'lb2-target-proxy')
