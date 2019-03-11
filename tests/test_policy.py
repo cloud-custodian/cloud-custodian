@@ -373,8 +373,8 @@ class TestPolicy(BaseTest):
             'resource': 'aws.ec2',
             'mode': {
                 'type': 'config-rule',
-                'member-role': 'arn:iam:{account_id}/role/BarFoo',
-                'role': 'arn:iam::{account_id}/role/FooBar'},
+                'member-role': 'arn:aws:iam:{account_id}/role/BarFoo',
+                'role': 'FooBar'},
             'actions': [
                 {'type': 'tag',
                  'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
@@ -394,8 +394,8 @@ class TestPolicy(BaseTest):
         self.assertEqual(
             p.data['actions'][1]['subject'],
             "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
-        self.assertEqual(p.data['mode']['role'], 'arn:iam::12312311/role/FooBar')
-        self.assertEqual(p.data['mode']['member-role'], 'arn:iam:{account_id}/role/BarFoo')
+        self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311/role/FooBar')
+        self.assertEqual(p.data['mode']['member-role'], 'arn:aws:iam:{account_id}/role/BarFoo')
         self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
 
     def test_child_resource_trail_validation(self):
