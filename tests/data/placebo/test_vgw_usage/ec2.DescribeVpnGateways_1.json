@@ -5,6 +5,42 @@
             {
                 "State": "available",
                 "Type": "ipsec.1",
+                "VpcAttachments": [
+                    {
+                        "State": "attached",
+                        "VpcId": "vpc-5b422f3c"
+                    }
+                ],
+                "VpnGatewayId": "vgw-0e20449d59a4e62f2",
+                "AmazonSideAsn": 64512,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test attached"
+                    }
+                ]
+            },
+            {
+                "State": "available",
+                "Type": "ipsec.1",
+                "VpcAttachments": [
+                    {
+                        "State": "detached",
+                        "VpcId": "vpc-5b422f3c"
+                    }
+                ],
+                "VpnGatewayId": "vgw-0f82259fd65669395",
+                "AmazonSideAsn": 64512,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test detached"
+                    }
+                ]
+            },
+            {
+                "State": "available",
+                "Type": "ipsec.1",
                 "VpcAttachments": [],
                 "VpnGatewayId": "vgw-0ff634ceeba67a121",
                 "AmazonSideAsn": 64512,
@@ -17,12 +53,12 @@
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "c37b0919-f452-4a9f-8c36-818a3f8f8fcb",
+            "RequestId": "8a933737-763e-412f-bd87-f6ff70c0e594",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "text/xml;charset=UTF-8",
-                "content-length": "660",
-                "date": "Sat, 09 Mar 2019 21:53:55 GMT",
+                "content-length": "1820",
+                "date": "Mon, 11 Mar 2019 16:35:24 GMT",
                 "server": "AmazonEC2"
             },
             "RetryAttempts": 0

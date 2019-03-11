@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+import pdb;
+
 
 import itertools
 import operator
@@ -1739,12 +1741,37 @@ class VPNGateway(query.QueryResourceManager):
         id_prefix = "vgw-"
 
 
+@VPNGateway.filter_registry.register("used")
+class VPNGatewayUnusedFilter(Filter):
+    """Filters VPN Gateways if they are being used
+
+    A VPN Gateway is defined as being used if one of the following states
+    ('attaching'|'attached'|'detaching') is associated with at least one VPC.
+
+      :example:
+
+      .. code-block:: yaml
+
+              policies:
+                - name: vpn-gateway-used
+                  resource: vpn-gateway
+                  filters:
+                    - used
+      """
+
+    schema = type_schema('used')
+
+    permissions = 'ec2:describe_vpn_gateways'
+
+    def process(self, resources, event=None):
+        return [v for v in resources if list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
+
+
 @VPNGateway.filter_registry.register("unused")
 class VPNGatewayUnusedFilter(Filter):
-    """Filters VPN Gateways if they are listed as a target in any route table
+    """Filters VPN Gateways if they are unused
 
-      true: VPN Gateway is listed as a target in a route table
-      false: VPN Gateway is not listed as a target in a route table
+    This operates as a complement to the used filter
 
       :example:
 
@@ -1754,33 +1781,15 @@ class VPNGatewayUnusedFilter(Filter):
                 - name: vpn-gateway-unused
                   resource: vpn-gateway
                   filters:
-                    - type: unused
-                      value: true
+                    - unused
       """
 
-    schema = type_schema('unused', value={'type': 'boolean'})
+    schema = type_schema('unused')
 
-    permissions = ('ec2:describe_vpn_gateways','ec2:describe_route_tables')
-
-    def _pull_vpn_gateways(self):
-        vgw_manager = self.manager.get_resource_manager('vpn_gateway')
-        x = self.manager.get_resource_manager('route-table').resources()
-        return set([v['VpnGatewayId'] for v in vgw_manager.resources()])
-
-    def _pull_route_tables(self):
-        route_table_manager = self.manager.get_resource_manager('route-table')
-        return route_table_manager.resources()
-
-    def _get_propogating_vgws(self):
-        route_tables = self._pull_route_tables()
-        vgw_ids_lists = [[vgw['GatewayId'] for vgw in table['PropagatingVgws']] for table in route_tables]
-        return list(set().union(*vgw_ids_lists))
+    permissions = 'ec2:describe_vpn_gateways'
 
     def process(self, resources, event=None):
-        vgws = self._pull_vpn_gateways().union(self._get_propogating_vgws())
-        if self.data.get('value', True):
-            return [v for v in resources if v['VpnGatewayId'] not in vgws]
-        return [v for v in resources if v['VpnGatewayId'] in vgws]
+        return [v for v in resources if not list(filter(lambda f: f['State'] != 'detached', v['VpcAttachments']))]
 
 
 @resources.register('vpc-endpoint')

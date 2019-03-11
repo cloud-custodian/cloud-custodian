@@ -2335,23 +2335,31 @@ class NATGatewayTest(BaseTest):
 
 class VPNGatewayTest(BaseTest):
 
-    def test_usage_filter(self):
-        session_factory = self.record_flight_data("test_vgw_usage")
+    def test_used_filter(self):
+        session_factory = self.replay_flight_data("test_vgw_usage")
         p = self.load_policy(
             {
-                "name": "vnp-gateway-usage",
+                "name": "vgw-used",
                 "resource": "vpn-gateway",
-                "filters": [
-                    {
-                        "unused": True
-                    }
-                ],
+                "filters": ["used"],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
-        self.assertTrue("c7n:DhcpConfiguration" in resources[0])
+        self.assertEqual([len(resources)], [1])
+
+    def test_unused_filter(self):
+        session_factory = self.replay_flight_data("test_vgw_usage")
+        p = self.load_policy(
+            {
+                "name": "vgw-unused",
+                "resource": "vpn-gateway",
+                "filters": ["unused"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual([len(resources)], [2])
 
 
 class FlowLogsTest(BaseTest):
