@@ -60,3 +60,14 @@ class BigQueryJobsTest(BaseTest):
         })
         self.assertEqual(job['jobReference']['jobId'], job_id)
 
+
+class BigQueryProjectsTest(BaseTest):
+
+    def test_query(self):
+        factory = self.replay_flight_data('bigquery-project-query')
+        p = self.load_policy({
+            'name': 'bq-get',
+            'resource': 'gcp.bq-project'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
