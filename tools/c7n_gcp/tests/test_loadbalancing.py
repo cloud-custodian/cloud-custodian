@@ -126,3 +126,31 @@ class LoadBalancingTargetSslProxyTest(BaseTest):
              'name': 'lb2-target-proxy'})
         self.assertEqual(instance['kind'], 'compute#targetSslProxy')
         self.assertEqual(instance['name'], 'lb2-target-proxy')
+
+
+class LoadBalancingSslPolicyTest(BaseTest):
+
+    def test_loadbalancing_ssl_policy_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-ssl-policies-query',
+                                          project_id=project_id)
+        p = self.load_policy(
+            {'name': 'all-lb-ssl-policies',
+             'resource': 'gcp.loadbalancing-ssl-policy'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#sslPolicy')
+        self.assertEqual(resources[0]['name'], 'newpolicy')
+
+    def test_loadbalancing_ssl_policy_get(self):
+        factory = self.replay_flight_data('lb-ssl-policies-get')
+        p = self.load_policy(
+            {'name': 'one-lb-ssl-policies',
+             'resource': 'gcp.loadbalancing-ssl-policy'},
+            session_factory=factory)
+        instance = p.resource_manager.get_resource(
+            {'project_id': 'cloud-custodian',
+             'name': 'newpolicy'})
+        self.assertEqual(instance['kind'], 'compute#sslPolicy')
+        self.assertEqual(instance['name'], 'newpolicy')
