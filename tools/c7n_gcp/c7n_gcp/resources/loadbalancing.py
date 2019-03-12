@@ -106,3 +106,39 @@ class LoadBalancingSslPolicy(QueryResourceManager):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
                 'sslPolicy': resource_info['name']})
+
+
+@resources.register('loadbalancing-ssl-certificate')
+class LoadBalancingSslCertificate(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'sslCertificates'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'sslCertificate': resource_info['name']})
+
+
+@resources.register('loadbalancing-target-https-proxy')
+class LoadBalancingTargetHttpsProxy(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'targetHttpsProxies'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'targetHttpsProxy': resource_info['name']})

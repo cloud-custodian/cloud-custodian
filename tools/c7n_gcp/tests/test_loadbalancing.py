@@ -154,3 +154,59 @@ class LoadBalancingSslPolicyTest(BaseTest):
              'name': 'newpolicy'})
         self.assertEqual(instance['kind'], 'compute#sslPolicy')
         self.assertEqual(instance['name'], 'newpolicy')
+
+
+class LoadBalancingSslCertificateTest(BaseTest):
+
+    def test_loadbalancing_ssl_certificate_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-ssl-certificates-query',
+                                          project_id=project_id)
+        p = self.load_policy(
+            {'name': 'all-lb-ssl-certificates',
+             'resource': 'gcp.loadbalancing-ssl-certificate'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#sslCertificate')
+        self.assertEqual(resources[0]['name'], 'testcert')
+
+    def test_loadbalancing_ssl_certificate_get(self):
+        factory = self.replay_flight_data('lb-ssl-certificates-get')
+        p = self.load_policy(
+            {'name': 'one-lb-ssl-certificates',
+             'resource': 'gcp.loadbalancing-ssl-certificate'},
+            session_factory=factory)
+        instance = p.resource_manager.get_resource(
+            {'project_id': 'cloud-custodian',
+             'name': 'testcert'})
+        self.assertEqual(instance['kind'], 'compute#sslCertificate')
+        self.assertEqual(instance['name'], 'testcert')
+
+
+class LoadBalancingTargetHttpsProxyTest(BaseTest):
+
+    def test_loadbalancing_target_https_proxy_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-target-https-proxies-query',
+                                          project_id=project_id)
+        p = self.load_policy(
+            {'name': 'all-lb-target-https-proxies',
+             'resource': 'gcp.loadbalancing-target-https-proxy'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#targetHttpsProxy')
+        self.assertEqual(resources[0]['name'], 'newhttpslb-target-proxy')
+
+    def test_loadbalancing_target_https_proxy_get(self):
+        factory = self.replay_flight_data('lb-target-https-proxies-get')
+        p = self.load_policy(
+            {'name': 'one-lb-target-https-proxies',
+             'resource': 'gcp.loadbalancing-target-https-proxy'},
+            session_factory=factory)
+        instance = p.resource_manager.get_resource(
+            {'project_id': 'cloud-custodian',
+             'name': 'newhttpslb-target-proxy'})
+        self.assertEqual(instance['kind'], 'compute#targetHttpsProxy')
+        self.assertEqual(instance['name'], 'newhttpslb-target-proxy')
