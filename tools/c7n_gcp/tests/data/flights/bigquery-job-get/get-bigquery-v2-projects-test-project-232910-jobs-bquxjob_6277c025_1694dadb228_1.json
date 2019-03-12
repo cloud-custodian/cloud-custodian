@@ -1,0 +1,54 @@
+{
+  "body": {
+    "status": {
+      "state": "DONE"
+    }, 
+    "kind": "bigquery#job", 
+    "statistics": {
+      "endTime": "1551786425045", 
+      "creationTime": "1551786423381", 
+      "startTime": "1551786423576"
+    }, 
+    "jobReference": {
+      "projectId": "test-project-232910", 
+      "location": "US", 
+      "jobId": "bquxjob_6277c025_1694dadb228"
+    }, 
+    "etag": "bTPHHaytSOY4bQuM2a1J7A==", 
+    "selfLink": "https://www.googleapis.com/bigquery/v2/projects/test-project-232910/jobs/bquxjob_6277c025_1694dadb228?location=US", 
+    "configuration": {
+      "copy": {
+        "destinationTable": {
+          "projectId": "test-project-232910", 
+          "tableId": "test1", 
+          "datasetId": "qwerty1234"
+        }, 
+        "sourceTable": {
+          "projectId": "test-project-232910", 
+          "tableId": "qwery1234", 
+          "datasetId": "qwerty1234"
+        }
+      }, 
+      "jobType": "COPY"
+    }, 
+    "id": "test-project-232910:US.bquxjob_6277c025_1694dadb228", 
+    "user_email": "dkhanas@gmail.com"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "946", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/bigquery/v2/projects/test-project-232910/jobs/bquxjob_6277c025_1694dadb228?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "bTPHHaytSOY4bQuM2a1J7A==", 
+    "cache-control": "private", 
+    "date": "Thu, 07 Mar 2019 15:53:50 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}
