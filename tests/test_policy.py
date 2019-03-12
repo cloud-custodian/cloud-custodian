@@ -389,7 +389,6 @@ class TestPolicy(BaseTest):
         p.expand_variables(p.get_variables())
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311/role/FooBar')
 
-
     def test_policy_variable_interpolation(self):
 
         p = self.load_policy({
