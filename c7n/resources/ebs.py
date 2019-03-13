@@ -250,10 +250,15 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 @Snapshot.filter_registry.register('unused')
 class SnapshotUnusedFilter(Filter):
     """Filters snapshots based on usage
+
     true: snapshot is not used by launch-template, launch-config, or ami.
+
     false: snapshot is being used by launch-template, launch-config, or ami.
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: snapshot-unused
                 resource: ebs-snapshot
@@ -261,6 +266,7 @@ class SnapshotUnusedFilter(Filter):
                   - type: unused
                     value: true
     """
+
     schema = type_schema('unused', value={'type': 'boolean'})
 
     def get_permissions(self):
