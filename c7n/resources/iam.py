@@ -143,7 +143,7 @@ class User(QueryResourceManager):
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeUser(self)
-        return super(Policy, self).get_source(source_type)
+        return super(User, self).get_source(source_type)
 
 
 class DescribeUser(DescribeSource):
