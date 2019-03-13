@@ -845,6 +845,11 @@ class Policy(object):
         if not variables:
             variables = {}
 
+        if 'mode' in self.data:
+            if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
+                self.data['mode']['role'] = "arn:aws:iam::%s/role/%s" % \
+                                            (self.options.account_id, self.data['mode']['role'])
+
         variables.update({
             # standard runtime variables for interpolation
             'account': '{account}',

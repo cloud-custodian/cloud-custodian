@@ -78,6 +78,7 @@ setup(
                       "azure-cli-core",
                       "adal",
                       "backports.functools_lru_cache",
+                      "future",
                       "futures>=3.1.1"],
     package_data={str(''): [str('function_binding_resources/bin/*.dll'),
                             str('function_binding_resources/*.csproj'),
