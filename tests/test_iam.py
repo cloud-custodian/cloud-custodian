@@ -346,6 +346,25 @@ class IamRoleTag(BaseTest):
 
 class IamUserTest(BaseTest):
 
+    def test_iam_user_usage(self):
+        factory = self.replay_flight_data('test_iam_user_usage')
+        p = self.load_policy({
+            'name': 'usage-check',
+            'resource': 'iam-user',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': [{'event': '', 'source': '', 'ids': 'ids'}]},
+            'filters': [
+                {'UserName': 'kapil'},
+                {'type': 'usage',
+                 'ServiceNamespace': 'dynamodb',
+                 'TotalAuthenticatedEntities': 1,
+                 'poll-delay': 0.1,
+                 'match-operator': 'any'}]}, session_factory=factory)
+        resources = p.push({'detail': {
+            'eventName': '', 'eventSource': '', 'ids': ['kapil']}}, None)
+        self.assertEqual(len(resources), 1)
+
     def test_iam_user_check_permissions(self):
         factory = self.replay_flight_data('test_iam_user_check_permissions')
         p = self.load_policy({

@@ -140,6 +140,25 @@ class User(QueryResourceManager):
         global_resource = True
         arn = 'Arn'
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeUser(self)
+        return super(Policy, self).get_source(source_type)
+
+
+class DescribeUser(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('iam')
+        results = []
+
+        for r in resource_ids:
+            try:
+                results.append(client.get_user(UserName=r)['User'])
+            except client.exceptions.NoSuchEntityException:
+                continue
+        return results
+
 
 @User.action_registry.register('tag')
 class UserTag(Tag):
@@ -275,6 +294,16 @@ class ServiceUsage(Filter):
     Note recent activity (last 4hrs) may not be shown, evaluation
     is against the last 365 days of data.
 
+    Each service access record is evaluated against all specified
+    attributes.  Attribute filters can be specified in short form k:v
+    pairs or in long form as a value type filter.
+
+    match-operator allows to specify how a resource is treated across
+    service access record matches. 'any' means a single matching
+    service record will return the policy resource as matching. 'all'
+    means all service access records have to match.
+
+
     Find iam users that have not used any services in the last year
 
     :example:
@@ -288,7 +317,27 @@ class ServiceUsage(Filter):
             match-operator: all
             LastAuthenticated: null
 
+    Find iam users that have used dynamodb in last 30 days
+
+    :example:
+
+    .. code-block:: yaml
+
+      - name: unused-users
+        resource: iam-user
+        filters:
+          - type: usage
+            ServiceNamespace: dynamodb
+            TotalAuthenticatedEntities: 1
+            LastAuthenticated:
+              type: value
+              value_type: age
+              op: less-than
+              value: 30
+            match-operator: any
+
     https://aws.amazon.com/blogs/security/automate-analyzing-permissions-using-iam-access-advisor/
+
     """
 
     JOB_COMPLETE = 'COMPLETED'
@@ -310,7 +359,6 @@ class ServiceUsage(Filter):
         'usage',
         required=('match-operator',),
         **schema_attr)
-
     permissions = ('iam:GenerateServiceLastAccessedDetails',
                    'iam:GetServiceLastAccessedDetails')
 

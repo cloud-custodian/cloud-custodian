@@ -190,7 +190,9 @@ class PostFinding(BaseAction):
                 "securityhub", region_name=region_name)
 
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
-        batch_size = self.data.get('batch_size', 10)
+        # default batch size to one to work around security hub console issue
+        # which only shows a single resource in a finding.
+        batch_size = self.data.get('batch_size', 1)
         stats = Counter()
         for key, grouped_resources in self.group_resources(resources).items():
             for resource_set in chunks(grouped_resources, batch_size):
