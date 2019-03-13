@@ -142,3 +142,21 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
                 'targetHttpsProxy': resource_info['name']})
+
+
+@resources.register('loadbalancing-backend-bucket')
+class LoadBalancingBackendBucket(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'backendBuckets'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'backendBucket': resource_info['name']})
