@@ -266,3 +266,31 @@ class LoadBalancingHttpsHealthCheckTest(BaseTest):
              'name': 'newhealthcheck'})
         self.assertEqual(instance['kind'], 'compute#httpsHealthCheck')
         self.assertEqual(instance['name'], 'newhealthcheck')
+
+
+class LoadBalancingHttpHealthCheckTest(BaseTest):
+
+    def test_loadbalancing_http_health_check_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-http-health-checks-query',
+                                          project_id=project_id)
+        p = self.load_policy(
+            {'name': 'all-lb-http-health-checks',
+             'resource': 'gcp.loadbalancing-http-health-check'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#httpHealthCheck')
+        self.assertEqual(resources[0]['name'], 'newhttphealthcheck')
+
+    def test_loadbalancing_http_health_check_get(self):
+        factory = self.replay_flight_data('lb-http-health-checks-get')
+        p = self.load_policy(
+            {'name': 'one-lb-http-health-checks',
+             'resource': 'gcp.loadbalancing-http-health-check'},
+            session_factory=factory)
+        instance = p.resource_manager.get_resource(
+            {'project_id': 'cloud-custodian',
+             'name': 'newhttphealthcheck'})
+        self.assertEqual(instance['kind'], 'compute#httpHealthCheck')
+        self.assertEqual(instance['name'], 'newhttphealthcheck')
