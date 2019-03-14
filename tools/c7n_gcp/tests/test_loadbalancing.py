@@ -238,3 +238,31 @@ class LoadBalancingBackendBucketTest(BaseTest):
              'name': 'newbucket'})
         self.assertEqual(instance['kind'], 'compute#backendBucket')
         self.assertEqual(instance['name'], 'newbucket')
+
+
+class LoadBalancingHttpsHealthCheckTest(BaseTest):
+
+    def test_loadbalancing_https_health_check_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-https-health-checks-query',
+                                          project_id=project_id)
+        p = self.load_policy(
+            {'name': 'all-lb-https-health-checks',
+             'resource': 'gcp.loadbalancing-https-health-check'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#httpsHealthCheck')
+        self.assertEqual(resources[0]['name'], 'newhealthcheck')
+
+    def test_loadbalancing_https_health_check_get(self):
+        factory = self.replay_flight_data('lb-https-health-checks-get')
+        p = self.load_policy(
+            {'name': 'one-lb-https-health-checks',
+             'resource': 'gcp.loadbalancing-https-health-check'},
+            session_factory=factory)
+        instance = p.resource_manager.get_resource(
+            {'project_id': 'cloud-custodian',
+             'name': 'newhealthcheck'})
+        self.assertEqual(instance['kind'], 'compute#httpsHealthCheck')
+        self.assertEqual(instance['name'], 'newhealthcheck')
