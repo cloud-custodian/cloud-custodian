@@ -1,7 +1,7 @@
 -r requirements.txt
 
 # Test & lint packages
-coverage==4.5.2
+coverage==4.5.3
 mock==2.0.0
 placebo==0.9.0
 flake8==3.7.7
@@ -15,8 +15,8 @@ nose-timer==0.7.4
 six >= 1.12.0
 
 # Optional feature testing in c7n
-psutil==5.5.1
-aws_xray_sdk==2.4.1
+psutil==5.6.1
+aws_xray_sdk==2.4.2
 
 -r tools/c7n_sphinxext/requirements.txt
 -r tools/c7n_mailer/requirements.txt
