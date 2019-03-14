@@ -196,3 +196,21 @@ class LoadBalancingHttpHealthCheck(QueryResourceManager):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
                 'httpHealthCheck': resource_info['name']})
+
+
+@resources.register('loadbalancing-health-check')
+class LoadBalancingHealthCheck(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'healthChecks'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'healthCheck': resource_info['name']})
