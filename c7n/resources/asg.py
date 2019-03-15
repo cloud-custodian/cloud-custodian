@@ -1353,7 +1353,7 @@ class RenameTag(Action):
             Resources=[i['InstanceId'] for i in asg['Instances']],
             Tags=[{"Key": source['Key']}])
         client.create_tags(
-            Resources=[i['InstanceId'] for i in asg['Instances']],
+           Resources=[i['InstanceId'] for i in asg['Instances']],
             Tags=[{'Key': destination_tag, 'Value': source['Value']}])
 
 
@@ -1425,7 +1425,7 @@ class MarkForOp(Tag):
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, action_date))
-        client = local_session(self.manager.session_factory).client('asg')
+        client = local_session(self.manager.session_factory).client('autoscaling')
         self.process_resource_set(client, asgs, [{'Key': key, 'Value': msg}])
 
     def _generate_timestamp(self, days, hours):
