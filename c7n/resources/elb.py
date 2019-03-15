@@ -163,9 +163,10 @@ class Tag(tags.Tag):
     permissions = ('elasticloadbalancing:AddTags',)
 
     def process_resource_set(self, client, resource_set, tags):
-        client.add_tags(
-            LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
-            Tags=tags)
+        for r in resource_set:
+            client.add_tags(
+                LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
+                Tags=tags)
 
 
 @actions.register('remove-tag')
