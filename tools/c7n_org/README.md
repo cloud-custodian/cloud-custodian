@@ -183,8 +183,14 @@ policies:
  - name: ec2-check-tag
    resource: aws.ec2
    filters:
-      - "tag:CostCenter": {charge_code}
+      - "tag:CostCenter": "{charge_code}"
 ```
+
+**Note** variable interpolation is senstive to proper quoting and spacing
+ie. `{ charge_code }` would be invalid due to the extra white space. Additionally
+yaml parsing can transform a value like `{charge_code}` to null, unless its quoteda
+in strings like the above example. Values that do interpolation into other content
+dont require quoting ie. "my_{charge_code}"
 
 ## Other commands
 
