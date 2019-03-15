@@ -1096,7 +1096,6 @@ class Tag(Action):
 
     def get_tag_set(self):
         tags = []
-        propagate = self.data.get('propagate', False)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
@@ -1107,9 +1106,6 @@ class Tag(Action):
         for k, v in self.data.get('tags').items():
             tags.append({'Key': k, 'Value': v})
 
-        if propagate:
-            for t in tags:
-                t['PropagateAtLaunch'] = propagate
         return tags
 
     def process(self, asgs):
@@ -1137,11 +1133,16 @@ class Tag(Action):
 
     def process_resource_set(self, client, asgs, tags):
         tag_params = []
-        for a in asgs:
-            atags = dict(tags)
-            atags['ResourceType'] = 'auto-scaling-group'
-            atags['ResourceId'] = a['AutoScalingGroupName']
-            tag_params.append(atags)
+        propagate = self.data.get('propagate', False)
+        for t in tags:
+            if 'PropagateAtLaunch' not in t:
+                t['PropagateAtLaunch'] = propagate
+        for t in tags:
+            for a in asgs:
+                atags = dict(t)
+                atags['ResourceType'] = 'auto-scaling-group'
+                atags['ResourceId'] = a['AutoScalingGroupName']
+                tag_params.append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
 
 
