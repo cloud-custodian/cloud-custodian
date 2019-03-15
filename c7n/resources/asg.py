@@ -1031,7 +1031,7 @@ class RemoveTag(Action):
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, tags)] = asg_set
+                    self.process_resource_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
@@ -1045,7 +1045,7 @@ class RemoveTag(Action):
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, tags):
+    def process_resource_set(self, client, asgs, tags):
         tag_set = []
         for a in asgs:
             for t in tags:
@@ -1084,6 +1084,7 @@ class Tag(Action):
         'tag',
         key={'type': 'string'},
         value={'type': 'string'},
+        tags={'type': 'object'},
         # Backwards compatibility
         tag={'type': 'string'},
         msg={'type': 'string'},
@@ -1093,14 +1094,26 @@ class Tag(Action):
     permissions = ('autoscaling:CreateOrUpdateTags',)
     batch_size = 1
 
-    def process(self, asgs):
+    def get_tag_set(self):
+        tags = []
+        propagate = self.data.get('propagate', False)
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
                 'msg', 'AutoScaleGroup does not meet policy guidelines'))
-        return self.tag(asgs, key, value)
+        if key and value:
+            tags.append({'Key': key, 'Value': value})
 
-    def tag(self, asgs, key, value):
+        for k, v in self.data.get('tags').items():
+            tags.append({'Key': k, 'Value': v})
+
+        if propagate:
+            for t in tags:
+                t['PropagateAtLaunch'] = propagate
+        return tags
+
+    def process(self, asgs):
+        tags = self.get_tag_set()
         error = None
 
         client = local_session(self.manager.session_factory).client('autoscaling')
@@ -1109,26 +1122,27 @@ class Tag(Action):
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, key, value)] = asg_set
+                    self.process_resource_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
                     self.log.exception(
-                        "Exception untagging tag:%s error:%s asg:%s" % (
-                            self.data.get('key', DEFAULT_TAG),
+                        "Exception tagging tag:%s error:%s asg:%s" % (
+                            tags,
                             f.exception(),
                             ", ".join([a['AutoScalingGroupName']
                                        for a in asg_set])))
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, key, value):
-        propagate = self.data.get('propagate_launch', True)
-        tags = [
-            dict(Key=key, ResourceType='auto-scaling-group', Value=value,
-                 PropagateAtLaunch=propagate,
-                 ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        self.manager.retry(client.create_or_update_tags, Tags=tags)
+    def process_resource_set(self, client, asgs, tags):
+        tag_params = []
+        for a in asgs:
+            atags = dict(tags)
+            atags['ResourceType'] = 'auto-scaling-group'
+            atags['ResourceId'] = a['AutoScalingGroupName']
+            tag_params.append(atags)
+        self.manager.retry(client.create_or_update_tags, Tags=tag_params)
 
 
 @ASG.action_registry.register('propagate-tags')
