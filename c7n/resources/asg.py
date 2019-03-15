@@ -1425,7 +1425,8 @@ class MarkForOp(Tag):
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, action_date))
-        self.tag(asgs, key, msg)
+        client = local_session(self.manager.session_factory).client('asg')
+        self.process_resource_set(client, asgs, [{'Key': key, 'Value': msg}])
 
     def _generate_timestamp(self, days, hours):
         n = datetime.now(tz=self.tz)
