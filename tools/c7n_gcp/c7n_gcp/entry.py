@@ -25,6 +25,7 @@ import c7n_gcp.resources.function
 import c7n_gcp.resources.gke
 import c7n_gcp.resources.iam
 import c7n_gcp.resources.logging
+import c7n_gcp.resources.mlengine
 import c7n_gcp.resources.network
 import c7n_gcp.resources.pubsub
 import c7n_gcp.resources.resourcemanager
