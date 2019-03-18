@@ -32,6 +32,7 @@ class Instance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('aggregatedList', 'items.*.instances[]', None)
         scope = 'project'
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
@@ -119,6 +120,7 @@ class Disk(QueryResourceManager):
         component = 'disks'
         scope = 'zone'
         enum_spec = ('aggregatedList', 'items.*.disks[]', None)
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
@@ -146,6 +148,7 @@ class Snapshot(QueryResourceManager):
         version = 'v1'
         component = 'snapshots'
         enum_spec = ('list', 'items[]', None)
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):

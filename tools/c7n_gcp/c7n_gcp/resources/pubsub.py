@@ -28,6 +28,7 @@ class PubSubTopic(QueryResourceManager):
         component = 'projects.topics'
         enum_spec = ('list', 'topics[]', None)
         scope_template = "projects/{}"
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
