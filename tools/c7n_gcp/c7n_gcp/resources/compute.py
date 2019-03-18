@@ -103,6 +103,7 @@ class Image(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'images'
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
