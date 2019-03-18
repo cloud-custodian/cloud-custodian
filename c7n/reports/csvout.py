@@ -185,14 +185,6 @@ class Formatter(object):
     def headers(self):
         return self.fields.keys()
 
-    def extract_raw(self, arr):
-        # Remove the datetime field in order to use as JSON
-        for record in arr:
-            for k in record.copy():
-                if k == "CustodianDate":
-                    del record[k]
-        return arr
-
     def extract_csv(self, record):
         tag_map = {t['Key']: t['Value'] for t in record.get('Tags', ())}
         return _get_values(record, self.fields.values(), tag_map)
