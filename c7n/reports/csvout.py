@@ -97,10 +97,13 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
         records += policy_records
 
     rows = formatter.to_csv(records)
+
     if options.format == 'csv':
         writer = UnicodeWriter(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
+    elif options.format == 'raw':
+        print(json.dumps(formatter.extract_raw(records)))
     else:
         # We special case CSV, and for other formats we pass to tabulate
         print(tabulate(rows, formatter.headers(), tablefmt=options.format))
@@ -181,6 +184,14 @@ class Formatter(object):
 
     def headers(self):
         return self.fields.keys()
+
+    def extract_raw(self, arr):
+        # Remove the datetime field in order to use as JSON
+        for record in arr:
+            for k in record.copy():
+                if k == "CustodianDate":
+                    del record[k]
+        return arr
 
     def extract_csv(self, record):
         tag_map = {t['Key']: t['Value'] for t in record.get('Tags', ())}
