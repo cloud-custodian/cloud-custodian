@@ -1103,7 +1103,7 @@ class Tag(Action):
         if key and value:
             tags.append({'Key': key, 'Value': value})
 
-        for k, v in self.data.get('tags').items():
+        for k, v in self.data.get('tags', {}).items():
             tags.append({'Key': k, 'Value': v})
 
         return tags
@@ -1353,7 +1353,7 @@ class RenameTag(Action):
             Resources=[i['InstanceId'] for i in asg['Instances']],
             Tags=[{"Key": source['Key']}])
         client.create_tags(
-           Resources=[i['InstanceId'] for i in asg['Instances']],
+            Resources=[i['InstanceId'] for i in asg['Instances']],
             Tags=[{'Key': destination_tag, 'Value': source['Value']}])
 
 
