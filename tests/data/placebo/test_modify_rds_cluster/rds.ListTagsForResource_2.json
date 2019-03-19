@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagList": [
+            {
+                "Key": "Owner",
+                "Value": "kapil"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "953156ab-3a5c-4b0f-b794-b28da81a4797",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "953156ab-3a5c-4b0f-b794-b28da81a4797",
+                "content-type": "text/xml",
+                "content-length": "386",
+                "date": "Tue, 19 Mar 2019 22:49:54 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

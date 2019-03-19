@@ -349,7 +349,7 @@ class RDSClusterTest(BaseTest):
 
 
     def test_modify_rds_cluster(self):
-        session_factory = self.record_flight_data("test_modify_rds_cluster")
+        session_factory = self.replay_flight_data("test_modify_rds_cluster")
         p = self.load_policy(
             {
                 "name": "modify-db-cluster",
@@ -368,7 +368,7 @@ class RDSClusterTest(BaseTest):
                     }
                 ],
             },
-            session_factory=session_factory,
+            session_factory=session_factory, config={'account_id': '644160558196'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
