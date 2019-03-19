@@ -2,6 +2,7 @@ argcomplete>=1.8.2
 boto3>=1.9.94
 botocore>=1.12.94
 jsonschema>=2.5.1
+json-logging==0.0.12
 PyYAML>=4.2b4
 # Pinned due to azure-core-cli pin on tabulate
 # https://github.com/Azure/azure-cli/issues/8567

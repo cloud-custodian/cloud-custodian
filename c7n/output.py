@@ -347,7 +347,7 @@ class JSONFormatter(logging.Formatter):
 
     @staticmethod
     def convert_to_json(message):
-        cnv_msg = {"org_msg":message}
+        cnv_msg = {"org_msg": message}
         split_message = message.split()
         for kv_pair in split_message:
             if len(kv_pair.split(':')) == 2:
