@@ -30,7 +30,6 @@ import shutil
 import time
 import uuid
 import traceback
-import json_logging
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
@@ -347,7 +346,7 @@ class JSONFormatter(logging.Formatter):
 
     @staticmethod
     def convert_to_json(message):
-        cnv_msg = {"org_msg": message}
+        cnv_msg = {"original": message}
         split_message = message.split()
         for kv_pair in split_message:
             if len(kv_pair.split(':')) == 2:
@@ -381,10 +380,10 @@ class LogOutput(object):
     def join_log(self):
         self.handler = self.get_handler()
         self.handler.setLevel(logging.DEBUG)
-        self.handler.setFormatter(logging.Formatter(self.log_format))
         if self.ctx.options.get("log_type") == "json":
-            json_logging.ENABLE_JSON_LOGGING = True
-            json_logging.init(custom_formatter=JSONFormatter)
+            self.handler.setFormatter(JSONFormatter())
+        else:
+            self.handler.setFormatter(logging.Formatter(self.log_format))
         mlog = logging.getLogger('custodian')
         mlog.addHandler(self.handler)
 
