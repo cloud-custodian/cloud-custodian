@@ -54,7 +54,7 @@ class RDSCluster(QueryResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id,
+                account_id=self.account_id,               
                 resource_type=self.resource_type.type, separator=':')
         return self._generate_arn
 
@@ -397,6 +397,69 @@ class Snapshot(BaseAction):
                     DBClusterIdentifier=cluster['DBClusterIdentifier']),
                 (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
                 client.exceptions.InvalidDBClusterStateFault)
+
+
+@RDSCluster.action_registry.register('modify-db-cluster')
+class ModifyDbCluster(BaseAction):
+    """Modifies an RDS instance based on specified parameter
+    using ModifyDbInstance.
+
+    'Update' is an array with with key value pairs that should be set to
+    the property and value you wish to modify.
+    'Immediate" determines whether the modification is applied immediately
+    or not. If 'immediate' is not specified, default is false.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: disable-db-cluster-deletion-protection
+                resource: rds-cluster
+                filters:
+                  - DeletionProtection: true
+                  - PubliclyAccessible: true
+                actions:
+                  - type: modify-db-cluster
+                    update:
+                      - property: 'DeletionProtection'
+                        value: false
+                    immediate: true
+    """
+
+    schema = type_schema(
+        'modify-db-cluster',
+        update={
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'property': {'type': 'string', 'enum': [
+                        'DeletionProtection']},
+                    'value': {'type': 'boolean'}
+                },
+            },
+        },
+        required=('update',))
+
+    permissions = ('rds:ModifyDBCluster',)
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client('rds')
+        param = {}
+        for c in clusters:
+            for update in self.data.get('update'):
+                if c[update['property']] != update['value']:
+                    param[update['property']] = update['value']
+            if not param:
+                continue
+            param['ApplyImmediately'] = self.data.get('immediate', False)
+            _run_cluster_method(
+                client.modify_db_cluster,
+                dict(DBClusterIdentifier=c['DBClusterIdentifier'],
+                    DeletionProtection=param['DeletionProtection'], ApplyImmediately=param['ApplyImmediately']),
+                    (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
+                    client.exceptions.InvalidDBClusterStateFault)
 
 
 @resources.register('rds-cluster-snapshot')

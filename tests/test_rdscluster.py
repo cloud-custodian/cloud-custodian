@@ -348,6 +348,37 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(cluster['Status'], 'starting')
 
 
+    def test_modify_rds_cluster(self):
+        session_factory = self.record_flight_data("test_modify_rds_cluster")
+        p = self.load_policy(
+            {
+                "name": "modify-db-cluster",
+                "resource": "rds-cluster",
+                "filters": [{"DBClusterIdentifier": "c7n-test-cluster"}],
+                "actions": [
+                    {
+                        "type": "modify-db-cluster",
+                        "update": [
+                            {
+                                "property": 'DeletionProtection',
+                                "value": False
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("rds")
+        cluster = client.describe_db_clusters(
+            DBClusterIdentifier='c7n-test-cluster')
+        self.assertFalse(cluster['DBClusters'][0]['DeletionProtection'])
+
+
 class RDSClusterSnapshotTest(BaseTest):
 
     def test_rdscluster_snapshot_simple(self):
