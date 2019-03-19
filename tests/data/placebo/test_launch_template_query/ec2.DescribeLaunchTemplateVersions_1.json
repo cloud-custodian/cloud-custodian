@@ -1,0 +1,107 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-0877401c93c294001",
+                "LaunchTemplateName": "test",
+                "VersionNumber": 4,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 25,
+                    "second": 48,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/Samson.Shi@capitalone.com",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-04bfee437f38a691e",
+                    "InstanceType": "t1.micro",
+                    "SecurityGroupIds": [
+                        "sg-02ec691909b2a4753"
+                    ]
+                }
+            },
+            {
+                "LaunchTemplateId": "lt-0877401c93c294001",
+                "LaunchTemplateName": "test",
+                "VersionNumber": 3,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 24,
+                    "second": 34,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/Samson.Shi@capitalone.com",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-04bfee437f38a691e",
+                    "InstanceType": "t1.micro",
+                    "SecurityGroupIds": [
+                        "sg-00cd07381bc482d51"
+                    ]
+                }
+            },
+            {
+                "LaunchTemplateId": "lt-0877401c93c294001",
+                "LaunchTemplateName": "test",
+                "VersionNumber": 2,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 23,
+                    "second": 8,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/Samson.Shi@capitalone.com",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "InstanceType": "t1.micro"
+                }
+            },
+            {
+                "LaunchTemplateId": "lt-0877401c93c294001",
+                "LaunchTemplateName": "test",
+                "VersionNumber": 1,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 21,
+                    "second": 58,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/Samson.Shi@capitalone.com",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-04bfee437f38a691e"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "a85e4bc1-930b-4da9-84a3-0f7072c7de4a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Fri, 01 Mar 2019 19:50:57 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

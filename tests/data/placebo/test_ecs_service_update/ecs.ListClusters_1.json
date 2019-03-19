@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "06bf8844-3877-11e9-9b45-0978c8e17a40",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "06bf8844-3877-11e9-9b45-0978c8e17a40",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "530",
+                "date": "Sun, 24 Feb 2019 20:59:06 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

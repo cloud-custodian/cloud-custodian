@@ -197,8 +197,10 @@ class QueryMeta(type):
                     register_ec2_tags(
                         attrs['filter_registry'], attrs['action_registry'])
             if getattr(m, 'universal_taggable', False):
+                compatibility = isinstance(m.universal_taggable, bool) and True or False
                 register_universal_tags(
-                    attrs['filter_registry'], attrs['action_registry'])
+                    attrs['filter_registry'], attrs['action_registry'],
+                    compatibility=compatibility)
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -292,7 +294,7 @@ class ConfigSource(object):
             if not revisions:
                 continue
             results.append(self.load_resource(revisions[0]))
-        return filter(None, results)
+        return list(filter(None, results))
 
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):
@@ -368,6 +370,16 @@ class QueryResourceManager(ResourceManager):
         return sources.get(source_type)(self)
 
     @classmethod
+    def has_arn(cls):
+        if getattr(cls.resource_type, 'arn', None):
+            return True
+        elif getattr(cls.resource_type, 'type', None) is not None:
+            return True
+        elif cls.__dict__.get('get_arns'):
+            return True
+        return False
+
+    @classmethod
     def get_model(cls):
         return ResourceQuery.resolve(cls.resource_type)
 
@@ -394,27 +406,27 @@ class QueryResourceManager(ResourceManager):
         }
 
     def resources(self, query=None):
-        key = self.get_cache_key(query)
+        cache_key = self.get_cache_key(query)
+        resources = None
+
         if self._cache.load():
-            resources = self._cache.get(key)
+            resources = self._cache.get(cache_key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
                     "%s.%s" % (self.__class__.__module__,
                                self.__class__.__name__),
                     len(resources)))
-                return self.filter_resources(resources)
 
-        if query is None:
-            query = {}
-
-        with self.ctx.tracer.subsegment('resource-fetch'):
-            resources = self.source.resources(query)
-        with self.ctx.tracer.subsegment('resource-augment'):
-            resources = self.augment(resources)
+        if resources is None:
+            if query is None:
+                query = {}
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.resources(query)
+            with self.ctx.tracer.subsegment('resource-augment'):
+                resources = self.augment(resources)
+            self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
-        self._cache.save(key, resources)
-
         with self.ctx.tracer.subsegment('filter'):
             resources = self.filter_resources(resources)
 
@@ -495,9 +507,19 @@ class QueryResourceManager(ResourceManager):
 
     def get_arns(self, resources):
         arns = []
+
+        m = self.get_model()
+        arn_key = getattr(m, 'arn', None)
+        if arn_key is False:
+            raise ValueError("%s do not have arns" % self.type)
+
+        id_key = m.id
+
         for r in resources:
-            _id = r[self.get_model().id]
-            if 'arn' in _id[:3]:
+            _id = r[id_key]
+            if arn_key:
+                arns.append(r[arn_key])
+            elif 'arn' in _id[:3]:
                 arns.append(_id)
             else:
                 arns.append(self.generate_arn(_id))

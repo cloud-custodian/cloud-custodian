@@ -11,6 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+try:
+    from botocore.config import Config
+except ImportError:
+    from c7n.config import Bag as Config  # pragma: no cover
+
 from .core import EventAction
 from c7n import utils
 from c7n.manager import resources
@@ -18,7 +24,7 @@ from c7n.version import version as VERSION
 
 
 class LambdaInvoke(EventAction):
-    """ Invoke an arbitrary lambda
+    """Invoke an arbitrary lambda
 
     serialized invocation parameters
 
@@ -37,6 +43,13 @@ class LambdaInvoke(EventAction):
 
      - type: invoke-lambda
        function: my-function
+
+    Note if your synchronously invoking the lambda, you may also need
+    to configure the timeout, to avoid multiple invokes. The default
+    is 90s, if the lambda doesn't respond within that time the boto
+    sdk will invoke the lambda again with the same
+    arguments. Alternatively use async: true
+
     """
     schema_alias = True
     schema = {
@@ -47,27 +60,24 @@ class LambdaInvoke(EventAction):
             'function': {'type': 'string'},
             'async': {'type': 'boolean'},
             'qualifier': {'type': 'string'},
-            'batch_size': {'type': 'integer'}
+            'batch_size': {'type': 'integer'},
+            'timeout': {'type': 'integer'},
         }
     }
-
-    def get_permissions(self):
-        if self.data.get('async', True):
-            return ('lambda:InvokeAsync',)
-        return ('lambda:Invoke',)
 
     permissions = ('lambda:InvokeFunction',)
 
     def process(self, resources, event=None):
-        client = utils.local_session(
-            self.manager.session_factory).client('lambda')
-
         params = dict(FunctionName=self.data['function'])
         if self.data.get('qualifier'):
             params['Qualifier'] = self.data['Qualifier']
 
         if self.data.get('async', True):
             params['InvocationType'] = 'Event'
+
+        config = Config(read_timeout=self.data.get('timeout', 90))
+        client = utils.local_session(
+            self.manager.session_factory).client('lambda', config=config)
 
         payload = {
             'version': VERSION,

@@ -42,6 +42,37 @@ class OutputXrayTracerTest(BaseTest):
             TraceSegmentDocuments=[doc.serialize()])
 
 
+class ArnTest(BaseTest):
+
+    def test_eb_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:elasticbeanstalk:us-east-1:123456789012:environment/My App/MyEnv')
+        self.assertEqual(arn.service, 'elasticbeanstalk')
+        self.assertEqual(arn.account_id, '123456789012')
+        self.assertEqual(arn.region, 'us-east-1')
+        self.assertEqual(arn.resource_type, 'environment')
+        self.assertEqual(arn.resource, 'My App/MyEnv')
+
+    def test_iam_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:iam::123456789012:user/David')
+        self.assertEqual(arn.service, 'iam')
+        self.assertEqual(arn.resource, 'David')
+        self.assertEqual(arn.resource_type, 'user')
+
+    def test_rds_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:rds:eu-west-1:123456789012:db:mysql-db')
+        self.assertEqual(arn.resource_type, 'db')
+        self.assertEqual(arn.resource, 'mysql-db')
+        self.assertEqual(arn.region, 'eu-west-1')
+
+    def test_s3_key_arn(self):
+        arn = aws.Arn.parse(
+            'arn:aws:s3:::my_corporate_bucket/exampleobject.png')
+        self.assertEqual(arn.resource, 'my_corporate_bucket/exampleobject.png')
+
+
 class UtilTest(BaseTest):
 
     def test_default_account_id_assume(self):
@@ -87,6 +118,34 @@ class TracerTest(BaseTest):
 
 
 class OutputMetricsTest(BaseTest):
+
+    def test_metrics_destination_dims(self):
+        tmetrics = []
+
+        class Metrics(aws.MetricsOutput):
+
+            def _put_metrics(self, ns, metrics):
+                tmetrics.extend(metrics)
+
+        conf = Bag({'region': 'us-east-2', 'scheme': 'aws', 'netloc': 'master'})
+        ctx = Bag(session_factory=None,
+                  options=Bag(account_id='001100', region='us-east-1'),
+                  policy=Bag(name='test', resource_type='ec2'))
+        moutput = Metrics(ctx, conf)
+
+        moutput.put_metric('Calories', 400, 'Count', Scope='Policy', Food='Pizza')
+        moutput.flush()
+
+        tmetrics[0].pop('Timestamp')
+        self.assertEqual(tmetrics, [{
+            'Dimensions': [{'Name': 'Policy', 'Value': 'test'},
+                           {'Name': 'ResType', 'Value': 'ec2'},
+                           {'Name': 'Food', 'Value': 'Pizza'},
+                           {'Name': 'Region', 'Value': 'us-east-1'},
+                           {'Name': 'Account', 'Value': '001100'}],
+            'MetricName': 'Calories',
+            'Unit': 'Count',
+            'Value': 400}])
 
     def test_metrics(self):
         session_factory = self.replay_flight_data('output-aws-metrics')

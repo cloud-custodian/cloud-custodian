@@ -130,9 +130,9 @@ def _report_options(p):
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
     p.add_argument(
-        '--format', default='csv', choices=['csv', 'grid', 'simple'],
+        '--format', default='csv', choices=['csv', 'grid', 'simple', 'json'],
         help="Format to output data in (default: %(default)s). "
-        "Options include simple, grid, csv")
+        "Options include simple, grid, csv, json")
 
 
 def _metrics_options(p):

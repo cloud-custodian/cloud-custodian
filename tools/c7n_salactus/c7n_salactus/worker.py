@@ -79,7 +79,7 @@ def patch_ssl():
         return
     from botocore.vendored import requests
     # Pick a preferred cipher suite, needs some benchmarking.
-    # https://goo.gl/groHHe
+    # https://www.slideshare.net/AmazonWebServices/maximizing-amazon-s3-performance-stg304-aws-reinvent-2013
     requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS = ':AES128-GCM-SHA256'
     try:
         setattr(requests.packages.urllib3.contrib.pyopenssl,
@@ -914,7 +914,7 @@ def process_key_chunk(s3, bucket, kchunk, processor, object_reporting):
         except ConnectionError:
             stats['connection'] += 1
         except ClientError as e:
-            #  https://goo.gl/HZLv9b
+            #  https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
             code = e.response['Error']['Code']
             if code in ('403', 'AccessDenied', '405', 'MethodNotAllowed'):  # Permission Denied
                 stats['denied'] += 1

@@ -16,13 +16,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import itertools
 import operator
 import zlib
-import functools
 import jmespath
 
-from botocore.exceptions import ClientError as BotoClientError
-
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
@@ -32,9 +29,8 @@ from c7n.filters.revisions import Diff
 from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr, generate_arn)
-from botocore.exceptions import ClientError
+from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
@@ -724,7 +720,8 @@ class Stale(Filter):
     a broken vpc peering connection. Note this applies to VPC
     Security groups only and will implicitly filter security groups.
 
-    AWS Docs - https://goo.gl/nSj7VG
+    AWS Docs:
+      https://docs.aws.amazon.com/vpc/latest/peering/vpc-peering-security-groups.html
 
     :example:
 
@@ -866,17 +863,18 @@ class SGPermission(Filter):
       - type: ingress
         Ports: [22, 3389]
         Cidr:
-          values:
+          value:
             - "0.0.0.0/0"
             - "::/0"
           op: in
+
 
     """
 
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference'))
+    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference', 'Description'))
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
 
@@ -955,6 +953,22 @@ class SGPermission(Filter):
             return None
         return match_op(cidr_match)
 
+    def process_description(self, perm):
+        if 'Description' not in self.data:
+            return None
+
+        d = dict(self.data['Description'])
+        d['key'] = 'Description'
+
+        vf = ValueFilter(d)
+        vf.annotate = False
+
+        for k in ('Ipv6Ranges', 'IpRanges', 'UserIdGroupPairs', 'PrefixListIds'):
+            if k not in perm or not perm[k]:
+                continue
+            return vf(perm[k][0])
+        return False
+
     def process_self_reference(self, perm, sg_id):
         found = None
         ref_match = self.data.get('SelfReference')
@@ -1001,6 +1015,7 @@ class SGPermission(Filter):
             perm_matches = {}
             for idx, f in enumerate(self.vfilters):
                 perm_matches[idx] = bool(f(perm))
+            perm_matches['description'] = self.process_description(perm)
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
@@ -1339,6 +1354,7 @@ class TransitGateway(query.QueryResourceManager):
         enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
         dimension = None
         name = id = 'TransitGatewayId'
+        arn = "TransitGatewayArn"
         filter_name = 'TransitGatewayIds'
         filter_type = 'list'
 
@@ -1371,6 +1387,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         name = id = 'TransitGatewayAttachmentId'
         filter_name = None
         filter_type = None
+        arn = False
 
 
 @resources.register('peering-connection')
@@ -1387,6 +1404,7 @@ class PeeringConnection(query.QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "pcx-"
+        type = "vpc-peering-connection"
 
 
 @PeeringConnection.filter_registry.register('cross-account')
@@ -1564,28 +1582,6 @@ class NetworkAddress(query.QueryResourceManager):
         dimension = None
         config_type = "AWS::EC2::EIP"
 
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.get_model().service,
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.resource_type.type,
-                separator='/')
-        return self._generate_arn
-
-    def get_arn(self, r):
-        return self.generate_arn(r[self.get_model().id])
-
-    def get_arns(self, resource_set):
-        arns = []
-        for r in resource_set:
-            _id = r[self.get_model().id]
-            arns.append(self.generate_arn(_id))
-        return arns
-
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
 NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
@@ -1620,7 +1616,7 @@ class AddressRelease(BaseAction):
         for aa in list(associated_addrs):
             try:
                 client.disassociate_address(AssociationId=aa['AssociationId'])
-            except BotoClientError as e:
+            except ClientError as e:
                 # If its already been diassociated ignore, else raise.
                 if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
                        aa['AssocationId'] in e.response['Error']['Message']):
@@ -1645,7 +1641,7 @@ class AddressRelease(BaseAction):
         for r in unassoc_addrs:
             try:
                 client.release_address(AllocationId=r['AllocationId'])
-            except BotoClientError as e:
+            except ClientError as e:
                 # If its already been released, ignore, else raise.
                 if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
                     raise

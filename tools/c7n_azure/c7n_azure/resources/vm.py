@@ -76,10 +76,11 @@ class VmPowerOffAction(AzureBaseAction):
 
     schema = type_schema('poweroff')
 
-    def process_resource_set(self, vms):
-        client = self.manager.get_client()
-        for vm in vms:
-            client.virtual_machines.power_off(vm['resourceGroup'], vm['name'])
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.virtual_machines.power_off(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('stop')
@@ -87,10 +88,11 @@ class VmStopAction(AzureBaseAction):
 
     schema = type_schema('stop')
 
-    def process_resource_set(self, vms):
-        client = self.manager.get_client()
-        for vm in vms:
-            client.virtual_machines.deallocate(vm['resourceGroup'], vm['name'])
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.virtual_machines.deallocate(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('start')
@@ -98,10 +100,11 @@ class VmStartAction(AzureBaseAction):
 
     schema = type_schema('start')
 
-    def process_resource_set(self, vms):
-        client = self.manager.get_client()
-        for vm in vms:
-            client.virtual_machines.start(vm['resourceGroup'], vm['name'])
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.virtual_machines.start(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('restart')
@@ -109,7 +112,8 @@ class VmRestartAction(AzureBaseAction):
 
     schema = type_schema('restart')
 
-    def process_resource_set(self, vms):
-        client = self.manager.get_client()
-        for vm in vms:
-            client.virtual_machines.restart(vm['resourceGroup'], vm['name'])
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.virtual_machines.restart(resource['resourceGroup'], resource['name'])

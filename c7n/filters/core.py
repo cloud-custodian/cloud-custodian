@@ -59,6 +59,14 @@ def regex_match(value, regex):
     return bool(re.match(regex, value, flags=re.IGNORECASE))
 
 
+def regex_case_sensitive_match(value, regex):
+    if not isinstance(value, six.string_types):
+        return False
+    # Note python 2.5+ internally cache regex
+    # would be nice to use re2
+    return bool(re.match(regex, value))
+
+
 def operator_in(x, y):
     return x in y
 
@@ -90,6 +98,7 @@ OPERATORS = {
     'less-than': operator.lt,
     'glob': glob_match,
     'regex': regex_match,
+    'regex-case': regex_case_sensitive_match,
     'in': operator_in,
     'ni': operator_ni,
     'not-in': operator_ni,
@@ -369,6 +378,7 @@ class ValueFilter(Filter):
             'op': {'enum': list(OPERATORS.keys())}}}
 
     annotate = True
+    required_keys = set(('value', 'key'))
 
     def __init__(self, data, manager=None):
         super(ValueFilter, self).__init__(data, manager)
@@ -394,7 +404,7 @@ class ValueFilter(Filter):
                 "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
-        if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
+        if self.data['op'] not in OPERATORS or self.data['op'] in {'regex', 'regex-case'}:
             raise PolicyValidationError(
                 "Invalid operator in value filter %s" % self.data)
 
@@ -409,17 +419,19 @@ class ValueFilter(Filter):
         if self.data.get('value_type') == 'resource_count':
             return self._validate_resource_count()
 
-        if 'key' not in self.data:
+        if 'key' not in self.data and 'key' in self.required_keys:
             raise PolicyValidationError(
                 "Missing 'key' in value filter %s" % self.data)
-        if 'value' not in self.data and 'value_from' not in self.data:
+        if ('value' not in self.data and
+                'value_from' not in self.data and
+                'value' in self.required_keys):
             raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
             if not self.data['op'] in OPERATORS:
                 raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
-            if self.data['op'] == 'regex':
+            if self.data['op'] in {'regex', 'regex-case'}:
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['value'])
@@ -531,7 +543,7 @@ class ValueFilter(Filter):
 
         elif self.vtype == 'integer':
             try:
-                value = int(value.strip())
+                value = int(str(value).strip())
             except ValueError:
                 value = 0
         elif self.vtype == 'size':

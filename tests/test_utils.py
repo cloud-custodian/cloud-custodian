@@ -114,6 +114,31 @@ class WorkerDecorator(BaseTest):
         self.assertTrue("more carrots" in log_output.getvalue())
 
 
+class UrlConfTest(BaseTest):
+
+    def test_parse_url(self):
+        self.assertEqual(
+            dict(utils.parse_url_config('aws://target?format=json&region=us-west-2')),
+            dict(url='aws://target?format=json&region=us-west-2',
+                 netloc='target',
+                 path='',
+                 scheme='aws',
+                 region='us-west-2',
+                 format='json'))
+
+        self.assertEqual(
+            dict(utils.parse_url_config('')),
+            {'netloc': '', 'path': '', 'scheme': '', 'url': ''})
+
+        self.assertEqual(
+            dict(utils.parse_url_config('aws')),
+            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+
+        self.assertEqual(
+            dict(utils.parse_url_config('aws://')),
+            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+
+
 class UtilTest(BaseTest):
 
     def test_local_session_region(self):
@@ -150,7 +175,7 @@ class UtilTest(BaseTest):
 
     def test_group_by(self):
         sorter = lambda x: x  # NOQA E731
-        sorter = sys.version_info.major is 2 and sorted or sorter
+        sorter = sys.version_info.major == 2 and sorted or sorter
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(
             sorter(list(utils.group_by(items, "Type").keys())), [None, "a", "b"]
@@ -222,6 +247,12 @@ class UtilTest(BaseTest):
         self.assertEqual(
             utils.generate_arn("s3", "my_bucket"), "arn:aws:s3:::my_bucket"
         )
+
+        self.assertEqual(
+            utils.generate_arn("s3", "my_bucket", region="us-gov-west-1"),
+            "arn:aws-us-gov:s3:::my_bucket"
+        )
+
         self.assertEqual(
             utils.generate_arn(
                 "cloudformation",

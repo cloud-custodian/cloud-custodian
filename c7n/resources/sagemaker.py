@@ -33,7 +33,7 @@ class NotebookInstance(QueryResourceManager):
         detail_spec = (
             'describe_notebook_instance', 'NotebookInstanceName',
             'NotebookInstanceName', None)
-        id = 'NotebookInstanceArn'
+        arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
         dimension = None
@@ -53,8 +53,7 @@ class NotebookInstance(QueryResourceManager):
 
         # Describe notebook-instance & then list tags
         resources = super(NotebookInstance, self).augment(resources)
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, resources)))
+        return list(map(_augment, resources))
 
 
 NotebookInstance.filter_registry.register('marked-for-op', TagActionFilter)
@@ -68,7 +67,7 @@ class SagemakerJob(QueryResourceManager):
         enum_spec = ('list_training_jobs', 'TrainingJobSummaries', None)
         detail_spec = (
             'describe_training_job', 'TrainingJobName', 'TrainingJobName', None)
-        id = 'TrainingJobArn'
+        arn = id = 'TrainingJobArn'
         name = 'TrainingJobName'
         date = 'CreationTime'
         dimension = None
@@ -103,8 +102,7 @@ class SagemakerJob(QueryResourceManager):
             return j
 
         jobs = super(SagemakerJob, self).augment(jobs)
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, jobs)))
+        return list(map(_augment, jobs))
 
 
 @resources.register('sagemaker-transform-job')
@@ -116,7 +114,7 @@ class SagemakerTransformJob(QueryResourceManager):
         enum_spec = ('list_transform_jobs', 'TransformJobSummaries', None)
         detail_spec = (
             'describe_transform_job', 'TransformJobName', 'TransformJobName', None)
-        id = 'TransformJobArn'
+        arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
         dimension = None
@@ -150,10 +148,7 @@ class SagemakerTransformJob(QueryResourceManager):
             j['Tags'] = tags
             return j
 
-        jobs = super(SagemakerTransformJob, self).augment(jobs)
-        for j in jobs:
-            _augment(j)
-        return jobs
+        return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
 
 class QueryFilter(object):
@@ -226,7 +221,7 @@ class SagemakerEndpoint(QueryResourceManager):
         detail_spec = (
             'describe_endpoint', 'EndpointName',
             'EndpointName', None)
-        id = 'EndpointArn'
+        arn = id = 'EndpointArn'
         name = 'EndpointName'
         date = 'CreationTime'
         dimension = None
@@ -245,8 +240,7 @@ class SagemakerEndpoint(QueryResourceManager):
 
         # Describe endpoints & then list tags
         endpoints = super(SagemakerEndpoint, self).augment(endpoints)
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, endpoints)))
+        return list(map(_augment, endpoints))
 
 
 SagemakerEndpoint.filter_registry.register('marked-for-op', TagActionFilter)
@@ -261,7 +255,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
         detail_spec = (
             'describe_endpoint_config', 'EndpointConfigName',
             'EndpointConfigName', None)
-        id = 'EndpointConfigArn'
+        arn = id = 'EndpointConfigArn'
         name = 'EndpointConfigName'
         date = 'CreationTime'
         dimension = None
@@ -279,8 +273,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
             return e
 
         endpoints = super(SagemakerEndpointConfig, self).augment(endpoints)
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, endpoints)))
+        return list(map(_augment, endpoints))
 
 
 SagemakerEndpointConfig.filter_registry.register('marked-for-op', TagActionFilter)
@@ -294,7 +287,7 @@ class Model(QueryResourceManager):
         detail_spec = (
             'describe_model', 'ModelName',
             'ModelName', None)
-        id = 'ModelArn'
+        arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'
         dimension = None
@@ -311,8 +304,7 @@ class Model(QueryResourceManager):
             r.setdefault('Tags', []).extend(tags)
             return r
 
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_augment, resources)))
+        return list(map(_augment, resources))
 
 
 Model.filter_registry.register('marked-for-op', TagActionFilter)
@@ -391,15 +383,10 @@ class TagNotebookInstance(Tag):
     """
     permissions = ('sagemaker:AddTags',)
 
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('sagemaker')
-
-        tag_list = []
-        for t in tags:
-            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
+    def process_resource_set(self, client, resources, tags):
+        mid = self.manager.resource_type.id
         for r in resources:
-            client.add_tags(ResourceArn=r[self.id_key], Tags=tag_list)
+            client.add_tags(ResourceArn=r[mid], Tags=tags)
 
 
 @SagemakerEndpoint.action_registry.register('remove-tag')
@@ -451,10 +438,7 @@ class RemoveTagNotebookInstance(RemoveTag):
     """
     permissions = ('sagemaker:DeleteTags',)
 
-    def process_resource_set(self, resources, keys):
-        client = local_session(
-            self.manager.session_factory).client('sagemaker')
-
+    def process_resource_set(self, client, resources, keys):
         for r in resources:
             client.delete_tags(ResourceArn=r[self.id_key], TagKeys=keys)
 
@@ -502,18 +486,6 @@ class MarkNotebookInstanceForOp(TagDelayedAction):
                 op: delete
                 days: 1
     """
-    permissions = ('sagemaker:AddTags',)
-
-    def process_resource_set(self, resources, tags):
-        client = local_session(
-            self.manager.session_factory).client('sagemaker')
-
-        tag_list = []
-        for t in tags:
-            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
-
-        for r in resources:
-            client.add_tags(ResourceArn=r[self.id_key], Tags=tag_list)
 
 
 @NotebookInstance.action_registry.register('start')

@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-2:644160558196:repository/devx",
+                "registryId": "644160558196",
+                "repositoryName": "devx",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-2.amazonaws.com/devx",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 5,
+                    "hour": 9,
+                    "minute": 24,
+                    "second": 17,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7b7e6a5a-2952-11e9-9ee0-a7e2f85d3534",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7b7e6a5a-2952-11e9-9ee0-a7e2f85d3534",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "235"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

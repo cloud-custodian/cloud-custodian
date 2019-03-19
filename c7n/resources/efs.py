@@ -34,7 +34,7 @@ class ElasticFileSystem(QueryResourceManager):
         id = 'FileSystemId'
         name = 'Name'
         date = 'CreationTime'
-        dimension = None
+        dimension = 'FileSystemId'
         type = 'file-system'
         # resource type for resource tagging api
         resource_type = 'elasticfilesystem:file-system'
@@ -76,6 +76,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         dimension = None
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
+        arn = False
 
 
 @ElasticFileSystemMountTarget.filter_registry.register('subnet')

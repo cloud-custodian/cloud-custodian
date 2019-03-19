@@ -1,0 +1,4 @@
+policies: []
+policies:
+  - name: ec2
+    resource: aws.ec2

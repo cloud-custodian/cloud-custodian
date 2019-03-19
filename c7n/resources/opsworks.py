@@ -30,7 +30,8 @@ class StateTransitionFilter(object):
     they are valid for. Separate from ec2 class as uses ['status']
     instead of ['State']['Name'].
 
-    For more details see http://goo.gl/TZH9Q5
+    For more details see
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
     """
     valid_origin_states = ()
 
@@ -56,6 +57,7 @@ class OpsworkStack(QueryResourceManager):
         name = 'Name'
         date = 'CreatedAt'
         dimension = "StackId"
+        arn = "Arn"
 
 
 @OpsworkStack.action_registry.register('delete')
@@ -167,6 +169,7 @@ class OpsworksCM(QueryResourceManager):
         name = id = 'ServerName'
         date = 'CreatedAt'
         dimension = None
+        arn = "ServerArn"
 
 
 @OpsworksCM.action_registry.register('delete')

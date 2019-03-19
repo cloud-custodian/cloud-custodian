@@ -14,5 +14,5 @@
 #
 
 from .core import Action, MethodAction
-
 from .cscc import PostFinding
+from .notify import Notify

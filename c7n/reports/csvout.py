@@ -97,10 +97,13 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
         records += policy_records
 
     rows = formatter.to_csv(records)
+
     if options.format == 'csv':
         writer = UnicodeWriter(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
+    elif options.format == 'json':
+        print(dumps(records, indent=2))
     else:
         # We special case CSV, and for other formats we pass to tabulate
         print(tabulate(rows, formatter.headers(), tablefmt=options.format))

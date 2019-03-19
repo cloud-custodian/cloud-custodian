@@ -91,6 +91,7 @@ def specific_error(error):
         return error
 
     r = t = None
+
     if isinstance(error.instance, dict):
         t = error.instance.get('type')
         r = error.instance.get('resource')
@@ -116,6 +117,9 @@ def specific_error(error):
         found = None
         for idx, v in enumerate(error.validator_value):
             if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
+                found = idx
+                break
+            elif 'type' in v and t in v['properties']['type']['enum']:
                 found = idx
                 break
 
@@ -206,7 +210,8 @@ def generate(resource_types=()):
                 # generalize server side query mechanisms, currently
                 # this only for ec2 instance queries. limitations
                 # in json schema inheritance prevent us from doing this
-                # on a type specific basis http://goo.gl/8UyRvQ
+                # on a type specific basis
+                # https://stackoverflow.com/questions/22689900/json-schema-allof-with-additionalproperties
                 'query': {
                     'type': 'array', 'items': {'type': 'object'}}
 
@@ -389,21 +394,23 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
 
 
 def summary(vocabulary):
-    print("resource count: %d" % len(vocabulary))
-    action_count = filter_count = 0
+    providers = {}
 
-    common_actions = set(['notify', 'invoke-lambda'])
-    common_filters = set(['value', 'and', 'or', 'event'])
+    for type_name, rv in vocabulary.items():
+        provider, name = type_name.split('.', 1)
+        stats = providers.setdefault(provider, {
+            'resources': 0, 'actions': Counter(), 'filters': Counter()})
+        stats['resources'] += 1
+        for a in rv.get('actions'):
+            stats['actions'][a] += 1
+        for f in rv.get('filters'):
+            stats['filters'][f] += 1
 
-    for rv in vocabulary.values():
-        action_count += len(
-            set(rv.get('actions', ())).difference(common_actions))
-        filter_count += len(
-            set(rv.get('filters', ())).difference(common_filters))
-    print("unique actions: %d" % action_count)
-    print("common actions: %d" % len(common_actions))
-    print("unique filters: %d" % filter_count)
-    print("common filters: %s" % len(common_filters))
+    for provider, stats in providers.items():
+        print("%s:" % provider)
+        print(" resource count: %d" % stats['resources'])
+        print(" actions: %d" % len(stats['actions']))
+        print(" filters: %d" % len(stats['filters']))
 
 
 def json_dump(resource=None):

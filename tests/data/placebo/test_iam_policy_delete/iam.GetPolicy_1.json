@@ -1,0 +1,21 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "Policy arn:aws:iam::644160558196:policy/IamCreateRoleAndCreatePolicy does not exist or is not attachable."
+        },
+        "ResponseMetadata": {
+            "RequestId": "68fcf8cb-2bf2-11e9-8670-cb387c42c204",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "68fcf8cb-2bf2-11e9-8670-cb387c42c204",
+                "content-type": "text/xml",
+                "content-length": "349",
+                "date": "Fri, 08 Feb 2019 22:39:34 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

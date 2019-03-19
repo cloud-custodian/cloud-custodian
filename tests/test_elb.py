@@ -17,7 +17,7 @@ from .common import BaseTest
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.resources.elb import ELB
+from c7n.resources.elb import ELB, SetSslListenerPolicy
 
 
 class ELBTagTest(BaseTest):
@@ -200,6 +200,21 @@ class SSLPolicyTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["LoadBalancerName"], "test-elb-invalid-policy")
+
+    def test_set_ssl_listener_policy_fail(self):
+        session_factory = self.replay_flight_data("test_set_ssl_listener")
+        self.patch(SetSslListenerPolicy, 'process_elb', lambda self, client, elb: elb.xyz)
+
+        policy = self.load_policy({
+            "name": "test-set-ssl-listerner",
+            "resource": "elb",
+            "filters": [{'LoadBalancerName': 'test-elb'}],
+            "actions": [{
+                "type": "set-ssl-listener-policy",
+                "name": "testpolicy",
+                "attributes": ["AES128-SHA256", "Protocol-TLSv1"]}]},
+            session_factory=session_factory)
+        self.assertRaises(AttributeError, policy.run)
 
     def test_set_ssl_listener_policy(self):
         session_factory = self.replay_flight_data("test_set_ssl_listener")

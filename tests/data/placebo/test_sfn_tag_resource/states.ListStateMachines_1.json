@@ -1,0 +1,31 @@
+{
+    "status_code": 200, 
+    "data": {
+        "stateMachines": [
+            {
+                "creationDate": {
+                    "hour": 21, 
+                    "__class__": "datetime", 
+                    "month": 2, 
+                    "second": 53, 
+                    "microsecond": 482000, 
+                    "year": 2019, 
+                    "day": 17, 
+                    "minute": 5
+                }, 
+                "stateMachineArn": "arn:aws:states:us-east-1:101010101111:stateMachine:test",
+                "name": "test"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "5ade7c18-33b8-11e9-a48f-5d5e8961e1b0", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5ade7c18-33b8-11e9-a48f-5d5e8961e1b0", 
+                "content-length": "143", 
+                "content-type": "application/x-amz-json-1.0"
+            }
+        }
+    }
+}

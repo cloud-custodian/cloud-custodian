@@ -39,10 +39,15 @@ class RestAccount(ResourceManager):
         service = 'apigateway'
         name = id = 'account_id'
         dimensions = None
+        arn = False
 
     @classmethod
     def get_permissions(cls):
         return ('apigateway:GET',)
+
+    @classmethod
+    def has_arn(self):
+        return False
 
     def get_model(self):
         return self.resource_type

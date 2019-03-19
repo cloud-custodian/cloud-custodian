@@ -36,8 +36,9 @@ class EventSubscription(QueryResourceManager):
 class Delete(AzureBaseAction):
     schema = type_schema('delete')
 
-    def process_resource_set(self, resources):
-        client = self.manager.get_client()
-        for resource in resources:
-            client.event_subscriptions.delete(
-                resource['properties']['topic'], resource['name'])
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.event_subscriptions.delete(
+            resource['properties']['topic'], resource['name'])

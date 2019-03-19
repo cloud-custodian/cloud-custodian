@@ -1,0 +1,69 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "ClusterName": "c7n-test-cluster",
+                "ClusterArn": "arn:aws:dax:us-east-1:644160558196:cache/c7n-test-cluster",
+                "TotalNodes": 1,
+                "ActiveNodes": 1,
+                "NodeType": "dax.r4.large",
+                "Status": "available",
+                "ClusterDiscoveryEndpoint": {
+                    "Address": "c7n-test-cluster.qgcgte.clustercfg.dax.use1.cache.amazonaws.com",
+                    "Port": 8111
+                },
+                "Nodes": [
+                    {
+                        "NodeId": "c7n-test-cluster-a",
+                        "Endpoint": {
+                            "Address": "c7n-test-cluster-a.qgcgte.0001.dax.use1.cache.amazonaws.com",
+                            "Port": 8111
+                        },
+                        "NodeCreateTime": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 3,
+                            "day": 4,
+                            "hour": 0,
+                            "minute": 33,
+                            "second": 9,
+                            "microsecond": 419000
+                        },
+                        "AvailabilityZone": "us-east-1a",
+                        "NodeStatus": "available",
+                        "ParameterGroupStatus": "in-sync"
+                    }
+                ],
+                "PreferredMaintenanceWindow": "sun:03:30-sun:04:30",
+                "SubnetGroup": "test-subnetgroup",
+                "SecurityGroups": [
+                    {
+                        "SecurityGroupIdentifier": "sg-0fd0c04f0c434d68d",
+                        "Status": "active"
+                    }
+                ],
+                "IamRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/dax.amazonaws.com/AWSServiceRoleForDAX",
+                "ParameterGroup": {
+                    "ParameterGroupName": "default.dax1.0",
+                    "ParameterApplyStatus": "in-sync",
+                    "NodeIdsToReboot": []
+                },
+                "SSEDescription": {
+                    "Status": "ENABLED"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "ccd58dc9-3e3f-11e9-ba86-d12b8123c9bd",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ccd58dc9-3e3f-11e9-ba86-d12b8123c9bd",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1099",
+                "date": "Mon, 04 Mar 2019 05:38:55 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

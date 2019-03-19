@@ -33,6 +33,7 @@ class ShieldProtection(QueryResourceManager):
         name = 'Name'
         dimension = None
         filter_name = None
+        arn = False
 
 
 @resources.register('shield-attack')
@@ -41,12 +42,14 @@ class ShieldAttack(QueryResourceManager):
     class resource_type(object):
         service = 'shield'
         enum_spec = ('list_attacks', 'Attacks', None)
-        detail_spec = ('describe_attack', 'AttackId', 'AttackId', 'Attack')
+        detail_spec = (
+            'describe_attack', 'AttackId', 'AttackId', 'Attack')
         name = id = 'AttackId'
         date = 'StartTime'
         dimension = None
         filter_name = 'ResourceArns'
         filter_type = 'list'
+        arn = False
 
 
 def get_protections_paginator(client):
@@ -154,4 +157,5 @@ class SetShieldProtection(BaseAction):
         stale = set(pmap).difference(resource_arns)
         self.log.info("clearing %d stale protections", len(stale))
         for s in stale:
-            ShieldRetry(client.delete_protection, ProtectionId=pmap[s]['Id'])
+            ShieldRetry(
+                client.delete_protection, ProtectionId=pmap[s]['Id'])

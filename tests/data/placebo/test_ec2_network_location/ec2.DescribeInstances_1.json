@@ -1,0 +1,81 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-0799ad445b5727125",
+                        "InstanceId": "i-06942813abca96f71",
+                        "InstanceType": "t2.micro",
+                        "KeyName": "caponeaws",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 2,
+                            "day": 28,
+                            "hour": 21,
+                            "minute": 58,
+                            "second": 36,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-west-1a",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 48,
+                            "Name": "terminated"
+                        },
+                        "StateTransitionReason": "User initiated (2019-02-28 21:58:47 GMT)",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [],
+                        "ClientToken": "",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [],
+                        "StateReason": {
+                            "Code": "Client.UserInitiatedShutdown",
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                        },
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 1
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        }
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-03daddd97f501bdd2"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "360de0bf-eb76-487e-bc39-c211bb1d2cf4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 28 Feb 2019 22:22:02 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

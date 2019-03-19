@@ -33,6 +33,7 @@ import uuid
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
+from c7n.utils import parse_url_config
 
 try:
     import psutil
@@ -59,7 +60,7 @@ class OutputRegistry(PluginRegistry):
                 self.default_protocol, selector)
         for k in self.keys():
             if selector.startswith(k):
-                return self[k](ctx, {'url': selector})
+                return self[k](ctx, parse_url_config(selector))
         raise InvalidOutputConfig("Invalid %s: %s" % (
             self.plugin_type,
             selector))

@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-0f4a39147cc7881b9",
+                "LaunchTemplateName": "c7n-test",
+                "VersionNumber": 1,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 17,
+                    "second": 53,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/pratyush.mishra@capitalone.com",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "Encrypted": false,
+                                "DeleteOnTermination": true,
+                                "SnapshotId": "snap-0ff5b79fdf9b021e8",
+                                "VolumeSize": 8,
+                                "VolumeType": "gp2"
+                            }
+                        },
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "Encrypted": false,
+                                "SnapshotId": "snap-0b818bbec5eebac4c",
+                                "VolumeSize": -43
+                            }
+                        }
+                    ],
+                    "ImageId": "ami-02da3a138888ced85",
+                    "InstanceType": "t1.micro"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "27c45fea-b419-4a34-97f8-ad46f40d5ee5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Fri, 08 Mar 2019 18:02:30 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

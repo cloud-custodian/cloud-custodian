@@ -135,23 +135,46 @@ class CloudFormationAddTag(Tag):
               - 'tag:DesiredTag': absent
             actions:
               - type: tag
-                key: DesiredTag
-                value: DesiredValue
+                tags:
+                  DesiredTag: DesiredValue
     """
     permissions = ('cloudformation:UpdateStack',)
 
-    def process_resource_set(self, stacks, tags):
-        client = local_session(
-            self.manager.session_factory).client('cloudformation')
+    def process_resource_set(self, client, stacks, tags):
+        for s in stacks:
+            _tag_stack(client, s, add=tags)
 
-        def _tag_stacks(s):
-            client.update_stack(
-                StackName=s['StackName'],
-                UsePreviousTemplate=True,
-                Tags=tags)
 
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(_tag_stacks, stacks))
+def _tag_stack(client, s, add=(), remove=()):
+
+    tags = {t['Key']: t['Value'] for t in s.get('Tags')}
+    for t in remove:
+        tags.pop(t, None)
+
+    for t in add:
+        tags[t['Key']] = t['Value']
+
+    params = []
+    for p in s.get('Parameters', []):
+        params.append(
+            {'ParameterKey': p['ParameterKey'],
+             'UsePreviousValue': True})
+
+    capabilities = []
+    for c in s.get('Capabilities', []):
+        capabilities.append(c)
+
+    notifications = []
+    for n in s.get('NotificationArns', []):
+        notifications.append(n)
+
+    client.update_stack(
+        StackName=s['StackName'],
+        UsePreviousTemplate=True,
+        Capabilities=capabilities,
+        Parameters=params,
+        NotificationARNs=notifications,
+        Tags=[{'Key': k, 'Value': v} for k, v in tags.items()])
 
 
 @CloudFormation.action_registry.register('remove-tag')
@@ -172,16 +195,6 @@ class CloudFormationRemoveTag(RemoveTag):
                 tags: ['DesiredTag']
     """
 
-    def process_resource_set(self, stacks, keys):
-        client = local_session(
-            self.manager.session_factory).client('cloudformation')
-
-        def _remove_tag(s):
-            tags = [t for t in s['Tags'] if t['Key'] not in keys]
-            client.update_stack(
-                StackName=s['StackName'],
-                UsePreviousTemplate=True,
-                Tags=tags)
-
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(_remove_tag, stacks))
+    def process_resource_set(self, client, stacks, keys):
+        for s in stacks:
+            _tag_stack(client, s, remove=keys)

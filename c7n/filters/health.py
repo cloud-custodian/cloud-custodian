@@ -24,12 +24,13 @@ class HealthEventFilter(Filter):
     """Check if there are health events related to the resources
 
 
-
     Health events are stored as annotation on a resource.
     """
     schema = type_schema(
         'health-event',
         types={'type': 'array', 'items': {'type': 'string'}},
+        category={'type': 'array', 'items': {
+            'enum': ['issue', 'accountNotification', 'scheduledChange']}},
         statuses={'type': 'array', 'items': {
             'type': 'string',
             'enum': ['open', 'upcoming', 'closed']

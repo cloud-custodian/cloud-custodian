@@ -2,15 +2,25 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [],
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-west-2:644160558196:function:CloudCustodian",
+                "Tags": [
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ]
+            }
+        ],
         "ResponseMetadata": {
-            "RequestId": "d134eab3-251f-11e8-8e0a-75498b982347",
+            "RequestId": "f14cb243-2bae-11e9-bb23-75ffe186ed69",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "d134eab3-251f-11e8-8e0a-75498b982347",
+                "x-amzn-requestid": "f14cb243-2bae-11e9-bb23-75ffe186ed69",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "50",
-                "date": "Sun, 11 Mar 2018 11:32:01 GMT"
+                "content-length": "166",
+                "date": "Fri, 08 Feb 2019 14:36:37 GMT"
             },
             "RetryAttempts": 0
         }

@@ -14,7 +14,7 @@
 
 from c7n.provider import clouds
 
-from collections import Counter
+from collections import Counter, namedtuple
 import contextlib
 import copy
 import datetime
@@ -130,6 +130,25 @@ def shape_validate(params, shape_name, service):
         raise PolicyValidationError(report.generate_report())
 
 
+class Arn(namedtuple('_Arn', (
+        'arn', 'partition', 'service', 'region',
+        'account_id', 'resource', 'resource_type'))):
+
+    __slots__ = ()
+
+    @classmethod
+    def parse(cls, arn):
+        parts = arn.split(':', 5)
+        # a few resources use qualifiers without specifying type
+        if parts[2] in ('s3', 'apigateway', 'execute-api'):
+            parts.append(None)
+        elif '/' in parts[-1]:
+            parts.extend(reversed(parts.pop(-1).split('/', 1)))
+        elif ':' in parts[-1]:
+            parts.extend(reversed(parts.pop(-1).split(':', 1)))
+        return cls(*parts)
+
+
 @metrics_outputs.register('aws')
 class MetricsOutput(Metrics):
     """Send metrics data to cloudwatch
@@ -141,6 +160,10 @@ class MetricsOutput(Metrics):
     def __init__(self, ctx, config=None):
         super(MetricsOutput, self).__init__(ctx, config)
         self.namespace = self.config.get('namespace', DEFAULT_NAMESPACE)
+        self.region = self.config.get('region')
+        self.destination = (
+            self.config.scheme == 'aws' and
+            self.config.get('netloc') == 'master') and 'master' or None
 
     def _format_metric(self, key, value, unit, dimensions):
         d = {
@@ -152,11 +175,25 @@ class MetricsOutput(Metrics):
             {"Name": "Policy", "Value": self.ctx.policy.name},
             {"Name": "ResType", "Value": self.ctx.policy.resource_type}]
         for k, v in dimensions.items():
+            # Skip legacy static dimensions if using new capabilities
+            if (self.destination or self.region) and k == 'Scope':
+                continue
             d['Dimensions'].append({"Name": k, "Value": v})
+        if self.region:
+            d['Dimensions'].append(
+                {'Name': 'Region', 'Value': self.ctx.options.region})
+        if self.destination:
+            d['Dimensions'].append(
+                {'Name': 'Account', 'Value': self.ctx.options.account_id or ''})
         return d
 
     def _put_metrics(self, ns, metrics):
-        watch = utils.local_session(self.ctx.session_factory).client('cloudwatch')
+        if self.destination == 'master':
+            watch = self.ctx.session_factory(
+                assume=False).client('cloudwatch', region_name=self.region)
+        else:
+            watch = utils.local_session(
+                self.ctx.session_factory).client('cloudwatch', region_name=self.region)
         return self.retry(
             watch.put_metric_data, Namespace=ns, MetricData=metrics)
 

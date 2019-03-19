@@ -25,6 +25,7 @@ from .test_offhours import mock_datetime_now
 
 from dateutil import parser
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from c7n.resources.sns import SNS
@@ -46,7 +47,9 @@ from c7n.resources.iam import (
     IamGroupInlinePolicy,
     SpecificIamRoleManagedPolicy,
     NoSpecificIamRoleManagedPolicy,
+    PolicyQueryParser
 )
+
 from c7n.executor import MainThreadExecutor
 
 
@@ -71,10 +74,10 @@ class UserCredentialReportTest(BaseTest):
             cache=True,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 4)
+        self.assertEqual(len(resources), 2)
         self.assertEqual(
             sorted([r["UserName"] for r in resources]),
-            ["Hazmat", "charmworld", "kaleb", "kapilt"],
+            ["Hazmat", "kapilt"],
         )
 
     def test_credential_access_key_multifilter_delete(self):
@@ -110,6 +113,9 @@ class UserCredentialReportTest(BaseTest):
         self.assertEqual(len(keys), 1)
         dt = parser.parse(resources[0]['c7n:matched-keys'][0]['last_rotated'])
         self.assertNotEqual(keys[0]['CreateDate'], dt)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ["arn:aws:iam::644160558196:user/kapil"])
 
     def test_access_key_last_service(self):
         # Note we're reusing the old console users flight records
@@ -210,6 +216,40 @@ class UserCredentialReportTest(BaseTest):
         )
 
 
+class IamUserTag(BaseTest):
+
+    def test_iam_user_actions(self):
+        factory = self.replay_flight_data('test_iam_user_tags')
+        p = self.load_policy({
+            'name': 'iam-tag',
+            'resource': 'iam-user',
+            'filters': [{
+                'tag:Role': 'Dev'}],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                 'tags': ['Role']},
+                {'type': 'mark-for-op',
+                 'op': 'delete',
+                 'days': 2}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client('iam')
+        if self.recording:
+            time.sleep(1)
+        user = client.get_user(UserName=resources[0]['UserName']).get('User')
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in resources[0]['Tags']},
+            {'Role': 'Dev'})
+        self.assertEqual(
+            {t['Key']: t['Value'] for t in user['Tags']},
+            {'Env': 'Dev',
+             'maid_status': 'Resource does not meet policy: delete@2019/01/25'})
+
+
 class IAMMFAFilter(BaseTest):
 
     def test_iam_mfa_filter(self):
@@ -241,7 +281,7 @@ class IamRoleFilterUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 1)
 
     def test_iam_role_unused(self):
         session_factory = self.replay_flight_data("test_iam_role_unused")
@@ -252,6 +292,9 @@ class IamRoleFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369']) # NOQA
 
     def test_iam_role_get_resources(self):
         session_factory = self.replay_flight_data("test_iam_role_get_resource")
@@ -266,7 +309,81 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(resources[0]['RoleId'], "AROAIGK7B2VUDZL4I73HK")
 
 
+class IamRoleTag(BaseTest):
+
+    def test_iam_role_actions(self):
+        factory = self.replay_flight_data('test_iam_role_tags')
+        p = self.load_policy({
+            'name': 'iam-role-tag',
+            'resource': 'iam-role',
+            'filters': [{
+                'tag:Role': 'Dev'}],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                 'tags': ['Application']}
+            ]
+        },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client('iam')
+        if self.recording:
+            time.sleep(1)
+        role = client.get_role(RoleName=resources[0]['RoleName']).get('Role')
+        self.assertEqual(
+            {'Role': 'Dev'},
+            {t['Key']: t['Value'] for t in resources[0]['Tags'] if t['Key'] == 'Role'})
+        self.assertEqual(
+            {'Dev'},
+            {t['Value'] for t in role['Tags'] if t['Key'] == 'Env'})
+        self.assertNotIn(
+            {'Application'},
+            {t['Key'] for t in role['Tags']})
+
+
 class IamUserTest(BaseTest):
+
+    def test_iam_user_usage(self):
+        factory = self.replay_flight_data('test_iam_user_usage')
+        p = self.load_policy({
+            'name': 'usage-check',
+            'resource': 'iam-user',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': [{'event': '', 'source': '', 'ids': 'ids'}]},
+            'filters': [
+                {'UserName': 'kapil'},
+                {'type': 'usage',
+                 'ServiceNamespace': 'dynamodb',
+                 'TotalAuthenticatedEntities': 1,
+                 'poll-delay': 0.1,
+                 'match-operator': 'any'}]}, session_factory=factory)
+        resources = p.push({'detail': {
+            'eventName': '', 'eventSource': '', 'ids': ['kapil']}}, None)
+        self.assertEqual(len(resources), 1)
+
+    def test_iam_user_check_permissions(self):
+        factory = self.replay_flight_data('test_iam_user_check_permissions')
+        p = self.load_policy({
+            'name': 'perm-check',
+            'resource': 'iam-user',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': [{'event': '', 'source': '', 'ids': 'ids'}],
+            },
+            'filters': [
+                {'UserName': 'kapil'},
+                {'type': 'check-permissions',
+                 'match': {'EvalDecision': 'allowed'},
+                 'actions': ['sqs:CreateUser']}]},
+            session_factory=factory)
+        resources = p.push({'detail': {
+            'eventName': '', 'eventSource': '', 'ids': ['kapil']}}, None)
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:perm-matches' in resources[0])
 
     @functional
     def test_iam_user_delete(self):
@@ -320,6 +437,7 @@ class IamUserTest(BaseTest):
             resources[0]['c7n:matched-keys'][0]['c7n:matched-type'], 'access')
 
     def test_iam_user_delete_some_access(self):
+        # TODO: this test could use a rewrite
         factory = self.replay_flight_data("test_iam_user_delete_options")
         p = self.load_policy(
             {
@@ -423,6 +541,9 @@ class IamInstanceProfileFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::644160558196:instance-profile/root_joshua'])
 
     def test_iam_instance_profile_unused(self):
         session_factory = self.replay_flight_data("test_iam_instance_profile_unused")
@@ -440,6 +561,26 @@ class IamInstanceProfileFilterUsage(BaseTest):
 
 
 class IamPolicyFilterUsage(BaseTest):
+
+    def test_iam_user_policy_permission(self):
+        session_factory = self.replay_flight_data('test_iam_policy_check_permission')
+        p = self.load_policy({
+            'name': 'iam-policy-check',
+            'resource': 'iam-policy',
+            'mode': {'type': 'cloudtrail', 'events': [
+                {'ids': 'ids', 'source': '', 'event': ''}]},
+            'filters': [
+                {'type': 'check-permissions',
+                 'match': 'allowed',
+                 'actions': ['ecr:PutImage']}]},
+            session_factory=session_factory)
+        resources = p.push({'detail': {
+            'eventName': '', 'eventSource': '',
+            'ids': ["arn:aws:iam::644160558196:policy/service-role/codebuild-policy"]}},
+            None)
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:policy' in resources[0])
+        self.assertTrue('c7n:perm-matches' in resources[0])
 
     def test_iam_policy_get_resources(self):
         session_factory = self.replay_flight_data("test_iam_policy_get_resource")
@@ -482,7 +623,44 @@ class IamPolicyFilterUsage(BaseTest):
         self.assertEqual(len(resources), 203)
 
 
-class IamPolicyHasAllowAll(BaseTest):
+class IamPolicy(BaseTest):
+
+    def test_iam_policy_delete(self):
+        factory = self.replay_flight_data('test_iam_policy_delete')
+        p = self.load_policy({
+            'name': 'delete-policy',
+            'resource': 'iam-policy',
+            'query': [{'Name': 'Scope', 'Value': 'Local'}],
+            'filters': [
+                {'AttachmentCount': 0},
+                {'type': 'value', 'key': 'DefaultVersionId', 'value': 'v1', 'op': 'ne'},
+            ],
+            'actions': ['delete']},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['PolicyName'], 'IamCreateRoleAndCreatePolicy')
+
+        if self.recording:
+            time.sleep(3)
+
+        client = factory().client('iam')
+        self.assertRaises(
+            client.exceptions.NoSuchEntityException,
+            client.get_policy,
+            PolicyArn=resources[0]['Arn'])
+
+    def test_iam_query_parser(self):
+        qfilters = [
+            {'Name': 'Scope', 'Value': 'Local'},
+            {'Name': 'OnlyAttached', 'Value': True}]
+
+        self.assertEqual(qfilters, PolicyQueryParser.parse(qfilters))
+        self.assertRaises(
+            PolicyValidationError,
+            PolicyQueryParser.parse,
+            {'Name': 'Scope', 'Value': ['All', 'Local']})
 
     def test_iam_has_allow_all_policies(self):
         session_factory = self.replay_flight_data("test_iam_policy_allow_all")
@@ -521,6 +699,10 @@ class IamGroupFilterUsage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:iam::644160558196:group/Admins',
+             'arn:aws:iam::644160558196:group/powerusers'])
 
     def test_iam_group_unused_users(self):
         session_factory = self.replay_flight_data("test_iam_group_unused_users")
@@ -553,7 +735,7 @@ class IamManagedPolicyUsage(BaseTest):
 
     def test_iam_role_has_specific_managed_policy(self):
         session_factory = self.replay_flight_data(
-            "test_iam_role_has_specific_managed_policy"
+            "test_iam_role_no_specific_managed_policy"
         )
         self.patch(SpecificIamRoleManagedPolicy, "executor_factory", MainThreadExecutor)
         p = self.load_policy(
@@ -593,7 +775,7 @@ class IamManagedPolicyUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 7)
+        self.assertEqual(len(resources), 2)
 
 
 class IamInlinePolicyUsage(BaseTest):
@@ -668,7 +850,7 @@ class IamInlinePolicyUsage(BaseTest):
             "oneClick_lambda_basic_execution_1466943062384")
 
     def test_iam_role_no_inline_policy(self):
-        session_factory = self.replay_flight_data("test_iam_role_no_inline_policy")
+        session_factory = self.replay_flight_data("test_iam_role_has_inline_policy")
         self.patch(IamRoleInlinePolicy, "executor_factory", MainThreadExecutor)
         p = self.load_policy(
             {
@@ -679,7 +861,7 @@ class IamInlinePolicyUsage(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 1)
         self.assertFalse(resources[0]["c7n:InlinePolicies"])
 
     def test_iam_group_has_inline_policy(self):

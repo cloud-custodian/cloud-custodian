@@ -116,9 +116,9 @@ def is_scope(scope, scope_type):
 
     regex = ""
     if scope_type == "subscription":
-        regex = "^\/subscriptions\/[^\/]+$"
+        regex = r"^\/subscriptions\/[^\/]+$"
     elif scope_type == "resource-group":
-        regex = "^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
+        regex = r"^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
     else:
         return False
 
@@ -235,8 +235,9 @@ class DeleteAssignmentAction(AzureBaseAction):
 
     schema = type_schema('delete')
 
-    def process_resource_set(self, assignments):
-        client = self.manager.get_client()
-        for assignment in assignments:
-            client.role_assignments.delete(
-                assignment['properties']['scope'], assignment['name'])
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.role_assignments.delete(
+            resource['properties']['scope'], resource['name'])

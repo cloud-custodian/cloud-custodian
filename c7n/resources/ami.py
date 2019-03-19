@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2015-2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,21 +17,19 @@ import itertools
 import logging
 
 from concurrent.futures import as_completed
+import jmespath
 
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import BaseAction
+from c7n.exceptions import ClientError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, Filter, OPERATORS, CrossAccountAccessFilter)
+    AgeFilter, Filter, OPERATORS, CrossAccountAccessFilter)
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, get_retry, chunks
+from c7n.utils import local_session, type_schema, chunks
 
 
 log = logging.getLogger('custodian.ami')
-
-
-filters = FilterRegistry('ami.filters')
-actions = ActionRegistry('ami.actions')
 
 
 @resources.register('ami')
@@ -50,17 +48,54 @@ class AMI(QueryResourceManager):
         dimension = None
         date = 'CreationDate'
 
-    filter_registry = filters
-    action_registry = actions
-
     def resources(self, query=None):
         query = query or {}
         if query.get('Owners') is None:
             query['Owners'] = ['self']
         return super(AMI, self).resources(query=query)
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeImageSource(self)
+        return super(AMI, self).get_source(source_type)
 
-@actions.register('deregister')
+
+class DescribeImageSource(DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        while ids:
+            try:
+                return super(DescribeImageSource, self).get_resources(ids, cache)
+            except ClientError as e:
+                bad_ami_ids = ErrorHandler.extract_bad_ami(e)
+                if bad_ami_ids:
+                    for b in bad_ami_ids:
+                        ids.remove(b)
+                    continue
+                raise
+        return []
+
+
+class ErrorHandler(object):
+
+    @staticmethod
+    def extract_bad_ami(e):
+        """Handle various client side errors when describing images"""
+        msg = e.response['Error']['Message']
+        error = e.response['Error']['Code']
+        e_ami_ids = None
+        if error == 'InvalidAMIID.NotFound':
+            e_ami_ids = [
+                e_ami_id.strip() for e_ami_id
+                in msg[msg.find("'[") + 2:msg.rfind("]'")].split(',')]
+            log.warning("Image not found %s" % e_ami_ids)
+        elif error == 'InvalidAMIID.Malformed':
+            e_ami_ids = [msg[msg.find('"') + 1:msg.rfind('"')]]
+            log.warning("Image id malformed %s" % e_ami_ids)
+        return e_ami_ids
+
+
+@AMI.action_registry.register('deregister')
 class Deregister(BaseAction):
     """Action to deregister AMI
 
@@ -81,23 +116,32 @@ class Deregister(BaseAction):
                   - deregister
     """
 
-    schema = type_schema('deregister')
+    schema = type_schema('deregister', **{'delete-snapshots': {'type': 'boolean'}})
     permissions = ('ec2:DeregisterImage',)
+    snap_expr = jmespath.compile('BlockDeviceMappings[].Ebs.SnapshotId')
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
-        retry = get_retry((
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
-
         image_count = len(images)
         images = [i for i in images if self.manager.ctx.options.account_id == i['OwnerId']]
         if len(images) != image_count:
             self.log.info("Implicitly filtered %d non owned images", image_count - len(images))
+
         for i in images:
-            retry(client.deregister_image, ImageId=i['ImageId'])
+            self.manager.retry(client.deregister_image, ImageId=i['ImageId'])
+
+            if not self.data.get('delete-snapshots'):
+                continue
+            snap_ids = self.snap_expr.search(i) or ()
+            for s in snap_ids:
+                try:
+                    self.manager.retry(client.delete_snapshot, SnapshotId=s)
+                except ClientError as e:
+                    if e.error['Code'] == 'InvalidSnapshot.InUse':
+                        continue
 
 
-@actions.register('remove-launch-permissions')
+@AMI.action_registry.register('remove-launch-permissions')
 class RemoveLaunchPermissions(BaseAction):
     """Action to remove the ability to launch an instance from an AMI
 
@@ -126,19 +170,21 @@ class RemoveLaunchPermissions(BaseAction):
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
         for i in images:
-            self.process(client, i)
+            self.process_image(client, i)
 
     def process_image(self, client, image):
         client.reset_image_attribute(
             ImageId=image['ImageId'], Attribute="launchPermission")
 
 
-@actions.register('copy')
+@AMI.action_registry.register('copy')
 class Copy(BaseAction):
     """Action to copy AMIs with optional encryption
 
     This action can copy AMIs while optionally encrypting or decrypting
     the target AMI. It is advised to use in conjunction with a filter.
+
+    Note there is a max in flight of 5 per account/region.
 
     :example:
 
@@ -186,7 +232,7 @@ class Copy(BaseAction):
                 KmsKeyId=self.data.get('key-id', ''))
 
 
-@filters.register('image-age')
+@AMI.filter_registry.register('image-age')
 class ImageAgeFilter(AgeFilter):
     """Filters images based on the age (in days)
 
@@ -209,7 +255,7 @@ class ImageAgeFilter(AgeFilter):
         days={'type': 'number', 'minimum': 0})
 
 
-@filters.register('unused')
+@AMI.filter_registry.register('unused')
 class ImageUnusedFilter(Filter):
     """Filters images based on usage
 
@@ -237,11 +283,20 @@ class ImageUnusedFilter(Filter):
 
     def _pull_asg_images(self):
         asgs = self.manager.get_resource_manager('asg').resources()
-        lcfgs = set(a['LaunchConfigurationName'] for a in asgs)
+        image_ids = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
         lcfg_mgr = self.manager.get_resource_manager('launch-config')
-        return set([
-            lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
-            if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        if lcfgs:
+            image_ids.update([
+                lcfg['ImageId'] for lcfg in lcfg_mgr.resources()
+                if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            image_ids.add(tversion['LaunchTemplateData'].get('ImageId'))
+        return image_ids
 
     def _pull_ec2_images(self):
         ec2_manager = self.manager.get_resource_manager('ec2')
@@ -254,7 +309,7 @@ class ImageUnusedFilter(Filter):
         return [r for r in resources if r['ImageId'] in images]
 
 
-@filters.register('cross-account')
+@AMI.filter_registry.register('cross-account')
 class AmiCrossAccountFilter(CrossAccountAccessFilter):
 
     schema = type_schema(

@@ -345,8 +345,10 @@ class LambdaMode(ServerlessExecutionMode):
             'execution-options': {'type': 'object'},
             'function-prefix': {'type': 'string'},
             'member-role': {'type': 'string'},
-            'packages': {'type': 'array'},
+            'packages': {'type': 'array', 'items': {'type': 'string'}},
             # Lambda passthrough config
+            'layers': {'type': 'array', 'items': {'type': 'string'}},
+            'concurrency': {'type': 'integer'},
             'runtime': {'enum': ['python2.7', 'python3.6', 'python3.7']},
             'role': {'type': 'string'},
             'timeout': {'type': 'number'},
@@ -491,7 +493,7 @@ class LambdaMode(ServerlessExecutionMode):
                 manager = mu.LambdaManager(
                     lambda assume=False: self.policy.session_factory(assume))
             return manager.publish(
-                mu.PolicyLambda(self.policy), 'current',
+                mu.PolicyLambda(self.policy),
                 role=self.policy.options.assume_role)
 
     def get_logs(self, start, end):
@@ -516,6 +518,56 @@ class PeriodicMode(LambdaMode, PullMode):
 
     def run(self, event, lambda_context):
         return PullMode.run(self)
+
+
+@execution.register('phd')
+class PHDMode(LambdaMode):
+    """Personal Health Dashboard event based policy execution."""
+
+    schema = utils.type_schema(
+        'phd',
+        required=['events'],
+        events={'type': 'array', 'items': {'type': 'string'}},
+        categories={'type': 'array', 'items': {
+            'enum': ['issue', 'accountNotification', 'scheduledChange']}},
+        statuses={'type': 'array', 'items': {
+            'enum': ['open', 'upcoming', 'closed']}})
+
+    def validate(self):
+        super(PHDMode, self).validate()
+        if self.policy.resource_type == 'account':
+            return
+        if 'health-event' not in self.policy.resource_manager.filter_registry:
+            raise PolicyValidationError(
+                "policy:%s phd event mode not supported for resource: %s" % (
+                    self.policy.name, self.policy.resource_type))
+
+    @staticmethod
+    def process_event_arns(client, event_arns):
+        entities = []
+        paginator = client.get_paginator('describe_affected_entities')
+        for event_set in utils.chunks(event_arns, 10):
+            entities.extend(list(itertools.chain(
+                            *[p['entities'] for p in paginator.paginate(
+                                filter={'eventArns': event_arns})])))
+        return entities
+
+    def resolve_resources(self, event):
+        session = utils.local_session(self.policy.resource_manager.session_factory)
+        health = session.client('health')
+        he_arn = event['detail']['eventArn']
+        resource_arns = self.process_event_arns(health, [he_arn])
+
+        m = self.policy.resource_manager.get_model()
+        if 'arn' in m.id.lower():
+            resource_ids = [r['entityValue'].rsplit('/', 1)[-1] for r in resource_arns]
+        else:
+            resource_ids = [r['entityValue'] for r in resource_arns]
+
+        resources = self.policy.resource_manager.get_resources(resource_ids)
+        for r in resources:
+            r.setdefault('c7n:HealthEvent', []).append(he_arn)
+        return resources
 
 
 @execution.register('cloudtrail')
@@ -779,13 +831,26 @@ class Policy(object):
         for a in self.resource_manager.actions:
             a.validate()
 
-    def get_variables(self):
+    def get_variables(self, variables=None):
+        """Get runtime variables for policy interpolation.
+
+        Runtime variables are merged with the passed in variables
+        if any.
+        """
         # Global policy variable expansion, we have to carry forward on
         # various filter/action local vocabularies. Where possible defer
         # by using a format string.
         #
         # See https://github.com/capitalone/cloud-custodian/issues/2330
-        return {
+        if not variables:
+            variables = {}
+
+        if 'mode' in self.data:
+            if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
+                self.data['mode']['role'] = "arn:aws:iam::%s/role/%s" % \
+                                            (self.options.account_id, self.data['mode']['role'])
+
+        variables.update({
             # standard runtime variables for interpolation
             'account': '{account}',
             'account_id': self.options.account_id,
@@ -809,7 +874,8 @@ class Policy(object):
             'target_bucket_name': '{target_bucket_name}',
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
-        }
+        })
+        return variables
 
     def expand_variables(self, variables):
         """Expand variables in policy data.
