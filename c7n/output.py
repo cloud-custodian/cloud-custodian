@@ -29,7 +29,8 @@ import os
 import shutil
 import time
 import uuid
-
+import traceback
+import json_logging
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
@@ -323,6 +324,38 @@ class LogMetrics(Metrics):
         return res
 
 
+class JSONFormatter(logging.Formatter):
+    """
+    Convert Logs to JSON for more usable cloudwatch logs
+    https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html
+    """
+
+    @classmethod
+    def format_exception(cls, exc_info):
+        return ''.join(traceback.format_exception(*exc_info)) if exc_info else ''
+
+    def format(self, record):
+        json_log_object = {"type": "log",
+                           "logger": record.name,
+                           "log_time": str(datetime.utcnow()),
+                           "level": record.levelname,
+                           "module": record.module,
+                           "msg": self.convert_to_json(record.getMessage()),
+                           }
+
+        return json.dumps(json_log_object)
+
+    @staticmethod
+    def convert_to_json(message):
+        cnv_msg = {"org_msg":message}
+        split_message = message.split()
+        for kv_pair in split_message:
+            if len(kv_pair.split(':')) == 2:
+                split = kv_pair.split(':')
+                cnv_msg[split[0]] = split[1]
+        return cnv_msg
+
+
 class LogOutput(object):
 
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -349,6 +382,9 @@ class LogOutput(object):
         self.handler = self.get_handler()
         self.handler.setLevel(logging.DEBUG)
         self.handler.setFormatter(logging.Formatter(self.log_format))
+        if self.ctx.options.get("log_type") == "json":
+            json_logging.ENABLE_JSON_LOGGING = True
+            json_logging.init(custom_formatter=JSONFormatter)
         mlog = logging.getLogger('custodian')
         mlog.addHandler(self.handler)
 
