@@ -54,7 +54,7 @@ class RDSCluster(QueryResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id,          
+                account_id=self.account_id,
                 resource_type=self.resource_type.type, separator=':')
         return self._generate_arn
 
@@ -435,8 +435,9 @@ class ModifyDbCluster(BaseAction):
                 'type': 'object',
                 'properties': {
                     'property': {'type': 'string', 'enum': [
+                        'CopyTagsToSnapshot',
                         'DeletionProtection']},
-                    'value': {'type': 'boolean'}
+                    'value': {}
                 },
             },
         },
@@ -446,20 +447,19 @@ class ModifyDbCluster(BaseAction):
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('rds')
-        param = {}
+        params = {}
         for c in clusters:
             for update in self.data.get('update'):
                 if c[update['property']] != update['value']:
-                    param[update['property']] = update['value']
-            if not param:
+                    params[update['property']] = update['value']
+            if not params:
                 continue
-            param['ApplyImmediately'] = self.data.get('immediate', False)
+            params['ApplyImmediately'] = self.data.get('immediate', False)
+            params['DBClusterIdentifier']=c['DBClusterIdentifier']
             _run_cluster_method(
-                client.modify_db_cluster,
-                dict(DBClusterIdentifier=c['DBClusterIdentifier'],
-                    DeletionProtection=param['DeletionProtection'], ApplyImmediately=param['ApplyImmediately']),
-                    (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
-                    client.exceptions.InvalidDBClusterStateFault)
+                client.modify_db_cluster, params,
+                (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
+                client.exceptions.InvalidDBClusterStateFault)
 
 
 @resources.register('rds-cluster-snapshot')

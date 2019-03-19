@@ -35,10 +35,10 @@
                     "year": 2019,
                     "month": 3,
                     "day": 19,
-                    "hour": 22,
-                    "minute": 45,
-                    "second": 55,
-                    "microsecond": 955000
+                    "hour": 23,
+                    "minute": 43,
+                    "second": 2,
+                    "microsecond": 21000
                 },
                 "Port": 3306,
                 "MasterUsername": "c7n_test",
@@ -120,10 +120,10 @@
                     "year": 2019,
                     "month": 3,
                     "day": 19,
-                    "hour": 22,
-                    "minute": 47,
-                    "second": 34,
-                    "microsecond": 35000
+                    "hour": 23,
+                    "minute": 43,
+                    "second": 55,
+                    "microsecond": 82000
                 },
                 "Port": 3306,
                 "MasterUsername": "mytest",
@@ -180,13 +180,13 @@
                     "year": 2019,
                     "month": 3,
                     "day": 19,
-                    "hour": 14,
-                    "minute": 44,
+                    "hour": 15,
+                    "minute": 40,
                     "second": 29,
-                    "microsecond": 69000
+                    "microsecond": 102000
                 },
                 "BacktrackWindow": 28800,
-                "BacktrackConsumedChangeRecords": 1524158,
+                "BacktrackConsumedChangeRecords": 1526462,
                 "EnabledCloudwatchLogsExports": [
                     "slowquery"
                 ],
@@ -197,14 +197,14 @@
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "89bfc7d4-d7e2-45a2-8b8f-deb533173ccb",
+            "RequestId": "30e0b5ec-aa9b-4da3-a7c3-f5d19346be5d",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "89bfc7d4-d7e2-45a2-8b8f-deb533173ccb",
+                "x-amzn-requestid": "30e0b5ec-aa9b-4da3-a7c3-f5d19346be5d",
                 "content-type": "text/xml",
                 "content-length": "7278",
                 "vary": "Accept-Encoding",
-                "date": "Tue, 19 Mar 2019 22:49:53 GMT"
+                "date": "Tue, 19 Mar 2019 23:45:24 GMT"
             },
             "RetryAttempts": 0
         }
