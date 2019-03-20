@@ -28,6 +28,7 @@ class DataSet(QueryResourceManager):
         scope = 'project'
         scope_key = 'projectId'
         get_requires_event = True
+        id = "id"
 
         @staticmethod
         def get(client, event):

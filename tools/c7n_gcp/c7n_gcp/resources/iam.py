@@ -27,6 +27,7 @@ class ProjectRole(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = 'projects/{}'
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
@@ -48,6 +49,7 @@ class ServiceAccount(QueryResourceManager):
         scope = 'project'
         scope_key = 'name'
         scope_template = 'projects/{}'
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
