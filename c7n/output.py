@@ -29,7 +29,6 @@ import os
 import shutil
 import time
 import uuid
-import traceback
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
