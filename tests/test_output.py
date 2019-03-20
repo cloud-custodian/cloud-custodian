@@ -173,13 +173,16 @@ class JSONFormatterTest(BaseTest):
     log_inputs = [
         'policy policy',
         'policy:test_policy id:123',
+        'policy: not a policy'
     ]
 
     log_outputs = [
         {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
          "msg": {"original": "policy policy"}},
         {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
-         "msg": {"original": "policy:test_policy id:123", "policy": "test_policy", "id": "123"}}
+         "msg": {"original": "policy:test_policy id:123", "policy": "test_policy", "id": "123"}},
+        {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output',
+         'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}
     ]
 
     def setUp(self):
@@ -201,4 +204,4 @@ class JSONFormatterTest(BaseTest):
             json_log = json.loads(log_contents[i])
             if json_log.get("log_time"):
                 del json_log["log_time"]
-            self.assertTrue(json.loads(log_contents[i]),self.log_outputs[i])
+            assert json_log == self.log_outputs[i]
