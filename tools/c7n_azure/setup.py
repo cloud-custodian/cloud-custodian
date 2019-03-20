@@ -26,11 +26,10 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.5.2',
+    version='0.5.3',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    include_package_data=True,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
