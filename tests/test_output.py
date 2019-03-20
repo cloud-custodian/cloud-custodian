@@ -18,12 +18,14 @@ import gzip
 import logging
 import mock
 import shutil
+import io
+import json
 import os
 
 from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
-from c7n.output import DirectoryOutput, LogFile, metrics_outputs
+from c7n.output import DirectoryOutput, LogFile, metrics_outputs, JSONFormatter
 from c7n.resources.aws import S3Output, MetricsOutput
 from c7n.testing import mock_datetime_now, TestUtils
 
@@ -91,7 +93,7 @@ class S3OutputTest(TestUtils):
         output = LogFile(Bag(log_dir=temp_dir), {})
         output.join_log()
 
-        l = logging.getLogger("custodian.s3") # NOQA
+        l = logging.getLogger("custodian.s3")  # NOQA
 
         # recent versions of nose mess with the logging manager
         v = l.manager.disable
@@ -164,3 +166,39 @@ class S3OutputTest(TestUtils):
             "%s/foo.txt" % output.key_prefix.lstrip('/'),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
+
+
+class JSONFormatterTest(BaseTest):
+
+    log_inputs = [
+        'policy policy',
+        'policy:test_policy id:123',
+    ]
+
+    log_outputs = [
+        {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
+         "msg": {"original": "policy policy"}},
+        {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
+         "msg": {"original": "policy:test_policy id:123", "policy": "test_policy", "id": "123"}}
+    ]
+
+    def setUp(self):
+        self.logger = logging.getLogger('test-logger')
+        self.logger.setLevel(logging.DEBUG)
+        self.stream = io.StringIO()
+
+    def test_convert_to_json(self):
+        self.setUp()
+        handler = logging.StreamHandler(self.stream)
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(JSONFormatter())
+        self.logger.addHandler(handler)
+        for log in self.log_inputs:
+            self.logger.info(log)
+        log_contents = self.stream.getvalue().split("\n")
+        self.stream.close()
+        for i in range(len(self.log_outputs)):
+            json_log = json.loads(log_contents[i])
+            if json_log.get("log_time"):
+                del json_log["log_time"]
+            self.assertTrue(json.loads(log_contents[i]),self.log_outputs[i])

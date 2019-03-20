@@ -329,10 +329,6 @@ class JSONFormatter(logging.Formatter):
     https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html
     """
 
-    @classmethod
-    def format_exception(cls, exc_info):
-        return ''.join(traceback.format_exception(*exc_info)) if exc_info else ''
-
     def format(self, record):
         json_log_object = {"type": "log",
                            "logger": record.name,
