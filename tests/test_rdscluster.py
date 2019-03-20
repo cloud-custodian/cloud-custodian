@@ -347,7 +347,6 @@ class RDSClusterTest(BaseTest):
             DBClusterIdentifier='mytest').get('DBClusters')[0]
         self.assertEqual(cluster['Status'], 'starting')
 
-
     def test_modify_rds_cluster(self):
         session_factory = self.replay_flight_data("test_modify_rds_cluster")
         p = self.load_policy(

@@ -429,6 +429,7 @@ class ModifyDbCluster(BaseAction):
 
     schema = type_schema(
         'modify-db-cluster',
+        immediate={"type": 'boolean'},
         update={
             'type': 'array',
             'items': {
@@ -455,7 +456,7 @@ class ModifyDbCluster(BaseAction):
             if not params:
                 continue
             params['ApplyImmediately'] = self.data.get('immediate', False)
-            params['DBClusterIdentifier']=c['DBClusterIdentifier']
+            params['DBClusterIdentifier'] = c['DBClusterIdentifier']
             _run_cluster_method(
                 client.modify_db_cluster, params,
                 (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
