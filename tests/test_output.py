@@ -21,6 +21,7 @@ import shutil
 import io
 import json
 import os
+import pytest
 
 from dateutil.parser import parse as date_parse
 
@@ -168,40 +169,35 @@ class S3OutputTest(TestUtils):
         )
 
 
-class JSONFormatterTest(BaseTest):
+test_cases = [
+    ('policy policy', {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
+                       "msg": {"original": "policy policy"}}),
+    ('policy:test_policy id:123', {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
+                                   "msg": {"original": "policy:test_policy id:123", "policy": "test_policy",
+                                           "id": "123"}}),
+    ('policy: not a policy', {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output',
+                              'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'})
 
-    log_inputs = [
-        'policy policy',
-        'policy:test_policy id:123',
-        'policy: not a policy'
-    ]
+]
 
-    log_outputs = [
-        {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
-         "msg": {"original": "policy policy"}},
-        {"type": "log", "logger": "test-logger", "level": "INFO", "module": "test_output",
-         "msg": {"original": "policy:test_policy id:123", "policy": "test_policy", "id": "123"}},
-        {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output',
-         'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}
-    ]
 
-    def setUp(self):
-        self.logger = logging.getLogger('test-logger')
-        self.logger.setLevel(logging.DEBUG)
-        self.stream = io.StringIO()
+@pytest.mark.parametrize("input_log,expected_output", test_cases)
+def test_convert_to_json(input_log, expected_output):
+    logger = logging.getLogger('test-logger')
+    logger.setLevel(logging.DEBUG)
+    stream = io.StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setLevel(logging.DEBUG)
+    handler.setFormatter(JSONFormatter())
+    logger.addHandler(handler)
 
-    def test_convert_to_json(self):
-        self.setUp()
-        handler = logging.StreamHandler(self.stream)
-        handler.setLevel(logging.DEBUG)
-        handler.setFormatter(JSONFormatter())
-        self.logger.addHandler(handler)
-        for log in self.log_inputs:
-            self.logger.info(log)
-        log_contents = self.stream.getvalue().split("\n")
-        self.stream.close()
-        for i in range(len(self.log_outputs)):
-            json_log = json.loads(log_contents[i])
-            if json_log.get("log_time"):
-                del json_log["log_time"]
-            assert json_log == self.log_outputs[i]
+    logger.info(input_log)
+    log_contents = stream.getvalue()
+
+    stream.close()
+    logger.removeHandler(handler)
+
+    json_log = json.loads(log_contents)
+    if json_log.get("log_time"):
+        del json_log["log_time"]
+    assert json_log == expected_output
