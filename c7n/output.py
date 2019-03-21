@@ -375,9 +375,12 @@ class LogOutput(object):
     def join_log(self):
         self.handler = self.get_handler()
         self.handler.setLevel(logging.DEBUG)
-        if self.ctx.get("options", {}).get("log_type") == "json":
-            self.handler.setFormatter(JSONFormatter())
-        else:
+        try:
+            if self.ctx.options.get("log_type") == "json":
+                self.handler.setFormatter(JSONFormatter())
+            else:
+                self.handler.setFormatter(logging.Formatter(self.log_format))
+        except:
             self.handler.setFormatter(logging.Formatter(self.log_format))
         mlog = logging.getLogger('custodian')
         mlog.addHandler(self.handler)
