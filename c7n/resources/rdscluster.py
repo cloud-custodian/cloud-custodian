@@ -1,4 +1,4 @@
-# Copyright 2016-2017 Capital One Services, LLC
+# Copyright 2019-2020 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -439,7 +439,7 @@ class ModifyDbCluster(BaseAction):
         if 'DBClusterIdentifier' in attrs:
             raise PolicyValidationError(
                 "Can't include DBClusterIdentifier in modify-db-cluster action")
-        attrs['DBClusterIdentifier'] = 'PolicyValidation'
+        attrs['DBClusterIdentifier'] = ''
         return shape_validate(
             attrs,
             self.shape,
