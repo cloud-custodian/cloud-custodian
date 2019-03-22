@@ -7,91 +7,6 @@
                 "AvailabilityZones": [
                     "us-east-1d",
                     "us-east-1a",
-                    "us-east-1e"
-                ],
-                "BackupRetentionPeriod": 1,
-                "DatabaseName": "c7n_test",
-                "DBClusterIdentifier": "c7n-test-cluster",
-                "DBClusterParameterGroup": "default.aurora5.6",
-                "DBSubnetGroup": "default",
-                "Status": "available",
-                "EarliestRestorableTime": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 3,
-                    "day": 19,
-                    "hour": 12,
-                    "minute": 8,
-                    "second": 7,
-                    "microsecond": 651000
-                },
-                "Endpoint": "c7n-test-cluster.cluster-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
-                "ReaderEndpoint": "c7n-test-cluster.cluster-ro-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
-                "MultiAZ": true,
-                "Engine": "aurora",
-                "EngineVersion": "5.6.10a",
-                "LatestRestorableTime": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 3,
-                    "day": 19,
-                    "hour": 23,
-                    "minute": 43,
-                    "second": 2,
-                    "microsecond": 21000
-                },
-                "Port": 3306,
-                "MasterUsername": "c7n_test",
-                "PreferredBackupWindow": "07:55-08:25",
-                "PreferredMaintenanceWindow": "sat:07:24-sat:07:54",
-                "ReadReplicaIdentifiers": [],
-                "DBClusterMembers": [
-                    {
-                        "DBInstanceIdentifier": "c7n-test-instance",
-                        "IsClusterWriter": true,
-                        "DBClusterParameterGroupStatus": "in-sync",
-                        "PromotionTier": 1
-                    },
-                    {
-                        "DBInstanceIdentifier": "c7n-test-instance-us-east-1a",
-                        "IsClusterWriter": false,
-                        "DBClusterParameterGroupStatus": "in-sync",
-                        "PromotionTier": 1
-                    }
-                ],
-                "VpcSecurityGroups": [
-                    {
-                        "VpcSecurityGroupId": "sg-05e84e6845b9c7dc2",
-                        "Status": "active"
-                    }
-                ],
-                "HostedZoneId": "Z2R2ITUGPM61AM",
-                "StorageEncrypted": true,
-                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
-                "DbClusterResourceId": "cluster-DYDMG3R4KWTWFLXDL4SQVNG2UY",
-                "DBClusterArn": "arn:aws:rds:us-east-1:644160558196:cluster:c7n-test-cluster",
-                "AssociatedRoles": [],
-                "IAMDatabaseAuthenticationEnabled": false,
-                "ClusterCreateTime": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 3,
-                    "day": 19,
-                    "hour": 12,
-                    "minute": 7,
-                    "second": 28,
-                    "microsecond": 510000
-                },
-                "EngineMode": "provisioned",
-                "DeletionProtection": true,
-                "HttpEndpointEnabled": false,
-                "CopyTagsToSnapshot": true
-            },
-            {
-                "AllocatedStorage": 1,
-                "AvailabilityZones": [
-                    "us-east-1d",
-                    "us-east-1a",
                     "us-east-1b"
                 ],
                 "BackupRetentionPeriod": 1,
@@ -104,11 +19,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 3,
-                    "day": 18,
+                    "day": 20,
                     "hour": 9,
                     "minute": 31,
-                    "second": 19,
-                    "microsecond": 492000
+                    "second": 32,
+                    "microsecond": 869000
                 },
                 "Endpoint": "mytest.cluster-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
                 "ReaderEndpoint": "mytest.cluster-ro-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
@@ -119,11 +34,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 3,
-                    "day": 19,
-                    "hour": 23,
-                    "minute": 43,
-                    "second": 55,
-                    "microsecond": 82000
+                    "day": 22,
+                    "hour": 5,
+                    "minute": 6,
+                    "second": 36,
+                    "microsecond": 61000
                 },
                 "Port": 3306,
                 "MasterUsername": "mytest",
@@ -179,14 +94,14 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 3,
-                    "day": 19,
-                    "hour": 15,
-                    "minute": 40,
-                    "second": 29,
-                    "microsecond": 102000
+                    "day": 21,
+                    "hour": 21,
+                    "minute": 5,
+                    "second": 46,
+                    "microsecond": 775000
                 },
                 "BacktrackWindow": 28800,
-                "BacktrackConsumedChangeRecords": 1526462,
+                "BacktrackConsumedChangeRecords": 1645065,
                 "EnabledCloudwatchLogsExports": [
                     "slowquery"
                 ],
@@ -197,14 +112,14 @@
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "30e0b5ec-aa9b-4da3-a7c3-f5d19346be5d",
+            "RequestId": "00264b32-2be8-41a1-a4ab-f75e7d0cbf40",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "30e0b5ec-aa9b-4da3-a7c3-f5d19346be5d",
+                "x-amzn-requestid": "00264b32-2be8-41a1-a4ab-f75e7d0cbf40",
                 "content-type": "text/xml",
-                "content-length": "7278",
+                "content-length": "4111",
                 "vary": "Accept-Encoding",
-                "date": "Tue, 19 Mar 2019 23:45:24 GMT"
+                "date": "Fri, 22 Mar 2019 05:09:00 GMT"
             },
             "RetryAttempts": 0
         }

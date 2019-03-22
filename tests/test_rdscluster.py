@@ -353,20 +353,12 @@ class RDSClusterTest(BaseTest):
             {
                 "name": "modify-db-cluster",
                 "resource": "rds-cluster",
-                "filters": [{"DBClusterIdentifier": "c7n-test-cluster"}],
-                "actions": [
-                    {
-                        "type": "modify-db-cluster",
-                        "update": [
-                            {
-                                "property": 'DeletionProtection',
-                                "value": False
-                            }
-                        ],
-                        "immediate": True
-                    }
-                ],
-            },
+                "filters": [{"DeletionProtection": True}],
+                "actions": [{
+                "type": "modify-db-cluster",
+                "attributes": {
+                    "DeletionProtection": False}
+                }]},
             session_factory=session_factory, config={'account_id': '644160558196'}
         )
         resources = p.run()
@@ -374,7 +366,7 @@ class RDSClusterTest(BaseTest):
 
         client = session_factory().client("rds")
         cluster = client.describe_db_clusters(
-            DBClusterIdentifier='c7n-test-cluster')
+            DBClusterIdentifier='mytest')
         self.assertFalse(cluster['DBClusters'][0]['DeletionProtection'])
 
 

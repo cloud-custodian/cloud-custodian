@@ -24,6 +24,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
+from .aws import shape_validate
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks,
     get_retry, generate_arn)
@@ -421,46 +422,37 @@ class ModifyDbCluster(BaseAction):
                   - PubliclyAccessible: true
                 actions:
                   - type: modify-db-cluster
-                    update:
-                      - property: 'DeletionProtection'
-                        value: false
-                    immediate: true
+                    attributes:
+                        CopyTagsToSnapshot: true
+                        DeletionProtection: false
     """
 
     schema = type_schema(
         'modify-db-cluster',
         immediate={"type": 'boolean'},
-        update={
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'property': {'type': 'string', 'enum': [
-                        'CopyTagsToSnapshot',
-                        'DeletionProtection']},
-                    'value': {}
-                },
-            },
-        },
-        required=('update',))
+        attributes={'type': 'object'},
+        required=('attributes',))
 
     permissions = ('rds:ModifyDBCluster',)
+    shape = 'ModifyDBClusterMessage'
+
+    def validate(self):
+        attrs = dict(self.data['attributes'])
+        if 'DBClusterIdentifier' in attrs:
+            raise PolicyValidationError(
+                "Can't include DBClusterIdentifier in modify-db-cluster action")
+        attrs['DBClusterIdentifier'] = 'PolicyValidation'
+        return shape_validate(
+            attrs,
+            self.shape,
+            'rds')
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('rds')
-        params = {}
         for c in clusters:
-            for update in self.data.get('update'):
-                if c[update['property']] != update['value']:
-                    params[update['property']] = update['value']
-            if not params:
-                continue
-            params['ApplyImmediately'] = self.data.get('immediate', False)
-            params['DBClusterIdentifier'] = c['DBClusterIdentifier']
-            _run_cluster_method(
-                client.modify_db_cluster, params,
-                (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
-                client.exceptions.InvalidDBClusterStateFault)
+            client.modify_db_cluster(
+                DBClusterIdentifier=c['DBClusterIdentifier'],
+                **self.data['attributes'])
 
 
 @resources.register('rds-cluster-snapshot')
