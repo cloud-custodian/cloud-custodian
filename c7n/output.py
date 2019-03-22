@@ -349,7 +349,7 @@ class JSONFormatter(logging.Formatter):
                 split = kv_pair.split(':')
                 try:
                     val = ast.literal_eval(split[1])
-                except:
+                except (SyntaxError, ValueError):
                     val = split[1]
                 cnv_msg[split[0]] = val
         return cnv_msg
