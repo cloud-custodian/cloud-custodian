@@ -43,7 +43,7 @@ class OutputTest(BaseTest):
             ExecutionContext(
                 None,
                 Bag(name="xyz", provider_name='azure'),
-                Config.empty(output_dir=output_dir)
+                Config.empty(output_dir=output_dir, options={})
             ),
             {'url': output_dir},
         )

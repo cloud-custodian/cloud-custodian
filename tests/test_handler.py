@@ -67,6 +67,7 @@ class HandleTest(BaseTest):
              'external_id': None,
              'dryrun': False,
              'profile': None,
+             'log_type': 'text',
              'authorization_file': None,
              'cache': '',
              'regions': (),
