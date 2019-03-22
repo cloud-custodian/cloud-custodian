@@ -29,6 +29,7 @@ class SqlInstance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('list', "items[]", None)
         scope = 'project'
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):

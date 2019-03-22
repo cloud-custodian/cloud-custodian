@@ -30,6 +30,7 @@ class Function(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
+        id = "name"
 
         events = {
             'create': 'google.cloud.functions.v1.CloudFunctionsService.CreateFunction',

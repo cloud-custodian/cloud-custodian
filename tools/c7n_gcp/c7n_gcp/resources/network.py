@@ -28,6 +28,7 @@ class Network(QueryResourceManager):
         version = 'v1'
         component = 'networks'
         scope_template = "projects/{}/global/networks"
+        id = "name"
 
 
 @resources.register('subnet')
@@ -38,6 +39,7 @@ class Subnet(QueryResourceManager):
         version = 'v1'
         component = 'subnetworks'
         enum_spec = ('aggregatedList', 'items.*.subnetworks[]', None)
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
@@ -111,6 +113,7 @@ class Firewall(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'firewalls'
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
@@ -128,6 +131,7 @@ class Router(QueryResourceManager):
         component = 'routers'
         enum_spec = ('aggregatedList', 'items.*.routers[]', None)
         scope_template = "projects/{}/aggregated/routers"
+        id = "name"
 
 
 @resources.register('route')
@@ -138,3 +142,4 @@ class Route(QueryResourceManager):
         version = 'v1'
         component = 'routes'
         scope_template = "projects/{}/global/routes"
+        id = "name"

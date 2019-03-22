@@ -11,19 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from gcp_common import BaseTest
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-@resources.register('gke-cluster')
-class KubernetesCluster(QueryResourceManager):
+class ResourceMetaTest(BaseTest):
 
-    class resource_type(TypeInfo):
-        service = 'container'
-        version = 'v1beta1'
-        component = 'projects.locations.clusters'
-        enum_spec = ('list', 'clusters[]', None)
-        scope = 'project'
-        scope_key = 'parent'
-        scope_template = "projects/{}/locations/-"
-        id = "name"
+    def test_resource_id_meta(self):
+        missing = []
+        for name, resource in resources.items():
+            if not getattr(resource.resource_type, 'id', None):
+                missing.append(name)
+
+        if missing:
+            raise KeyError(
+                "Following resources are missing id metadata %s" % " ".join(missing))

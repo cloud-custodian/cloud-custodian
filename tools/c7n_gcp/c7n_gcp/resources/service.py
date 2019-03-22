@@ -29,6 +29,7 @@ class Service(QueryResourceManager):
         scope = 'project'
         scope_key = 'consumerId'
         scope_template = 'project:{}'
+        id = 'serviceName'
 
         @staticmethod
         def get(client, resource_info):

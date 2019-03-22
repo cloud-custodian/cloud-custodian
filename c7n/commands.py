@@ -17,7 +17,6 @@ from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
 import inspect
-import json
 import logging
 import os
 import pprint
@@ -26,11 +25,12 @@ import time
 
 import six
 import yaml
+from yaml.constructor import ConstructorError
 
 from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.utils import dumps, load_file, local_session
+from c7n.utils import dumps, load_file, local_session, SafeLoader
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
@@ -171,6 +171,27 @@ def _print_no_policies_warning(options, policies):
         log.warning('Empty policy file(s).  Nothing to do.')
 
 
+class DuplicateKeyCheckLoader(SafeLoader):
+
+    def construct_mapping(self, node, deep=False):
+        if not isinstance(node, yaml.MappingNode):
+            raise ConstructorError(None, None,
+                    "expected a mapping node, but found %s" % node.id,
+                    node.start_mark)
+        key_set = set()
+        for key_node, value_node in node.value:
+            if not isinstance(key_node, yaml.ScalarNode):
+                continue
+            k = key_node.value
+            if k in key_set:
+                raise ConstructorError(
+                    "while constructing a mapping", node.start_mark,
+                    "found duplicate key", key_node.start_mark)
+            key_set.add(k)
+
+        return super(DuplicateKeyCheckLoader, self).construct_mapping(node, deep)
+
+
 def validate(options):
     from c7n import schema
     load_resources()
@@ -189,11 +210,10 @@ def validate(options):
 
         options.dryrun = True
         fmt = config_file.rsplit('.', 1)[-1]
+
         with open(config_file) as fh:
-            if fmt in ('yml', 'yaml'):
-                data = yaml.safe_load(fh.read())
-            elif fmt in ('json',):
-                data = json.load(fh)
+            if fmt in ('yml', 'yaml', 'json'):
+                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)
             else:
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
