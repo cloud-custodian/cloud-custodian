@@ -91,7 +91,7 @@ class S3OutputTest(TestUtils):
 
     def test_join_leave_log(self):
         temp_dir = self.get_temp_dir()
-        output = LogFile(Bag(log_dir=temp_dir), {})
+        output = LogFile(Bag(log_dir=temp_dir, options={}), {})
         output.join_log()
 
         l = logging.getLogger("custodian.s3")  # NOQA

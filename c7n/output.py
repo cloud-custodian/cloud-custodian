@@ -331,7 +331,7 @@ class JSONFormatter(logging.Formatter):
     def format(self, record):
         json_log_object = {"type": "log",
                            "logger": record.name,
-                           "log_time": str(datetime.utcnow()),
+                           "log_time": datetime.fromtimestamp(record.created).isoformat(),
                            "level": record.levelname,
                            "module": record.module,
                            "msg": self.convert_to_json(record.getMessage()),
@@ -375,12 +375,9 @@ class LogOutput(object):
     def join_log(self):
         self.handler = self.get_handler()
         self.handler.setLevel(logging.DEBUG)
-        try:
-            if self.ctx.options.get("log_type") == "json":
-                self.handler.setFormatter(JSONFormatter())
-            else:
-                self.handler.setFormatter(logging.Formatter(self.log_format))
-        except:
+        if self.ctx.options.get("log_type") == "json":
+            self.handler.setFormatter(JSONFormatter())
+        else:
             self.handler.setFormatter(logging.Formatter(self.log_format))
         mlog = logging.getLogger('custodian')
         mlog.addHandler(self.handler)

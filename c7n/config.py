@@ -47,6 +47,7 @@ class Config(Bag):
             'assume_role': None,
             'external_id': None,
             'log_group': None,
+            'log_type': "text",
             'tracer': 'default',
             'metrics_enabled': False,
             'output_dir': '',
