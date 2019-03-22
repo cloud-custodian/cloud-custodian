@@ -1,4 +1,4 @@
-# Copyright 2019-2020 Capital One Services, LLC
+# Copyright 2016-2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -428,7 +428,6 @@ class ModifyDbCluster(BaseAction):
 
     schema = type_schema(
         'modify-db-cluster',
-        immediate={"type": 'boolean'},
         attributes={'type': 'object'},
         required=('attributes',))
 
@@ -441,10 +440,7 @@ class ModifyDbCluster(BaseAction):
             raise PolicyValidationError(
                 "Can't include DBClusterIdentifier in modify-db-cluster action")
         attrs['DBClusterIdentifier'] = 'PolicyValidation'
-        return shape_validate(
-            attrs,
-            self.shape,
-            'rds')
+        return shape_validate(attrs, self.shape, 'rds')
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client('rds')
