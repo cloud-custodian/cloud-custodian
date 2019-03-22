@@ -24,6 +24,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
+from .aws import shape_validate
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks,
     get_retry, generate_arn)
@@ -397,6 +398,59 @@ class Snapshot(BaseAction):
                     DBClusterIdentifier=cluster['DBClusterIdentifier']),
                 (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
                 client.exceptions.InvalidDBClusterStateFault)
+
+
+@RDSCluster.action_registry.register('modify-db-cluster')
+class ModifyDbCluster(BaseAction):
+    """Modifies an RDS instance based on specified parameter
+    using ModifyDbInstance.
+
+    'Immediate" determines whether the modification is applied immediately
+    or not. If 'immediate' is not specified, default is false.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: disable-db-cluster-deletion-protection
+                resource: rds-cluster
+                filters:
+                  - DeletionProtection: true
+                  - PubliclyAccessible: true
+                actions:
+                  - type: modify-db-cluster
+                    attributes:
+                        CopyTagsToSnapshot: true
+                        DeletionProtection: false
+    """
+
+    schema = type_schema(
+        'modify-db-cluster',
+        immediate={"type": 'boolean'},
+        attributes={'type': 'object'},
+        required=('attributes',))
+
+    permissions = ('rds:ModifyDBCluster',)
+    shape = 'ModifyDBClusterMessage'
+
+    def validate(self):
+        attrs = dict(self.data['attributes'])
+        if 'DBClusterIdentifier' in attrs:
+            raise PolicyValidationError(
+                "Can't include DBClusterIdentifier in modify-db-cluster action")
+        attrs['DBClusterIdentifier'] = 'PolicyValidation'
+        return shape_validate(
+            attrs,
+            self.shape,
+            'rds')
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client('rds')
+        for c in clusters:
+            client.modify_db_cluster(
+                DBClusterIdentifier=c['DBClusterIdentifier'],
+                **self.data['attributes'])
 
 
 @resources.register('rds-cluster-snapshot')
