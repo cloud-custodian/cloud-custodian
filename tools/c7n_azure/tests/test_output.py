@@ -108,7 +108,7 @@ class OutputTest(BaseTest):
 
     def test_app_insights_logs(self):
         policy = Bag(name='test', resource_type='azure.vm', session_factory=Session)
-        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000')
+        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000', options={})
         with log_outputs.select('azure://00000000-0000-0000-0000-000000000000', ctx) as log:
             self.assertTrue(isinstance(log, AppInsightsLogOutput))
             logging.getLogger('custodian.test').warning('test message')
