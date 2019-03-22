@@ -178,7 +178,10 @@ test_cases = [
       "msg": {"original": "policy:test_policy id:123", "policy": "test_policy", "id": "123"}}),
     ('policy: not a policy',
      {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output',
-      'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'})
+      'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}),
+    ("ids:['xyz','abc','def']",
+     {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
+      'msg': {'original': "ids:['xyz','abc','def']", 'ids': "['xyz','abc','def']"}}),
 ]
 
 
