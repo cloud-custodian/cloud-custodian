@@ -25,6 +25,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n import tags
 from .aws import shape_validate
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks,
     get_retry, generate_arn)
@@ -439,7 +440,7 @@ class ModifyDbCluster(BaseAction):
         if 'DBClusterIdentifier' in attrs:
             raise PolicyValidationError(
                 "Can't include DBClusterIdentifier in modify-db-cluster action")
-        attrs['DBClusterIdentifier'] = ''
+        attrs['DBClusterIdentifier'] = 'PolicyValidation'
         return shape_validate(
             attrs,
             self.shape,
