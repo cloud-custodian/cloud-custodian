@@ -19,6 +19,7 @@ import os
 from datetime import datetime, timedelta
 
 import jinja2
+import jmespath
 from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
@@ -35,6 +36,7 @@ def get_jinja_env(template_folders):
     env.globals['format_struct'] = format_struct
     env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
+    env.globals['search'] = jmespath.search
     env.loader = jinja2.FileSystemLoader(template_folders)
     return env
 
