@@ -21,18 +21,18 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_autodoc",
-    version='0.1',
+    version='0.2',
     description="Cloud Custodian - Automated Policy Documentation",
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     long_description=description,
     long_description_content_type='text/markdown',
     author="Ryan Ash",
     author_email="ryanash@gmail.com",
     license="Apache-2.0",
     py_modules=["c7n_autodoc"],
-    install_requires=["c7n", "pyyaml>=4.2b4", "boto3", "jinja2==2.10"]
+    install_requires=["c7n", "pyyaml>=4.2b4", "boto3", "jinja2==2.10", "jsonschema"]
 )
