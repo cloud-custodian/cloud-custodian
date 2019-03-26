@@ -128,6 +128,7 @@ class RestApi(query.QueryResourceManager):
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
+        config_type = "AWS::ApiGateway::RestApi"
 
 
 @RestApi.filter_registry.register('cross-account')
@@ -190,6 +191,7 @@ class RestStage(query.ChildResourceManager):
         dimension = None
         universal_taggable = True
         type = None
+        config_type = "AWS::ApiGateway::Stage"
 
     def augment(self, resources):
         return universal_augment(
