@@ -315,12 +315,12 @@ class PullMode(PolicyExecutionMode):
         now = datetime.now(self.policy.tz)
         if self.policy.start and self.policy.start > now:
             self.policy.log.info(
-                "Skipping policy%s start-date:%s is after current date:%s",
+                "Skipping policy:%s start-date:%s is after current-date:%s",
                 self.policy.name, self.policy.start, now)
             return False
         if self.policy.end and self.policy.end < now:
             self.policy.log.info(
-                "Skipping policy:%s end-date:%s is before current date:%s",
+                "Skipping policy:%s end-date:%s is before current-date:%s",
                 self.policy.name, self.policy.end, now)
             return False
         if self.policy.region and (

@@ -175,13 +175,10 @@ test_cases = [
       'msg': {'original': 'policy policy'}}),
     ('policy:test_policy id:123',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
-      'msg': {'original': 'policy:test_policy id:123', 'policy': 'test_policy', 'id': 123}}),
+      'msg': {'original': 'policy:test_policy id:123', 'policy': 'test_policy', 'id': '123'}}),
     ('policy: not a policy',
      {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output',
       'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}),
-    ("ids:['xyz','abc','def']",
-     {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
-      'msg': {'ids': ['xyz', 'abc', 'def'], 'original': "ids:['xyz','abc','def']"}}),
 ]
 
 
@@ -190,12 +187,7 @@ def test_convert_to_json(input_log, expected_output):
     logger = logging.getLogger('test-logger')
     logger.setLevel(logging.DEBUG)
 
-    # python 2 uses StringIO
-    try:
-        from StringIO import StringIO
-        stream = StringIO()
-    except ImportError:
-        stream = io.StringIO()
+    stream = io.StringIO()
     handler = logging.StreamHandler(stream)
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(JSONFormatter())

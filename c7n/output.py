@@ -29,7 +29,6 @@ import os
 import shutil
 import time
 import uuid
-import ast
 
 from c7n.exceptions import InvalidOutputConfig
 from c7n.registry import PluginRegistry
@@ -347,11 +346,7 @@ class JSONFormatter(logging.Formatter):
         for kv_pair in split_message:
             if len(kv_pair.split(':')) == 2:
                 split = kv_pair.split(':')
-                try:
-                    val = ast.literal_eval(split[1])
-                except (SyntaxError, ValueError):
-                    val = split[1]
-                cnv_msg[split[0]] = val
+                cnv_msg[split[0]] = split[1]
         return cnv_msg
 
 
