@@ -187,7 +187,12 @@ def test_convert_to_json(input_log, expected_output):
     logger = logging.getLogger('test-logger')
     logger.setLevel(logging.DEBUG)
 
-    stream = io.StringIO()
+    # python 2 uses StringIO
+    try:
+        from StringIO import StringIO
+        stream = StringIO()
+    except ImportError:
+        stream = io.StringIO()
     handler = logging.StreamHandler(stream)
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(JSONFormatter())
