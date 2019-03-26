@@ -193,9 +193,9 @@ class RestStage(query.ChildResourceManager):
         type = None
         config_type = "AWS::ApiGateway::Stage"
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(RestStage, self).augment(resources))
+    def get_source(self, source_type):
+        if source_type == 'describe-rest-stage':
+            return DescribeRestStage(self)
 
 
 @query.sources.register('describe-rest-stage')
