@@ -205,6 +205,108 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
         return vpc_group_ids
 
 
+@Vpc.filter_registry.register('subnet')
+class VpcSubnetFilter(RelatedResourceFilter):
+    """Filter VPCs based on Subnet attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: subnet
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'subnet', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.Subnet"
+    RelatedIdsExpression = '[Subnets][].SubnetId'
+    AnnotationKey = "MatchedVpcsSubnets"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_subnet_ids = {
+            g['SubnetId'] for g in
+            self.manager.get_resource_manager('subnet').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        return vpc_subnet_ids
+
+
+@Vpc.filter_registry.register('nat-gateway')
+class VpcNatGatewayFilter(RelatedResourceFilter):
+    """Filter VPCs based on NAT Gateway attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: nat-gateway
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'nat-gateway', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.NATGateway"
+    RelatedIdsExpression = '[NatGateways][].NatGatewayId'
+    AnnotationKey = "MatchedVpcsNatGateways"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_natgw_ids = {
+            g['NatGatewayId'] for g in
+            self.manager.get_resource_manager('nat-gateway').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        return vpc_natgw_ids
+
+
+@Vpc.filter_registry.register('internet-gateway')
+class VpcInternetGatewayFilter(RelatedResourceFilter):
+    """Filter VPCs based on Internet Gateway attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: internet-gateway
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'internet-gateway', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.InternetGateway"
+    RelatedIdsExpression = '[InternetGateways][].InternetGatewayId'
+    AnnotationKey = "MatchedVpcsIgws"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_igw_ids = set()
+        for igw in self.manager.get_resource_manager('internet-gateway').resources():
+            for attachment in igw['Attachments']:
+                if attachment.get('VpcId', '') in vpc_ids:
+                    vpc_igw_ids.add(igw['InternetGatewayId'])
+        return vpc_igw_ids
+
+
 @Vpc.filter_registry.register('vpc-attributes')
 class AttributesFilter(Filter):
     """Filters VPCs based on their DNS attributes

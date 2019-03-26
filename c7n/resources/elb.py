@@ -347,7 +347,7 @@ class EnableS3Logging(BaseAction):
 
             policies:
               - name: elb-test
-                resource: app-elb
+                resource: elb
                 filters:
                   - type: is-not-logging
                 actions:

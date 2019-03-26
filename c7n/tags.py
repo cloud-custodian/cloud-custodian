@@ -355,13 +355,12 @@ class TagCountFilter(Filter):
 
        - filters:
            - type: value
-             key: "[length(Tags)][0]"
              op: gte
-             value: 8
+             count: 8
 
        - filters:
            - type: tag-count
-             value: 8
+             count: 8
     """
     schema = utils.type_schema(
         'tag-count',

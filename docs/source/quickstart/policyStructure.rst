@@ -1,4 +1,4 @@
-.. _tagCompliance:
+.. _policyStructure:
 
 Example tag compliance policy
 =============================
