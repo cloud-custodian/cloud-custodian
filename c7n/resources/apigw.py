@@ -22,7 +22,6 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.tags import universal_augment
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -196,6 +195,7 @@ class RestStage(query.ChildResourceManager):
     def get_source(self, source_type):
         if source_type == 'describe-rest-stage':
             return DescribeRestStage(self)
+        return super(RestStage, self).get_source(source_type)
 
 
 @query.sources.register('describe-rest-stage')
