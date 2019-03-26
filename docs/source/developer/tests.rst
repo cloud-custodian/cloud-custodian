@@ -12,20 +12,6 @@ Unit tests can be run with:
 
    $ tox
 
-Coverage reports can be generated and viewed with the following:
-
-.. code-block:: bash
-
-   (py27) $ make coverage
-
-   # Open the reports in a browser
-
-   # on osx
-   $ open coverage/index.html
-
-   # on gnomeish linux
-   $ gnome-open coverage/index.html
-
 Linting can be run with:
 
 .. code-block:: bash
