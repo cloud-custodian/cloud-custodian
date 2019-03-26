@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "NatGateways": [
+            {
+                "NatGatewayAddresses": [
+                    {
+                        "PublicIp": "1.2.3.4",
+                        "NetworkInterfaceId": "eni-0d9ed30596168bcf1",
+                        "AllocationId": "eipalloc-0ee66407",
+                        "PrivateIp": "10.0.0.216"
+                    }
+                ],
+                "VpcId": "vpc-0c1be6284618ac4c1",
+                "Tags": [
+                    {
+                        "Value": "Fancy NAT Gateway",
+                        "Key": "Name"
+                    }
+                ],
+                "State": "available",
+                "NatGatewayId": "nat-0bdb87de14bdf340a",
+                "SubnetId": "subnet-03b1c10838dfbb431",
+                "CreateTime": "2019-01-08T16:19:20.000Z"
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "688ea6ff-7a28-41fb-9729-eea68fab91d8",
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "server": "AmazonEC2",
+                "content-type": "text/xml;charset=UTF-8",
+                "date": "Tue, 27 Jun 2017 17:50:58 GMT"
+            }
+        }
+    }
+}

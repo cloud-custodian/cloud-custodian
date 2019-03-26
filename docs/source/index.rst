@@ -20,14 +20,24 @@ Navigate below and get started with Cloud Custodian!
    quickstart/index
    quickstart/usage
    quickstart/advanced
+   quickstart/policyStructure
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Examples
 
-   quickstart/offhours
-   quickstart/tagCompliance
    usecases/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Azure
+
+   azure/gettingstarted
+   azure/authentication
+   azure/examples/index
+   azure/policy/index
+   azure/advanced/index
+   azure/contribute
 
 .. toctree::
    :maxdepth: 2
@@ -51,17 +61,6 @@ Navigate below and get started with Cloud Custodian!
    developer/index.rst
    developer/installing.rst
    developer/tests.rst
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Azure
-
-   azure/gettingstarted
-   azure/authentication
-   azure/examples/index
-   azure/policy/index
-   azure/advanced/index
-   azure/contribute
 
 .. toctree::
    :maxdepth: 2
