@@ -172,12 +172,13 @@ class S3OutputTest(TestUtils):
 test_cases = [
     ('policy policy',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
-      'msg': {'original': 'policy policy'}}),
+      'exc_info': None, 'msg': {'original': 'policy policy'}}),
     ('policy:test_policy id:123',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
-      'msg': {'original': 'policy:test_policy id:123', 'policy': 'test_policy', 'id': '123'}}),
+      'exc_info': None, 'msg': {'original': 'policy:test_policy id:123',
+                                'policy': 'test_policy', 'id': '123'}}),
     ('policy: not a policy',
-     {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output',
+     {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output', 'exc_info': None,
       'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}),
 ]
 
@@ -205,7 +206,10 @@ def test_convert_to_json(input_log, expected_output):
     logger.removeHandler(handler)
 
     json_log = json.loads(log_contents)
-    if json_log.get("log_time"):
-        del json_log["log_time"]
+
+    # remove dynamic fields
+    del json_log["log_time"]
+    del json_log["lineno"]
+    del json_log["pathname"]
 
     assert json_log == expected_output
