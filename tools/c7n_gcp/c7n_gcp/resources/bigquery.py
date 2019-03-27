@@ -70,3 +70,15 @@ class BigQueryJob(QueryResourceManager):
                 'projectId': resource_info['project_id'],
                 'jobId': resource_info['job_id']
             })
+
+
+@resources.register('bq-project')
+class BigQueryProject(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'bigquery'
+        version = 'v2'
+        component = 'projects'
+        enum_spec = ('list', 'projects[]', None)
+        scope = 'global'
+        id = 'id'
