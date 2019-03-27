@@ -442,6 +442,19 @@ class QueryResourceManager(ResourceManager):
         filtering behind the resource manager facade for default usage.
         """
         p = self.ctx.policy
+
+        if isinstance(p.max_resources, dict):
+            op = p.max_resources.get("op", "or").lower()
+            amount = p.max_resources.get("amount", selection_count)
+            percent = p.max_resources.get("percent", 100)
+
+        if isinstance(p.max_resources, int):
+            amount = p.max_resources
+
+        if isinstance(p.max_resources_percent, int):
+            percent = p.max_resources_percent
+
+
         if isinstance(p.max_resources, int) and selection_count > p.max_resources:
             raise ResourceLimitExceeded(
                 ("policy: %s exceeded resource limit: {limit} "
