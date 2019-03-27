@@ -309,9 +309,10 @@ class SetS3Logging(BaseAction):
                     key: Attributes."access_logs.s3.enabled"
                     value: False
                 actions:
-                  - type: enable-s3-logging
+                  - type: set-s3-logging
                     bucket: elbv2logtest
                     prefix: dahlogs
+                    state: enabled
     """
     schema = type_schema(
         'set-s3-logging',
