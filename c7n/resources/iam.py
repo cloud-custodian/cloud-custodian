@@ -833,6 +833,7 @@ class RoleDelete(BaseAction):
                   - delete
     """
 
+    schema = type_schema('delete')
     permissions = ('iam:DeleteRole',)
 
     def process(self, resources):
