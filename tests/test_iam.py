@@ -1433,17 +1433,19 @@ class DeleteRoleAction(BaseTest):
     def test_delete_role(self):
         factory = self.replay_flight_data("test_delete_role")
         policy_doc = json.dumps({
-            "Version":"2012-10-17",
-            "Statement":[{
-                "Effect":"Allow",
-                "Principal":{
-                    "Service":"ec2.amazonaws.com"
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ec2.amazonaws.com"
                 },
-                "Action":"sts:AssumeRole"
+                "Action": "sts:AssumeRole"
             }]
         })
         client = factory().client("iam")
-        client.create_role(RoleName="c7n-test-delete", AssumeRolePolicyDocument=policy_doc, Path='/pratyush/', Tags=[{'Key': 'Name','Value': 'pratyush'}])
+        client.create_role(
+            RoleName="c7n-test-delete", AssumeRolePolicyDocument=policy_doc, Path='/pratyush/',
+            Tags=[{'Key': 'Name', 'Value': 'pratyush'}])
         p = self.load_policy(
             {
                 'name': 'iam-attach-role-policy',
@@ -1451,7 +1453,7 @@ class DeleteRoleAction(BaseTest):
                 'filters': [{'tag:Name': 'pratyush'}],
                 "actions": ["delete"],
             },
-            session_factory = factory
+            session_factory=factory
         )
 
         resources = p.run()
