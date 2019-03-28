@@ -456,24 +456,24 @@ class QueryResourceManager(ResourceManager):
         if isinstance(p.max_resources, int):
             amount = p.max_resources
 
-        if isinstance(p.max_resources_percent, int):
+        if isinstance(p.max_resources_percent, (int, float)):
             percent = p.max_resources_percent
 
-        calculated_percentage = population_count * (percent / 100.0)
+        percentage_amount = population_count * (percent / 100.0)
 
-        if selection_count > amount and calculated_percentage > percent and op == "and":
+        if selection_count > amount and selection_count > percentage_amount and op == "and":
             raise ResourceLimitExceeded(
-                ("policy:%s exceeded resource-limit:{limit} and percentage-limit:{limit}%%"
-                 "found:{selection_count}") % p.name, "max-resources", p.max_resources,
-                percent, selection_count, population_count)
+                ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
+                 "found:{selection_count} total:{population_count}") % (p.name, percent),
+                "max-resource and max-percent", amount, selection_count, population_count)
 
-        if selection_count > amount:
+        if selection_count > amount and op != "and":
             raise ResourceLimitExceeded(
                 ("policy:%s exceeded resource-limit:{limit} "
                  "found:{selection_count} total: {population_count}") % p.name,
-                "max-percent", amount, selection_count, population_count)
+                "max-resource", amount, selection_count, population_count)
 
-        if selection_count > amount:
+        if selection_count > percentage_amount and op != "and":
             raise ResourceLimitExceeded(
                 ("policy:%s exceeded resource-limit:{limit}%% "
                  "found:{selection_count} total:{population_count}") % p.name,
