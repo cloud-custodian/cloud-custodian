@@ -817,6 +817,37 @@ class SetPolicy(BaseAction):
                     pass
 
 
+@Role.action_registry.register('delete')
+class RoleDelete(BaseAction):
+    """Delete an iam role.
+
+    :example:
+
+    .. code-block:: yaml
+            policies:
+              - name: delete-iam
+                resource: iam-role
+                filters:
+                  - "tag:owner": absent
+                actions:
+                  - delete
+    """
+
+    permissions = ('iam:DeleteRole',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for r in resources:
+            try:
+                client.delete_role(RoleName=r['RoleName'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'DeleteConflict':
+                    self.log.warning(
+                        "Cannot delete entity, must remove roles from instance profile first")
+                if e.response['Error']['Code'] == 'NoSuchEntity':
+                    self.log.warning("Role not found")
+
+
 ######################
 #    IAM Policies    #
 ######################
