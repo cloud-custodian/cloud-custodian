@@ -170,21 +170,24 @@ class S3OutputTest(TestUtils):
 
 
 test_cases = [
-    ('policy policy',
+    ('policy policy','info',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
       'exc_info': None, 'msg': {'original': 'policy policy'}}),
-    ('policy:test_policy id:123',
+    ('policy:test_policy id:123','info',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
       'exc_info': None, 'msg': {'original': 'policy:test_policy id:123',
                                 'policy': 'test_policy', 'id': '123'}}),
-    ('policy: not a policy',
+    ('policy: not a policy', 'info',
      {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output', 'exc_info': None,
       'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}),
+    ('exception', 'exception',
+     {'level': 'ERROR', 'logger': 'test-logger', 'module': 'test_output', 'exc_info': 'NoneType: None',
+      'msg': {'original': 'exception'}, 'type': 'log'})
 ]
 
 
-@pytest.mark.parametrize("input_log,expected_output", test_cases)
-def test_convert_to_json(input_log, expected_output):
+@pytest.mark.parametrize("input_log,logger_type,expected_output", test_cases)
+def test_convert_to_json(input_log, logger_type, expected_output):
     logger = logging.getLogger('test-logger')
     logger.setLevel(logging.DEBUG)
 
@@ -199,7 +202,7 @@ def test_convert_to_json(input_log, expected_output):
     handler.setFormatter(JSONFormatter())
     logger.addHandler(handler)
 
-    logger.info(input_log)
+    getattr(logger, logger_type)(input_log)
     log_contents = stream.getvalue()
 
     stream.close()

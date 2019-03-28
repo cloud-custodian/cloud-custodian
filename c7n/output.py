@@ -329,16 +329,20 @@ class JSONFormatter(logging.Formatter):
     """
 
     def format(self, record):
+
         json_log_object = {"type": "log",
                            "logger": record.name,
                            "log_time": datetime.fromtimestamp(record.created).isoformat(),
-                           "exc_info": record.exc_info,
+                           "exc_info": None,
                            "lineno": record.lineno,
                            "pathname": record.pathname,
                            "level": record.levelname,
                            "module": record.module,
                            "msg": self.convert_to_json(record.getMessage()),
                            }
+
+        if record.exc_info:
+            json_log_object["exc_info"] = self.formatException(record.exc_info)
 
         return json.dumps(json_log_object)
 
