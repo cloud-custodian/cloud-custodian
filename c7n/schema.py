@@ -363,6 +363,7 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None, d
 def resource_vocabulary(cloud_name=None, qualify_name=True):
     vocabulary = {}
     resources = {}
+    modes = {}
 
     for cname, ctype in clouds.items():
         if cloud_name is not None and cloud_name != cname:
@@ -390,6 +391,11 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
             'actions': sorted(actions),
             'classes': classes,
         }
+
+    vocabulary["mode"] = {}
+    for mode_name, cls in execution.items():
+        vocabulary["mode"][mode_name] = cls
+
     return vocabulary
 
 
