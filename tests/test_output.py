@@ -170,10 +170,10 @@ class S3OutputTest(TestUtils):
 
 
 test_cases = [
-    ('policy policy','info',
+    ('policy policy', 'info',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
       'exc_info': None, 'msg': {'original': 'policy policy'}}),
-    ('policy:test_policy id:123','info',
+    ('policy:test_policy id:123', 'info',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
       'exc_info': None, 'msg': {'original': 'policy:test_policy id:123',
                                 'policy': 'test_policy', 'id': '123'}}),
@@ -181,8 +181,8 @@ test_cases = [
      {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output', 'exc_info': None,
       'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}),
     ('exception', 'exception',
-     {'level': 'ERROR', 'logger': 'test-logger', 'module': 'test_output', 'exc_info': 'NoneType: None',
-      'msg': {'original': 'exception'}, 'type': 'log'})
+     {'level': 'ERROR', 'logger': 'test-logger', 'module': 'test_output',
+      'exc_info': 'NoneType: None', 'msg': {'original': 'exception'}, 'type': 'log'})
 ]
 
 
