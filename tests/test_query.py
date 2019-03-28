@@ -109,6 +109,36 @@ class ResourceQueryTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+class ConfigSourceTest(BaseTest):
+
+    def test_config_select(self):
+        pass
+
+    def test_config_get_query(self):
+        p = self.load_policy({'name': 'x', 'resource': 'ec2'})
+        source = p.resource_manager.get_source('config')
+
+        # if query passed in reflect it back
+        self.assertEqual(
+            source.get_query_params({'expr': 'select 1'}),
+            {'expr': 'select 1'})
+
+        # if no query passed reflect back policy data
+        p.data['query'] = [{'expr': 'select configuration'}]
+        self.assertEqual(
+            source.get_query_params(None), {'expr': 'select configuration'})
+
+        p.data.pop('query')
+
+        # default query construction
+        self.assertTrue(
+            source.get_query_params(None)['expr'].startswith(
+                'select configuration, supplementaryConfiguration where resourceType'))
+
+        p.data['query'] = [{'clause': "configuration.imageId = 'xyz'"}]
+        self.assertIn("imageId = 'xyz'", source.get_query_params(None)['expr'])
+
+
 class QueryResourceManagerTest(BaseTest):
 
     def test_registries(self):
