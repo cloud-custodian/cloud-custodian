@@ -172,17 +172,17 @@ class S3OutputTest(TestUtils):
 test_cases = [
     ('policy policy', 'info',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
-      'exc_info': None, 'msg': {'original': 'policy policy'}}),
+      'msg': {'original': 'policy policy'}}),
     ('policy:test_policy id:123', 'info',
      {'type': 'log', 'logger': 'test-logger', 'level': 'INFO', 'module': 'test_output',
-      'exc_info': None, 'msg': {'original': 'policy:test_policy id:123',
-                                'policy': 'test_policy', 'id': '123'}}),
+      'msg': {'original': 'policy:test_policy id:123',
+              'policy': 'test_policy', 'id': '123'}}),
     ('policy: not a policy', 'info',
-     {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output', 'exc_info': None,
+     {'level': 'INFO', 'logger': 'test-logger', 'module': 'test_output',
       'msg': {'original': 'policy: not a policy', 'policy': ''}, 'type': 'log'}),
     ('exception', 'exception',
      {'level': 'ERROR', 'logger': 'test-logger', 'module': 'test_output',
-      'exc_info': 'NoneType: None', 'msg': {'original': 'exception'}, 'type': 'log'})
+      'msg': {'original': 'exception'}, 'type': 'log'})
 ]
 
 
@@ -202,17 +202,27 @@ def test_convert_to_json(input_log, logger_type, expected_output):
     handler.setFormatter(JSONFormatter())
     logger.addHandler(handler)
 
-    getattr(logger, logger_type)(input_log)
-    log_contents = stream.getvalue()
+    if logger_type == "exception":
+        try:
+            raise BaseException
+        except BaseException:
+            getattr(logger, logger_type)(input_log)
+    else:
+        getattr(logger, logger_type)(input_log)
 
+    log_contents = stream.getvalue()
     stream.close()
     logger.removeHandler(handler)
 
     json_log = json.loads(log_contents)
 
+    if logger_type == "exception":
+        assert 'Traceback' in json_log["exc_info"]
+
     # remove dynamic fields
     del json_log["log_time"]
     del json_log["lineno"]
     del json_log["pathname"]
+    del json_log['exc_info']
 
     assert json_log == expected_output
