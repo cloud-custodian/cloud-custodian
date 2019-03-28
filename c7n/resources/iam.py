@@ -846,6 +846,7 @@ class RoleDelete(BaseAction):
                         "Cannot delete entity, must remove roles from instance profile first")
                 if e.response['Error']['Code'] == 'NoSuchEntity':
                     self.log.warning("Role not found")
+                raise
 
 
 ######################
