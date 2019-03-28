@@ -819,20 +819,22 @@ class SetPolicy(BaseAction):
 
 @Role.action_registry.register('delete')
 class RoleDelete(BaseAction):
-    """Delete an iam role.
+    """Delete an IAM Role.
+
+    For example, if you want to automatically delete an unused IAM role.
 
     :example:
 
-    .. code-block:: yaml
-            policies:
-              - name: delete-iam
-                resource: iam-role
-                filters:
-                  - "tag:owner": absent
-                actions:
-                  - delete
-    """
+      .. code-block:: yaml
 
+        - name: iam-delete-unused-role
+          resource: iam-role
+          filters:
+            - type: unused
+          actions:
+            - delete
+
+    """
     schema = type_schema('delete')
     permissions = ('iam:DeleteRole',)
 
