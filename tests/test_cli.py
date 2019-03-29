@@ -175,6 +175,12 @@ class SchemaTest(CliTest):
         # with just a resource
         self.run_and_expect_success(["custodian", "schema", "ec2"])
 
+        # with just a mode
+        self.run_and_expect_success(["custodian", "schema", "mode"])
+
+        # mode.type
+        self.run_and_expect_success(["custodian", "schema", "mode.phd"])
+
         # resource.actions
         self.run_and_expect_success(["custodian", "schema", "ec2.actions"])
 

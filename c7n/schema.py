@@ -363,7 +363,6 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None, d
 def resource_vocabulary(cloud_name=None, qualify_name=True):
     vocabulary = {}
     resources = {}
-    modes = {}
 
     for cname, ctype in clouds.items():
         if cloud_name is not None and cloud_name != cname:
@@ -401,22 +400,30 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
 
 def summary(vocabulary):
     providers = {}
+    non_providers = {}
 
     for type_name, rv in vocabulary.items():
-        provider, name = type_name.split('.', 1)
-        stats = providers.setdefault(provider, {
-            'resources': 0, 'actions': Counter(), 'filters': Counter()})
-        stats['resources'] += 1
-        for a in rv.get('actions'):
-            stats['actions'][a] += 1
-        for f in rv.get('filters'):
-            stats['filters'][f] += 1
+        if '.' not in type_name:
+            non_providers[type_name] = len(rv)
+        else:
+            provider, name = type_name.split('.', 1)
+            stats = providers.setdefault(provider, {
+                'resources': 0, 'actions': Counter(), 'filters': Counter()})
+            stats['resources'] += 1
+            for a in rv.get('actions'):
+                stats['actions'][a] += 1
+            for f in rv.get('filters'):
+                stats['filters'][f] += 1
 
     for provider, stats in providers.items():
         print("%s:" % provider)
         print(" resource count: %d" % stats['resources'])
         print(" actions: %d" % len(stats['actions']))
         print(" filters: %d" % len(stats['filters']))
+
+    for non_providers_type, length in non_providers.items():
+        print("%s:" % non_providers_type)
+        print(" total count: %d" % length)
 
 
 def json_dump(resource=None):

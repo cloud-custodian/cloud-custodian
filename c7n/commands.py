@@ -425,7 +425,7 @@ def schema_cmd(options):
     else:
         resource_mapping = schema.resource_vocabulary('aws')
         components[0] = 'aws.%s' % components[0]
-        
+
     #
     # Handle mode
     #
@@ -519,6 +519,7 @@ def _print_cls_schema(cls):
         print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
     print('')
     return
+
 
 def _metrics_get_endpoints(options):
     """ Determine the start and end dates based on user-supplied options. """
