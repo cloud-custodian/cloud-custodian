@@ -830,7 +830,9 @@ class RoleDelete(BaseAction):
         - name: iam-delete-unused-role
           resource: iam-role
           filters:
-            - type: unused
+            - type: usage
+              match-operator: all
+              LastAuthenticated: null
           actions:
             - delete
 
@@ -847,9 +849,10 @@ class RoleDelete(BaseAction):
                 if e.response['Error']['Code'] == 'DeleteConflict':
                     self.log.warning(
                         "Cannot delete entity, must remove roles from instance profile first")
+                    continue
                 if e.response['Error']['Code'] == 'NoSuchEntity':
-                    self.log.warning("Role not found")
-                continue
+                    continue
+                raise
 
 
 ######################
