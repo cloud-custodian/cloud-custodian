@@ -845,14 +845,12 @@ class RoleDelete(BaseAction):
         for r in resources:
             try:
                 client.delete_role(RoleName=r['RoleName'])
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'DeleteConflict':
-                    self.log.warning(
-                        "Cannot delete entity, must remove roles from instance profile first")
-                    continue
-                if e.response['Error']['Code'] == 'NoSuchEntity':
-                    continue
-                raise
+            except client.exceptions.DeleteConflictException:
+                self.log.warning(
+                    "Cannot delete entity, must remove roles from instance profile first")
+                continue
+            except client.exceptions.NoSuchEntityException:
+                continue
 
 
 ######################
