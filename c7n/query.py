@@ -25,7 +25,7 @@ from concurrent.futures import as_completed
 
 import jmespath
 import six
-
+import os
 
 from c7n.actions import ActionRegistry
 from c7n.exceptions import ClientError, ResourceLimitExceeded
@@ -531,9 +531,11 @@ class QueryResourceManager(ResourceManager):
 
 class MaxResourceLimit(object):
 
+    C7N_MAXRES_OP = os.environ.get("C7N_MAXRES_OP")
+
     def __init__(self, policy, selection_count, population_count):
         self.p = policy
-        self.op = None
+        self.op = MaxResourceLimit.C7N_MAXRES_OP
         self.selection_count = selection_count
         self.population_count = population_count
         self.amount = selection_count
@@ -543,7 +545,7 @@ class MaxResourceLimit(object):
 
     def _parse_policy(self,):
         if isinstance(self.p.max_resources, dict):
-            self.op = self.p.max_resources.get("op", "or").lower()
+            self.op = self.p.max_resources.get("op", MaxResourceLimit.C7N_MAXRES_OP).lower()
             self.percent = self.p.max_resources.get("percent", 100)
             self.amount = self.p.max_resources.get("amount", self.population_count)
 
@@ -556,8 +558,8 @@ class MaxResourceLimit(object):
         self.percentage_amount = self.population_count * (self.percent / 100.0)
 
     def check_resource_limits(self):
-        if self.selection_count > self.amount and self.selection_count > self.percentage_amount:
-            if self.op == "and":
+        if self.selection_count > self.amount and self.selection_count > self.percentage_amount \
+         and self.op == "and":
                 raise ResourceLimitExceeded(
                     ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
                      "found:{selection_count} total:{population_count}")
