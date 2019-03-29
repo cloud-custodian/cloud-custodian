@@ -556,13 +556,13 @@ class MaxResourceLimit(object):
         self.percentage_amount = self.population_count * (self.percent / 100.0)
 
     def check_resource_limits(self):
-        if self.selection_count > self.amount and self.selection_count > self.percentage_amount \
-         and self.op == "and":
-            raise ResourceLimitExceeded(
-                ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
-                 "found:{selection_count} total:{population_count}") % (self.p.name, self.percent),
-                "max-resource and max-percent", self.amount, self.selection_count,
-                self.population_count)
+        if self.selection_count > self.amount and self.selection_count > self.percentage_amount:
+            if self.op == "and":
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
+                     "found:{selection_count} total:{population_count}")
+                    % (self.p.name, self.percent), "max-resource and max-percent",
+                    self.amount, self.selection_count, self.population_count)
 
         if self.selection_count > self.amount and self.op != "and":
             raise ResourceLimitExceeded(
