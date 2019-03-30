@@ -18,6 +18,7 @@ import c7n_gcp.policy
 import c7n_gcp.resources.bigquery
 import c7n_gcp.resources.build
 import c7n_gcp.resources.compute
+import c7n_gcp.resources.dataflow
 import c7n_gcp.resources.dns
 import c7n_gcp.resources.function
 import c7n_gcp.resources.gke
