@@ -443,9 +443,9 @@ def schema_cmd(options):
             _print_cls_schema(resource_mapping[components[0]][components[1]])
             return
 
-        # We received too much (e.g. s3.actions.foo.bar)
-        log.error("Invalid selector '{}'. Max of 1 component in the "
-                  "format MODE.TYPE".format(options.resource))
+        # We received too much (e.g. mode.actions.foo)
+        log.error("Invalid selector '{}'. Valid options are 'mode' "
+                  "or 'mode.TYPE'".format(options.resource))
         sys.exit(1)
     #
     # Handle resource

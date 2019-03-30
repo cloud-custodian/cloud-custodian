@@ -423,7 +423,7 @@ def summary(vocabulary):
 
     for non_providers_type, length in non_providers.items():
         print("%s:" % non_providers_type)
-        print(" total count: %d" % length)
+        print(" count: %d" % length)
 
 
 def json_dump(resource=None):
