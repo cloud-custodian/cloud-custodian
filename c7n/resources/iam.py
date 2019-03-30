@@ -842,15 +842,18 @@ class RoleDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
+        error = None
         for r in resources:
             try:
                 client.delete_role(RoleName=r['RoleName'])
-            except client.exceptions.DeleteConflictException:
+            except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
                     "Cannot delete entity, must remove roles from instance profile first")
-                continue
+                error = e
             except client.exceptions.NoSuchEntityException:
                 continue
+        if error:
+            raise error
 
 
 ######################
