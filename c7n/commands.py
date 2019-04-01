@@ -456,7 +456,12 @@ def schema_cmd(options):
         sys.exit(1)
 
     if len(components) == 1:
+        docstring = _schema_get_docstring(
+            resource_mapping[resource]['classes']['resource'])
         del(resource_mapping[resource]['classes'])
+        if docstring:
+            print("\nHelp\n----\n")
+            print(docstring + '\n')
         output = {resource: resource_mapping[resource]}
         print(yaml.safe_dump(output))
         return
