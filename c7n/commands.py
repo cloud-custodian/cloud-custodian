@@ -378,6 +378,7 @@ def schema_cmd(options):
         return
 
     load_resources()
+
     resource_mapping = schema.resource_vocabulary()
     if options.summary:
         schema.summary(resource_mapping)
@@ -390,6 +391,8 @@ def schema_cmd(options):
     #   - List all available RESOURCES for supplied PROVIDER
     # - RESOURCE
     #   - List all available actions and filters for supplied RESOURCE
+    # - MODE
+    #   - List all available MODES
     # - RESOURCE.actions
     #   - List all available actions for supplied RESOURCE
     # - RESOURCE.actions.ACTION
@@ -417,9 +420,33 @@ def schema_cmd(options):
         resource_mapping = schema.resource_vocabulary(
             cloud_provider)
         components[0] = '%s.%s' % (cloud_provider, components[0])
+    elif components[0] in schema.resource_vocabulary().keys():
+        resource_mapping = schema.resource_vocabulary()
     else:
         resource_mapping = schema.resource_vocabulary('aws')
         components[0] = 'aws.%s' % components[0]
+
+    #
+    # Handle mode
+    #
+    if components[0] == "mode":
+        if len(components) == 1:
+            output = {components[0]: list(resource_mapping[components[0]].keys())}
+            print(yaml.safe_dump(output, default_flow_style=False))
+            return
+
+        if len(components) == 2:
+            if components[1] not in resource_mapping[components[0]]:
+                log.error('{} is not a valid mode'.format(components[1]))
+                sys.exit(1)
+
+            _print_cls_schema(resource_mapping[components[0]][components[1]])
+            return
+
+        # We received too much (e.g. mode.actions.foo)
+        log.error("Invalid selector '{}'. Valid options are 'mode' "
+                  "or 'mode.TYPE'".format(options.resource))
+        sys.exit(1)
     #
     # Handle resource
     #
@@ -460,33 +487,38 @@ def schema_cmd(options):
 
     if len(components) == 3:
         cls = resource_mapping[resource]['classes'][category][item]
+        _print_cls_schema(cls)
 
-        # Print docstring
-        docstring = _schema_get_docstring(cls)
-        print("\nHelp\n----\n")
-        if docstring:
-            print(docstring)
-        else:
-            # Shouldn't ever hit this, so exclude from cover
-            print("No help is available for this item.")  # pragma: no cover
-
-        # Print schema
-        print("\nSchema\n------\n")
-        if hasattr(cls, 'schema'):
-            component_schema = dict(cls.schema)
-            component_schema.pop('additionalProperties', None)
-            component_schema.pop('type', None)
-            print(yaml.safe_dump(component_schema))
-        else:
-            # Shouldn't ever hit this, so exclude from cover
-            print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
-        print('')
         return
 
     # We received too much (e.g. s3.actions.foo.bar)
     log.error("Invalid selector '{}'.  Max of 3 components in the "
               "format RESOURCE.CATEGORY.ITEM".format(options.resource))
     sys.exit(1)
+
+
+def _print_cls_schema(cls):
+    # Print docstring
+    docstring = _schema_get_docstring(cls)
+    print("\nHelp\n----\n")
+    if docstring:
+        print(docstring)
+    else:
+        # Shouldn't ever hit this, so exclude from cover
+        print("No help is available for this item.")  # pragma: no cover
+
+    # Print schema
+    print("\nSchema\n------\n")
+    if hasattr(cls, 'schema'):
+        component_schema = dict(cls.schema)
+        component_schema.pop('additionalProperties', None)
+        component_schema.pop('type', None)
+        print(yaml.safe_dump(component_schema))
+    else:
+        # Shouldn't ever hit this, so exclude from cover
+        print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
+    print('')
+    return
 
 
 def _metrics_get_endpoints(options):
