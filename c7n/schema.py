@@ -38,7 +38,7 @@ from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
-
+from c7n.actions import Notify
 
 def validate(data, schema=None):
     if schema is None:
@@ -197,6 +197,7 @@ def generate(resource_types=()):
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'mode': {'$ref': '#/definitions/policy-mode'},
+                'notify-on-failure': Notify.schema,
                 'source': {'enum': ['describe', 'config']},
                 'actions': {
                     'type': 'array',

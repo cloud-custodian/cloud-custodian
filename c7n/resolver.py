@@ -100,7 +100,7 @@ class ValuesFrom(object):
     # intent is that callers embed this schema
     schema = {
         'type': 'object',
-        'additionalProperties': 'False',
+        'additionalProperties': False,
         'required': ['url'],
         'properties': {
             'url': {'type': 'string'},

@@ -797,6 +797,10 @@ class Policy(object):
         return self.data.get('max-resources-percent')
 
     @property
+    def notify_on_failure(self):
+        return self.data.get('notify-on-failure')
+
+    @property
     def tags(self):
         return self.data.get('tags', ())
 
@@ -939,12 +943,24 @@ class Policy(object):
     def __call__(self):
         """Run policy in default mode"""
         mode = self.get_execution_mode()
-        if self.options.dryrun:
-            resources = PullMode(self).run()
-        elif isinstance(mode, ServerlessExecutionMode):
-            resources = mode.provision()
-        else:
-            resources = mode.run()
+        try:
+            if self.options.dryrun:
+                resources = PullMode(self).run()
+            elif isinstance(mode, ServerlessExecutionMode):
+                resources = mode.provision()
+            else:
+                resources = mode.run()
+        except Exception as e:
+            if self.notify_on_failure:
+                from c7n.actions import Notify
+                # breakpoint()
+                self.ctx.policy.resource_manager.data = self.notify_on_failure
+                notify = Notify(manager=self.ctx.policy.resource_manager, data=self.notify_on_failure)
+                # notify = Notify(policy.notify_on_failure)
+                notify.process([], event=e)
+                # breakpoint()
+                raise e
+
         # clear out resource manager post run, to clear cache
         self.resource_manager = self.load_resource_manager()
         return resources
