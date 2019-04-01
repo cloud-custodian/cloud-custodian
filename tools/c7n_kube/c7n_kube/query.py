@@ -16,6 +16,7 @@ import logging
 import six
 
 from c7n.actions import ActionRegistry
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
@@ -39,7 +40,9 @@ class ResourceQuery(object):
         return self._invoke_client_enum(client, enum_op, params, path)
 
     def _invoke_client_enum(self, client, enum_op, params, path):
-        res = getattr(client, enum_op)(**params).to_dict()
+        res = getattr(client, enum_op)(**params)
+        if not isinstance(res, dict):
+            res = res.to_dict()
         if path and path in res:
             res = res.get(path)
         return res
@@ -119,6 +122,29 @@ class QueryResourceManager(ResourceManager):
         return resources
 
 
+@six.add_metaclass(QueryMeta)
+class CustomResourceQueryManager(QueryResourceManager):
+    def get_resource_query(self):
+        custom_resource = self.data['query'][0]
+        return {
+            'version': custom_resource['version'],
+            'group': custom_resource['group'],
+            'plural': custom_resource['plural']
+        }
+
+    def validate(self):
+        required_keys = set(['group', 'version', 'plural'])
+        if 'query' not in self.data:
+            raise PolicyValidationError(
+                "Custom resources require query in policy with only " +
+                "group, version, and plural attributes")
+        if set(list(self.data.get('query', [])[0].keys())) != required_keys:
+            raise PolicyValidationError(
+                "Custom resources require query in policy with only " +
+                "group, version, and plural attributes")
+        return self
+
+
 class TypeMeta(type):
     def __repr__(cls):
         return "<TypeInfo group:%s version:%s>" % (
@@ -132,3 +158,10 @@ class TypeInfo(object):
     version = None
     enum_spec = ()
     namespaced = True
+
+
+@six.add_metaclass(TypeMeta)
+class CustomTypeInfo(TypeInfo):
+    group = 'CustomObjects'
+    version = ''
+    enum_spec = ('list_cluster_custom_object', 'items', None)

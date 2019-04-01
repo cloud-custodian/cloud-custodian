@@ -374,7 +374,7 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
                 resources[rname] = rtype
 
     for type_name, resource_type in resources.items():
-        classes = {'actions': {}, 'filters': {}}
+        classes = {'actions': {}, 'filters': {}, 'resource': resource_type}
         actions = []
         for action_name, cls in resource_type.action_registry.items():
             actions.append(action_name)

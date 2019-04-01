@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_kube.actions.core import DeleteResource
+from c7n_kube.actions.core import DeleteResource, PatchResource
 from c7n_kube.actions.labels import LabelAction
 from c7n_kube.provider import resources as kube_resources
 
-SHARED_ACTIONS = (DeleteResource, LabelAction)
+SHARED_ACTIONS = (DeleteResource, LabelAction, PatchResource)
 
 
 for action in SHARED_ACTIONS:
