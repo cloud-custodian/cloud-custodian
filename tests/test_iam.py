@@ -1430,6 +1430,8 @@ class SetRolePolicyAction(BaseTest):
 
 
 class DeleteRoleAction(BaseTest):
+    
+    @functional
     def test_delete_role(self):
         factory = self.replay_flight_data("test_delete_role")
         policy_doc = json.dumps({
