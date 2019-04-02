@@ -184,7 +184,7 @@ class Notify(BaseNotify):
             message['resources'] = self.prepare_resources(batch)
             receipt = self.send_data_message(message)
             self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                receipt, self.manager.data['name'],
+                receipt, self.manager.data.get('name'),
                 self.data.get('template', 'default'), len(batch)))
 
     def prepare_resources(self, resources):

@@ -953,12 +953,10 @@ class Policy(object):
         except Exception as e:
             if self.notify_on_failure:
                 from c7n.actions import Notify
-                # breakpoint()
+                self.notify_on_failure['name'] = self.ctx.policy.resource_manager.data['name']
                 self.ctx.policy.resource_manager.data = self.notify_on_failure
                 notify = Notify(manager=self.ctx.policy.resource_manager, data=self.notify_on_failure)
-                # notify = Notify(policy.notify_on_failure)
-                notify.process([], event=e)
-                # breakpoint()
+                notify.process(self.ctx.policy.resource_manager.resources(), event=str(e))
                 raise e
 
         # clear out resource manager post run, to clear cache
