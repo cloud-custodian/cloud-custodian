@@ -86,6 +86,9 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        event=sqs_message.get('event', None),
+        action=sqs_message['action'],
+        policy=sqs_message['policy'],
         region=sqs_message.get('region', '')
     )
     return subject
