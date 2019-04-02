@@ -34,6 +34,7 @@ from c7n.registry import PluginRegistry
 from c7n.provider import clouds
 from c7n import utils
 from c7n.version import version
+from c7n.actions import Notify
 
 log = logging.getLogger('c7n.policy')
 
@@ -952,10 +953,10 @@ class Policy(object):
                 resources = mode.run()
         except Exception as e:
             if self.notify_on_failure:
-                from c7n.actions import Notify
                 self.notify_on_failure['name'] = self.ctx.policy.resource_manager.data['name']
                 self.ctx.policy.resource_manager.data = self.notify_on_failure
-                notify = Notify(manager=self.ctx.policy.resource_manager, data=self.notify_on_failure)
+                notify = Notify(manager=self.ctx.policy.resource_manager,
+                                data=self.notify_on_failure)
                 notify.process(self.ctx.policy.resource_manager.resources(), event=str(e))
                 raise e
 

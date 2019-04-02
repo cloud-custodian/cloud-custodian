@@ -40,6 +40,7 @@ from c7n.resources import load_resources
 from c7n.filters import ValueFilter, EventFilter, AgeFilter
 from c7n.actions import Notify
 
+
 def validate(data, schema=None):
     if schema is None:
         schema = generate()

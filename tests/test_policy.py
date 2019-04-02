@@ -741,7 +741,7 @@ class TestPolicy(BaseTest):
         logs = list(policy.get_logs("2016-10-01 00:00:00", "2016-10-31 11:59:59"))
         self.assertEqual(len(logs), 0)
 
-    def xtest_policy_run(self):
+    def test_policy_run(self):
         manager.resources.register("dummy", DummyResource)
         self.addCleanup(manager.resources.unregister, "dummy")
         self.output_dir = tempfile.mkdtemp()
@@ -806,6 +806,24 @@ class TestPolicy(BaseTest):
         p = self.load_policy(data)
         result = p.validate_policy_start_stop()
         self.assertEqual(result, None)
+
+    def test_notify_on_failure(self):
+        p = self.load_policy(
+            {'name': 'notify_on_failure',
+             'resource': 'ec2',
+             'notify_on_failure': {
+                 'type': 'notify',
+                 'to': ['me@example.com'],
+                 'transport': {
+                     'type': 'sns',
+                     'topic': 'arn:::::',
+                 },
+             }
+             },
+            config={'validate': True},
+            session_factory=None)
+        pull_mode = policy.PullMode(p)
+        self.assertEqual(pull_mode.is_runnable(), True)
 
 
 class PolicyExecutionModeTest(BaseTest):
