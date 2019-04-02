@@ -1,4 +1,4 @@
-# Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import functools
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource
+from c7n.query import QueryResourceManager
 from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import generate_arn
 
@@ -39,6 +39,7 @@ class Workspace(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    augment = universal_augment
     _generate_arn = None
 
     def __init__(self, data, options):
@@ -51,18 +52,6 @@ class Workspace(QueryResourceManager):
                 generate_arn, 'workspaces', region=self.config.region,
                 account_id=self.account_id, resource_type='workspace', separator='/')
         return self._generate_arn
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeWorkspace(self)
-        return super(Workspace, self).get_source(source_type)
-
-
-class DescribeWorkspace(DescribeSource):
-
-    def augment(self, workspaces):
-        return universal_augment(
-            self.manager, super(DescribeWorkspace, self).augment(workspaces))
 
 
 register_universal_tags(
