@@ -35,9 +35,6 @@ class Workspace(QueryResourceManager):
     augment = universal_augment
     _generate_arn = None
 
-    def __init__(self, data, options):
-        super(Workspace, self).__init__(data, options)
-
     @property
     def generate_arn(self):
         if self._generate_arn is None:
