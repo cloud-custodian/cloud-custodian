@@ -227,7 +227,7 @@ def generate(resource_types=()):
             'type': 'object',
             'properties': {
                 'amount': {"type": 'integer', 'minimum': 1},
-                'op': {'type': 'string'},
+                'op': {'enum': ['or', 'and']},
                 'percent': {'type': 'number', 'minimum': 0, 'maximum': 100}
             }
         }

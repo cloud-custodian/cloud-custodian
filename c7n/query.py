@@ -531,7 +531,8 @@ class QueryResourceManager(ResourceManager):
 
 class MaxResourceLimit(object):
 
-    C7N_MAXRES_OP = os.environ.get("C7N_MAXRES_OP")
+    C7N_MAXRES_OP = os.environ.get("C7N_MAXRES_OP", 'or')
+    C7N_MAXRES_PERCENT = os.environ.get("C7N_MAXRES_PERCENT", 100)
 
     def __init__(self, policy, selection_count, population_count):
         self.p = policy
@@ -540,13 +541,14 @@ class MaxResourceLimit(object):
         self.population_count = population_count
         self.amount = selection_count
         self.percentage_amount = population_count
-        self.percent = 100
+        self.percent = MaxResourceLimit.C7N_MAXRES_PER
         self._parse_policy()
 
     def _parse_policy(self,):
         if isinstance(self.p.max_resources, dict):
             self.op = self.p.max_resources.get("op", MaxResourceLimit.C7N_MAXRES_OP).lower()
-            self.percent = self.p.max_resources.get("percent", 100)
+            self.percent = self.p.max_resources.get("percent",
+                                                    MaxResourceLimit.C7N_MAXRES_PERCENT)
             self.amount = self.p.max_resources.get("amount", self.population_count)
 
         if isinstance(self.p.max_resources, int):
