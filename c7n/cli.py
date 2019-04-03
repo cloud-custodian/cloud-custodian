@@ -249,7 +249,6 @@ def setup_parser():
         dest="tracer",
         help=argparse.SUPPRESS,
         default=None, nargs="?", const="default")
-    run.add_argument("--log-type", default="text", choices=["text", "json"], help="Sets log type.")
 
     schema_desc = ("Browse the available vocabularies (resources, filters, and "
                    "actions) for policy construction. The selector "
