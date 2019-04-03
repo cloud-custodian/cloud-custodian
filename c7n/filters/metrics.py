@@ -107,6 +107,7 @@ class MetricsFilter(Filter):
         's3': 'AWS/S3',
         'sns': 'AWS/SNS',
         'sqs': 'AWS/SQS',
+        'workspaces': 'AWS/WorkSpaces',
     }
 
     def process(self, resources, event=None):

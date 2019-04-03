@@ -826,6 +826,7 @@ class Policy(object):
                 "Invalid Execution mode in policy %s" % (self.data,))
         m.validate()
         self.validate_policy_start_stop()
+        self.resource_manager.validate()
         for f in self.resource_manager.filters:
             f.validate()
         for a in self.resource_manager.actions:

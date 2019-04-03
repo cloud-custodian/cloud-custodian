@@ -33,6 +33,6 @@ setup(
     },
     install_requires=[
         "c7n>=0.8.40.0",
-        "kubernetes==8.0.1"
+        "kubernetes==9.0.0"
     ]
 )
