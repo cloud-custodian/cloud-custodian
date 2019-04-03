@@ -1,0 +1,80 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/9.0.0/python
+    method: GET
+    uri: https://ghost/api/v1/services
+  response:
+    body:
+      string: '{"kind":"ServiceList","apiVersion":"v1","metadata":{"selfLink":"/api/v1/services","resourceVersion":"62589"},"items":[{"metadata":{"name":"hello-node","namespace":"default","selfLink":"/api/v1/namespaces/default/services/hello-node","uid":"a73d4914-4f28-11e9-86a8-080027415632","resourceVersion":"62582","creationTimestamp":"2019-03-25T18:06:03Z","labels":{"app":"hello-node","blah":"value","test":"value"}},"spec":{"ports":[{"protocol":"TCP","port":8080,"targetPort":8080,"nodePort":30770}],"selector":{"app":"hello-node"},"clusterIP":"10.98.90.235","type":"LoadBalancer","sessionAffinity":"None","externalTrafficPolicy":"Cluster"},"status":{"loadBalancer":{}}},{"metadata":{"name":"kubernetes","namespace":"default","selfLink":"/api/v1/namespaces/default/services/kubernetes","uid":"d3c62ed5-4b25-11e9-86a8-080027415632","resourceVersion":"13729","creationTimestamp":"2019-03-20T15:35:45Z","labels":{"blah":"value","component":"apiserver","provider":"kubernetes","test":"value"}},"spec":{"ports":[{"name":"https","protocol":"TCP","port":443,"targetPort":8443}],"clusterIP":"10.96.0.1","type":"ClusterIP","sessionAffinity":"None"},"status":{"loadBalancer":{}}},{"metadata":{"name":"kube-dns","namespace":"kube-system","selfLink":"/api/v1/namespaces/kube-system/services/kube-dns","uid":"d63135db-4b25-11e9-86a8-080027415632","resourceVersion":"13730","creationTimestamp":"2019-03-20T15:35:49Z","labels":{"blah":"value","k8s-app":"kube-dns","kubernetes.io/cluster-service":"true","kubernetes.io/name":"KubeDNS","test":"value"},"annotations":{"prometheus.io/port":"9153","prometheus.io/scrape":"true"}},"spec":{"ports":[{"name":"dns","protocol":"UDP","port":53,"targetPort":53},{"name":"dns-tcp","protocol":"TCP","port":53,"targetPort":53}],"selector":{"k8s-app":"kube-dns"},"clusterIP":"10.96.0.10","type":"ClusterIP","sessionAffinity":"None"},"status":{"loadBalancer":{}}}]}
+
+        '
+    headers:
+      Content-Length:
+      - '1876'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 25 Mar 2019 18:06:07 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"gracePeriodSeconds": 30}'
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/9.0.0/python
+    method: DELETE
+    uri: https://ghost/api/v1/namespaces/default/services/hello-node
+  response:
+    body:
+      string: '{"kind":"Status","apiVersion":"v1","metadata":{},"status":"Success","details":{"name":"hello-node","kind":"services","uid":"a73d4914-4f28-11e9-86a8-080027415632"}}
+
+        '
+    headers:
+      Content-Length:
+      - '164'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 25 Mar 2019 18:06:08 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/9.0.0/python
+    method: GET
+    uri: https://ghost/api/v1/services
+  response:
+    body:
+      string: '{"kind":"ServiceList","apiVersion":"v1","metadata":{"selfLink":"/api/v1/services","resourceVersion":"62593"},"items":[{"metadata":{"name":"kubernetes","namespace":"default","selfLink":"/api/v1/namespaces/default/services/kubernetes","uid":"d3c62ed5-4b25-11e9-86a8-080027415632","resourceVersion":"13729","creationTimestamp":"2019-03-20T15:35:45Z","labels":{"blah":"value","component":"apiserver","provider":"kubernetes","test":"value"}},"spec":{"ports":[{"name":"https","protocol":"TCP","port":443,"targetPort":8443}],"clusterIP":"10.96.0.1","type":"ClusterIP","sessionAffinity":"None"},"status":{"loadBalancer":{}}},{"metadata":{"name":"kube-dns","namespace":"kube-system","selfLink":"/api/v1/namespaces/kube-system/services/kube-dns","uid":"d63135db-4b25-11e9-86a8-080027415632","resourceVersion":"13730","creationTimestamp":"2019-03-20T15:35:49Z","labels":{"blah":"value","k8s-app":"kube-dns","kubernetes.io/cluster-service":"true","kubernetes.io/name":"KubeDNS","test":"value"},"annotations":{"prometheus.io/port":"9153","prometheus.io/scrape":"true"}},"spec":{"ports":[{"name":"dns","protocol":"UDP","port":53,"targetPort":53},{"name":"dns-tcp","protocol":"TCP","port":53,"targetPort":53}],"selector":{"k8s-app":"kube-dns"},"clusterIP":"10.96.0.10","type":"ClusterIP","sessionAffinity":"None"},"status":{"loadBalancer":{}}}]}
+
+        '
+    headers:
+      Content-Length:
+      - '1331'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 25 Mar 2019 18:06:08 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

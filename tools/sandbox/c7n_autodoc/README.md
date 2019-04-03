@@ -17,7 +17,7 @@ Features include:
 * Automatically writes to S3 bucket
 * Groups policies by resource type
 * Groups policies by category (i.e 'Security & Governance' vs 'Cost Controls')
-* Provide links to underlying file in your versioning system of choice
+* Provide links to underlying file in GitLab/GitHub
 * Uses policy tags to determine applicable environments
 
 ## Assumptions
@@ -27,14 +27,16 @@ Features include:
 
 ## Installation
 
-  pip install pyyaml boto3 jinja2
+<i>NOTE: Requires python3</i>
+
+  pip3 install pyyaml boto3 jinja2 jsonschema
 
 ## Configuration
 
-Use your favorite editor to modify the c7n-autodoc.py script.  There is a section at the top
-which needs to be customized for each implementation. There is documentation within the script to 
-help you better understand how each variable should be set.  You can also customize the jinja2 template 
-to further modify the HTML documentation which is created. 
+The only item you should need to customize is the configuration YAML file which is required by the 
+script.  Look at the example file provided to determine which fields are required and which 
+are optional.  You can also customize the jinja2 template to further modify the HTML 
+documentation which is created. 
 
 The S3 bucket which will house the HTML file needs to have `Static website hosting` enabled.  The 
 default (index.html, error.html) are fine because you will be directly targeting the c7n-autodoc.html
@@ -44,16 +46,16 @@ file.
 
 For the best results this script should be run as a part of a CI/CD pipeline. 
 
-  python c7n-autodoc.py
+  python3 c7n-autodoc.py -c my_config_file.yml
 
 Assuming there aren't any issues you should see the HTML file in the S3 bucket.
 
 ## Example 
 
-![alt text](images/c7n-autodoc_example1.png "Example c7n-autodoc")
+![alt text](images/c7n-autodoc_example2.png "Example c7n-autodoc")
 
 ## TODO
 
-* Account for multiple cloud platforms 
-* Move configuration from script into a configuration file, cli params, etc
 * Account for different policies for proper rendering
+* Improved UI layout
+* Easier user setup
