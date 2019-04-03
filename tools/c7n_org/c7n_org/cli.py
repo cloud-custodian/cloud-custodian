@@ -172,7 +172,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
         if isinstance(h, logging.StreamHandler):
             h.addFilter(LogFilter())
 
-    with open(config) as fh:
+    with open(config, 'rb') as fh:
         accounts_config = yaml.safe_load(fh.read())
         jsonschema.validate(accounts_config, CONFIG_SCHEMA)
 

@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "etag": "5c5e35d416330aff000001692f229785",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 04 Mar 2019 17:18:18 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "270",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/dns/v1beta2/projects/cloud-custodian/managedZones/custodian?alt=json"
+  },
+  "body": {
+    "name": "custodian",
+    "dnsName": "custodian.",
+    "description": "",
+    "id": "6655816484321954559",
+    "nameServers": [
+      "ns-gcp-private.googledomains.com."
+    ],
+    "creationTime": "2019-02-27T13:26:30.021Z",
+    "visibility": "private",
+    "kind": "dns#managedZone"
+  }
+}

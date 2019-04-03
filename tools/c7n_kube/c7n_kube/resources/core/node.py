@@ -22,4 +22,7 @@ class Node(QueryResourceManager):
     class resource_type(TypeInfo):
         group = 'Core'
         version = 'V1'
+        namespaced = False
+        patch = 'patch_node'
+        delete = 'delete_node'
         enum_spec = ('list_node', 'items', None)

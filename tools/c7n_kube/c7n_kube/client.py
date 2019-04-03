@@ -31,6 +31,6 @@ class Session(object):
         config.load_kube_config(self.config_file, client_configuration=client_config)
         client_config.proxy = self.http_proxy
         api_client = ApiClient(configuration=client_config)
-        log.info('connecting to %s' % (api_client.configuration.host))
+        log.debug('connecting to %s' % (api_client.configuration.host))
         # e.g. client.CoreV1Api()
         return getattr(client, '%s%sApi' % (group, version))(api_client)
