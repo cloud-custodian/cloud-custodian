@@ -541,7 +541,7 @@ class MaxResourceLimit(object):
         self.population_count = population_count
         self.amount = selection_count
         self.percentage_amount = population_count
-        self.percent = MaxResourceLimit.C7N_MAXRES_PER
+        self.percent = MaxResourceLimit.C7N_MAXRES_PERCENT
         self._parse_policy()
 
     def _parse_policy(self,):
