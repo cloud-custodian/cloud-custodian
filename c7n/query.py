@@ -532,24 +532,22 @@ class QueryResourceManager(ResourceManager):
 class MaxResourceLimit(object):
 
     C7N_MAXRES_OP = os.environ.get("C7N_MAXRES_OP", 'or')
-    C7N_MAXRES_PERCENT = os.environ.get("C7N_MAXRES_PERCENT", 100)
 
     def __init__(self, policy, selection_count, population_count):
         self.p = policy
         self.op = MaxResourceLimit.C7N_MAXRES_OP
         self.selection_count = selection_count
         self.population_count = population_count
-        self.amount = selection_count
-        self.percentage_amount = population_count
-        self.percent = MaxResourceLimit.C7N_MAXRES_PERCENT
+        self.amount = None
+        self.percentage_amount = None
+        self.percent = None
         self._parse_policy()
 
     def _parse_policy(self,):
         if isinstance(self.p.max_resources, dict):
             self.op = self.p.max_resources.get("op", MaxResourceLimit.C7N_MAXRES_OP).lower()
-            self.percent = self.p.max_resources.get("percent",
-                                                    MaxResourceLimit.C7N_MAXRES_PERCENT)
-            self.amount = self.p.max_resources.get("amount", self.population_count)
+            self.percent = self.p.max_resources.get("percent")
+            self.amount = self.p.max_resources.get("amount")
 
         if isinstance(self.p.max_resources, int):
             self.amount = self.p.max_resources
@@ -557,28 +555,32 @@ class MaxResourceLimit(object):
         if isinstance(self.p.max_resources_percent, (int, float)):
             self.percent = self.p.max_resources_percent
 
-        self.percentage_amount = self.population_count * (self.percent / 100.0)
+        if self.percent:
+            self.percentage_amount = self.population_count * (self.percent / 100.0)
 
     def check_resource_limits(self):
-        if self.selection_count > self.amount and self.selection_count > self.percentage_amount \
-           and self.op == "and":
-            raise ResourceLimitExceeded(
-                ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
-                 "found:{selection_count} total:{population_count}")
-                % (self.p.name, self.percent), "max-resource and max-percent",
-                self.amount, self.selection_count, self.population_count)
+        if self.percentage_amount and self.amount:
+            if (self.selection_count > self.amount and
+               self.selection_count > self.percentage_amount and self.op == "and"):
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
+                     "found:{selection_count} total:{population_count}")
+                    % (self.p.name, self.percent), "max-resource and max-percent",
+                    self.amount, self.selection_count, self.population_count)
 
-        if self.selection_count > self.amount and self.op != "and":
-            raise ResourceLimitExceeded(
-                ("policy:%s exceeded resource-limit:{limit} "
-                 "found:{selection_count} total: {population_count}") % self.p.name,
-                "max-resource", self.amount, self.selection_count, self.population_count)
+        if self.amount:
+            if self.selection_count > self.amount and self.op != "and":
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit} "
+                     "found:{selection_count} total: {population_count}") % self.p.name,
+                    "max-resource", self.amount, self.selection_count, self.population_count)
 
-        if self.selection_count > self.percentage_amount and self.op != "and":
-            raise ResourceLimitExceeded(
-                ("policy:%s exceeded resource-limit:{limit}%% "
-                 "found:{selection_count} total:{population_count}") % self.p.name,
-                "max-percent", self.percent, self.selection_count, self.population_count)
+        if self.percentage_amount:
+            if self.selection_count > self.percentage_amount and self.op != "and":
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit}%% "
+                     "found:{selection_count} total:{population_count}") % self.p.name,
+                    "max-percent", self.percent, self.selection_count, self.population_count)
 
 
 class ChildResourceManager(QueryResourceManager):
