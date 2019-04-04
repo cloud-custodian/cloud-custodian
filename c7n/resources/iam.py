@@ -853,6 +853,8 @@ class RoleDelete(BaseAction):
                 error = e
             except client.exceptions.NoSuchEntityException:
                 continue
+            except client.exceptions.UnmodifiableEntityException:
+                continue
         if error:
             raise error
 

@@ -16,7 +16,8 @@
                 "second": 22,
                 "microsecond": 0
             },
-            "AssumeRolePolicyDocument": "%7B%22Version%22%3A%20%222012-10-17%22%2C%20%22Statement%22%3A%20%5B%7B%22Effect%22%3A%20%22Allow%22%2C%20%22Principal%22%3A%20%7B%22Service%22%3A%20%22ec2.amazonaws.com%22%7D%2C%20%22Action%22%3A%20%22sts%3AAssumeRole%22%7D%5D%7D",
+            "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+            "MaxSessionDuration": 3600,
             "Tags": [
                 {
                     "Key": "Name",
@@ -25,13 +26,13 @@
             ]
         },
         "ResponseMetadata": {
-            "RequestId": "34fe923a-5711-11e9-a1e5-a9ff6aae66f1",
+            "RequestId": "35481e82-5711-11e9-a1e5-a9ff6aae66f1",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "34fe923a-5711-11e9-a1e5-a9ff6aae66f1",
+                "x-amzn-requestid": "35481e82-5711-11e9-a1e5-a9ff6aae66f1",
                 "content-type": "text/xml",
-                "content-length": "921",
-                "date": "Thu, 04 Apr 2019 19:38:21 GMT"
+                "content-length": "934",
+                "date": "Thu, 04 Apr 2019 19:38:22 GMT"
             },
             "RetryAttempts": 0
         }

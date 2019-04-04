@@ -1,14 +1,20 @@
 {
-    "status_code": 200,
+    "status_code": 400,
     "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "UnmodifiableEntity",
+            "Message": "Cannot perform the operation on the protected role 'AWSServiceRoleForSupport' - this role is only modifiable by AWS"
+        },
         "ResponseMetadata": {
-            "RequestId": "2403e33b-5187-11e9-8bac-bd89644d0661",
-            "HTTPStatusCode": 200,
+            "RequestId": "34da4162-5711-11e9-9cb9-29c73f9ffcdc",
+            "HTTPStatusCode": 400,
             "HTTPHeaders": {
-                "x-amzn-requestid": "2403e33b-5187-11e9-8bac-bd89644d0661",
+                "x-amzn-requestid": "34da4162-5711-11e9-9cb9-29c73f9ffcdc",
                 "content-type": "text/xml",
-                "content-length": "200",
-                "date": "Thu, 28 Mar 2019 18:27:27 GMT"
+                "content-length": "365",
+                "date": "Thu, 04 Apr 2019 19:38:22 GMT",
+                "connection": "close"
             },
             "RetryAttempts": 0
         }

@@ -18,16 +18,22 @@
             },
             "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22support.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
             "Description": "Enables resource access for AWS to provide billing, administrative and support services",
-            "MaxSessionDuration": 3600
+            "MaxSessionDuration": 3600,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "CannotDelete"
+                }
+            ]
         },
         "ResponseMetadata": {
-            "RequestId": "23c7ebf9-5187-11e9-908f-53cfd5626f29",
+            "RequestId": "34c02921-5711-11e9-8c80-67e2505a3d10",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "23c7ebf9-5187-11e9-908f-53cfd5626f29",
+                "x-amzn-requestid": "34c02921-5711-11e9-8c80-67e2505a3d10",
                 "content-type": "text/xml",
-                "content-length": "1015",
-                "date": "Thu, 28 Mar 2019 18:27:26 GMT"
+                "content-length": "1141",
+                "date": "Thu, 04 Apr 2019 19:38:21 GMT"
             },
             "RetryAttempts": 0
         }
