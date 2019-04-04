@@ -1446,7 +1446,8 @@ class DeleteRoleAction(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = factory().client("iam")
-        self.assertTrue(client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')     
+        self.assertTrue(
+            client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
         policy_doc = json.dumps({
             "Version": "2012-10-17",
             "Statement": [{
@@ -1457,7 +1458,6 @@ class DeleteRoleAction(BaseTest):
                 "Action": "sts:AssumeRole"
             }]
         })
-        
         client.create_role(
             RoleName="c7n-test-delete", AssumeRolePolicyDocument=policy_doc, Path='/pratyush/',
             Tags=[{'Key': 'Name', 'Value': 'pratyush'}])
