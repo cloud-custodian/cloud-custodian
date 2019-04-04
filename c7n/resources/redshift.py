@@ -544,8 +544,10 @@ class TagTrim(tags.TagTrim):
               - name: redshift-tag-trim
                 resource: redshift
                 filters:
-                  - type: tag-count
-                    count: 10
+                  - type: value
+                    key: "[length(Tags)][0]"
+                    op: ge
+                    value: 10
                 actions:
                   - type: tag-trim
                     space: 1

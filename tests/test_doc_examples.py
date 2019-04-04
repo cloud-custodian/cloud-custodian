@@ -14,6 +14,7 @@
 import sys
 import yaml
 from parameterized import parameterized
+import itertools
 
 from c7n.resources import load_resources
 from c7n.exceptions import PolicyValidationError
@@ -24,17 +25,16 @@ def get_doc_examples():
     policies = []
     load_resources()
     for mod in sys.modules.keys():
-        if 'c7n.resources' in mod:
+        if 'c7n.resources.s3' in mod:
             module = sys.modules[mod]
             for sub_item in dir(module):
                 cls = getattr(sys.modules[mod], sub_item, None)
                 if isinstance(cls, type):
                     if cls.__doc__:
-                        splt_doc = cls.__doc__.split('yaml') # fix reget to catch all tests
-                        if len(splt_doc) == 2:
-                                # pp = yaml.load(splt_doc[1])
-                                # p = self.load_policy(pp["policies"][0])
-                            policies.append((splt_doc[1], module.__name__,cls.__name__))
+                        split_doc = [x.split('\n\n ') for x in cls.__doc__.split('yaml')]  # split on yaml and new lines
+                        for item in itertools.chain.from_iterable(split_doc):
+                            if 'policies:\n' in item:
+                                policies.append((item, module.__name__, cls.__name__))
 
     return policies
 
@@ -58,4 +58,4 @@ class DocExampleTest(BaseTest):
             policy = self.load_policy(parsed_policy["policies"][0])
             self.assertIsNone(policy.validate())
         except PolicyValidationError:
-            self.assertIsNone(None)
+            assert 0
