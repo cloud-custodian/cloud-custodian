@@ -21,7 +21,7 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_autodoc",
-    version='0.2',
+    version='0.3',
     description="Cloud Custodian - Automated Policy Documentation",
     classifiers=[
         "Topic :: System :: Systems Administration",
