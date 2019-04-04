@@ -17,9 +17,10 @@ for mod in sys.modules.keys():
                     if len(splt_doc) ==2:
                         try:
                             p = yaml.load(splt_doc[1])
-                            print(p)
+                            # print(p)
                             p_num = p_num + 1
                         except:
+                            print(splt_doc)
                             error = error +1
 
 
