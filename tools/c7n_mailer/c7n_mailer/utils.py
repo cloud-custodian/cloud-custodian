@@ -320,6 +320,10 @@ def resource_format(resource, resource_type):
         return "id: %s  attachments: %s" % (
             resource['InternetGatewayId'],
             len(resource['Attachments']))
+    elif resource_type == 'lambda':
+        return "Name: %s  RunTime: %s  \n" % (
+            resource['FunctionName'],
+            resource['Runtime'])
     else:
         return "%s" % format_struct(resource)
 

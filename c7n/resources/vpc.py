@@ -1854,6 +1854,7 @@ class VpcEndpoint(query.QueryResourceManager):
         filter_type = 'list'
         dimension = None
         id_prefix = "vpce-"
+        taggable = False
 
 
 @VpcEndpoint.filter_registry.register('cross-account')
@@ -1895,6 +1896,7 @@ class KeyPair(query.QueryResourceManager):
         name = 'KeyName'
         date = None
         dimension = None
+        taggable = False
 
 
 @Vpc.action_registry.register('set-flow-log')
