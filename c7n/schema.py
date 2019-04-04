@@ -190,7 +190,10 @@ def generate(resource_types=()):
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
                 'resource': {'type': 'string'},
-                'max-resources': {'type': 'integer', 'minimum': 1},
+                'max-resources': {'anyOf': [
+                    {'type': 'integer', 'minimum': 1},
+                    {'$ref': '#/definitions/max-resources-properties'}
+                ]},
                 'max-resources-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
@@ -219,6 +222,14 @@ def generate(resource_types=()):
         },
         'policy-mode': {
             'anyOf': [e.schema for _, e in execution.items()],
+        },
+        'max-resources-properties': {
+            'type': 'object',
+            'properties': {
+                'amount': {"type": 'integer', 'minimum': 1},
+                'op': {'enum': ['or', 'and']},
+                'percent': {'type': 'number', 'minimum': 0, 'maximum': 100}
+            }
         }
     }
 
