@@ -95,7 +95,7 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
                   - type: cross-account
                     whitelist_from:
                       expr: "accounts.*.accountNumber"
-                      url: *accounts_url
+                      url: accounts_url
     """
     permissions = ('ecr:GetRepositoryPolicy',)
 

@@ -21,17 +21,18 @@ from c7n.exceptions import PolicyValidationError
 from .common import BaseTest
 
 
-def get_doc_examples():
+def get_doc_examples(doc_folders):
     policies = []
-    load_resources()
+    load_resources() # just aws resources
     for mod in sys.modules.keys():
-        if 'c7n.resources.s3' in mod:
+        if any(doc_base in mod for doc_base in doc_folders):
             module = sys.modules[mod]
             for sub_item in dir(module):
                 cls = getattr(sys.modules[mod], sub_item, None)
                 if isinstance(cls, type):
                     if cls.__doc__:
-                        split_doc = [x.split('\n\n ') for x in cls.__doc__.split('yaml')]  # split on yaml and new lines
+                        split_doc = [x.split('\n\n ') for x in
+                                     cls.__doc__.split('yaml')]  # split on yaml and new lines
                         for item in itertools.chain.from_iterable(split_doc):
                             if 'policies:\n' in item:
                                 policies.append((item, module.__name__, cls.__name__))
@@ -43,13 +44,12 @@ def custom_test_name(testcase_func, param_num, param):
     return "test_docs_%s_%s" % (
         param.args[1],
         param.args[2]
-
     )
 
 
 class DocExampleTest(BaseTest):
 
-    policies_in_docs = get_doc_examples()
+    policies_in_docs = get_doc_examples(['c7n.resources'])
 
     @parameterized.expand(policies_in_docs, name_func=custom_test_name)
     def test_doc_examples(self, policy, module, name):
@@ -58,4 +58,4 @@ class DocExampleTest(BaseTest):
             policy = self.load_policy(parsed_policy["policies"][0])
             self.assertIsNone(policy.validate())
         except PolicyValidationError:
-            assert 0
+            raise

@@ -219,7 +219,7 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 actions:
                   - type: modify-policy
                     add-statements: [statement]
-                    remove-statements: [statement_id] or * or 'matched'
+                    remove-statements: [statement_id] # or * or 'matched'
     """
 
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')

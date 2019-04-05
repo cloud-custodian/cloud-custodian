@@ -553,7 +553,7 @@ class VolumeDetach(BaseAction):
                - name: instance-ebs-volumes
                  resource: ebs
                  filters:
-                   VolumeId :  volumeid
+                   - VolumeId :  volumeid
                  actions:
                    - detach
 

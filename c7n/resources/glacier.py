@@ -108,7 +108,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
             policies:
               - name: glacier-cross-account
-                resource: glaier
+                resource: glacier
                 filters:
                   - type: cross-account
                 actions:

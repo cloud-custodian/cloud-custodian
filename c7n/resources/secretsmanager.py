@@ -116,6 +116,6 @@ class MarkSecretForOp(TagDelayedAction):
               resource: secrets-manager
               actions:
                 - type: mark-for-op
-                  op: delete
+                  op: tag
                   days: 1
     """

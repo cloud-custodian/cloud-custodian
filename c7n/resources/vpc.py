@@ -365,7 +365,7 @@ class DhcpOptionsFilter(Filter):
 
      .. code-block: yaml
 
-        - policies:
+          policies:
              - name: vpcs-in-domain
                resource: vpc
                filters:
@@ -1211,8 +1211,7 @@ class RemovePermissions(BaseAction):
                 filters:
                   - type: ingress
                     IpProtocol: tcp
-                    FromPort: 0
-                    GroupName: http-group
+                    Ports: [8080]
                 actions:
                   - type: remove-permissions
                     ingress: matched
@@ -1360,7 +1359,7 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                     key: FromPort
                     value: 22
                 actions:
-                  - type: remove-groups
+                  - type: modify-security-groups
                     groups: matched
                     isolation-group: sg-01ab23c4
     """

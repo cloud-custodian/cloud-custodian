@@ -221,7 +221,7 @@ class SetEncryption(BaseAction):
                 filters:
                   - KmsMasterKeyId: absent
                 actions:
-                  - type: set_encryption
+                  - type: set-encryption
                     key: "<alias of kms key>"
     """
     schema = type_schema(
