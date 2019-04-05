@@ -257,7 +257,7 @@ class EmailDelivery(object):
             smtp_connection.ehlo()
         if self.config.get('smtp_username') or self.config.get('smtp_password'):
             smtp_username = self.config.get('smtp_username')
-            smtp_password = kms_decrypt(self.config, self.logger, self.session, 'smtp_password')  # pragma: no cover
+            smtp_password = kms_decrypt(self.config, self.logger, self.session, 'smtp_password')  # NOQA pragma: no cover
             smtp_connection.login(smtp_username, smtp_password)
         smtp_connection.sendmail(message['From'], to_addrs, message.as_string())
         smtp_connection.quit()
