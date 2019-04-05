@@ -334,7 +334,7 @@ def kms_decrypt(config, logger, session, encrypted_field):
             kms = session.client('kms')
             return kms.decrypt(
                 CiphertextBlob=base64.b64decode(config[encrypted_field]))[
-                    'Plaintext']
+                    'Plaintext'].decode('utf8')
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
                 "Error: %s Unable to base64 decode %s, will assume plaintext." %
