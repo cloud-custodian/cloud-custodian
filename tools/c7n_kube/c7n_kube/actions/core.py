@@ -127,7 +127,7 @@ class DeleteResource(DeleteAction):
     .. code-block:: yaml
       policies:
         - name: delete-{resource}
-          resource: k8s.{resource}
+          resource: k8s.pod # k8s.{resource}
           filters:
             - 'metadata.name': 'test-{resource}'
           actions:

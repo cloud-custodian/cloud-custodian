@@ -18,24 +18,29 @@ import itertools
 
 from c7n.resources import load_resources
 from c7n.exceptions import PolicyValidationError
+from c7n.provider import resources
 from .common import BaseTest
 
 
-def get_doc_examples(doc_folders):
+def get_doc_examples():
     policies = []
-    load_resources()
-    for mod in sys.modules.keys():
-        if any(doc_base in mod for doc_base in doc_folders):
-            module = sys.modules[mod]
-            for sub_item in dir(module):
-                cls = getattr(sys.modules[mod], sub_item, None)
-                if isinstance(cls, type):
-                    if cls.__doc__:
-                        split_doc = [x.split('\n\n ') for x in
-                                     cls.__doc__.split('yaml')]  # split on yaml and new lines
-                        for item in itertools.chain.from_iterable(split_doc):
-                            if 'policies:\n' in item:
-                                policies.append((item, module.__name__, cls.__name__))
+    for key, v in resources().items():
+        #filters
+        for k, filter in v.filter_registry._factories.items():
+                if filter.__doc__:
+                    split_doc = [x.split('\n\n ') for x in
+                                 filter.__doc__.split('yaml')]  # split on yaml and new lines
+                    for item in itertools.chain.from_iterable(split_doc):
+                        if 'policies:\n' in item:
+                            policies.append((item, key, filter.__name__))
+        #actions
+        for k, action in v.action_registry._factories.items():
+            if action.__doc__:
+                split_doc = [x.split('\n\n ') for x in
+                             action.__doc__.split('yaml')]  # split on yaml and new lines
+                for item in itertools.chain.from_iterable(split_doc):
+                    if 'policies:\n' in item:
+                        policies.append((item, key, action.__name__))
 
     return policies
 
@@ -49,7 +54,7 @@ def custom_test_name(testcase_func, param_num, param):
 
 class DocExampleTest(BaseTest):
 
-    policies_in_docs = get_doc_examples(['c7n.resources', 'c7n_azure', 'c7n_gcp'])
+    policies_in_docs = get_doc_examples()
 
     @parameterized.expand(policies_in_docs, name_func=custom_test_name)
     def test_doc_examples(self, policy, module, name):
