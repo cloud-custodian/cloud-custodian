@@ -23,7 +23,7 @@ from .common import BaseTest
 
 def get_doc_examples(doc_folders):
     policies = []
-    load_resources() # just aws resources
+    load_resources()
     for mod in sys.modules.keys():
         if any(doc_base in mod for doc_base in doc_folders):
             module = sys.modules[mod]
@@ -49,7 +49,7 @@ def custom_test_name(testcase_func, param_num, param):
 
 class DocExampleTest(BaseTest):
 
-    policies_in_docs = get_doc_examples(['c7n.resources'])
+    policies_in_docs = get_doc_examples(['c7n.resources', 'c7n_azure', 'c7n_gcp'])
 
     @parameterized.expand(policies_in_docs, name_func=custom_test_name)
     def test_doc_examples(self, policy, module, name):

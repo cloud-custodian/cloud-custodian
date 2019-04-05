@@ -22,20 +22,22 @@ class Notify(BaseNotify):
     """
     Example::
 
-      policies:
-        - name: bad-instance-get
-          resource: gcp.compute
-          filters:
-           - Name: bad-instance
-          actions:
-           - type: notify
-             to:
-              - email@address
-             # which template for the email should we use
-             template: policy-template
-             transport:
-               type: pubsub
-               topic: projects/yourproject/topics/yourtopic
+    .. code-block:: yaml
+
+          policies:
+            - name: bad-instance-get
+              resource: gcp.instance
+              filters:
+               - Name: bad-instance
+              actions:
+               - type: notify
+                 to:
+                  - email@address
+                 # which template for the email should we use
+                 template: policy-template
+                 transport:
+                   type: pubsub
+                   topic: projects/yourproject/topics/yourtopic
     """
 
     batch_size = 1000
