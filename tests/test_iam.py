@@ -1434,20 +1434,6 @@ class DeleteRoleAction(BaseTest):
     @functional
     def test_delete_role(self):
         factory = self.replay_flight_data("test_delete_role")
-        p = self.load_policy(
-            {
-                'name': 'iam-delete-profile-roles',
-                'resource': 'iam-role',
-                'filters': [{'tag:Name': 'CannotDelete'}],
-                "actions": ["delete"],
-            },
-            session_factory=factory
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = factory().client("iam")
-        self.assertTrue(
-            client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
         policy_doc = json.dumps({
             "Version": "2012-10-17",
             "Statement": [{
@@ -1458,6 +1444,7 @@ class DeleteRoleAction(BaseTest):
                 "Action": "sts:AssumeRole"
             }]
         })
+        client = factory().client("iam")
         client.create_role(
             RoleName="c7n-test-delete", AssumeRolePolicyDocument=policy_doc, Path='/pratyush/',
             Tags=[{'Key': 'Name', 'Value': 'pratyush'}])
@@ -1474,3 +1461,20 @@ class DeleteRoleAction(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertRaises(ClientError, client.get_role, RoleName=resources[0]['RoleName'])
+
+    def test_delete_role_error(self):
+        factory = self.replay_flight_data("test_delete_role_error")
+        p = self.load_policy(
+            {
+                'name': 'iam-delete-profile-roles',
+                'resource': 'iam-role',
+                'filters': [{'tag:Name': 'CannotDelete'}],
+                "actions": ["delete"],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("iam")
+        self.assertTrue(
+            client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
