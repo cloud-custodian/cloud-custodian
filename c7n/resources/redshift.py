@@ -545,7 +545,7 @@ class TagTrim(tags.TagTrim):
                 resource: redshift
                 filters:
                   - type: value
-                    key: "[length(Tags)][0]"
+                    key: "length(Tags)"
                     op: ge
                     value: 10
                 actions:

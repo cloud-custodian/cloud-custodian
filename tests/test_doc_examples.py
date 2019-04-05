@@ -58,9 +58,6 @@ class DocExampleTest(BaseTest):
 
     @parameterized.expand(policies_in_docs, name_func=custom_test_name)
     def test_doc_examples(self, policy, module, name):
-        try:
-            parsed_policy = yaml.load(policy)
-            policy = self.load_policy(parsed_policy["policies"][0])
-            self.assertIsNone(policy.validate())
-        except PolicyValidationError:
-            raise
+        parsed_policy = yaml.load(policy)
+        policy = self.load_policy(parsed_policy["policies"][0])
+        self.assertIsNone(policy.validate())
