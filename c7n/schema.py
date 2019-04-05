@@ -190,7 +190,10 @@ def generate(resource_types=()):
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
                 'resource': {'type': 'string'},
-                'max-resources': {'type': 'integer', 'minimum': 1},
+                'max-resources': {'anyOf': [
+                    {'type': 'integer', 'minimum': 1},
+                    {'$ref': '#/definitions/max-resources-properties'}
+                ]},
                 'max-resources-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
@@ -219,6 +222,14 @@ def generate(resource_types=()):
         },
         'policy-mode': {
             'anyOf': [e.schema for _, e in execution.items()],
+        },
+        'max-resources-properties': {
+            'type': 'object',
+            'properties': {
+                'amount': {"type": 'integer', 'minimum': 1},
+                'op': {'enum': ['or', 'and']},
+                'percent': {'type': 'number', 'minimum': 0, 'maximum': 100}
+            }
         }
     }
 
@@ -374,7 +385,7 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
                 resources[rname] = rtype
 
     for type_name, resource_type in resources.items():
-        classes = {'actions': {}, 'filters': {}}
+        classes = {'actions': {}, 'filters': {}, 'resource': resource_type}
         actions = []
         for action_name, cls in resource_type.action_registry.items():
             actions.append(action_name)
@@ -390,27 +401,40 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
             'actions': sorted(actions),
             'classes': classes,
         }
+
+    vocabulary["mode"] = {}
+    for mode_name, cls in execution.items():
+        vocabulary["mode"][mode_name] = cls
+
     return vocabulary
 
 
 def summary(vocabulary):
     providers = {}
+    non_providers = {}
 
     for type_name, rv in vocabulary.items():
-        provider, name = type_name.split('.', 1)
-        stats = providers.setdefault(provider, {
-            'resources': 0, 'actions': Counter(), 'filters': Counter()})
-        stats['resources'] += 1
-        for a in rv.get('actions'):
-            stats['actions'][a] += 1
-        for f in rv.get('filters'):
-            stats['filters'][f] += 1
+        if '.' not in type_name:
+            non_providers[type_name] = len(rv)
+        else:
+            provider, name = type_name.split('.', 1)
+            stats = providers.setdefault(provider, {
+                'resources': 0, 'actions': Counter(), 'filters': Counter()})
+            stats['resources'] += 1
+            for a in rv.get('actions'):
+                stats['actions'][a] += 1
+            for f in rv.get('filters'):
+                stats['filters'][f] += 1
 
     for provider, stats in providers.items():
         print("%s:" % provider)
         print(" resource count: %d" % stats['resources'])
         print(" actions: %d" % len(stats['actions']))
         print(" filters: %d" % len(stats['filters']))
+
+    for non_providers_type, length in non_providers.items():
+        print("%s:" % non_providers_type)
+        print(" count: %d" % length)
 
 
 def json_dump(resource=None):

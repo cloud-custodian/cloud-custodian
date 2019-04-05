@@ -1,0 +1,29 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/9.0.0/python
+    method: GET
+    uri: https://ghost/apis/stable.example.com/v1/crontabs
+  response:
+    body:
+      string: '{"apiVersion":"stable.example.com/v1","items":[{"apiVersion":"stable.example.com/v1","kind":"CronTab","metadata":{"creationTimestamp":"2019-03-25T16:07:29Z","generation":1,"name":"my-new-cron-object","namespace":"default","resourceVersion":"60107","selfLink":"/apis/stable.example.com/v1/namespaces/default/crontabs/my-new-cron-object","uid":"16c8eb7a-4f18-11e9-86a8-080027415632"},"spec":{"cronSpec":"*
+        * * * */5","image":"my-awesome-cron-image"}}],"kind":"CronTabList","metadata":{"continue":"","resourceVersion":"69373","selfLink":"/apis/stable.example.com/v1/crontabs"}}
+
+        '
+    headers:
+      Content-Length:
+      - '575'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 25 Mar 2019 22:14:53 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

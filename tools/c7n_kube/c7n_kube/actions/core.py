@@ -75,6 +75,26 @@ class PatchAction(MethodAction):
             op(**patch_args)
 
 
+class PatchResource(PatchAction):
+    """
+    Patches a resource
+    """
+    schema = type_schema(
+        'patch',
+        **{'options': {'type': 'object'}}
+    )
+
+    def process_resource_set(self, client, resources):
+        patch_args = {'body': self.data.get('options', {})}
+        self.patch_resources(client, resources, **patch_args)
+
+    @classmethod
+    def register_resources(klass, registry, resource_class):
+        model = resource_class.resource_type
+        if hasattr(model, 'patch') and hasattr(model, 'namespaced'):
+            resource_class.action_registry.register('patch', klass)
+
+
 class DeleteAction(MethodAction):
     """
     Deletes a resource
