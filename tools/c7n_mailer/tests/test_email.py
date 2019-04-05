@@ -63,6 +63,23 @@ class EmailTest(unittest.TestCase):
         self.assertFalse(is_email('slack://foo@bar.com'))
         self.assertTrue(is_email('foo@bar.com'))
 
+    def test_smtp_creds(self):
+        conf = dict(MAILER_CONFIG)
+        conf['smtp_username'] = 'alice'
+        conf['smtp_password'] = 'bob'
+
+        msg = dict(SQS_MESSAGE_1)
+        deliver = MockEmailDelivery(conf, self.aws_session, logger)
+        messages_map = deliver.get_to_addrs_email_messages_map(msg)
+
+        with patch("smtplib.SMTP") as mock_smtp:
+            with patch('c7n_mailer.email_delivery.kms_decrypt') as mock_decrypt:
+                mock_decrypt.return_value = 'xyz'
+                for email_addrs, mimetext_msg in messages_map.items():
+                    deliver.send_c7n_email(msg, list(email_addrs), mimetext_msg)
+            mock_decrypt.assert_called_once()
+            mock_smtp.assert_has_calls([call().login('alice', 'xyz')])
+
     def test_priority_header_is_valid(self):
         self.assertFalse(self.email_delivery.priority_header_is_valid('0'))
         self.assertFalse(self.email_delivery.priority_header_is_valid('-1'))
