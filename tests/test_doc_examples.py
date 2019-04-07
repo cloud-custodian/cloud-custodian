@@ -11,13 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
 import yaml
-from parameterized import parameterized
 import itertools
 
-from c7n.resources import load_resources
-from c7n.exceptions import PolicyValidationError
 from c7n.provider import resources
 from .common import BaseTest
 
@@ -26,7 +22,7 @@ def get_doc_examples():
     policies = []
     for key, v in resources().items():
         #filters
-        for k, filter in v.filter_registry._factories.items():
+        for k, filter in v.filter_registry.items():
                 if filter.__doc__:
                     split_doc = [x.split('\n\n ') for x in
                                  filter.__doc__.split('yaml')]  # split on yaml and new lines
@@ -34,7 +30,7 @@ def get_doc_examples():
                         if 'policies:\n' in item:
                             policies.append((item, key, filter.__name__))
         #actions
-        for k, action in v.action_registry._factories.items():
+        for k, action in v.action_registry.items():
             if action.__doc__:
                 split_doc = [x.split('\n\n ') for x in
                              action.__doc__.split('yaml')]  # split on yaml and new lines
@@ -45,19 +41,18 @@ def get_doc_examples():
     return policies
 
 
-def custom_test_name(testcase_func, param_num, param):
-    return "test_docs_%s_%s" % (
-        param.args[1],
-        param.args[2]
-    )
-
-
 class DocExampleTest(BaseTest):
 
     policies_in_docs = get_doc_examples()
 
-    @parameterized.expand(policies_in_docs, name_func=custom_test_name)
-    def test_doc_examples(self, policy, module, name):
-        parsed_policy = yaml.load(policy)
-        policy = self.load_policy(parsed_policy["policies"][0])
-        self.assertIsNone(policy.validate())
+    def test_doc_examples(self):
+        errors = []
+        for policy, module, cls_name in self.policies_in_docs:
+            try:
+                parsed_policy = yaml.load(policy)  # loads policy as list of len 1
+                policy = self.load_policy(parsed_policy["policies"][0])
+                policy.validate()
+            except Exception as e:
+                errors.append((module, cls_name, e))
+
+        assert len(errors) == 0

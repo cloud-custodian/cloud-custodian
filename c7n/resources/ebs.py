@@ -1405,7 +1405,7 @@ class ModifyVolume(BaseAction):
         if 'modifyable' not in self.manager.data.get('filters', ()):
             raise PolicyValidationError(
                 "modify action requires modifyable filter in policy")
-        if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
+        if self.data.get('size-percent', 100) < 100 and not self.data.get('shrink', False):
             raise PolicyValidationError((
                 "shrinking volumes requires os/fs support "
                 "or data-loss may ensue, use `shrink: true` to override"))
