@@ -121,7 +121,19 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 
 @SQS.filter_registry.register('kms-alias')
 class KmsKeyAlias(ResourceKmsKeyAlias):
-
+    """
+    Filter a resource by its associated kms key aliasname 'AliasName'
+     :example:
+         .. code-block:: yaml
+             policies:
+                - name: sqs-kms-key-filters
+                  resource: sqs
+                  filters:
+                    - type: kms-alias
+                      key: AliasName
+                      value: "^(alias/aws/)"
+                      op: regex
+    """
     def process(self, resources, event=None):
         for resource in resources:
             if 'KmsMasterKeyId' in resource:
