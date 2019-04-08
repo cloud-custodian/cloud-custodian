@@ -24,7 +24,7 @@ def get_doc_examples():
         #filters
         for k, filter in v.filter_registry.items():
                 if filter.__doc__:
-                    split_doc = [x.split('\n\n ') for x in
+                    split_doc = [x.split('\n\n') for x in
                                  filter.__doc__.split('yaml')]  # split on yaml and new lines
                     for item in itertools.chain.from_iterable(split_doc):
                         if 'policies:\n' in item:
@@ -43,13 +43,11 @@ def get_doc_examples():
 
 class DocExampleTest(BaseTest):
 
-    policies_in_docs = get_doc_examples()
-
     def test_doc_examples(self):
         errors = []
-        for policy, module, cls_name in self.policies_in_docs:
+        for policy, module, cls_name in get_doc_examples():
             try:
-                parsed_policy = yaml.load(policy)  # loads policy as list of len 1
+                parsed_policy = yaml.safe_load(policy)  # loads policy as list of len 1
                 policy = self.load_policy(parsed_policy["policies"][0])
                 policy.validate()
             except Exception as e:

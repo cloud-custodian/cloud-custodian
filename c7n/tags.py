@@ -161,7 +161,7 @@ class TagTrim(Action):
                  # as we need space for 3 more, this also ensures that
                  # metrics reporting is correct for the policy.
                - type: value
-                 key: "[length(Tags)][0]"
+                 key: "length(Tags)"
                  op: ge
                  value: 48
            actions:

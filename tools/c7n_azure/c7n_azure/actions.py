@@ -377,7 +377,7 @@ class TagTrim(AzureBaseAction):
                # removed for the 2 extra. This also ensures that metrics
                # reporting is correct for the policy.
               - type: value
-                key: "[length(Tags)][0]"
+                key: "length(Tags)"
                 op: ge
                 value: 14
            actions:
