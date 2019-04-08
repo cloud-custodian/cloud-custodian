@@ -66,7 +66,9 @@ class Notify(BaseNotify):
     transport, with the exception of the ``mtype`` attribute, which is a
     reserved attribute used by Cloud Custodian.
 
-    Example::
+    :example:
+
+    .. code-block:: yaml
 
       policies:
         - name: ec2-bad-instance-kill
