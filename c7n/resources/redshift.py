@@ -27,6 +27,7 @@ from c7n.filters import (
     FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS,
     CrossAccountAccessFilter)
 import c7n.filters.vpc as net_filters
+from c7n.filters.kms import KmsRelatedFilter
 
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
@@ -183,6 +184,28 @@ class Parameter(ValueFilter):
         for pg in db['ClusterParameterGroups']:
             params.update(self.group_params[pg['ParameterGroupName']])
         return self.match(params)
+
+
+@filters.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: redshift-kms-key-filters
+                  resource: redshift
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KmsKeyId'
 
 
 @actions.register('delete')

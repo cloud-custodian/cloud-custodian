@@ -268,6 +268,26 @@ class TestRedshift(BaseTest):
         )
         self.assertFalse(cluster["PubliclyAccessible"])
 
+    def test_redshift_kms_alias(self):
+        factory = self.replay_flight_data("test_redshift_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift-kms-alias",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestRedshiftSnapshot(BaseTest):
 
