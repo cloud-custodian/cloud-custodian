@@ -123,8 +123,11 @@ class SQSCrossAccount(CrossAccountAccessFilter):
 class KmsKeyAlias(ResourceKmsKeyAlias):
     """
     Filter a resource by its associated kms key aliasname 'AliasName'
-     :example:
+
+    :example:
+
          .. code-block:: yaml
+
              policies:
                 - name: sqs-kms-key-filters
                   resource: sqs
