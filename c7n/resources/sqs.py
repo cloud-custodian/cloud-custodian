@@ -20,6 +20,7 @@ import json
 from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.manager import resources
+from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.utils import local_session
 from c7n.query import QueryResourceManager
 from c7n.actions import BaseAction
@@ -116,6 +117,16 @@ class SQSCrossAccount(CrossAccountAccessFilter):
                   - type: cross-account
     """
     permissions = ('sqs:GetQueueAttributes',)
+
+
+@SQS.filter_registry.register('kms-alias')
+class KmsKeyAlias(ResourceKmsKeyAlias):
+
+    def process(self, resources, event=None):
+        for resource in resources:
+            if 'KmsMasterKeyId' in resource:
+                resource['KmsKeyId'] = resource['KmsMasterKeyId']
+        return self.get_matching_aliases(resources)
 
 
 @SQS.action_registry.register('remove-statements')

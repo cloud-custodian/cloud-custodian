@@ -422,3 +422,25 @@ class TestSqsAction(BaseTest):
         self.assertEqual(resources[0]["QueueUrl"], url1)
         resources = p.resource_manager.get_resources([url2])
         self.assertEqual(resources[0]["QueueUrl"], url1)
+
+    @functional
+    def test_sqs_kms_alias(self):
+        session_factory = self.replay_flight_data("test_sqs_kms_key_filter")
+
+        p = self.load_policy(
+            {
+                "name": "sqs-kms-alias",
+                "resource": "sqs",
+                "filters": [
+                    {
+                        "type": "kms-alias",
+                        "key": "AliasName",
+                        "value": "^(alias/aws/)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
