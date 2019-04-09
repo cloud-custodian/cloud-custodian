@@ -21,22 +21,13 @@ from .common import BaseTest
 def get_doc_examples():
     policies = []
     for key, v in resources().items():
-        # filters
-        for k, filter in v.filter_registry.items():
-            if filter.__doc__:
+        for k, cls in itertools.chain(v.filter_registry.items(), v.action_registry.items()):
+            if cls.__doc__:
                 split_doc = [x.split('\n\n') for x in
-                             filter.__doc__.split('yaml')]  # split on yaml and new lines
+                             cls.__doc__.split('yaml')]  # split on yaml and new lines
                 for item in itertools.chain.from_iterable(split_doc):
                     if 'policies:\n' in item:
-                        policies.append((item, key, filter.__name__))
-        # actions
-        for k, action in v.action_registry.items():
-            if action.__doc__:
-                split_doc = [x.split('\n\n ') for x in
-                             action.__doc__.split('yaml')]  # split on yaml and new lines
-                for item in itertools.chain.from_iterable(split_doc):
-                    if 'policies:\n' in item:
-                        policies.append((item, key, action.__name__))
+                        policies.append((item, key, cls.__name__))
 
     return policies
 
@@ -48,7 +39,7 @@ class DocExampleTest(BaseTest):
         for policy, module, cls_name in get_doc_examples():
             try:
                 parsed_policy = yaml.safe_load(policy)
-                list(map(lambda p: self.load_policy(p).validate(), parsed_policy["policies"]))
+                list(map(lambda p: self.load_policy(p), parsed_policy["policies"]))
             except Exception as e:
                 errors.append((module, cls_name, e))
 
