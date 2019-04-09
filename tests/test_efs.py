@@ -121,4 +121,5 @@ class ElasticFileSystem(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['KmsKeyId'], 'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5')
+        self.assertEqual(resources[0]['KmsKeyId'],
+                         'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5')
