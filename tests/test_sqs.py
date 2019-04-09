@@ -433,14 +433,24 @@ class TestSqsAction(BaseTest):
                 "resource": "sqs",
                 "filters": [
                     {
-                        "type": "kms-alias",
-                        "key": "AliasName",
-                        "value": "^(alias/aws/)",
-                        "op": "regex"
+                        "or": [
+                            {
+                                "type": "value",
+                                "key": "KmsMasterKeyId",
+                                "value": "^(alias/aws/)",
+                                "op": "regex"
+                            },
+                            {
+                                "type": "kms-key",
+                                "key": "c7n:AliasName",
+                                "value": "^(alias/aws/)",
+                                "op": "regex"
+                            }
+                        ]
                     }
                 ]
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(1, len(resources))
+        self.assertEqual(2, len(resources))

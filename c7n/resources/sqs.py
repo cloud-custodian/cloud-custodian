@@ -19,6 +19,7 @@ import json
 
 from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.utils import local_session
@@ -119,29 +120,32 @@ class SQSCrossAccount(CrossAccountAccessFilter):
     permissions = ('sqs:GetQueueAttributes',)
 
 
-@SQS.filter_registry.register('kms-alias')
-class KmsKeyAlias(ResourceKmsKeyAlias):
+@SQS.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
     """
-    Filter a resource by its associated kms key aliasname 'AliasName'
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+    The KmsMasterId returned for SQS sometimes has the alias name directly in the value.
 
     :example:
 
-         .. code-block:: yaml
+        .. code-block:: yaml
 
-             policies:
-                - name: sqs-kms-key-filters
-                  resource: sqs
+            policies:
+                - name: efs-kms-key-filters
+                  resource: efs
                   filters:
-                    - type: kms-alias
-                      key: AliasName
-                      value: "^(alias/aws/)"
-                      op: regex
+                    - or:
+                      - type: value
+                        key: KmsMasterKeyId
+                        value: "^(alias/aws/)"
+                        op: regex
+                      - type: kms-key
+                        key: c7n:AliasName
+                        value: "^(alias/aws/)"
+                        op: regex
     """
-    def process(self, resources, event=None):
-        for resource in resources:
-            if 'KmsMasterKeyId' in resource:
-                resource['KmsKeyId'] = resource['KmsMasterKeyId']
-        return self.get_matching_aliases(resources)
+    RelatedIdsExpression = 'KmsMasterKeyId'
 
 
 @SQS.action_registry.register('remove-statements')

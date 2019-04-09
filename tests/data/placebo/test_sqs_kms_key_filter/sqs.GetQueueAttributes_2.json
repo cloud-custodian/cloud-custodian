@@ -4,7 +4,7 @@
         "Attributes": {
             "ApproximateNumberOfMessagesNotVisible": "0",
             "KmsDataKeyReusePeriodSeconds": "300",
-            "KmsMasterKeyId": "arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5",
+            "KmsMasterKeyId": "alias/aws/sqs",
             "MessageRetentionPeriod": "345600",
             "ApproximateNumberOfMessagesDelayed": "0",
             "MaximumMessageSize": "262144",
@@ -14,7 +14,7 @@
             "DelaySeconds": "0",
             "VisibilityTimeout": "30",
             "LastModifiedTimestamp": "1509792378",
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:sqs-test-id"
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:sqs-test-alias"
         },
         "ResponseMetadata": {
             "RetryAttempts": 0,

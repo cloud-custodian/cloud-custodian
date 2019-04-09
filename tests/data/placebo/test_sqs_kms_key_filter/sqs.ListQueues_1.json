@@ -2,7 +2,8 @@
     "status_code": 200,
     "data": {
         "QueueUrls": [
-            "https://queue.amazonaws.com/644160558196/sqs-test"
+            "https://queue.amazonaws.com/644160558196/sqs-test-alias",
+            "https://queue.amazonaws.com/644160558196/sqs-test-id"
         ],
         "ResponseMetadata": {
             "RetryAttempts": 0,
