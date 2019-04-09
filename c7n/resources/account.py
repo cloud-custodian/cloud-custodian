@@ -1127,7 +1127,7 @@ class SetXrayEncryption(BaseAction):
                 resource: aws.account
                 actions:
                   - type: set-xray-encrypt
-                    key: alias/some/alias/ke
+                    key: alias/some/alias/key
     """
 
     permissions = ('xray:PutEncryptionConfig',)
