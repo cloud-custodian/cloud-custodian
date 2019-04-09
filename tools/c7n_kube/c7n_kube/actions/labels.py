@@ -26,7 +26,7 @@ class LabelAction(PatchAction):
     .. code-block:: yaml
 
       policies:
-        - name: label-{resource}
+        - name: label-resource
           resource: k8s.pod # k8s.{resource}
           filters:
             - 'metadata.name': 'name'
@@ -41,7 +41,7 @@ class LabelAction(PatchAction):
     .. code-block:: yaml
 
       policies:
-        - name: remove-label-from-{resource}
+        - name: remove-label-from-resource
           resource: k8s.pod # k8s.{resource}
           filters:
             - 'metadata.labels.label1': present
