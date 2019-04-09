@@ -20,7 +20,7 @@ from c7n_gcp.provider import resources as gcp_resources
 
 class Notify(BaseNotify):
     """
-    Example::
+    :example:
 
     .. code-block:: yaml
 
