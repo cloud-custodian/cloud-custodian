@@ -454,3 +454,26 @@ class TestSqsAction(BaseTest):
         )
         resources = p.run()
         self.assertEqual(2, len(resources))
+        # self.assertEqual(
+        #     [
+        #         u'alias/aws/sqs',
+        #         u'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5'
+        #     ],
+        #     sorted([r['KmsMasterKeyId'] for r in resources])
+        # )
+        # self.assertEqual(
+        #     [
+        #         u'arn:aws:sqs:us-east-1:644160558196:sqs-test-alias',
+        #         u'arn:aws:sqs:us-east-1:644160558196:sqs-test-id'
+        #     ],
+        #     sorted([r["QueueArn"] for r in resources])
+        # )
+        for r in resources:
+            self.assertTrue(r['KmsMasterKeyId'] in [
+                u'alias/aws/sqs',
+                u'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5'
+            ])
+            self.assertTrue(r['QueueArn'] in [
+                u'arn:aws:sqs:us-east-1:644160558196:sqs-test-alias',
+                u'arn:aws:sqs:us-east-1:644160558196:sqs-test-id'
+            ])
