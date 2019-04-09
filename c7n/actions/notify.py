@@ -109,8 +109,8 @@ class Notify(BaseNotify):
                        region: us-east-1
                        topic: your-notify-topic
                        attributes:
-                         - attribute_key: attribute_value
-                         - attribute_key_2: attribute_value_2
+                          attribute_key: attribute_value
+                          attribute_key_2: attribute_value_2
     """
 
     C7N_DATA_MESSAGE = "maidmsg/1.0"
