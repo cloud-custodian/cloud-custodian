@@ -21,7 +21,6 @@ from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.utils import local_session
 from c7n.query import QueryResourceManager
 from c7n.actions import BaseAction
