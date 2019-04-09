@@ -65,8 +65,8 @@ JMESPath Filter
        actions:
          - unmark
 
-  Transformations on the value can be done using the ``value_type`` keyword.  The
-  following value types are supported:
+  Transformations on the value returned from a describe call can be done using the
+  ``value_type`` keyword.  The following value types are supported:
 
   - ``age`` - convert to a datetime (for past date comparisons)
   - ``cidr`` - parse an ipaddress
@@ -77,6 +77,8 @@ JMESPath Filter
   - ``resource_count`` - compare against the number of matched resources
   - ``size`` - the length of an element
   - ``swap`` - swap the value and the evaluated key
+
+For both ``age`` and ``expiration`` transforms, the comparison ``value`` can be a float (days and fractions of a day) or a dictionary of arguments to the `timedelta <https://python.readthedocs.io/en/latest/library/datetime.html?highlight=datetime#datetime.timedelta>`_ function.
 
   Examples:
 
@@ -108,6 +110,19 @@ JMESPath Filter
        op: less-than
        value_type: age
        value: 32
+
+     # Find EBS volumes created more than 70 minutes ago but less than (approximately) 2 hours ago
+     - type: value
+       key: CreateTime
+       op: greater-than
+       value_type: age
+       value:
+        minutes: 70
+     - type: value
+       key: CreateTime
+       op: less-than
+       value_type: age
+       value: 0.08
 
      # Use `resource_count` to filter resources based on the number that matched
      # Note that no `key` is used for this value_type since it is matching on
