@@ -219,17 +219,13 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                 actions:
                   - type: modify-policy
                     add-statements: [{
-                         'Sid':'1',
-                         'Action': '*',
-                         'Resource': '*',
-                         'Effect': 'Allow'
-                     }]
-                    remove-statements: [{
-                         'Sid':'2',
-                         'Action': '*',
-                         'Resource': '*',
-                         'Effect': 'Allow'
-                     }]
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:GetTopicAttributes"],
+                        "Resource": topic_arn,
+                            }]
+                    remove-statements: '*'
     """
 
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
