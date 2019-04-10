@@ -29,7 +29,7 @@ from six.moves.urllib_parse import unquote_plus
 from c7n.utils import chunks
 
 
-def load_manifest_file(client, bucket, schema, versioned, ifilters, key_info):
+def load_manifest_file(client, bucket, schema, versioned, ofilter, key_info):
     """Given an inventory csv file, return an iterator over keys
     """
     # To avoid thundering herd downloads, we do an immediate yield for
@@ -49,7 +49,7 @@ def load_manifest_file(client, bucket, schema, versioned, ifilters, key_info):
             keys = []
             for kr in key_set:
                 k = kr[1]
-                if inventory_filter(ifilters, schema, kr):
+                if ofilter(kr):
                     continue
                 k = unquote_plus(k)
                 if versioned:
@@ -62,14 +62,41 @@ def load_manifest_file(client, bucket, schema, versioned, ifilters, key_info):
             yield keys
 
 
-def inventory_filter(ifilters, ischema, kr):
-    if 'IsDeleteMarker' in ischema and kr[ischema['IsDeleteMarker']] == 'true':
-        return True
+class ObjectFilter(object):
 
-    for f in ifilters:
-        if f(ischema, kr):
-            return True
-    return False
+    def __init__(self, data, schema):
+        self.data = data
+        self.schema = schema
+        self.max_size = 'max-size' in data and self.data['max-size'] or None
+        self.min_size = 'min-size' in data and self.data['min-size'] or None
+        self.extensions = 'extensions' in data and set(self.data['extensions'])
+        self.encrypted = 'encrypted' in data and set(self.data['encryption'])
+        if 'EncryptionStatus' not in schema:
+            self.encrypted = None
+        self.last_modified = 'last-modified' in data and self.data['last-modified'] or None
+        if self.last_modified:
+            self.last_modified = datetime.datetime.utcnow() - datetime.timedelta(
+                days=self.data['last-modified'])
+
+    def __call__(self, kr):
+        if self.max_size or self.min_size:
+            size = kr[self.schema['Size']]
+            if self.max_size and size > self.max_size:
+                return True
+            if self.min_size and size < self.min_size:
+                return True
+        if self.last_modified:
+            modified = kr[self.schema['LastModified']]
+            if self.last_modified < modified:
+                return True
+        if self.extensions:
+            kext = kr[self.schema['Key']].rsplit('.', 1)[-1]
+            if kext not in self.extensions:
+                return True
+        if self.encrypted:
+            if kr[self.schema['EncryptionStatus']] not in self.encrypted:
+                return True
+        return False
 
 
 def load_bucket_inventory(
@@ -95,9 +122,10 @@ def load_bucket_inventory(
     schema = dict([(k, i) for i, k in enumerate(
         [n.strip() for n in manifest_data['fileSchema'].split(',')])])
 
+    ofilter = ObjectFilter(ifilters, schema)
     processor = functools.partial(
         load_manifest_file, client, inventory_bucket,
-        schema, versioned, ifilters)
+        schema, versioned, ofilter)
     generators = map(processor, manifest_data.get('files', ()))
     return random_chain(generators)
 

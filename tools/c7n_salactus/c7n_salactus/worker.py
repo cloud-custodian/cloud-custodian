@@ -73,6 +73,11 @@ from c7n.utils import chunks, dumps
 from c7n_salactus.objectacl import ObjectAclCheck
 from c7n_salactus.inventory import load_bucket_inventory, get_bucket_inventory
 
+try:
+    from c7n_salactus.classify import ObjectContentClassify
+except ImportError:
+    ObjectContentClassify = None
+
 
 def patch_ssl():
     if getattr(CONN_CACHE, 'patched', None):
@@ -187,7 +192,7 @@ def bulk_invoke(func, args, nargs):
         with connection.pipeline() as pipe:
             for s in n:
                 argv[-1] = s
-                job._id = unicode(uuid4())
+                job._id = str(uuid4())
                 job.args = argv
                 q.enqueue_job(job, pipeline=pipe)
             pipe.execute()
@@ -716,10 +721,9 @@ def process_bucket_inventory(bid, inventory_bucket, inventory_prefix):
     session = boto3.Session()
     s3 = session.client('s3', region_name=region, config=s3config)
 
-    # find any key visitors with inventory filtering
+    # find any account inventory filtering.
     account_info = json.loads(connection.hget('bucket-accounts', account))
-    ifilters = [v.inventory_filter for v
-                in get_key_visitors(account_info) if v.inventory_filter]
+    ifilters = account_info.get('inventory', {}).get('object-filters', {})
 
     with bucket_ops(bid, 'inventory'):
         page_iterator = load_bucket_inventory(
@@ -790,15 +794,20 @@ def get_key_visitors(account_info):
         return [EncryptExtantKeys(keyconfig)]
     visitors = []
     for v in account_info.get('visitors'):
+        vi = None
         if v['type'] == 'encrypt-keys':
             vi = EncryptExtantKeys(v)
             vi.visitor_name = 'encrypt-keys'
             vi.inventory_filter = filter_encrypted
-            visitors.append(vi)
         elif v['type'] == 'object-acl':
             vi = ObjectAclCheck(v)
             vi.visitor_name = 'object-acl'
             vi.inventory_filter = None
+        elif v['type'] == 'classify' and ObjectContentClassify:
+            vi = ObjectContentClassify(v)
+            vi.visitor_name = 'object-classify'
+            vi.inventory_filter = None
+        if vi:
             visitors.append(vi)
     return visitors
 
