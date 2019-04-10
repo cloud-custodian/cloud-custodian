@@ -43,4 +43,4 @@ class DocExampleTest(BaseTest):
             except Exception as e:
                 errors.append((module, cls_name, e))
 
-        assert len(errors) == 0
+        assert len(errors) == 0, errors

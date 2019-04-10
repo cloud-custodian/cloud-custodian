@@ -218,8 +218,18 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                   - type: cross-account
                 actions:
                   - type: modify-policy
-                    add-statements: [statement]
-                    remove-statements: [statement_id] # or * or 'matched'
+                    add-statements: [{
+                         'Sid':'1',
+                         'Action': '*',
+                         'Resource': '*',
+                         'Effect': 'Allow'
+                     }]
+                    remove-statements: [{
+                         'Sid':'2',
+                         'Action': '*',
+                         'Resource': '*',
+                         'Effect': 'Allow'
+                     }]
     """
 
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')

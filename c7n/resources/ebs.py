@@ -1358,7 +1358,7 @@ class ModifyVolume(BaseAction):
                - modifyable
               actions:
                - type: modify
-                 volume-type: gp1
+                 volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
     respectively iops on io1 volumes and volume size.

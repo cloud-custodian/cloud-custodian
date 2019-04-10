@@ -1270,7 +1270,7 @@ class ToggleLogging(BucketActionBase):
             policies:
               - name: s3-enable-logging
                 resource: s3
-                filter:
+                filters:
                   - "tag:Testing": present
                 actions:
                   - type: toggle-logging

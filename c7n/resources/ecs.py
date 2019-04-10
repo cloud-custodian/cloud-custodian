@@ -758,11 +758,11 @@ class ECSTaggable(Filter):
         .. code-block:: yaml
 
             policies:
-                - name:
+                - name: taggable
                   resource: ecs-service
                   filters:
                     - type: taggable
-                      state: true
+                      state: True
     """
 
     schema = type_schema('taggable', state={'type': 'boolean'})

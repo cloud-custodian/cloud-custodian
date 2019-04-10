@@ -180,11 +180,12 @@ class LifecycleRule(Filter):
           resource: aws.ecr
           filters:
             - type: lifecycle-rule
-              state: false
+              state: False
               match:
                 - selection.tagStatus: untagged
                 - action.type: expire
-                - key: selection.countNumber
+                - type: value
+                  key: selection.countNumber
                   value: 30
                   op: less-than
     """

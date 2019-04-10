@@ -1360,8 +1360,8 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                     value: 22
                 actions:
                   - type: modify-security-groups
-                    groups: matched
                     isolation-group: sg-01ab23c4
+                    add: []
     """
     permissions = ('ec2:ModifyNetworkInterfaceAttribute',)
 
@@ -1707,7 +1707,7 @@ class AddressRelease(BaseAction):
                   - AllocationId: ...
                 actions:
                   - type: release
-                    force: true|false
+                    force: True
     """
 
     schema = type_schema('release', force={'type': 'boolean'})

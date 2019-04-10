@@ -39,7 +39,7 @@ class ConfigCompliance(Filter):
               eval_filters:
                - type: value
                  key: ResultRecordedTime
-                 type: age
+                 value_type: age
                  value: 30
                  op: less-than
               rules:
