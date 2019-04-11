@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 from concurrent.futures import as_completed
-
+from c7n.exceptions import PolicyValidationError
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
@@ -531,8 +531,23 @@ class FilterRestMethod(ValueFilter):
         method={'type': 'string', 'enum': [
             'all', 'ANY', 'PUT', 'GET', "POST",
             "DELETE", "OPTIONS", "HEAD", "PATCH"]},
-        rinherit=ValueFilter.schema)
+        rinherit=ValueFilter.schema, matched={'type': 'boolean'})
     permissions = ('apigateway:GET',)
+
+    def validate(self):
+        if not self.data.get('matched'):
+            return
+        rm = list(self.manager.iter_filters())
+        found = False
+        for r in rm[:rm.index(self)]:
+            if not r.data.get('matched', False):
+                found = True
+                break
+        if not found:
+            raise PolicyValidationError(
+                "matched filter, requires preceding filter on %s " % (
+                    self.manager.data,))
+        return self
 
     def process(self, resources, event=None):
         method_set = self.data.get('method', 'all')
@@ -549,6 +564,8 @@ class FilterRestMethod(ValueFilter):
         with self.executor_factory(max_workers=2) as w:
             tasks = []
             for r in resources:
+                if self.data.get('matched', False):
+                    r.pop(ANNOTATION_KEY_MATCHED_METHODS, [])
                 r_method_set = method_set
                 if method_set == 'all':
                     r_method_set = r.get('resourceMethods', {}).keys()

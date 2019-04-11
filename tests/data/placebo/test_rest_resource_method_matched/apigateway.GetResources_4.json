@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b90c07e8-5c60-11e9-a160-c50c63a40e0f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 11 Apr 2019 13:50:10 GMT",
+                "content-type": "application/json",
+                "content-length": "71",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b90c07e8-5c60-11e9-a160-c50c63a40e0f",
+                "x-amz-apigw-id": "X-fi2KgGoAMEcFw="
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "x4ixbp4ukh",
+                "path": "/",
+                "resourceMethods": {
+                    "GET": {}
+                }
+            }
+        ]
+    }
+}

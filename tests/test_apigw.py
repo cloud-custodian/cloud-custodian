@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.exceptions import ClientError
+from c7n.exceptions import PolicyValidationError
 
 from .common import BaseTest
 
@@ -251,6 +252,101 @@ class TestRestResource(BaseTest):
             httpMethod=m["httpMethod"],
         )
         self.assertEqual(method["authorizationType"], "AWS_IAM")
+
+    def test_rest_resource_method_matched_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "rest-method-filter",
+                "resource": "rest-resource",
+                "filters": [
+                    {
+                        "type": "rest-method",
+                        "key": "authorizationType",
+                        "value": "AWS_IAM",
+                        "matched": True,
+                    }
+                ],
+            },
+        )
+
+        try:
+            self.load_policy(
+                {
+                    "name": "rest-method-filter",
+                    "resource": "rest-resource",
+                    "filters": [
+                        {
+                            "type": "rest-method",
+                            "key": "authorizationType",
+                            "value": "AWS_IAM",
+                        },
+                        {
+                            "type": "rest-method",
+                            "key": "apiKeyRequired",
+                            "matched": True,
+                            "value": "false",
+                        },
+                    ],
+                }
+            )
+        except PolicyValidationError:
+            raise
+            self.fail("filter validation should not have failed")
+
+    def test_rest_resource_method_matched(self):
+        session_factory = self.replay_flight_data("test_rest_resource_method_matched")
+        p = self.load_policy(
+            {
+                "name": "rest-method-filter",
+                "resource": "rest-resource",
+                "filters": [
+                    {
+                        "type": "rest-method",
+                        "key": "authorizationType",
+                        "value": "AWS_IAM",
+                        "op": "equal",
+                    },
+                    {
+                        "type": "rest-method",
+                        "key": "apiKeyRequired",
+                        "value": False,
+                        "op": "equal",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["restApiId"], "41tqbpyer2")
+        self.assertEqual(len(resources[0].get("c7n:matched-resource-methods")), 2)
+
+        p = self.load_policy(
+            {
+                "name": "rest-method-filter",
+                "resource": "rest-resource",
+                "filters": [
+                    {
+                        "type": "rest-method",
+                        "key": "authorizationType",
+                        "value": "AWS_IAM",
+                    },
+                    {
+                        "type": "rest-method",
+                        "key": "apiKeyRequired",
+                        "value": False,
+                        "matched": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["restApiId"], "41tqbpyer2")
+        self.assertEqual(len(resources[0].get("c7n:matched-resource-methods")), 1)
 
 
 class TestRestStage(BaseTest):
