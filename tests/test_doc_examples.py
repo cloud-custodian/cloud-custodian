@@ -13,9 +13,12 @@
 # limitations under the License.
 import yaml
 import itertools
+import os
 
 from c7n.provider import resources
 from .common import BaseTest
+
+C7N_TEST_DOCS = bool(os.environ.get("C7N_TEST_DOCS", False))
 
 
 def get_doc_examples():
@@ -39,7 +42,7 @@ class DocExampleTest(BaseTest):
         for policy, module, cls_name in get_doc_examples():
             try:
                 parsed_policy = yaml.safe_load(policy)
-                list(map(lambda p: self.load_policy(p), parsed_policy["policies"]))
+                list(map(lambda p: self.load_policy(p, validate=C7N_TEST_DOCS), parsed_policy["policies"]))
             except Exception as e:
                 errors.append((module, cls_name, e))
 
