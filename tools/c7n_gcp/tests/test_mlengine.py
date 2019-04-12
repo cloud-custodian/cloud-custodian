@@ -14,46 +14,6 @@
 from gcp_common import BaseTest
 
 
-class TestMLLocations(BaseTest):
-
-    def test_locations_query(self):
-        project_id = "cloud-custodian"
-
-        session_factory = self.replay_flight_data(
-            'ml-locations-query', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-locations-query',
-                'resource': 'gcp.ml-location'
-            },
-            session_factory=session_factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-    def test_location_get(self):
-        project_id = 'cloud-custodian'
-        location = "asia-east1"
-
-        session_factory = self.replay_flight_data(
-            'ml-locations-query-get', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-locations-query-get',
-                'resource': 'gcp.ml-location'
-            },
-            session_factory=session_factory)
-
-        resource = policy.resource_manager.get_resource({
-            "location": location,
-            "project_id": project_id,
-        })
-
-        self.assertEqual(resource['name'], location)
-
-
 class TestMLModels(BaseTest):
 
     def test_models_query(self):

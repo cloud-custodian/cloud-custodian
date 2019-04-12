@@ -16,28 +16,6 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-@resources.register('ml-location')
-class MLLocation(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'ml'
-        version = 'v1'
-        component = 'projects.locations'
-        enum_spec = ('list', 'locations[]', None)
-        scope = 'project'
-        scope_key = 'parent'
-        scope_template = 'projects/{}'
-        id = 'name'
-
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_query(
-                'get', verb_arguments={
-                    'name': 'projects/{}/locations/{}'.format(
-                        resource_info['project_id'],
-                        resource_info['location'])})
-
-
 @resources.register('ml-model')
 class MLModel(QueryResourceManager):
 
