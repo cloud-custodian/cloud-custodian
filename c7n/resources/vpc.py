@@ -205,6 +205,40 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
         return vpc_group_ids
 
 
+@Vpc.filter_registry.register('network-acl')
+class VpcNetworkAclFilter(RelatedResourceFilter):
+    """Filter VPCs based on Security Group attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: network-acl
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'network-acl', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.NetworkAcl"
+    RelatedIdsExpression = '[NetworkAcls][].NetworkAclId'
+    AnnotationKey = "MatchedVpcNetworkAcl"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_network_acl_ids = {
+            g['NetworkAclId'] for g in
+            self.manager.get_resource_manager('network-acl').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        return vpc_network_acl_ids
+
+
 @Vpc.filter_registry.register('subnet')
 class VpcSubnetFilter(RelatedResourceFilter):
     """Filter VPCs based on Subnet attributes

@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "Vpcs": [
+            {
+                "CidrBlock": "10.205.0.0/18",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-03005fb9b8740263d",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0f6765530d80dc044",
+                        "CidrBlock": "10.205.0.0/18",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "faizan.ahmed@capitalone.com"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "testing-vpc"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "172.31.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-d2d616b5",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-33669f5a",
+                        "CidrBlock": "172.31.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FlowLogTest"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "883f18c9-d69e-4ed2-a3a3-48c41705c7f5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "2205",
+                "vary": "accept-encoding",
+                "date": "Fri, 12 Apr 2019 19:28:33 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -584,6 +584,27 @@ class NetworkAclTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_vpc_by_network_acl(self):
+        factory = self.replay_flight_data("test_vpc_by_nacl")
+        p = self.load_policy(
+            {
+                "name": "vpc-nacl",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "network-acl",
+                        "key": "tag:Name",
+                        "value": "pratyush",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Tags"][0]["Value"], "FlowLogTest")
+        self.assertEqual(resources[0]["c7n:MatchedVpcNetworkAcl"], ["acl-c2f35fa5"])
+
 
 class TransitGatewayTest(BaseTest):
 
