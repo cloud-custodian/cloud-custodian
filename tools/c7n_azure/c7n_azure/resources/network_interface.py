@@ -15,7 +15,10 @@
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n.filters.core import ValueFilter, type_schema
+import logging
 
+
+log = logging.getLogger('azure.networkinterface')
 
 @resources.register('networkinterface')
 class NetworkInterface(ArmResourceManager):
@@ -40,12 +43,15 @@ class EffectiveRouteTableFilter(ValueFilter):
         if 'routes' not in i:
             client = self.manager.get_client()
 
-            route_table = (
-                client.network_interfaces
-                    .get_effective_route_table(i['resourceGroup'], i['name'])
-                    .result()
-            )
+            try:
+                route_table = (
+                    client.network_interfaces
+                        .get_effective_route_table(i['resourceGroup'], i['name'])
+                        .result()
+                )
 
-            i['routes'] = route_table.serialize()
+                i['routes'] = route_table.serialize()
+            except Exception as error:
+                log.warning(error)
 
         return super(EffectiveRouteTableFilter, self).__call__(i)
