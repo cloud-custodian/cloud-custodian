@@ -43,3 +43,15 @@ and then perform the delete operation on those ready for deletion.
             op: delete
         actions:
           - type: delete
+
+.. code-block:: yaml
+
+    policies:
+      - name: get-nic-with-user-routes
+        resource: azure.networkinterface
+        filters:
+          - type: effective-route-table
+            key: routes.value[].source
+            op: in
+            value_type: swap
+            value: User
