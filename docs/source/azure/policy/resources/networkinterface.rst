@@ -10,6 +10,12 @@ Filters
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- ``effective-route-table``
+  Filter based on Effective Routes associated with network interfaces such as route names, next hops.
+    - Network Interfaces must be attached to a virtual machine and the virtual machine must be powered on.
+
+  .. c7n-schema:: EffectiveRouteTableFilter
+       :module: c7n_azure.resources.network_interface
 
 Actions
 -------
@@ -55,3 +61,15 @@ and then perform the delete operation on those ready for deletion.
             op: in
             value_type: swap
             value: User
+
+.. code-block:: yaml
+
+    policies:
+      - name: virtual-network-gateway-hop
+        resource: azure.networkinterface
+        filters:
+          - type: effective-route-table
+            key: routes.value[].nextHopType
+            op: in
+            value_type: swap
+            value: VirtualNetworkGateway
