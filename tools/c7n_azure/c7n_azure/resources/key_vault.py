@@ -75,7 +75,11 @@ class WhiteListFilter(Filter):
         #   - User is whitelisted
         #   - Permissions don't exceed allowed permissions
         for p in i['accessPolicies']:
-            if p[self.key] not in self.users:
+            if self.key not in p:
+                raise KeyError("Key: {0} not found on access policy in Keyvault: {1}. "
+                               "Unable to apply white list filter.".format(self.key, i['name']),
+                               self.key, i['name'])
+            elif p[self.key] not in self.users:
                 if not self.compare_permissions(p['permissions'], self.permissions):
                     return False
         return True
@@ -97,6 +101,9 @@ class WhiteListFilter(Filter):
         return True
 
     def enhance_policies(self, access_policies):
+        if not access_policies:
+            return access_policies
+
         if self.graph_client is None:
             s = Session(resource='https://graph.windows.net')
             self.graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
@@ -109,8 +116,9 @@ class WhiteListFilter(Filter):
 
         for policy in access_policies:
             aad_object = principal_dics[policy['objectId']]
-            policy['displayName'] = aad_object.display_name
-            policy['aadType'] = aad_object.object_type
-            policy['principalName'] = GraphHelper.get_principal_name(aad_object)
+            if aad_object.object_id:
+                policy['displayName'] = aad_object.display_name
+                policy['aadType'] = aad_object.object_type
+                policy['principalName'] = GraphHelper.get_principal_name(aad_object)
 
         return access_policies

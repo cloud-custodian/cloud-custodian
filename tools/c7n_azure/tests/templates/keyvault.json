@@ -6,7 +6,7 @@
     "resources": [
         {
             "type": "Microsoft.KeyVault/vaults",
-            "name": "cckeyvault1",
+            "name": "[concat('cckeyvault1', uniqueString(resourceGroup().id))]",
             "apiVersion": "2016-10-01",
             "location": "southcentralus",
             "tags": {},

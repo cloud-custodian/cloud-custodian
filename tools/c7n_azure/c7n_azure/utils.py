@@ -194,6 +194,9 @@ class GraphHelper(object):
 
     @staticmethod
     def get_principal_dictionary(graph_client, object_ids):
+        if not object_ids:
+            return {}
+
         object_params = GetObjectsParameters(
             include_directory_object_references=True,
             object_ids=object_ids)
@@ -204,10 +207,16 @@ class GraphHelper(object):
         try:
             for aad_object in aad_objects:
                 principal_dics[aad_object.object_id] = aad_object
-        except CloudError:
-            GraphHelper.log.warning(
-                'Credentials not authorized for access to read from Microsoft Graph. \n '
-                'Can not query on principalName, displayName, or aadType. \n')
+        except CloudError as e:
+            if e.status_code in [403, 401]:
+                GraphHelper.log.warning(
+                    'Credentials not authorized for access to read from Microsoft Graph. \n '
+                    'Can not query on principalName, displayName, or aadType. \n')
+            else:
+                GraphHelper.log.error(
+                    'Exception in call to Microsoft Graph. \n '
+                    'Can not query on principalName, displayName, or aadType. \n'
+                    'Error: {0}'.format(e))
 
         return principal_dics
 
