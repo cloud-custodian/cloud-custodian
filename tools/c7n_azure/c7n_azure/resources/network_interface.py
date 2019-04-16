@@ -15,8 +15,7 @@
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n.filters.core import ValueFilter, type_schema
-from c7n.utils import chunks
-from concurrent.futures import as_completed
+from c7n_azure.utils import ThreadHelper
 import logging
 
 log = logging.getLogger('azure.networkinterface')
@@ -41,26 +40,21 @@ class EffectiveRouteTableFilter(ValueFilter):
     schema = type_schema('effective-route-table', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
-        futures = []
-        results = []
         chunk_size = 20
+        max_workers = 3
 
-        # Process each resource in a separate thread, returning all that pass filter
-        with self.executor_factory(max_workers=3) as w:
-            for resource_set in chunks(resources, chunk_size):
-                futures.append(w.submit(self.process_resource_set, resource_set))
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log,
+            max_workers=max_workers,
+            chunk_size=chunk_size
+        )
+        return resources
 
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.warning(
-                        "Diagnostic settings filter error: %s" % f.exception())
-                    continue
-                else:
-                    results.extend(f.result())
-
-            return results
-
-    def process_resource_set(self, resources):
+    def _process_resource_set(self, resources, event):
         client = self.manager.get_client()
         matched = []
 
@@ -74,7 +68,7 @@ class EffectiveRouteTableFilter(ValueFilter):
                     )
 
                     resource['routes'] = route_table.serialize()
-                    filtered_effective_route_table = super(EffectiveRouteTableFilter, self).process([resource], event=None)
+                    filtered_effective_route_table = super(EffectiveRouteTableFilter, self).process([resource], event)
 
                     if filtered_effective_route_table:
                         matched.append(resource)
