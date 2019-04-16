@@ -54,10 +54,10 @@ class NetworkInterfaceTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'myvmnic'},
                 {'type': 'effective-route-table',
-                 'key': 'routes.value[].source',
+                 'key': 'routes.value[].nextHopType',
                  'op': 'in',
                  'value_type': 'swap',
-                 'value': 'Default'}]
+                 'value': 'VnetLocal'}]
         })
         resources = p.run()
         self.assertEqual(len(resources),1)
