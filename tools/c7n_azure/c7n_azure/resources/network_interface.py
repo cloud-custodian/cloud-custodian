@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from c7n_azure import constants
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+
 from c7n.filters.core import ValueFilter, type_schema
 from c7n_azure.utils import ThreadHelper
 import logging
 
+max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
+chunk_size = constants.DEFAULT_MAX_THREAD_WORKERS
 log = logging.getLogger('azure.networkinterface')
+
 
 @resources.register('networkinterface')
 class NetworkInterface(ArmResourceManager):
@@ -40,10 +45,8 @@ class EffectiveRouteTableFilter(ValueFilter):
     schema = type_schema('effective-route-table', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
-        chunk_size = 20
-        max_workers = 3
 
-        resources, exceptions = ThreadHelper.execute_in_parallel(
+        resources, _ = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self._process_resource_set,
@@ -63,12 +66,13 @@ class EffectiveRouteTableFilter(ValueFilter):
                 if 'routes' not in resource:
                     route_table = (
                         client.network_interfaces
-                            .get_effective_route_table(resource['resourceGroup'], resource['name'])
-                            .result()
+                        .get_effective_route_table(resource['resourceGroup'], resource['name'])
+                        .result()
                     )
 
                     resource['routes'] = route_table.serialize()
-                    filtered_effective_route_table = super(EffectiveRouteTableFilter, self).process([resource], event)
+                    filtered_effective_route_table = super(EffectiveRouteTableFilter, self)\
+                        .process([resource], event)
 
                     if filtered_effective_route_table:
                         matched.append(resource)

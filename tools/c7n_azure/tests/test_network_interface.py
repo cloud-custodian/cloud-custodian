@@ -60,4 +60,4 @@ class NetworkInterfaceTest(BaseTest):
                  'value': 'VnetLocal'}]
         })
         resources = p.run()
-        self.assertEqual(len(resources),1)
+        self.assertEqual(len(resources), 1)
