@@ -36,7 +36,7 @@ from concurrent.futures import ThreadPoolExecutor
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
-from c7n.utils import parse_s3, temporary_open
+from c7n.utils import parse_s3, local_session, temporary_open
 
 
 log = logging.getLogger('custodian.serverless')
