@@ -32,7 +32,7 @@ from c7n.actions import (
 from c7n.actions.securityhub import PostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase, ANNOTATION_KEY
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
@@ -40,7 +40,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.iam import CheckPermissions
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, set_annotation
 
 
 RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
@@ -330,7 +330,11 @@ class AttachedVolume(ValueFilter):
                 for a in v.get('Attachments', []):
                     if a['Device'] in self.skip:
                         volumes.remove(v)
-        return self.operator(map(self.match, volumes))
+        if self.operator(map(self.match, volumes)):
+            i['Volumes'] = volumes
+            set_annotation(i, ANNOTATION_KEY, "volume-%s" % self.k)
+            return True
+        return False
 
 
 @filters.register('termination-protected')
