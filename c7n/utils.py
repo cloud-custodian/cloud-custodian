@@ -523,9 +523,9 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
 
 def temporary_open(name, mode=0o777):
     if os.name == 'nt' and sys.version_info >= (3, 0):
-        return open(name, mode=mode, opener=os.open(name, os.O_TEMPORARY, mode))
+        return open(name, mode, opener=os.open(name, os.O_TEMPORARY, mode))
     else:
-        return open(name, mode=mode)
+        return open(name, mode)
 
 def parse_url_config(url):
     if url and '://' not in url:
