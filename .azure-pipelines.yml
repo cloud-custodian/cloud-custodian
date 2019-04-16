@@ -84,7 +84,7 @@ jobs:
       testRunTitle: 'Python $(python.version)'
     condition: succeededOrFailed()
 
-- job: 'Test Windows'
+- job: 'TestWindows'
   condition: "succeeded()"
   pool:
     vmImage: 'vs2017-win2016'
