@@ -20,7 +20,7 @@ import hashlib
 
 from c7n_gcp.client import errors
 from c7n.mu import custodian_archive as base_archive
-from c7n.utils import local_session
+from c7n.utils import local_session, temporary_open
 
 from googleapiclient.errors import HttpError
 
@@ -186,7 +186,7 @@ class CloudFunctionManager(object):
                 'Content-Length': '%d' % archive.size,
                 'x-goog-content-length-range': '0,104857600'
             },
-            body=open(archive.path, 'rb')
+            body=temporary_open(archive.path, 'rb')
         )
         log.info("function code uploaded")
         if headers['status'] != '200':
