@@ -135,6 +135,7 @@ class PostFinding(BaseAction):
     schema = type_schema(
         "post-finding",
         required=["types"],
+        title={"type": "string"},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
