@@ -229,7 +229,7 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     :Example:
 
      Find any fargate services that are running with a particular
-     image in the task and delete them.
+     image in the task and stop them.
 
     .. code-block:: yaml
 
@@ -237,15 +237,14 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
          - name: fargate-readonly-tasks
            resource: ecs-task
            filters:
-            - launchType: FARGATE
-            - type: task-definition
-              key: "containerDefinitions[].image"
-              value: "elasticsearch/elasticsearch:6.4.3
-              value_type: swap
-              op: contains
+             - launchType: FARGATE
+             - type: task-definition
+               key: "containerDefinitions[].image"
+               value: "elasticsearch/elasticsearch:6.4.3"
+               value_type: swap
+               op: contains
            actions:
-            - delete
-
+             - type: stop
     """
 
 
@@ -426,14 +425,14 @@ class TaskTaskDefinitionFilter(RelatedTaskDefinitionFilter):
          - name: fargate-readonly-tasks
            resource: ecs-task
            filters:
-            - launchType: FARGATE
-            - type: task-definition
-              key: "containerDefinitions[].readonlyRootFilesystem"
-              value: None
-              value_type: swap
-              op: contains
+             - launchType: FARGATE
+             - type: task-definition
+               key: "containerDefinitions[].readonlyRootFilesystem"
+               value: None
+               value_type: swap
+               op: contains
            actions:
-            - stop
+             - type: stop
 
     """
     related_key = 'taskDefinitionArn'
@@ -694,12 +693,11 @@ class RemoveTagEcsResource(RemoveTag):
     .. code-block:: yaml
 
             policies:
-              - name: ecs-cluster-remove-tag
-                resource: ecs
+              - name: ecs-service-remove-tag
+                resource: ecs-service
                 filters:
-                  - "tag:BadTag": present
                   - type: taggable
-                    value: true
+                    state: true
                 actions:
                   - type: remove-tag
                     tags: ["BadTag"]
@@ -760,11 +758,11 @@ class ECSTaggable(Filter):
         .. code-block:: yaml
 
             policies:
-                - name:
+                - name: taggable
                   resource: ecs-service
                   filters:
                     - type: taggable
-                      state: true
+                      state: True
     """
 
     schema = type_schema('taggable', state={'type': 'boolean'})

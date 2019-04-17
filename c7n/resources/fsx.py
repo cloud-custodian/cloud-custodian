@@ -61,7 +61,7 @@ class DeleteBackup(BaseAction):
     .. code-block: yaml
 
         policies:
-            - type: delete-backups
+            - name: delete-backups
               resource: fsx-backup
               filters:
                 - type: value

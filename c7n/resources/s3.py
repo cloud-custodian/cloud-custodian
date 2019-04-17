@@ -1270,7 +1270,7 @@ class ToggleLogging(BucketActionBase):
             policies:
               - name: s3-enable-logging
                 resource: s3
-                filter:
+                filters:
                   - "tag:Testing": present
                 actions:
                   - type: toggle-logging
@@ -1342,12 +1342,14 @@ class AttachLambdaEncrypt(BucketActionBase):
 
 
                 policies:
-                  - name: s3-attach-encryption-event
+                  - name: attach-lambda-encrypt
                     resource: s3
                     filters:
                       - type: missing-policy-statement
                     actions:
-                      - attach-encrypt
+                      - type: attach-encrypt
+                        role: arn:aws:iam::123456789012:role/my-role
+
     """
     schema = type_schema(
         'attach-encrypt',
@@ -2821,7 +2823,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
               - name: s3-bucket-encryption-KMS
                 resource: s3
                 region: us-east-1
-                filters
+                filters:
                   - type: bucket-encryption
                     state: True
                     crypto: aws:kms
@@ -2829,7 +2831,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
               - name: s3-bucket-encryption-off
                 resource: s3
                 region: us-east-1
-                filters
+                filters:
                   - type: bucket-encryption
                     state: False
     """

@@ -422,3 +422,44 @@ class TestSqsAction(BaseTest):
         self.assertEqual(resources[0]["QueueUrl"], url1)
         resources = p.resource_manager.get_resources([url2])
         self.assertEqual(resources[0]["QueueUrl"], url1)
+
+    @functional
+    def test_sqs_kms_alias(self):
+        session_factory = self.replay_flight_data("test_sqs_kms_key_filter")
+
+        p = self.load_policy(
+            {
+                "name": "sqs-kms-alias",
+                "resource": "sqs",
+                "filters": [
+                    {
+                        "or": [
+                            {
+                                "type": "value",
+                                "key": "KmsMasterKeyId",
+                                "value": "^(alias/aws/)",
+                                "op": "regex"
+                            },
+                            {
+                                "type": "kms-key",
+                                "key": "c7n:AliasName",
+                                "value": "^(alias/aws/)",
+                                "op": "regex"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(2, len(resources))
+        for r in resources:
+            self.assertTrue(r['KmsMasterKeyId'] in [
+                u'alias/aws/sqs',
+                u'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5'
+            ])
+            self.assertTrue(r['QueueArn'] in [
+                u'arn:aws:sqs:us-east-1:644160558196:sqs-test-alias',
+                u'arn:aws:sqs:us-east-1:644160558196:sqs-test-id'
+            ])

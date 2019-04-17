@@ -3,7 +3,7 @@ botocore>=1.12.94
 docutils>=0.12
 jmespath>=0.9.0
 vcversioner==2.16.0.0
-Jinja2==2.10
+Jinja2==2.10.1
 jsonschema>=2.5.1
 ruamel.yaml>=0.15.88
 six>=1.12.0

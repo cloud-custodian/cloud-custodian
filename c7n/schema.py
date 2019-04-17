@@ -61,7 +61,7 @@ def validate(data, schema=None):
                     ", ".join(dupes))), dupes[0]]
         return []
     try:
-        resp = specific_error(errors[0])
+        resp = policy_error_scope(specific_error(errors[0]), data)
         name = isinstance(
             errors[0].instance,
             dict) and errors[0].instance.get(
@@ -76,6 +76,18 @@ def validate(data, schema=None):
         errors[0],
         best_match(validator.iter_errors(data)),
     ]))
+
+
+def policy_error_scope(error, data):
+    """Scope a schema error to its policy name and resource."""
+    err_path = list(error.absolute_path)
+    if err_path[0] != 'policies':
+        return error
+    pdata = data['policies'][err_path[1]]
+    pdata.get('name', 'unknown')
+    error.message = "Error on policy:{} resource:{}\n".format(
+        pdata.get('name', 'unknown'), pdata.get('resource', 'unknown')) + error.message
+    return error
 
 
 def specific_error(error):

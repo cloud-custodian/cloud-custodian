@@ -1,0 +1,21 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Certificate arn:aws:acm:us-west-2:644160558196:certificate/b867707e-33c3-4024-b45d-b6133c3b4c05 in account 644160558196 is in use.",
+            "Code": "ResourceInUseException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "56911dc2-5d6d-11e9-bc3e-a7fd24ceeaf2",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "56911dc2-5d6d-11e9-bc3e-a7fd24ceeaf2",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "178",
+                "date": "Fri, 12 Apr 2019 21:52:58 GMT",
+                "connection": "close"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

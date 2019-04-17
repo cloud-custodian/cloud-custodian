@@ -365,7 +365,7 @@ class DhcpOptionsFilter(Filter):
 
      .. code-block: yaml
 
-        - policies:
+          policies:
              - name: vpcs-in-domain
                resource: vpc
                filters:
@@ -1211,8 +1211,7 @@ class RemovePermissions(BaseAction):
                 filters:
                   - type: ingress
                     IpProtocol: tcp
-                    FromPort: 0
-                    GroupName: http-group
+                    Ports: [8080]
                 actions:
                   - type: remove-permissions
                     ingress: matched
@@ -1360,9 +1359,9 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                     key: FromPort
                     value: 22
                 actions:
-                  - type: remove-groups
-                    groups: matched
+                  - type: modify-security-groups
                     isolation-group: sg-01ab23c4
+                    add: []
     """
     permissions = ('ec2:ModifyNetworkInterfaceAttribute',)
 
@@ -1708,7 +1707,7 @@ class AddressRelease(BaseAction):
                   - AllocationId: ...
                 actions:
                   - type: release
-                    force: true|false
+                    force: True
     """
 
     schema = type_schema('release', force={'type': 'boolean'})

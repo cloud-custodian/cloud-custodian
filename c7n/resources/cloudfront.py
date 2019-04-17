@@ -399,7 +399,7 @@ class DistributionSSLAction(BaseAction):
                     value: allow-all
                     op: contains
                 actions:
-                  - type: set-ssl
+                  - type: set-protocols
                     ViewerProtocolPolicy: https-only
     """
     schema = {

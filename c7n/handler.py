@@ -162,6 +162,9 @@ def dispatch_event(event, context):
     if policies:
         for p in policies:
             try:
+                # validation provides for an initialization point for
+                # some filters/actions.
+                p.validate()
                 p.push(event, context)
             except Exception:
                 log.exception("error during policy execution")

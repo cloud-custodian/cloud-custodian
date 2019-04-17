@@ -286,7 +286,7 @@ class ModifyDmsEndpoint(BaseAction):
 
     .. code-block: yaml
 
-        - policies:
+          policies:
             - name: dms-endpoint-modify
               resource: dms-endpoint
               filters:
@@ -391,7 +391,7 @@ class DeleteDmsEndpoint(BaseAction):
 
     .. code-block: yaml
 
-        - policies:
+          policies:
             - name: dms-endpoint-no-ssl-delete
               resource: dms-endpoint
               filters:

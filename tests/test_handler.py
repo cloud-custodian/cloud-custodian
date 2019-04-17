@@ -131,11 +131,16 @@ class HandleTest(BaseTest):
         self.change_environment(C7N_OUTPUT_DIR=self.run_dir)
 
         policy_execution = []
+        validation_called = []
+
+        def validate(self):
+            validation_called.append(True)
 
         def push(self, event, context):
             policy_execution.append((event, context))
 
         self.patch(Policy, "push", push)
+        self.patch(Policy, "validate", validate)
 
         from c7n import handler
 
@@ -161,6 +166,7 @@ class HandleTest(BaseTest):
         )
         self.assertEqual(handler.dispatch_event({"detail": {}}, None), True)
         self.assertEqual(policy_execution, [({"detail": {}, "debug": True}, None)])
+        self.assertEqual(validation_called, [True])
 
         config = handler.Config.empty()
         self.assertEqual(config.assume_role, None)

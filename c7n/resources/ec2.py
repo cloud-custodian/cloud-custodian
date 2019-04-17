@@ -1308,10 +1308,10 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-          actions:
-            - type: snapshot
-              copy-tags:
-                - Name
+            actions:
+              - type: snapshot
+                copy-tags:
+                  - Name
     """
 
     schema = type_schema(
@@ -1433,8 +1433,8 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
             resource: ec2
             filters:
               - singleton
-          actions:
-            - autorecover-alarm
+            actions:
+              - autorecover-alarm
 
     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
     """
@@ -1573,14 +1573,14 @@ class PropagateSpotTags(BaseAction):
         policies:
           - name: ec2-spot-instances
             resource: ec2
-          filters:
-            - State.Name: pending
-            - instanceLifecycle: spot
-          actions:
-            - type: propagate-spot-tags
-              only_tags:
-                - Name
-                - BillingTag
+            filters:
+              - State.Name: pending
+              - instanceLifecycle: spot
+            actions:
+              - type: propagate-spot-tags
+                only_tags:
+                  - Name
+                  - BillingTag
     """
 
     schema = type_schema(

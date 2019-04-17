@@ -39,9 +39,9 @@ class ConfigCompliance(Filter):
               eval_filters:
                - type: value
                  key: ResultRecordedTime
-                 type: age
+                 value_type: age
                  value: 30
-                 op: less-thanx
+                 op: less-than
               rules:
                - custodian-ec2-encryption-required
                - custodian-ec2-tags-required

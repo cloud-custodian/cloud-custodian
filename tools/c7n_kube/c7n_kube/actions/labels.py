@@ -24,9 +24,10 @@ class LabelAction(PatchAction):
     Labels a resource
 
     .. code-block:: yaml
+
       policies:
-        - name: label-{resource}
-          resource: k8s.{resource}
+        - name: label-resource
+          resource: k8s.pod # k8s.{resource}
           filters:
             - 'metadata.name': 'name'
           actions:
@@ -38,9 +39,10 @@ class LabelAction(PatchAction):
     To remove a label from a resource, provide the label with the value ``null``
 
     .. code-block:: yaml
+
       policies:
-        - name: remove-label-from-{resource}
-          resource: k8s.{resource}
+        - name: remove-label-from-resource
+          resource: k8s.pod # k8s.{resource}
           filters:
             - 'metadata.labels.label1': present
           actions:

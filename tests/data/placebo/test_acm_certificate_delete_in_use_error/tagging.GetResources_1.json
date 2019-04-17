@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:acm:us-west-2:644160558196:certificate/b867707e-33c3-4024-b45d-b6133c3b4c05",
+                "Tags": [
+                    {
+                        "Key": "KEY1",
+                        "Value": "VALUE1"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "5681b43d-5d6d-11e9-aa0c-35c22bc7c6ad",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5681b43d-5d6d-11e9-aa0c-35c22bc7c6ad",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "903",
+                "date": "Fri, 12 Apr 2019 21:52:58 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
