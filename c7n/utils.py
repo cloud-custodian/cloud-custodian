@@ -522,9 +522,13 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
         return obj
 
 
+def temporary_opener(name, flag, mode=0o777):
+    return os.open(name, flag | os.O_TEMPORARY, 0o777)
+
+
 def temporary_open(name, mode):
     if os.name == 'nt' and sys.version_info >= (3, 0):
-        return open(name, mode, opener=os.open(name, os.O_TEMPORARY, 0o777))
+        return open(name, mode, opener=temporary_opener)
     else:
         return open(name, mode)
 
