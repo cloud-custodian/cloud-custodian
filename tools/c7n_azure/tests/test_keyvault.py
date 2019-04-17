@@ -76,6 +76,29 @@ class KeyVaultTest(BaseTest):
         p2 = {}
         self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))
 
+    @arm_template('keyvault.json')
+    @patch('c7n_azure.session.Session.get_tenant_id', return_value=DEFAULT_SUBSCRIPTION_ID)
+    def test_whitelist(self, get_tenant_id):
+        """Tests basic whitelist functionality"""
+        p = self.load_policy({
+            'name': 'test-key-vault',
+            'resource': 'azure.keyvault',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cckeyvault1*'},
+                {'not': [
+                    {'type': 'whitelist',
+                     'key': 'principalName',
+                     'users': ['account1@sample.com']}
+                ]}
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     @arm_template('keyvault-no-policies.json')
     def test_whitelist_zero_access_policies(self):
         """Tests that a keyvault with 0 access policies is processed properly
