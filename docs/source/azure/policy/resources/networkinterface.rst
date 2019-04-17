@@ -23,7 +23,7 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all Network Interfaces for deletion in 7 days that have 'test' in name (ignore case),
+This policy will mark all Network Interfaces for deletion in 7 days that have 'test' in name (ignore case),
 and then perform the delete operation on those ready for deletion.
 
 .. code-block:: yaml
@@ -49,6 +49,8 @@ and then perform the delete operation on those ready for deletion.
         actions:
           - type: delete
 
+This policy will get Network Interfaces that have User added routes.
+
 .. code-block:: yaml
 
     policies:
@@ -61,6 +63,8 @@ and then perform the delete operation on those ready for deletion.
             value_type: swap
             value: User
 
+This policy will get Network Interfaces that have VirtualNetworkGateway and VNet hops.
+
 .. code-block:: yaml
 
     policies:
@@ -68,9 +72,10 @@ and then perform the delete operation on those ready for deletion.
         resource: azure.networkinterface
         filters:
           - type: effective-route-table
-            key: routes.value[].nextHopType
-            op: in
-            value_type: swap
-            value: VirtualNetworkGateway
-
+            key: routes.value[?source == 'User'].nextHopType
+            op: difference
+            value:
+              - Internet
+              - None
+              - VirtualAppliance
 
