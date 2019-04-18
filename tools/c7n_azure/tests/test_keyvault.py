@@ -18,6 +18,7 @@ import re
 from azure_common import BaseTest, arm_template, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.resources.key_vault import WhiteListFilter
 from mock import patch
+from msrestazure.azure_exceptions import CloudError
 
 
 class KeyVaultTest(BaseTest):
@@ -151,12 +152,11 @@ class KeyVaultTest(BaseTest):
             ]
         })
 
-        with self.assertRaises(KeyError) as e:
+        with self.assertRaises(CloudError) as e:
             p.run()
 
-        self.assertTrue(re.match(
-            "Can not resolve key: principalName on access policy in Keyvault: "
-            "cckeyvault1[a-z0-9]+. due to Microsoft Graph call failure. See GraphHelper log "
-            "messages for more detail.", e.exception.args[0]))
-        self.assertEqual("principalName", e.exception.args[1])
-        self.assertTrue(re.match("cckeyvault1[a-z0-9]", e.exception.args[2]))
+        self.assertEqual(403, e.exception.status_code)
+        self.assertEqual("Operation failed with status: 'Forbidden'. Details: 403 Client Error: "
+                         "Forbidden for url: https://graph.windows.net/"
+                         "ea42f556-5106-4743-99b0-c129bfa71a47/getObjectsByObjectIds?"
+                         "api-version=1.6", e.exception.message)

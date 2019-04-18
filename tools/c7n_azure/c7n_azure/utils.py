@@ -193,16 +193,17 @@ class GraphHelper(object):
     log = logging.getLogger('custodian.azure.utils.GraphHelper')
 
     @staticmethod
-    def get_principal_dictionary(graph_client, object_ids):
+    def get_principal_dictionary(graph_client, object_ids, raise_on_graph_call_error = False):
         """Retrieves Azure AD Objects for corresponding object ids passed.
-        :param graph_client: A client for Microsoft Graph
+        :param graph_client: A client for Microsoft Graph.
         :param object_ids: The object ids to retrieve Azure AD objects for.
-        :return: A tuple with both a boolean indicating whether the graph call was successful or
-        not and a dictionary keyed by object id with the Azure AD object as the value.
+        :param raise_on_graph_call_error: A boolean indicate whether an error should be
+        raised if the underlying Microsoft Graph call fails.
+        :return: A dictionary keyed by object id with the Azure AD object as the value.
         Note: empty Azure AD objects could be returned if not found in the graph.
         """
         if not object_ids:
-            return True, {}
+            return {}
 
         object_params = GetObjectsParameters(
             include_directory_object_references=True,
@@ -211,12 +212,10 @@ class GraphHelper(object):
         principal_dics = {object_id: DirectoryObject() for object_id in object_ids}
 
         aad_objects = graph_client.objects.get_objects_by_object_ids(object_params)
-        succeeded = False
         try:
             for aad_object in aad_objects:
                 principal_dics[aad_object.object_id] = aad_object
 
-            succeeded = True
         except CloudError as e:
             if e.status_code in [403, 401]:
                 GraphHelper.log.warning(
@@ -228,7 +227,10 @@ class GraphHelper(object):
                     'Can not query on principalName, displayName, or aadType. \n'
                     'Error: {0}'.format(e))
 
-        return succeeded, principal_dics
+            if raise_on_graph_call_error:
+                raise
+
+        return principal_dics
 
     @staticmethod
     def get_principal_name(graph_object):

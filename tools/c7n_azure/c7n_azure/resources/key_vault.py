@@ -69,23 +69,17 @@ class WhiteListFilter(Filter):
                         'certificates': policy.permissions.certificates
                     }
                 })
-            # Enhance access policies with displayName, aadType and principalName
-            graph_call_succeeded, i['accessPolicies'] = self._enhance_policies(access_policies)
+            # Enhance access policies with displayName, aadType and
+            # principalName if necessary
+            if self.key in self.GRAPH_PROVIDED_KEYS:
+                i['accessPolicies'] = self._enhance_policies(access_policies)
 
         # Ensure each policy is
         #   - User is whitelisted
         #   - Permissions don't exceed allowed permissions
         for p in i['accessPolicies']:
             if self.key not in p:
-                # Raise errors when the graph call fails and we need to measure against one of
-                # its provided fields, otherwise return False.
-                if graph_call_succeeded or self.key not in self.GRAPH_PROVIDED_KEYS:
-                    return False
-                else:
-                    raise KeyError("Can not resolve key: {0} on access policy in Keyvault: {1} "
-                                   "due to Microsoft Graph call failure. See GraphHelper log "
-                                   "messages for more detail.".format(self.key, i['name']),
-                                   self.key, i['name'])
+                return False
             elif p[self.key] not in self.users:
                 if not self.compare_permissions(p['permissions'], self.permissions):
                     return False
@@ -109,7 +103,7 @@ class WhiteListFilter(Filter):
 
     def _enhance_policies(self, access_policies):
         if not access_policies:
-            return True, access_policies
+            return access_policies
 
         if self.graph_client is None:
             s = Session(resource='https://graph.windows.net')
@@ -119,15 +113,14 @@ class WhiteListFilter(Filter):
         object_ids = [p['objectId'] for p in access_policies]
         # GraphHelper.get_principal_dictionary returns empty AADObject if not found with graph
         # or if graph is not available.
-        graph_call_succeeded, principal_dics = GraphHelper.get_principal_dictionary(
-            self.graph_client, object_ids)
+        principal_dics = GraphHelper.get_principal_dictionary(
+            self.graph_client, object_ids, True)
 
-        if graph_call_succeeded:
-            for policy in access_policies:
-                aad_object = principal_dics[policy['objectId']]
-                if aad_object.object_id:
-                    policy['displayName'] = aad_object.display_name
-                    policy['aadType'] = aad_object.object_type
-                    policy['principalName'] = GraphHelper.get_principal_name(aad_object)
+        for policy in access_policies:
+            aad_object = principal_dics[policy['objectId']]
+            if aad_object.object_id:
+                policy['displayName'] = aad_object.display_name
+                policy['aadType'] = aad_object.object_type
+                policy['principalName'] = GraphHelper.get_principal_name(aad_object)
 
-        return graph_call_succeeded, access_policies
+        return access_policies
