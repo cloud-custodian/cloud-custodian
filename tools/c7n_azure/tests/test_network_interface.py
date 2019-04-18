@@ -41,3 +41,23 @@ class NetworkInterfaceTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('vm.json')
+    def test_find_by_default_routes(self):
+        p = self.load_policy({
+            'name': 'test-azure-network-interface',
+            'resource': 'azure.networkinterface',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'myvmnic'},
+                {'type': 'effective-route-table',
+                 'key': 'routes.value[].nextHopType',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'VnetLocal'}]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

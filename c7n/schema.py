@@ -46,20 +46,9 @@ def validate(data, schema=None):
         Validator.check_schema(schema)
 
     validator = Validator(schema)
-
     errors = list(validator.iter_errors(data))
-
     if not errors:
-        counter = Counter([p['name'] for p in data.get('policies')])
-        dupes = []
-        for k, v in counter.items():
-            if v > 1:
-                dupes.append(k)
-        if dupes:
-            return [ValueError(
-                "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes))), dupes[0]]
-        return []
+        return check_unique(data) or []
     try:
         resp = policy_error_scope(specific_error(errors[0]), data)
         name = isinstance(
@@ -76,6 +65,17 @@ def validate(data, schema=None):
         errors[0],
         best_match(validator.iter_errors(data)),
     ]))
+
+
+def check_unique(data):
+    counter = Counter([p['name'] for p in data.get('policies', [])])
+    for k, v in list(counter.items()):
+        if v == 1:
+            counter.pop(k)
+    if counter:
+        return [ValueError(
+            "Only one policy with a given name allowed, duplicates: {}".format(counter)),
+            list(counter.keys())[0]]
 
 
 def policy_error_scope(error, data):
@@ -264,7 +264,7 @@ def generate(resource_types=()):
                 ))
 
     schema = {
-        '$schema': 'http://json-schema.org/schema#',
+        "$schema": "http://json-schema.org/draft-07/schema#",
         'id': 'http://schema.cloudcustodian.io/v0/custodian.json',
         'definitions': definitions,
         'type': 'object',
