@@ -155,7 +155,8 @@ class KeyVaultTest(BaseTest):
             p.run()
 
         self.assertTrue(re.match(
-            "Key: principalName not found on access policy in Keyvault: cckeyvault1[a-z0-9]+. "
-            "Unable to apply white list filter.", e.exception.args[0]))
+            "Can not resolve key: principalName on access policy in Keyvault: "
+            "cckeyvault1[a-z0-9]+. due to Microsoft Graph call failure. See GraphHelper log "
+            "messages for more detail.", e.exception.args[0]))
         self.assertEqual("principalName", e.exception.args[1])
         self.assertTrue(re.match("cckeyvault1[a-z0-9]", e.exception.args[2]))
