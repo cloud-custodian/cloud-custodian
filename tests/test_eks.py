@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
+import time
 from .common import BaseTest
 
 
@@ -38,6 +38,29 @@ class EKS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'dev')
+
+    def test_update_config(self):
+        factory = self.replay_flight_data('test_eks_update_config')
+        p = self.load_policy({
+            'name': 'eksupdate',
+            'resource': 'eks',
+            'filters': [
+                {'name': 'devk8s'},
+                {'resourcesVpcConfig.endpointPublicAccess': True}],
+            'actions': [{
+                'type': 'update-config',
+                'resourcesVpcConfig': {
+                    'endpointPublicAccess': False,
+                    'endpointPrivateAccess': True
+                }}]}, session_factory=factory, config={'region': 'us-east-2'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(10)
+        client = factory().client('eks')
+        info = client.describe_cluster(name='devk8s')['cluster']
+        self.assertEqual(resources[0]['status'], 'ACTIVE')
+        self.assertEqual(info['status'], 'UPDATING')
 
     def test_delete_eks(self):
         factory = self.replay_flight_data("test_eks_delete")

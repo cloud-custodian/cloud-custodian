@@ -1,5 +1,4 @@
-vcrpy==1.11.0
-vcrpy_unittest
-adal~=1.0.0
-backports.functools_lru_cache
+vcrpy==2.0.1
+vcrpy_unittest==0.1.7
+backports.functools_lru_cache==1.5
 azure-functions-worker; python_version >= '3.6'

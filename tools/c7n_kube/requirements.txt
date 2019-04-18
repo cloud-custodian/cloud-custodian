@@ -1,1 +1,1 @@
-kubernetes==7.0.0
+kubernetes==9.0.0

@@ -18,7 +18,6 @@ import logging
 import re
 import time
 import uuid
-from builtins import bytes
 from concurrent.futures import as_completed
 
 import six
@@ -80,8 +79,10 @@ class StringUtils(object):
         return components[0] + ''.join(x.title() for x in components[1:])
 
     @staticmethod
-    def naming_hash(string, length=8):
-        return hashlib.sha256(bytes(string, 'utf-8')).hexdigest().lower()[:length]
+    def naming_hash(val, length=8):
+        if isinstance(val, six.string_types):
+            val = val.encode('utf8')
+        return hashlib.sha256(val).hexdigest().lower()[:length]
 
 
 def utcnow():

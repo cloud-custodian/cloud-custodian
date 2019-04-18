@@ -1,0 +1,37 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "compute#backendBucket", 
+        "description": "", 
+        "enableCdn": false, 
+        "bucketName": "newbucket_em", 
+        "creationTimestamp": "2019-03-12T02:55:51.212-07:00", 
+        "id": "1200379941928713416", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendBuckets/newbucket", 
+        "name": "newbucket"
+      }
+    ], 
+    "kind": "compute#backendBucketList", 
+    "id": "projects/cloud-custodian/global/backendBuckets", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendBuckets"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "574", 
+    "transfer-encoding": "chunked", 
+    "expires": "Wed, 13 Mar 2019 17:37:05 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Wed, 13 Mar 2019 17:37:05 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendBuckets?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"Vigi4KrCJsAk6dAcCrpUcsJTBw8=/4_bmPo5kV8sGBzCB9oBsXFGv9fE=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

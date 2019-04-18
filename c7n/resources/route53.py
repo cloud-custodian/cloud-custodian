@@ -185,13 +185,11 @@ class Route53DomainAddTag(Tag):
     """
     permissions = ('route53domains:UpdateTagsForDomain',)
 
-    def process_resource_set(self, domains, tags):
-        client = local_session(
-            self.manager.session_factory).client('route53domains')
-
+    def process_resource_set(self, client, domains, tags):
+        mid = self.manager.resource_type.id
         for d in domains:
             client.update_tags_for_domain(
-                DomainName=d[self.id_key],
+                DomainName=d[mid],
                 TagsToUpdate=tags)
 
 
@@ -214,10 +212,7 @@ class Route53DomainRemoveTag(RemoveTag):
     """
     permissions = ('route53domains:DeleteTagsForDomain',)
 
-    def process_resource_set(self, domains, keys):
-        client = local_session(
-            self.manager.session_factory).client('route53domains')
-
+    def process_resource_set(self, client, domains, keys):
         for d in domains:
             client.delete_tags_for_domain(
                 DomainName=d[self.id_key],

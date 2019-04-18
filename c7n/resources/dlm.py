@@ -29,3 +29,4 @@ class DLMPolicy(QueryResourceManager):
         filter_name = 'PolicyIds'
         filter_type = 'list'
         dimension = None
+        arn = False

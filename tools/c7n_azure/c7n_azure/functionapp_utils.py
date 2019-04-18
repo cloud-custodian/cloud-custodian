@@ -13,6 +13,7 @@
 # limitations under the License.
 import datetime
 import logging
+import os
 import re
 import time
 
@@ -148,8 +149,12 @@ class FunctionAppUtilities(object):
 
             # upload package
             blob_name = '%s.zip' % function_params.function_app_name
-            blob_client.create_blob_from_path(
-                FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, package.pkg.path)
+            packageToPublish = package.pkg.get_stream()
+            count = os.path.getsize(package.pkg.path)
+
+            blob_client.create_blob_from_stream(
+                FUNCTION_CONSUMPTION_BLOB_CONTAINER, blob_name, packageToPublish, count)
+            packageToPublish.close()
 
             # create blob url for package
             sas = blob_client.generate_blob_shared_access_signature(

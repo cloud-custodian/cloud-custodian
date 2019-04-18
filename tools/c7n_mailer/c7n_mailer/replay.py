@@ -42,7 +42,7 @@ class MailerTester(object):
             logger.debug('base64-decoding and zlib decompressing message')
             raw = zlib.decompress(base64.b64decode(raw))
             if json_dump_file is not None:
-                with open(json_dump_file, 'w') as fh:
+                with open(json_dump_file, 'wb') as fh:  # pragma: no cover
                     fh.write(raw)
         self.data = json.loads(raw)
         logger.debug('Loaded message JSON')

@@ -1,0 +1,32 @@
+{
+  "body": {
+    "nextHopNetwork": "https://www.googleapis.com/compute/v1/projects/atomic-shine-231410/global/networks/sssss", 
+    "kind": "compute#route", 
+    "network": "https://www.googleapis.com/compute/v1/projects/atomic-shine-231410/global/networks/sssss", 
+    "name": "default-route-748fda88a0393274", 
+    "priority": 1000, 
+    "destRange": "192.168.0.0/24", 
+    "creationTimestamp": "2019-03-04T05:23:45.803-08:00", 
+    "id": "336156827480791054", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/atomic-shine-231410/global/routes/default-route-748fda88a0393274", 
+    "description": "Default local route to the subnetwork 192.168.0.0/24."
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "623", 
+    "transfer-encoding": "chunked", 
+    "expires": "Tue, 05 Mar 2019 15:24:07 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Tue, 05 Mar 2019 15:24:07 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/atomic-shine-231410/global/routes/default-route-748fda88a0393274?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"eSLXPuxnxXeI-khnpFsEH34ehdQ=/6L3zDHLqROXbmmSStp4S8t1gWqM=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

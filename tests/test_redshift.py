@@ -268,6 +268,29 @@ class TestRedshift(BaseTest):
         )
         self.assertFalse(cluster["PubliclyAccessible"])
 
+    def test_redshift_kms_alias(self):
+        factory = self.replay_flight_data("test_redshift_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift-kms-alias",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['KmsKeyId'],
+            'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5') # NOQA
+
 
 class TestRedshiftSnapshot(BaseTest):
 

@@ -45,7 +45,7 @@ class MetricFilter(Filter):
                 filters:
                   - type: metric
                     metric: Percentage CPU
-                    aggregation: average,
+                    aggregation: average
                     op: gt
                     threshold: 75
                     timeframe: 2
@@ -183,7 +183,7 @@ class TagActionFilter(Filter):
 
     .. code-block :: yaml
 
-      - policies:
+       policies:
         - name: vm-stop-marked
           resource: azure.vm
           filters:
@@ -313,7 +313,7 @@ class PolicyCompliantFilter(Filter):
 
     .. code-block :: yaml
 
-      - policies:
+       policies:
         - name: vm-stop-marked
           resource: azure.vm
           filters:

@@ -74,7 +74,8 @@ class OrgTest(TestUtils):
         result = runner.invoke(
             org.cli,
             ['run', '-c', 'accounts.yml', '-u', 'policies.yml',
-             '--debug', '-s', 'output', '--cache-path', 'cache'],
+             '--debug', '-s', 'output', '--cache-path', 'cache',
+             '--metrics-uri', 'aws://'],
             catch_exceptions=False)
 
         self.assertEqual(result.exit_code, 0)

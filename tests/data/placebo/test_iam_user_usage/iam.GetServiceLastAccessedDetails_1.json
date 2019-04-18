@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "JobStatus": "IN_PROGRESS",
+        "JobCreationDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 3,
+            "day": 13,
+            "hour": 12,
+            "minute": 56,
+            "second": 11,
+            "microsecond": 74000
+        },
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "605fc6a4-458f-11e9-a1c2-c103d986345a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "605fc6a4-458f-11e9-a1c2-c103d986345a",
+                "content-type": "text/xml",
+                "content-length": "459",
+                "date": "Wed, 13 Mar 2019 12:56:10 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

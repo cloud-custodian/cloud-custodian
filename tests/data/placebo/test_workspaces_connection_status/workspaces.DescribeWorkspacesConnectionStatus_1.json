@@ -1,0 +1,118 @@
+{
+    "status_code": 200,
+    "data": {
+        "WorkspacesConnectionStatus": [
+            {
+                "WorkspaceId": "ws-aeac9da6b",
+                "ConnectionState": "UNKNOWN",
+                "ConnectionStateCheckTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 11,
+                    "minute": 26,
+                    "second": 52,
+                    "microsecond": 578000
+                },
+                "LastKnownUserConnectionTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 12,
+                    "hour": 6,
+                    "minute": 26,
+                    "second": 18,
+                    "microsecond": 957000
+                }
+            },
+            {
+                "WorkspaceId": "ws-5c6b1e01e",
+                "ConnectionState": "UNKNOWN",
+                "ConnectionStateCheckTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 11,
+                    "minute": 26,
+                    "second": 50,
+                    "microsecond": 363000
+                },
+                "LastKnownUserConnectionTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 15,
+                    "hour": 21,
+                    "minute": 56,
+                    "second": 29,
+                    "microsecond": 981000
+                }
+            },
+            {
+                "WorkspaceId": "ws-91068dbb7",
+                "ConnectionState": "UNKNOWN",
+                "ConnectionStateCheckTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 11,
+                    "minute": 27,
+                    "second": 52,
+                    "microsecond": 244000
+                }
+            },
+            {
+                "WorkspaceId": "ws-e83a7fec1",
+                "ConnectionState": "DISCONNECTED",
+                "ConnectionStateCheckTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 11,
+                    "minute": 27,
+                    "second": 12,
+                    "microsecond": 848000
+                },
+                "LastKnownUserConnectionTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 11,
+                    "minute": 46,
+                    "second": 59,
+                    "microsecond": 284000
+                }
+            },
+            {
+                "WorkspaceId": "ws-82358d15a",
+                "ConnectionState": "UNKNOWN",
+                "ConnectionStateCheckTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 11,
+                    "minute": 31,
+                    "second": 21,
+                    "microsecond": 868000
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "41ffebcb-5e01-11e9-a4dd-3769f9635b17",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "41ffebcb-5e01-11e9-a4dd-3769f9635b17",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "733",
+                "date": "Sat, 13 Apr 2019 15:31:50 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

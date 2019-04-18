@@ -1,0 +1,28 @@
+{
+  "body": {
+    "kind": "compute#targetHttpProxy", 
+    "name": "new-proxy", 
+    "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/new-url-map", 
+    "creationTimestamp": "2019-03-14T03:31:10.263-07:00", 
+    "id": "7476794674400170881", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/new-proxy"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "372", 
+    "transfer-encoding": "chunked", 
+    "expires": "Thu, 14 Mar 2019 12:00:14 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Thu, 14 Mar 2019 12:00:14 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/new-proxy?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"CMV7mgal23anb8a58xTZWo9ecH8=/e3C5S-Oq9mz7KT-t8i7IEmo4MjA=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

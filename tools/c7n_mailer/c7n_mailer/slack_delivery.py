@@ -123,9 +123,9 @@ class SlackDelivery(object):
 
         for address in email_addresses:
             if self.caching and self.caching.get(address):
-                    self.logger.debug('Got Slack metadata from cache for: %s' % address)
-                    list[address] = self.caching.get(address)
-                    continue
+                self.logger.debug('Got Slack metadata from cache for: %s' % address)
+                list[address] = self.caching.get(address)
+                continue
 
             response = requests.post(
                 url='https://slack.com/api/users.lookupByEmail',
@@ -183,6 +183,8 @@ class SlackDelivery(object):
                 int(response.headers['retry-after']))
             time.sleep(int(response.headers['Retry-After']))
             return
-        elif response.status_code != 200:
-            self.logger.info("Error in sending Slack message: %s" % response.json())
+        elif response.status_code != 200:  # pragma: no cover
+            self.logger.info(
+                "Error in sending Slack message status:%s response: %s",
+                response.status_code, response.text())
             return

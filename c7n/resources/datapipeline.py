@@ -57,8 +57,9 @@ class DataPipeline(QueryResourceManager):
 
 def _datapipeline_info(pipes, session_factory, executor_factory, retry):
 
+    client = local_session(session_factory).client('datapipeline')
+
     def process_tags(pipe_set):
-        client = local_session(session_factory).client('datapipeline')
         pipe_map = {pipe['id']: pipe for pipe in pipe_set}
 
         while True:
@@ -114,17 +115,14 @@ class Delete(BaseAction):
     permissions = ("datapipeline:DeletePipeline",)
 
     def process(self, pipelines):
-        with self.executor_factory(max_workers=2) as w:
-            list(w.map(self.process_pipeline, pipelines))
-
-    def process_pipeline(self, pipeline):
         client = local_session(
             self.manager.session_factory).client('datapipeline')
-        try:
-            client.delete_pipeline(pipelineId=pipeline['id'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting pipeline:\n %s" % e)
+
+        for p in pipelines:
+            try:
+                client.delete_pipeline(pipelineId=p['id'])
+            except client.exceptions.PipelineNotFoundException:
+                continue
 
 
 @DataPipeline.action_registry.register('mark-for-op')
@@ -148,23 +146,6 @@ class MarkForOpPipeline(TagDelayedAction):
                     days: 7
     """
 
-    permissions = ('datapipeline:AddTags',)
-
-    def process_resource_set(self, pipelines, tags):
-        client = local_session(self.manager.session_factory).client(
-            'datapipeline')
-        tag_array = []
-        for t in tags:
-            tag_array.append(dict(key=t['Key'], value=t['Value']))
-        for pipeline in pipelines:
-            try:
-                client.add_tags(pipelineId=pipeline['id'], tags=tag_array)
-            except Exception as err:
-                self.log.exception(
-                    'Exception tagging data pipeline %s: %s',
-                    pipeline['id'], err)
-                continue
-
 
 @DataPipeline.action_registry.register('tag')
 class TagPipeline(Tag):
@@ -187,19 +168,13 @@ class TagPipeline(Tag):
 
     permissions = ('datapipeline:AddTags',)
 
-    def process_resource_set(self, pipelines, tags):
-        client = local_session(self.manager.session_factory).client(
-            'datapipeline')
-        tag_array = []
-        for t in tags:
-            tag_array.append(dict(key=t['Key'], value=t['Value']))
+    def process_resource_set(self, client, pipelines, tags):
+        tag_array = [dict(key=t['Key'], value=t['Value']) for t in tags]
         for pipeline in pipelines:
             try:
                 client.add_tags(pipelineId=pipeline['id'], tags=tag_array)
-            except Exception as err:
-                self.log.exception(
-                    'Exception tagging data pipeline %s: %s',
-                    pipeline['id'], err)
+            except (client.exceptions.PipelineDeletedException,
+                    client.exceptions.PipelineNotFoundException):
                 continue
 
 
@@ -223,14 +198,10 @@ class UntagPipeline(RemoveTag):
 
     permissions = ('datapipeline:RemoveTags',)
 
-    def process_resource_set(self, pipelines, tags):
-        client = local_session(self.manager.session_factory).client(
-            'datapipeline')
+    def process_resource_set(self, client, pipelines, tags):
         for pipeline in pipelines:
             try:
                 client.remove_tags(pipelineId=pipeline['id'], tagKeys=tags)
-            except Exception as err:
-                self.log.exception(
-                    'Exception while removing tags from data pipeline %s: %s',
-                    pipeline['id'], err)
+            except (client.exceptions.PipelineDeletedException,
+                    client.exceptions.PipelineNotFoundException):
                 continue

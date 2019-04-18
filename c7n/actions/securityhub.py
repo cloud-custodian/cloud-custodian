@@ -81,6 +81,10 @@ FindingTypes = {
 }
 
 
+# Mostly undocumented value size limit
+SECHUB_VALUE_SIZE_LIMIT = 1024
+
+
 def build_vocabulary():
     vocab = []
     for ns, quals in FindingTypes.items():
@@ -131,6 +135,7 @@ class PostFinding(BaseAction):
     schema = type_schema(
         "post-finding",
         required=["types"],
+        title={"type": "string"},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
@@ -140,6 +145,7 @@ class PostFinding(BaseAction):
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
+        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10},
         types={
             "type": "array",
             "items": {"type": "string", "enum": build_vocabulary()},
@@ -185,10 +191,12 @@ class PostFinding(BaseAction):
                 "securityhub", region_name=region_name)
 
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
-
+        # default batch size to one to work around security hub console issue
+        # which only shows a single resource in a finding.
+        batch_size = self.data.get('batch_size', 1)
         stats = Counter()
         for key, grouped_resources in self.group_resources(resources).items():
-            for resource_set in chunks(grouped_resources, 10):
+            for resource_set in chunks(grouped_resources, batch_size):
                 stats['Finding'] += 1
                 if key == self.NEW_FINDING:
                     finding_id = None
@@ -290,10 +298,15 @@ class PostFinding(BaseAction):
         if "compliance_status" in self.data:
             finding["Compliance"] = {"Status": self.data["compliance_status"]}
 
-        fields = {}
+        fields = {
+            'resource': policy.resource_type,
+            'ProviderName': 'CloudCustodian',
+            'ProviderVersion': version
+        }
+
         if "fields" in self.data:
             fields.update(self.data["fields"])
-        if not fields:
+        else:
             tags = {}
             for t in policy.tags:
                 if ":" in t:
@@ -301,10 +314,7 @@ class PostFinding(BaseAction):
                 else:
                     k, v = t, ""
                 tags[k] = v
-            fields = tags
-            fields["resource"] = policy.resource_type
-            fields["ProviderName"] = "CloudCustodian"
-            fields["ProviderVersion"] = version
+            fields.update(tags)
         if fields:
             finding["ProductFields"] = fields
 
@@ -346,7 +356,7 @@ class OtherResourcePostFinding(PostFinding):
                 v = str(v)
             else:
                 continue
-            details[k] = v
+            details[k] = v[:SECHUB_VALUE_SIZE_LIMIT]
 
         details['c7n:resource-type'] = self.manager.type
         other = {
@@ -363,6 +373,8 @@ class OtherResourcePostFinding(PostFinding):
     @classmethod
     def register_resource(klass, registry, event):
         for rtype, resource_manager in registry.items():
+            if not resource_manager.has_arn():
+                continue
             if 'post-finding' in resource_manager.action_registry:
                 continue
             resource_manager.action_registry.register('post-finding', klass)

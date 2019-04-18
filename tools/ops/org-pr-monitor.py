@@ -22,7 +22,7 @@ import requests
 
 from c7n.config import Bag
 from c7n.credentials import SessionFactory
-from c7n.output import MetricsOutput
+from c7n.resources.aws import MetricsOutput, DEFAULT_NAMESPACE
 from c7n.utils import dumps
 
 log = logging.getLogger('c7nops.cimetrics')
@@ -88,6 +88,9 @@ class RepoMetrics(MetricsOutput):
         for k, v in dimensions.items():
             d['Dimensions'].append({"Name": k, "Value": v})
         return d
+
+    def get_timestamp(self):
+        return datetime.utcnow()
 
 
 def process_commit(c, r, metrics, stats, since, now):
@@ -162,7 +165,9 @@ def run(organization, hook_context, github_url, github_token,
     now = datetime.utcnow().replace(tzinfo=tzutc())
     stats = Counter()
     repo_metrics = RepoMetrics(
-        Bag(session_factory=SessionFactory(region, assume_role=assume)))
+        Bag(session_factory=SessionFactory(region, assume_role=assume)),
+        {'namespace': DEFAULT_NAMESPACE}
+    )
 
     for r in result['data']['organization']['repositories']['nodes']:
         commits = jmespath.search(

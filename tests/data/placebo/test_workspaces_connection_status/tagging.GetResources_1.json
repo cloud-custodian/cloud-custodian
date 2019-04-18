@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-aeac9da6b",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-5c6b1e01e",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "production"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-91068dbb7",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-e83a7fec1",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "production"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-82358d15a",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "3d253f3c-5e01-11e9-9137-d5cc568d75e0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3d253f3c-5e01-11e9-9137-d5cc568d75e0",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "9747",
+                "date": "Sat, 13 Apr 2019 15:31:41 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

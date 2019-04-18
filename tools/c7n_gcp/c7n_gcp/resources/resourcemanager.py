@@ -23,6 +23,13 @@ class Organization(QueryResourceManager):
         version = 'v1'
         component = 'organizations'
         scope = 'global'
+        enum_spec = ('search', 'organizations[]', {'body': {}})
+        id = "name"
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'name': resource_info['name']})
 
 
 @resources.register('folder')
@@ -33,6 +40,7 @@ class Folder(QueryResourceManager):
         version = 'v2'
         component = 'folders'
         scope = 'global'
+        id = "name"
 
 
 @resources.register('project')
@@ -44,3 +52,4 @@ class Project(QueryResourceManager):
         component = 'projects'
         scope = 'global'
         enum_spec = ('list', 'projects', None)
+        id = "projectId"

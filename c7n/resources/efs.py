@@ -16,6 +16,7 @@ import functools
 import logging
 
 from c7n.actions import Action
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager
@@ -34,7 +35,7 @@ class ElasticFileSystem(QueryResourceManager):
         id = 'FileSystemId'
         name = 'Name'
         date = 'CreationTime'
-        dimension = None
+        dimension = 'FileSystemId'
         type = 'file-system'
         # resource type for resource tagging api
         resource_type = 'elasticfilesystem:file-system'
@@ -76,6 +77,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         dimension = None
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
+        arn = False
 
 
 @ElasticFileSystemMountTarget.filter_registry.register('subnet')
@@ -113,6 +115,28 @@ class SecurityGroup(SecurityGroupFilter):
 
         self.efs_group_cache = groups
         return list(group_ids)
+
+
+@ElasticFileSystem.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: efs-kms-key-filters
+                  resource: efs
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KmsKeyId'
 
 
 @ElasticFileSystem.action_registry.register('delete')

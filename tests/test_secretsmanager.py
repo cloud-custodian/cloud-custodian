@@ -17,6 +17,24 @@ from .common import BaseTest
 
 class TestSecretsManager(BaseTest):
 
+    def test_secrets_manager_cross_account(self):
+        factory = self.replay_flight_data('test_secrets_manager_cross_account')
+        p = self.load_policy({
+            'name': 'secrets-manager',
+            'resource': 'secrets-manager',
+            'filters': ['cross-account']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        secret = resources.pop()
+        self.assertEqual(secret['Name'], 'c7n-test-key')
+        self.assertEqual(
+            secret['CrossAccountViolations'],
+            [{'Action': 'secretsmanager:*',
+              'Effect': 'Allow',
+              'Principal': {'AWS': 'arn:aws:iam::123456789012:root'},
+              'Resource': '*'}])
+
     def test_secrets_manager_tag_resource(self):
         session = self.replay_flight_data("test_secrets_manager_tag")
         client = session(region="us-east-1").client("secretsmanager")

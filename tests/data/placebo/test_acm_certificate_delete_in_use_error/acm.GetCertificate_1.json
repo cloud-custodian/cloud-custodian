@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Certificate": "",
+        "CertificateChain": "",
+        "ResponseMetadata": {
+            "RequestId": "569ed992-5d6d-11e9-9027-b9cb833280a3",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "569ed992-5d6d-11e9-9027-b9cb833280a3",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "6938",
+                "date": "Fri, 12 Apr 2019 21:52:59 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

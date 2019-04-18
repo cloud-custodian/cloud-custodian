@@ -17,7 +17,6 @@ from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
 import inspect
-import json
 import logging
 import os
 import pprint
@@ -26,11 +25,12 @@ import time
 
 import six
 import yaml
+from yaml.constructor import ConstructorError
 
 from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.utils import dumps, load_file, local_session
+from c7n.utils import dumps, load_file, local_session, SafeLoader
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources
@@ -62,7 +62,7 @@ def policy_command(f):
         for fp in options.configs:
             try:
                 collection = policy_load(options, fp, validate=validate, vars=vars)
-            except IOError as e:
+            except IOError:
                 log.error('policy file does not exist ({})'.format(fp))
                 errors += 1
                 continue
@@ -171,6 +171,27 @@ def _print_no_policies_warning(options, policies):
         log.warning('Empty policy file(s).  Nothing to do.')
 
 
+class DuplicateKeyCheckLoader(SafeLoader):
+
+    def construct_mapping(self, node, deep=False):
+        if not isinstance(node, yaml.MappingNode):
+            raise ConstructorError(None, None,
+                    "expected a mapping node, but found %s" % node.id,
+                    node.start_mark)
+        key_set = set()
+        for key_node, value_node in node.value:
+            if not isinstance(key_node, yaml.ScalarNode):
+                continue
+            k = key_node.value
+            if k in key_set:
+                raise ConstructorError(
+                    "while constructing a mapping", node.start_mark,
+                    "found duplicate key", key_node.start_mark)
+            key_set.add(k)
+
+        return super(DuplicateKeyCheckLoader, self).construct_mapping(node, deep)
+
+
 def validate(options):
     from c7n import schema
     load_resources()
@@ -189,11 +210,10 @@ def validate(options):
 
         options.dryrun = True
         fmt = config_file.rsplit('.', 1)[-1]
+
         with open(config_file) as fh:
-            if fmt in ('yml', 'yaml'):
-                data = yaml.safe_load(fh.read())
-            elif fmt in ('json',):
-                data = json.load(fh)
+            if fmt in ('yml', 'yaml', 'json'):
+                data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)
             else:
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
@@ -358,6 +378,7 @@ def schema_cmd(options):
         return
 
     load_resources()
+
     resource_mapping = schema.resource_vocabulary()
     if options.summary:
         schema.summary(resource_mapping)
@@ -370,6 +391,8 @@ def schema_cmd(options):
     #   - List all available RESOURCES for supplied PROVIDER
     # - RESOURCE
     #   - List all available actions and filters for supplied RESOURCE
+    # - MODE
+    #   - List all available MODES
     # - RESOURCE.actions
     #   - List all available actions for supplied RESOURCE
     # - RESOURCE.actions.ACTION
@@ -397,9 +420,33 @@ def schema_cmd(options):
         resource_mapping = schema.resource_vocabulary(
             cloud_provider)
         components[0] = '%s.%s' % (cloud_provider, components[0])
+    elif components[0] in schema.resource_vocabulary().keys():
+        resource_mapping = schema.resource_vocabulary()
     else:
         resource_mapping = schema.resource_vocabulary('aws')
         components[0] = 'aws.%s' % components[0]
+
+    #
+    # Handle mode
+    #
+    if components[0] == "mode":
+        if len(components) == 1:
+            output = {components[0]: list(resource_mapping[components[0]].keys())}
+            print(yaml.safe_dump(output, default_flow_style=False))
+            return
+
+        if len(components) == 2:
+            if components[1] not in resource_mapping[components[0]]:
+                log.error('{} is not a valid mode'.format(components[1]))
+                sys.exit(1)
+
+            _print_cls_schema(resource_mapping[components[0]][components[1]])
+            return
+
+        # We received too much (e.g. mode.actions.foo)
+        log.error("Invalid selector '{}'. Valid options are 'mode' "
+                  "or 'mode.TYPE'".format(options.resource))
+        sys.exit(1)
     #
     # Handle resource
     #
@@ -409,7 +456,12 @@ def schema_cmd(options):
         sys.exit(1)
 
     if len(components) == 1:
+        docstring = _schema_get_docstring(
+            resource_mapping[resource]['classes']['resource'])
         del(resource_mapping[resource]['classes'])
+        if docstring:
+            print("\nHelp\n----\n")
+            print(docstring + '\n')
         output = {resource: resource_mapping[resource]}
         print(yaml.safe_dump(output))
         return
@@ -440,30 +492,38 @@ def schema_cmd(options):
 
     if len(components) == 3:
         cls = resource_mapping[resource]['classes'][category][item]
+        _print_cls_schema(cls)
 
-        # Print docstring
-        docstring = _schema_get_docstring(cls)
-        print("\nHelp\n----\n")
-        if docstring:
-            print(docstring)
-        else:
-            # Shouldn't ever hit this, so exclude from cover
-            print("No help is available for this item.")  # pragma: no cover
-
-        # Print schema
-        print("\nSchema\n------\n")
-        if hasattr(cls, 'schema'):
-            print(json.dumps(cls.schema, indent=4))
-        else:
-            # Shouldn't ever hit this, so exclude from cover
-            print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
-        print('')
         return
 
     # We received too much (e.g. s3.actions.foo.bar)
     log.error("Invalid selector '{}'.  Max of 3 components in the "
               "format RESOURCE.CATEGORY.ITEM".format(options.resource))
     sys.exit(1)
+
+
+def _print_cls_schema(cls):
+    # Print docstring
+    docstring = _schema_get_docstring(cls)
+    print("\nHelp\n----\n")
+    if docstring:
+        print(docstring)
+    else:
+        # Shouldn't ever hit this, so exclude from cover
+        print("No help is available for this item.")  # pragma: no cover
+
+    # Print schema
+    print("\nSchema\n------\n")
+    if hasattr(cls, 'schema'):
+        component_schema = dict(cls.schema)
+        component_schema.pop('additionalProperties', None)
+        component_schema.pop('type', None)
+        print(yaml.safe_dump(component_schema))
+    else:
+        # Shouldn't ever hit this, so exclude from cover
+        print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
+    print('')
+    return
 
 
 def _metrics_get_endpoints(options):
@@ -484,6 +544,8 @@ def _metrics_get_endpoints(options):
 
 @policy_command
 def metrics_cmd(options, policies):
+    log.warning("metrics command is deprecated, and will be removed in future")
+    policies = [p for p in policies if p.provider_name == 'aws']
     start, end = _metrics_get_endpoints(options)
     data = {}
     for p in policies:

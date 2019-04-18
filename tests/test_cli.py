@@ -175,6 +175,12 @@ class SchemaTest(CliTest):
         # with just a resource
         self.run_and_expect_success(["custodian", "schema", "ec2"])
 
+        # with just a mode
+        self.run_and_expect_success(["custodian", "schema", "mode"])
+
+        # mode.type
+        self.run_and_expect_success(["custodian", "schema", "mode.phd"])
+
         # resource.actions
         self.run_and_expect_success(["custodian", "schema", "ec2.actions"])
 
@@ -252,6 +258,12 @@ class ReportTest(CliTest):
         )
         self.assertIn("InstanceId", output)
         self.assertIn("i-014296505597bf519", output)
+
+        # json format
+        output = self.get_output(
+            ["custodian", "report", "--format", "json", "-s", self.output_dir, yaml_file]
+        )
+        self.assertTrue("i-014296505597bf519", json.loads(output)[0]['InstanceId'])
 
         # empty file
         temp_dir = self.get_temp_dir()

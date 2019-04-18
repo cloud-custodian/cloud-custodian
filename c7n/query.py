@@ -25,7 +25,7 @@ from concurrent.futures import as_completed
 
 import jmespath
 import six
-
+import os
 
 from c7n.actions import ActionRegistry
 from c7n.exceptions import ClientError, ResourceLimitExceeded
@@ -197,8 +197,10 @@ class QueryMeta(type):
                     register_ec2_tags(
                         attrs['filter_registry'], attrs['action_registry'])
             if getattr(m, 'universal_taggable', False):
+                compatibility = isinstance(m.universal_taggable, bool) and True or False
                 register_universal_tags(
-                    attrs['filter_registry'], attrs['action_registry'])
+                    attrs['filter_registry'], attrs['action_registry'],
+                    compatibility=compatibility)
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -292,7 +294,7 @@ class ConfigSource(object):
             if not revisions:
                 continue
             results.append(self.load_resource(revisions[0]))
-        return filter(None, results)
+        return list(filter(None, results))
 
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):
@@ -368,6 +370,16 @@ class QueryResourceManager(ResourceManager):
         return sources.get(source_type)(self)
 
     @classmethod
+    def has_arn(cls):
+        if getattr(cls.resource_type, 'arn', None):
+            return True
+        elif getattr(cls.resource_type, 'type', None) is not None:
+            return True
+        elif cls.__dict__.get('get_arns'):
+            return True
+        return False
+
+    @classmethod
     def get_model(cls):
         return ResourceQuery.resolve(cls.resource_type)
 
@@ -394,27 +406,27 @@ class QueryResourceManager(ResourceManager):
         }
 
     def resources(self, query=None):
-        key = self.get_cache_key(query)
+        cache_key = self.get_cache_key(query)
+        resources = None
+
         if self._cache.load():
-            resources = self._cache.get(key)
+            resources = self._cache.get(cache_key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
                     "%s.%s" % (self.__class__.__module__,
                                self.__class__.__name__),
                     len(resources)))
-                return self.filter_resources(resources)
 
-        if query is None:
-            query = {}
-
-        with self.ctx.tracer.subsegment('resource-fetch'):
-            resources = self.source.resources(query)
-        with self.ctx.tracer.subsegment('resource-augment'):
-            resources = self.augment(resources)
+        if resources is None:
+            if query is None:
+                query = {}
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.resources(query)
+            with self.ctx.tracer.subsegment('resource-augment'):
+                resources = self.augment(resources)
+            self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
-        self._cache.save(key, resources)
-
         with self.ctx.tracer.subsegment('filter'):
             resources = self.filter_resources(resources)
 
@@ -430,19 +442,8 @@ class QueryResourceManager(ResourceManager):
         filtering behind the resource manager facade for default usage.
         """
         p = self.ctx.policy
-        if isinstance(p.max_resources, int) and selection_count > p.max_resources:
-            raise ResourceLimitExceeded(
-                ("policy: %s exceeded resource limit: {limit} "
-                 "found: {selection_count}") % p.name,
-                "max-resources", p.max_resources, selection_count, population_count)
-        elif p.max_resources_percent:
-            if (population_count * (
-                    p.max_resources_percent / 100.0) < selection_count):
-                raise ResourceLimitExceeded(
-                    ("policy: %s exceeded resource limit: {limit}%% "
-                     "found: {selection_count} total: {population_count}") % p.name,
-                    "max-percent", p.max_resources_percent, selection_count, population_count)
-        return True
+        max_resource_limits = MaxResourceLimit(p, selection_count, population_count)
+        return max_resource_limits.check_resource_limits()
 
     def _get_cached_resources(self, ids):
         key = self.get_cache_key(None)
@@ -495,9 +496,19 @@ class QueryResourceManager(ResourceManager):
 
     def get_arns(self, resources):
         arns = []
+
+        m = self.get_model()
+        arn_key = getattr(m, 'arn', None)
+        if arn_key is False:
+            raise ValueError("%s do not have arns" % self.type)
+
+        id_key = m.id
+
         for r in resources:
-            _id = r[self.get_model().id]
-            if 'arn' in _id[:3]:
+            _id = r[id_key]
+            if arn_key:
+                arns.append(r[arn_key])
+            elif 'arn' in _id[:3]:
                 arns.append(_id)
             else:
                 arns.append(self.generate_arn(_id))
@@ -516,6 +527,60 @@ class QueryResourceManager(ResourceManager):
                 resource_type=self.get_model().type,
                 separator='/')
         return self._generate_arn
+
+
+class MaxResourceLimit(object):
+
+    C7N_MAXRES_OP = os.environ.get("C7N_MAXRES_OP", 'or')
+
+    def __init__(self, policy, selection_count, population_count):
+        self.p = policy
+        self.op = MaxResourceLimit.C7N_MAXRES_OP
+        self.selection_count = selection_count
+        self.population_count = population_count
+        self.amount = None
+        self.percentage_amount = None
+        self.percent = None
+        self._parse_policy()
+
+    def _parse_policy(self,):
+        if isinstance(self.p.max_resources, dict):
+            self.op = self.p.max_resources.get("op", MaxResourceLimit.C7N_MAXRES_OP).lower()
+            self.percent = self.p.max_resources.get("percent")
+            self.amount = self.p.max_resources.get("amount")
+
+        if isinstance(self.p.max_resources, int):
+            self.amount = self.p.max_resources
+
+        if isinstance(self.p.max_resources_percent, (int, float)):
+            self.percent = self.p.max_resources_percent
+
+        if self.percent:
+            self.percentage_amount = self.population_count * (self.percent / 100.0)
+
+    def check_resource_limits(self):
+        if self.percentage_amount and self.amount:
+            if (self.selection_count > self.amount and
+               self.selection_count > self.percentage_amount and self.op == "and"):
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
+                     "found:{selection_count} total:{population_count}")
+                    % (self.p.name, self.percent), "max-resource and max-percent",
+                    self.amount, self.selection_count, self.population_count)
+
+        if self.amount:
+            if self.selection_count > self.amount and self.op != "and":
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit} "
+                     "found:{selection_count} total: {population_count}") % self.p.name,
+                    "max-resource", self.amount, self.selection_count, self.population_count)
+
+        if self.percentage_amount:
+            if self.selection_count > self.percentage_amount and self.op != "and":
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit}%% "
+                     "found:{selection_count} total:{population_count}") % self.p.name,
+                    "max-percent", self.percent, self.selection_count, self.population_count)
 
 
 class ChildResourceManager(QueryResourceManager):

@@ -28,7 +28,7 @@ from c7n.filters import FilterValidationError
 
 class TagsTest(BaseTest):
     # regex for identifying valid email addresses
-    EMAIL_REGEX = "[^@]+@[^@]+\.[^@]+"
+    EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 
     logger = logging.getLogger()
 

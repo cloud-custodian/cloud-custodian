@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyVersion": {
+            "Document": "%7B%0A%20%20%22Version%22%3A%20%222012-10-17%22%2C%0A%20%20%22Statement%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22Effect%22%3A%20%22Allow%22%2C%0A%20%20%20%20%20%20%22Resource%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%22%2A%22%0A%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%22Action%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%22logs%3ACreateLogGroup%22%2C%0A%20%20%20%20%20%20%20%20%22logs%3ACreateLogStream%22%2C%0A%20%20%20%20%20%20%20%20%22logs%3APutLogEvents%22%0A%20%20%20%20%20%20%5D%0A%20%20%20%20%7D%2C%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%20%22Sid%22%3A%20%22CodeCommitPolicy%22%2C%0A%20%20%20%20%20%20%20%22Effect%22%3A%20%22Allow%22%2C%0A%20%20%20%20%20%20%20%22Action%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%22codecommit%3AGitPull%22%0A%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%22Resource%22%3A%20%5B%22%2A%22%5D%0A%20%20%20%20%7D%2C%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%20%22Sid%22%3A%20%22S3GetObjectPolicy%22%2C%0A%20%20%20%20%20%20%20%22Effect%22%3A%20%22Allow%22%2C%0A%20%20%20%20%20%20%20%22Action%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%22s3%3AGetObject%22%2C%0A%20%20%20%20%20%20%20%20%20%20%22s3%3AGetObjectVersion%22%0A%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%22Resource%22%3A%20%5B%22%2A%22%5D%0A%20%20%20%20%7D%2C%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%20%22Sid%22%3A%20%22S3PutObjectPolicy%22%2C%0A%20%20%20%20%20%20%20%22Effect%22%3A%20%22Allow%22%2C%0A%20%20%20%20%20%20%20%22Action%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%22s3%3APutObject%22%0A%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%22Resource%22%3A%20%5B%22%2A%22%5D%0A%20%20%20%20%7D%2C%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%20%22Action%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%22ecr%3ABatchCheckLayerAvailability%22%2C%0A%20%20%20%20%20%20%20%20%20%22ecr%3ACompleteLayerUpload%22%2C%0A%20%20%20%20%20%20%20%20%20%22ecr%3AGetAuthorizationToken%22%2C%0A%20%20%20%20%20%20%20%20%20%22ecr%3AInitiateLayerUpload%22%2C%0A%20%20%20%20%20%20%20%20%20%22ecr%3APutImage%22%2C%0A%20%20%20%20%20%20%20%20%20%22ecr%3AUploadLayerPart%22%0A%20%20%20%20%20%20%20%20%5D%2C%0A%09%22Resource%22%3A%20%22%2A%22%2C%0A%09%22Effect%22%3A%20%22Allow%22%0A%20%20%20%20%7D%0A%20%20%5D%0A%7D%0A",
+            "VersionId": "v1",
+            "IsDefaultVersion": true,
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 9,
+                "day": 12,
+                "hour": 12,
+                "minute": 59,
+                "second": 52,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "c50051cf-3a83-11e9-8849-4b98e6ba2d71",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c50051cf-3a83-11e9-8849-4b98e6ba2d71",
+                "content-type": "text/xml",
+                "content-length": "2673",
+                "vary": "Accept-Encoding",
+                "date": "Wed, 27 Feb 2019 11:35:22 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

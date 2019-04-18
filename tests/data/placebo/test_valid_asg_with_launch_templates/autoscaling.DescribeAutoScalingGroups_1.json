@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "test2",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:bcdafcd7-7ceb-4fb2-ad2c-d841f1d7001b:autoScalingGroupName/test2",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0877401c93c294001",
+                    "LaunchTemplateName": "test",
+                    "Version": "$Latest"
+                },
+                "MinSize": 1,
+                "MaxSize": 1,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-0aca1d4f8f943d73e",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-0877401c93c294001",
+                            "LaunchTemplateName": "test",
+                            "Version": "4"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 26,
+                    "second": 2,
+                    "microsecond": 296000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3a334610",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "68288da8-3acf-11e9-92b8-39dfefc0525a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "68288da8-3acf-11e9-92b8-39dfefc0525a",
+                "content-type": "text/xml",
+                "content-length": "2365",
+                "vary": "Accept-Encoding",
+                "date": "Wed, 27 Feb 2019 20:36:49 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

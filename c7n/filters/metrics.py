@@ -31,8 +31,11 @@ class MetricsFilter(Filter):
 
     Docs on cloud watch metrics
 
-    - GetMetricStatistics - http://goo.gl/w8mMEY
-    - Supported Metrics - http://goo.gl/n0E0L7
+    - GetMetricStatistics
+      https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricStatistics.html
+
+    - Supported Metrics
+      https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html
 
     .. code-block:: yaml
 
@@ -86,6 +89,7 @@ class MetricsFilter(Filter):
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
         'ecs': 'AWS/ECS',
+        'efs': 'AWS/EFS',
         'elasticache': 'AWS/ElastiCache',
         'ec2': 'AWS/EC2',
         'elb': 'AWS/ELB',
@@ -103,6 +107,7 @@ class MetricsFilter(Filter):
         's3': 'AWS/S3',
         'sns': 'AWS/SNS',
         'sqs': 'AWS/SQS',
+        'workspaces': 'AWS/WorkSpaces',
     }
 
     def process(self, resources, event=None):

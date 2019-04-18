@@ -1486,6 +1486,7 @@ class S3Test(BaseTest):
                                 "Effect": "Deny",
                                 "Action": "s3:PutObject",
                                 "Principal": "*",
+                                "Resource": "arn:aws:s3:::{bucket_name}/*"
                             }
                         ],
                     },

@@ -1,0 +1,42 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "compute#httpsHealthCheck", 
+        "description": "", 
+        "timeoutSec": 5, 
+        "checkIntervalSec": 10, 
+        "port": 443, 
+        "healthyThreshold": 2, 
+        "host": "", 
+        "requestPath": "/", 
+        "unhealthyThreshold": 3, 
+        "creationTimestamp": "2019-03-13T23:57:20.595-07:00", 
+        "id": "1274526500684842431", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/httpsHealthChecks/newhealthcheck", 
+        "name": "newhealthcheck"
+      }
+    ], 
+    "kind": "compute#httpsHealthCheckList", 
+    "id": "projects/cloud-custodian/global/httpsHealthChecks", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/httpsHealthChecks"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "698", 
+    "transfer-encoding": "chunked", 
+    "expires": "Thu, 14 Mar 2019 07:37:55 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Thu, 14 Mar 2019 07:37:55 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/httpsHealthChecks?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"QbldhMMo_fTxJaG8W-5Z64RsGDo=/2ER5cKJYjunZPElIaM5b0MiM6ug=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

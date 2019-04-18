@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 04 Mar 2019 21:59:02 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "264",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/dns/v1beta2/projects/cloud-custodian/policies?alt=json"
+  },
+  "body": {
+    "policies": [
+      {
+        "id": "4598680974969317602",
+        "name": "custodian",
+        "enableInboundForwarding": false,
+        "description": "custodian",
+        "networks": [],
+        "kind": "dns#policy"
+      }
+    ],
+    "kind": "dns#policiesListResponse"
+  }
+}
