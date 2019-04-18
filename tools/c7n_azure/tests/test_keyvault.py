@@ -13,8 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import re
-
 from azure_common import BaseTest, arm_template, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.resources.key_vault import WhiteListFilter
 from mock import patch

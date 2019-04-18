@@ -78,9 +78,7 @@ class WhiteListFilter(Filter):
         #   - User is whitelisted
         #   - Permissions don't exceed allowed permissions
         for p in i['accessPolicies']:
-            if self.key not in p:
-                return False
-            elif p[self.key] not in self.users:
+            if self.key not in p or p[self.key] not in self.users:
                 if not self.compare_permissions(p['permissions'], self.permissions):
                     return False
         return True
