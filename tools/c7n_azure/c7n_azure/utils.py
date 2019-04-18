@@ -193,7 +193,7 @@ class GraphHelper(object):
     log = logging.getLogger('custodian.azure.utils.GraphHelper')
 
     @staticmethod
-    def get_principal_dictionary(graph_client, object_ids, raise_on_graph_call_error = False):
+    def get_principal_dictionary(graph_client, object_ids, raise_on_graph_call_error=False):
         """Retrieves Azure AD Objects for corresponding object ids passed.
         :param graph_client: A client for Microsoft Graph.
         :param object_ids: The object ids to retrieve Azure AD objects for.
