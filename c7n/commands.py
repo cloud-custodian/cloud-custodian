@@ -22,6 +22,7 @@ import os
 import pprint
 import sys
 import time
+import uuid
 
 import six
 import yaml
@@ -312,6 +313,26 @@ def logs(options, policies):
                 "%Y-%m-%d %H:%M:%S", time.localtime(e['timestamp'] / 1000)),
             e['message']))
 
+
+@policy_command
+def generate_role(options, policies):
+    permissions = [policy.get_permissions() for policy in policies]
+    if not options.name:
+        options.name = str(uuid.uuid4())
+    policy_doc = _generate_policy_doc(permissions)
+    print(policy_doc)
+
+
+def _generate_policy_doc(permissions):
+    """Given a list of policy dicts, return a policy document"""
+    statement = [{
+        "Effect": "Allow",
+        "Action": list(p)
+    } for p in permissions]
+    return {
+        "Version": "2012-10-17",
+        "Statement": statement
+    }
 
 def _schema_get_docstring(starting_class):
     """ Given a class, return its docstring.

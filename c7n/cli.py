@@ -303,6 +303,13 @@ def setup_parser():
     validate.add_argument("-q", "--quiet", action="count", help="Less logging (repeatable)")
     validate.add_argument("--debug", default=False, help=argparse.SUPPRESS)
 
+    generate_role_desc = "Generate iam role with oermissions required from yaml policies"
+    generate_role = subs.add_parser("generate-role", description=generate_role_desc,
+                                    help=generate_role_desc)
+    generate_role.set_defaults(command="c7n.commands.generate_role")
+    generate_role.add_argument("--name", help="Name for the generated role")
+    _default_options(generate_role)
+
     return parser
 
 
