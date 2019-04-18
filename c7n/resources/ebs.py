@@ -289,7 +289,7 @@ class SnapshotUnusedFilter(Filter):
         tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
         for tversion in tmpl_mgr.get_resources(
                 list(tmpl_mgr.get_asg_templates(asgs).keys())):
-            for bd in tversion['LaunchTemplateData']['BlockDeviceMappings']:
+            for bd in tversion['LaunchTemplateData'].get('BlockDeviceMappings', ()):
                 if 'Ebs' in bd and 'SnapshotId' in bd['Ebs']:
                     snap_ids.add(bd['Ebs']['SnapshotId'])
         return snap_ids
