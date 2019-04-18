@@ -78,7 +78,6 @@ class PythonPackageArchive(object):
             self._temp_archive_file.close()
             os.unlink(self.path)
 
-
     @property
     def path(self):
         return self._temp_archive_file.name
