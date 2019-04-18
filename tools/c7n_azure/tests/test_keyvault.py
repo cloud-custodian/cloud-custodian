@@ -128,6 +128,11 @@ class KeyVaultTest(BaseTest):
     def test_whitelist_not_authorized(self, get_tenant_id):
         """Tests that more detailed error messaging is returned for missing and/or incorrect
         keys regarding whitelist filtering of keyvaults based on access policies.
+
+        Note: to regenerate the cassette for this test case, use a service principle / user who
+        does not have the correct permissions to access Microsoft Graph:
+        See https://docs.microsoft.com/en-us/graph/api/directoryobject-getbyids for required
+        permissions.
         """
         p = self.load_policy({
             'name': 'test-key-vault',
