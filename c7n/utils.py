@@ -523,10 +523,12 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
 
 
 def temporary_opener(name, flag, mode=0o777):
-    return os.open(name, flag | os.O_TEMPORARY, 0o777)
+    return os.open(name, flag | os.O_TEMPORARY | 4, mode)
 
 
 def temporary_open(name, mode):
+    """ Allows opening additional handles to temporary files on Windows.
+    ANY file opened with this flag will be deleted after it is closed. """
     if os.name == 'nt' and sys.version_info >= (3, 0):
         return open(name, mode, opener=temporary_opener)
     else:

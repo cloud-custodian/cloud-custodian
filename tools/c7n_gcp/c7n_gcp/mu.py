@@ -20,7 +20,7 @@ import hashlib
 
 from c7n_gcp.client import errors
 from c7n.mu import custodian_archive as base_archive
-from c7n.utils import local_session, temporary_open
+from c7n.utils import local_session
 
 from googleapiclient.errors import HttpError
 
@@ -157,6 +157,7 @@ class CloudFunctionManager(object):
 
     def _delta_source(self, archive, func_name):
         checksum = archive.get_checksum(hasher=hashlib.md5)
+        checksum = archive.get_checksum(hasher=hashlib.md5)
         source_info = self.client.execute_command(
             'generateDownloadUrl', {'name': func_name, 'body': {}})
         http = self._get_http_client(self.client)
@@ -186,7 +187,7 @@ class CloudFunctionManager(object):
                 'Content-Length': '%d' % archive.size,
                 'x-goog-content-length-range': '0,104857600'
             },
-            body=temporary_open(archive.path, 'rb')
+            body=open(archive.path, 'rb')
         )
         log.info("function code uploaded")
         if headers['status'] != '200':

@@ -36,7 +36,7 @@ from concurrent.futures import ThreadPoolExecutor
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
-from c7n.utils import parse_s3, local_session, temporary_open
+from c7n.utils import parse_s3, local_session
 
 
 log = logging.getLogger('custodian.serverless')
@@ -64,12 +64,19 @@ class PythonPackageArchive(object):
     zip_compression = zipfile.ZIP_DEFLATED
 
     def __init__(self, *modules):
-        self._temp_archive_file = tempfile.NamedTemporaryFile()
+        self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
         self._zip_file = zipfile.ZipFile(
             self._temp_archive_file, mode='w',
             compression=self.zip_compression)
         self._closed = False
         self.add_modules(None, *modules)
+
+    def __del__(self):
+        if not self._closed:
+            self.close()
+        self._temp_archive_file.close()
+        os.unlink(self.path)
+
 
     @property
     def path(self):
@@ -154,7 +161,7 @@ class PythonPackageArchive(object):
 
         """
         dest = dest or os.path.basename(src)
-        with temporary_open(src, 'rb') as fp:
+        with open(src, 'rb') as fp:
             contents = fp.read()
         self.add_contents(dest, contents)
 
@@ -210,7 +217,7 @@ class PythonPackageArchive(object):
     def get_checksum(self, encoder=base64.b64encode, hasher=hashlib.sha256):
         """Return the b64 encoded sha256 checksum of the archive."""
         assert self._closed, "Archive not closed"
-        with temporary_open(self._temp_archive_file.name, 'rb') as fh:
+        with open(self._temp_archive_file.name, 'rb') as fh:
             return encoder(checksum(fh, hasher())).decode('ascii')
 
     def get_bytes(self):
@@ -221,7 +228,7 @@ class PythonPackageArchive(object):
     def get_stream(self):
         """Return the entire zip file as a stream. """
         assert self._closed, "Archive not closed"
-        return temporary_open(self._temp_archive_file.name, 'rb')
+        return open(self._temp_archive_file.name, 'rb')
 
     def get_reader(self):
         """Return a read-only :py:class:`~zipfile.ZipFile`."""

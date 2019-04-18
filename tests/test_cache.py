@@ -19,6 +19,7 @@ from argparse import Namespace
 from six.moves import cPickle as pickle
 import tempfile
 import mock
+import os
 
 
 class TestCache(TestCase):
@@ -62,7 +63,8 @@ class FileCacheManagerTest(TestCase):
         self.test_value = [1, 2, 3]
 
     def test_get_set(self):
-        t = tempfile.NamedTemporaryFile()
+        t = tempfile.NamedTemporaryFile(delete=False)
+        self.addCleanup(os.unlink, t.name)
         self.addCleanup(t.close)
         c = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
         self.assertFalse(c.load())
@@ -91,7 +93,10 @@ class FileCacheManagerTest(TestCase):
         self.assertEqual(self.test_cache.get(self.bad_key), None)
 
     def test_load(self):
-        t = tempfile.NamedTemporaryFile(suffix=".cache")
+        t = tempfile.NamedTemporaryFile(suffix=".cache", delete=False)
+        self.addCleanup(os.unlink, t.name)
+        self.addCleanup(t.close)
+
         load_config = Namespace(cache_period=0, cache=t.name)
         load_cache = cache.FileCacheManager(load_config)
         self.assertFalse(load_cache.load())
@@ -106,7 +111,10 @@ class FileCacheManagerTest(TestCase):
         # path exists then we dont need to create the folder
         mock_exists.return_value = True
         # tempfile to hold the pickle
-        temp_cache_file = tempfile.NamedTemporaryFile()
+        temp_cache_file = tempfile.NamedTemporaryFile(delete=False)
+        self.addCleanup(os.unlink, temp_cache_file.name)
+        self.addCleanup(temp_cache_file.close)
+
         self.test_cache.cache_path = temp_cache_file.name
         # make the call
         self.test_cache.save(self.test_key, self.test_value)
@@ -126,7 +134,10 @@ class FileCacheManagerTest(TestCase):
     @mock.patch.object(cache.pickle, "dump")
     @mock.patch.object(cache.pickle, "dumps")
     def test_save_doesnt_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
-        temp_cache_file = tempfile.NamedTemporaryFile()
+        temp_cache_file = tempfile.NamedTemporaryFile(delete=False)
+        self.addCleanup(os.unlink, temp_cache_file.name)
+        self.addCleanup(temp_cache_file.close)
+
         self.test_cache.cache_path = temp_cache_file.name
 
         # path doesnt exists then we will create the folder
