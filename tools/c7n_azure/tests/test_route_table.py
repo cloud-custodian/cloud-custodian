@@ -94,7 +94,7 @@ class RouteTableTest(BaseTest):
                 },
                 {
                     'type': 'value',
-                    'key': 'properties.subnets[?contains(id, \'{}\')] | [0]'.format(
+                    'key': 'properties.subnets[?ends_with(id, \'{}\')] | [0]'.format(
                         RouteTableTest._subnet_id_suffix(RouteTableTest.disallowed_subnet_name)
                     ),
                     'value': 'not-null'
@@ -120,7 +120,7 @@ class RouteTableTest(BaseTest):
                 },
                 {
                     'type': 'value',
-                    'key': 'properties.subnets[?contains(id, \'{}\')] | [0]'.format(
+                    'key': 'properties.subnets[?ends_with(id, \'{}\')] | [0]'.format(
                         RouteTableTest._subnet_id_suffix(RouteTableTest.allowed_subnet_name)
                     ),
                     'value': 'not-null'
