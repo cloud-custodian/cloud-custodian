@@ -77,7 +77,8 @@ class ResolverTest(BaseTest):
         content = json.dumps({"universe": {"galaxy": {"system": "sun"}}})
         cache = FakeCache()
         resolver = URIResolver(None, cache)
-        with tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd()) as fh:
+        with tempfile.NamedTemporaryFile(mode="w+", dir=os.getcwd(), delete=False) as fh:
+            self.addCleanup(os.unlink, fh.name)
             fh.write(content)
             fh.flush()
             self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
@@ -131,7 +132,7 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), ["2", "2", "2", "2", "2"])
 
     def test_csv_expr_using_dict(self):
-        with open("test_dict.csv", "w") as out:
+        with open("test_dict.csv", "w", newline='') as out:
             writer = csv.writer(out)
             writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
             writer.writerows([range(5) for r in range(5)])
@@ -143,16 +144,16 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), "1")
 
     def test_csv_column(self):
-        with open("test_column.csv", "w") as out:
+        with open("test_column.csv", "w", newline='') as out:
             writer = csv.writer(out)
             writer.writerows([range(5) for r in range(5)])
-        with open("test_column.csv", "r") as out:
+        with open("test_column.csv", "r", newline='') as out:
             values = self.get_values_from({"url": "sun.csv", "expr": 1}, out.read())
         os.remove("test_column.csv")
         self.assertEqual(values.get_values(), ["1", "1", "1", "1", "1"])
 
     def test_csv_raw(self):
-        with open("test_raw.csv", "w") as out:
+        with open("test_raw.csv", "w", newline='') as out:
             writer = csv.writer(out)
             writer.writerows([range(3, 4) for r in range(5)])
         with open("test_raw.csv", "r") as out:

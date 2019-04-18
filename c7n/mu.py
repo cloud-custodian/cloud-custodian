@@ -74,8 +74,9 @@ class PythonPackageArchive(object):
     def __del__(self):
         if not self._closed:
             self.close()
-        self._temp_archive_file.close()
-        os.unlink(self.path)
+        if self._temp_archive_file:
+            self._temp_archive_file.close()
+            os.unlink(self.path)
 
 
     @property
@@ -106,7 +107,7 @@ class PythonPackageArchive(object):
                     # Likely a namespace package. Try to add *.pth files so
                     # submodules are importable under Python 2.7.
 
-                    sitedir = list(module.__path__)[0].rsplit('/', 1)[0]
+                    sitedir = os.path.abspath(os.path.join(list(module.__path__)[0], os.pardir))
                     for filename in os.listdir(sitedir):
                         s = filename.startswith
                         e = filename.endswith
