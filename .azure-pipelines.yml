@@ -85,15 +85,18 @@ jobs:
     condition: succeededOrFailed()
 
 - job: 'TestWindows'
-  displayName: 'Test Windows'
+  displayName: 'Test Win2019'
   condition: "succeeded()"
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-2019'
   strategy:
     matrix:
       Python36:
         python.version: '3.6'
         TOXENV: py36
+      Python37:
+        python.version: '3.7'
+        TOXENV: py37
     maxParallel: 3
 
   steps:
