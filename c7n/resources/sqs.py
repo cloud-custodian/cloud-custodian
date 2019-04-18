@@ -304,10 +304,7 @@ class SetRetentionPeriod(BaseAction):
     """
     schema = type_schema(
         'set-retention-period',
-        period={'type': 'integer',
-                'minimum': 60, 'exclusiveMinimum': True,
-                'maximum': 1209600, 'exclusiveMaximum': True})
-
+        period={'type': 'integer', 'minimum': 60, 'maximum': 1209600})
     permissions = ('sqs:SetQueueAttributes',)
 
     def process(self, queues):

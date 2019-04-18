@@ -60,9 +60,7 @@ class ModifyPolicyBase(BaseAction):
         **{
             'add-statements': {
                 'type': 'array',
-                'required': True,
                 'items': {'$ref': '#/definitions/iam-statement'},
-                'additionalProperties': False
             },
             'remove-statements': {
                 'type': ['array', 'string'],
@@ -70,8 +68,6 @@ class ModifyPolicyBase(BaseAction):
                     {'enum': ['matched', '*']},
                     {'type': 'array', 'items': {'type': 'string'}}
                 ],
-                'required': True,
-                'additionalProperties': False
             }
         }
     )

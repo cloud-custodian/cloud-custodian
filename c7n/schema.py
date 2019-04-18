@@ -46,22 +46,11 @@ def validate(data, schema=None):
         Validator.check_schema(schema)
 
     validator = Validator(schema)
-
     errors = list(validator.iter_errors(data))
-
     if not errors:
-        counter = Counter([p['name'] for p in data.get('policies')])
-        dupes = []
-        for k, v in counter.items():
-            if v > 1:
-                dupes.append(k)
-        if dupes:
-            return [ValueError(
-                "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes))), dupes[0]]
-        return []
+        return check_unique(data) or []
     try:
-        resp = specific_error(errors[0])
+        resp = policy_error_scope(specific_error(errors[0]), data)
         name = isinstance(
             errors[0].instance,
             dict) and errors[0].instance.get(
@@ -76,6 +65,29 @@ def validate(data, schema=None):
         errors[0],
         best_match(validator.iter_errors(data)),
     ]))
+
+
+def check_unique(data):
+    counter = Counter([p['name'] for p in data.get('policies', [])])
+    for k, v in list(counter.items()):
+        if v == 1:
+            counter.pop(k)
+    if counter:
+        return [ValueError(
+            "Only one policy with a given name allowed, duplicates: {}".format(counter)),
+            list(counter.keys())[0]]
+
+
+def policy_error_scope(error, data):
+    """Scope a schema error to its policy name and resource."""
+    err_path = list(error.absolute_path)
+    if err_path[0] != 'policies':
+        return error
+    pdata = data['policies'][err_path[1]]
+    pdata.get('name', 'unknown')
+    error.message = "Error on policy:{} resource:{}\n".format(
+        pdata.get('name', 'unknown'), pdata.get('resource', 'unknown')) + error.message
+    return error
 
 
 def specific_error(error):
@@ -252,7 +264,7 @@ def generate(resource_types=()):
                 ))
 
     schema = {
-        '$schema': 'http://json-schema.org/schema#',
+        "$schema": "http://json-schema.org/draft-07/schema#",
         'id': 'http://schema.cloudcustodian.io/v0/custodian.json',
         'definitions': definitions,
         'type': 'object',
