@@ -78,7 +78,7 @@ class Publish(BaseTest):
         result = mgr.publish(func)
         self.assertEqual(result["CodeSize"], 169)
 
-    @pytest.mark.skipif(sys.platform.startswith("win"), reason="Requires changes to pass on Windows")
+    @pytest.mark.skipif(sys.platform.startswith("win"), reason="Requires changes for Windows")
     def test_publish_a_lambda_with_layer_and_concurrency(self):
         factory = self.replay_flight_data('test_lambda_layer_concurrent_publish')
         mgr = LambdaManager(factory)

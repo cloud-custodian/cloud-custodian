@@ -18,6 +18,11 @@ Linting can be run with:
 
   $ make lint
 
+Operating System Compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tests are currently executed on both Ubuntu 1604 and Windows Server 2019
+and must pass on both operating systems.
 
 Decorating tests
 ~~~~~~~~~~~~~~~~
