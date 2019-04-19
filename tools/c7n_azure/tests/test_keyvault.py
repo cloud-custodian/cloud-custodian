@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template, DEFAULT_SUBSCRIPTION_ID
+from azure_common import BaseTest, arm_template, DEFAULT_TENANT_ID
 from c7n_azure.resources.key_vault import WhiteListFilter
 from mock import patch
 from msrestazure.azure_exceptions import CloudError
@@ -76,7 +76,7 @@ class KeyVaultTest(BaseTest):
         self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))
 
     @arm_template('keyvault.json')
-    @patch('c7n_azure.session.Session.get_tenant_id', return_value=DEFAULT_SUBSCRIPTION_ID)
+    @patch('c7n_azure.session.Session.get_tenant_id', return_value=DEFAULT_TENANT_ID)
     def test_whitelist(self, get_tenant_id):
         """Tests basic whitelist functionality"""
         p = self.load_policy({
@@ -123,11 +123,11 @@ class KeyVaultTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('keyvault.json')
-    @patch('c7n_azure.session.Session.get_tenant_id', return_value=DEFAULT_SUBSCRIPTION_ID)
+    @patch('c7n_azure.session.Session.get_tenant_id', return_value=DEFAULT_TENANT_ID)
     def test_whitelist_not_authorized(self, get_tenant_id):
-        """Tests that more detailed error messaging is returned for missing and/or incorrect
-        keys regarding whitelist filtering of keyvaults based on access policies.
-
+        """Tests that an exception is thrown when both:
+        * The Microsoft Graph call fails
+        * A Graph provided field is being measured (principleName in this case)
         Note: to regenerate the cassette for this test case, use a service principle / user who
         does not have the correct permissions to access Microsoft Graph:
         See https://docs.microsoft.com/en-us/graph/api/directoryobject-getbyids for required
