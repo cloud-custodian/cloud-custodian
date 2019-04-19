@@ -183,7 +183,8 @@ class SqlServerTest(BaseTest):
 
         self.assertEqual(len(resources), 1, "Expected a single SqlServer")
         sqlserver = resources[0]
-        self.assertEqual('cctestsqlserver12262018', sqlserver.get('name'), "The wrong sqlserver was found")
+        self.assertEqual('cctestsqlserver12262018', sqlserver.get('name'),
+                         "The wrong sqlserver was found")
 
         return sqlserver
 
