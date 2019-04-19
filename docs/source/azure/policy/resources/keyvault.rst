@@ -23,6 +23,12 @@ Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
+- ``access-policy``
+  Add, Replace, or Delete access policies from key vaults under a provided principal
+
+  .. c7n-schema:: KeyVaultAccessPolicyAction
+       :module: c7n_azure.resources.key_vault
+
 Example Policies
 ----------------
 
@@ -100,3 +106,23 @@ This policy will find all KeyVaults with an access of Service Principals not in 
                     - get
                   certificates:
                     - get
+
+This policy will find all KeyVaults and add get and list permissions for keys.
+
+.. code-block:: yaml
+
+    policies:
+        - name: policy
+          description:
+            Add get and list permissions to keys
+          resource: azure.keyvault
+          actions:
+            - type: access-policy
+              operation: add
+              access_policies:
+                - tenant_id: 00000000-0000-0000-0000-000000000000
+                  object_id: 11111111-1111-1111-1111-111111111111
+                  permissions:
+                    keys:
+                      - get
+                      - list
