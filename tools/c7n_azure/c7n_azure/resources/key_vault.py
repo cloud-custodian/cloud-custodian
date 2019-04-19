@@ -128,10 +128,10 @@ class WhiteListFilter(Filter):
         return access_policies
 
 
-@KeyVault.action_registry.register('assign')
-class KeyVaultAssignAction(AzureBaseAction):
+@KeyVault.action_registry.register('access-policy')
+class KeyVaultAccessPolicyAction(AzureBaseAction):
 
-    schema = type_schema('assign',
+    schema = type_schema('access-policy',
         required=['operation', 'access_policies'],
         operation={'type': 'string', 'enum': ['add', 'replace', 'remove']},
         access_policies={'type': 'array'})
@@ -141,7 +141,7 @@ class KeyVaultAssignAction(AzureBaseAction):
 
     def _process_resource(self, resource):
         operation = self.data.get('operation')
-        access_policies = KeyVaultAssignAction._transform_access_policies(
+        access_policies = KeyVaultAccessPolicyAction._transform_access_policies(
             self.data.get('access_policies')
         )
 
