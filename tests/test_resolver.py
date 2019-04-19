@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
-import io
 import json
 import os
 import tempfile
@@ -116,7 +115,7 @@ class UrlValueTest(BaseTest):
         with open("resolver_test.txt", "w") as out:
             for i in ["a", "b", "c", "d"]:
                 out.write("%s\n" % i)
-        with open("resolver_test.txt", "r") as out:
+        with open("resolver_test.txt", "rb") as out:
             values = self.get_values_from({"url": "letters.txt"}, out.read())
         os.remove("resolver_test.txt")
         self.assertEqual(values.get_values(), ["a", "b", "c", "d"])
@@ -125,7 +124,7 @@ class UrlValueTest(BaseTest):
         with open("test_expr.csv", "w") as out:
             writer = csv.writer(out)
             writer.writerows([range(5) for r in range(5)])
-        with open("test_expr.csv", "r") as out:
+        with open("test_expr.csv", "rb") as out:
             values = self.get_values_from(
                 {"url": "sun.csv", "expr": "[*][2]"}, out.read()
             )
@@ -133,11 +132,11 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), ["2", "2", "2", "2", "2"])
 
     def test_csv_expr_using_dict(self):
-        with io.open("test_dict.csv", "w", newline='') as out:
+        with open("test_dict.csv", "w") as out:
             writer = csv.writer(out)
             writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
             writer.writerows([range(5) for r in range(5)])
-        with io.open("test_dict.csv", "r", newline='') as out:
+        with open("test_dict.csv", "rb") as out:
             values = self.get_values_from(
                 {"url": "sun.csv", "expr": "bb[1]", "format": "csv2dict"}, out.read()
             )
@@ -145,19 +144,19 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), "1")
 
     def test_csv_column(self):
-        with io.open("test_column.csv", "w", newline='') as out:
+        with open("test_column.csv", "w") as out:
             writer = csv.writer(out)
             writer.writerows([range(5) for r in range(5)])
-        with io.open("test_column.csv", "r", newline='') as out:
+        with open("test_column.csv", "rb") as out:
             values = self.get_values_from({"url": "sun.csv", "expr": 1}, out.read())
         os.remove("test_column.csv")
         self.assertEqual(values.get_values(), ["1", "1", "1", "1", "1"])
 
     def test_csv_raw(self):
-        with io.open("test_raw.csv", "w", newline='') as out:
+        with open("test_raw.csv", "w") as out:
             writer = csv.writer(out)
             writer.writerows([range(3, 4) for r in range(5)])
-        with io.open("test_raw.csv", "r", newline='') as out:
+        with open("test_raw.csv", "rb") as out:
             values = self.get_values_from({"url": "sun.csv"}, out.read())
         os.remove("test_raw.csv")
         self.assertEqual(values.get_values(), [["3"], ["3"], ["3"], ["3"], ["3"]])

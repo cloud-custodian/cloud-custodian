@@ -2564,7 +2564,7 @@ class DeleteBucket(ScanBucket):
         log.info(
             "EmptyBucket buckets:%d Complete keys:%d rate:%0.2f/s time:%0.2fs",
             len(buckets), object_count,
-            float(object_count) / run_time, run_time)
+            float(object_count) / run_time if run_time else 0, run_time)
         return results
 
     def process_chunk(self, batch, bucket):
