@@ -158,8 +158,7 @@ class KeyVaultAccessPolicyAction(AzureBaseAction):
     @staticmethod
     def _transform_access_policies(access_policies):
         policies = [
-            {"applicationId": i['application_id'],
-                "objectId": i['object_id'],
+            {"objectId": i['object_id'],
                 "tenantId": i['tenant_id'],
                 "permissions": i['permissions']} for i in access_policies]
 
