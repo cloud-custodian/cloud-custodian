@@ -307,8 +307,10 @@ def setup_parser():
     generate_role = subs.add_parser("generate-role", description=generate_role_desc,
                                     help=generate_role_desc)
     generate_role.set_defaults(command="c7n.commands.generate_role")
-    generate_role.add_argument("--name", help="Name for the generated role")
-    _default_options(generate_role)
+    generate_role.add_argument("-n", "--name", help="Name for the generated role")
+    generate_role.add_argument("-d", "--dryrun", default=False, action="store_true",
+                               help="Only print generated policy")
+    _default_options(generate_role, blacklist=["dryrun", "output-dir"])
 
     return parser
 

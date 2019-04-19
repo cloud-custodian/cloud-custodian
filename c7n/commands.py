@@ -320,7 +320,8 @@ def generate_role(options, policies):
     if not options.name:
         options.name = str(uuid.uuid4())
     policy_doc = _generate_policy_doc(permissions)
-    print(policy_doc)
+    if options.dryrun:
+        print(policy_doc)
 
 
 def _generate_policy_doc(permissions):
@@ -329,10 +330,12 @@ def _generate_policy_doc(permissions):
         "Effect": "Allow",
         "Action": list(p)
     } for p in permissions]
+
     return {
         "Version": "2012-10-17",
         "Statement": statement
     }
+
 
 def _schema_get_docstring(starting_class):
     """ Given a class, return its docstring.
