@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "expires": "Fri, 19 Apr 2019 11:51:40 GMT",
+    "date": "Fri, 19 Apr 2019 11:51:40 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1774",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/sslCerts?alt=json"
+  },
+  "body": {
+    "kind": "sql#sslCertsList",
+    "items": [
+      {
+        "kind": "sql#sslCert",
+        "selfLink": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/sslCerts/62a43e710693b34d5fdb34911a656fd7a3b76cc7",
+        "instance": "custodian-postgres",
+        "sha1Fingerprint": "62a43e710693b34d5fdb34911a656fd7a3b76cc7",
+        "commonName": "custodian",
+        "certSerialNumber": "1267517316",
+        "cert": "-----BEGIN CERTIFICATE-----\nMIIDXjCCAkagAwIBAgIES4zHhDANBgkqhkiG9w0BAQsFADCBgTEtMCsGA1UELhMk\nYjNkYjFhZTQtNTkwNS00MmI1LTk1ZTMtZTY1ZWVhNjE0MDc0MS0wKwYDVQQDEyRH\nb29nbGUgQ2xvdWQgU1FMIENsaWVudCBDQSBjdXN0b2RpYW4xFDASBgNVBAoTC0dv\nb2dsZSwgSW5jMQswCQYDVQQGEwJVUzAeFw0xOTA0MTkxMTI0NDVaFw0yOTA0MTYx\nMTI1NDVaMDcxEjAQBgNVBAMTCWN1c3RvZGlhbjEUMBIGA1UEChMLR29vZ2xlLCBJ\nbmMxCzAJBgNVBAYTAlVTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\niFL654HEtGuhdMZCeIIdCwXYgV0eKQJ7/dgEcyBPN9UWSHInqxrz6ckrZsA7viB5\nqwXlNny0UFCPmXVPXR1G6Fikme5wx6c7rsozYDXh19XZX0zM5Qrv9GAihgQxBKXj\nNoZJrqaBYXeoiY14Xt/PzlGjOT8NypwHI1spsPJip2h43uotvrAPNpHDEpPakt7Y\ndoYspPqWYBoyOmnrmK55uYIBhxhQmsE/W0NYe8ZEPvV9g2rkIh0bVx545tqVAU7M\nUEmK4P05r1jtK4/YdRoGYM9FYcxIk4dIhUL94CnNstmpUhM0046wAjwivfCiMHhu\nucoSzM33QhwrJxPw0SnvrwIDAQABoycwJTAjBgNVHREEHDAagRhhbGV4LmthcnBp\ndHNraUBnbWFpbC5jb20wDQYJKoZIhvcNAQELBQADggEBADy5zRpiFNu0YTN47GK1\nwC0iQdVqjKtk2XyKr0rCqBKZtJ/U3aAGpsJUsTUan/QsgOFU8JtDxzdM0wX4SQBd\nWrVzXnbx2qydJ0gR6Ij+K9Dzn9FS+M3KNe0V6GQY9bc77mR3RS+xniFJ+46CCcw+\nJT0u6f0IvbUWslVzeqc873VYVPUKLI0rDJcA/xOsie/SXyPUImxV62+qKZ1SxyQf\nAiu6IGEe6Evj+P2KdCYkf7ndVKN51PD2eQItTYbO0HN+wIHmUZw4vur1rYFPSUMI\nSPNbMpOezqma9SJfi/X0gLKzleWqlCpkzVrzckl/J9FZhad2HM4WDC/A9Pev/rFp\n0Uo=\n-----END CERTIFICATE-----",
+        "createTime": "2019-04-19T11:24:45.696Z",
+        "expirationTime": "2029-04-16T11:25:45.696Z"
+      }
+    ]
+  }
+}

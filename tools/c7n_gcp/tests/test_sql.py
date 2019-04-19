@@ -197,3 +197,43 @@ class SqlBackupRunTest(BaseTest):
 
         self.assertEqual(backup_run['id'], backup_run_id)
         self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
+
+
+class SqlSslCertTest(BaseTest):
+
+    def test_sqlsslcet_query(self):
+        ssl_cert_sha = '62a43e710693b34d5fdb34911a656fd7a3b76cc7'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlsslcert-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-ssl-cert-dryrun',
+             'resource': 'gcp.sql-ssl-cert'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        ssl_cert = policy.run()[0]
+
+        self.assertEqual(ssl_cert['sha1Fingerprint'], ssl_cert_sha)
+        self.assertEqual(ssl_cert[parent_annotation_key]['name'], instance_name)
+
+    def test_sqlsslcet_get(self):
+        ssl_cert_sha = '62a43e710693b34d5fdb34911a656fd7a3b76cc7'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlsslcert-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-ssl-cert-dryrun',
+             'resource': 'gcp.sql-ssl-cert'},
+            session_factory=session_factory)
+
+        resource_manager = policy.resource_manager
+        ssl_cert = resource_manager.get_resource(
+            {'project_id': project_id,
+             'sha_1_fingerprint': ssl_cert_sha,
+             'database_id': project_id + ':' + instance_name})
+        parent_annotation_key = resource_manager.resource_type.get_parent_annotation_key()
+
+        self.assertEqual(ssl_cert['sha1Fingerprint'], ssl_cert_sha)
+        self.assertEqual(ssl_cert[parent_annotation_key]['name'], instance_name)

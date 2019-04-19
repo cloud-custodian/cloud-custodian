@@ -149,3 +149,35 @@ class SqlBackupRun(ChildResourceManager):
                         'id': resource_info['backup_run_id'],
                         'instance': resource_info['database_id'].split(':')[1]}
             )
+
+
+@resources.register('sql-ssl-cert')
+class SqlSslCert(ChildResourceManager):
+
+    def _get_parent_resource_info(self, child_instance):
+        mappings = {}
+        project_param_re = re.compile('.*?/projects/(.*?)/instances/.*')
+        mappings['project'] = project_param_re.match(child_instance['selfLink']).group(1)
+        mappings['name'] = child_instance['instance']
+        return mappings
+
+    class resource_type(ChildTypeInfo):
+        service = 'sqladmin'
+        version = 'v1beta4'
+        component = 'sslCerts'
+        enum_spec = ('list', 'items[]', None)
+        id = 'sha1Fingerprint'
+        parent_spec = {
+            'resource': 'sql-instance',
+            'child_enum_params': [
+                ('name', 'instance')
+            ]
+        }
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'sha1Fingerprint': resource_info['sha_1_fingerprint'],
+                        'instance': resource_info['database_id'].split(':')[1]}
+            )
