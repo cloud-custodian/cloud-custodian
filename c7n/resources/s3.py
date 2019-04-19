@@ -1818,7 +1818,7 @@ class EncryptExtantKeys(ScanBucket):
              "remediated:%d rate:%0.2f/s time:%0.2fs"),
             object_count,
             remediated_count,
-            float(object_count) / run_time,
+            float(object_count) / run_time if run_time else 0,
             run_time)
         return results
 
