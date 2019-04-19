@@ -16,6 +16,5 @@ ADD . /src
 
 # Setup for EntryPoint
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-VOLUME ["/var/log/cloud-custodian", "/etc/cloud-custodian"]
 WORKDIR /src
 ENTRYPOINT ["tox", "-e", "py37"]
