@@ -14,7 +14,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template, DEFAULT_TENANT_ID
-from c7n_azure.resources.key_vault import WhiteListFilter
+from c7n_azure.resources.key_vault import KeyVaultAccessPolicyAction, WhiteListFilter
+from c7n_azure.session import Session
+from c7n.utils import local_session
 from mock import patch
 from msrestazure.azure_exceptions import CloudError
 
@@ -31,6 +33,11 @@ class KeyVaultTest(BaseTest):
                 'filters': [
                     {'type': 'whitelist',
                      'key': 'test'}
+                ],
+                'actions': [
+                    {'type': 'access-policy',
+                     'operation': 'add',
+                     'access_policies': []}
                 ]
             }, validate=True)
             self.assertTrue(p)
@@ -158,3 +165,42 @@ class KeyVaultTest(BaseTest):
                          "Forbidden for url: https://graph.windows.net/"
                          "ea42f556-5106-4743-99b0-c129bfa71a47/getObjectsByObjectIds?"
                          "api-version=1.6", e.exception.message)
+
+    def test_access_policy_action(self):
+        with patch(self._get_key_vault_client_string() + '.update_access_policy')\
+                as access_policy_action_mock:
+            p = self.load_policy({
+                'name': 'test-azure-keyvault',
+                'resource': 'azure.keyvault',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'glob',
+                     'value_type': 'normalize',
+                     'value': 'cckeyvault1*'}],
+                'actions': [
+                    {'type': 'access-policy',
+                     'operation': 'replace',
+                     'access_policies': [{
+                         'tenant_id': '72f988bf-86f1-41af-91ab-2d7cd011db47',
+                         'object_id': 'de4152e3-335e-41b5-9b56-f8f2e043e3ee',
+                         'permissions': {'keys': ['Get']}}]}]
+            })
+
+            p.run()
+            access_policy_action_mock.assert_called()
+
+    def test_transform_access_policies(self):
+        mock_access_policies = [{"object_id": "mockObjectId",
+                                 "tenant_id": "mockTenantId",
+                                 "permissions": {"keys": ["Get"]}}]
+        transformed_access_policies = KeyVaultAccessPolicyAction._transform_access_policies(
+            mock_access_policies).get("accessPolicies")[0]
+        self.assertTrue("objectId" in transformed_access_policies)
+        self.assertTrue("tenantId" in transformed_access_policies)
+        self.assertTrue("permissions" in transformed_access_policies)
+
+    def _get_key_vault_client_string(self):
+        client = local_session(Session) \
+            .client('azure.mgmt.keyvault.KeyVaultManagementClient').vaults
+        return client.__module__ + '.' + client.__class__.__name__
