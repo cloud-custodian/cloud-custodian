@@ -137,7 +137,7 @@ class UrlValueTest(BaseTest):
             writer = csv.writer(out)
             writer.writerow(["aa", "bb", "cc", "dd", "ee"])  # header row
             writer.writerows([range(5) for r in range(5)])
-        with io.open("test_dict.csv", "r",newline='') as out:
+        with io.open("test_dict.csv", "r", newline='') as out:
             values = self.get_values_from(
                 {"url": "sun.csv", "expr": "bb[1]", "format": "csv2dict"}, out.read()
             )
