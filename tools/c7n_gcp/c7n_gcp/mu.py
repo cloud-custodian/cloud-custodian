@@ -157,7 +157,6 @@ class CloudFunctionManager(object):
 
     def _delta_source(self, archive, func_name):
         checksum = archive.get_checksum(hasher=hashlib.md5)
-        checksum = archive.get_checksum(hasher=hashlib.md5)
         source_info = self.client.execute_command(
             'generateDownloadUrl', {'name': func_name, 'body': {}})
         http = self._get_http_client(self.client)
