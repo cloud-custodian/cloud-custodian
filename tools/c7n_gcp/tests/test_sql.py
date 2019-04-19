@@ -127,6 +127,38 @@ class SqlDatabaseTest(BaseTest):
         self.assertEqual(database[annotation_key]['name'], instance_name)
 
 
+class SqlUserTest(BaseTest):
+
+    def test_sqluser_query(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data(
+            'sqluser-query', project_id=project_id)
+
+        user_name = 'postgres'
+        instance_name = 'custodian-postgres'
+
+        filter_annotation_key = 'c7n:sql-instance'
+        policy = self.load_policy(
+            {'name': 'gcp-sql-user-dryrun',
+             'resource': 'gcp.sql-user',
+             'filters': [{
+                     'type': 'value',
+                     'key': '\"{}\".name'.format(filter_annotation_key),
+                     'op': 'regex',
+                     'value': instance_name}]
+             },
+            session_factory=session_factory)
+        annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        # If fails there, policies using filters for the resource
+        # need to be updated since the key has been changed.
+        self.assertEqual(annotation_key, filter_annotation_key)
+
+        users = policy.run()
+
+        self.assertEqual(users[0]['name'], user_name)
+        self.assertEqual(users[0][annotation_key]['name'], instance_name)
+
+
 class SqlBackupRunTest(BaseTest):
 
     def test_sqlbackuprun_query(self):

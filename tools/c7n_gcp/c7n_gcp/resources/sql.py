@@ -102,6 +102,23 @@ class SqlDatabase(ChildResourceManager):
             )
 
 
+@resources.register('sql-user')
+class SqlUser(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        service = 'sqladmin'
+        version = 'v1beta4'
+        component = 'users'
+        enum_spec = ('list', 'items[]', None)
+        id = 'name'
+        parent_spec = {
+            'resource': 'sql-instance',
+            'child_enum_params': [
+                ('name', 'instance')
+            ]
+        }
+
+
 @resources.register('sql-backup-run')
 class SqlBackupRun(ChildResourceManager):
 
