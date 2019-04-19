@@ -100,3 +100,35 @@ class SqlDatabase(ChildResourceManager):
                         'database': resource_info['name'],
                         'instance': resource_info['instance']}
             )
+
+
+@resources.register('sql-backup-run')
+class SqlBackupRun(ChildResourceManager):
+
+    def _get_parent_resource_info(self, child_instance):
+        mappings = {}
+        project_param_re = re.compile('.*?/projects/(.*?)/instances/.*')
+        mappings['project'] = project_param_re.match(child_instance['selfLink']).group(1)
+        mappings['name'] = child_instance['instance']
+        return mappings
+
+    class resource_type(ChildTypeInfo):
+        service = 'sqladmin'
+        version = 'v1beta4'
+        component = 'backupRuns'
+        enum_spec = ('list', 'items[]', None)
+        id = 'id'
+        parent_spec = {
+            'resource': 'sql-instance',
+            'child_enum_params': [
+                ('name', 'instance')
+            ]
+        }
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'id': resource_info['backup_run_id'],
+                        'instance': resource_info['database_id'].split(':')[1]}
+            )

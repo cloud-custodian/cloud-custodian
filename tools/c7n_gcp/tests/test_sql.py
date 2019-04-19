@@ -125,3 +125,43 @@ class SqlDatabaseTest(BaseTest):
 
         self.assertEqual(database['name'], database_name)
         self.assertEqual(database[annotation_key]['name'], instance_name)
+
+
+class SqlBackupRunTest(BaseTest):
+
+    def test_sqlbackuprun_query(self):
+        backup_run_id = '1555592400197'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlbackuprun-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-backup-run-dryrun',
+             'resource': 'gcp.sql-backup-run'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        backup_run = policy.run()[0]
+
+        self.assertEqual(backup_run['id'], backup_run_id)
+        self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
+
+    def test_sqlbackuprun_get(self):
+        backup_run_id = '1555592400197'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlbackuprun-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-backup-run-dryrun',
+             'resource': 'gcp.sql-backup-run'},
+            session_factory=session_factory)
+
+        resource_manager = policy.resource_manager
+        backup_run = resource_manager.get_resource(
+            {'project_id': project_id,
+             'backup_run_id': backup_run_id,
+             'database_id': project_id + ':' + instance_name})
+        parent_annotation_key = resource_manager.resource_type.get_parent_annotation_key()
+
+        self.assertEqual(backup_run['id'], backup_run_id)
+        self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
