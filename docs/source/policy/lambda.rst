@@ -118,6 +118,7 @@ We support both rate per unit time and cron expressions, per `scheduler syntax
        mode:
          type: periodic
          schedule: "rate(1 day)"
+         role: arn:aws:iam::123456789012:role/some-role
 
 
 Config Rules
