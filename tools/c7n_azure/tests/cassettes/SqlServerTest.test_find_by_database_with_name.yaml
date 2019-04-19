@@ -33,7 +33,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Fri, 19 Apr 2019 19:48:01 GMT
+      - Fri, 19 Apr 2019 19:48:00 GMT
       Expires:
       - '-1'
       Pragma:
@@ -49,13 +49,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 1c38db52-2c6e-4e78-9736-b61dff5bcf5b
+      - 918b507c-13ae-4393-b14a-0f1949cb7d1f
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11983'
+      - '11986'
       x-ms-request-id:
-      - b33b7763-f959-4b25-89eb-333ef34e8a1b
+      - eb433b05-b873-4175-9eee-e80cb075e59d
       x-ms-routing-request-id:
-      - WESTUS2:20190419T194802Z:1c38db52-2c6e-4e78-9736-b61dff5bcf5b
+      - WESTUS2:20190419T194800Z:918b507c-13ae-4393-b14a-0f1949cb7d1f
     status:
       code: 200
       message: OK
@@ -70,53 +70,60 @@ interactions:
       - keep-alive
       User-Agent:
       - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
-        azure-mgmt-monitor/0.6.0 Azure-SDK-For-Python
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
       accept-language:
       - en-US
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserver12262018/providers/microsoft.insights/metrics?timespan=2019-04-15%2014%3A10%3A00%2F2019-04-18%2014%3A10%3A00&interval=P1D&metricnames=dtu_consumption_percent&aggregation=average&$filter=ElasticPoolResourceId%20eq%20%27%2A%27&api-version=2018-01-01
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserver12262018/databases?api-version=2017-10-01-preview
   response:
     body:
       string: !!binary |
         H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR9Oq
-        aT96tDP6qC0WebPKlh89+mhvZ/fh9s7+9u79N7v7j3Z3Hu3s/NRd++GB+/Cj0UfFss3ry6yk117u
-        PqUP6Pd1/tGj7/3ij4oZfXi3WU+aaV2s2qJaNndnBw8enp/vT7YPJrOH2/v3Dw62H04mO9v3d/O9
-        g4f38739+5/erfOmWtfT/PO6Wq+au23etL9/84vKhjrK67ururosZnnd3P2imNZVU52349e/qLwr
-        Xzd3p1O8YNvv7u19SrgfRN87WzbFxbxt7i7yti6mhF+7/v2nhOh6wQj//quc8Fi2NK72ekXD+mj4
-        XWqzzBbU5hcbGnw0DK2spllZ/CCf/aQ2ffrmq1S/zi7yj37J6KP1sqCZ+eilfEjv8AzldZE3RN7v
-        /5LvS380Z1MAcIh5xKC3DDHr/IJQoIZ51rTrZu+jX/L/AAiqym/9AQAA
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xR83b90aNf/NEyW9DfH72s80WxXnw0+qgt8jr4YJqtsmnRXn/0aHfv/i8ZffS2WM6o
+        weXu3nhntG6o9eijVV2t8ppebQBzWpVl1hbVkpq9/onnv/9z+mO5+/t/ni/zOit//5OXu7//ydnv
+        f/yaXlxk714XP8ifXLd4dW93/8H+wb1P9w9GHzVt1q7ps4++XJbFMqe2s6zNJlmTn6H73U+z+zvn
+        5/e2H86ms+39h+cH2wf7+cH2/u7D+9Pz3fu7D6cH9M60zqnzavk0azHMvZ3dh9s7+9u7D9/sPnx0
+        7/6j3Yfjhw8f/BRarus6X7av8/qymOZfTn46n7bFZf5C6bNLTer8F63zps1nmxrN8vNsXRKcabWc
+        ZfX182rKGND3U4JPBKBRUXc0mLK6OLk9qX5QLfNX+WxNUJftR4/Os7LJRx/lWV0S2dtX9P+qzuPj
+        /PTR3t744Q6Pkwgyez3NSjQ7XWaTMp/pp6/yVVlMs5NqDfi7hKOS5OtxCrFK6caeZw1N5x61KjB9
+        d5v1pJnWxQpfN3dnBw8enp/vT7YPJrOH2/v3Dw62H04mO9v3d/O9g4f38739+5/erfOmWtfT/PO6
+        Wq+au8Qx7e/f/CKiQn2Z13eJBS+LWV43d78opnXVVOft+PUvKu/K183d6RQv2Pa7e3ufEpUO7hqu
+        Mi1mE8JRx+p90l6v8EkctoXx0S8ZdSXr9TVxDKij5LJ/O2rtEKkCqWpMm0W2zC7y2RNq9P8ekhFe
+        9OY3Ie/39vYI6P39B3s7Nwr8LN+b3vt09972zsH0/vb+wX62fZAf3N+e3b93f29/ZyfPHwKzzQK/
+        /2h3f/zpHuTAMDcNLSLKMktg15uE3rX8IUs+DdQK8tOiGZZkoq0Z7PtzJrHm/7ekeEEo0nCsDNu/
+        byvB3/8l/w+0yUljJwcAAA==
     headers:
       Cache-Control:
       - no-cache
       Content-Encoding:
       - gzip
       Content-Type:
-      - application/json
+      - application/json; charset=utf-8
       Date:
-      - Fri, 19 Apr 2019 19:48:02 GMT
+      - Fri, 19 Apr 2019 19:48:00 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
       Server:
-      - Microsoft-IIS/10.0
+      - Microsoft-HTTPAPI/2.0
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
       Transfer-Encoding:
       - chunked
       Vary:
-      - Accept-Encoding,Accept-Encoding
-      X-AspNet-Version:
-      - 4.0.30319
+      - Accept-Encoding
       X-Content-Type-Options:
       - nosniff
-      X-Powered-By:
-      - ASP.NET
       x-ms-correlation-request-id:
-      - 746b8160-f0c7-4c9d-a8cd-54ef710b9a04
+      - f698d062-4fc5-4eb6-83d6-8593c3a0f048
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11990'
+      - '11985'
       x-ms-request-id:
-      - '{746b8160-f0c7-4c9d-a8cd-54ef710b9a04}'
+      - 72e9a4c7-2b6d-4225-acf6-9efe4d65fe31
       x-ms-routing-request-id:
-      - WESTUS2:20190419T194803Z:746b8160-f0c7-4c9d-a8cd-54ef710b9a04
+      - WESTUS2:20190419T194801Z:f698d062-4fc5-4eb6-83d6-8593c3a0f048
     status:
       code: 200
       message: OK

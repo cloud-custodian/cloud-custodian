@@ -21,7 +21,7 @@ from mock import patch
 
 class SqlServerTest(BaseTest):
 
-    TEST_DATE = datetime.datetime(2018, 12, 26, 14, 10, 00)
+    TEST_DATE = datetime.datetime(2019, 4, 18, 14, 10, 00)
 
     def test_sql_server_schema_validate(self):
         with self.sign_out_patch():
@@ -100,3 +100,102 @@ class SqlServerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_sql_database_view_filter_adds_database_view(self):
+
+        p = self.load_policy({
+            'name': 'test-sql-database-view-filter-adds-database-view',
+            'resource': 'azure.sqlserver',
+            'filters': [{'type': 'sql-database-view'}]
+        })
+
+        resources = p.run()
+        sqlserver = self._assert_cctestsqlserver_was_found(resources)
+
+        databases = sqlserver.get('databases')
+        self.assertIsNotNone(databases, "The database view was not appended to the sqlserver model")
+        self.assertEqual(2, len(databases), "There should be 2 databases on this sql server")
+
+        for database in databases:
+            self._assert_valid_database_model_format(database)
+
+    def test_find_by_database_with_name(self):
+
+        p = self.load_policy({
+            'name': 'test-find-by-database-with-name',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {
+                    'type': 'sql-database-view'
+                },
+                {
+                    'type': 'value',
+                    'key': 'databases[?name==\'cctestdb\']',
+                    'value': 'not-null'
+                }
+            ]
+        })
+
+        resources = p.run()
+        self._assert_cctestsqlserver_was_found(resources)
+
+    def test_find_by_database_with_premium_sku(self):
+
+        p = self.load_policy({
+            'name': 'test-find-by-database-with-premium-sku',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {
+                    'type': 'sql-database-view'
+                },
+                {
+                    'type': 'value',
+                    'key': 'databases[?sku.tier==\'Premium\']',
+                    'value': 'not-null'
+                }
+            ]
+        })
+
+        resources = p.run()
+        self._assert_cctestsqlserver_was_found(resources)
+
+    def test_filtering_on_database_field_value(self):
+
+        p = self.load_policy({
+            'name': 'test-filtering-on-database-field-value',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {
+                    'type': 'sql-database-view'
+                },
+                {
+                    'type': 'value',
+                    'key': 'databases[?name==\'this-db-doesnt-exist\']',
+                    'value': 'not-null'
+                }
+            ]
+        })
+
+        resources = p.run()
+        self.assertEqual(0, len(resources), "There shouldn't be any SqlServers here")
+
+    def _assert_cctestsqlserver_was_found(self, resources):
+
+        self.assertEqual(len(resources), 1, "Expected a single SqlServer")
+        sqlserver = resources[0]
+        self.assertEqual('cctestsqlserver12262018', sqlserver.get('name'), "The wrong sqlserver was found")
+
+        return sqlserver
+
+    def _assert_valid_database_model_format(self, database):
+
+        self.assertTrue(type(database) is dict, "The database is not a dictionary")
+
+        # field check is not exhaustive, but enough to be confident that the full model is present
+        string_fields = ['id', 'name', 'type', 'location', 'status', 'database_id']
+        for string_field in string_fields:
+            self.assertTrue(type(database.get(string_field) is str))
+
+        sku = database.get('sku')
+        self.assertTrue(type(sku) is dict)
+        self.assertTrue(type(sku.get('tier') is str))

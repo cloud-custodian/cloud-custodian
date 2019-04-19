@@ -39,6 +39,6 @@ class SqlDatabaseViewFilter(Filter):
             resource_group = i['resourceGroup']
             server_name = i['name']
             dbs = client.databases.list_by_server(resource_group, server_name)
-            i['databases'] = [db.serialize() for db in dbs]
+            i['databases'] = [db.as_dict() for db in dbs]
 
         return True
