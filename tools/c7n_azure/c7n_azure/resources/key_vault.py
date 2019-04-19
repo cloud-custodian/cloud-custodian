@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from azure.graphrbac import GraphRbacManagementClient
+from c7n_azure.actions import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
 
@@ -21,6 +22,9 @@ from c7n.utils import type_schema
 from c7n_azure.utils import GraphHelper
 
 from c7n_azure.resources.arm import ArmResourceManager
+
+import logging
+log = logging.getLogger('custodian.azure.keyvault')
 
 
 @resources.register('keyvault')
@@ -122,3 +126,41 @@ class WhiteListFilter(Filter):
                 policy['principalName'] = GraphHelper.get_principal_name(aad_object)
 
         return access_policies
+
+
+@KeyVault.action_registry.register('assign')
+class KeyVaultAssignAction(AzureBaseAction):
+
+    schema = type_schema('assign',
+        required=['operation', 'access_policies'],
+        operation={'type': 'string', 'enum': ['add', 'replace', 'remove']},
+        access_policies={'type': 'array'})
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        operation = self.data.get('operation')
+        access_policies = KeyVaultAssignAction._transform_access_policies(
+            self.data.get('access_policies')
+        )
+
+        try:
+            self.client.vaults.update_access_policy(
+                resource_group_name=resource['resourceGroup'],
+                vault_name=resource['name'],
+                operation_kind=operation,
+                properties=access_policies
+            )
+        except Exception as error:
+            log.warning(error)
+
+    @staticmethod
+    def _transform_access_policies(access_policies):
+        policies = [
+            {"applicationId": i['application_id'],
+                "objectId": i['object_id'],
+                "tenantId": i['tenant_id'],
+                "permissions": i['permissions']} for i in access_policies]
+
+        return {"accessPolicies": policies}
