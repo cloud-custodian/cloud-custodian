@@ -198,20 +198,4 @@ class QueryResourceManager(ResourceManager):
             klass.action_registry.register('notify', Notify)
 
 
-@six.add_metaclass(QueryMeta)
-class ChildResourceManager(QueryResourceManager):
-
-    child_source = 'describe-child'
-
-    @property
-    def source_type(self):
-        source = self.data.get('source', self.child_source)
-        if source == 'describe':
-            source = self.child_source
-        return source
-
-    def get_parent_manager(self):
-        return self.get_resource_manager(self.resource_type.parent_spec[0])
-
-
 resources.subscribe(resources.EVENT_FINAL, QueryResourceManager.register_actions_and_filters)
