@@ -23,6 +23,7 @@ import pprint
 import sys
 import time
 import uuid
+import json
 
 import six
 import yaml
@@ -317,24 +318,67 @@ def logs(options, policies):
 @policy_command
 def generate_role(options, policies):
     permissions = [policy.get_permissions() for policy in policies]
-    if not options.name:
-        options.name = str(uuid.uuid4())
+    if not options.policy:
+        options.policy = str(uuid.uuid4())
+    if not options.role:
+        options.role = str(uuid.uuid4())
     policy_doc = _generate_policy_doc(permissions)
     if options.dryrun:
         print(policy_doc)
+    else:
+        _create_role(policy_doc, options.policy, options.role, options)
 
 
 def _generate_policy_doc(permissions):
     """Given a list of policy dicts, return a policy document"""
     statement = [{
         "Effect": "Allow",
-        "Action": list(p)
+        "Action": list(p),
+        "Resource": "*"
     } for p in permissions]
 
     return {
         "Version": "2012-10-17",
-        "Statement": statement
+        "Statement": statement,
     }
+
+
+def _create_role(policy_doc, policy_name, role_name, options):
+    """Updates aws role with a given policy. If none exists then it creates a new role."""
+    # Todo - only works for aws
+    try:
+        session = local_session(clouds['aws']().get_session_factory(options))
+        client = session.client("iam")
+    except ClientError:
+        log.exception("Unable to assume role %s", options.assume_role)
+        sys.exit(1)
+    try:
+        client.get_role(RoleName=role_name)
+    except ClientError:
+        assume_role_policy_doc = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"Service": "lambda.amazonaws.com"},
+                "Action": "sts:AssumeRole"
+            }]
+        }
+        client.create_role(
+            RoleName=role_name,
+            AssumeRolePolicyDocument=json.dumps(assume_role_policy_doc))
+
+    # add policy to role
+    resp = session.client("iam").put_role_policy(
+        PolicyName=policy_name,
+        RoleName=role_name,
+        PolicyDocument=json.dumps(policy_doc)
+    )
+    if resp.get("ResponseMetadata", {}).get("HTTPStatusCode") != 200:
+        log.error('Error occurred when adding policy %s to role %s',
+                  role_name, policy_name)
+        sys.exit(1)
+
+    log.info('Successfully created role %s with policy %s', role_name, policy_name)
 
 
 def _schema_get_docstring(starting_class):
