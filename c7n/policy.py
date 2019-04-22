@@ -848,7 +848,7 @@ class Policy(object):
 
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
-                self.data['mode']['role'] = "arn:aws:iam::%s/role/%s" % \
+                self.data['mode']['role'] = "arn:aws:iam::%s:role/%s" % \
                                             (self.options.account_id, self.data['mode']['role'])
 
         variables.update({
