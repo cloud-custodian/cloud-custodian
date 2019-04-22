@@ -1,0 +1,21 @@
+{
+  "body": {
+    "state": "READY", 
+    "name": "projects/custodiantestproject/instances/spanner-instance/databases/custodian-database"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "122", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://spanner.googleapis.com/v1/projects/custodiantestproject/instances/spanner-instance/databases/custodian-database?alt=json", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Mon, 22 Apr 2019 13:43:20 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
