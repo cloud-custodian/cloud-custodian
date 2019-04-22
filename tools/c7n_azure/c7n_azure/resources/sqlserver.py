@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 
 
 @resources.register('sqlserver')
@@ -23,3 +23,13 @@ class SqlServer(ArmResourceManager):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'
         enum_spec = ('servers', 'list', None)
+
+
+@resources.register('sqldatabase')
+class SqlDatabase(ChildArmResourceManager):
+
+    class resource_type(ArmResourceManager.resource_type):
+        service = 'azure.mgmt.sql'
+        client = 'SqlManagementClient'
+        enum_spec = ('databases', 'list_by_server', {'resource_group_name': 'resourceGroup', 'server_name': 'name'})
+        parent_spec = ('sqlserver', True)
