@@ -20,7 +20,6 @@ import logging
 import os
 import platform
 import py_compile
-import pytest
 import shutil
 import site
 import sys
