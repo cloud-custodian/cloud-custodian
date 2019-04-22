@@ -26,7 +26,7 @@ class SendGridDelivery(object):
         self.config = config
         self.logger = logger
         self.sendgrid_client = \
-            sendgrid.SendGridAPIClient(apikey=self.config.get('sendgrid_api_key', ''))
+            sendgrid.SendGridAPIClient(self.config.get('sendgrid_api_key', ''))
 
     def get_to_addrs_sendgrid_messages_map(self, queue_message):
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
