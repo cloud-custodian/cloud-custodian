@@ -152,6 +152,12 @@ class FileCacheManagerTest(TestCase):
         self.assertEqual(mock_dumps.call_count, 1)
 
     def temporary_file_with_cleanup(self, **kwargs):
+        """
+        NamedTemporaryFile with delete=True has
+        significantly different behavior on Windows
+        so we utilize delete=False to simplify maintaining
+        compatibility.
+        """
         t = tempfile.NamedTemporaryFile(delete=False, **kwargs)
 
         self.addCleanup(os.unlink, t.name)
