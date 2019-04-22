@@ -282,7 +282,7 @@ class DefaultVpc(net_filters.DefaultVpcBase):
               - name: default-vpc-rds
                 resource: rds
                 filters:
-                  - default-vpc
+                  - type: default-vpc
     """
     schema = type_schema('default-vpc')
 
@@ -379,8 +379,8 @@ class UpgradeAvailable(Filter):
               - name: rds-upgrade-available
                 resource: rds
                 filters:
-                  - upgrade-available
-                    major: false
+                  - type: upgrade-available
+                    major: False
 
     """
 
@@ -423,13 +423,10 @@ class UpgradeMinor(BaseAction):
             policies:
               - name: upgrade-rds-minor
                 resource: rds
-                filters:
-                  - name: upgrade-available
-                    major: false
                 actions:
                   - type: upgrade
-                    major: false
-                    immediate: false
+                    major: False
+                    immediate: False
 
     """
 

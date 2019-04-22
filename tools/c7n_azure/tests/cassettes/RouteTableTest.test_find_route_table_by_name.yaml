@@ -1,0 +1,71 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        networkmanagementclient/2.6.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/routeTables?api-version=2018-12-01
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/zRMlvQLx9Np23etHW1bvM2m5T5R6OPihl9frdZT5ppXazaolo2d2cHDx6en+9Ptg8m
+        s4fb+/cPDrYfTiY72/d3872Dh/fzvf37n96t86Za19P8cwK3au4C8O9Pv7b5NoPezpaz7ctl3t5d
+        1dVlMcvr5u4XxbSumuq8Hb/I26uqfnuXX3iD9s3dCHL0ywWh9927v+9HD7OHD7J8L99+ML2fE04P
+        Pt2e7H16sL17P5vO9g92Pv00n/y+H9E77fUKQ93YFzUrq2mG0VLTK+p2jc8I01VetwU1ePSL8ddl
+        0VCTYnnxus1aQH29nk7zfJbPqLUlwJppuD8jRO49/HR772A22d6/tzvZntyf7Wyfzx7uzKbTnZ37
+        B+f01qxogMKTi9Ur4POSuswuFJPzrGxyAowvCIXvfX/0UbOeEA3xxy/+OZ6qy6Ju11mpf2K6GARD
+        4JcJMfqBL9CB/LX70S/5/i/5JSPLgG8Pmu1F1rR5vX3vyYPTg0+f7m47MESeb2qMy6KZzrPrZpuG
+        tMjbeb5utoHWxiHSq4ZD7t6IKf1iePPB9Hz24GA63d6ZPdzb3p9NiKQ704fbD3cPZvv7e7Msn+Rf
+        kzdzQuEb4M3ppw+zg3t727MHkweE4P172we7WbZ98OnBg9lkmuU7+/fprffhzeiUTh7kB5/Odrd3
+        CBh3fPf/9TMpTcNW/jCo1XtPM2H2HnOVzWY05OZlnZ8X7+i73Z3x3v7+eG+8c3dvn75f5u/ab1er
+        N8I7PylieLxalUW2nIITtcHZ6lggUSuGQf+/f398/6NfcjvGk98bah7MbXaRL1tHk13q8P+DUxsZ
+        BTX6uZnZ3W9gZnfG+zRR3+C8gtf/vz+vGAU1+rmZ13vfyLx+w/K6R939f39eMQpq9HMzrzQr38C8
+        fkoT9X7z+rPk/n2tWex6f5gjeH12Hu8SYvS3fCO/0wh+yS/5/i/5fwBfSzRPiAwAAA==
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '847'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 17 Apr 2019 22:24:54 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - aee66e2f-e9f4-4521-b437-8fc8f054ece9
+      x-ms-original-request-ids:
+      - 3ebf8dad-0ed8-4868-b561-caa9ddbc214f
+      - 0f26a3d1-d8bd-4aa6-be03-f0fb42447eed
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11999'
+      x-ms-request-id:
+      - aee66e2f-e9f4-4521-b437-8fc8f054ece9
+      x-ms-routing-request-id:
+      - WESTUS2:20190417T222454Z:aee66e2f-e9f4-4521-b437-8fc8f054ece9
+    status:
+      code: 200
+      message: OK
+version: 1

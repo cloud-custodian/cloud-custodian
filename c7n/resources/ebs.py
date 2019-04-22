@@ -289,7 +289,7 @@ class SnapshotUnusedFilter(Filter):
         tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
         for tversion in tmpl_mgr.get_resources(
                 list(tmpl_mgr.get_asg_templates(asgs).keys())):
-            for bd in tversion['LaunchTemplateData']['BlockDeviceMappings']:
+            for bd in tversion['LaunchTemplateData'].get('BlockDeviceMappings', ()):
                 if 'Ebs' in bd and 'SnapshotId' in bd['Ebs']:
                     snap_ids.add(bd['Ebs']['SnapshotId'])
         return snap_ids
@@ -553,7 +553,7 @@ class VolumeDetach(BaseAction):
                - name: instance-ebs-volumes
                  resource: ebs
                  filters:
-                   VolumeId :  volumeid
+                   - VolumeId :  volumeid
                  actions:
                    - detach
 
@@ -1358,7 +1358,7 @@ class ModifyVolume(BaseAction):
                - modifyable
               actions:
                - type: modify
-                 volume-type: gp1
+                 volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
     respectively iops on io1 volumes and volume size.
@@ -1405,7 +1405,7 @@ class ModifyVolume(BaseAction):
         if 'modifyable' not in self.manager.data.get('filters', ()):
             raise PolicyValidationError(
                 "modify action requires modifyable filter in policy")
-        if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
+        if self.data.get('size-percent', 100) < 100 and not self.data.get('shrink', False):
             raise PolicyValidationError((
                 "shrinking volumes requires os/fs support "
                 "or data-loss may ensue, use `shrink: true` to override"))

@@ -100,7 +100,9 @@ class TagDelayedAction(tags.TagDelayedAction):
               - name: mark-for-delete
                 resource: rds-cluster
                 filters:
-                  - type: default-vpc
+                  - type: value
+                    key: default-vpc
+                    value: True
                 actions:
                   - type: mark-for-op
                     op: delete

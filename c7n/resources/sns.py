@@ -218,8 +218,14 @@ class ModifyPolicyStatement(ModifyPolicyBase):
                   - type: cross-account
                 actions:
                   - type: modify-policy
-                    add-statements: [statement]
-                    remove-statements: [statement_id] or * or 'matched'
+                    add-statements: [{
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:GetTopicAttributes"],
+                        "Resource": topic_arn,
+                            }]
+                    remove-statements: '*'
     """
 
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')

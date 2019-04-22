@@ -423,6 +423,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
 
         policies:
           - name: lambda-layer
+            resource: lambda
             query:
               - version: latest
 

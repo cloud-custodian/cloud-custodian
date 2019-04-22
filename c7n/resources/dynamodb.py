@@ -90,7 +90,7 @@ class DescribeTable(query.DescribeSource):
                 'CreateTable' in self.manager.data['mode']['events']):
             waiter, waiter_config = self.get_waiter()
             for tid in ids:
-                waiter.wait(tid, WaiterConfig=waiter_config)
+                waiter.wait(TableName=tid, WaiterConfig=waiter_config)
         return super(DescribeTable, self).get_resources(ids, *args, **kw)
 
     def get_waiter(self):

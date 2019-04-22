@@ -194,8 +194,9 @@ class Copy(BaseAction):
               - name: ami-ensure-encrypted
                 resource: ami
                 filters:
-                  - not:
-                    - type: encrypted
+                  - type: value
+                    key: encrypted
+                    value: true
                 actions:
                   - type: copy
                     encrypt: true
