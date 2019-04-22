@@ -31,5 +31,8 @@ class SqlDatabase(ChildArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'
-        enum_spec = ('databases', 'list_by_server', {'resource_group_name': 'resourceGroup', 'server_name': 'name'})
+        enum_spec = ('databases', 'list_by_server', {
+            'resource_group_name': 'resourceGroup',
+            'server_name': 'name'
+        })
         parent_spec = ('sqlserver', True)
