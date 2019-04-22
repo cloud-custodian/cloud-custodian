@@ -151,8 +151,9 @@ class FileCacheManagerTest(TestCase):
         self.assertEqual(mock_dump.call_count, 1)
         self.assertEqual(mock_dumps.call_count, 1)
 
-    def temporary_file_with_cleanup(self, suffix=None):
-        t = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    def temporary_file_with_cleanup(self, **kwargs):
+        t = tempfile.NamedTemporaryFile(delete=False, **kwargs)
+
         self.addCleanup(os.unlink, t.name)
         self.addCleanup(t.close)
         return t
