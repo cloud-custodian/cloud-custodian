@@ -194,6 +194,7 @@ class PythonPackageArchive(object):
             dest = zinfo(dest)  # see for some caveats
         # Ensure we apply the compression
         dest.compress_type = self.zip_compression
+        dest.create_system = 3
         self._zip_file.writestr(dest, contents)
 
     def close(self):

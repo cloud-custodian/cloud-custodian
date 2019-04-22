@@ -63,9 +63,7 @@ class FileCacheManagerTest(TestCase):
         self.test_value = [1, 2, 3]
 
     def test_get_set(self):
-        t = tempfile.NamedTemporaryFile(delete=False)
-        self.addCleanup(os.unlink, t.name)
-        self.addCleanup(t.close)
+        t = self.temporary_file_with_cleanup()
         c = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
         self.assertFalse(c.load())
         k1 = {"account": "12345678901234", "region": "us-west-2", "resource": "ec2"}
@@ -93,9 +91,7 @@ class FileCacheManagerTest(TestCase):
         self.assertEqual(self.test_cache.get(self.bad_key), None)
 
     def test_load(self):
-        t = tempfile.NamedTemporaryFile(suffix=".cache", delete=False)
-        self.addCleanup(os.unlink, t.name)
-        self.addCleanup(t.close)
+        t = self.temporary_file_with_cleanup(suffix=".cache")
 
         load_config = Namespace(cache_period=0, cache=t.name)
         load_cache = cache.FileCacheManager(load_config)
@@ -111,9 +107,7 @@ class FileCacheManagerTest(TestCase):
         # path exists then we dont need to create the folder
         mock_exists.return_value = True
         # tempfile to hold the pickle
-        temp_cache_file = tempfile.NamedTemporaryFile(delete=False)
-        self.addCleanup(os.unlink, temp_cache_file.name)
-        self.addCleanup(temp_cache_file.close)
+        temp_cache_file = self.temporary_file_with_cleanup()
 
         self.test_cache.cache_path = temp_cache_file.name
         # make the call
@@ -134,9 +128,7 @@ class FileCacheManagerTest(TestCase):
     @mock.patch.object(cache.pickle, "dump")
     @mock.patch.object(cache.pickle, "dumps")
     def test_save_doesnt_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
-        temp_cache_file = tempfile.NamedTemporaryFile(delete=False)
-        self.addCleanup(os.unlink, temp_cache_file.name)
-        self.addCleanup(temp_cache_file.close)
+        temp_cache_file = self.temporary_file_with_cleanup()
 
         self.test_cache.cache_path = temp_cache_file.name
 
@@ -158,3 +150,9 @@ class FileCacheManagerTest(TestCase):
         self.assertEqual(mock_mkdir.call_count, 1)
         self.assertEqual(mock_dump.call_count, 1)
         self.assertEqual(mock_dumps.call_count, 1)
+
+    def temporary_file_with_cleanup(self, suffix=None):
+        t = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+        self.addCleanup(os.unlink, t.name)
+        self.addCleanup(t.close)
+        return t
