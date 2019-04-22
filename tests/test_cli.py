@@ -237,15 +237,12 @@ class GenerateRoleTest(CliTest):
         }
         yaml_file = self.write_policy_file(valid_policies)
 
-        self.run_and_expect_success(["custodian", "generate-role", yaml_file])
-
         # requires config file
         self.run_and_expect_failure(["custodian", "generate-role", "no_file"], 1)
 
         output = self.get_output(["custodian", "generate-role", "--dryrun", yaml_file])
-        self.assertIn("'Action': ['ec2:DescribeVpnGateways', 'ec2:CreateTags']",
-                      output)
-        self.assertIn("'Effect': 'Allow'", output)
+        self.assertIn("'ec2:DescribeVpnGateways'", output)
+        self.assertIn("ec2:CreateTags'", output)
 
 
 class ReportTest(CliTest):
