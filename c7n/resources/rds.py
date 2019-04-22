@@ -1684,7 +1684,7 @@ class ModifyDb(BaseAction):
                 raise
 
 @resources.register('rds-reserved')
-class ReservedRDS(query.QueryResourceManager):
+class ReservedRDS(QueryResourceManager):
 
     class resource_type(object):
         service = 'rds'
