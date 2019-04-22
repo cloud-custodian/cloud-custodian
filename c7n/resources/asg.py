@@ -97,7 +97,7 @@ class LaunchInfo(object):
             return {}
         return {
             (t['LaunchTemplateId'],
-             t.get('c7n:VersionAlias', t['VersionNumber'])): t['LaunchTemplateData']
+             str(t.get('c7n:VersionAlias', t['VersionNumber']))): t['LaunchTemplateData']
             for t in tmpl_mgr.get_resources(template_ids)}
 
     def get_launch_configs(self, asgs):
