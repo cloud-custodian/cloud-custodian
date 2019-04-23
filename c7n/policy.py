@@ -531,7 +531,8 @@ class PHDMode(LambdaMode):
         categories={'type': 'array', 'items': {
             'enum': ['issue', 'accountNotification', 'scheduledChange']}},
         statuses={'type': 'array', 'items': {
-            'enum': ['open', 'upcoming', 'closed']}})
+            'enum': ['open', 'upcoming', 'closed']}},
+        rinherit=LambdaMode.schema)
 
     def validate(self):
         super(PHDMode, self).validate()
