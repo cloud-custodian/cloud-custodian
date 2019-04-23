@@ -48,10 +48,6 @@ from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
 
-# On OSX High Sierra Workaround
-# https://github.com/ansible/ansible/issues/32499
-if sys.platform == 'darwin':
-    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
 
 WORKER_COUNT = int(
     os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
