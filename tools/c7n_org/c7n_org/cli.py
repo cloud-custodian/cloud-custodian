@@ -24,8 +24,8 @@ import sys
 
 # Try to set this early if offers any help against this OSX issue
 # https://bugs.python.org/issue33725
-if sys.platform == 'darwin':
-    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
+# if sys.platform == 'darwin':
+#    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
 
 import multiprocessing
 from concurrent.futures import (
