@@ -371,7 +371,7 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'$ref': '#/definitions/filters_common/value_types'},
             'default': {'type': 'object'},
-            'value_from': {'$ref': '#/definitions/filters_common/values_from'},
+            'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
         }
