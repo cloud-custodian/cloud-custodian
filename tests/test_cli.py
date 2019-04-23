@@ -102,6 +102,9 @@ class VersionTest(CliTest):
     def test_debug_version(self):
         output = self.get_output(["custodian", "version", "--debug"])
         # Among other things, this should print sys.path
+        # Normalize double escaped backslashes for Windows
+        output = output.replace('\\\\', '\\')
+
         self.assertIn(version.version, output)
         self.assertIn(sys.path[0], output)
 

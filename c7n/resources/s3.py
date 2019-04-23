@@ -1818,7 +1818,7 @@ class EncryptExtantKeys(ScanBucket):
              "remediated:%d rate:%0.2f/s time:%0.2fs"),
             object_count,
             remediated_count,
-            float(object_count) / run_time,
+            float(object_count) / run_time if run_time else 0,
             run_time)
         return results
 
@@ -2231,6 +2231,7 @@ class MarkBucketForOp(TagDelayedAction):
 
 
 @actions.register('unmark')
+@actions.register('remove-tag')
 class RemoveBucketTag(RemoveTag):
     """Removes tag/tags from a S3 object
 
@@ -2244,12 +2245,9 @@ class RemoveBucketTag(RemoveTag):
                 filters:
                   - "tag:BucketOwner": present
                 actions:
-                  - type: unmark
+                  - type: remove-tag
                     tags: ['BucketOwner']
     """
-
-    schema = type_schema(
-        'unmark', aliases=('remove-tag',), tags={'type': 'array'})
 
     def process_resource_set(self, client, resource_set, tags):
         modify_bucket_tags(
@@ -2564,7 +2562,7 @@ class DeleteBucket(ScanBucket):
         log.info(
             "EmptyBucket buckets:%d Complete keys:%d rate:%0.2f/s time:%0.2fs",
             len(buckets), object_count,
-            float(object_count) / run_time, run_time)
+            float(object_count) / run_time if run_time else 0, run_time)
         return results
 
     def process_chunk(self, batch, bucket):

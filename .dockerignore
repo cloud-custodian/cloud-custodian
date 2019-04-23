@@ -1,4 +1,4 @@
-*.pyc
+**/*.pyc
 *.egg-info/
 *.swp
 src/

@@ -37,7 +37,8 @@ from jsonschema.exceptions import best_match
 from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
-from c7n.filters import ValueFilter, EventFilter, AgeFilter
+from c7n.resolver import ValuesFrom
+from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
 
 
 def validate(data, schema=None):
@@ -188,7 +189,18 @@ def generate(resource_types=()):
                 'minProperties': 1,
                 'maxProperties': 1},
         },
-
+        'filters_common': {
+            'comparison_operators': {
+                'enum': list(OPERATORS.keys())},
+            'value_types': {'enum': VALUE_TYPES},
+            'value_from': ValuesFrom.schema,
+            'value': {'oneOf': [
+                {'type': 'array'},
+                {'type': 'string'},
+                {'type': 'boolean'},
+                {'type': 'number'},
+                {'type': 'null'}]},
+        },
         'policy': {
             'type': 'object',
             'required': ['name', 'resource'],
@@ -295,7 +307,11 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None, d
             seen_actions.add(a)
         if a.schema_alias:
             if action_name in definitions['actions']:
-                assert definitions['actions'][action_name] == a.schema, "Schema mismatch on action w/ schema alias"  # NOQA
+
+                if definitions['actions'][action_name] != a.schema: # NOQA
+                    msg = "Schema mismatch on type:{} action:{} w/ schema alias ".format(
+                        type_name, action_name)
+                    raise SyntaxError(msg)
             definitions['actions'][action_name] = a.schema
             action_refs.append({'$ref': '#/definitions/actions/%s' % action_name})
         else:
