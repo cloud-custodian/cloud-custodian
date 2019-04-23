@@ -93,7 +93,7 @@ class ChildArmResourceManager(ArmResourceManager):
         return source
 
     def get_parent_manager(self):
-        return self.get_resource_manager(self.resource_type.parent_spec[0])
+        return self.get_resource_manager(self.resource_type.parent_spec.manager_name)
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)
