@@ -1,0 +1,40 @@
+{
+  "body": {
+    "jobs": [
+      {
+        "name": "qwery", 
+        "projectId": "test-project-232910", 
+        "createTime": "2019-04-23T09:09:17.706433Z", 
+        "jobMetadata": {
+          "sdkVersion": {
+            "versionDisplayName": "Apache Beam SDK for Java", 
+            "version": "2.10.0", 
+            "sdkSupportStatus": "STALE"
+          }
+        }, 
+        "currentStateTime": "2019-04-23T09:09:19.100523Z", 
+        "startTime": "2019-04-23T09:09:17.706433Z", 
+        "type": "JOB_TYPE_BATCH", 
+        "id": "2019-04-23_02_09_16-16697938732736845668", 
+        "currentState": "JOB_STATE_FAILED", 
+        "location": "us-central1"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "612", 
+    "x-xss-protection": "0", 
+    "content-location": "https://dataflow.googleapis.com/v1b3/projects/test-project-232910/jobs:aggregated?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Tue, 23 Apr 2019 10:11:28 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

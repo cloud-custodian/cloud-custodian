@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
 
 @resources.register('dataflow-job')
@@ -34,3 +34,21 @@ class DataflowJob(QueryResourceManager):
                     'projectId': resource_info['project_id'],
                     'jobId': resource_info['job_id']
                 })
+
+
+@resources.register('dataflow-job-message')
+class DataflowJobMessage(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        service = 'dataflow'
+        version = 'v1b3'
+        component = 'projects.jobs.messages'
+        enum_spec = ('list', 'jobMessages[]', None)
+        scope_key = 'projectId'
+        id = 'name'
+        parent_spec = {
+            'resource': 'dataflow-job',
+            'child_enum_params': [
+                ('id', 'jobId')
+            ]
+        }

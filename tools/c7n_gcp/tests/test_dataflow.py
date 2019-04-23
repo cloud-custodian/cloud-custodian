@@ -45,3 +45,18 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(resource['name'], 'test')
         self.assertEqual(resource['projectId'], project_id)
         self.assertEqual(resource['location'], 'us-central1')
+
+
+class DataflowJobMessageTest(BaseTest):
+
+    def test_query(self):
+        project_id = 'test-project-232910'
+        factory = self.replay_flight_data('dataflow-job-message', project_id)
+        p = self.load_policy({
+            'name': 'dataflow-job-message',
+            'resource': 'gcp.dataflow-job-message'},
+            session_factory=factory)
+        resource = p.run()
+        self.assertEqual(len(resource), 1)
+        self.assertEqual(resource[0]['messageImportance'], 'JOB_MESSAGE_DETAILED')
+        self.assertEqual(resource[0]['id'], '1556010556517')
