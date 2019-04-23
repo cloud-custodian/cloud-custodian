@@ -25,7 +25,6 @@ jobs:
       displayName: "Flake8 Lint"
 
 - job: 'Test'
-  condition: "succeeded()"
   pool:
     vmImage: 'Ubuntu-16.04'
   strategy:
@@ -86,7 +85,6 @@ jobs:
 
 - job: 'TestWindows'
   displayName: 'Test Win2019'
-  condition: "succeeded()"
   pool:
     vmImage: 'windows-2019'
   strategy:
