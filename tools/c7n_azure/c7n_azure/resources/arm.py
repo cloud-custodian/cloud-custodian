@@ -80,7 +80,7 @@ class ArmResourceManager(QueryResourceManager):
 @six.add_metaclass(QueryMeta)
 class ChildArmResourceManager(ArmResourceManager):
 
-    child_source = 'describe-child'
+    child_source = 'describe-child-azure'
 
     @property
     def source_type(self):

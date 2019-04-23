@@ -107,7 +107,7 @@ class ChildResourceQuery(ResourceQuery):
         return results
 
 
-@sources.register('describe-child')
+@sources.register('describe-child-azure')
 class ChildDescribeSource(DescribeSource):
 
     resource_query_factory = ChildResourceQuery

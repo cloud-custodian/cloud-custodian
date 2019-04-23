@@ -113,7 +113,6 @@ class SqlDatabaseTest(BaseTest):
             self.assertTrue(p)
 
     def test_get_database_by_name(self):
-
         p = self.load_policy({
             'name': 'test-get-database-by-name',
             'resource': 'azure.sqldatabase',
@@ -131,7 +130,6 @@ class SqlDatabaseTest(BaseTest):
         self._assert_found_only_test_database(resources)
 
     def test_find_databases_with_premium_sku(self):
-
         p = self.load_policy({
             'name': 'test-find-databases-with-premium-sku',
             'resource': 'azure.sqldatabase',
@@ -149,7 +147,6 @@ class SqlDatabaseTest(BaseTest):
         self._assert_found_only_test_database(resources)
 
     def _assert_found_only_test_database(self, resources):
-
         self.assertEqual(len(resources), 1)
         db = resources[0]
 
