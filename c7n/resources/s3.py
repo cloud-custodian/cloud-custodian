@@ -2231,6 +2231,7 @@ class MarkBucketForOp(TagDelayedAction):
 
 
 @actions.register('unmark')
+@actions.register('remove-tag')
 class RemoveBucketTag(RemoveTag):
     """Removes tag/tags from a S3 object
 
@@ -2244,12 +2245,9 @@ class RemoveBucketTag(RemoveTag):
                 filters:
                   - "tag:BucketOwner": present
                 actions:
-                  - type: unmark
+                  - type: remove-tag
                     tags: ['BucketOwner']
     """
-
-    schema = type_schema(
-        'unmark', aliases=('remove-tag',), tags={'type': 'array'})
 
     def process_resource_set(self, client, resource_set, tags):
         modify_bucket_tags(

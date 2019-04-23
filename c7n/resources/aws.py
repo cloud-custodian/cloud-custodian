@@ -397,7 +397,7 @@ class S3Output(DirectoryOutput):
 
     def get_output_path(self, output_url):
         if '{' not in output_url:
-            date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
+            date_path = datetime.datetime.utcnow().strftime('%Y/%m/%d/%H')
             return self.join(
                 output_url, self.ctx.policy.name, date_path)
         return output_url.format(**self.get_output_vars())

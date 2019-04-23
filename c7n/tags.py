@@ -462,7 +462,7 @@ class RemoveTag(Action):
     schema = utils.type_schema(
         'untag', aliases=('unmark', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
-
+    schema_alias = True
     permissions = ('ec2:DeleteTags',)
 
     def process(self, resources):

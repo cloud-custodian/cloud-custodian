@@ -28,7 +28,7 @@ import time
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import ValueFilter, AgeFilter, Filter, OPERATORS
+from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
@@ -563,7 +563,7 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def process(self, asgs, event=None):
@@ -1683,7 +1683,7 @@ class LaunchConfigAge(AgeFilter):
     date_attribute = "CreatedTime"
     schema = type_schema(
         'age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
 
