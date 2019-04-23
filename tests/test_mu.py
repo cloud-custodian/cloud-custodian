@@ -260,7 +260,7 @@ class PolicyLambdaProvision(BaseTest):
         if self.recording:
             time.sleep(60)
 
-        log_events = list(manager.logs(func, "1970-1-1 UTC", "9170-1-1"))
+        log_events = list(manager.logs(func, "1970-1-1 UTC", "2037-1-1"))
         messages = [
             e["message"] for e in log_events if e["message"].startswith('{"Records')
         ]
@@ -300,7 +300,7 @@ class PolicyLambdaProvision(BaseTest):
         client.publish(TopicArn=topic_arn, Message="Greetings, program!")
         if self.recording:
             time.sleep(30)
-        log_events = manager.logs(func, "1970-1-1 UTC", "9170-1-1")
+        log_events = manager.logs(func, "1970-1-1 UTC", "2037-1-1")
         messages = [
             e["message"] for e in log_events if e["message"].startswith('{"Records')
         ]

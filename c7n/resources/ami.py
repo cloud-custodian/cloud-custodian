@@ -22,7 +22,7 @@ import jmespath
 from c7n.actions import BaseAction
 from c7n.exceptions import ClientError
 from c7n.filters import (
-    AgeFilter, Filter, OPERATORS, CrossAccountAccessFilter)
+    AgeFilter, Filter, CrossAccountAccessFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
@@ -252,7 +252,7 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number', 'minimum': 0})
 
 

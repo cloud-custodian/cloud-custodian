@@ -531,7 +531,8 @@ class PHDMode(LambdaMode):
         categories={'type': 'array', 'items': {
             'enum': ['issue', 'accountNotification', 'scheduledChange']}},
         statuses={'type': 'array', 'items': {
-            'enum': ['open', 'upcoming', 'closed']}})
+            'enum': ['open', 'upcoming', 'closed']}},
+        rinherit=LambdaMode.schema)
 
     def validate(self):
         super(PHDMode, self).validate()
@@ -982,7 +983,10 @@ class Policy(object):
             except Exception as e:
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
-            if not isinstance(p_tz, tzutil.tzfile):
+
+            # Type will be tzwin on windows, but tzwin is null on linux
+            if not (isinstance(p_tz, tzutil.tzfile) or
+                    (tzutil.tzwin and isinstance(p_tz, tzutil.tzwin))):
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
 

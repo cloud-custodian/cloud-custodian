@@ -61,9 +61,7 @@ from c7n.actions.securityhub import OtherResourcePostFinding
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
-    OPERATORS)
-
+    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter)
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -1069,7 +1067,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
 

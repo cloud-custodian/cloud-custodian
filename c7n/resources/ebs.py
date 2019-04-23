@@ -28,7 +28,7 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, OPERATORS)
+    ANNOTATION_KEY)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
@@ -186,7 +186,7 @@ class SnapshotAge(AgeFilter):
     schema = type_schema(
         'age',
         days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
     date_attribute = 'StartTime'
 
 
