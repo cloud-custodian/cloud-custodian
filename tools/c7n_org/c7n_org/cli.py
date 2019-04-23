@@ -17,12 +17,17 @@
 from collections import Counter
 import logging
 import os
-import multiprocessing
 import time
 import subprocess
 import six
 import sys
 
+# Try to set this early if offers any help against this OSX issue
+# https://bugs.python.org/issue33725
+if sys.platform == 'darwin':
+    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
+
+import multiprocessing
 from concurrent.futures import (
     ProcessPoolExecutor,
     as_completed)
@@ -47,7 +52,6 @@ from c7n_org.utils import environ, account_tags
 from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
-
 
 WORKER_COUNT = int(
     os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
