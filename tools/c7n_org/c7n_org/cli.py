@@ -20,6 +20,7 @@ import os
 import multiprocessing
 import time
 import subprocess
+import six
 import sys
 
 from concurrent.futures import (
@@ -205,10 +206,18 @@ def get_session(account, session_name, region):
         roles = account['role']
         if isinstance(roles, six.string_types):
             roles = [roles]
+        s = None
         for r in roles:
-            s = assumed_session(
-                account['role'], session_name, region=region,
-                external_id=account.get('external_id'))
+            try:
+                s = assumed_session(
+                    r, session_name, region=region,
+                    external_id=account.get('external_id'),
+                    session=s)
+            except ClientError as e:
+                log.error(
+                    "unable to obtain credentials for account:%s role:%s error:%s",
+                    account['name'], r, e)
+                raise
         return s
     elif account.get('profile'):
         return SessionFactory(region, account['profile'])()
@@ -377,7 +386,7 @@ def report(config, output, use, output_dir, accounts,
     writer.writerows(rows)
 
 
-def _get_env_creds(session):
+def _get_env_creds(session, region):
     creds = session._session.get_credentials()
     env = {}
     env['AWS_ACCESS_KEY_ID'] = creds.access_key
@@ -391,13 +400,10 @@ def run_account_script(account, region, output_dir, debug, script_args):
     try:
         session = get_session(account, "org-script", region)
     except ClientError:
-        log.error(
-            "unable to obtain credentials for account:%s role:%s",
-            account['name'], account['role'])
         return 1
 
     env = os.environ.copy()
-    env.update(_get_env_creds(session))
+    env.update(_get_env_creds(session, region))
 
     log.info("running script on account:%s region:%s script: `%s`",
              account['name'], region, " ".join(script_args))
@@ -511,7 +517,7 @@ def run_account(account, region, policies_config, output_path,
             config['external_id'] = account.get('external_id')
         else:
             env_vars.update(
-                _get_env_creds(get_session(account, 'custodian', region)))
+                _get_env_creds(get_session(account, 'custodian', region), region))
 
     elif account.get('profile'):
         config['profile'] = account['profile']
