@@ -72,7 +72,6 @@ class ChildResourceQuery(ResourceQuery):
     parents identifiers. ie. SQL and Cosmos databases
     """
 
-    capture_parent_id = False
     parent_key = 'c7n:parent-id'
 
     def __init__(self, session_factory, manager):
