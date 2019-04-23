@@ -3,7 +3,7 @@
    "contentVersion": "1.0.0.0",
    "parameters": {
       "servers_cctestsqlserver_name": {
-         "defaultValue": "cctestsqlserver04212019",
+         "defaultValue": "[concat('cctestsqlserver', uniqueString(resourceGroup().id))]",
          "type": "string"
       }
    },

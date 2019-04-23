@@ -39,9 +39,9 @@ class SqlServerTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestsqlserver04212019'}],
+                 'value': 'cctestsqlserver*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
