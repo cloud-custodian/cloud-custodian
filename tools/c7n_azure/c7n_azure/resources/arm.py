@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import six
+from collections import namedtuple
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction, DeleteAction
 from c7n_azure.filters import (MetricFilter, TagActionFilter,
                                DiagnosticSettingsFilter, PolicyCompliantFilter)
@@ -79,6 +80,8 @@ class ArmResourceManager(QueryResourceManager):
 
 @six.add_metaclass(QueryMeta)
 class ChildArmResourceManager(ArmResourceManager):
+
+    ParentSpec = namedtuple("ParentSpec", ["manager_name", "annotate_parent"])
 
     child_source = 'describe-child-azure'
 

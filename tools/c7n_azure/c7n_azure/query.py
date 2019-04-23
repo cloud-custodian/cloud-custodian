@@ -75,7 +75,7 @@ class ChildResourceQuery(ResourceQuery):
     parent_key = 'c7n:parent-id'
 
     def __init__(self, session_factory, manager):
-        self.session_factory = session_factory
+        super(ChildResourceQuery, self).__init__(session_factory)
         self.manager = manager
 
     def filter(self, resource_manager, **params):

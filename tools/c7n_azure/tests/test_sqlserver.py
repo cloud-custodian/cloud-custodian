@@ -41,7 +41,7 @@ class SqlServerTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctestsqlserver12262018'}],
+                 'value': 'cctestsqlserver04212019'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -100,54 +100,3 @@ class SqlServerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-
-class SqlDatabaseTest(BaseTest):
-
-    def test_sql_database_schema_validate(self):
-        with self.sign_out_patch():
-            p = self.load_policy({
-                'name': 'test-sql-database-schema-validate',
-                'resource': 'azure.sqldatabase'
-            }, validate=True)
-            self.assertTrue(p)
-
-    def test_get_database_by_name(self):
-        p = self.load_policy({
-            'name': 'test-get-database-by-name',
-            'resource': 'azure.sqldatabase',
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'name',
-                    'op': 'eq',
-                    'value': 'cctestdb'
-                }
-            ]
-        })
-
-        resources = p.run()
-        self._assert_found_only_test_database(resources)
-
-    def test_find_databases_with_premium_sku(self):
-        p = self.load_policy({
-            'name': 'test-find-databases-with-premium-sku',
-            'resource': 'azure.sqldatabase',
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'sku.tier',
-                    'op': 'eq',
-                    'value': 'Premium'
-                }
-            ]
-        })
-
-        resources = p.run()
-        self._assert_found_only_test_database(resources)
-
-    def _assert_found_only_test_database(self, resources):
-        self.assertEqual(len(resources), 1)
-        db = resources[0]
-
-        self.assertEqual(db.get('name'), 'cctestdb')

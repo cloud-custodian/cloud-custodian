@@ -22,9 +22,9 @@ interactions:
         VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
         uc4/evS9X/zR22I5++jRR5e7e+Odj0YfrepqlddtkTcfPfrFH2WzRbEsmrbO2qp+Xl0US2o6XTdt
         NSuyJTW/zOumqPCpvt+0WUuAP3qVZ7Nr+vt8XZbXP7HOyuK8yGdPq0VWLF9kCzSZTtu8aZtfVDZ5
-        TXB29/Y+3dvZPRjPsjabZE0+viLUqqtmvMzbj37J6KOymmatdJZnTbtu9gh+AeTvNutJM62LFb5u
-        7s4OHjw8P9+fbB9MZg+39+8fHGw/nEx2tu/v5nsHD+/ne/v3P71b5021rqf553W1XjV3gcrvb3G5
-        S2S4LGY0uLtfFNO6aqrzdvz6F5V35evm7gDuhNBy4+CoQXu9QoMo3I9+yfd/yf8Da8SLpZ0BAAA=
+        TXB29vd293Z2H45nWZtNsiYfXxFq1VUzXubtR79k9FFZTbNWOsuzpl03ewS/APJ3m/WkmdbFCl83
+        d2cHDx6en+9Ptg8ms4fb+/cPDrYfTiY72/d3872Dh/fzvf37n96t86Za19P887par5q7QOX3t7jc
+        JTJcFjMa3N0vimldNdV5O379i8q78nVzdwB3Qmi5cXDUoL1eoUEU7ke/5Pu/5P8BT94ZuZ0BAAA=
     headers:
       Cache-Control:
       - no-cache
@@ -33,7 +33,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 22 Apr 2019 19:50:19 GMT
+      - Tue, 23 Apr 2019 16:43:55 GMT
       Expires:
       - '-1'
       Pragma:
@@ -49,13 +49,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 19902ba2-1be7-4477-b34a-fd2608bf37f3
+      - e89c823e-202d-475e-a54a-b1134662d558
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11999'
+      - '11997'
       x-ms-request-id:
-      - 5b93e9b9-c3eb-4d54-b3e6-912db201740d
+      - c0d1c054-f255-4688-b590-83c8b102d754
       x-ms-routing-request-id:
-      - WESTUS2:20190422T195020Z:19902ba2-1be7-4477-b34a-fd2608bf37f3
+      - WESTUS2:20190423T164356Z:e89c823e-202d-475e-a54a-b1134662d558
     status:
       code: 200
       message: OK
@@ -74,7 +74,7 @@ interactions:
       accept-language:
       - en-US
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserver12262018/databases?api-version=2017-10-01-preview
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserver04212019/databases?api-version=2017-10-01-preview
   response:
     body:
       string: !!binary |
@@ -82,17 +82,17 @@ interactions:
         VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
         uc4/evS9X/xR83b90aNf/NEyW9DfH72s80WxXnw0+qgt8jr4YJqtsmnRXn/0aHfv/i8ZffS2WM6o
         weXu3nhntG6o9eijVV2t8ppebQBzWpVl1hbVkpq9/onnv/9z+mO5+/t/ni/zOit//5OXu7//ydnv
-        f/yaXlxk714XP8ifXLd4dW93/8H+wb1P9w9GHzVt1q7ps4++XJbFMqe2s6zNJlmTn6H7nb2d3ene
-        pzvbn072Pt3ef5DvbD8838u2H9x7+PDBw093J7PzT+mdaZ1T59XyadZimPTSw+2d/e29vTe7Dx/t
-        P3h07954f+/eT6Hluq7zZfs6ry+Laf7l5KfzaVtc5i+UPrvUpM5/0Tpv2ny2qdEsP8/WJcGZVstZ
-        Vl8/r6aMAX0/JfhEABoVdUeDKauLk9uT6gfVMn+Vz9YEddl+9Og8K5t89FGe1SWRvX1F/6/qPD7O
-        g0c7D8d7Bw8wTiLI7PU0K9HsdJlNynymn77KV2UxzU6qNeDvEo5Kkq/HKcQqpRt7njU0nXvUqsD0
-        3W3Wk2ZaFyt83dydHTx4eH6+P9k+mMwebu/fPzjYfjiZ7Gzf3833Dh7ez/f27396t86bal1P88/r
-        ar1q7hLHtL9/84uICvVlXt8lFrwsZnnd3P2imNZVU52349e/qLwrXzd3p1O8YNvv7u19SlQ6uGu4
-        yrSYTQhHHav3SXu9widx2BbGR79k1JWs19fEMaCOksv+7ai1Q6QKpKoxbRbZMrvIZ0+o0f97SEZ4
-        0ZvfhLzf29sjoPf3H+zt3Cjwew8/fXC+u0Oynt/b2d5/+HB/O7u3O9ne38vv59mnB+cP7j2gdzYL
-        /KeP7u2PH95C3mWWwK43Cb1r+UOWfBqoFeSnRTMsyURbM9j350xizf9vSfGCUKThWBm2f99Wgr//
-        S/4fdyI4XycHAAA=
+        f/yaXlxk714XP8ifXLd4dW93/8H+wb1P9w9GHzVt1q7ps4++XJbFMqe2s6zNJlmTn6H7hw/3H+zN
+        9ibbn+7ms+39vem97ew829n+dH939/70YPrp/ckBvTOtc+q8Wj7NWgxzb2f34fbO/vbevTe7nz7a
+        3310/+H4/qf3fgot13WdL9vXeX1ZTPMvJz+dT9viMn+h9NmlJnX+i9Z50+azTY1m+Xm2LgnOtFrO
+        svr6eTVlDOj7KcEnAtCoqDsaTFldnNyeVD+olvmrfLYmqMv2o0fnWdnko4/yrC6J7O0r+n9V5/Fx
+        3nu0uzv+9B6Pkwgyez3NSjQ7XWaTMp/pp6/yVVlMs5NqDfi7hKOS5OtxCrFK6caeZw1N5x61KjB9
+        d5v1pJnWxQpfN3dnBw8enp/vT7YPJrOH2/v3Dw62H04mO9v3d/O9g4f38739+5/erfOmWtfT/PO6
+        Wq+au8Qx7e/f/CKiQn2Z13eJBS+LWV43d78opnXVVOft+PUvKu/K183d6RQv2PY7+3u7oNJdw1Wm
+        xWxCOOpYvU/a6xU+icO2MD76JaOuZL2+Jo4BdZRc9m9HrR0iVSBVjWmzyJbZRT57Qo3+30Mywove
+        /Cbk/d4eQdy7T5K8c6PAfzqdzR7OHjzczvKD6fb+g4f3tydTGv5kdm/26SR/8GBy72aB33l079Px
+        wwMWBMPdNLaILMs0gV9vknrX8ocs+jRSK8lPi2ZYlIm4ZrDvz5rEm//fEuMFoUjDsUJs/76tCH//
+        l/w/2cga0ygHAAA=
     headers:
       Cache-Control:
       - no-cache
@@ -101,7 +101,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 22 Apr 2019 19:50:20 GMT
+      - Tue, 23 Apr 2019 16:43:56 GMT
       Expires:
       - '-1'
       Pragma:
@@ -117,13 +117,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 59c40828-0566-466f-8912-c9b01b2b3735
+      - 38c49783-0b2b-4160-9dec-3ac58b928d34
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11986'
+      - '11998'
       x-ms-request-id:
-      - 4a450e64-ff22-4a4b-8a17-22816d991e4a
+      - 54c4581b-64db-4ab4-bad1-fa231332c5d4
       x-ms-routing-request-id:
-      - WESTUS2:20190422T195020Z:59c40828-0566-466f-8912-c9b01b2b3735
+      - WESTUS2:20190423T164356Z:38c49783-0b2b-4160-9dec-3ac58b928d34
     status:
       code: 200
       message: OK

@@ -2,8 +2,8 @@
    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
    "contentVersion": "1.0.0.0",
    "parameters": {
-      "servers_cctestsqlserver12262018_name": {
-         "defaultValue": "cctestsqlserver12262018",
+      "servers_cctestsqlserver_name": {
+         "defaultValue": "cctestsqlserver04212019",
          "type": "string"
       }
    },
@@ -13,7 +13,7 @@
          "apiVersion": "2015-05-01-preview",
          "type": "Microsoft.Sql/servers",
          "location": "EastUS2",
-         "name": "[parameters('servers_cctestsqlserver12262018_name')]",
+         "name": "[parameters('servers_cctestsqlserver_name')]",
          "properties": {
             "administratorLogin": "custodian",
             "administratorLoginPassword": "Cust0dianPassw0rd",
@@ -23,10 +23,10 @@
       {
          "type": "Microsoft.Sql/servers/databases",
          "apiVersion": "2017-03-01-preview",
-         "name": "[concat(parameters('servers_cctestsqlserver12262018_name'), '/cctestdb')]",
+         "name": "[concat(parameters('servers_cctestsqlserver_name'), '/cctestdb')]",
          "location": "eastus2",
          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver12262018_name'))]"
+            "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
          ],
          "sku": {
             "name": "Premium",

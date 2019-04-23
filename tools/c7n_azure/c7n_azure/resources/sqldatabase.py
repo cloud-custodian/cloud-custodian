@@ -10,16 +10,23 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# limitations under the License.from c7n_azure.provider import resources
 
 from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 
 
-@resources.register('sqlserver')
-class SqlServer(ArmResourceManager):
+@resources.register('sqldatabase')
+class SqlDatabase(ChildArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'
-        enum_spec = ('servers', 'list', None)
+        enum_spec = ('databases', 'list_by_server', {
+            'resource_group_name': 'resourceGroup',
+            'server_name': 'name'
+        })
+        parent_spec = ChildArmResourceManager.ParentSpec(
+            manager_name='sqlserver',
+            annotate_parent=True
+        )
