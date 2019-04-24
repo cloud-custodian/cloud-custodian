@@ -29,6 +29,21 @@ from c7n.filters.offhours import Time, OffHour, OnHour
 from c7n.utils import chunks
 from c7n.utils import type_schema
 
+scalar_ops = {
+    'eq': operator.eq,
+    'equal': operator.eq,
+    'ne': operator.ne,
+    'not-equal': operator.ne,
+    'gt': operator.gt,
+    'greater-than': operator.gt,
+    'ge': operator.ge,
+    'gte': operator.ge,
+    'le': operator.le,
+    'lte': operator.le,
+    'lt': operator.lt,
+    'less-than': operator.lt
+}
+
 
 class MetricFilter(Filter):
     """
@@ -61,27 +76,12 @@ class MetricFilter(Filter):
         'total': Math.sum
     }
 
-    ops = {
-        'eq': operator.eq,
-        'equal': operator.eq,
-        'ne': operator.ne,
-        'not-equal': operator.ne,
-        'gt': operator.gt,
-        'greater-than': operator.gt,
-        'ge': operator.ge,
-        'gte': operator.ge,
-        'le': operator.le,
-        'lte': operator.le,
-        'lt': operator.lt,
-        'less-than': operator.lt
-    }
-
     schema = {
         'type': 'object',
         'required': ['type', 'metric', 'op', 'threshold'],
         'properties': {
             'metric': {'type': 'string'},
-            'op': {'enum': list(ops.keys())},
+            'op': {'enum': list(scalar_ops.keys())},
             'threshold': {'type': 'number'},
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
@@ -97,7 +97,7 @@ class MetricFilter(Filter):
         # Metric name as defined by Azure SDK
         self.metric = self.data.get('metric')
         # gt (>), ge  (>=), eq (==), le (<=), lt (<)
-        self.op = self.ops[self.data.get('op')]
+        self.op = scalar_ops[self.data.get('op')]
         # Value to compare metric value with self.op
         self.threshold = self.data.get('threshold')
         # Number of hours from current UTC time

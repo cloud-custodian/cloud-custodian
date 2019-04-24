@@ -14,11 +14,11 @@
 
 import enum
 import isodate
-import operator
 from datetime import datetime, timedelta
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 from c7n_azure.query import ChildResourceQuery
+from c7n_azure.filters import scalar_ops
 from c7n.filters import Filter
 from c7n.utils import type_schema
 from msrestazure.azure_exceptions import CloudError
@@ -43,22 +43,6 @@ class SqlDatabase(ChildArmResourceManager):
 
 class BackupRetentionPolicyFilter(Filter):
 
-    # TODO: consolidate with MetricFilter.op?
-    number_ops = {
-        'eq': operator.eq,
-        'equal': operator.eq,
-        'ne': operator.ne,
-        'not-equal': operator.ne,
-        'gt': operator.gt,
-        'greater-than': operator.gt,
-        'ge': operator.ge,
-        'gte': operator.ge,
-        'le': operator.le,
-        'lte': operator.le,
-        'lt': operator.lt,
-        'less-than': operator.lt
-    }
-
     def __init__(self, operations_property, data, manager=None):
         super(BackupRetentionPolicyFilter, self).__init__(data, manager)
         self.operations_property = operations_property
@@ -69,7 +53,7 @@ class BackupRetentionPolicyFilter(Filter):
 
         resource_group_name = i.get('resourceGroup')
         server_name = BackupRetentionPolicyFilter.get_sql_server_name(
-            i[ChildResourceQuery.parent_key])
+            i.get(ChildResourceQuery.parent_key))
         database_name = i.get('name')
 
         list_response = list_operation(
@@ -84,7 +68,7 @@ class BackupRetentionPolicyFilter(Filter):
         raise NotImplementedError()
 
     def perform_op(self, a, b):
-        op = BackupRetentionPolicyFilter.number_ops[self.data.get('op', 'eq')]
+        op = scalar_ops.get(self.data.get('op', 'eq'))
         return op(a, b)
 
     @staticmethod
@@ -95,12 +79,32 @@ class BackupRetentionPolicyFilter(Filter):
 
 @SqlDatabase.filter_registry.register('short-term-backup-retention-policy')
 class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
+    """
+
+    Filter SQL Databases on the length of their short term backup retention policies.
+
+    If the database has no backup retention policies, the database is treated as if
+    it has a backup retention of zero days.
+
+    :example: Find all SQL Databases with a short term retention policy shorter than 2 weeks.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: short-term-backup-retention-policy
+                resource: azure.sqldatabase
+                filters:
+                  - type: short-term-backup-retention-policy
+                    op: lt
+                    retention-period-days: 14
+
+    """
 
     schema = type_schema(
         'short-term-backup-retention-policy',
         required=['retention-period-days'],
         **{
-            'op': {'enum': list(BackupRetentionPolicyFilter.number_ops.keys())},
+            'op': {'enum': list(scalar_ops.keys())},
             'retention-period-days': {'type': 'number'},
         },
     )
@@ -112,8 +116,10 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
     def filter_with_policies(self, i, policies):
         try:
+            # TODO: re-think this to better handle the case of multiple policies...
+            # (can there be mutliple policies?)
             for policy in policies:
-                actual_retention_days = policy.get('retention_days')
+                actual_retention_days = policy.retention_days
                 return self.perform_op(actual_retention_days, self.retention_period_days_limit)
         except CloudError as e:
             # TODO: is there a way to figure this out before trying to iterate through policies?
@@ -129,6 +135,29 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
 @SqlDatabase.filter_registry.register('long-term-backup-retention-policy')
 class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
+    """
+
+    Filter SQL Databases on the length of their long term backup retention policies.
+
+    There are 3 backup types for a sql database: weekly, monthly, and yearly. And, each
+    of these backups has a retention period that can specified in units of days, weeks,
+    months, or years.
+
+    :example: Find all SQL Databases with weekly backup retentions longer than 1 month.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: long-term-backup-retention-policy
+                resource: azure.sqldatabase
+                filters:
+                  - type: long-term-backup-retention-policy
+                    backup-type: weekly
+                    op: gt
+                    retention-period: 1
+                    retention-period-units: months
+
+    """
 
     @enum.unique
     class BackupType(enum.Enum):
@@ -158,7 +187,7 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         required=['backup-type', 'retention-period', 'retention-period-units'],
         **{
             'backup-type': {'enum': list([str(t) for t in BackupType])},
-            'op': {'enum': list(BackupRetentionPolicyFilter.number_ops.keys())},
+            'op': {'enum': list(scalar_ops.keys())},
             'retention-period': {'type': 'number'},
             'retention-period-units': {'enum': list([str(u) for u in RetentionPeriodUnits])},
         },
@@ -202,11 +231,12 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
             raise ValueError("Unknown backup-type: {}".format(self.backup_type))
 
         # TODO figure out a better way to compare durations
+        # https://docs.microsoft.com/en-us/azure/sql-database/sql-database-long-term-retention
         #
         # given ISO 8601 duration: P30D and P1M:
-        #   in march : P30D > P1M
-        #   in april : P30D = P1M
-        #   in may   : P30D < P1M
+        #   in february : P30D > P1M
+        #   in april    : P30D = P1M
+        #   in may      : P30D < P1M
 
         actual_duration = isodate.parse_duration(actual_retention_days_iso8601)
         actual_duration = LongTermBackupRetentionPolicyFilter.normalize_duration(actual_duration)
