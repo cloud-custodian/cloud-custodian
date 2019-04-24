@@ -1507,10 +1507,28 @@ class Suspend(Action):
                 return
             raise
         ec2_client = session.client('ec2')
+        asg_instance_ids = [i['InstanceId'] for i in asg['Instances']]
+        if not asg_instance_ids:
+            log.info("No instances in asg to stop %s" % (
+                asg['AutoScalingGroupName']))
+            return
+
+        # Determine which EC2s in ASG can be stopped:
+        # - Only EBS-backed EC2s, No Spot instances, Only running instances.
+        response = ec2_client.describe_instances(InstanceIds=asg_instance_ids)
+        instance_ids = []
+        for reservation in response.get('Reservations'):
+            for instance in reservation.get('Instances'):
+                if (instance.get('RootDeviceType') == 'ebs' and
+                    not instance.get('SpotInstanceRequestId') and
+                    instance.get('State').get('Name') == 'running'):
+                    instance_ids.append(instance.get('InstanceId'))
+        if not instance_ids:
+            log.info("No asg instances were eligible to stop %s" % (
+                asg['AutoScalingGroupName']))
+            return
+
         try:
-            instance_ids = [i['InstanceId'] for i in asg['Instances']]
-            if not instance_ids:
-                return
             retry = get_retry((
                 'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
@@ -1588,9 +1606,25 @@ class Resume(Action):
     def resume_asg_instances(self, ec2_client, asg):
         """Resume asg instances.
         """
-        instance_ids = [i['InstanceId'] for i in asg['Instances']]
-        if not instance_ids:
+        asg_instance_ids = [i['InstanceId'] for i in asg['Instances']]
+        if not asg_instance_ids:
             return
+
+        # Determine which EC2s in ASG can be started:
+        # - Only EBS-backed EC2s, no Spot instances, only stopped instances.
+        response = ec2_client.describe_instances(InstanceIds=asg_instance_ids)
+        instance_ids = []
+        for reservation in response.get('Reservations'):
+            for instance in reservation.get('Instances'):
+                if (instance.get('RootDeviceType') == 'ebs' and
+                    not instance.get('SpotInstanceRequestId') and
+                    instance.get('State').get('Name') == 'stopped'):
+                    instance_ids.append(instance.get('InstanceId'))
+        if not instance_ids:
+            log.info("No asg instances were eligible to start %s" % (
+                asg['AutoScalingGroupName']))
+            return
+
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
         retry(ec2_client.start_instances, InstanceIds=instance_ids)
