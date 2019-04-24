@@ -25,8 +25,7 @@ class AppEngineAppTest(BaseTest):
 
         policy = self.load_policy(
             {'name': 'gcp-appengine-app-dryrun',
-             'resource': 'gcp.appengine-app',
-             'query': [{'app-name': app_name}]},
+             'resource': 'gcp.appengine-app'},
             session_factory=session_factory)
 
         resources = policy.run()

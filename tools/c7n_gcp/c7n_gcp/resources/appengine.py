@@ -16,6 +16,7 @@ import re
 
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
+from c7n.utils import local_session
 
 
 @resources.register('appengine-app')
@@ -32,12 +33,8 @@ class AppEngineApp(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_query(
-                'get', {'appsId': AppEngineApp.extract_app_id(resource_info['resourceName'])})
+                'get', {'appsId': re.compile('apps/(.*)').match(
+                    resource_info['resourceName']).group(1)})
 
     def get_resource_query(self):
-        if 'query' in self.data:
-            return {'appsId': AppEngineApp.extract_app_id(self.data.get('query')[0]['app-name'])}
-
-    @staticmethod
-    def extract_app_id(app_name):
-        return re.compile('apps/(.*)').match(app_name).group(1)
+        return {'appsId': local_session(self.session_factory).get_default_project()}
