@@ -1,0 +1,28 @@
+{
+  "body": {
+    "kind": "compute#sslCertificate", 
+    "name": "testcert", 
+    "certificate": "-----BEGIN CERTIFICATE-----\nMIIDAjCCAeqgAwIBAgIJAPUXF8V4YbOEMA0GCSqGSIb3DQEBCwUAMBYxFDASBgNV\nBAMMC2V4YW1wbGUuY29tMB4XDTE5MDMwNjE0MjE1NFoXDTIwMDMwNTE0MjE1NFow\nFjEUMBIGA1UEAwwLZXhhbXBsZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw\nggEKAoIBAQDRrclYoZV7DoERFHJKRIK8wPUr4VVj4dsJn+SsMb96J5EsVNMd0QFp\nDsvn6E7Dg/Ujn1HohEUg+EsqFmDJSMcZO9nJxpTLGNP2GTgs3T5Z6ddouhBqXovG\ncY5c7t5TzRfZBbZPbhZu4nd6sJFbVIE90dRiqszPKuwHYBW5cV4n2zhMwx4BpgHT\nFGBqzIUaQhOWhV+STqlsKzWW6UpZrX4552pycJKIIHPEfU50dEnnr/z9laf3zf2i\nX+yBwGB2uJKix9rN5zfXOXC2JwYZ+8UE1kJ2b8RV93Qvnuc7htbUCCvZWqhOuPzB\nDQisYkL1XQv+LzQzWYj0ulC/AMd4ChU5AgMBAAGjUzBRMB0GA1UdDgQWBBTWGDWJ\n0cu9uR5LMdPc3pRhHw7ARzAfBgNVHSMEGDAWgBTWGDWJ0cu9uR5LMdPc3pRhHw7A\nRzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQAmNR9sCJbIvSy8\nV8+CdFCZH+utP3sAtK4WY15lOlgBgfgGuXK9snfWU3B6SOFKttX0vsbQTzONShEX\nc9NDE+mbtlfYhiaAlUKUyV+w0N9xoenS1jIhrz0KByaKklAfPSJdSBwtzRZ9psIr\ncSueI2K1KTj4dxyYj4M78j/Z7LXgOVwBlInlTKGcSJd+qDRM0lSiZLQKt09qZFg8\nf6D8otR/o4LlauQONPAB91Vm/fJRVdiM5KD3aBK5jy0LMRA3iCVpItQf8gRH4ItO\n77+fpa0SHU58Gf+fDgyDCcXn77M0Ht5sBvuS5PB9BJHzc3VEWZeQXANXdM9e+zJj\nlpvn3RPW\n-----END CERTIFICATE-----\n\n", 
+    "creationTimestamp": "2019-03-06T07:33:58.591-08:00", 
+    "id": "733338214555866761", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/testcert"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1402", 
+    "transfer-encoding": "chunked", 
+    "expires": "Tue, 12 Mar 2019 08:57:07 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Tue, 12 Mar 2019 08:57:07 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/testcert?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"ROdJYUw3NredrVJUI61-Wzgttbw=/a4I_lxU9_0Ym7B4yAuAIu9Avgwg=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

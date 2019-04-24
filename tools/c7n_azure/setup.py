@@ -56,6 +56,7 @@ setup(
                       "azure-mgmt-datafactory",
                       "azure-mgmt-iothub",
                       "azure-mgmt-keyvault",
+                      "azure-mgmt-managementgroups",
                       "azure-mgmt-network",
                       "azure-mgmt-redis",
                       "azure-mgmt-resource",

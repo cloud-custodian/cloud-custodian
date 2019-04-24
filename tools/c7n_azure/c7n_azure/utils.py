@@ -18,17 +18,17 @@ import logging
 import re
 import time
 import uuid
-from concurrent.futures import as_completed
 
 import six
 from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
+from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
+from concurrent.futures import as_completed
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
 from c7n.utils import chunks
-
 from c7n.utils import local_session
 
 
@@ -37,6 +37,10 @@ class ResourceIdParser(object):
     @staticmethod
     def get_namespace(resource_id):
         return parse_resource_id(resource_id).get('namespace')
+
+    @staticmethod
+    def get_subscription_id(resource_id):
+        return parse_resource_id(resource_id).get('subscription')
 
     @staticmethod
     def get_resource_group(resource_id):
@@ -193,7 +197,18 @@ class GraphHelper(object):
     log = logging.getLogger('custodian.azure.utils.GraphHelper')
 
     @staticmethod
-    def get_principal_dictionary(graph_client, object_ids):
+    def get_principal_dictionary(graph_client, object_ids, raise_on_graph_call_error=False):
+        """Retrieves Azure AD Objects for corresponding object ids passed.
+        :param graph_client: A client for Microsoft Graph.
+        :param object_ids: The object ids to retrieve Azure AD objects for.
+        :param raise_on_graph_call_error: A boolean indicate whether an error should be
+        raised if the underlying Microsoft Graph call fails.
+        :return: A dictionary keyed by object id with the Azure AD object as the value.
+        Note: empty Azure AD objects could be returned if not found in the graph.
+        """
+        if not object_ids:
+            return {}
+
         object_params = GetObjectsParameters(
             include_directory_object_references=True,
             object_ids=object_ids)
@@ -204,15 +219,29 @@ class GraphHelper(object):
         try:
             for aad_object in aad_objects:
                 principal_dics[aad_object.object_id] = aad_object
-        except CloudError:
-            GraphHelper.log.warning(
-                'Credentials not authorized for access to read from Microsoft Graph. \n '
-                'Can not query on principalName, displayName, or aadType. \n')
+
+        except CloudError as e:
+            if e.status_code in [403, 401]:
+                GraphHelper.log.warning(
+                    'Credentials not authorized for access to read from Microsoft Graph. \n '
+                    'Can not query on principalName, displayName, or aadType. \n')
+            else:
+                GraphHelper.log.error(
+                    'Exception in call to Microsoft Graph. \n '
+                    'Can not query on principalName, displayName, or aadType. \n'
+                    'Error: {0}'.format(e))
+
+            if raise_on_graph_call_error:
+                raise
 
         return principal_dics
 
     @staticmethod
     def get_principal_name(graph_object):
+        """Attempts to resolve a principal name.
+        :param graph_object: the Azure AD Graph Object
+        :return: The resolved value or an empty string if unsuccessful.
+        """
         if hasattr(graph_object, 'user_principal_name'):
             return graph_object.user_principal_name
         elif hasattr(graph_object, 'service_principal_names'):
@@ -379,3 +408,13 @@ class AppInsightsHelper(object):
                                           "Resource Group name: %s, App Insights name: %s" %
                                           (resource_group_name, resource_name))
             return ''
+
+
+class ManagedGroupHelper(object):
+
+    @staticmethod
+    def get_subscriptions_list(managed_resource_group, credentials):
+        client = ManagementGroupsAPI(credentials)
+        entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
+
+        return [e.name for e in entities if e.type == '/subscriptions']

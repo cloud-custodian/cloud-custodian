@@ -320,6 +320,10 @@ def resource_format(resource, resource_type):
         return "id: %s  attachments: %s" % (
             resource['InternetGatewayId'],
             len(resource['Attachments']))
+    elif resource_type == 'lambda':
+        return "Name: %s  RunTime: %s  \n" % (
+            resource['FunctionName'],
+            resource['Runtime'])
     else:
         return "%s" % format_struct(resource)
 
@@ -330,7 +334,7 @@ def kms_decrypt(config, logger, session, encrypted_field):
             kms = session.client('kms')
             return kms.decrypt(
                 CiphertextBlob=base64.b64decode(config[encrypted_field]))[
-                    'Plaintext']
+                    'Plaintext'].decode('utf8')
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
                 "Error: %s Unable to base64 decode %s, will assume plaintext." %

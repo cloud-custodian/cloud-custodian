@@ -83,7 +83,8 @@ class FunctionPackageTest(BaseTest):
                           u'mode': {u'type': u'azure-event-grid',
                                     u'events': [u'VmWrite']}})
 
-    def test_event_package_files(self):
+    @patch("c7n_azure.session.Session.get_functions_auth_string", return_value="")
+    def test_event_package_files(self, session_mock):
         p = self.load_policy({
             'name': 'test-azure-package',
             'resource': 'azure.resourcegroup',

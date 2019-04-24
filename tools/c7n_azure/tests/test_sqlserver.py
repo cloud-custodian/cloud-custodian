@@ -21,7 +21,7 @@ from mock import patch
 
 class SqlServerTest(BaseTest):
 
-    TEST_DATE = datetime.datetime(2018, 12, 26, 14, 10, 00)
+    TEST_DATE = datetime.datetime(2019, 4, 21, 14, 10, 00)
 
     def test_sql_server_schema_validate(self):
         with self.sign_out_patch():
@@ -39,9 +39,9 @@ class SqlServerTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestsqlserver12262018'}],
+                 'value': 'cctestsqlserver*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

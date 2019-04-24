@@ -565,16 +565,21 @@ def run_account(account, region, policies_config, output_path,
                   file_okay=False, dir_okay=True),
               default=None)
 @click.option("--metrics", default=False, is_flag=True)
+@click.option("--metrics-uri", default=None, help="Configure provider metrics target")
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 def run(config, use, output_dir, accounts, tags, region,
-        policy, policy_tags, cache_period, cache_path, metrics, dryrun, debug, verbose):
+        policy, policy_tags, cache_period, cache_path, metrics,
+        dryrun, debug, verbose, metrics_uri):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
     policy_counts = Counter()
     success = True
+
+    if metrics_uri:
+        metrics = metrics_uri
 
     if not cache_path:
         cache_path = os.path.expanduser("~/.cache/c7n-org")

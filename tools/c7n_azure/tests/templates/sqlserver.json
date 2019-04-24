@@ -1,22 +1,45 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-  },
-  "variables": {
-  },
-  "resources": [
-    {
-      "apiVersion": "2015-05-01-preview",
-      "type": "Microsoft.Sql/servers",
-      "location": "EastUS2",
-      "name": "cctestsqlserver12262018",
-      "properties": {
-        "administratorLogin": "custodian",
-        "administratorLoginPassword": "Cust0dianPassw0rd" ,
-        "version": "12.0"
+   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+   "contentVersion": "1.0.0.0",
+   "parameters": {
+      "servers_cctestsqlserver_name": {
+         "defaultValue": "[concat('cctestsqlserver', uniqueString(resourceGroup().id))]",
+         "type": "string"
+      }
+   },
+   "variables": {},
+   "resources": [
+      {
+         "apiVersion": "2015-05-01-preview",
+         "type": "Microsoft.Sql/servers",
+         "location": "EastUS2",
+         "name": "[parameters('servers_cctestsqlserver_name')]",
+         "properties": {
+            "administratorLogin": "custodian",
+            "administratorLoginPassword": "Cust0dianPassw0rd",
+            "version": "12.0"
+         }
       },
-    },
-  ],
-  "outputs": {}
+      {
+         "type": "Microsoft.Sql/servers/databases",
+         "apiVersion": "2017-03-01-preview",
+         "name": "[concat(parameters('servers_cctestsqlserver_name'), '/cctestdb')]",
+         "location": "eastus2",
+         "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
+         ],
+         "sku": {
+            "name": "Premium",
+            "tier": "Premium"
+         },
+         "kind": "v12.0,user",
+         "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": 2147483648,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false
+         }
+      }
+   ],
+   "outputs": {}
 }

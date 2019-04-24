@@ -25,13 +25,18 @@ import sys
 
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from msrestazure.azure_active_directory import MSIAuthentication
-from azure_common import BaseTest
+from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure import constants
 from c7n_azure.session import Session
 from mock import patch
 
+CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
+
 
 class SessionTest(BaseTest):
+
+    authorization_file = os.path.join(os.path.dirname(__file__), 'files', 'test_auth_file.json')
+
     def setUp(self):
         super(SessionTest, self).setUp()
 
@@ -42,13 +47,32 @@ class SessionTest(BaseTest):
     def mock_init(self, client_id, secret, tenant, resource):
         pass
 
+    def test_initialize_session_auth_file(self):
+        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
+                   autospec=True, return_value=None):
+            s = Session(authorization_file=self.authorization_file)
+
+            self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertEqual(s.get_tenant_id(), 'tenant')
+
+    def test_initialize_session_auth_file_custom_subscription(self):
+        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
+                   autospec=True, return_value=None):
+            s = Session(subscription_id=CUSTOM_SUBSCRIPTION_ID,
+                        authorization_file=self.authorization_file)
+
+            self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
+            self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
+            self.assertEqual(s.get_tenant_id(), 'tenant')
+
     def test_initialize_session_principal(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
                    autospec=True, return_value=None):
             with patch.dict(os.environ,
                             {
                                 constants.ENV_TENANT_ID: 'tenant',
-                                constants.ENV_SUB_ID: 'ea42f556-5106-4743-99b0-c129bfa71a47',
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
                                 constants.ENV_CLIENT_ID: 'client',
                                 constants.ENV_CLIENT_SECRET: 'secret'
                             }, clear=True):
@@ -56,7 +80,8 @@ class SessionTest(BaseTest):
                 s = Session()
 
                 self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
-                self.assertEqual(s.get_subscription_id(), 'ea42f556-5106-4743-99b0-c129bfa71a47')
+                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+                self.assertEqual(s.get_tenant_id(), 'tenant')
 
     def test_initialize_msi_auth_system(self):
         with patch('msrestazure.azure_active_directory.MSIAuthentication.__init__',
@@ -64,12 +89,12 @@ class SessionTest(BaseTest):
             with patch.dict(os.environ,
                             {
                                 constants.ENV_USE_MSI: 'true',
-                                constants.ENV_SUB_ID: 'ea42f556-5106-4743-99b0-c129bfa71a47'
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID
                             }, clear=True):
                 s = Session()
 
                 self.assertIs(type(s.get_credentials()), MSIAuthentication)
-                self.assertEqual(s.get_subscription_id(), 'ea42f556-5106-4743-99b0-c129bfa71a47')
+                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
 
     def test_initialize_msi_auth_user(self):
         with patch('msrestazure.azure_active_directory.MSIAuthentication.__init__',
@@ -77,25 +102,25 @@ class SessionTest(BaseTest):
             with patch.dict(os.environ,
                             {
                                 constants.ENV_USE_MSI: 'true',
-                                constants.ENV_SUB_ID: 'ea42f556-5106-4743-99b0-c129bfa71a47',
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
                                 constants.ENV_CLIENT_ID: 'client'
                             }, clear=True):
                 s = Session()
 
                 self.assertIs(type(s.get_credentials()), MSIAuthentication)
-                self.assertEqual(s.get_subscription_id(), 'ea42f556-5106-4743-99b0-c129bfa71a47')
+                self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
 
     def test_initialize_session_token(self):
         with patch.dict(os.environ,
                         {
                             constants.ENV_ACCESS_TOKEN: 'token',
-                            constants.ENV_SUB_ID: 'ea42f556-5106-4743-99b0-c129bfa71a47'
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID
                         }, clear=True):
 
             s = Session()
 
             self.assertIs(type(s.get_credentials()), BasicTokenAuthentication)
-            self.assertEqual(s.get_subscription_id(), 'ea42f556-5106-4743-99b0-c129bfa71a47')
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
 
     def test_get_functions_auth_string(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
@@ -103,25 +128,21 @@ class SessionTest(BaseTest):
             with patch.dict(os.environ,
                             {
                                 constants.ENV_TENANT_ID: 'tenant',
-                                constants.ENV_SUB_ID: 'ea42f556-5106-4743-99b0-c129bfa71a47',
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
                                 constants.ENV_CLIENT_ID: 'client',
                                 constants.ENV_CLIENT_SECRET: 'secret'
                             }, clear=True):
-
                 s = Session()
 
-                auth = s.get_functions_auth_string()
+                auth = s.get_functions_auth_string(CUSTOM_SUBSCRIPTION_ID)
 
-                expected = """{
-                              "credentials": {
-                                "client_id": "client",
-                                "secret": "secret",
-                                "tenant": "tenant"
-                              },
-                              "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47"
-                            }"""
+                expected = {"credentials":
+                            {"client_id": "client",
+                             "secret": "secret",
+                             "tenant": "tenant"},
+                            "subscription": CUSTOM_SUBSCRIPTION_ID}
 
-                self.assertEqual(json.loads(auth), json.loads(expected))
+                self.assertEqual(json.loads(auth), expected)
 
     def test_get_functions_auth_string_overrides(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
@@ -137,21 +158,64 @@ class SessionTest(BaseTest):
                                 constants.ENV_FUNCTION_CLIENT_ID: 'functionclient',
                                 constants.ENV_FUNCTION_CLIENT_SECRET: 'functionsecret'
                             }, clear=True):
-
                 s = Session()
 
-                auth = s.get_functions_auth_string()
+                auth = s.get_functions_auth_string('000000-5106-4743-99b0-c129bfa71a47')
 
                 expected = """{
-                              "credentials": {
-                                "client_id": "functionclient",
-                                "secret": "functionsecret",
-                                "tenant": "functiontenant"
-                              },
-                              "subscription": "000000-5106-4743-99b0-c129bfa71a47"
-                            }"""
+                               "credentials": {
+                                 "client_id": "functionclient",
+                                 "secret": "functionsecret",
+                                 "tenant": "functiontenant"
+                               },
+                               "subscription": "000000-5106-4743-99b0-c129bfa71a47"
+                             }"""
 
                 self.assertEqual(json.loads(auth), json.loads(expected))
+
+    def test_get_function_target_subscription(self):
+        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
+                   autospec=True, return_value=None):
+            with patch.dict(os.environ,
+                            {
+                                constants.ENV_TENANT_ID: 'tenant',
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                                constants.ENV_CLIENT_ID: 'client',
+                                constants.ENV_CLIENT_SECRET: 'secret'
+                            }, clear=True):
+                s = Session()
+                self.assertEqual(s.get_function_target_subscription_name(),
+                                 DEFAULT_SUBSCRIPTION_ID)
+                self.assertEqual(s.get_function_target_subscription_ids(),
+                                 [DEFAULT_SUBSCRIPTION_ID])
+
+            with patch.dict(os.environ,
+                            {
+                                constants.ENV_TENANT_ID: 'tenant',
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                                constants.ENV_CLIENT_ID: 'client',
+                                constants.ENV_CLIENT_SECRET: 'secret',
+                                constants.ENV_FUNCTION_SUB_ID: CUSTOM_SUBSCRIPTION_ID
+                            }, clear=True):
+                s = Session()
+                self.assertEqual(s.get_function_target_subscription_name(),
+                                 CUSTOM_SUBSCRIPTION_ID)
+                self.assertEqual(s.get_function_target_subscription_ids(),
+                                 [CUSTOM_SUBSCRIPTION_ID])
+
+            with patch.dict(os.environ,
+                            {
+                                constants.ENV_TENANT_ID: 'tenant',
+                                constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                                constants.ENV_CLIENT_ID: 'client',
+                                constants.ENV_CLIENT_SECRET: 'secret',
+                                constants.ENV_FUNCTION_MANAGED_GROUP_NAME: 'test'
+                            }, clear=True):
+                with patch('c7n_azure.utils.ManagedGroupHelper.get_subscriptions_list',
+                           return_value=[]):
+                    s = Session()
+                    self.assertEqual(s.get_function_target_subscription_name(), 'test')
+                    self.assertEqual(s.get_function_target_subscription_ids(), [])
 
     def test_api_version(self):
         """Verify we retrieve the correct API version for a resource type"""
