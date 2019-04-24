@@ -19,7 +19,7 @@ import functools
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, OPERATORS
+from c7n.filters import AgeFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -489,7 +489,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
 

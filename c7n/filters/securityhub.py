@@ -27,7 +27,7 @@ class SecurityHubFindingFilter(Filter):
         # for filtering.
         region={'type': 'string'},
         query={'type': 'object'})
-
+    schema_alias = True
     permissions = ('securityhub:GetFindings',)
     annotation_key = 'c7n:finding-filter'
     query_shape = 'AwsSecurityFindingFilters'
