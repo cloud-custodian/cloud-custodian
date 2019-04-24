@@ -1442,6 +1442,19 @@ class MarkForOp(Tag):
         return action_date_string
 
 
+def _eligible_ec2_start_stop(instance, state):
+    if instance.get('RootDeviceType') != 'ebs':
+        return False
+
+    if instance.get('SpotInstanceRequestId'):
+        return False
+
+    if instance.get('State', {}).get('Name') != state:
+        return False
+
+    return True
+
+
 @ASG.action_registry.register('suspend')
 class Suspend(Action):
     """Action to suspend ASG processes and instances
@@ -1513,16 +1526,12 @@ class Suspend(Action):
                 asg['AutoScalingGroupName']))
             return
 
-        # Determine which EC2s in ASG can be stopped:
-        # - Only EBS-backed EC2s, No Spot instances, Only running instances.
-        response = ec2_client.describe_instances(InstanceIds=asg_instance_ids)
-        instance_ids = []
-        for reservation in response.get('Reservations'):
-            for instance in reservation.get('Instances'):
-                if (instance.get('RootDeviceType') == 'ebs' and
-                    not instance.get('SpotInstanceRequestId') and
-                    instance.get('State').get('Name') == 'running'):
-                    instance_ids.append(instance.get('InstanceId'))
+        # Determine which EC2s in ASG can be stopped.
+        instances = self.manager.get_resource_manager('ec2').get_resources(
+            asg_instance_ids)
+        instance_ids = [i['InstanceId'] for i in
+                        filter(lambda x: _eligible_ec2_start_stop(x, 'running'),
+                               instances)]
         if not instance_ids:
             log.info("No asg instances were eligible to stop %s" % (
                 asg['AutoScalingGroupName']))
@@ -1610,16 +1619,12 @@ class Resume(Action):
         if not asg_instance_ids:
             return
 
-        # Determine which EC2s in ASG can be started:
-        # - Only EBS-backed EC2s, no Spot instances, only stopped instances.
-        response = ec2_client.describe_instances(InstanceIds=asg_instance_ids)
-        instance_ids = []
-        for reservation in response.get('Reservations'):
-            for instance in reservation.get('Instances'):
-                if (instance.get('RootDeviceType') == 'ebs' and
-                    not instance.get('SpotInstanceRequestId') and
-                    instance.get('State').get('Name') == 'stopped'):
-                    instance_ids.append(instance.get('InstanceId'))
+        # Determine which EC2s in ASG can be started.
+        instances = self.manager.get_resource_manager('ec2').get_resources(
+            asg_instance_ids)
+        instance_ids = [i['InstanceId'] for i in
+                        filter(lambda x: _eligible_ec2_start_stop(x, 'stopped'),
+                               instances)]
         if not instance_ids:
             log.info("No asg instances were eligible to start %s" % (
                 asg['AutoScalingGroupName']))
