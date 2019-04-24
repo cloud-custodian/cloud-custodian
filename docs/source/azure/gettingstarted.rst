@@ -12,7 +12,7 @@ Install Cloud Custodian and Azure Plugin
 ----------------------------------------
 
 Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and Windows.
-We recommend using Python 3.6 or higher.
+We recommend using Python 3.6 or higher. 
 
 The Azure provider is an additional package which is installed in addition to c7n.
 
