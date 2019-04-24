@@ -45,3 +45,43 @@ class AppEngineAppTest(BaseTest):
         resource = policy.resource_manager.get_resource(
             {'resourceName': app_name})
         self.assertEqual(resource['name'], app_name)
+
+
+class AppEngineCertificateTest(BaseTest):
+
+    def test_certificate_query(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/{}'.format(project_id)
+        certificate_id = '12277184'
+        certificate_name = '{}/authorizedCertificates/{}'.format(app_name, certificate_id)
+        session_factory = self.replay_flight_data(
+            'appengine-certificate-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-appengine-certificate-dryrun',
+             'resource': 'gcp.appengine-certificate'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], certificate_name)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
+
+    def test_certificate_get(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/' + project_id
+        certificate_id = '12277184'
+        certificate_name = '{}/authorizedCertificates/{}'.format(app_name, certificate_id)
+        session_factory = self.replay_flight_data(
+            'appengine-certificate-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-appengine-certificate-dryrun',
+             'resource': 'gcp.appengine-certificate'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resource = policy.resource_manager.get_resource(
+            {'resourceName': certificate_name})
+        self.assertEqual(resource['name'], certificate_name)
+        self.assertEqual(resource[parent_annotation_key]['name'], app_name)

@@ -38,3 +38,32 @@ class AppEngineApp(QueryResourceManager):
 
     def get_resource_query(self):
         return {'appsId': local_session(self.session_factory).get_default_project()}
+
+
+@resources.register('appengine-certificate')
+class AppEngineCertificate(ChildResourceManager):
+
+    def _get_parent_resource_info(self, child_instance):
+        return {'resourceName': re.compile(
+            '(apps/.*?)/authorizedCertificates/.*').match(child_instance['name']).group(1)}
+
+    class resource_type(ChildTypeInfo):
+        service = 'appengine'
+        version = 'v1'
+        component = 'apps.authorizedCertificates'
+        enum_spec = ('list', 'certificates[]', None)
+        scope = None
+        id = 'id'
+        parent_spec = {
+            'resource': 'appengine-app',
+            'child_enum_params': {
+                ('id', 'appsId')
+            }
+        }
+
+        @staticmethod
+        def get(client, resource_info):
+            name_param_re = re.compile('apps/(.*?)/authorizedCertificates/(.*)')
+            apps_id, cert_id = name_param_re.match(resource_info['resourceName']).groups()
+            return client.execute_query('get', {'appsId': apps_id,
+                                                'authorizedCertificatesId': cert_id})
