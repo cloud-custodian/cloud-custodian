@@ -35,20 +35,6 @@ $ pip install -e ./cloud-custodian
 $ pip install -e ./cloud-custodian/tools/c7n_azure
 
 
-### Option 3: Run from docker image
-
-Note: Azure CLI auth will require additional workarounds in this scenario.
-
-.. code-block:: bash
-
-$ docker pull cloudcustodian/c7n
-$ docker run -it
-    -v $(pwd)/output:/output
-    -v $(pwd)/policy.yml:/policy.yml
-    --env-file <(env | grep "^AZURE")
-    cloudcustodian/c7n run -v -s /output /policy.yml
-
-
 .. _azure_write-policy:
 
 Write your first policy
