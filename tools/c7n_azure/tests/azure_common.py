@@ -34,6 +34,7 @@ load_resources()
 
 C7N_SCHEMA = generate()
 DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
+CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 DEFAULT_TENANT_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
 # latest VCR recording date that tag tests
 # If tests need to be re-recorded, update to current date

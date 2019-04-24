@@ -18,17 +18,17 @@ import logging
 import re
 import time
 import uuid
-from concurrent.futures import as_completed
 
 import six
 from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
+from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
+from concurrent.futures import as_completed
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
 from c7n.utils import chunks
-
 from c7n.utils import local_session
 
 
@@ -37,6 +37,10 @@ class ResourceIdParser(object):
     @staticmethod
     def get_namespace(resource_id):
         return parse_resource_id(resource_id).get('namespace')
+
+    @staticmethod
+    def get_subscription_id(resource_id):
+        return parse_resource_id(resource_id).get('subscription')
 
     @staticmethod
     def get_resource_group(resource_id):
@@ -404,3 +408,13 @@ class AppInsightsHelper(object):
                                           "Resource Group name: %s, App Insights name: %s" %
                                           (resource_group_name, resource_name))
             return ''
+
+
+class ManagedGroupHelper(object):
+
+    @staticmethod
+    def get_subscriptions_list(managed_resource_group, credentials):
+        client = ManagementGroupsAPI(credentials)
+        entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
+
+        return [e.name for e in entities if e.type == '/subscriptions']
