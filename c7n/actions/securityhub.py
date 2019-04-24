@@ -81,6 +81,10 @@ FindingTypes = {
 }
 
 
+# Mostly undocumented value size limit
+SECHUB_VALUE_SIZE_LIMIT = 1024
+
+
 def build_vocabulary():
     vocab = []
     for ns, quals in FindingTypes.items():
@@ -131,6 +135,7 @@ class PostFinding(BaseAction):
     schema = type_schema(
         "post-finding",
         required=["types"],
+        title={"type": "string"},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
@@ -186,7 +191,9 @@ class PostFinding(BaseAction):
                 "securityhub", region_name=region_name)
 
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
-        batch_size = self.data.get('batch_size', 10)
+        # default batch size to one to work around security hub console issue
+        # which only shows a single resource in a finding.
+        batch_size = self.data.get('batch_size', 1)
         stats = Counter()
         for key, grouped_resources in self.group_resources(resources).items():
             for resource_set in chunks(grouped_resources, batch_size):
@@ -349,7 +356,7 @@ class OtherResourcePostFinding(PostFinding):
                 v = str(v)
             else:
                 continue
-            details[k] = v
+            details[k] = v[:SECHUB_VALUE_SIZE_LIMIT]
 
         details['c7n:resource-type'] = self.manager.type
         other = {
@@ -366,6 +373,8 @@ class OtherResourcePostFinding(PostFinding):
     @classmethod
     def register_resource(klass, registry, event):
         for rtype, resource_manager in registry.items():
+            if not resource_manager.has_arn():
+                continue
             if 'post-finding' in resource_manager.action_registry:
                 continue
             resource_manager.action_registry.register('post-finding', klass)

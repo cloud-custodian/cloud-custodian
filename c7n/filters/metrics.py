@@ -89,6 +89,7 @@ class MetricsFilter(Filter):
         'cloudsearch': 'AWS/CloudSearch',
         'dynamodb': 'AWS/DynamoDB',
         'ecs': 'AWS/ECS',
+        'efs': 'AWS/EFS',
         'elasticache': 'AWS/ElastiCache',
         'ec2': 'AWS/EC2',
         'elb': 'AWS/ELB',
@@ -106,6 +107,7 @@ class MetricsFilter(Filter):
         's3': 'AWS/S3',
         'sns': 'AWS/SNS',
         'sqs': 'AWS/SQS',
+        'workspaces': 'AWS/WorkSpaces',
     }
 
     def process(self, resources, event=None):

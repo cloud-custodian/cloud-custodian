@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "a30fbaeb-36dd-11e9-933b-dfd966ce4863",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "260",
+                "connection": "keep-alive",
+                "date": "Fri, 22 Feb 2019 20:08:36 GMT",
+                "x-amzn-requestid": "a30fbaeb-36dd-11e9-933b-dfd966ce4863",
+                "x-amz-apigw-id": "VhJ-qFFNoAMFb7A=",
+                "x-amzn-trace-id": "Root=1-5c7056c4-2a664b82f0b60a96ff6f58e9;Sampled=0",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 dca69919d6f10bd537498dd599f5104e.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "WEk3tkzABkl65_3QuQQcBiyx4uankbHGxRZRfPNSEmTi_AFAZGdzBQ=="
+            },
+            "RetryAttempts": 0
+        },
+        "CreatedAt": "2017-12-05T00:29:11.374Z",
+        "FindingPublishingFrequency": "SIX_HOURS",
+        "ServiceRole": "arn:aws:iam::644160558196:role/aws-service-role/guardduty.amazonaws.com/AWSServiceRoleForAmazonGuardDuty",
+        "Status": "ENABLED",
+        "UpdatedAt": "2019-02-22T02:50:23.795Z"
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": {
+            "PolicyName": "codebuild-policy",
+            "PolicyId": "ANPAJZLSS55ZLNURAPAW6",
+            "Arn": "arn:aws:iam::644160558196:policy/service-role/codebuild-policy",
+            "Path": "/service-role/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "Description": "Policy used in trust relationship with CodeBuild",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 9,
+                "day": 12,
+                "hour": 12,
+                "minute": 59,
+                "second": 52,
+                "microsecond": 0
+            },
+            "UpdateDate": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 9,
+                "day": 12,
+                "hour": 12,
+                "minute": 59,
+                "second": 52,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "c4effe4b-3a83-11e9-9b8f-834f93a9c98a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c4effe4b-3a83-11e9-9b8f-834f93a9c98a",
+                "content-type": "text/xml",
+                "content-length": "863",
+                "date": "Wed, 27 Feb 2019 11:35:22 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

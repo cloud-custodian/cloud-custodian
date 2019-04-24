@@ -102,6 +102,9 @@ class VersionTest(CliTest):
     def test_debug_version(self):
         output = self.get_output(["custodian", "version", "--debug"])
         # Among other things, this should print sys.path
+        # Normalize double escaped backslashes for Windows
+        output = output.replace('\\\\', '\\')
+
         self.assertIn(version.version, output)
         self.assertIn(sys.path[0], output)
 
@@ -174,6 +177,12 @@ class SchemaTest(CliTest):
 
         # with just a resource
         self.run_and_expect_success(["custodian", "schema", "ec2"])
+
+        # with just a mode
+        self.run_and_expect_success(["custodian", "schema", "mode"])
+
+        # mode.type
+        self.run_and_expect_success(["custodian", "schema", "mode.phd"])
 
         # resource.actions
         self.run_and_expect_success(["custodian", "schema", "ec2.actions"])
@@ -252,6 +261,12 @@ class ReportTest(CliTest):
         )
         self.assertIn("InstanceId", output)
         self.assertIn("i-014296505597bf519", output)
+
+        # json format
+        output = self.get_output(
+            ["custodian", "report", "--format", "json", "-s", self.output_dir, yaml_file]
+        )
+        self.assertTrue("i-014296505597bf519", json.loads(output)[0]['InstanceId'])
 
         # empty file
         temp_dir = self.get_temp_dir()

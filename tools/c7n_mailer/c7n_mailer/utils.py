@@ -19,6 +19,7 @@ import os
 from datetime import datetime, timedelta
 
 import jinja2
+import jmespath
 from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
@@ -35,6 +36,7 @@ def get_jinja_env(template_folders):
     env.globals['format_struct'] = format_struct
     env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
+    env.globals['search'] = jmespath.search
     env.loader = jinja2.FileSystemLoader(template_folders)
     return env
 
@@ -84,6 +86,9 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        event=sqs_message.get('event', None),
+        action=sqs_message['action'],
+        policy=sqs_message['policy'],
         region=sqs_message.get('region', '')
     )
     return subject
@@ -315,6 +320,10 @@ def resource_format(resource, resource_type):
         return "id: %s  attachments: %s" % (
             resource['InternetGatewayId'],
             len(resource['Attachments']))
+    elif resource_type == 'lambda':
+        return "Name: %s  RunTime: %s  \n" % (
+            resource['FunctionName'],
+            resource['Runtime'])
     else:
         return "%s" % format_struct(resource)
 
@@ -325,7 +334,7 @@ def kms_decrypt(config, logger, session, encrypted_field):
             kms = session.client('kms')
             return kms.decrypt(
                 CiphertextBlob=base64.b64decode(config[encrypted_field]))[
-                    'Plaintext']
+                    'Plaintext'].decode('utf8')
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
                 "Error: %s Unable to base64 decode %s, will assume plaintext." %

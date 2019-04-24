@@ -37,7 +37,8 @@ from jsonschema.exceptions import best_match
 from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
-from c7n.filters import ValueFilter, EventFilter, AgeFilter
+from c7n.resolver import ValuesFrom
+from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
 
 
 def validate(data, schema=None):
@@ -46,22 +47,11 @@ def validate(data, schema=None):
         Validator.check_schema(schema)
 
     validator = Validator(schema)
-
     errors = list(validator.iter_errors(data))
-
     if not errors:
-        counter = Counter([p['name'] for p in data.get('policies')])
-        dupes = []
-        for k, v in counter.items():
-            if v > 1:
-                dupes.append(k)
-        if dupes:
-            return [ValueError(
-                "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes))), dupes[0]]
-        return []
+        return check_unique(data) or []
     try:
-        resp = specific_error(errors[0])
+        resp = policy_error_scope(specific_error(errors[0]), data)
         name = isinstance(
             errors[0].instance,
             dict) and errors[0].instance.get(
@@ -78,6 +68,29 @@ def validate(data, schema=None):
     ]))
 
 
+def check_unique(data):
+    counter = Counter([p['name'] for p in data.get('policies', [])])
+    for k, v in list(counter.items()):
+        if v == 1:
+            counter.pop(k)
+    if counter:
+        return [ValueError(
+            "Only one policy with a given name allowed, duplicates: {}".format(counter)),
+            list(counter.keys())[0]]
+
+
+def policy_error_scope(error, data):
+    """Scope a schema error to its policy name and resource."""
+    err_path = list(error.absolute_path)
+    if err_path[0] != 'policies':
+        return error
+    pdata = data['policies'][err_path[1]]
+    pdata.get('name', 'unknown')
+    error.message = "Error on policy:{} resource:{}\n".format(
+        pdata.get('name', 'unknown'), pdata.get('resource', 'unknown')) + error.message
+    return error
+
+
 def specific_error(error):
     """Try to find the best error for humans to resolve
 
@@ -91,6 +104,7 @@ def specific_error(error):
         return error
 
     r = t = None
+
     if isinstance(error.instance, dict):
         t = error.instance.get('type')
         r = error.instance.get('resource')
@@ -116,6 +130,9 @@ def specific_error(error):
         found = None
         for idx, v in enumerate(error.validator_value):
             if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
+                found = idx
+                break
+            elif 'type' in v and t in v['properties']['type']['enum']:
                 found = idx
                 break
 
@@ -172,7 +189,18 @@ def generate(resource_types=()):
                 'minProperties': 1,
                 'maxProperties': 1},
         },
-
+        'filters_common': {
+            'comparison_operators': {
+                'enum': list(OPERATORS.keys())},
+            'value_types': {'enum': VALUE_TYPES},
+            'value_from': ValuesFrom.schema,
+            'value': {'oneOf': [
+                {'type': 'array'},
+                {'type': 'string'},
+                {'type': 'boolean'},
+                {'type': 'number'},
+                {'type': 'null'}]},
+        },
         'policy': {
             'type': 'object',
             'required': ['name', 'resource'],
@@ -186,7 +214,10 @@ def generate(resource_types=()):
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
                 'resource': {'type': 'string'},
-                'max-resources': {'type': 'integer', 'minimum': 1},
+                'max-resources': {'anyOf': [
+                    {'type': 'integer', 'minimum': 1},
+                    {'$ref': '#/definitions/max-resources-properties'}
+                ]},
                 'max-resources-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
@@ -215,6 +246,14 @@ def generate(resource_types=()):
         },
         'policy-mode': {
             'anyOf': [e.schema for _, e in execution.items()],
+        },
+        'max-resources-properties': {
+            'type': 'object',
+            'properties': {
+                'amount': {"type": 'integer', 'minimum': 1},
+                'op': {'enum': ['or', 'and']},
+                'percent': {'type': 'number', 'minimum': 0, 'maximum': 100}
+            }
         }
     }
 
@@ -237,7 +276,7 @@ def generate(resource_types=()):
                 ))
 
     schema = {
-        '$schema': 'http://json-schema.org/schema#',
+        "$schema": "http://json-schema.org/draft-07/schema#",
         'id': 'http://schema.cloudcustodian.io/v0/custodian.json',
         'definitions': definitions,
         'type': 'object',
@@ -268,7 +307,11 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None, d
             seen_actions.add(a)
         if a.schema_alias:
             if action_name in definitions['actions']:
-                assert definitions['actions'][action_name] == a.schema, "Schema mismatch on action w/ schema alias"  # NOQA
+
+                if definitions['actions'][action_name] != a.schema: # NOQA
+                    msg = "Schema mismatch on type:{} action:{} w/ schema alias ".format(
+                        type_name, action_name)
+                    raise SyntaxError(msg)
             definitions['actions'][action_name] = a.schema
             action_refs.append({'$ref': '#/definitions/actions/%s' % action_name})
         else:
@@ -370,7 +413,7 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
                 resources[rname] = rtype
 
     for type_name, resource_type in resources.items():
-        classes = {'actions': {}, 'filters': {}}
+        classes = {'actions': {}, 'filters': {}, 'resource': resource_type}
         actions = []
         for action_name, cls in resource_type.action_registry.items():
             actions.append(action_name)
@@ -386,25 +429,40 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
             'actions': sorted(actions),
             'classes': classes,
         }
+
+    vocabulary["mode"] = {}
+    for mode_name, cls in execution.items():
+        vocabulary["mode"][mode_name] = cls
+
     return vocabulary
 
 
 def summary(vocabulary):
-    print("resource count: %d" % len(vocabulary))
-    action_count = filter_count = 0
+    providers = {}
+    non_providers = {}
 
-    common_actions = set(['notify', 'invoke-lambda'])
-    common_filters = set(['value', 'and', 'or', 'event'])
+    for type_name, rv in vocabulary.items():
+        if '.' not in type_name:
+            non_providers[type_name] = len(rv)
+        else:
+            provider, name = type_name.split('.', 1)
+            stats = providers.setdefault(provider, {
+                'resources': 0, 'actions': Counter(), 'filters': Counter()})
+            stats['resources'] += 1
+            for a in rv.get('actions'):
+                stats['actions'][a] += 1
+            for f in rv.get('filters'):
+                stats['filters'][f] += 1
 
-    for rv in vocabulary.values():
-        action_count += len(
-            set(rv.get('actions', ())).difference(common_actions))
-        filter_count += len(
-            set(rv.get('filters', ())).difference(common_filters))
-    print("unique actions: %d" % action_count)
-    print("common actions: %d" % len(common_actions))
-    print("unique filters: %d" % filter_count)
-    print("common filters: %s" % len(common_filters))
+    for provider, stats in providers.items():
+        print("%s:" % provider)
+        print(" resource count: %d" % stats['resources'])
+        print(" actions: %d" % len(stats['actions']))
+        print(" filters: %d" % len(stats['filters']))
+
+    for non_providers_type, length in non_providers.items():
+        print("%s:" % non_providers_type)
+        print(" count: %d" % length)
 
 
 def json_dump(resource=None):

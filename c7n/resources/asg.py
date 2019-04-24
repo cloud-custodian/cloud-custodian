@@ -28,7 +28,7 @@ import time
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import ValueFilter, AgeFilter, Filter, OPERATORS
+from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
@@ -97,7 +97,7 @@ class LaunchInfo(object):
             return {}
         return {
             (t['LaunchTemplateId'],
-             t.get('c7n:VersionAlias', t['VersionNumber'])): t['LaunchTemplateData']
+             str(t.get('c7n:VersionAlias', t['VersionNumber']))): t['LaunchTemplateData']
             for t in tmpl_mgr.get_resources(template_ids)}
 
     def get_launch_configs(self, asgs):
@@ -126,7 +126,7 @@ class LaunchInfo(object):
 
         lid = asg.get('LaunchTemplate')
         if lid is not None:
-            return (lid['LaunchTemplateId'], lid['LaunchTemplateVersion'])
+            return (lid['LaunchTemplateId'], lid['Version'])
 
         # we've noticed some corner cases where the asg name is the lc name, but not
         # explicitly specified as launchconfiguration attribute.
@@ -147,7 +147,8 @@ class LaunchInfo(object):
     def get_image_ids(self):
         image_ids = {}
         for cid, c in self.items():
-            image_ids.setdefault(c['ImageId'], []).append(cid)
+            if c.get('ImageId'):
+                image_ids.setdefault(c['ImageId'], []).append(cid)
         return image_ids
 
     def get_image_map(self):
@@ -164,9 +165,14 @@ class LaunchInfo(object):
         # amis, it doesn't seem to have any upper bound on number of
         # ImageIds to pass (Tested with 1k+ ImageIds)
         #
+        # Explicitly use a describe source. Can't use a config source
+        # since it won't have state for third party ami, we auto
+        # propagate source normally. Can't use a cache either as their
+        # not in the account.
         return {i['ImageId']: i for i in
-                self.manager.get_resource_manager('ami').get_resources(
-                    list(self.get_image_ids()), cache=False)}
+                self.manager.get_resource_manager(
+                    'ami').get_source('describe').get_resources(
+                        list(self.get_image_ids()), cache=False)}
 
     def get_security_group_ids(self):
         # return set of security group ids for given asg
@@ -298,7 +304,7 @@ class ConfigValidFilter(Filter):
     def get_snapshots(self):
         snaps = set()
         for cid, cfg in self.launch_info.items():
-            for bd in cfg['BlockDeviceMappings']:
+            for bd in cfg.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                     continue
                 snaps.add(bd['Ebs']['SnapshotId'].strip())
@@ -336,7 +342,7 @@ class ConfigValidFilter(Filter):
         if cfg is None:
             errors.append(('invalid-config', cfg_id))
             self.log.debug(
-                "asg:%s no launch config found" % asg['AutoScalingGroupName'])
+                "asg:%s no launch config or template found" % asg['AutoScalingGroupName'])
             asg['Invalid'] = errors
             return True
 
@@ -346,13 +352,13 @@ class ConfigValidFilter(Filter):
             if sg not in self.security_groups:
                 errors.append(('invalid-security-group', sg))
 
-        if cfg['KeyName'] and cfg['KeyName'].strip() not in self.key_pairs:
+        if cfg.get('KeyName') and cfg['KeyName'].strip() not in self.key_pairs:
             errors.append(('invalid-key-pair', cfg['KeyName']))
 
-        if cfg['ImageId'].strip() not in self.images:
+        if cfg.get('ImageId') and cfg['ImageId'].strip() not in self.images:
             errors.append(('invalid-image', cfg['ImageId']))
 
-        for bd in cfg['BlockDeviceMappings']:
+        for bd in cfg.get('BlockDeviceMappings', ()):
             if 'Ebs' not in bd or 'SnapshotId' not in bd['Ebs']:
                 continue
             snapshot_id = bd['Ebs']['SnapshotId'].strip()
@@ -500,7 +506,7 @@ class NotEncryptedFilter(Filter):
         snaps = {}
 
         for cid, c in self.launch_info.items():
-            image = self.images.get(c['ImageId'])
+            image = self.images.get(c.get('ImageId', ''))
             # image deregistered/unavailable or exclude_image set
             if image is not None:
                 image_block_devs = {
@@ -508,7 +514,7 @@ class NotEncryptedFilter(Filter):
                     image['BlockDeviceMappings'] if 'Ebs' in bd}
             else:
                 image_block_devs = set()
-            for bd in c['BlockDeviceMappings']:
+            for bd in c.get('BlockDeviceMappings', ()):
                 if 'Ebs' not in bd:
                     continue
                 # Launch configs can shadow image devices, images have
@@ -557,7 +563,7 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def process(self, asgs, event=None):
@@ -567,7 +573,7 @@ class ImageAgeFilter(AgeFilter):
 
     def get_resource_date(self, asg):
         cfg = self.launch_info.get(asg)
-        ami = self.images.get(cfg['ImageId'], {})
+        ami = self.images.get(cfg.get('ImageId'), {})
         return parse(ami.get(
             self.date_attribute, "2000-01-01T01:01:01.000Z"))
 
@@ -601,8 +607,7 @@ class ImageFilter(ValueFilter):
         return super(ImageFilter, self).process(asgs, event)
 
     def __call__(self, i):
-        cfg = self.configs[i['LaunchConfigurationName']]
-        image = self.images.get(cfg['ImageId'], {})
+        image = self.launch_info.get(i).get('ImageId', None)
         # Finally, if we have no image...
         if not image:
             self.log.warning(
@@ -1009,20 +1014,24 @@ class RemoveTag(Action):
     schema = type_schema(
         'remove-tag',
         aliases=('untag', 'unmark'),
+        tags={'type': 'array', 'items': {'type': 'string'}},
         key={'type': 'string'})
+
     permissions = ('autoscaling:DeleteTags',)
     batch_size = 1
 
     def process(self, asgs):
         error = False
-        key = self.data.get('key', DEFAULT_TAG)
+        tags = self.data.get('tags', [])
+        if not tags:
+            tags = [self.data.get('key', DEFAULT_TAG)]
         client = local_session(self.manager.session_factory).client('autoscaling')
 
         with self.executor_factory(max_workers=2) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, key)] = asg_set
+                    self.process_resource_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
@@ -1036,11 +1045,14 @@ class RemoveTag(Action):
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, key):
-        tags = [dict(
-            Key=key, ResourceType='auto-scaling-group',
-            ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        self.manager.retry(client.delete_tags, Tags=tags)
+    def process_resource_set(self, client, asgs, tags):
+        tag_set = []
+        for a in asgs:
+            for t in tags:
+                tag_set.append(dict(
+                    Key=t, ResourceType='auto-scaling-group',
+                    ResourceId=a['AutoScalingGroupName']))
+        self.manager.retry(client.delete_tags, Tags=tag_set)
 
 
 @ASG.action_registry.register('tag')
@@ -1072,6 +1084,7 @@ class Tag(Action):
         'tag',
         key={'type': 'string'},
         value={'type': 'string'},
+        tags={'type': 'object'},
         # Backwards compatibility
         tag={'type': 'string'},
         msg={'type': 'string'},
@@ -1081,14 +1094,22 @@ class Tag(Action):
     permissions = ('autoscaling:CreateOrUpdateTags',)
     batch_size = 1
 
-    def process(self, asgs):
+    def get_tag_set(self):
+        tags = []
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
                 'msg', 'AutoScaleGroup does not meet policy guidelines'))
-        return self.tag(asgs, key, value)
+        if key and value:
+            tags.append({'Key': key, 'Value': value})
 
-    def tag(self, asgs, key, value):
+        for k, v in self.data.get('tags', {}).items():
+            tags.append({'Key': k, 'Value': v})
+
+        return tags
+
+    def process(self, asgs):
+        tags = self.get_tag_set()
         error = None
 
         client = local_session(self.manager.session_factory).client('autoscaling')
@@ -1097,26 +1118,32 @@ class Tag(Action):
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, key, value)] = asg_set
+                    self.process_resource_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
                     self.log.exception(
-                        "Exception untagging tag:%s error:%s asg:%s" % (
-                            self.data.get('key', DEFAULT_TAG),
+                        "Exception tagging tag:%s error:%s asg:%s" % (
+                            tags,
                             f.exception(),
                             ", ".join([a['AutoScalingGroupName']
                                        for a in asg_set])))
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, key, value):
-        propagate = self.data.get('propagate_launch', True)
-        tags = [
-            dict(Key=key, ResourceType='auto-scaling-group', Value=value,
-                 PropagateAtLaunch=propagate,
-                 ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        self.manager.retry(client.create_or_update_tags, Tags=tags)
+    def process_resource_set(self, client, asgs, tags):
+        tag_params = []
+        propagate = self.data.get('propagate', False)
+        for t in tags:
+            if 'PropagateAtLaunch' not in t:
+                t['PropagateAtLaunch'] = propagate
+        for t in tags:
+            for a in asgs:
+                atags = dict(t)
+                atags['ResourceType'] = 'auto-scaling-group'
+                atags['ResourceId'] = a['AutoScalingGroupName']
+                tag_params.append(atags)
+        self.manager.retry(client.create_or_update_tags, Tags=tag_params)
 
 
 @ASG.action_registry.register('propagate-tags')
@@ -1398,7 +1425,8 @@ class MarkForOp(Tag):
 
         self.log.info("Tagging %d asgs for %s on %s" % (
             len(asgs), op, action_date))
-        self.tag(asgs, key, msg)
+        client = local_session(self.manager.session_factory).client('autoscaling')
+        self.process_resource_set(client, asgs, [{'Key': key, 'Value': msg}])
 
     def _generate_timestamp(self, days, hours):
         n = datetime.now(tz=self.tz)
@@ -1655,7 +1683,7 @@ class LaunchConfigAge(AgeFilter):
     date_attribute = "CreatedTime"
     schema = type_schema(
         'age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
 

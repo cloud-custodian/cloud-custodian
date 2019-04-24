@@ -25,7 +25,7 @@ class StepFunction(QueryResourceManager):
     class resource_type(object):
         service = 'stepfunctions'
         enum_spec = ('list_state_machines', 'stateMachines', None)
-        id = 'stateMachineArn'
+        arn = id = 'stateMachineArn'
         name = 'name'
         date = 'creationDate'
         dimension = None

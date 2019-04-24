@@ -1,0 +1,126 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusters": [
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-east-1d",
+                    "us-east-1a",
+                    "us-east-1b"
+                ],
+                "BackupRetentionPeriod": 1,
+                "DatabaseName": "mytest",
+                "DBClusterIdentifier": "mytest",
+                "DBClusterParameterGroup": "default.aurora5.6",
+                "DBSubnetGroup": "default",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 20,
+                    "hour": 9,
+                    "minute": 31,
+                    "second": 30,
+                    "microsecond": 930000
+                },
+                "Endpoint": "mytest.cluster-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
+                "ReaderEndpoint": "mytest.cluster-ro-cz6wy8cci3uf.us-east-1.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora",
+                "EngineVersion": "5.6.10a",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 15,
+                    "second": 34,
+                    "microsecond": 118000
+                },
+                "Port": 3306,
+                "MasterUsername": "mytest",
+                "PreferredBackupWindow": "09:27-09:57",
+                "PreferredMaintenanceWindow": "tue:06:41-tue:07:11",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "mycluster-us-east-1a",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "mycluster",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-02ec691909b2a4753",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-6c7fa917",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-08ee699c0c4e168e4",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z2R2ITUGPM61AM",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
+                "DbClusterResourceId": "cluster-FLECGNGAS7PCRHRT7DHDF24BGU",
+                "DBClusterArn": "arn:aws:rds:us-east-1:644160558196:cluster:mytest",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": true,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 33,
+                    "second": 56,
+                    "microsecond": 465000
+                },
+                "EarliestBacktrackTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 21,
+                    "hour": 4,
+                    "minute": 12,
+                    "second": 23,
+                    "microsecond": 942000
+                },
+                "BacktrackWindow": 28800,
+                "BacktrackConsumedChangeRecords": 75776,
+                "EnabledCloudwatchLogsExports": [
+                    "slowquery"
+                ],
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "6bcccda2-6f12-43cc-a4f3-456e911163c0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6bcccda2-6f12-43cc-a4f3-456e911163c0",
+                "content-type": "text/xml",
+                "content-length": "4044",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 21 Feb 2019 12:16:34 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

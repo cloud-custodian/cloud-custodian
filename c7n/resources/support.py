@@ -29,3 +29,4 @@ class SupportCase(QueryResourceManager):
         name = 'displayId'
         date = 'timeCreated'
         dimension = None
+        arn = False

@@ -59,6 +59,14 @@ def regex_match(value, regex):
     return bool(re.match(regex, value, flags=re.IGNORECASE))
 
 
+def regex_case_sensitive_match(value, regex):
+    if not isinstance(value, six.string_types):
+        return False
+    # Note python 2.5+ internally cache regex
+    # would be nice to use re2
+    return bool(re.match(regex, value))
+
+
 def operator_in(x, y):
     return x in y
 
@@ -90,12 +98,19 @@ OPERATORS = {
     'less-than': operator.lt,
     'glob': glob_match,
     'regex': regex_match,
+    'regex-case': regex_case_sensitive_match,
     'in': operator_in,
     'ni': operator_ni,
     'not-in': operator_ni,
     'contains': operator.contains,
     'difference': difference,
     'intersect': intersect}
+
+
+VALUE_TYPES = [
+    'age', 'integer', 'expiration', 'normalize', 'size',
+    'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
+    'unique_size']
 
 
 class FilterRegistry(PluginRegistry):
@@ -354,19 +369,13 @@ class ValueFilter(Filter):
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
-            'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
-                'unique_size']},
+            'value_type': {'$ref': '#/definitions/filters_common/value_types'},
             'default': {'type': 'object'},
-            'value_from': ValuesFrom.schema,
-            'value': {'oneOf': [
-                {'type': 'array'},
-                {'type': 'string'},
-                {'type': 'boolean'},
-                {'type': 'number'},
-                {'type': 'null'}]},
-            'op': {'enum': list(OPERATORS.keys())}}}
+            'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+            'value': {'$ref': '#/definitions/filters_common/value'},
+            'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+        }
+    }
 
     annotate = True
     required_keys = set(('value', 'key'))
@@ -395,7 +404,7 @@ class ValueFilter(Filter):
                 "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
-        if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
+        if self.data['op'] not in OPERATORS or self.data['op'] in {'regex', 'regex-case'}:
             raise PolicyValidationError(
                 "Invalid operator in value filter %s" % self.data)
 
@@ -422,7 +431,7 @@ class ValueFilter(Filter):
             if not self.data['op'] in OPERATORS:
                 raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
-            if self.data['op'] == 'regex':
+            if self.data['op'] in {'regex', 'regex-case'}:
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['value'])
@@ -534,7 +543,7 @@ class ValueFilter(Filter):
 
         elif self.vtype == 'integer':
             try:
-                value = int(value.strip())
+                value = int(str(value).strip())
             except ValueError:
                 value = 0
         elif self.vtype == 'size':

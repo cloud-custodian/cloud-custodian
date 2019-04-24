@@ -112,7 +112,7 @@ class CloudHSM(QueryResourceManager):
     class resource_type(object):
         service = 'cloudhsm'
         enum_spec = ('list_hsms', 'HsmList', None)
-        id = 'HsmArn'
+        arn = id = 'HsmArn'
         name = 'Name'
         date = dimension = None
         detail_spec = (
@@ -127,7 +127,7 @@ class PartitionGroup(QueryResourceManager):
         service = 'cloudhsm'
         enum_spec = ('list_hapgs', 'HapgList', None)
         detail_spec = ('describe_hapg', 'HapgArn', None, None)
-        id = 'HapgArn'
+        arn = id = 'HapgArn'
         name = 'HapgSerial'
         date = 'LastModifiedTimestamp'
         dimension = None
@@ -141,7 +141,7 @@ class HSMClient(QueryResourceManager):
         service = 'cloudhsm'
         enum_spec = ('list_luna_clients', 'ClientList', None)
         detail_spec = ('describe_luna_client', 'ClientArn', None, None)
-        id = 'ClientArn'
+        arn = id = 'ClientArn'
         name = 'Label'
         date = dimension = None
         filter_name = None

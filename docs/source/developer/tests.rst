@@ -12,26 +12,28 @@ Unit tests can be run with:
 
    $ tox
 
-Coverage reports can be generated and viewed with the following:
-
-.. code-block:: bash
-
-   (py27) $ make coverage
-
-   # Open the reports in a browser
-
-   # on osx
-   $ open coverage/index.html
-
-   # on gnomeish linux
-   $ gnome-open coverage/index.html
-
 Linting can be run with:
 
 .. code-block:: bash
 
   $ make lint
 
+Operating System Compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tests are currently executed on both Ubuntu 1604 and Windows Server 2019
+and must pass on both operating systems.
+
+Both Windows and Linux sample dockerfiles are provided for running Tox which may help you.
+You can find these in `tools/dev`.
+
+In Docker for Windows you can run both of these containers,
+`even simultaneously <https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/linux-containers>`_.
+
+
+If you need access to Windows you can download a
+`virtual machine <https://developer.microsoft.com/en-us/windows/downloads/virtual-machines>`_
+directly from Microsoft for any hypervisor.
 
 Decorating tests
 ~~~~~~~~~~~~~~~~

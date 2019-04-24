@@ -100,6 +100,44 @@ class TestEcsService(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue("c7n.metrics" in resources[0])
 
+    def test_ecs_service_update(self):
+        session_factory = self.replay_flight_data("test_ecs_service_update")
+        test_service_name = 'custodian-service-update-test'
+
+        p = self.load_policy(
+            {
+                "name": "all-ecs-to-update",
+                "resource": "ecs-service",
+                "filters": [
+                    {"networkConfiguration.awsvpcConfiguration.assignPublicIp": "ENABLED"},
+                    {"serviceName": test_service_name}
+                ],
+                "actions": [
+                    {
+                        'type': 'modify',
+                        'update': {
+                            'networkConfiguration': {
+                                'awsvpcConfiguration': {
+                                    'assignPublicIp': 'DISABLED',
+                                }
+                            },
+                        }
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        result = p.run()
+        self.assertEqual(len(result), 1)
+
+        client = session_factory().client("ecs")
+        svc_current = client.describe_services(
+            cluster="arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+            services=[test_service_name]
+        )["services"][0]
+        self.assertEqual(svc_current['networkConfiguration'][
+            'awsvpcConfiguration']['assignPublicIp'], 'DISABLED')
+
     def test_ecs_service_delete(self):
         session_factory = self.replay_flight_data("test_ecs_service_delete")
         p = self.load_policy(
@@ -149,6 +187,23 @@ class TestEcsService(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["serviceName"], "home-web")
+
+    def test_ecs_service_taggable(self):
+        services = [
+            {"serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test/test-yes-tag",
+             "serviceName": "test-yes-tag",
+             "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test"},
+            {"serviceArn": "arn:aws:ecs:us-east-1:644160558196:service/test-no-tag",
+             "serviceName": "test-no-tag",
+             "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test"}]
+        p = self.load_policy({
+            "name": "ecs-service-taggable",
+            "resource": "ecs-service",
+            "filters": [
+                {"type": "taggable", "state": True}]})
+        resources = p.resource_manager.filter_resources(services)
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['serviceName'], 'test-yes-tag')
 
 
 class TestEcsTaskDefinition(BaseTest):
@@ -214,6 +269,36 @@ class TestEcsTaskDefinition(BaseTest):
             ),
             1,
         )
+
+    def test_ecs_task_def_tags(self):
+        session_factory = self.replay_flight_data(
+            "test_ecs_task_def_tags"
+        )
+        arn = "arn:aws:ecs:us-east-1:644160558196:task-definition/c7n:1"
+        p = self.load_policy(
+            {
+                "name": "tag-ecs-task-def",
+                "resource": "ecs-task-definition",
+                "filters": [
+                    {"taskDefinitionArn": arn},
+                    {"tag:Role": "present"}
+                ],
+                "actions": [
+                    {"type": "tag", "key": "TestKey", "value": "TestValue"},
+                    {"type": "tag", "key": "c7n-tag", "value": "present"},
+                    {"type": "remove-tag", "tags": ["Role"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("ecs")
+        tags = {t['key']: t['value'] for t in
+                client.list_tags_for_resource(
+                    resourceArn=resources[0]["taskDefinitionArn"]).get("tags")}
+        self.assertEqual(tags, {"TestKey": "TestValue", "c7n-tag": "present"})
 
 
 class TestEcsTask(BaseTest):

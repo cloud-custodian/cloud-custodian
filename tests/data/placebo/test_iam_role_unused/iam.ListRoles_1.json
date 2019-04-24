@@ -49,40 +49,6 @@
                 "RoleName": "custodian-mu",
                 "Path": "/",
                 "Arn": "arn:aws:iam::644160558196:role/custodian-mu"
-            },
-            {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAJVFVDALUIEJPNG236",
-                "CreateDate": {
-                    "hour": 14,
-                    "__class__": "datetime",
-                    "month": 12,
-                    "second": 2,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 19,
-                    "minute": 46
-                },
-                "RoleName": "ecsInstanceRole",
-                "Path": "/",
-                "Arn": "arn:aws:iam::644160558196:role/ecsInstanceRole"
-            },
-            {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAIYSSSIEWDYBRVPH2A",
-                "CreateDate": {
-                    "hour": 18,
-                    "__class__": "datetime",
-                    "month": 9,
-                    "second": 46,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 26,
-                    "minute": 25
-                },
-                "RoleName": "root_joshua",
-                "Path": "/",
-                "Arn": "arn:aws:iam::644160558196:role/root_joshua"
             }
         ]
     }

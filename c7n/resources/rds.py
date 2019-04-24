@@ -61,9 +61,7 @@ from c7n.actions.securityhub import OtherResourcePostFinding
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
-    OPERATORS)
-
+    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter)
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -282,7 +280,7 @@ class DefaultVpc(net_filters.DefaultVpcBase):
               - name: default-vpc-rds
                 resource: rds
                 filters:
-                  - default-vpc
+                  - type: default-vpc
     """
     schema = type_schema('default-vpc')
 
@@ -379,8 +377,8 @@ class UpgradeAvailable(Filter):
               - name: rds-upgrade-available
                 resource: rds
                 filters:
-                  - upgrade-available
-                    major: false
+                  - type: upgrade-available
+                    major: False
 
     """
 
@@ -423,13 +421,10 @@ class UpgradeMinor(BaseAction):
             policies:
               - name: upgrade-rds-minor
                 resource: rds
-                filters:
-                  - name: upgrade-available
-                    major: false
                 actions:
                   - type: upgrade
-                    major: false
-                    immediate: false
+                    major: False
+                    immediate: False
 
     """
 
@@ -1072,7 +1067,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
 

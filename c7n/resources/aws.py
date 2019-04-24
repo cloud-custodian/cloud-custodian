@@ -160,6 +160,10 @@ class MetricsOutput(Metrics):
     def __init__(self, ctx, config=None):
         super(MetricsOutput, self).__init__(ctx, config)
         self.namespace = self.config.get('namespace', DEFAULT_NAMESPACE)
+        self.region = self.config.get('region')
+        self.destination = (
+            self.config.scheme == 'aws' and
+            self.config.get('netloc') == 'master') and 'master' or None
 
     def _format_metric(self, key, value, unit, dimensions):
         d = {
@@ -171,11 +175,25 @@ class MetricsOutput(Metrics):
             {"Name": "Policy", "Value": self.ctx.policy.name},
             {"Name": "ResType", "Value": self.ctx.policy.resource_type}]
         for k, v in dimensions.items():
+            # Skip legacy static dimensions if using new capabilities
+            if (self.destination or self.region) and k == 'Scope':
+                continue
             d['Dimensions'].append({"Name": k, "Value": v})
+        if self.region:
+            d['Dimensions'].append(
+                {'Name': 'Region', 'Value': self.ctx.options.region})
+        if self.destination:
+            d['Dimensions'].append(
+                {'Name': 'Account', 'Value': self.ctx.options.account_id or ''})
         return d
 
     def _put_metrics(self, ns, metrics):
-        watch = utils.local_session(self.ctx.session_factory).client('cloudwatch')
+        if self.destination == 'master':
+            watch = self.ctx.session_factory(
+                assume=False).client('cloudwatch', region_name=self.region)
+        else:
+            watch = utils.local_session(
+                self.ctx.session_factory).client('cloudwatch', region_name=self.region)
         return self.retry(
             watch.put_metric_data, Namespace=ns, MetricData=metrics)
 
@@ -379,7 +397,7 @@ class S3Output(DirectoryOutput):
 
     def get_output_path(self, output_url):
         if '{' not in output_url:
-            date_path = datetime.datetime.now().strftime('%Y/%m/%d/%H')
+            date_path = datetime.datetime.utcnow().strftime('%Y/%m/%d/%H')
             return self.join(
                 output_url, self.ctx.policy.name, date_path)
         return output_url.format(**self.get_output_vars())

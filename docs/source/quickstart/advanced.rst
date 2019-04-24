@@ -165,6 +165,32 @@ If metrics are being published ('-m/--metrics-enabled') then an additional
 metric named `ResourceLimitExceeded` will be published with the number
 of resources that matched the policy.
 
+Max resources can also be specified as an object with an `or` or `and` operator
+if you would like both a resource percent and a resource amount enforced.
+
+
+.. code-block:: yaml
+
+  policies:
+
+    - name: log-delete
+      description: |
+    This policy will not execute if
+    the resources affected are over 50% of
+    the total resource type amount and that
+    amount is over 20.
+      resource: aws.log-group
+      max-resources:
+        - percent: 50
+        - amount: 20
+        - op: and
+      filters:
+        - type: last-write
+    days: 5
+      actions:
+        - delete
+
+
 .. _report-custom-fields:
 
 Adding custom fields to reports

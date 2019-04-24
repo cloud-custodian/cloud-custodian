@@ -28,6 +28,7 @@ class GameLiftBuild(QueryResourceManager):
         date = 'CreationTime'
         dimension = None
         filter_name = None
+        arn = False
 
 
 @resources.register('gamelift-fleet')
@@ -37,6 +38,7 @@ class GameLiftFleet(QueryResourceManager):
         service = 'gamelift'
         enum_spec = ('list_fleets', 'FleetIds', None)
         id = 'FleetId'
+        arn = "FleetArn"
         name = 'Name'
         date = 'CreationTime'
         dimension = None

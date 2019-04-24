@@ -57,6 +57,7 @@ class OpsworkStack(QueryResourceManager):
         name = 'Name'
         date = 'CreatedAt'
         dimension = "StackId"
+        arn = "Arn"
 
 
 @OpsworkStack.action_registry.register('delete')
@@ -168,6 +169,7 @@ class OpsworksCM(QueryResourceManager):
         name = id = 'ServerName'
         date = 'CreatedAt'
         dimension = None
+        arn = "ServerArn"
 
 
 @OpsworksCM.action_registry.register('delete')

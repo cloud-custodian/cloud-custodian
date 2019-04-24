@@ -32,15 +32,14 @@ from c7n.actions import (
 from c7n.actions.securityhub import PostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n import query
-
-from c7n import utils
+from c7n import query, utils
+from c7n.resources.iam import CheckPermissions
 from c7n.utils import type_schema, filter_empty
 
 
@@ -191,7 +190,26 @@ class VpcFilter(net_filters.VpcFilter):
     RelatedIdsExpression = "VpcId"
 
 
-filters.register('network-location', net_filters.NetworkLocation)
+@filters.register('check-permissions')
+class ComputePermissions(CheckPermissions):
+
+    def get_iam_arns(self, resources):
+        profile_arn_map = {
+            r['IamInstanceProfile']['Arn']: r['IamInstanceProfile']['Id']
+            for r in resources if 'IamInstanceProfile' in r}
+
+        # py2 compat on dict ordering
+        profile_arns = list(profile_arn_map.items())
+        profile_role_map = {
+            arn: profile['Roles'][0]['Arn']
+            for arn, profile in zip(
+                [p[0] for p in profile_arns],
+                self.manager.get_resource_manager(
+                    'iam-profile').get_resources(
+                        [p[1] for p in profile_arns]))}
+        return [
+            profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
+            for r in resources]
 
 
 @filters.register('state-age')
@@ -216,7 +234,7 @@ class StateTransitionAge(AgeFilter):
 
     schema = type_schema(
         'state-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def get_resource_date(self, i):
@@ -415,7 +433,7 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def get_permissions(self):
@@ -512,6 +530,19 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     def process(self, resources, event=None):
         return super(InstanceOffHour, self).process(
             self.filter_instance_state(resources))
+
+
+@filters.register('network-location')
+class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
+
+    valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
+                           'stopped')
+
+    def process(self, resources, event=None):
+        resources = self.filter_instance_state(resources)
+        if not resources:
+            return []
+        return super(EC2NetworkLocation, self).process(resources)
 
 
 @filters.register('onhour')
@@ -613,7 +644,7 @@ class UpTimeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-uptime',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
 
@@ -639,7 +670,7 @@ class InstanceAgeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'},
         hours={'type': 'number'},
         minutes={'type': 'number'})
@@ -867,15 +898,19 @@ class SsmStatus(ValueFilter):
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
     def format_resource(self, r):
+        ip_addresses = jmespath.search(
+            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
+
+        # limit to max 10 ip addresses, per security hub service limits
+        ip_addresses = ip_addresses and ip_addresses[:10] or ip_addresses
         details = {
             "Type": r["InstanceType"],
             "ImageId": r["ImageId"],
-            "IpV4Addresses": jmespath.search(
-                "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r
-            ),
+            "IpV4Addresses": ip_addresses,
             "KeyName": r.get("KeyName"),
-            "LaunchedAt": r["LaunchTime"].isoformat(),
+            "LaunchedAt": r["LaunchTime"].isoformat()
         }
+
         if "VpcId" in r:
             details["VpcId"] = r["VpcId"]
         if "SubnetId" in r:
@@ -1273,10 +1308,10 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-          actions:
-            - type: snapshot
-              copy-tags:
-                - Name
+            actions:
+              - type: snapshot
+                copy-tags:
+                  - Name
     """
 
     schema = type_schema(
@@ -1398,8 +1433,8 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
             resource: ec2
             filters:
               - singleton
-          actions:
-            - autorecover-alarm
+            actions:
+              - autorecover-alarm
 
     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
     """
@@ -1538,14 +1573,14 @@ class PropagateSpotTags(BaseAction):
         policies:
           - name: ec2-spot-instances
             resource: ec2
-          filters:
-            - State.Name: pending
-            - instanceLifecycle: spot
-          actions:
-            - type: propagate-spot-tags
-              only_tags:
-                - Name
-                - BillingTag
+            filters:
+              - State.Name: pending
+              - instanceLifecycle: spot
+            actions:
+              - type: propagate-spot-tags
+                only_tags:
+                  - Name
+                  - BillingTag
     """
 
     schema = type_schema(
@@ -1774,23 +1809,26 @@ class InstanceAttribute(ValueFilter):
 class LaunchTemplate(query.QueryResourceManager):
 
     class resource_type(object):
+        id = 'LaunchTemplateId'
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
-        dimension = 'None'
+        dimension = None
         enum_spec = (
             'describe_launch_templates', 'LaunchTemplates', None)
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
+        type = "launch-template"
 
     def augment(self, resources):
         client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+            self.session_factory).client('ec2')
         template_versions = []
         for r in resources:
             template_versions.extend(
                 client.describe_launch_template_versions(
-                    LaunchTemplateId=r['LaunchTemplateId']))
+                    LaunchTemplateId=r['LaunchTemplateId']).get(
+                        'LaunchTemplateVersions', ()))
         return template_versions
 
     def get_resources(self, rids, cache=True):
@@ -1826,10 +1864,12 @@ class LaunchTemplate(query.QueryResourceManager):
         results = []
         # We may end up fetching duplicates on $Latest and $Version
         for tid, tversions in t_versions.items():
-            for tversion, t in zip(
-                tversions, client.describe_launch_template_versions(
-                    LaunchTemplateId=tid, Versions=tversions).get(
-                        'LaunchTemplateVersions')):
+            ltv = client.describe_launch_template_versions(
+                LaunchTemplateId=tid, Versions=tversions).get(
+                    'LaunchTemplateVersions')
+            if not tversions:
+                tversions = [str(t['VersionNumber']) for t in ltv]
+            for tversion, t in zip(tversions, ltv):
                 if not tversion.isdigit():
                     t['c7n:VersionAlias'] = tversion
                 results.append(t)
@@ -1845,3 +1885,18 @@ class LaunchTemplate(query.QueryResourceManager):
                 (t['LaunchTemplateId'], t['Version']), []).append(
                     a['AutoScalingGroupName'])
         return templates
+
+
+@resources.register('ec2-reserved')
+class ReservedInstance(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        name = id = 'ReservedInstancesId'
+        date = 'Start'
+        enum_spec = (
+            'describe_reserved_instances', 'ReservedInstances', None)
+        filter_name = 'ReservedInstancesIds'
+        filter_type = 'list'
+        dimension = None
+        type = "reserved-instances"

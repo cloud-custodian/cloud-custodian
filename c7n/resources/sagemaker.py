@@ -33,7 +33,7 @@ class NotebookInstance(QueryResourceManager):
         detail_spec = (
             'describe_notebook_instance', 'NotebookInstanceName',
             'NotebookInstanceName', None)
-        id = 'NotebookInstanceArn'
+        arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
         dimension = None
@@ -67,7 +67,7 @@ class SagemakerJob(QueryResourceManager):
         enum_spec = ('list_training_jobs', 'TrainingJobSummaries', None)
         detail_spec = (
             'describe_training_job', 'TrainingJobName', 'TrainingJobName', None)
-        id = 'TrainingJobArn'
+        arn = id = 'TrainingJobArn'
         name = 'TrainingJobName'
         date = 'CreationTime'
         dimension = None
@@ -114,7 +114,7 @@ class SagemakerTransformJob(QueryResourceManager):
         enum_spec = ('list_transform_jobs', 'TransformJobSummaries', None)
         detail_spec = (
             'describe_transform_job', 'TransformJobName', 'TransformJobName', None)
-        id = 'TransformJobArn'
+        arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
         dimension = None
@@ -221,7 +221,7 @@ class SagemakerEndpoint(QueryResourceManager):
         detail_spec = (
             'describe_endpoint', 'EndpointName',
             'EndpointName', None)
-        id = 'EndpointArn'
+        arn = id = 'EndpointArn'
         name = 'EndpointName'
         date = 'CreationTime'
         dimension = None
@@ -255,7 +255,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
         detail_spec = (
             'describe_endpoint_config', 'EndpointConfigName',
             'EndpointConfigName', None)
-        id = 'EndpointConfigArn'
+        arn = id = 'EndpointConfigArn'
         name = 'EndpointConfigName'
         date = 'CreationTime'
         dimension = None
@@ -287,7 +287,7 @@ class Model(QueryResourceManager):
         detail_spec = (
             'describe_model', 'ModelName',
             'ModelName', None)
-        id = 'ModelArn'
+        arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'
         dimension = None

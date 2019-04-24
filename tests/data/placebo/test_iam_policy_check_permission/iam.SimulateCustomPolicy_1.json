@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalActionName": "ecr:PutImage",
+                "EvalResourceName": "*",
+                "EvalDecision": "allowed",
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "PolicyInputList.1",
+                        "StartPosition": {
+                            "Line": 1,
+                            "Column": 475
+                        },
+                        "EndPosition": {
+                            "Line": 1,
+                            "Column": 682
+                        }
+                    }
+                ],
+                "MissingContextValues": []
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "c50952a2-3a83-11e9-8849-4b98e6ba2d71",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c50952a2-3a83-11e9-8849-4b98e6ba2d71",
+                "content-type": "text/xml",
+                "content-length": "975",
+                "date": "Wed, 27 Feb 2019 11:35:22 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

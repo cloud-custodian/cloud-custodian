@@ -31,7 +31,7 @@ class ECR(QueryResourceManager):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
         name = "repositoryName"
-        id = "repositoryArn"
+        arn = id = "repositoryArn"
         dimension = None
         filter_name = 'repositoryNames'
         filter_type = 'list'
@@ -95,7 +95,7 @@ class ECRCrossAccountAccessFilter(CrossAccountAccessFilter):
                   - type: cross-account
                     whitelist_from:
                       expr: "accounts.*.accountNumber"
-                      url: *accounts_url
+                      url: accounts_url
     """
     permissions = ('ecr:GetRepositoryPolicy',)
 
@@ -180,11 +180,12 @@ class LifecycleRule(Filter):
           resource: aws.ecr
           filters:
             - type: lifecycle-rule
-              state: false
+              state: False
               match:
                 - selection.tagStatus: untagged
                 - action.type: expire
-                - key: selection.countNumber
+                - type: value
+                  key: selection.countNumber
                   value: 30
                   op: less-than
     """

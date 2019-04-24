@@ -26,6 +26,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
@@ -64,6 +65,10 @@ class Account(ResourceManager):
     @classmethod
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
+
+    @classmethod
+    def has_arn(cls):
+        return True
 
     def get_arns(self, resources):
         return ["arn:::{account_id}".format(**r) for r in resources]
@@ -166,6 +171,74 @@ class CloudTrailEnabled(Filter):
         if trails:
             return []
         return resources
+
+
+@filters.register('guard-duty')
+class GuardDutyEnabled(MultiAttrFilter):
+    """Check if the guard duty service is enabled.
+
+    This allows looking at account's detector and its associated
+    master if any.
+
+    :example:
+
+     Check to ensure guard duty is active on account and associated to a master.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: guardduty-enabled
+                resource: account
+                filters:
+                  - type: guard-duty
+                    Detector.Status: ENABLED
+                    Master.AccountId: "00011001"
+                    Master.RelationshipStatus: ENABLED
+    """
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['guard-duty']},
+            'match-operator': {'enum': ['or', 'and']}},
+        'patternProperties': {
+            '^Detector': {'oneOf': [{'type': 'object'}, {'type': 'string'}]},
+            '^Master': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
+    }
+
+    annotation = "c7n:guard-duty"
+    permissions = (
+        'guardduty:GetMasterAccount',
+        'guardduty:ListDetectors',
+        'guardduty:GetDetector')
+
+    def validate(self):
+        attrs = set()
+        for k in self.data:
+            if k.startswith('Detector') or k.startswith('Master'):
+                attrs.add(k)
+        self.multi_attrs = attrs
+        return super(GuardDutyEnabled, self).validate()
+
+    def get_target(self, resource):
+        if self.annotation in resource:
+            return resource[self.annotation]
+
+        client = local_session(self.manager.session_factory).client('guardduty')
+        # detectors are singletons too.
+        detector_ids = client.list_detectors().get('DetectorIds')
+
+        if not detector_ids:
+            return None
+        else:
+            detector_id = detector_ids.pop()
+
+        detector = client.get_detector(DetectorId=detector_id)
+        detector.pop('ResponseMetadata', None)
+        master = client.get_master_account(DetectorId=detector_id).get('Master')
+        resource[self.annotation] = r = {'Detector': detector, 'Master': master}
+        return r
 
 
 @filters.register('check-config')
@@ -531,6 +604,7 @@ class RequestLimitIncrease(BaseAction):
         'VPC': 'amazon-virtual-private-cloud',
         'IAM': 'aws-identity-and-access-management',
         'CloudFormation': 'aws-cloudformation',
+        'Kinesis': 'amazon-kinesis',
     }
 
     def process(self, resources):
@@ -998,14 +1072,18 @@ class XrayEncrypted(Filter):
               - name: xray-encrypt-with-default
                 resource: aws.account
                 filters:
-                  - type: xray-encrypt-key
-                    key: default
+                   - type: xray-encrypt-key
+                     key: default
               - name: xray-encrypt-with-kms
-                  - type: xray-encrypt-key
-                    key: kms
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: kms
               - name: xray-encrypt-with-specific-key
-                  -type: xray-encrypt-key
-                   key: alias/my-alias or arn or keyid
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: alias/my-alias or arn or keyid
     """
 
     permissions = ('xray:GetEncryptionConfig',)
@@ -1046,8 +1124,10 @@ class SetXrayEncryption(BaseAction):
                   - type: set-xray-encrypt
                     key: default
               - name: xray-kms-encrypt
+                resource: aws.account
+                actions:
                   - type: set-xray-encrypt
-                    key: alias/some/alias/ke
+                    key: alias/some/alias/key
     """
 
     permissions = ('xray:PutEncryptionConfig',)

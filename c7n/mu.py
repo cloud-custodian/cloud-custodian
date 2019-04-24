@@ -64,12 +64,19 @@ class PythonPackageArchive(object):
     zip_compression = zipfile.ZIP_DEFLATED
 
     def __init__(self, *modules):
-        self._temp_archive_file = tempfile.NamedTemporaryFile()
+        self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
         self._zip_file = zipfile.ZipFile(
             self._temp_archive_file, mode='w',
             compression=self.zip_compression)
         self._closed = False
         self.add_modules(None, *modules)
+
+    def __del__(self):
+        if not self._closed:
+            self.close()
+        if self._temp_archive_file:
+            self._temp_archive_file.close()
+            os.unlink(self.path)
 
     @property
     def path(self):
@@ -99,7 +106,7 @@ class PythonPackageArchive(object):
                     # Likely a namespace package. Try to add *.pth files so
                     # submodules are importable under Python 2.7.
 
-                    sitedir = list(module.__path__)[0].rsplit('/', 1)[0]
+                    sitedir = os.path.abspath(os.path.join(list(module.__path__)[0], os.pardir))
                     for filename in os.listdir(sitedir):
                         s = filename.startswith
                         e = filename.endswith
@@ -128,6 +135,9 @@ class PythonPackageArchive(object):
         """
         for root, dirs, files in os.walk(path):
             arc_prefix = os.path.relpath(root, os.path.dirname(path))
+            # py3 remove pyc cache dirs.
+            if '__pycache__' in dirs:
+                dirs.remove('__pycache__')
             for f in files:
                 dest_path = os.path.join(arc_prefix, f)
 
@@ -184,6 +194,8 @@ class PythonPackageArchive(object):
             dest = zinfo(dest)  # see for some caveats
         # Ensure we apply the compression
         dest.compress_type = self.zip_compression
+        # Mark host OS as Linux for all archives
+        dest.create_system = 3
         self._zip_file.writestr(dest, contents)
 
     def close(self):
@@ -198,10 +210,6 @@ class PythonPackageArchive(object):
             (os.path.getsize(self._temp_archive_file.name) / (
                 1024.0 * 1024.0)))
         return self
-
-    @staticmethod
-    def _temporary_opener(name, flag, mode=0o777):
-        return os.open(name, flag | os.O_TEMPORARY, mode)
 
     def remove(self):
         """Dispose of the temp file for garbage collection."""
@@ -222,11 +230,7 @@ class PythonPackageArchive(object):
     def get_stream(self):
         """Return the entire zip file as a stream. """
         assert self._closed, "Archive not closed"
-        # Windows requires TEMPORARY flag if you want to open files created by tempfile library
-        if os.name == 'nt':
-            return open(self._temp_archive_file.name, 'rb', opener=self._temporary_opener)
-        else:
-            return open(self._temp_archive_file.name, 'rb')
+        return open(self._temp_archive_file.name, 'rb')
 
     def get_reader(self):
         """Return a read-only :py:class:`~zipfile.ZipFile`."""
@@ -863,7 +867,8 @@ class PolicyLambda(AbstractLambdaFunction):
     def get_archive(self):
         self.archive.add_contents(
             'config.json', json.dumps(
-                {'policies': [self.policy.data]}, indent=2))
+                {'execution-options': dict(self.policy.options),
+                 'policies': [self.policy.data]}, indent=2))
         self.archive.add_contents('custodian_policy.py', PolicyHandlerTemplate)
         self.archive.close()
         return self.archive

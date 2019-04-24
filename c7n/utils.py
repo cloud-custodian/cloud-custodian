@@ -28,9 +28,10 @@ import time
 import six
 import sys
 
+from six.moves.urllib import parse as urlparse
 
 from c7n.exceptions import ClientError, PolicyValidationError
-from c7n import ipaddress
+from c7n import ipaddress, config
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
@@ -519,6 +520,19 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
             return obj
     else:
         return obj
+
+
+def parse_url_config(url):
+    if url and '://' not in url:
+        url += "://"
+    conf = config.Bag()
+    parsed = urlparse.urlparse(url)
+    for k in ('scheme', 'netloc', 'path'):
+        conf[k] = getattr(parsed, k)
+    for k, v in urlparse.parse_qs(parsed.query).items():
+        conf[k] = v[0]
+    conf['url'] = url
+    return conf
 
 
 class FormatDate(object):

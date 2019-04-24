@@ -82,8 +82,8 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
         if policy.ctx.output.type == 's3':
             policy_records = record_set(
                 policy.session_factory,
-                policy.ctx.output.bucket,
-                policy.ctx.output.key_prefix,
+                policy.ctx.output.config['netloc'],
+                policy.ctx.output.config['path'].strip('/'),
                 start_date)
         else:
             policy_records = fs_record_set(policy.ctx.log_dir, policy.name)
@@ -97,10 +97,13 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
         records += policy_records
 
     rows = formatter.to_csv(records)
+
     if options.format == 'csv':
         writer = UnicodeWriter(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
+    elif options.format == 'json':
+        print(dumps(records, indent=2))
     else:
         # We special case CSV, and for other formats we pass to tabulate
         print(tabulate(rows, formatter.headers(), tablefmt=options.format))

@@ -34,6 +34,7 @@ class SSMParameter(QueryResourceManager):
         filter_name = None
         dimension = None
         universal_taggable = True
+        type = "parameter"
 
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',
@@ -50,6 +51,8 @@ class ManagedInstance(QueryResourceManager):
         date = 'RegistrationDate'
         dimension = None
         filter_name = None
+        type = "managed-instance"
+
     permissions = ('ssm:DescribeInstanceInformation',)
 
 
@@ -137,6 +140,7 @@ class SSMActivation(QueryResourceManager):
         date = 'CreatedDate'
         dimension = None
         filter_name = None
+        arn = False
     permissions = ('ssm:DescribeActivations',)
 
 

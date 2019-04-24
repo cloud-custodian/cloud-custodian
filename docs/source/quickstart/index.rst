@@ -81,8 +81,8 @@ overwriting it). Lastly, you should find the instance stopping or stopped in
 your AWS console. Congratulations, and welcome to Custodian!
 
 For more information on basic concepts and terms, check the :ref:`glossary
-<glossary>`. See our extended examples of an :ref:`offhours policy <offhours>`
-and a :ref:`tag compliance policy <tagCompliance>`, or browse all of our
+<glossary>`. See our extended example of a policy's structure 
+:ref:`tag compliance policy <policyStructure>`, or browse all of our
 :ref:`use case recipes <usecases>`.
 
 Troubleshooting & Tinkering

@@ -26,11 +26,10 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.5',
+    version='0.5.3',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    include_package_data=True,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
@@ -57,6 +56,7 @@ setup(
                       "azure-mgmt-datafactory",
                       "azure-mgmt-iothub",
                       "azure-mgmt-keyvault",
+                      "azure-mgmt-managementgroups",
                       "azure-mgmt-network",
                       "azure-mgmt-redis",
                       "azure-mgmt-resource",
@@ -78,6 +78,7 @@ setup(
                       "azure-cli-core",
                       "adal",
                       "backports.functools_lru_cache",
+                      "future",
                       "futures>=3.1.1"],
     package_data={str(''): [str('function_binding_resources/bin/*.dll'),
                             str('function_binding_resources/*.csproj'),

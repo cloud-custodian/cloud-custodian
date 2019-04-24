@@ -28,12 +28,13 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, OPERATORS)
+    ANNOTATION_KEY)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager
+from c7n.tags import Tag
 from c7n.utils import (
     camelResource,
     chunks,
@@ -102,6 +103,16 @@ class Snapshot(QueryResourceManager):
 class ErrorHandler(object):
 
     @staticmethod
+    def remove_snapshot(rid, resource_set):
+        found = None
+        for r in resource_set:
+            if r['SnapshotId'] == rid:
+                found = r
+                break
+        if found:
+            resource_set.remove(found)
+
+    @staticmethod
     def extract_bad_snapshot(e):
         """Handle various client side errors when describing snapshots"""
         msg = e.response['Error']['Message']
@@ -135,6 +146,24 @@ class SnapshotQueryParser(QueryParser):
     type_name = 'EBS'
 
 
+@Snapshot.action_registry.register('tag')
+class SnapshotTag(Tag):
+
+    permissions = ('ec2:CreateTags',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        while resource_set:
+            try:
+                return super(SnapshotTag, self).process_resource_set(
+                    client, resource_set, tags)
+            except ClientError as e:
+                bad_snap = ErrorHandler.extract_bad_snapshot(e)
+                if bad_snap:
+                    ErrorHandler.remove_snapshot(bad_snap, resource_set)
+                    continue
+                raise
+
+
 @Snapshot.filter_registry.register('age')
 class SnapshotAge(AgeFilter):
     """EBS Snapshot Age Filter
@@ -157,7 +186,7 @@ class SnapshotAge(AgeFilter):
     schema = type_schema(
         'age',
         days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
     date_attribute = 'StartTime'
 
 
@@ -216,6 +245,69 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
                 r['c7n:CrossAccountViolations'] = list(delta_accounts)
                 results.append(r)
         return results
+
+
+@Snapshot.filter_registry.register('unused')
+class SnapshotUnusedFilter(Filter):
+    """Filters snapshots based on usage
+
+    true: snapshot is not used by launch-template, launch-config, or ami.
+
+    false: snapshot is being used by launch-template, launch-config, or ami.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: snapshot-unused
+                resource: ebs-snapshot
+                filters:
+                  - type: unused
+                    value: true
+    """
+
+    schema = type_schema('unused', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return list(itertools.chain([
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ('asg', 'launch-config', 'ami')]))
+
+    def _pull_asg_snapshots(self):
+        asgs = self.manager.get_resource_manager('asg').resources()
+        snap_ids = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
+        lcfg_mgr = self.manager.get_resource_manager('launch-config')
+
+        if lcfgs:
+            for lc in lcfg_mgr.resources():
+                for b in lc.get('BlockDeviceMappings'):
+                    if 'Ebs' in b and 'SnapshotId' in b['Ebs']:
+                        snap_ids.add(b['Ebs']['SnapshotId'])
+
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            for bd in tversion['LaunchTemplateData'].get('BlockDeviceMappings', ()):
+                if 'Ebs' in bd and 'SnapshotId' in bd['Ebs']:
+                    snap_ids.add(bd['Ebs']['SnapshotId'])
+        return snap_ids
+
+    def _pull_ami_snapshots(self):
+        amis = self.manager.get_resource_manager('ami').resources()
+        ami_snaps = set()
+        for i in amis:
+            for dev in i.get('BlockDeviceMappings'):
+                if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+                    ami_snaps.add(dev['Ebs']['SnapshotId'])
+        return ami_snaps
+
+    def process(self, resources, event=None):
+        snaps = self._pull_asg_snapshots().union(self._pull_ami_snapshots())
+        if self.data.get('value', True):
+            return [r for r in resources if r['SnapshotId'] not in snaps]
+        return [r for r in resources if r['SnapshotId'] in snaps]
 
 
 @Snapshot.filter_registry.register('skip-ami-snapshots')
@@ -461,7 +553,7 @@ class VolumeDetach(BaseAction):
                - name: instance-ebs-volumes
                  resource: ebs
                  filters:
-                   VolumeId :  volumeid
+                   - VolumeId :  volumeid
                  actions:
                    - detach
 
@@ -1064,7 +1156,15 @@ class CreateSnapshot(BaseAction):
         retry = get_retry(['Throttled'], max_attempts=5)
         for vol in volumes:
             vol_id = vol['VolumeId']
-            retry(client.create_snapshot, VolumeId=vol_id)
+            retry(self.process_volume, client=client, volume=vol_id)
+
+    def process_volume(self, client, volume):
+        try:
+            client.create_snapshot(VolumeId=volume)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'InvalidVolume.NotFound':
+                return
+            raise
 
 
 @EBS.action_registry.register('delete')
@@ -1258,7 +1358,7 @@ class ModifyVolume(BaseAction):
                - modifyable
               actions:
                - type: modify
-                 volume-type: gp1
+                 volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
     respectively iops on io1 volumes and volume size.
@@ -1305,7 +1405,7 @@ class ModifyVolume(BaseAction):
         if 'modifyable' not in self.manager.data.get('filters', ()):
             raise PolicyValidationError(
                 "modify action requires modifyable filter in policy")
-        if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
+        if self.data.get('size-percent', 100) < 100 and not self.data.get('shrink', False):
             raise PolicyValidationError((
                 "shrinking volumes requires os/fs support "
                 "or data-loss may ensue, use `shrink: true` to override"))

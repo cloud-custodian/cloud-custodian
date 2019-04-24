@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": [
+            {
+                "key": "c7n-tag",
+                "value": "present"
+            },
+            {
+                "key": "TestKey",
+                "value": "TestValue"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "df15e832-3937-11e9-b3f3-0f027ac5b310",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "df15e832-3937-11e9-b3f3-0f027ac5b310",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "84",
+                "date": "Mon, 25 Feb 2019 19:59:33 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

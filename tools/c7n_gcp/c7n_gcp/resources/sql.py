@@ -17,7 +17,7 @@ import re
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
 
 @resources.register('sql-instance')
@@ -29,6 +29,7 @@ class SqlInstance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('list', "items[]", None)
         scope = 'project'
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
@@ -67,3 +68,32 @@ class SqlInstanceStop(MethodAction):
         return {'project': project,
                 'instance': instance,
                 'body': {'settings': {'activationPolicy': 'NEVER'}}}
+
+
+@resources.register('sql-database')
+class SqlDatabase(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        service = 'sqladmin'
+        version = 'v1beta4'
+        component = 'databases'
+        enum_spec = ('list', 'items[]', None)
+        id = 'name'
+        parent_spec = {
+            'resource': 'sql-instance',
+            'child_enum_params': [
+                ('name', 'instance')
+            ],
+            'parent_get_params': [
+                ('project', 'project'),
+                ('instance', 'name')
+            ]
+        }
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project'],
+                        'database': resource_info['name'],
+                        'instance': resource_info['instance']}
+            )

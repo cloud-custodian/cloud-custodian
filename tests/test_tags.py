@@ -25,6 +25,28 @@ from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from .common import BaseTest
 
 
+class UniversalAugmentTest(BaseTest):
+
+    def test_universal_augment_resource_missing_tags(self):
+        session_factory = self.replay_flight_data('test_tags_universal_augment_missing_tags')
+        cache_cluster_id = 'arn:aws:elasticache:us-east-1:644160558196:cluster:test'
+        client = session_factory().client('elasticache')
+        tags = client.list_tags_for_resource(ResourceName=cache_cluster_id)
+        self.assertEqual(len(tags['TagList']), 0)
+        policy = self.load_policy(
+            {
+                'name': 'elasticache-no-tags',
+                'resource': 'cache-cluster',
+                'filters': [
+                    {'CacheClusterId': 'test'}
+                ]
+            },
+            session_factory=session_factory
+        )
+        results = policy.run()
+        self.assertTrue('Tags' in results[0])
+
+
 class UniversalTagRetry(BaseTest):
 
     def test_retry_no_error(self):

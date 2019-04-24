@@ -41,9 +41,9 @@ def build_function_package(config, function_name):
 
     package.build(None,
                   modules=['c7n', 'c7n-azure', 'c7n-mailer', 'applicationinsights'],
-                  non_binary_packages=['pyyaml', 'pycparser', 'tabulate',
-                                       'datadog', 'MarkupSafe', 'simplejson'],
-                  excluded_packages=['azure-cli-core', 'distlib', 'futures'])
+                  non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'jmespath',
+                                       'datadog', 'MarkupSafe', 'simplejson', 'pyrsistent'],
+                  excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])
 
     package.pkg.add_contents(
         function_name + '/function.json',

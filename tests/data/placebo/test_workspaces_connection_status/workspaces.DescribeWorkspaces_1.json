@@ -1,0 +1,111 @@
+{
+    "status_code": 200,
+    "data": {
+        "Workspaces": [
+            {
+                "WorkspaceId": "ws-aeac9da6b",
+                "DirectoryId": "d-5183055e94",
+                "UserName": "mitchellkim",
+                "State": "STOPPED",
+                "BundleId": "wsb-c4dc00cc1",
+                "VolumeEncryptionKey": "arn:aws:kms:us-east-1:644160558196:key/14a03569-d26b-4496-92e5-dfe8cb1855fe",
+                "UserVolumeEncryptionEnabled": true,
+                "RootVolumeEncryptionEnabled": true,
+                "WorkspaceProperties": {
+                    "RunningMode": "AUTO_STOP",
+                    "RunningModeAutoStopTimeoutInMinutes": 120,
+                    "RootVolumeSizeGib": 80,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            },
+            {
+                "WorkspaceId": "ws-5c6b1e01e",
+                "DirectoryId": "d-5183055e94",
+                "UserName": "jessicahernandez",
+                "State": "STOPPED",
+                "BundleId": "wsb-c4dc00cc1",
+                "VolumeEncryptionKey": "arn:aws:kms:us-east-1:644160558196:key/14a03569-d26b-4496-92e5-dfe8cb1855fe",
+                "UserVolumeEncryptionEnabled": true,
+                "RootVolumeEncryptionEnabled": true,
+                "WorkspaceProperties": {
+                    "RunningMode": "AUTO_STOP",
+                    "RunningModeAutoStopTimeoutInMinutes": 120,
+                    "RootVolumeSizeGib": 80,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            },
+            {
+                "WorkspaceId": "ws-91068dbb7",
+                "DirectoryId": "d-5183055e94",
+                "UserName": "rarellano",
+                "State": "STOPPED",
+                "BundleId": "wsb-d6072b154",
+                "VolumeEncryptionKey": "arn:aws:kms:us-east-1:644160558196:key/14a03569-d26b-4496-92e5-dfe8cb1855fe",
+                "UserVolumeEncryptionEnabled": true,
+                "RootVolumeEncryptionEnabled": true,
+                "WorkspaceProperties": {
+                    "RunningMode": "AUTO_STOP",
+                    "RunningModeAutoStopTimeoutInMinutes": 120,
+                    "RootVolumeSizeGib": 80,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            },
+            {
+                "WorkspaceId": "ws-e83a7fec1",
+                "DirectoryId": "d-5183055e94",
+                "UserName": "vsmith",
+                "IpAddress": "10.108.139.220",
+                "State": "AVAILABLE",
+                "BundleId": "wsb-c4dc00cc1",
+                "SubnetId": "subnet-5047890c",
+                "ComputerName": "hharding",
+                "VolumeEncryptionKey": "arn:aws:kms:us-east-1:644160558196:key/14a03569-d26b-4496-92e5-dfe8cb1855fe",
+                "UserVolumeEncryptionEnabled": true,
+                "RootVolumeEncryptionEnabled": true,
+                "WorkspaceProperties": {
+                    "RunningMode": "ALWAYS_ON",
+                    "RootVolumeSizeGib": 80,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            },
+            {
+                "WorkspaceId": "ws-82358d15a",
+                "DirectoryId": "d-5183055e94",
+                "UserName": "masseyolivia",
+                "State": "STOPPED",
+                "BundleId": "wsb-c4dc00cc1",
+                "VolumeEncryptionKey": "arn:aws:kms:us-east-1:644160558196:key/14a03569-d26b-4496-92e5-dfe8cb1855fe",
+                "UserVolumeEncryptionEnabled": true,
+                "RootVolumeEncryptionEnabled": true,
+                "WorkspaceProperties": {
+                    "RunningMode": "AUTO_STOP",
+                    "RunningModeAutoStopTimeoutInMinutes": 120,
+                    "RootVolumeSizeGib": 80,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            }
+        ],
+        "NextToken": "",
+        "ResponseMetadata": {
+            "RequestId": "3ceb1c22-5e01-11e9-bd24-850ba9611379",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3ceb1c22-5e01-11e9-bd24-850ba9611379",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "17851",
+                "date": "Sat, 13 Apr 2019 15:31:42 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

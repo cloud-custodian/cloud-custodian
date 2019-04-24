@@ -27,6 +27,7 @@ class ConfigRule(QueryResourceManager):
         service = "config"
         enum_spec = ("describe_config_rules", "ConfigRules", None)
         id = name = "ConfigRuleName"
+        arn = "ConfigRuleArn"
         dimension = None
         filter_name = 'ConfigRuleNames'
         filter_type = 'list'

@@ -1,0 +1,20 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidSnapshot.NotFound",
+            "Message": "The snapshot 'snap-0d16416527e67c663' does not exist."
+        },
+        "ResponseMetadata": {
+            "RequestId": "4cacefe7-d230-47f6-b844-5fa55f353032",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "date": "Fri, 01 Mar 2019 16:00:30 GMT",
+                "connection": "close",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

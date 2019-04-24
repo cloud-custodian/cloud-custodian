@@ -1,0 +1,46 @@
+{
+  "body": {
+    "kind": "storage#bucket", 
+    "name": "staging.cloud-custodian.appspot.com",
+    "timeCreated": "2019-02-28T14:45:53.549Z", 
+    "updated": "2019-02-28T14:45:53.549Z", 
+    "projectNumber": "518122731295", 
+    "metageneration": "1", 
+    "location": "EU", 
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": false
+      }
+    }, 
+    "etag": "CAE=", 
+    "lifecycle": {
+      "rule": [
+        {
+          "action": {
+            "type": "Delete"
+          }, 
+          "condition": {
+            "age": 15
+          }
+        }
+      ]
+    }, 
+    "id": "staging.cloud-custodian.appspot.com",
+    "selfLink": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com",
+    "storageClass": "STANDARD"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "641", 
+    "content-location": "https://www.googleapis.com/storage/v1/b/staging.cloud-custodian.appspot.com?alt=json",
+    "expires": "Thu, 07 Mar 2019 12:40:23 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "UploadServer", 
+    "etag": "CAE=", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Thu, 07 Mar 2019 12:40:23 GMT", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "x-guploader-uploadid": "AEnB2UogjqzFvhYav_EA5QUlm8h33YChNC7Qk4V9YeI3dWQEGnfW8PIf8XK-e7wdwzEGN6VAA20Iq3RZsLYYsV63C1UUbsFgMQ"
+  }
+}

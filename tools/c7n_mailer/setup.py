@@ -28,6 +28,7 @@ requires = [
     "datadog",
     "sendgrid",
     "ldap3",
+    "c7n",
     "redis"]
 
 
@@ -48,7 +49,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_mailer",
-    version='0.4.1',
+    version='0.5.0',
     description="Cloud Custodian - Reference Mailer",
     long_description=long_description,
     long_description_content_type='text/markdown',

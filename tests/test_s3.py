@@ -17,6 +17,7 @@ import datetime
 import functools
 import json
 import os
+import io
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
@@ -1274,7 +1275,7 @@ class S3Test(BaseTest):
             Bucket=bname,
             Key=key,
             Metadata={"planet": "earth"},
-            Body=wrapper(open("/dev/zero"), size),
+            Body=wrapper(io.BytesIO(bytearray(size)), size),
             ContentLength=size,
         )
         info = client.head_object(Bucket=bname, Key=key)
@@ -1486,6 +1487,7 @@ class S3Test(BaseTest):
                                 "Effect": "Deny",
                                 "Action": "s3:PutObject",
                                 "Principal": "*",
+                                "Resource": "arn:aws:s3:::{bucket_name}/*"
                             }
                         ],
                     },

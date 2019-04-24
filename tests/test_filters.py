@@ -231,6 +231,26 @@ class TestRegexValue(unittest.TestCase):
         self.assertEqual(f(instance(Architecture="x86_64")), False)
 
 
+class TestRegexCaseSensitiveValue(unittest.TestCase):
+
+    def test_regex_case_sensitive_validate(self):
+        self.assertRaises(
+            PolicyValidationError,
+            filters.factory(
+                {"type": "value", "key": "Color", "value": "*green", "op": "regex-case"}
+            ).validate,
+        )
+
+    def test_regex_case_sensitive_match(self):
+        f = filters.factory(
+            {"type": "value", "key": "Color", "value": ".*GREEN.*", "op": "regex-case"}
+        )
+        self.assertEqual(f(instance(Architecture="x86_64", Color="GREEN papaya")), True)
+        self.assertEqual(f(instance(Architecture="x86_64", Color="green papaya")), False)
+
+        self.assertEqual(f(instance(Architecture="x86_64")), False)
+
+
 class TestValueTypes(BaseFilterTest):
 
     def test_normalize(self):

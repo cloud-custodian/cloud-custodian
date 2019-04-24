@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "expires": "Tue, 05 Mar 2019 10:26:16 GMT",
+    "date": "Tue, 05 Mar 2019 10:26:16 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "etag": "\"AIRMFkoY8YjJYfvNisNXJV7nEnQ=/u0DnQFqBn2MpIu85qWIblb-lPs0=\"",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "450",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/addresses/new1?alt=json"
+  },
+  "body": {
+    "kind": "compute#address",
+    "id": "8149548791059677337",
+    "creationTimestamp": "2019-03-05T01:16:38.474-08:00",
+    "name": "new1",
+    "description": "",
+    "address": "35.193.10.19",
+    "status": "RESERVED",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/dcloud-custodian/regions/us-central1/addresses/new1",
+    "networkTier": "PREMIUM"
+  }
+}

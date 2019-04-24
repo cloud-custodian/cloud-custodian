@@ -29,6 +29,7 @@ class WAF(QueryResourceManager):
         dimension = "WebACL"
         filter_name = None
         config_type = "AWS::WAF::WebACL"
+        type = "webacl"
 
 
 @resources.register('waf-regional')
@@ -43,3 +44,4 @@ class RegionalWAF(QueryResourceManager):
         dimension = "WebACL"
         filter_name = None
         config_type = "AWS::WAFRegional::WebACL"
+        type = "webacl"

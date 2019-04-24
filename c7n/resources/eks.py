@@ -19,6 +19,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import local_session, type_schema
 
+from .aws import shape_validate
+
 
 @resources.register('eks')
 class EKS(QueryResourceManager):
@@ -26,6 +28,7 @@ class EKS(QueryResourceManager):
     class resource_type(object):
         service = 'eks'
         enum_spec = ('list_clusters', 'clusters', None)
+        arn = 'arn'
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
@@ -49,6 +52,48 @@ class EKSSGFilter(SecurityGroupFilter):
 class EKSVpcFilter(VpcFilter):
 
     RelatedIdsExpression = 'resourcesVpcConfig.vpcId'
+
+
+@EKS.action_registry.register('update-config')
+class UpdateConfig(Action):
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'oneOf': [
+            {'required': ['type', 'logging']},
+            {'required': ['type', 'resourcesVpcConfig']},
+            {'required': ['type', 'logging', 'resourcesVpcConfig']}],
+        'properties': {
+            'type': {'enum': ['update-config']},
+            'logging': {'type': 'object'},
+            'resourcesVpcConfig': {'type': 'object'}
+        }
+    }
+
+    permissions = ('eks:UpdateClusterConfig',)
+    shape = 'UpdateClusterConfigRequest'
+
+    def validate(self):
+        cfg = dict(self.data)
+        cfg['name'] = 'validate'
+        cfg.pop('type')
+        return shape_validate(
+            cfg, self.shape, self.manager.resource_type.service)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        state_filtered = 0
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            if r['status'] != 'ACTIVE':
+                state_filtered += 1
+                continue
+            client.update_cluster_config(name=r['name'], **params)
+        if state_filtered:
+            self.log.warning(
+                "Filtered %d of %d clusters due to state", state_filtered, len(resources))
 
 
 @EKS.action_registry.register('delete')

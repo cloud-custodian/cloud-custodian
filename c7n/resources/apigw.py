@@ -22,7 +22,6 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.tags import universal_augment
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -39,10 +38,15 @@ class RestAccount(ResourceManager):
         service = 'apigateway'
         name = id = 'account_id'
         dimensions = None
+        arn = False
 
     @classmethod
     def get_permissions(cls):
         return ('apigateway:GET',)
+
+    @classmethod
+    def has_arn(self):
+        return False
 
     def get_model(self):
         return self.resource_type
@@ -123,6 +127,7 @@ class RestApi(query.QueryResourceManager):
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
+        config_type = "AWS::ApiGateway::RestApi"
 
 
 @RestApi.filter_registry.register('cross-account')
@@ -147,6 +152,7 @@ class UpdateApi(BaseAction):
 
        policies:
          - name: apigw-description
+           resource: rest-api
            filters:
              - description: empty
            actions:
@@ -185,10 +191,12 @@ class RestStage(query.ChildResourceManager):
         dimension = None
         universal_taggable = True
         type = None
+        config_type = "AWS::ApiGateway::Stage"
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(RestStage, self).augment(resources))
+    def get_source(self, source_type):
+        if source_type == 'describe-rest-stage':
+            return DescribeRestStage(self)
+        return super(RestStage, self).get_source(source_type)
 
 
 @query.sources.register('describe-rest-stage')

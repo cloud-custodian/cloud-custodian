@@ -34,6 +34,7 @@ class GlueConnection(QueryResourceManager):
         date = 'CreationTime'
         dimension = None
         filter_name = None
+        arn = False
 
     permissions = ('glue:GetConnections',)
 
@@ -94,6 +95,7 @@ class GlueDevEndpoint(QueryResourceManager):
         date = 'CreatedTimestamp'
         dimension = None
         filter_name = None
+        arn = False
 
     permissions = ('glue:GetDevEndpoints',)
 

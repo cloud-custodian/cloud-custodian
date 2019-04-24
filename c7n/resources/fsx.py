@@ -30,6 +30,7 @@ class FSx(QueryResourceManager):
         service = 'fsx'
         enum_spec = ('describe_file_systems', 'FileSystems', None)
         name = id = 'FileSystemId'
+        arn = "ResourceARN"
         date = 'CreationTime'
         dimension = None
         filter_name = None
@@ -44,6 +45,7 @@ class FSxBackup(QueryResourceManager):
         service = 'fsx'
         enum_spec = ('describe_backups', 'Backups', None)
         name = id = 'BackupId'
+        arn = "ResourceARN"
         date = 'CreationTime'
         dimension = None
         filter_name = None
@@ -59,7 +61,7 @@ class DeleteBackup(BaseAction):
     .. code-block: yaml
 
         policies:
-            - type: delete-backups
+            - name: delete-backups
               resource: fsx-backup
               filters:
                 - type: value

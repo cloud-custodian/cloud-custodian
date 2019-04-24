@@ -11,25 +11,29 @@ Getting Started
 Install Cloud Custodian and Azure Plugin
 ----------------------------------------
 
-The Azure provider must be installed as a separate package in addition to c7n.
+Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and Windows.
+We recommend using Python 3.6 or higher. 
+
+The Azure provider is an additional package which is installed in addition to c7n.
+
+
+### Option 1: Install released packages to local Python Environment
 
 .. code-block:: bash
 
-  $ virtualenv custodian
-  $ source custodian/bin/activate
-  (custodian) $ pip install c7n
-  (custodian) $ pip install c7n_azure
+$ pip install c7n
+$ pip install c7n_azure
 
 
-If you prefer to install the latest from source control you can do so as follows:
+### Option 2: Install latest from the repository
 
 .. code-block:: bash
 
-  $ git clone https://github.com/capitalone/cloud-custodian.git
-  $ virtualenv custodian
-  $ source custodian/bin/activate
-  (custodian) $ pip install ./cloud-custodian
-  (custodian) $ pip install ./cloud-custodian/tools/c7n_azure
+$ git clone https://github.com/capitalone/cloud-custodian.git
+$ cd cloud-custodian
+$ pip install -e ./cloud-custodian
+$ pip install -e ./cloud-custodian/tools/c7n_azure
+
 
 .. _azure_write-policy:
 
@@ -42,17 +46,23 @@ A policy specifies the following items:
 * Filters to narrow down the set of resources
 * Actions to take on the filtered set of resources
 
-For this tutorial we will add a tag to all virtual machines with the name "Hello" and the value "World".
+For this tutorial we will filter to a VM of a specific name, then add the tag ``Hello: World``.
 
-Create a file named ``custodian.yml`` with this content:
+Create a file named ``custodian.yml`` with this content, and update ``my_vm_name`` to match an existing VM.
+
+*note: Some text editors (VSCode) inject invalid whitespace characters when copy/pasting YAML from a browser*
 
 .. code-block:: yaml
 
     policies:
         - name: my-first-policy
           description: |
-            Adds a tag to all virtual machines
+            Adds a tag to a virtual machines
           resource: azure.vm
+          filters:
+            - type: value
+              key: name
+              value: my_vm_name
           actions:
            - type: tag
              tag: Hello
@@ -63,7 +73,7 @@ Create a file named ``custodian.yml`` with this content:
 Run your policy
 ---------------
 
-First, choose one of the supported authentication mechanisms and either log in to Azure CLI or set
+First, **choose one of the supported authentication mechanisms** and either log in to Azure CLI or set
 environment variables as documented in :ref:`azure_authentication`.
 
 .. code-block:: bash
@@ -81,3 +91,4 @@ You should also find a new ``my-first-policy`` directory with a log and other
 files (subsequent runs will append to the log by default rather than
 overwriting it).
 
+See :ref:`filters` for more information on the features of the Value filter used in this sample.

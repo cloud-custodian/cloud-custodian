@@ -28,6 +28,7 @@ class LogSink(QueryResourceManager):
         enum_spec = ('list', 'sinks[]', None)
         scope_key = 'parent'
         scope_template = "projects/{}/sinks"
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):

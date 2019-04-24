@@ -19,6 +19,7 @@ import json
 
 from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.utils import local_session
 from c7n.query import QueryResourceManager
@@ -37,6 +38,7 @@ class SQS(QueryResourceManager):
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         id = 'QueueUrl'
+        arn = "QueueArn"
         filter_name = 'QueueNamePrefix'
         filter_type = 'scalar'
         name = 'QueueUrl'
@@ -53,9 +55,6 @@ class SQS(QueryResourceManager):
         perms = super(SQS, self).get_permissions()
         perms.append('sqs:GetQueueAttributes')
         return perms
-
-    def get_arns(self, resources):
-        return [r['QueueArn'] for r in resources]
 
     def get_resources(self, ids, cache=True):
         ids_normalized = []
@@ -118,6 +117,34 @@ class SQSCrossAccount(CrossAccountAccessFilter):
                   - type: cross-account
     """
     permissions = ('sqs:GetQueueAttributes',)
+
+
+@SQS.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+    The KmsMasterId returned for SQS sometimes has the alias name directly in the value.
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: efs-kms-key-filters
+                  resource: efs
+                  filters:
+                    - or:
+                      - type: value
+                        key: KmsMasterKeyId
+                        value: "^(alias/aws/)"
+                        op: regex
+                      - type: kms-key
+                        key: c7n:AliasName
+                        value: "^(alias/aws/)"
+                        op: regex
+    """
+    RelatedIdsExpression = 'KmsMasterKeyId'
 
 
 @SQS.action_registry.register('remove-statements')
@@ -223,7 +250,7 @@ class SetEncryption(BaseAction):
                 filters:
                   - KmsMasterKeyId: absent
                 actions:
-                  - type: set_encryption
+                  - type: set-encryption
                     key: "<alias of kms key>"
     """
     schema = type_schema(
@@ -277,10 +304,7 @@ class SetRetentionPeriod(BaseAction):
     """
     schema = type_schema(
         'set-retention-period',
-        period={'type': 'integer',
-                'minimum': 60, 'exclusiveMinimum': True,
-                'maximum': 1209600, 'exclusiveMaximum': True})
-
+        period={'type': 'integer', 'minimum': 60, 'maximum': 1209600})
     permissions = ('sqs:SetQueueAttributes',)
 
     def process(self, queues):

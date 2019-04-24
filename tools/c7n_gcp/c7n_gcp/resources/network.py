@@ -28,6 +28,7 @@ class Network(QueryResourceManager):
         version = 'v1'
         component = 'networks'
         scope_template = "projects/{}/global/networks"
+        id = "name"
 
 
 @resources.register('subnet')
@@ -38,6 +39,7 @@ class Subnet(QueryResourceManager):
         version = 'v1'
         component = 'subnetworks'
         enum_spec = ('aggregatedList', 'items.*.subnetworks[]', None)
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
@@ -111,6 +113,7 @@ class Firewall(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'firewalls'
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
@@ -127,7 +130,14 @@ class Router(QueryResourceManager):
         version = 'v1'
         component = 'routers'
         enum_spec = ('aggregatedList', 'items.*.routers[]', None)
-        scope_template = "projects/{}/aggregated/routers"
+        id = "name"
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'router': resource_info['name'],
+                        'region': resource_info['region'].rsplit('/', 1)[-1]})
 
 
 @resources.register('route')
@@ -137,4 +147,46 @@ class Route(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'routes'
-        scope_template = "projects/{}/global/routes"
+        enum_spec = ('list', 'items[]', None)
+        id = "name"
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'route': resource_info['name']})
+
+
+@resources.register('interconnect')
+class Interconnect(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'interconnects'
+        enum_spec = ('list', 'items[]', None)
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'interconnect': resource_info['name']})
+
+
+@resources.register('interconnect-attachment')
+class InterconnectAttachment(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'interconnectAttachments'
+        enum_spec = ('aggregatedList', 'items.*.interconnectAttachments[]', None)
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'interconnectAttachment': resource_info['name'],
+                        'region': resource_info['region'].rsplit('/', 1)[-1]})

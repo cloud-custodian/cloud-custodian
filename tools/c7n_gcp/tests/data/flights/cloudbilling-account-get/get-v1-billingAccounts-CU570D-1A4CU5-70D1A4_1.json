@@ -1,0 +1,23 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 07 Mar 2019 09:43:42 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "108",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudbilling.googleapis.com/v1/billingAccounts/CU570D-1A4CU5-70D1A4?alt=json"
+  },
+  "body": {
+    "name": "billingAccounts/CU570D-1A4CU5-70D1A4",
+    "open": true,
+    "displayName": "Custodian"
+  }
+}

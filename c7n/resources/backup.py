@@ -27,12 +27,10 @@ class BackupPlan(QueryResourceManager):
         detail_spec = ('get_backup_plan', 'BackupPlanId', 'BackupPlanId', 'BackupPlan')
         id = 'BackupPlanName'
         name = 'BackupPlanId'
+        arn = 'BackupPlanArn'
         dimension = None
         filter_name = None
         filter_type = None
-
-    def get_arns(self, resources):
-        return [r['BackupPlanArn'] for r in resources]
 
     def augment(self, resources):
         super(BackupPlan, self).augment(resources)

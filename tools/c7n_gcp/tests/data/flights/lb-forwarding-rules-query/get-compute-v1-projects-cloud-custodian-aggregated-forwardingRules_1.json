@@ -1,0 +1,274 @@
+{
+  "body": {
+    "items": {
+      "regions/us-west2": {
+        "warning": {
+          "message": "There are no results for scope 'regions/us-west2' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/us-west2", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/asia-northeast1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/asia-northeast1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/asia-northeast1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/us-west1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/us-west1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/us-west1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/southamerica-east1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/southamerica-east1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/southamerica-east1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/europe-west6": {
+        "warning": {
+          "message": "There are no results for scope 'regions/europe-west6' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/europe-west6", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/europe-west4": {
+        "warning": {
+          "message": "There are no results for scope 'regions/europe-west4' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/europe-west4", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/asia-east1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/asia-east1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/asia-east1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/europe-north1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/europe-north1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/europe-north1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "global": {
+        "warning": {
+          "message": "There are no results for scope 'global' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "global", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/us-east4": {
+        "warning": {
+          "message": "There are no results for scope 'regions/us-east4' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/us-east4", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/europe-west1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/europe-west1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/europe-west1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/europe-west2": {
+        "warning": {
+          "message": "There are no results for scope 'regions/europe-west2' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/europe-west2", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/europe-west3": {
+        "warning": {
+          "message": "There are no results for scope 'regions/europe-west3' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/europe-west3", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/australia-southeast1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/australia-southeast1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/australia-southeast1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/asia-south1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/asia-south1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/asia-south1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/us-east1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/us-east1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/us-east1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/asia-southeast1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/asia-southeast1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/asia-southeast1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/us-central1": {
+        "forwardingRules": [
+          {
+            "kind": "compute#forwardingRule", 
+            "description": "", 
+            "IPAddress": "35.206.75.120", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1", 
+            "networkTier": "STANDARD", 
+            "loadBalancingScheme": "EXTERNAL", 
+            "target": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpProxies/new-url-map-target-proxy", 
+            "portRange": "80-80", 
+            "IPProtocol": "TCP", 
+            "creationTimestamp": "2019-03-17T21:28:47.400-07:00", 
+            "id": "4700927637065998480", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/forwardingRules/new-fe", 
+            "name": "new-fe"
+          }
+        ]
+      }, 
+      "regions/asia-east2": {
+        "warning": {
+          "message": "There are no results for scope 'regions/asia-east2' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/asia-east2", 
+              "key": "scope"
+            }
+          ]
+        }
+      }, 
+      "regions/northamerica-northeast1": {
+        "warning": {
+          "message": "There are no results for scope 'regions/northamerica-northeast1' on this page.", 
+          "code": "NO_RESULTS_ON_PAGE", 
+          "data": [
+            {
+              "value": "regions/northamerica-northeast1", 
+              "key": "scope"
+            }
+          ]
+        }
+      }
+    }, 
+    "kind": "compute#forwardingRuleAggregatedList", 
+    "id": "projects/cloud-custodian/aggregated/forwardingRules", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/forwardingRules"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "6107", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 18 Mar 2019 04:40:00 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Mon, 18 Mar 2019 04:40:00 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/forwardingRules?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"9GtV-Qkhy5SUlyQaQiUKJWj2dE4=/ortZHV5Czwd-xKEdW3Mv9b1ESb4=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

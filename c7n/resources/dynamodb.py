@@ -90,7 +90,7 @@ class DescribeTable(query.DescribeSource):
                 'CreateTable' in self.manager.data['mode']['events']):
             waiter, waiter_config = self.get_waiter()
             for tid in ids:
-                waiter.wait(tid, WaiterConfig=waiter_config)
+                waiter.wait(TableName=tid, WaiterConfig=waiter_config)
         return super(DescribeTable, self).get_resources(ids, *args, **kw)
 
     def get_waiter(self):
@@ -386,7 +386,7 @@ class Stream(query.QueryResourceManager):
         # Note max rate of 10 calls per second.
         detail_spec = (
             "describe_stream", "StreamArn", "StreamArn", "StreamDescription")
-        id = 'StreamArn'
+        arn = id = 'StreamArn'
 
         # TODO, we default to filtering by id, but the api takes table names, which
         # require additional client side filtering as multiple streams may be present
@@ -423,8 +423,20 @@ class DynamoDbAccelerator(query.QueryResourceManager):
             return query.ConfigSource(self)
         raise ValueError('invalid source %s' % source_type)
 
+    def get_resources(self, ids, cache=True, augment=True):
+        """Override in order to disable the augment for serverless policies.
+           list_tags on dax resources always fail until the cluster is finished creating.
+        """
+        return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
+
 
 class DescribeDaxCluster(query.DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        """Retrieve dax resources for serverless policies or related resources
+        """
+        client = local_session(self.manager.session_factory).client('dax')
+        return client.describe_clusters(ClusterNames=ids).get('Clusters')
 
     def augment(self, clusters):
         resources = super(DescribeDaxCluster, self).augment(clusters)

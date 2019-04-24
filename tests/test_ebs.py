@@ -17,7 +17,7 @@ import logging
 import sys
 
 from botocore.exceptions import ClientError
-
+import mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -64,7 +64,36 @@ class SnapshotQueryParse(BaseTest):
                 {'Name': 'snapshot-id', 'Values': [1]}])
 
 
-class SnapshotDescribeError(BaseTest):
+class SnapshotErrorHandler(BaseTest):
+
+    def test_tag_error(self):
+        snaps = [{'SnapshotId': 'aa'}]
+        error_response = {
+            "Error": {
+                "Message": "The snapshot 'aa' does not exist.",
+                "Code": "InvalidSnapshot.NotFound",
+            }
+        }
+        client = mock.MagicMock()
+        client.create_tags.side_effect = ClientError(error_response, 'CreateTags')
+
+        p = self.load_policy({
+            "name": "snap-copy",
+            "resource": "ebs-snapshot",
+            'actions': [{'type': 'tag', 'tags': {'bar': 'foo'}}]})
+        tagger = p.resource_manager.actions[0]
+        tagger.process_resource_set(client, snaps, [{'Key': 'bar', 'Value': 'foo'}])
+        client.create_tags.assert_called_once()
+
+    def test_remove_snapshot(self):
+        snaps = [{'SnapshotId': 'a'}, {'SnapshotId': 'b'}, {'SnapshotId': 'c'}]
+
+        t1 = list(snaps)
+        ErrorHandler.remove_snapshot('c', t1)
+        self.assertEqual([t['SnapshotId'] for t in t1], ['a', 'b'])
+
+        ErrorHandler.remove_snapshot('d', snaps)
+        self.assertEqual(len(snaps), 3)
 
     def test_get_bad_snapshot_malformed(self):
         operation_name = "DescribeSnapshots"
@@ -208,6 +237,33 @@ class SnapshotAmiSnapshotTest(BaseTest):
                 "name": "non-ami-snap-filter",
                 "resource": "ebs-snapshot",
                 "filters": [{"type": "skip-ami-snapshots", "value": True}],
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+
+class SnapshotUnusedTest(BaseTest):
+
+    def test_snapshot_unused(self):
+        factory = self.replay_flight_data("test_ebs_snapshot_unused")
+        p = self.load_policy(
+            {
+                "name": "snap-unused",
+                "resource": "ebs-snapshot",
+                "filters": [{"type": "unused", "value": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        policy = self.load_policy(
+            {
+                "name": "snap-used",
+                "resource": "ebs-snapshot",
+                "filters": [{"type": "unused", "value": False}],
             },
             session_factory=factory,
         )

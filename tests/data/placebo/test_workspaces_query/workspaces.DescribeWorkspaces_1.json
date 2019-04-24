@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "Workspaces": [
+            {
+                "WorkspaceId": "ws-quaith6ec",
+                "DirectoryId": "d-90672a7419",
+                "UserName": "lucascarol",
+                "IpAddress": "10.0.42.15",
+                "State": "AVAILABLE",
+                "BundleId": "wsb-62db28901",
+                "SubnetId": "subnet-2a8374658",
+                "ComputerName": "lucascarol",
+                "WorkspaceProperties": {
+                    "RunningMode": "ALWAYS_ON",
+                    "RootVolumeSizeGib": 175,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            },
+            {
+                "WorkspaceId": "ws-go0eiz0sh",
+                "DirectoryId": "d-90672a7419",
+                "UserName": "yclark",
+                "IpAddress": "10.0.42.16",
+                "State": "AVAILABLE",
+                "BundleId": "wsb-62db28901",
+                "SubnetId": "subnet-2a8374658",
+                "ComputerName": "yclark",
+                "WorkspaceProperties": {
+                    "RunningMode": "ALWAYS_ON",
+                    "RootVolumeSizeGib": 175,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            },
+            {
+                "WorkspaceId": "ws-aicoo5che",
+                "DirectoryId": "d-90672a7419",
+                "UserName": "salinasmary",
+                "IpAddress": "10.0.42.17",
+                "State": "AVAILABLE",
+                "BundleId": "wsb-62db28901",
+                "SubnetId": "subnet-2a8374658",
+                "ComputerName": "salinasmary",
+                "WorkspaceProperties": {
+                    "RunningMode": "ALWAYS_ON",
+                    "RootVolumeSizeGib": 175,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
+            }
+       ],
+        "ResponseMetadata": {
+            "RequestId": "c7e60246-54e3-11e9-b801-f7de56cf56dd",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c7e60246-54e3-11e9-b801-f7de56cf56dd",
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Tue, 02 Apr 2019 01:08:09 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

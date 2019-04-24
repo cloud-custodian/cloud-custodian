@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalActionName": "sqs:CreateUser",
+                "EvalResourceName": "*",
+                "EvalDecision": "allowed",
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "AdministratorAccess",
+                        "StartPosition": {
+                            "Line": 3,
+                            "Column": 17
+                        },
+                        "EndPosition": {
+                            "Line": 8,
+                            "Column": 6
+                        }
+                    }
+                ],
+                "MissingContextValues": []
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "612bfc18-3a83-11e9-8849-4b98e6ba2d71",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "612bfc18-3a83-11e9-8849-4b98e6ba2d71",
+                "content-type": "text/xml",
+                "content-length": "988",
+                "date": "Wed, 27 Feb 2019 11:32:35 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

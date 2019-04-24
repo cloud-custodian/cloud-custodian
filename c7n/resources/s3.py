@@ -731,6 +731,16 @@ class BucketActionBase(BaseAction):
             return results
 
 
+class BucketFilterBase(Filter):
+    def get_std_format_args(self, bucket):
+        return {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'bucket_name': bucket['Name'],
+            'bucket_region': get_region(bucket)
+        }
+
+
 @S3.action_registry.register("post-finding")
 class BucketFinding(PostFinding):
     def format_resource(self, r):
@@ -750,7 +760,7 @@ class BucketFinding(PostFinding):
 
 
 @filters.register('has-statement')
-class HasStatementFilter(Filter):
+class HasStatementFilter(BucketFilterBase):
     """Find buckets with set of policy statements.
 
     :example:
@@ -820,7 +830,8 @@ class HasStatementFilter(Filter):
             if s.get('Sid') in required:
                 required.remove(s['Sid'])
 
-        required_statements = list(self.data.get('statements', []))
+        required_statements = format_string_values(list(self.data.get('statements', [])),
+                                                   **self.get_std_format_args(b))
         for required_statement in required_statements:
             for statement in statements:
                 found = 0
@@ -1067,7 +1078,6 @@ class SetPolicyStatement(BucketActionBase):
         **{
             'statements': {
                 'type': 'array',
-                'required': True,
                 'items': {
                     'type': 'object',
                     'properties': {
@@ -1101,19 +1111,23 @@ class SetPolicyStatement(BucketActionBase):
     def process_bucket(self, bucket):
         policy = bucket.get('Policy') or '{}'
 
-        fmtargs = self.get_std_format_args(bucket)
+        target_statements = format_string_values(
+            copy.deepcopy({s['Sid']: s for s in self.data.get('statements', [])}),
+            **self.get_std_format_args(bucket))
 
         policy = json.loads(policy)
-        current = {s['Sid']: s for s in policy.get('Statement', [])}
-        new = copy.deepcopy(current)
-        additional = {s['Sid']: s for s in self.data.get('statements', [])}
-        additional = format_string_values(additional, **fmtargs)
-        new.update(additional)
-        if new == current:
+        bucket_statements = policy.setdefault('Statement', [])
+
+        for s in bucket_statements:
+            if s.get('Sid') not in target_statements:
+                continue
+            if s == target_statements[s['Sid']]:
+                target_statements.pop(s['Sid'])
+
+        if not target_statements:
             return
 
-        statements = list(new.values())
-        policy['Statement'] = statements
+        bucket_statements.extend(target_statements.values())
         policy = json.dumps(policy)
 
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
@@ -1255,7 +1269,7 @@ class ToggleLogging(BucketActionBase):
             policies:
               - name: s3-enable-logging
                 resource: s3
-                filter:
+                filters:
                   - "tag:Testing": present
                 actions:
                   - type: toggle-logging
@@ -1327,12 +1341,14 @@ class AttachLambdaEncrypt(BucketActionBase):
 
 
                 policies:
-                  - name: s3-attach-encryption-event
+                  - name: attach-lambda-encrypt
                     resource: s3
                     filters:
                       - type: missing-policy-statement
                     actions:
-                      - attach-encrypt
+                      - type: attach-encrypt
+                        role: arn:aws:iam::123456789012:role/my-role
+
     """
     schema = type_schema(
         'attach-encrypt',
@@ -1802,7 +1818,7 @@ class EncryptExtantKeys(ScanBucket):
              "remediated:%d rate:%0.2f/s time:%0.2fs"),
             object_count,
             remediated_count,
-            float(object_count) / run_time,
+            float(object_count) / run_time if run_time else 0,
             run_time)
         return results
 
@@ -2215,6 +2231,7 @@ class MarkBucketForOp(TagDelayedAction):
 
 
 @actions.register('unmark')
+@actions.register('remove-tag')
 class RemoveBucketTag(RemoveTag):
     """Removes tag/tags from a S3 object
 
@@ -2228,12 +2245,9 @@ class RemoveBucketTag(RemoveTag):
                 filters:
                   - "tag:BucketOwner": present
                 actions:
-                  - type: unmark
+                  - type: remove-tag
                     tags: ['BucketOwner']
     """
-
-    schema = type_schema(
-        'unmark', aliases=('remove-tag',), tags={'type': 'array'})
 
     def process_resource_set(self, client, resource_set, tags):
         modify_bucket_tags(
@@ -2548,7 +2562,7 @@ class DeleteBucket(ScanBucket):
         log.info(
             "EmptyBucket buckets:%d Complete keys:%d rate:%0.2f/s time:%0.2fs",
             len(buckets), object_count,
-            float(object_count) / run_time, run_time)
+            float(object_count) / run_time if run_time else 0, run_time)
         return results
 
     def process_chunk(self, batch, bucket):
@@ -2598,7 +2612,6 @@ class Lifecycle(BucketActionBase):
         **{
             'rules': {
                 'type': 'array',
-                'required': True,
                 'items': {
                     'type': 'object',
                     'required': ['ID', 'Status'],
@@ -2806,7 +2819,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
               - name: s3-bucket-encryption-KMS
                 resource: s3
                 region: us-east-1
-                filters
+                filters:
                   - type: bucket-encryption
                     state: True
                     crypto: aws:kms
@@ -2814,7 +2827,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
               - name: s3-bucket-encryption-off
                 resource: s3
                 region: us-east-1
-                filters
+                filters:
                   - type: bucket-encryption
                     state: False
     """

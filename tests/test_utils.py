@@ -114,6 +114,31 @@ class WorkerDecorator(BaseTest):
         self.assertTrue("more carrots" in log_output.getvalue())
 
 
+class UrlConfTest(BaseTest):
+
+    def test_parse_url(self):
+        self.assertEqual(
+            dict(utils.parse_url_config('aws://target?format=json&region=us-west-2')),
+            dict(url='aws://target?format=json&region=us-west-2',
+                 netloc='target',
+                 path='',
+                 scheme='aws',
+                 region='us-west-2',
+                 format='json'))
+
+        self.assertEqual(
+            dict(utils.parse_url_config('')),
+            {'netloc': '', 'path': '', 'scheme': '', 'url': ''})
+
+        self.assertEqual(
+            dict(utils.parse_url_config('aws')),
+            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+
+        self.assertEqual(
+            dict(utils.parse_url_config('aws://')),
+            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+
+
 class UtilTest(BaseTest):
 
     def test_local_session_region(self):

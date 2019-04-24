@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyPairs": [],
+        "ResponseMetadata": {
+            "RequestId": "40b8df26-062e-40de-946b-ce0f56324e7f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "2149",
+                "vary": "Accept-Encoding",
+                "date": "Wed, 27 Feb 2019 20:36:51 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

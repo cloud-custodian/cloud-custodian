@@ -1,0 +1,29 @@
+{
+  "body": {
+    "roles": [
+      {
+        "description": "Viewer access to Cloud Spanner resources.", 
+        "stage": "GA", 
+        "name": "roles/spanner.viewer", 
+        "etag": "AA==", 
+        "title": "Cloud Spanner Viewer"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "4933", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://iam.googleapis.com/v1/roles?pageToken=CgoHBYPknTvNnyABEIyKi_uerIqzbBisAiIcL3Jvb3RzL0dPT0dMRS9zcGFubmVyLnZpZXdlcg&alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Tue, 12 Mar 2019 12:13:18 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

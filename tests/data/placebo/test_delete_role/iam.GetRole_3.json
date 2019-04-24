@@ -1,0 +1,21 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "The role with name c7n-test-delete cannot be found."
+        },
+        "ResponseMetadata": {
+            "RequestId": "add83096-57be-11e9-9ff9-39d852a2d04e",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "add83096-57be-11e9-9ff9-39d852a2d04e",
+                "content-type": "text/xml",
+                "content-length": "295",
+                "date": "Fri, 05 Apr 2019 16:20:07 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

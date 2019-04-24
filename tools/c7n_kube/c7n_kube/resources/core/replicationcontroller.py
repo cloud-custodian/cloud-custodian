@@ -22,4 +22,6 @@ class ReplicationController(QueryResourceManager):
     class resource_type(TypeInfo):
         group = 'Core'
         version = 'V1'
-        enum_spec = ('list_replication_controller_all_namespaces', 'items', None)
+        patch = 'patch_namespaced_replication_controller'
+        delete = 'delete_namespaced_replication_controller'
+        enum_spec = ('list_replication_controller_for_all_namespaces', 'items', None)
