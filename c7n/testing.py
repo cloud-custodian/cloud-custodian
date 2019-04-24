@@ -65,13 +65,14 @@ class TestUtils(unittest.TestCase):
         Input a dictionary and a format. Valid formats are `yaml` and `json`
         Returns the file path.
         """
-        fh = tempfile.NamedTemporaryFile(mode="w+b", suffix="." + format)
+        fh = tempfile.NamedTemporaryFile(mode="w+b", suffix="." + format, delete=False)
         if format == "json":
             fh.write(json.dumps(policy).encode("utf8"))
         else:
             fh.write(yaml.dump(policy, encoding="utf8", Dumper=yaml.SafeDumper))
 
         fh.flush()
+        self.addCleanup(os.unlink, fh.name)
         self.addCleanup(fh.close)
         return fh.name
 

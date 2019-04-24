@@ -42,6 +42,7 @@ class WhiteListFilter(Filter):
                              'certificates': {'type': 'array'},
                              'secrets': {'type': 'array'},
                              'keys': {'type': 'array'}})
+    GRAPH_PROVIDED_KEYS = ['displayName', 'aadType', 'principalName']
     graph_client = None
 
     def __init__(self, data, manager=None):
@@ -68,14 +69,16 @@ class WhiteListFilter(Filter):
                         'certificates': policy.permissions.certificates
                     }
                 })
-            # Enhance access policies with displayName, aadType and principalName
-            i['accessPolicies'] = self.enhance_policies(access_policies)
+            # Enhance access policies with displayName, aadType and
+            # principalName if necessary
+            if self.key in self.GRAPH_PROVIDED_KEYS:
+                i['accessPolicies'] = self._enhance_policies(access_policies)
 
         # Ensure each policy is
         #   - User is whitelisted
         #   - Permissions don't exceed allowed permissions
         for p in i['accessPolicies']:
-            if p[self.key] not in self.users:
+            if self.key not in p or p[self.key] not in self.users:
                 if not self.compare_permissions(p['permissions'], self.permissions):
                     return False
         return True
@@ -96,7 +99,10 @@ class WhiteListFilter(Filter):
 
         return True
 
-    def enhance_policies(self, access_policies):
+    def _enhance_policies(self, access_policies):
+        if not access_policies:
+            return access_policies
+
         if self.graph_client is None:
             s = Session(resource='https://graph.windows.net')
             self.graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
@@ -105,12 +111,14 @@ class WhiteListFilter(Filter):
         object_ids = [p['objectId'] for p in access_policies]
         # GraphHelper.get_principal_dictionary returns empty AADObject if not found with graph
         # or if graph is not available.
-        principal_dics = GraphHelper.get_principal_dictionary(self.graph_client, object_ids)
+        principal_dics = GraphHelper.get_principal_dictionary(
+            self.graph_client, object_ids, True)
 
         for policy in access_policies:
             aad_object = principal_dics[policy['objectId']]
-            policy['displayName'] = aad_object.display_name
-            policy['aadType'] = aad_object.object_type
-            policy['principalName'] = GraphHelper.get_principal_name(aad_object)
+            if aad_object.object_id:
+                policy['displayName'] = aad_object.display_name
+                policy['aadType'] = aad_object.object_type
+                policy['principalName'] = GraphHelper.get_principal_name(aad_object)
 
         return access_policies
