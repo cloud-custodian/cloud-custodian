@@ -28,6 +28,7 @@ from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
 from msrestazure.azure_exceptions import CloudError
+from c7n_azure.autoscale_utils import AutoScaleUtilities
 
 from c7n.utils import local_session
 
@@ -79,6 +80,9 @@ class FunctionAppUtilities(object):
             app_resource_group_name = ResourceIdParser.get_resource_group(app_id)
             app_service_plan = web_client.app_service_plans.get(app_resource_group_name, app_name)
 
+            # enable autoscale if applicable
+            auto_scale = AutoScaleUtilities(app_service_plan, parameters.service_plan['auto_scale'])
+            auto_scale.deploy_auto_scale(app_resource_group_name)
             # update the sku tier to properly reflect what is provisioned in Azure
             parameters.service_plan['sku_tier'] = app_service_plan.sku.tier
 
@@ -104,6 +108,8 @@ class FunctionAppUtilities(object):
              'is_consumption_plan': FunctionAppUtilities.is_consumption_plan(parameters),
              'storage_account_connection_string': con_string})
 
+        auto_scale = AutoScaleUtilities(app_service_plan, parameters.service_plan['auto_scale'])
+        auto_scale.deploy_auto_scale(parameters.function_app_resource_group_name)
         return function_app_unit.provision(function_app_params)
 
     @staticmethod

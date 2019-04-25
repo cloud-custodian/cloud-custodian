@@ -111,7 +111,13 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'location': 'eastus',
                 'resource_group_name': 'cloud-custodian',
                 'sku_tier': 'Dynamic',  # consumption plan
-                'sku_name': 'Y1'
+                'sku_name': 'Y1',
+                'auto_scale':{
+                    'enable_auto_scale': False,
+                    'min_capacity':1,
+                    'max_capacity':2,
+                    'default_capacity':1
+                }
             })
 
         # Metadata used for automatic naming
@@ -164,7 +170,14 @@ class AzureFunctionMode(ServerlessExecutionMode):
             result['resource_group_name'] = ResourceIdParser.get_resource_group(settings)
         else:
             for key in properties.keys():
-                result[key] = settings.get(StringUtils.snake_to_camel(key), properties[key])
+                value = settings.get(StringUtils.snake_to_camel(key), properties[key])
+                if isinstance(value, dict):
+                    result[key] = {}
+                    for key2 in properties.get(key).keys():
+                        result[key][key2] = settings.get(StringUtils.snake_to_camel(key), properties[key]).get(
+                            StringUtils.snake_to_camel(key2),properties[key][key2])
+                else:
+                    result[key] = value
 
         return result
 
