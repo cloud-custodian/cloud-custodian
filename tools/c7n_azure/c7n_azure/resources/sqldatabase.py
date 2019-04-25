@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.from c7n_azure.provider import resources
 
+import logging
 import enum
 import isodate
 from c7n_azure.provider import resources
@@ -23,6 +24,8 @@ from c7n_azure.utils import RetentionPeriodHelper
 from c7n.utils import type_schema
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
+
+log = logging.getLogger('custodian.azure.sqldatabase')
 
 
 @resources.register('sqldatabase')
@@ -75,7 +78,9 @@ class BackupRetentionPolicyFilter(Filter):
             if e.status_code == 404:
                 response = None
             else:
-                # TODO how to better handle this error?
+                log.error("Unable to get backup retention policy. "
+                "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
+                    resource_group_name, server_name, database_name))
                 raise e
         return response
 
