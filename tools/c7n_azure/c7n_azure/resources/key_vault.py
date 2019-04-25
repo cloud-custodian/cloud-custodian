@@ -128,21 +128,57 @@ class WhiteListFilter(Filter):
         return access_policies
 
 
-@KeyVault.action_registry.register('access-policy')
-class KeyVaultAccessPolicyAction(AzureBaseAction):
+@KeyVault.action_registry.register('update-access-policy')
+class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
+    """
+        Adds Get and List key access policy to all keyvaults
 
-    schema = type_schema('access-policy',
-        required=['operation', 'access_policies'],
-        operation={'type': 'string', 'enum': ['add', 'replace', 'remove']},
-        access_policies={'type': 'array'})
+            .. code-block:: yaml
+
+              policies:
+                - name: azure-keyvault-update-access-policies
+                  resource: azure.keyvault
+                  description: |
+                    Add key get and list to all keyvault access policies
+                  actions:
+                   - type: update-access-policy
+                     operation: add
+                     access-policies:
+                      - tenant-id: 00000000-0000-0000-0000-000000000000
+                        object-id: 11111111-1111-1111-1111-111111111111
+                        permissions:
+                          keys:
+                            - Get
+                            - List
+    """
+
+    schema = type_schema('update-access-policy',
+        required=['operation', 'access-policies'],
+        operation={'type': 'string', 'enum': ['add', 'replace']},
+        **{
+            "access-policies": {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'tenant-id': {'type': 'string'},
+                    'object-id': {'type': 'string'},
+                    'permissions': {
+                        'type': 'object',
+                        'keys': {'type': 'array', 'items': {'type': 'string'}},
+                        'secrets': {'type': 'array', 'items': {'type': 'string'}},
+                        'certificates': {'type': 'array', 'items': {'type': 'string'}}
+                    }
+                }
+            }
+        })
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
         operation = self.data.get('operation')
-        access_policies = KeyVaultAccessPolicyAction._transform_access_policies(
-            self.data.get('access_policies')
+        access_policies = KeyVaultUpdateAccessPolicyAction._transform_access_policies(
+            self.data.get('access-policies')
         )
 
         try:
@@ -158,8 +194,8 @@ class KeyVaultAccessPolicyAction(AzureBaseAction):
     @staticmethod
     def _transform_access_policies(access_policies):
         policies = [
-            {"objectId": i['object_id'],
-                "tenantId": i['tenant_id'],
+            {"objectId": i['object-id'],
+                "tenantId": i['tenant-id'],
                 "permissions": i['permissions']} for i in access_policies]
 
         return {"accessPolicies": policies}

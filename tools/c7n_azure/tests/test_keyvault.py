@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template, DEFAULT_TENANT_ID
-from c7n_azure.resources.key_vault import KeyVaultAccessPolicyAction, WhiteListFilter
+from c7n_azure.resources.key_vault import KeyVaultUpdateAccessPolicyAction, WhiteListFilter
 from c7n_azure.session import Session
 from c7n.utils import local_session
 from mock import patch
@@ -35,9 +35,9 @@ class KeyVaultTest(BaseTest):
                      'key': 'test'}
                 ],
                 'actions': [
-                    {'type': 'access-policy',
+                    {'type': 'update-access-policy',
                      'operation': 'add',
-                     'access_policies': []}
+                     'access-policies': []}
                 ]
             }, validate=True)
             self.assertTrue(p)
@@ -166,7 +166,7 @@ class KeyVaultTest(BaseTest):
                          "ea42f556-5106-4743-99b0-c129bfa71a47/getObjectsByObjectIds?"
                          "api-version=1.6", e.exception.message)
 
-    def test_access_policy_action(self):
+    def test_update_access_policy_action(self):
         with patch(self._get_key_vault_client_string() + '.update_access_policy')\
                 as access_policy_action_mock:
             p = self.load_policy({
@@ -179,11 +179,11 @@ class KeyVaultTest(BaseTest):
                      'value_type': 'normalize',
                      'value': 'cckeyvault1*'}],
                 'actions': [
-                    {'type': 'access-policy',
+                    {'type': 'update-access-policy',
                      'operation': 'replace',
-                     'access_policies': [{
-                         'tenant_id': '72f988bf-86f1-41af-91ab-2d7cd011db47',
-                         'object_id': 'de4152e3-335e-41b5-9b56-f8f2e043e3ee',
+                     'access-policies': [{
+                         'tenant-id': '00000000-0000-0000-0000-000000000000',
+                         'object-id': '11111111-1111-1111-1111-111111111111',
                          'permissions': {'keys': ['Get']}}]}]
             })
 
@@ -191,10 +191,10 @@ class KeyVaultTest(BaseTest):
             access_policy_action_mock.assert_called()
 
     def test_transform_access_policies(self):
-        mock_access_policies = [{"object_id": "mockObjectId",
-                                 "tenant_id": "mockTenantId",
+        mock_access_policies = [{"object-id": "mockObjectId",
+                                 "tenant-id": "mockTenantId",
                                  "permissions": {"keys": ["Get"]}}]
-        transformed_access_policies = KeyVaultAccessPolicyAction._transform_access_policies(
+        transformed_access_policies = KeyVaultUpdateAccessPolicyAction._transform_access_policies(
             mock_access_policies).get("accessPolicies")[0]
         self.assertTrue("objectId" in transformed_access_policies)
         self.assertTrue("tenantId" in transformed_access_policies)
