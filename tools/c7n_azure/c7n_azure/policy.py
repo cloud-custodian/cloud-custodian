@@ -169,6 +169,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             result['name'] = ResourceIdParser.get_resource_name(settings)
             result['resource_group_name'] = ResourceIdParser.get_resource_group(settings)
         else:
+            #get nested keys
             for key in properties.keys():
                 value = settings.get(StringUtils.snake_to_camel(key), properties[key])
                 if isinstance(value, dict):
