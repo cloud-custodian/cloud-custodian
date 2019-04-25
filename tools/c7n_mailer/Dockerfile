@@ -1,4 +1,5 @@
-FROM python:3.7-slim-strech
+FROM python:3.7-slim-stretch
+
 LABEL name="mailer" \
       description="Cloud Custodian Notification Delivery" \
       repository="http://github.com/cloud-custodian/cloud-custodian" \
