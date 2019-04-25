@@ -12,6 +12,10 @@ get deleted so you always have a rolling 7 days worth of snapshots.
    policies:
      - name: ec2-create-ebs-snapshots
        resource: ec2
+       mode:
+         type: periodic
+         schedule: "cron(0 6 * * ? *)" # daily at 6 AM UTC
+         timeout: 900 # in case it times out
        actions:
           - type: snapshot
             copy-tags:
@@ -24,6 +28,10 @@ get deleted so you always have a rolling 7 days worth of snapshots.
 
      - name: ebs-delete-old-ebs-snapshots
        resource: ebs-snapshot
+       mode:
+         type: periodic
+         schedule: "cron(30 6 * * ? *)" # daily at 6:30 AM UTC
+         timeout: 900 # in case it times out
        filters:
            - type: age
              days: 7
