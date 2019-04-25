@@ -114,3 +114,33 @@ class AppEngineDomainMapping(ChildResourceManager):
             apps_id, mapping_id = name_param_re.match(resource_info['resourceName']).groups()
             return client.execute_query('get', {'appsId': apps_id,
                                                 'domainMappingsId': mapping_id})
+
+
+@resources.register('appengine-firewall-ingress-rule')
+class AppEngineFirewallIngressRule(ChildResourceManager):
+
+    def _get_parent_resource_info(self, child_instance):
+        return {'resourceName': 'apps/%s' %
+                                local_session(self.session_factory).get_default_project()}
+
+    class resource_type(ChildTypeInfo):
+        service = 'appengine'
+        version = 'v1'
+        component = 'apps.firewall.ingressRules'
+        enum_spec = ('list', 'ingressRules[]', None)
+        scope = None
+        id = 'id'
+        parent_spec = {
+            'resource': 'appengine-app',
+            'child_enum_params': {
+                ('id', 'appsId')
+            }
+        }
+
+        @staticmethod
+        def get(client, resource_info):
+            rule_re = re.compile('apps/(.*?)/firewall/ingressRules/(.*)')
+            apps_id, ingress_rules_id = rule_re.match(resource_info['resourceName']).groups()
+            return client.execute_query(
+                'get', {'appsId': apps_id,
+                        'ingressRulesId': ingress_rules_id})

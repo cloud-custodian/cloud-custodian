@@ -146,3 +146,42 @@ class AppEngineDomainMappingTest(BaseTest):
             {'resourceName': domain_mapping_name})
         self.assertEqual(resource['name'], domain_mapping_name)
         self.assertEqual(resource[parent_annotation_key]['name'], app_name)
+
+
+class AppEngineFirewallIngressRuleTest(BaseTest):
+
+    def test_firewall_ingress_rule_query(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/{}'.format(project_id)
+        rule_priority = 2147483647
+        session_factory = self.replay_flight_data(
+            'appengine-firewall-ingress-rule-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-appengine-firewall-ingress-rule-dryrun',
+             'resource': 'gcp.appengine-firewall-ingress-rule'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['priority'], rule_priority)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
+
+    def test_firewall_ingress_rule_get(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/{}'.format(project_id)
+        rule_priority = 2147483647
+        rule_priority_full = '{}/firewall/ingressRules/{}'.format(app_name, rule_priority)
+        session_factory = self.replay_flight_data(
+            'appengine-firewall-ingress-rule-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-appengine-firewall-ingress-rule-dryrun',
+             'resource': 'gcp.appengine-firewall-ingress-rule'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resource = policy.resource_manager.get_resource(
+            {'resourceName': rule_priority_full})
+        self.assertEqual(resource['priority'], rule_priority)
+        self.assertEqual(resource[parent_annotation_key]['name'], app_name)
