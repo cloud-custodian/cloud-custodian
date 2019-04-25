@@ -43,6 +43,13 @@ class SqlDatabase(ChildArmResourceManager):
 
 class BackupRetentionPolicyFilter(Filter):
 
+    schema = type_schema(
+        'backup-retention-policy',
+        **{
+            'op': {'enum': list(scalar_ops.keys())},
+        },
+    )
+
     def __init__(self, operations_property, data, manager=None):
         super(BackupRetentionPolicyFilter, self).__init__(data, manager)
         self.operations_property = operations_property
@@ -61,10 +68,10 @@ class BackupRetentionPolicyFilter(Filter):
         return list_response
 
     def __call__(self, i):
-        policies = self.list_backup_retention_policies(i)
-        return self.filter_with_policies(i, policies)
+        retention_policies = self.list_backup_retention_policies(i)
+        return self.filter_with_retention_policies(i, retention_policies)
 
-    def filter_with_policies(self, i, policies):
+    def filter_with_retention_policies(self, i, retention_policies):
         raise NotImplementedError()
 
     def perform_op(self, a, b):
@@ -103,8 +110,8 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
     schema = type_schema(
         'short-term-backup-retention-policy',
         required=['retention-period-days'],
+        rinherit=BackupRetentionPolicyFilter.schema,
         **{
-            'op': {'enum': list(scalar_ops.keys())},
             'retention-period-days': {'type': 'number'},
         },
     )
@@ -114,21 +121,22 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
             'backup_short_term_retention_policies', data, manager)
         self.retention_period_days_limit = self.data.get('retention-period-days')
 
-    def filter_with_policies(self, i, policies):
+    def filter_with_retention_policies(self, i, retention_policies):
         try:
-            # TODO: re-think this to better handle the case of multiple policies...
-            # (can there be mutliple policies?)
-            for policy in policies:
-                actual_retention_days = policy.retention_days
+            # TODO: re-think this to better handle the case of multiple backup policies...
+            # (can there be mutliple backup policies?)
+            for retention_policy in retention_policies:
+                actual_retention_days = retention_policy.retention_days
                 return self.perform_op(actual_retention_days, self.retention_period_days_limit)
         except CloudError as e:
-            # TODO: is there a way to figure this out before trying to iterate through policies?
+            # TODO: is there a way to figure this out before trying to iterate through
+            # backup policies?
             if e.status_code == 404:
-                return self.filter_without_policies(i)
+                return self.filter_without_retention_policies(i)
             else:
                 raise e
 
-    def filter_without_policies(self, i):
+    def filter_without_retention_policies(self, i):
         # without any backup retention policies, this is effectively 0 days of retention
         return self.perform_op(0, self.retention_period_days_limit)
 
@@ -189,9 +197,9 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
     schema = type_schema(
         'long-term-backup-retention-policy',
         required=['backup-type', 'retention-period', 'retention-period-units'],
+        rinherit=BackupRetentionPolicyFilter.schema,
         **{
             'backup-type': {'enum': list([str(t) for t in BackupType])},
-            'op': {'enum': list(scalar_ops.keys())},
             'retention-period': {'type': 'number'},
             'retention-period-units': {'enum': list([str(u) for u in RetentionPeriodUnits])},
         },
@@ -223,14 +231,14 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
             raise ValueError("Could not normalize {} to a timedelta".format(duration))
         return duration
 
-    def filter_with_policies(self, i, policies):
+    def filter_with_retention_policies(self, i, retention_policies):
 
         if self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.weekly.value:
-            actual_retention_days_iso8601 = policies.weekly_retention
+            actual_retention_days_iso8601 = retention_policies.weekly_retention
         elif self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.monthly.value:
-            actual_retention_days_iso8601 = policies.monthly_retention
+            actual_retention_days_iso8601 = retention_policies.monthly_retention
         elif self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.yearly.value:
-            actual_retention_days_iso8601 = policies.yearly_retention
+            actual_retention_days_iso8601 = retention_policies.yearly_retention
         else:
             raise ValueError("Unknown backup-type: {}".format(self.backup_type))
 
