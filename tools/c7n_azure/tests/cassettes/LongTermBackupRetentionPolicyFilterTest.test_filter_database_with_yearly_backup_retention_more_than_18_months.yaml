@@ -1,0 +1,251 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/zR22I5++jRR5e7e+Odj0YfrepqlddtkTcfPfrFH2WzRbEsmrbO2qp+Xl0US2o6XTdt
+        NSuyJTW/zOumqPCpvt+0WUuAP3qVZ7Nr+vt8XZbXP7HOyuK8yGdPq0VWLF9kCzSZTtu8aZtfVDZ5
+        TXDeVsv1vU/Xl+u8qffHs6zNJlmTj68Iv+qqGS/z9qNfMvqorKZZKz3mWdOumz3qpMAI7jbrSTOt
+        ixW+bu7ODh48PD/fn2wfTGYPt/fvHxxsP5xMdrbv7+Z7Bw/v53v79z+9W+dNta6n+ed1tV41d4HP
+        728Ruku0uCxmNMK7XxTTumqq83b8+heVd+Xr5u6mARBWy5uHSa3a6xVaRXv46Jd8/5f8P1Clfeis
+        AQAA
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 25 Apr 2019 16:54:19 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - 33b46bba-0366-4469-a0d6-a9c12029c107
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11995'
+      x-ms-request-id:
+      - d091a492-7747-4a44-beb6-f3c19deddd1c
+      x-ms-routing-request-id:
+      - WESTUS2:20190425T165419Z:33b46bba-0366-4469-a0d6-a9c12029c107
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases?api-version=2017-10-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
+        uc4/evS9X/xR83b90aNf/NEyW9DfH72s80WxXnw0+qgt8jr4YJqtsmnRXn/0aHfv/i8ZffS2WM6o
+        weXu3nhntG6o9eijVV2t8ppebQBzWpVl1hbVkpq9/onnv/9z+mO5+/t/ni/zOit//5OXu7//ydnv
+        f/yaXlxk714XP8ifXLd4dW93/8H+wb1P9w9GHzVt1q7ps4++XJbFMqe2s6zNJlmTn6H7Tw/29h7e
+        39vfPniY5dv7e3u729mD3YPtg+zhdLp/bzrZyXfpnWmdU+fV8mnWYph7O7sPt3f2t/fuvdk9eLS/
+        92jnwXjv03s/hZbrus6X7eu8viym+ZeTn86nbXGZv1D6AFid/6J13rT5bFOjWX6erUuCM62Ws6y+
+        fl5NGQP6fkrwiQA0KuqOBlNWFye3J9UPqmX+Kp+tCeqy/ejReVY2+eijPKtLInv7iv5f1Xl8nPce
+        3dsf7+3wOIkgs9fTrESz02U2KfOZfvoqX5XFNDup1oC/SzgqSb4epxCrlG7sedbQdO5RqwLTd7dZ
+        T5ppXazwdXN3dvDg4fn5/mT7YDJ7uL1//+Bg++FksrN9fzffO3h4P9/bv//p3TpvqnU9zT+vq/Wq
+        uUsc0/7+zS8iKtSXeX2XWPCymOV1c/eLYlpXTXXejl//ovKufN3cnU7xgm3/tlqu7326vqQJrffv
+        GtYyzWYTQlQH7H3SXq/wSbwDC+OjXzLqitfra2IbkEhpZv92JNshegWi1Zg2i2yZXeSzJ9To/2V0
+        I+To9W9C8u+RAO/t3d9/sLdzo+jfO9idPny4/3D7YHefRH/3fLp98Gmeb08fnH863XvwcO/h5Jze
+        2Sz6O4/2Px3fe8AiYficBhiRapkrcO5N8u9a/pCVAI3UyvTTohkWaiKuGez78ycx6P8HBXpBeNKY
+        rDjbv28rzN//Jf8PxcpFczcHAAA=
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 25 Apr 2019 16:54:31 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - a6df3ff5-df55-4bb6-9349-f0a9441569cf
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11990'
+      x-ms-request-id:
+      - badde33f-87c9-47a1-91ac-07cfe7c3b3c2
+      x-ms-routing-request-id:
+      - WESTUS2:20190425T165431Z:a6df3ff5-df55-4bb6-9349-f0a9441569cf
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cctestdb/backupLongTermRetentionPolicies?api-version=2017-03-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
+        WuV1W+TNR49+8UdXef62vH6Vt/myLarlR48+ern/3Y9GHy2qZTvvfHHvC/riOs/qzud7vw99DkBf
+        nv8+9O1Hj/Z2fsnoo2JG391t1pNmWhcrtG3uzg4ePDw/359sH0xmD7f37x8cbD+cTHa27+/mewcP
+        7+d7+/c/vVvnTbWup/nndbVeNXfbvGl//+YXlU1eX+b1XUL/spjldXP3i2JaV0113o5f/6Lyrnzd
+        3J1O8YJt/7Zaru99ur5c5029f3eWtdkka3LTbDa5O8mmb9er59Xy4k1eL+y4XlZlMSUa3Z3l59m6
+        bGmEy2yR05DcB+31Ch/E8XBd3dDDR7/k/wFtrgd4lAEAAA==
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 25 Apr 2019 16:54:27 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - 386b22ae-83bb-48b1-81f5-c29e15c29dd6
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11995'
+      x-ms-request-id:
+      - f611983c-310b-439d-82db-435cbe9e4bc2
+      x-ms-routing-request-id:
+      - WESTUS2:20190425T165428Z:386b22ae-83bb-48b1-81f5-c29e15c29dd6
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupLongTermRetentionPolicies?api-version=2017-03-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
+        WuV1W+TNR49+8UdXef62vH6Vt/myLarlR48+evlm5/VHo48W1bKdR7+5zrM6+gVgfXn++9DXHz3a
+        +SWjj4oZfXe3WU+aaV2s0La5Ozt48PD8fH+yfTCZPdzev39wsP1wMtnZvr+b7x08vJ/v7d//9G6d
+        N9W6nuaf19V61dxt86b9/ZtfVDZ5fZnXd2kAl8Usr5u7XxTTumqq83b8+heVd+Xr5u50ihds+7fV
+        cn3v0/XlOm/q/buzrM0mWZM3dxdZ0xK0STZ9u149r5YXb/J6YUf1siqLKdHo7iw/z9ZlS8NbZouc
+        BuQ+aK9X+CCOhevohh4++iX/D0HF8c2UAQAA
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 25 Apr 2019 16:54:20 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - d54b413c-934e-459e-b101-a635614a427f
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11995'
+      x-ms-request-id:
+      - e4ea1e69-7b4f-453c-a057-c2d95b2de2e8
+      x-ms-routing-request-id:
+      - WESTUS2:20190425T165420Z:d54b413c-934e-459e-b101-a635614a427f
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -170,9 +170,13 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
     @enum.unique
     class RetentionPeriodUnits(enum.Enum):
+        day = ('day', 'D')
         days = ('days', 'D')
+        week = ('week', 'W')
         weeks = ('weeks', 'W')
+        month = ('month', 'M')
         months = ('months', 'M')
+        year = ('year', 'Y')
         years = ('years', 'Y')
 
         def __init__(self, str_value, iso8601_symbol):
