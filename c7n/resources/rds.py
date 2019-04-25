@@ -509,7 +509,7 @@ class Stop(BaseAction):
 
     schema = type_schema('stop')
 
-    permissions = ("rds:StopDBInstance")
+    permissions = ("rds:StopDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
@@ -530,7 +530,7 @@ class Start(BaseAction):
 
     schema = type_schema('start')
 
-    permissions = ("rds:StartDBInstance")
+    permissions = ("rds:StartDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
