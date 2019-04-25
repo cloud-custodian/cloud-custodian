@@ -1072,14 +1072,18 @@ class XrayEncrypted(Filter):
               - name: xray-encrypt-with-default
                 resource: aws.account
                 filters:
-                  - type: xray-encrypt-key
-                    key: default
+                   - type: xray-encrypt-key
+                     key: default
               - name: xray-encrypt-with-kms
-                  - type: xray-encrypt-key
-                    key: kms
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: kms
               - name: xray-encrypt-with-specific-key
-                  -type: xray-encrypt-key
-                   key: alias/my-alias or arn or keyid
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: alias/my-alias or arn or keyid
     """
 
     permissions = ('xray:GetEncryptionConfig',)
@@ -1120,8 +1124,10 @@ class SetXrayEncryption(BaseAction):
                   - type: set-xray-encrypt
                     key: default
               - name: xray-kms-encrypt
+                resource: aws.account
+                actions:
                   - type: set-xray-encrypt
-                    key: alias/some/alias/ke
+                    key: alias/some/alias/key
     """
 
     permissions = ('xray:PutEncryptionConfig',)

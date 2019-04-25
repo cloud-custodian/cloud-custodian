@@ -147,8 +147,13 @@ class QueryResourceManager(ResourceManager):
     def resources(self, query=None):
         q = query or self.get_resource_query()
         key = self.get_cache_key(q)
+        resources = self._fetch_resources(q)
+        self._cache.save(key, resources)
+        return self.filter_resources(resources)
+
+    def _fetch_resources(self, query):
         try:
-            resources = self.augment(self.source.get_resources(q)) or []
+            return self.augment(self.source.get_resources(query)) or []
         except HttpError as e:
             error = extract_error(e)
             if error is None:
@@ -161,11 +166,63 @@ class QueryResourceManager(ResourceManager):
                     local_session(self.session_factory).get_default_project())
                 return []
             raise
-        self._cache.save(key, resources)
-        return self.filter_resources(resources)
 
     def augment(self, resources):
         return resources
+
+
+class ChildResourceManager(QueryResourceManager):
+
+    def get_resource(self, resource_info):
+        child_instance = super(ChildResourceManager, self).get_resource(resource_info)
+
+        parent_resource = self.resource_type.parent_spec['resource']
+        parent_instance = self.get_resource_manager(parent_resource).get_resource(
+            self._get_parent_resource_info(child_instance)
+        )
+
+        annotation_key = self.resource_type.get_parent_annotation_key()
+        child_instance[annotation_key] = parent_instance
+
+        return child_instance
+
+    def _fetch_resources(self, query):
+        if not query:
+            query = {}
+
+        resources = []
+        annotation_key = self.resource_type.get_parent_annotation_key()
+        parent_resource_manager = self.get_resource_manager(
+            self.resource_type.parent_spec['resource']
+        )
+
+        for parent_instance in parent_resource_manager.resources():
+            query.update(self._get_child_enum_args(parent_instance))
+            children = super(ChildResourceManager, self)._fetch_resources(query)
+
+            for child_instance in children:
+                child_instance[annotation_key] = parent_instance
+
+            resources.extend(children)
+
+        return resources
+
+    def _get_parent_resource_info(self, child_instance):
+        mappings = self.resource_type.parent_spec['parent_get_params']
+        return self._extract_fields(child_instance, mappings)
+
+    def _get_child_enum_args(self, parent_instance):
+        mappings = self.resource_type.parent_spec['child_enum_params']
+        return self._extract_fields(parent_instance, mappings)
+
+    @staticmethod
+    def _extract_fields(source, mappings):
+        result = {}
+
+        for mapping in mappings:
+            result[mapping[1]] = jmespath.search(mapping[0], source)
+
+        return result
 
 
 class TypeMeta(type):
@@ -199,6 +256,16 @@ class TypeInfo(object):
     get = None
     # for get methods that require the full event payload
     get_requires_event = False
+
+
+class ChildTypeInfo(TypeInfo):
+
+    parent_spec = None
+
+    @classmethod
+    def get_parent_annotation_key(cls):
+        parent_resource = cls.parent_spec['resource']
+        return 'c7n:{}'.format(parent_resource)
 
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')

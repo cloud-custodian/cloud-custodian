@@ -1,0 +1,35 @@
+{
+  "body": {
+    "kind": "compute#httpHealthCheck", 
+    "description": "", 
+    "timeoutSec": 5, 
+    "checkIntervalSec": 10, 
+    "port": 80, 
+    "healthyThreshold": 2, 
+    "host": "", 
+    "requestPath": "/", 
+    "unhealthyThreshold": 3, 
+    "creationTimestamp": "2019-03-14T00:45:36.570-07:00", 
+    "id": "7550768777334863951", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/httpHealthChecks/newhttphealthcheck", 
+    "name": "newhttphealthcheck"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "441", 
+    "transfer-encoding": "chunked", 
+    "expires": "Thu, 14 Mar 2019 07:56:35 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Thu, 14 Mar 2019 07:56:35 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/httpHealthChecks/newhttphealthcheck?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"UIx2Dvpqy8KrCmmYGrEZyNjt5ak=/FasiAVALgZgA4fuqwO5tLBVD-R8=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

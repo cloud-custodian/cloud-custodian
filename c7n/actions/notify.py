@@ -66,50 +66,51 @@ class Notify(BaseNotify):
     transport, with the exception of the ``mtype`` attribute, which is a
     reserved attribute used by Cloud Custodian.
 
-    Example::
+    :example:
 
-      policies:
-        - name: ec2-bad-instance-kill
-          resource: ec2
-          filters:
-           - Name: bad-instance
-          actions:
-           - terminate
-           - type: notify
-             to:
-              - event-user
-              - resource-creator
-              - email@address
-             owner_absent_contact:
-              - other_email@address
-             # which template for the email should we use
-             template: policy-template
-             transport:
-               type: sqs
-               region: us-east-1
-               queue: xyz
+    .. code-block:: yaml
 
-        - name: ec2-notify-with-attributes
-          resource: ec2
-          filters:
-           - Name: bad-instance
-          actions:
-           - type: notify
-             to:
-              - event-user
-              - resource-creator
-              - email@address
-             owner_absent_contact:
-              - other_email@address
-             # which template for the email should we use
-             template: policy-template
-             transport:
-               type: sns
-               region: us-east-1
-               topic: your-notify-topic
-               attributes:
-                 - attribute_key: attribute_value
-                 - attribute_key_2: attribute_value_2
+              policies:
+                - name: ec2-bad-instance-kill
+                  resource: ec2
+                  filters:
+                   - Name: bad-instance
+                  actions:
+                   - terminate
+                   - type: notify
+                     to:
+                      - event-user
+                      - resource-creator
+                      - email@address
+                     owner_absent_contact:
+                      - other_email@address
+                     # which template for the email should we use
+                     template: policy-template
+                     transport:
+                       type: sqs
+                       region: us-east-1
+                       queue: xyz
+                - name: ec2-notify-with-attributes
+                  resource: ec2
+                  filters:
+                   - Name: bad-instance
+                  actions:
+                   - type: notify
+                     to:
+                      - event-user
+                      - resource-creator
+                      - email@address
+                     owner_absent_contact:
+                      - other_email@address
+                     # which template for the email should we use
+                     template: policy-template
+                     transport:
+                       type: sns
+                       region: us-east-1
+                       topic: your-notify-topic
+                       attributes:
+                          attribute_key: attribute_value
+                          attribute_key_2: attribute_value_2
     """
 
     C7N_DATA_MESSAGE = "maidmsg/1.0"

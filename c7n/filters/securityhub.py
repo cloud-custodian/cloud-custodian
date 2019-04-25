@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.utils import local_session, type_schema
 from .core import Filter
 from c7n.manager import resources
-from c7n.resources import aws
 
 
 class SecurityHubFindingFilter(Filter):
@@ -28,7 +27,7 @@ class SecurityHubFindingFilter(Filter):
         # for filtering.
         region={'type': 'string'},
         query={'type': 'object'})
-
+    schema_alias = True
     permissions = ('securityhub:GetFindings',)
     annotation_key = 'c7n:finding-filter'
     query_shape = 'AwsSecurityFindingFilters'
@@ -36,6 +35,7 @@ class SecurityHubFindingFilter(Filter):
     def validate(self):
         query = self.data.get('query')
         if query:
+            from c7n.resources import aws
             aws.shape_validate(query, self.query_shape, 'securityhub')
 
     def process(self, resources, event=None):

@@ -82,8 +82,8 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
         if policy.ctx.output.type == 's3':
             policy_records = record_set(
                 policy.session_factory,
-                policy.ctx.output.bucket,
-                policy.ctx.output.key_prefix,
+                policy.ctx.output.config['netloc'],
+                policy.ctx.output.config['path'].strip('/'),
                 start_date)
         else:
             policy_records = fs_record_set(policy.ctx.log_dir, policy.name)
