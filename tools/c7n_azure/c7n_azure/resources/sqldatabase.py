@@ -14,12 +14,12 @@
 
 import enum
 import isodate
-from datetime import datetime, timedelta
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 from c7n_azure.query import ChildResourceQuery
 from c7n_azure.filters import scalar_ops
 from c7n.filters import Filter
+from c7n_azure.utils import RetentionPeriodHelper
 from c7n.utils import type_schema
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
@@ -176,24 +176,6 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         def __str__(self):
             return self.value
 
-    @enum.unique
-    class RetentionPeriodUnits(enum.Enum):
-        day = ('day', 'D')
-        days = ('days', 'D')
-        week = ('week', 'W')
-        weeks = ('weeks', 'W')
-        month = ('month', 'M')
-        months = ('months', 'M')
-        year = ('year', 'Y')
-        years = ('years', 'Y')
-
-        def __init__(self, str_value, iso8601_symbol):
-            self.str_value = str_value
-            self.iso8601_symbol = iso8601_symbol
-
-        def __str__(self):
-            return self.str_value
-
     schema = type_schema(
         'long-term-backup-retention-policy',
         required=['backup-type', 'retention-period', 'retention-period-units'],
@@ -201,7 +183,9 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         **{
             'backup-type': {'enum': list([str(t) for t in BackupType])},
             'retention-period': {'type': 'number'},
-            'retention-period-units': {'enum': list([str(u) for u in RetentionPeriodUnits])},
+            'retention-period-units': {
+                'enum': list([str(u) for u in RetentionPeriodHelper.RetentionPeriodUnits]),
+            },
         },
     )
 
@@ -211,28 +195,12 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         self.backup_type = self.data.get('backup-type')
 
         retention_period = self.data.get('retention-period')
-        retention_period_units = LongTermBackupRetentionPolicyFilter.RetentionPeriodUnits[
+        retention_period_units = RetentionPeriodHelper.RetentionPeriodUnits[
             self.data.get('retention-period-units')]
-        self.duration_limit = LongTermBackupRetentionPolicyFilter.period_to_duration_limit(
+        self.duration_limit = RetentionPeriodHelper.period_to_duration_limit(
             retention_period, retention_period_units)
 
-    @staticmethod
-    def period_to_duration_limit(period, unit):
-        iso8601_str = "P{}{}".format(period, unit.iso8601_symbol)
-        duration = isodate.parse_duration(iso8601_str)
-        return LongTermBackupRetentionPolicyFilter.normalize_duration(duration)
-
-    @staticmethod
-    def normalize_duration(duration):
-        if isinstance(duration, isodate.Duration):
-            now = datetime.now()
-            duration = duration.totimedelta(start=now)
-        if not isinstance(duration, timedelta):
-            raise ValueError("Could not normalize {} to a timedelta".format(duration))
-        return duration
-
     def filter_with_retention_policies(self, i, retention_policies):
-
         if self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.weekly.value:
             actual_retention_days_iso8601 = retention_policies.weekly_retention
         elif self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.monthly.value:
@@ -242,15 +210,7 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         else:
             raise ValueError("Unknown backup-type: {}".format(self.backup_type))
 
-        # TODO figure out a better way to compare durations
-        # https://docs.microsoft.com/en-us/azure/sql-database/sql-database-long-term-retention
-        #
-        # given ISO 8601 duration: P30D and P1M:
-        #   in february : P30D > P1M
-        #   in april    : P30D = P1M
-        #   in may      : P30D < P1M
-
         actual_duration = isodate.parse_duration(actual_retention_days_iso8601)
-        actual_duration = LongTermBackupRetentionPolicyFilter.normalize_duration(actual_duration)
+        actual_duration = RetentionPeriodHelper.normalize_duration(actual_duration)
         result = self.perform_op(actual_duration, self.duration_limit)
         return result

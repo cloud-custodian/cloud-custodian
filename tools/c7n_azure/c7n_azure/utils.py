@@ -13,7 +13,9 @@
 # limitations under the License.
 import collections
 import datetime
+import enum
 import hashlib
+import isodate
 import logging
 import re
 import time
@@ -418,3 +420,48 @@ class ManagedGroupHelper(object):
         entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
 
         return [e.name for e in entities if e.type == '/subscriptions']
+
+
+class RetentionPeriodHelper(object):
+
+    @enum.unique
+    class RetentionPeriodUnits(enum.Enum):
+        day = ('day', 'D')
+        days = ('days', 'D')
+        week = ('week', 'W')
+        weeks = ('weeks', 'W')
+        month = ('month', 'M')
+        months = ('months', 'M')
+        year = ('year', 'Y')
+        years = ('years', 'Y')
+
+        def __init__(self, str_value, iso8601_symbol):
+            self.str_value = str_value
+            self.iso8601_symbol = iso8601_symbol
+
+        def __str__(self):
+            return self.str_value
+
+    @staticmethod
+    def period_to_duration_limit(period, retention_period_unit):
+        iso8601_str = "P{}{}".format(period, retention_period_unit.iso8601_symbol)
+        duration = isodate.parse_duration(iso8601_str)
+        return RetentionPeriodHelper.normalize_duration(duration)
+
+    @staticmethod
+    def normalize_duration(duration):
+
+        # TODO figure out a better way to compare durations
+        # https://docs.microsoft.com/en-us/azure/sql-database/sql-database-long-term-retention
+        #
+        # given ISO 8601 duration: P30D and P1M:
+        #   in february : P30D > P1M
+        #   in april    : P30D = P1M
+        #   in may      : P30D < P1M
+
+        if isinstance(duration, isodate.Duration):
+            now = datetime.datetime.now()
+            duration = duration.totimedelta(start=now)
+        if not isinstance(duration, datetime.timedelta):
+            raise ValueError("Could not normalize {} to a timedelta".format(duration))
+        return duration
