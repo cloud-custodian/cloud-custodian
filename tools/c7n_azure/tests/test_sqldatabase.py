@@ -81,8 +81,8 @@ class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
                         'type': 'short-term-backup-retention-policy',
                         'op': 'gte',
                         'retention-period-days': 60
-                    },
-                ],
+                    }
+                ]
             }, validate=True)
             self.assertTrue(p)
 
@@ -93,9 +93,9 @@ class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
             'filters': [
                 {
                     'type': 'short-term-backup-retention-policy',
-                    'retention-period-days': 14,
-                },
-            ],
+                    'retention-period-days': 14
+                }
+            ]
         })
         resources = p.run()
         db = next((r for r in resources if r.get('name') == 'cctestdb'), None)
@@ -110,9 +110,9 @@ class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
                 {
                     'type': 'short-term-backup-retention-policy',
                     'op': 'ne',
-                    'retention-period-days': 14,
-                },
-            ],
+                    'retention-period-days': 14
+                }
+            ]
         })
         resources = p.run()
         db = next((r for r in resources if r.get('name') == 'cctestdb'), None)
@@ -132,9 +132,9 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
                         'backup-type': 'weekly',
                         'op': 'gt',
                         'retention-period': 1,
-                        'retention-period-units': 'year',
-                    },
-                ],
+                        'retention-period-units': 'year'
+                    }
+                ]
             }, validate=True)
             self.assertTrue(p)
 
@@ -150,8 +150,8 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
                     'op': 'lt',
                     'retention-period': 2,
                     'retention-period-units': 'months',
-                },
-            ],
+                }
+            ]
         })
 
         resources = p.run()
@@ -170,9 +170,9 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
                     'backup-type': 'yearly',
                     'op': 'lte',
                     'retention-period': 18,
-                    'retention-period-units': 'months',
-                },
-            ],
+                    'retention-period-units': 'months'
+                }
+            ]
         })
 
         resources = p.run()

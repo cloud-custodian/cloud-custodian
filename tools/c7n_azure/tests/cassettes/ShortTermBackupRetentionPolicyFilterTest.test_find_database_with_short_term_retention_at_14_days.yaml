@@ -34,7 +34,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:27:03 GMT
+      - Thu, 25 Apr 2019 20:35:06 GMT
       Expires:
       - '-1'
       Pragma:
@@ -50,13 +50,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 004f4fd5-b3d4-47c7-92d8-3cfae4d140aa
+      - 66d619f6-4d10-4148-9029-16b3a7ab1a9f
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11994'
+      - '11980'
       x-ms-request-id:
-      - 176fe37f-fe80-4a09-9fa6-9333b652c4a1
+      - 0824c7a3-de93-4d8b-b801-507e6f78e2cf
       x-ms-routing-request-id:
-      - WESTUS2:20190425T162704Z:004f4fd5-b3d4-47c7-92d8-3cfae4d140aa
+      - WESTUS2:20190425T203506Z:66d619f6-4d10-4148-9029-16b3a7ab1a9f
     status:
       code: 200
       message: OK
@@ -102,7 +102,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:27:03 GMT
+      - Thu, 25 Apr 2019 20:35:09 GMT
       Expires:
       - '-1'
       Pragma:
@@ -118,13 +118,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 6e9072ce-8ede-4c51-b035-e9d1343c241c
+      - d3fc20b4-2f02-4226-b3b1-b1fb987d6cbd
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11998'
+      - '11988'
       x-ms-request-id:
-      - e91a4c3b-2af4-4a66-b2d1-e1bcdae2f43d
+      - 3064b057-f9c6-4b64-b5b5-2eb0ee4d0dd2
       x-ms-routing-request-id:
-      - WESTUS2:20190425T162703Z:6e9072ce-8ede-4c51-b035-e9d1343c241c
+      - WESTUS2:20190425T203510Z:d3fc20b4-2f02-4226-b3b1-b1fb987d6cbd
     status:
       code: 200
       message: OK
@@ -143,17 +143,16 @@ interactions:
       accept-language:
       - en-US
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cctestdb/backupShortTermRetentionPolicies?api-version=2017-10-01-preview
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cctestdb/backupShortTermRetentionPolicies/default?api-version=2017-10-01-preview
   response:
     body:
       string: !!binary |
         H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
-        uc4/evS9X/zRqq5Wed0WefPRo1/8UZ23+bItquXT7Jo+2N3/JaOPitlHjz6626wnzbQuVviyuTs7
-        ePDw/Hx/sn0wmT3c3r9/cLD9cDLZ2b6/m+8dPLyf7+3f//RunTfVup7mn9fVetXcbfOm/f2bX1Q2
-        eX2Z13ep48tiltfN3S+KaV011Xk7fv2LyrvydXN3OsULtv3barm+9+n6cp039f7dWdZmk6zJTbPZ
-        5O4km75dr17Pq7p9k9eLV2YkL6uymNLw7s7y82xdth+NPlpmCxr8R+6D9nqFD+KIuL5u6uKjX/L9
-        X/L/AAu4UeVcAQAA
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
+        WuV1W+TNR49+8Ud13ubLtqiWT7Nr+mB3/5eMPipmHz366G6znjTTuljhy+bu7ODBw/Pz/cn2wWT2
+        cHv//sHB9sPJZGf7/m6+d/Dwfr63f//Tu3XeVOt6mn9eV+tVc7fNm/b3b35R2eT1ZV7fpY4vi1le
+        N3e/KKZ11VTn7fj1LyrvytfN3ekUL9j2b6vl+t6n68t13tT7d2dZm02yJjfNZpO7k2z6dr16Pa/q
+        9k1eL16ZkbysymJKw7s7y8+zddl+NPpomS1yGpP7oL1e4YM4Iq6vm7r46Jf8P421PJRQAQAA
     headers:
       Cache-Control:
       - no-cache
@@ -162,7 +161,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:27:04 GMT
+      - Thu, 25 Apr 2019 20:35:05 GMT
       Expires:
       - '-1'
       Pragma:
@@ -178,13 +177,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 1d9b7b9a-a8ac-49b9-842e-867d8eded7d5
+      - 2883a8c5-df31-44d8-9a27-e579376dcaa5
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11999'
+      - '11988'
       x-ms-request-id:
-      - b2cc2699-ae12-4f42-9725-db9f2c02c26e
+      - e57b15d7-7182-448e-9954-70ee954bbe62
       x-ms-routing-request-id:
-      - WESTUS2:20190425T162704Z:1d9b7b9a-a8ac-49b9-842e-867d8eded7d5
+      - WESTUS2:20190425T203506Z:2883a8c5-df31-44d8-9a27-e579376dcaa5
     status:
       code: 200
       message: OK
@@ -203,7 +202,7 @@ interactions:
       accept-language:
       - en-US
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupShortTermRetentionPolicies?api-version=2017-10-01-preview
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupShortTermRetentionPolicies/default?api-version=2017-10-01-preview
   response:
     body:
       string: '{"error":{"code":"ResourceNotFound","message":"The requested resource
@@ -218,7 +217,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:27:04 GMT
+      - Thu, 25 Apr 2019 20:35:04 GMT
       Expires:
       - '-1'
       Pragma:
@@ -230,13 +229,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - b2e90a27-f5d4-4fec-8f0b-af7231040e92
+      - 33aabd12-47dc-453c-abd3-a9b76b62397f
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11997'
+      - '11980'
       x-ms-request-id:
-      - f1e80ae9-b695-453e-b640-047a5874c690
+      - 87bfe49c-30d1-41ba-92fb-66b9daabeb99
       x-ms-routing-request-id:
-      - WESTUS2:20190425T162704Z:b2e90a27-f5d4-4fec-8f0b-af7231040e92
+      - WESTUS2:20190425T203504Z:33aabd12-47dc-453c-abd3-a9b76b62397f
     status:
       code: 404
       message: Not Found

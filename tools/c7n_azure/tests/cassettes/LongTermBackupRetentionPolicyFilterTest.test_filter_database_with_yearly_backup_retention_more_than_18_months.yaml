@@ -34,7 +34,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:54:19 GMT
+      - Thu, 25 Apr 2019 20:35:07 GMT
       Expires:
       - '-1'
       Pragma:
@@ -50,13 +50,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 33b46bba-0366-4469-a0d6-a9c12029c107
+      - 1c1f1715-1f0a-46b0-8648-aeb1cc933690
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11995'
+      - '11979'
       x-ms-request-id:
-      - d091a492-7747-4a44-beb6-f3c19deddd1c
+      - b3f03a09-5b03-4208-afbe-f056c170223c
       x-ms-routing-request-id:
-      - WESTUS2:20190425T165419Z:33b46bba-0366-4469-a0d6-a9c12029c107
+      - WESTUS2:20190425T203507Z:1c1f1715-1f0a-46b0-8648-aeb1cc933690
     status:
       code: 200
       message: OK
@@ -102,7 +102,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:54:31 GMT
+      - Thu, 25 Apr 2019 20:35:13 GMT
       Expires:
       - '-1'
       Pragma:
@@ -118,13 +118,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - a6df3ff5-df55-4bb6-9349-f0a9441569cf
+      - 39aacba4-1c42-4b0f-9ab8-0fddf0528bd7
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11990'
+      - '11992'
       x-ms-request-id:
-      - badde33f-87c9-47a1-91ac-07cfe7c3b3c2
+      - 97cbe301-e9db-4afe-9686-f526ff832992
       x-ms-routing-request-id:
-      - WESTUS2:20190425T165431Z:a6df3ff5-df55-4bb6-9349-f0a9441569cf
+      - WESTUS2:20190425T203514Z:39aacba4-1c42-4b0f-9ab8-0fddf0528bd7
     status:
       code: 200
       message: OK
@@ -143,7 +143,7 @@ interactions:
       accept-language:
       - en-US
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cctestdb/backupLongTermRetentionPolicies?api-version=2017-03-01-preview
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cctestdb/backupLongTermRetentionPolicies/default?api-version=2017-03-01-preview
   response:
     body:
       string: !!binary |
@@ -162,7 +162,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:54:27 GMT
+      - Thu, 25 Apr 2019 20:35:09 GMT
       Expires:
       - '-1'
       Pragma:
@@ -178,13 +178,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 386b22ae-83bb-48b1-81f5-c29e15c29dd6
+      - 9ef98885-d0b5-40d7-aa1f-0fc9073b4f3a
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11995'
+      - '11997'
       x-ms-request-id:
-      - f611983c-310b-439d-82db-435cbe9e4bc2
+      - 23faf6df-35fe-441e-943b-e9d268ef3f52
       x-ms-routing-request-id:
-      - WESTUS2:20190425T165428Z:386b22ae-83bb-48b1-81f5-c29e15c29dd6
+      - WESTUS2:20190425T203509Z:9ef98885-d0b5-40d7-aa1f-0fc9073b4f3a
     status:
       code: 200
       message: OK
@@ -203,7 +203,7 @@ interactions:
       accept-language:
       - en-US
     method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupLongTermRetentionPolicies?api-version=2017-03-01-preview
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupLongTermRetentionPolicies/default?api-version=2017-03-01-preview
   response:
     body:
       string: !!binary |
@@ -222,7 +222,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 16:54:20 GMT
+      - Thu, 25 Apr 2019 20:35:09 GMT
       Expires:
       - '-1'
       Pragma:
@@ -238,13 +238,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - d54b413c-934e-459e-b101-a635614a427f
+      - bb177175-e8bb-4149-98c0-1ac30ad77d6e
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11995'
+      - '11990'
       x-ms-request-id:
-      - e4ea1e69-7b4f-453c-a057-c2d95b2de2e8
+      - c58067ab-ee8a-4094-b93a-d7a9355ee286
       x-ms-routing-request-id:
-      - WESTUS2:20190425T165420Z:d54b413c-934e-459e-b101-a635614a427f
+      - WESTUS2:20190425T203509Z:bb177175-e8bb-4149-98c0-1ac30ad77d6e
     status:
       code: 200
       message: OK

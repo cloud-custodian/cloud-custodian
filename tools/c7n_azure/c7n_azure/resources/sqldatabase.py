@@ -46,42 +46,52 @@ class BackupRetentionPolicyFilter(Filter):
     schema = type_schema(
         'backup-retention-policy',
         **{
-            'op': {'enum': list(scalar_ops.keys())},
-        },
+            'op': {'enum': list(scalar_ops.keys())}
+        }
     )
 
-    def __init__(self, operations_property, data, manager=None):
+    @staticmethod
+    def get_sql_server_name(sql_server_id):
+        parsed = parse_resource_id(sql_server_id)
+        return parsed.get('name')
+
+    def __init__(self, operations_property, retention_limit, data, manager=None):
         super(BackupRetentionPolicyFilter, self).__init__(data, manager)
         self.operations_property = operations_property
+        self.retention_limit = retention_limit
 
-    def list_backup_retention_policies(self, i):
+    def get_backup_retention_policy(self, i):
         client = self.manager.get_client()
-        list_operation = getattr(client, self.operations_property).list_by_database
+        get_operation = getattr(client, self.operations_property).get
 
         resource_group_name = i.get('resourceGroup')
         server_name = BackupRetentionPolicyFilter.get_sql_server_name(
             i.get(ChildResourceQuery.parent_key))
         database_name = i.get('name')
 
-        list_response = list_operation(
-            resource_group_name, server_name, database_name)
-        return list_response
+        try:
+            response = get_operation(resource_group_name, server_name, database_name)
+        except CloudError as e:
+            if e.status_code == 404:
+                response = None
+            else:
+                # TODO how to better handle this error?
+                raise e
+        return response
 
     def __call__(self, i):
-        retention_policies = self.list_backup_retention_policies(i)
-        return self.filter_with_retention_policies(i, retention_policies)
+        retention_policy = self.get_backup_retention_policy(i)
+        if retention_policy is None:
+            return self.perform_op(0, self.retention_limit)
+        retention = self.get_retention_from_policy(retention_policy)
+        return self.perform_op(retention, self.retention_limit)
 
-    def filter_with_retention_policies(self, i, retention_policies):
+    def get_retention_from_policy(self, retention_policy):
         raise NotImplementedError()
 
     def perform_op(self, a, b):
         op = scalar_ops.get(self.data.get('op', 'eq'))
         return op(a, b)
-
-    @staticmethod
-    def get_sql_server_name(sql_server_id):
-        parsed = parse_resource_id(sql_server_id)
-        return parsed.get('name')
 
 
 @SqlDatabase.filter_registry.register('short-term-backup-retention-policy')
@@ -112,33 +122,17 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         required=['retention-period-days'],
         rinherit=BackupRetentionPolicyFilter.schema,
         **{
-            'retention-period-days': {'type': 'number'},
-        },
+            'retention-period-days': {'type': 'number'}
+        }
     )
 
     def __init__(self, data, manager=None):
+        retention_limit = data.get('retention-period-days')
         super(ShortTermBackupRetentionPolicyFilter, self).__init__(
-            'backup_short_term_retention_policies', data, manager)
-        self.retention_period_days_limit = self.data.get('retention-period-days')
+            'backup_short_term_retention_policies', retention_limit, data, manager)
 
-    def filter_with_retention_policies(self, i, retention_policies):
-        try:
-            # TODO: re-think this to better handle the case of multiple backup policies...
-            # (can there be mutliple backup policies?)
-            for retention_policy in retention_policies:
-                actual_retention_days = retention_policy.retention_days
-                return self.perform_op(actual_retention_days, self.retention_period_days_limit)
-        except CloudError as e:
-            # TODO: is there a way to figure this out before trying to iterate through
-            # backup policies?
-            if e.status_code == 404:
-                return self.filter_without_retention_policies(i)
-            else:
-                raise e
-
-    def filter_without_retention_policies(self, i):
-        # without any backup retention policies, this is effectively 0 days of retention
-        return self.perform_op(0, self.retention_period_days_limit)
+    def get_retention_from_policy(self, retention_policy):
+        return retention_policy.retention_days
 
 
 @SqlDatabase.filter_registry.register('long-term-backup-retention-policy')
@@ -184,33 +178,32 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
             'backup-type': {'enum': list([str(t) for t in BackupType])},
             'retention-period': {'type': 'number'},
             'retention-period-units': {
-                'enum': list([str(u) for u in RetentionPeriodHelper.RetentionPeriodUnits]),
-            },
-        },
+                'enum': list([str(u) for u in RetentionPeriodHelper.RetentionPeriodUnits])
+            }
+        }
     )
 
     def __init__(self, data, manager=None):
-        super(LongTermBackupRetentionPolicyFilter, self).__init__(
-            'backup_long_term_retention_policies', data, manager)
-        self.backup_type = self.data.get('backup-type')
-
-        retention_period = self.data.get('retention-period')
+        retention_period = data.get('retention-period')
         retention_period_units = RetentionPeriodHelper.RetentionPeriodUnits[
-            self.data.get('retention-period-units')]
-        self.duration_limit = RetentionPeriodHelper.period_to_duration_limit(
+            data.get('retention-period-units')]
+        retention_limit = RetentionPeriodHelper.period_to_duration_limit(
             retention_period, retention_period_units)
 
-    def filter_with_retention_policies(self, i, retention_policies):
+        super(LongTermBackupRetentionPolicyFilter, self).__init__(
+            'backup_long_term_retention_policies', retention_limit, data, manager)
+        self.backup_type = self.data.get('backup-type')
+
+    def get_retention_from_policy(self, retention_policy):
         if self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.weekly.value:
-            actual_retention_days_iso8601 = retention_policies.weekly_retention
+            actual_retention_days_iso8601 = retention_policy.weekly_retention
         elif self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.monthly.value:
-            actual_retention_days_iso8601 = retention_policies.monthly_retention
+            actual_retention_days_iso8601 = retention_policy.monthly_retention
         elif self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.yearly.value:
-            actual_retention_days_iso8601 = retention_policies.yearly_retention
+            actual_retention_days_iso8601 = retention_policy.yearly_retention
         else:
             raise ValueError("Unknown backup-type: {}".format(self.backup_type))
 
         actual_duration = isodate.parse_duration(actual_retention_days_iso8601)
         actual_duration = RetentionPeriodHelper.normalize_duration(actual_duration)
-        result = self.perform_op(actual_duration, self.duration_limit)
-        return result
+        return actual_duration
