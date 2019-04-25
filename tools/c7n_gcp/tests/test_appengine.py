@@ -106,3 +106,43 @@ class AppEngineDomainTest(BaseTest):
         resources = policy.run()
         self.assertEqual(resources[0]['name'], domain_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
+
+
+class AppEngineDomainMappingTest(BaseTest):
+
+    def test_domain_mapping_query(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/{}'.format(project_id)
+        domain_mapping_id = 'alex.gcp-li.ga'
+        domain_mapping_name = '{}/domainMappings/{}'.format(app_name, domain_mapping_id)
+        session_factory = self.replay_flight_data(
+            'appengine-domain-mapping-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-appengine-domain-mapping-dryrun',
+             'resource': 'gcp.appengine-domain-mapping'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], domain_mapping_name)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
+
+    def test_domain_mapping_get(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/' + project_id
+        domain_mapping_id = 'alex.gcp-li.ga'
+        domain_mapping_name = '{}/domainMappings/{}'.format(app_name, domain_mapping_id)
+        session_factory = self.replay_flight_data(
+            'appengine-domain-mapping-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-appengine-domain-mapping-dryrun',
+             'resource': 'gcp.appengine-domain-mapping'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resource = policy.resource_manager.get_resource(
+            {'resourceName': domain_mapping_name})
+        self.assertEqual(resource['name'], domain_mapping_name)
+        self.assertEqual(resource[parent_annotation_key]['name'], app_name)

@@ -85,3 +85,32 @@ class AppEngineDomain(ChildResourceManager):
                 ('id', 'appsId')
             }
         }
+
+
+@resources.register('appengine-domain-mapping')
+class AppEngineDomainMapping(ChildResourceManager):
+
+    def _get_parent_resource_info(self, child_instance):
+        return {'resourceName': re.compile(
+            '(apps/.*?)/domainMappings/.*').match(child_instance['name']).group(1)}
+
+    class resource_type(ChildTypeInfo):
+        service = 'appengine'
+        version = 'v1'
+        component = 'apps.domainMappings'
+        enum_spec = ('list', 'domainMappings[]', None)
+        scope = None
+        id = 'id'
+        parent_spec = {
+            'resource': 'appengine-app',
+            'child_enum_params': {
+                ('id', 'appsId')
+            }
+        }
+
+        @staticmethod
+        def get(client, resource_info):
+            name_param_re = re.compile('apps/(.*?)/domainMappings/(.*)')
+            apps_id, mapping_id = name_param_re.match(resource_info['resourceName']).groups()
+            return client.execute_query('get', {'appsId': apps_id,
+                                                'domainMappingsId': mapping_id})
