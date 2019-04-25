@@ -23,8 +23,7 @@ Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
-- ``update-access-policy``
-  Add or Replace access policies from key vaults under a provided principal object id
+- ``update-access-policy`` - Add or Replace access policies from key vaults under a provided principal object id
     - operation: `add`, `append`
         - `add`: adds or appends permission
         - `replace`: replaces existing access policy
