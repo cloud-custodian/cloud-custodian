@@ -509,8 +509,7 @@ class Stop(BaseAction):
 
     schema = type_schema('stop')
 
-    # permissions are unclear, and not currrently documented or in iam gen
-    permissions = ("rds:RebootDBInstance",)
+    permissions = ("rds:StopDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
@@ -531,8 +530,7 @@ class Start(BaseAction):
 
     schema = type_schema('start')
 
-    # permissions are unclear, and not currrently documented or in iam gen
-    permissions = ("rds:RebootDBInstance",)
+    permissions = ("rds:StartDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
