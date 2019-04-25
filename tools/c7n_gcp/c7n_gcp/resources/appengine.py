@@ -67,3 +67,21 @@ class AppEngineCertificate(ChildResourceManager):
             apps_id, cert_id = name_param_re.match(resource_info['resourceName']).groups()
             return client.execute_query('get', {'appsId': apps_id,
                                                 'authorizedCertificatesId': cert_id})
+
+
+@resources.register('appengine-domain')
+class AppEngineDomain(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        service = 'appengine'
+        version = 'v1'
+        component = 'apps.authorizedDomains'
+        enum_spec = ('list', 'domains[]', None)
+        scope = None
+        id = 'id'
+        parent_spec = {
+            'resource': 'appengine-app',
+            'child_enum_params': {
+                ('id', 'appsId')
+            }
+        }

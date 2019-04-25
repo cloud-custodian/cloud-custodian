@@ -85,3 +85,24 @@ class AppEngineCertificateTest(BaseTest):
             {'resourceName': certificate_name})
         self.assertEqual(resource['name'], certificate_name)
         self.assertEqual(resource[parent_annotation_key]['name'], app_name)
+
+
+class AppEngineDomainTest(BaseTest):
+
+    def test_domain_query(self):
+        project_id = 'cloud-custodian'
+        app_name = 'apps/{}'.format(project_id)
+        domain_id = 'gcp-li.ga'
+        domain_name = '{}/authorizedDomains/{}'.format(app_name, domain_id)
+        session_factory = self.replay_flight_data(
+            'appengine-domain-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-appengine-domain-dryrun',
+             'resource': 'gcp.appengine-domain'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], domain_name)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], app_name)
