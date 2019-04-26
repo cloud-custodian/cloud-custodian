@@ -87,32 +87,32 @@ class BackupRetentionPolicyFilterTest(BaseTest):
 
     def test_raises_key_error_without_resource_group(self):
         with self.assertRaises(KeyError):
-            self.filter({
+            self.filter.process([{
                 ChildResourceQuery.parent_key: self.parent_key,
                 'name': self.name
-            })
+            }])
 
     def test_raises_key_error_without_parent_key(self):
         with self.assertRaises(KeyError):
-            self.filter({
+            self.filter.process([{
                 'resourceGroup': self.resouce_group,
                 'name': self.name
-            })
+            }])
 
     def test_raises_key_error_without_name(self):
         with self.assertRaises(KeyError):
-            self.filter({
+            self.filter.process([{
                 'resourceGroup': self.resouce_group,
                 ChildResourceQuery.parent_key: self.parent_key
-            })
+            }])
 
     def test_raises_value_error_when_cannot_determine_sql_server_name(self):
         with self.assertRaises(ValueError):
-            self.filter({
+            self.filter.process([{
                 'resourceGroup': self.resouce_group,
                 ChildResourceQuery.parent_key: "invalidResourceId",
                 'name': self.name
-            })
+            }])
 
 
 class ShortTermBackupRetentionPolicyFilterTest(BaseTest):

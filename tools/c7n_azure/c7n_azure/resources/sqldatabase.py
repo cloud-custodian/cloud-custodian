@@ -20,7 +20,7 @@ from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 from c7n_azure.query import ChildResourceQuery
 from c7n_azure.filters import scalar_ops
 from c7n.filters import Filter
-from c7n_azure.utils import RetentionPeriodHelper, ResourceIdParser
+from c7n_azure.utils import RetentionPeriodHelper, ResourceIdParser, ThreadHelper
 from c7n.utils import type_schema
 from msrestazure.azure_exceptions import CloudError
 
@@ -57,10 +57,40 @@ class BackupRetentionPolicyFilter(Filter):
         self.operations_property = operations_property
         self.retention_limit = retention_limit
 
-    def get_backup_retention_policy(self, i):
+    def get_retention_from_policy(self, retention_policy):
+        raise NotImplementedError()
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event):
         client = self.manager.get_client()
         get_operation = getattr(client, self.operations_property).get
+        matched_resources = []
 
+        for resource in resources:
+            match = self._process_resource(resource, get_operation)
+            if match:
+                matched_resources.append(resource)
+        return matched_resources
+
+    def _process_resource(self, i, get_operation):
+        retention_policy = self._get_backup_retention_policy(i, get_operation)
+        if retention_policy is None:
+            return self._perform_op(0, self.retention_limit)
+        retention = self.get_retention_from_policy(retention_policy)
+        return self._perform_op(retention, self.retention_limit)
+
+    def _get_backup_retention_policy(self, i, get_operation):
         resource_group_name = i['resourceGroup']
         server_id = i[ChildResourceQuery.parent_key]
         database_name = i['name']
@@ -79,19 +109,10 @@ class BackupRetentionPolicyFilter(Filter):
                 "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
                     resource_group_name, server_name, database_name))
                 raise e
+
         return response
 
-    def __call__(self, i):
-        retention_policy = self.get_backup_retention_policy(i)
-        if retention_policy is None:
-            return self.perform_op(0, self.retention_limit)
-        retention = self.get_retention_from_policy(retention_policy)
-        return self.perform_op(retention, self.retention_limit)
-
-    def get_retention_from_policy(self, retention_policy):
-        raise NotImplementedError()
-
-    def perform_op(self, a, b):
+    def _perform_op(self, a, b):
         op = scalar_ops.get(self.data.get('op', 'eq'))
         return op(a, b)
 
