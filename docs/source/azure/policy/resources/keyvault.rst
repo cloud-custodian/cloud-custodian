@@ -27,7 +27,7 @@ Actions
     - operation: `add`, `append`
         - `add`: adds or appends permission
         - `replace`: replaces existing access policy
-    - tenant-id: The tenant id of the subscription the action will be performed on
+    - tenant-id: The tenant id of the object id and is used for authenticating with keyvault
     - object-id: The object id of the user or service principal. This can be retrieved through azure cli or azure portal
     - Keys permissions: `Get`, `Create`, `Delete`, `List`, `Update`, `Import`, `Backup`, `Restore`, `Recover`, `Decrypt`, `UnwrapKey`, `Encrypt`, `WrapKey`, `Verify`, `Sign`, `Purge`
     - Secret permissions: `Get`, `List`, `Set`, `Delete`, `Backup`, `Restore`, `Recover`, `Purge`
