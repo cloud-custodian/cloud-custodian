@@ -1,6 +1,6 @@
-.. image:: https://badges.gitter.im/capitalone/cloud-custodian.svg
-     :target: https://gitter.im/capitalone/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-     :alt: Join the chat at https://gitter.im/capitalone/cloud-custodian
+.. image:: https://badges.gitter.im/cloud-custodian/cloud-custodian.svg
+     :target: https://gitter.im/cloud-custodian/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+     :alt: Join the chat at https://gitter.im/cloud-custodian/cloud-custodian
 
 .. image:: https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/cloud-custodian.cloud-custodian?branchName=master
      :target: https://dev.azure.com/cloud-custodian/cloud-custodian/_build
@@ -10,8 +10,8 @@
      :target: https://www.apache.org/licenses/LICENSE-2.0
      :alt: License
 
-.. image:: https://coveralls.io/repos/github/capitalone/cloud-custodian/badge.svg?branch=master
-     :target: https://coveralls.io/github/capitalone/cloud-custodian?branch=master
+.. image:: https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg
+     :target: https://codecov.io/gh/cloud-custodian/cloud-custodian
      :alt: Coverage
 
 .. image:: https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master
