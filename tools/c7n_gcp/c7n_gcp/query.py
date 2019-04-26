@@ -198,7 +198,15 @@ class ChildResourceManager(QueryResourceManager):
 
         for parent_instance in parent_resource_manager.resources():
             query.update(self._get_child_enum_args(parent_instance))
-            children = super(ChildResourceManager, self)._fetch_resources(query)
+
+            try:
+                children = super(ChildResourceManager, self)._fetch_resources(query)
+            except HttpError as e:
+                error = extract_error(e)
+                if error == 'invalid':
+                    continue
+                else:
+                    raise
 
             for child_instance in children:
                 child_instance[annotation_key] = parent_instance
