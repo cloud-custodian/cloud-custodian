@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigurationRecordersStatus": [
+            {
+                "name": "default",
+                "lastStartTime": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 12,
+                    "day": 2,
+                    "hour": 15,
+                    "minute": 28,
+                    "second": 1,
+                    "microsecond": 309000
+                },
+                "lastStopTime": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 12,
+                    "day": 2,
+                    "hour": 15,
+                    "minute": 27,
+                    "second": 47,
+                    "microsecond": 448000
+                },
+                "recording": true,
+                "lastStatus": "SUCCESS",
+                "lastStatusChangeTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 4,
+                    "day": 24,
+                    "hour": 19,
+                    "minute": 28,
+                    "second": 13,
+                    "microsecond": 959000
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "f6c97487-66fc-11e9-9235-15f1e21ed970",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f6c97487-66fc-11e9-9235-15f1e21ed970",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "198",
+                "date": "Thu, 25 Apr 2019 01:53:46 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
