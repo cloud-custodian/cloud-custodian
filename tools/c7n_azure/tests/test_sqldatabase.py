@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import mock
 from azure_common import BaseTest, arm_template
+from c7n_azure.resources.sqldatabase import BackupRetentionPolicyFilter
+from c7n_azure.query import ChildResourceQuery
 
 
 class SqlDatabaseTest(BaseTest):
@@ -67,6 +70,49 @@ class SqlDatabaseTest(BaseTest):
         db = resources[0]
 
         self.assertEqual(db.get('name'), 'cctestdb')
+
+
+class BackupRetentionPolicyFilterTest(BaseTest):
+
+    def setUp(self):
+        super(BackupRetentionPolicyFilterTest, self).setUp()
+
+        self.resouce_group = "test_sqlserver"
+        self.parent_key = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/"
+        "test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserver"
+        self.name = "cctestdb"
+
+        manager = mock.Mock()
+        self.filter = BackupRetentionPolicyFilter('op-prop', 0, {}, manager)
+
+    def test_raises_key_error_without_resource_group(self):
+        with self.assertRaises(KeyError):
+            self.filter({
+                ChildResourceQuery.parent_key: self.parent_key,
+                'name': self.name
+            })
+
+    def test_raises_key_error_without_parent_key(self):
+        with self.assertRaises(KeyError):
+            self.filter({
+                'resourceGroup': self.resouce_group,
+                'name': self.name
+            })
+
+    def test_raises_key_error_without_name(self):
+        with self.assertRaises(KeyError):
+            self.filter({
+                'resourceGroup': self.resouce_group,
+                ChildResourceQuery.parent_key: self.parent_key
+            })
+
+    def test_raises_value_error_when_cannot_determine_sql_server_name(self):
+        with self.assertRaises(ValueError):
+            self.filter({
+                'resourceGroup': self.resouce_group,
+                ChildResourceQuery.parent_key: "invalidResourceId",
+                'name': self.name
+            })
 
 
 class ShortTermBackupRetentionPolicyFilterTest(BaseTest):

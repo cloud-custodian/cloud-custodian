@@ -20,10 +20,9 @@ from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 from c7n_azure.query import ChildResourceQuery
 from c7n_azure.filters import scalar_ops
 from c7n.filters import Filter
-from c7n_azure.utils import RetentionPeriodHelper
+from c7n_azure.utils import RetentionPeriodHelper, ResourceIdParser
 from c7n.utils import type_schema
 from msrestazure.azure_exceptions import CloudError
-from msrestazure.tools import parse_resource_id
 
 log = logging.getLogger('custodian.azure.sqldatabase')
 
@@ -53,11 +52,6 @@ class BackupRetentionPolicyFilter(Filter):
         }
     )
 
-    @staticmethod
-    def get_sql_server_name(sql_server_id):
-        parsed = parse_resource_id(sql_server_id)
-        return parsed.get('name')
-
     def __init__(self, operations_property, retention_limit, data, manager=None):
         super(BackupRetentionPolicyFilter, self).__init__(data, manager)
         self.operations_property = operations_property
@@ -67,10 +61,13 @@ class BackupRetentionPolicyFilter(Filter):
         client = self.manager.get_client()
         get_operation = getattr(client, self.operations_property).get
 
-        resource_group_name = i.get('resourceGroup')
-        server_name = BackupRetentionPolicyFilter.get_sql_server_name(
-            i.get(ChildResourceQuery.parent_key))
-        database_name = i.get('name')
+        resource_group_name = i['resourceGroup']
+        server_id = i[ChildResourceQuery.parent_key]
+        database_name = i['name']
+
+        server_name = ResourceIdParser.get_resource_name(server_id)
+        if server_name is None:
+            raise ValueError("Unable to determine the sqlserver name for sqldatabase")
 
         try:
             response = get_operation(resource_group_name, server_name, database_name)
