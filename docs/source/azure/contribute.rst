@@ -13,7 +13,7 @@ in the makefile:
 
 This creates a virtual env in your enlistment and installs all packages as editable.
 
-Instead, you can do `pip install tools/c7n_azure/requirements.txt` to install test dependencies.
+Instead, you can do `pip install -r tools/c7n_azure/requirements.txt` to install test dependencies.
 
 Adding New Azure Resources
 ==========================

@@ -16,6 +16,18 @@ Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
+- ``set-network-rules`` Set network (firewall) rules.
+    - `default-action`: Required. Can be either Allow or Deny. 
+    - `bypass`: Optional. List of services that are allowed to bypass the rules. Any combination of AzureServices, 
+       Logging and Metrics, e.g. [Logging, Metrics]. If not specified the property is not changed.
+    - `ip-rules`: Optional. List of allowed ip-s or addresses. Specify empty list [] to remove all items.
+      - `ip-address-or-range`: Ip address or range that is allowed.
+    - `virtual-network-rules`: Optional. List of allowed virtual networks. Specify empty list [] to remove all items.
+      - `virtual-network-resource-id`: Azure id of a subnet of a virtual network.
+
+  .. c7n-schema:: StorageSetNetworkRulesAction
+       :module: c7n_azure.resources.storage
+
 Example Policies
 ----------------
 
