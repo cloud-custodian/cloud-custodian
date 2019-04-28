@@ -42,6 +42,7 @@ except ImportError:
     # Likely using another provider in a serverless environment
     class PageIterator(object):
         pass
+
     class Paginator(object):
         pass
 
