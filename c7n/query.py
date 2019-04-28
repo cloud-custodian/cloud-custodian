@@ -21,14 +21,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 import itertools
 import json
-from concurrent.futures import as_completed
 
 import jmespath
 import six
 
 
 from c7n.actions import ActionRegistry
-from c7n.exceptions import ClientError, ResourceLimitExceeded
+from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyRuntimeError
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
@@ -217,11 +216,11 @@ sources = PluginRegistry('sources')
 @sources.register('describe')
 class DescribeSource(object):
 
-    QueryFactory = ResourceQuery
+    resource_query_factory = ResourceQuery
 
     def __init__(self, manager):
         self.manager = manager
-        self.query = self.QueryFactory(self.manager.session_factory)
+        self.query = self.get_query()
 
     def get_resources(self, ids, cache=True):
         return self.query.get(self.manager, ids)
@@ -229,8 +228,11 @@ class DescribeSource(object):
     def resources(self, query):
         return self.query.filter(self.manager, **query)
 
-    def get_query_params(self, query):
-        return query
+    def get_query(self):
+        return self.resource_query_factory(self.manager.session_factory)
+
+    def get_query_params(self, query_params):
+        return query_params
 
     def get_permissions(self):
         m = self.manager.get_model()
@@ -265,10 +267,6 @@ class ChildDescribeSource(DescribeSource):
 
     resource_query_factory = ChildResourceQuery
 
-    def __init__(self, manager):
-        self.manager = manager
-        self.query = self._get_query()
-
     def get_query(self):
         return self.resource_query_factory(
             self.manager.session_factory, self.manager)
@@ -302,7 +300,7 @@ class ConfigSource(object):
         return list(filter(None, results))
 
     def get_query_params(self, query):
-        """Get config select expression from policy and parameter.
+        """Parse config select expression from policy and parameter.
 
         On policy config supports a full statement being given, or
         a clause that will be added to the where expression.

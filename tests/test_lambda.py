@@ -156,18 +156,21 @@ class LambdaLayerTest(BaseTest):
 class LambdaTest(BaseTest):
 
     def test_lambda_config_source(self):
-        factory = self.replay_flight_data("test_aws_lambda_config_source")
+        factory = self.record_flight_data("test_aws_lambda_config_source")
         p = self.load_policy(
             {
                 "name": "lambda-config",
                 "resource": "lambda",
                 "source": "config",
-                "filters": [{"FunctionName": "omnissm-register"}],
+                'query': [
+                    {'clause': "resourceId = 'omnissm-handle-registrations'"},
+                ],
             },
-            session_factory=factory,
-        )
+            session_factory=factory, config={'region': 'us-east-2'})
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'omnissm-handle-registrations')
         self.assertEqual(
             resources[0]["Tags"], [{"Key": "lambda:createdBy", "Value": "SAM"}]
         )
