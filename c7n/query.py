@@ -27,7 +27,7 @@ import six
 
 
 from c7n.actions import ActionRegistry
-from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyRuntimeError
+from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyExecutionError
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
@@ -312,7 +312,7 @@ class ConfigSource(object):
         must have resourceType qualifier.
         """
         if query and not isinstance(query, dict):
-            raise PolicyRuntimeError("invalid config source query %s" % (query,))
+            raise PolicyExecutionError("invalid config source query %s" % (query,))
 
         if query is None and 'query' in self.manager.data:
             _q = [q for q in self.manager.data['query'] if 'expr' in q]

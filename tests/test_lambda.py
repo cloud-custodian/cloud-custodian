@@ -156,7 +156,7 @@ class LambdaLayerTest(BaseTest):
 class LambdaTest(BaseTest):
 
     def test_lambda_config_source(self):
-        factory = self.record_flight_data("test_aws_lambda_config_source")
+        factory = self.replay_flight_data("test_aws_lambda_config_source")
         p = self.load_policy(
             {
                 "name": "lambda-config",
