@@ -218,7 +218,7 @@ class NetworkSecurityGroupTest(BaseTest):
                  'match': 'any',
                  'access': 'Deny'}],
             'actions': [
-                {'type': 'open',
+                {'type': 'close',
                  'ports': '1000-1100',
                  'direction': 'Inbound'}]
         })

@@ -66,6 +66,6 @@ class AzureEventsTest(BaseTest):
         sub_name = 'custodiantestsubscription'
         event_subscription = AzureEventSubscription.create(sub_destination,
                                                            sub_name,
-                                                           DEFAULT_SUBSCRIPTION_ID)
+                                                           self.session.get_subscription_id())
         self.assertEqual(event_subscription.name, sub_name)
         self.assertEqual(event_subscription.destination.endpoint_type, 'StorageQueue')

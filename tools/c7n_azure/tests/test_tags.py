@@ -17,7 +17,7 @@ import datetime
 import logging
 import re
 
-from azure_common import BaseTest, arm_template, TEST_DATE
+from azure_common import BaseTest, arm_template
 from c7n_azure.actions import AutoTagUser
 from c7n_azure.session import Session
 from mock import patch
@@ -389,81 +389,77 @@ class TagsTest(BaseTest):
             p.run()
 
     @arm_template('vm.json')
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_auto_tag_add_creator_tag(self, utcnow):
-        """Adds CreatorEmail to a resource group.
-           IMPORTANT: If this test is failing, you might need to update
-                      TEST_DATE and capture new cassette.
-        """
-        p = self.load_policy({
-            'name': 'test-azure-tag',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'}
-            ],
-            'actions': [
-                {'type': 'auto-tag-user',
-                 'tag': 'CreatorEmail',
-                 'days': 2},
-            ],
-        })
-        p.run()
+    def test_auto_tag_add_creator_tag(self):
+        """Adds CreatorEmail to a resource group."""
+        with patch('c7n_azure.actions.utcnow') as utc_patch:
+            utc_patch.return_value = self.get_test_date()
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'}
+                ],
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'days': 2},
+                ],
+            })
+            p.run()
 
-        after_tags = self.get_tags(self.rg_name, self.vm_name)
-        self.assertTrue(re.match(self.EMAIL_REGEX, after_tags.get('CreatorEmail')))
+            after_tags = self.get_tags(self.rg_name, self.vm_name)
+            self.assertTrue(re.match(self.EMAIL_REGEX, after_tags.get('CreatorEmail')))
 
     @arm_template('vm.json')
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_auto_tag_update_false_noop_for_existing_tag(self, utcnow):
-        """Adds CreatorEmail to a resource group
-           IMPORTANT: If this test is failing, you might need to update
-                      TEST_DATE and capture new cassette.
-        """
+    def test_auto_tag_update_false_noop_for_existing_tag(self):
+        """Adds CreatorEmail to a resource group"""
+        with patch('c7n_azure.actions.utcnow') as utc_patch:
+            utc_patch.return_value = self.get_test_date()
 
-        # setup by adding an existing CreatorEmail tag
-        p = self.load_policy({
-            'name': 'test-azure-tag',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'}
-            ],
-            'actions': [
-                {'type': 'tag',
-                 'tag': 'CreatorEmail',
-                 'value': 'do-not-modify'},
-            ],
-        })
-        p.run()
+            # setup by adding an existing CreatorEmail tag
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'}
+                ],
+                'actions': [
+                    {'type': 'tag',
+                     'tag': 'CreatorEmail',
+                     'value': 'do-not-modify'},
+                ],
+            })
+            p.run()
 
-        p = self.load_policy({
-            'name': 'test-azure-tag',
-            'resource': 'azure.vm',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctestvm'}
-            ],
-            'actions': [
-                {'type': 'auto-tag-user',
-                 'tag': 'CreatorEmail',
-                 'update': False,
-                 'days': 10}
-            ],
-        })
-        p.run()
+            p = self.load_policy({
+                'name': 'test-azure-tag',
+                'resource': 'azure.vm',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestvm'}
+                ],
+                'actions': [
+                    {'type': 'auto-tag-user',
+                     'tag': 'CreatorEmail',
+                     'update': False,
+                     'days': 10}
+                ],
+            })
+            p.run()
 
-        after_tags = self.get_tags(self.rg_name, self.vm_name)
-        self.assertEqual(after_tags['CreatorEmail'], 'do-not-modify')
+            after_tags = self.get_tags(self.rg_name, self.vm_name)
+            self.assertEqual(after_tags['CreatorEmail'], 'do-not-modify')
 
     def test_auto_tag_days_must_be_btwn_1_and_90(self):
         with self.assertRaises(FilterValidationError):
@@ -1195,13 +1191,10 @@ class TagsTest(BaseTest):
     DAYS = 10
 
     @arm_template('vm.json')
-    @patch('c7n_azure.utils.now', return_value=TEST_DATE)
-    def test_mark_for_op(self, date_mock):
-        """IMPORTANT: If this test is failing, you might need to update
-                      TEST_DATE and capture new cassette.
-        """
-        with patch('c7n_azure.utils.now') as MockClass:
-            MockClass.return_value = TEST_DATE
+    def test_mark_for_op(self):
+        with patch('c7n_azure.utils.now') as utc_patch:
+            utc_patch.return_value = self.get_test_date()
+
             policy = {
                 'name': 'test-mark-for-op',
                 'resource': 'azure.vm',
@@ -1237,7 +1230,7 @@ class TagsTest(BaseTest):
             resources = p.run()
             self.assertEqual(len(resources), 0)
 
-            MockClass.return_value = TEST_DATE + datetime.timedelta(days=self.DAYS)
+            utc_patch.return_value = self.get_test_date() + datetime.timedelta(days=self.DAYS)
             policy = {
                 'name': 'test-mark-for-op',
                 'resource': 'azure.vm',

@@ -14,12 +14,15 @@
 import datetime
 import os
 import re
+import email.utils as eut
+import json
 
-from c7n_azure import constants
+from c7n_azure import constants, actions
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
 from vcr_unittest import VCRTestCase
+from azure_serializer import AzureSerializer
 
 from c7n.resources import load_resources
 from c7n.schema import generate
@@ -36,33 +39,46 @@ C7N_SCHEMA = generate()
 DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 DEFAULT_TENANT_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
-# latest VCR recording date that tag tests
-# If tests need to be re-recorded, update to current date
-TEST_DATE = datetime.datetime(2018, 9, 10, 23, 59, 59)
 
 
 class AzureVCRBaseTest(VCRTestCase):
 
+    TEST_DATE = None
+
+    FILTERED_HEADERS = ['Authorization',
+                        'client-request-id',
+                        'retry-after',
+                        'strict-transport-security',
+                        'server',
+                        'User-Agent',
+                        'accept-language',
+                        'Connection',
+                        'x-ms-client-request-id',
+                        'x-ms-correlation-request-id',
+                        'x-ms-ratelimit-remaining-subscription-reads',
+                        'x-ms-request-id',
+                        'x-ms-routing-request-id',
+                        'x-ms-gateway-service-instanceid',
+                        'x-ms-ratelimit-remaining-tenant-reads',
+                        'x-ms-served-by',
+                        'x-aspnet-version',
+                        'x-content-type-options',
+                        'x-powered-by']
+
     def _get_vcr_kwargs(self):
         return super(VCRTestCase, self)._get_vcr_kwargs(
-            filter_headers=['Authorization',
-                            'client-request-id',
-                            'retry-after',
-                            'x-ms-client-request-id',
-                            'x-ms-correlation-request-id',
-                            'x-ms-ratelimit-remaining-subscription-reads',
-                            'x-ms-request-id',
-                            'x-ms-routing-request-id',
-                            'x-ms-gateway-service-instanceid',
-                            'x-ms-ratelimit-remaining-tenant-reads',
-                            'x-ms-served-by', ],
-            before_record_request=self.request_callback
+            filter_headers=self.FILTERED_HEADERS,
+            before_record_request=self._request_callback,
+            before_record_response=self._response_callback,
+            decode_compressed_response=True
         )
 
     def _get_vcr(self, **kwargs):
         myvcr = super(VCRTestCase, self)._get_vcr(**kwargs)
-        myvcr.register_matcher('azurematcher', self.azure_matcher)
-        myvcr.match_on = ['azurematcher', 'method']
+        myvcr.register_matcher('azure-matcher', self._azure_matcher)
+        myvcr.match_on = ['azure-matcher', 'method']
+        myvcr.register_serializer('azure-json', AzureSerializer())
+        myvcr.serializer = 'azure-json'
 
         # Block recording when using fake token (tox runs)
         if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
@@ -70,7 +86,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
         return myvcr
 
-    def azure_matcher(self, r1, r2):
+    def _azure_matcher(self, r1, r2):
         """Replace all subscription ID's and ignore api-version"""
         if [k for k in set(r1.query) if k[0] != 'api-version'] != [
                 k for k in set(r2.query) if k[0] != 'api-version']:
@@ -90,7 +106,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
         return r1_path == r2_path
 
-    def request_callback(self, request):
+    def _request_callback(self, request):
         """Modify requests before saving"""
         if "/subscriptions/" in request.url:
             request.uri = re.sub(
@@ -105,6 +121,30 @@ class AzureVCRBaseTest(VCRTestCase):
             return None
         return request
 
+    def _response_callback(self, response):
+        if not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path):
+            if 'data' in response['body']:
+                body = json.dumps(response['body']['data'])
+                response['body']['string'] = body.encode('utf-8')
+                response['headers']['content-length'] = [str(len(body))]
+
+            return response
+
+        headers = {}
+        for key in response['headers']:
+            if key.lower() not in self.FILTERED_HEADERS:
+                headers[key.lower()] = response['headers'][key]
+        response['headers'] = headers
+
+        content_type = response['headers'].get('content-type', (None,))[0]
+        if not content_type or 'application/json' not in content_type:
+            return response
+
+        body = response['body'].pop('string')
+        response['body']['data'] = json.loads(body)
+
+        return response
+
 
 class BaseTest(TestUtils, AzureVCRBaseTest):
     """ Azure base testing class.
@@ -115,12 +155,32 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         ThreadHelper.disable_multi_threading = True
 
         # Patch Poller with constructor that always disables polling
-        self.lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_test_init)
-        self.lro_patch.start()
+        self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
+        self._lro_patch.start()
+
+        self._utc_patch = patch.object(actions, 'utcnow', BaseTest.get_test_date)
+        self._utc_patch.start()
 
     def tearDown(self):
         super(BaseTest, self).tearDown()
-        self.lro_patch.stop()
+        self._lro_patch.stop()
+        self._utc_patch.stop()
+
+    def get_test_date(self):
+        header_date = self.cassette.responses[0]['headers'].get('date') if self.cassette.responses else None
+
+        if header_date:
+            test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
+        else:
+            test_date = datetime.datetime.now()
+        return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
+
+        # test_date = self.cassette.requests[0]['headers'].get('test-date')
+        # if test_date:
+        #     return datetime.datetime(*eut.parsedate(test_date[0])[:6])
+        # else:
+        #     current_date = datetime.datetime.now()
+        #     self.cassette.requests[0]['headers']['test-date'] =
 
     @staticmethod
     def setup_account():
@@ -142,7 +202,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                           }, clear=True)
 
     @staticmethod
-    def lro_test_init(self, client, initial_response, deserialization_callback, polling_method):
+    def lro_init(self, client, initial_response, deserialization_callback, polling_method):
         self._client = client if isinstance(client, ServiceClient) else client._client
         self._response = initial_response.response if \
             isinstance(initial_response, ClientRawResponse) else \

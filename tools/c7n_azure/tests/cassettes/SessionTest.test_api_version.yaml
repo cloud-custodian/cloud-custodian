@@ -1,129 +1,1760 @@
-interactions:
-- request:
-    body: null
-    headers:
-      Accept: [application/json]
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/2.7.13 (Windows-10-10.0.16299) requests/2.18.4 msrest/0.4.27
-          msrest_azure/0.4.25 resourcemanagementclient/1.2.1 Azure-SDK-For-Python]
-      accept-language: [en-US]
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?api-version=2017-05-10
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
-        uc4/evS9X/xRMfvo0Ud3m/WkmdbFqi2qZXM3yx4ePHywP9m+P9vLtvdnDw+2swcH2fa9g73zew92
-        7892HuR367yp1vU0/7yu1qvm7vGLn/ry+Zcn395+c/r6zfZPfnF3VVeXxSyvm7tfFNO6aqrzdnxS
-        LVbrNr87K5q31M3yB1VZTefbbd6025eL3//L5il98fvv/v75/Z383mx38mByPtk/OLg3ub/34NM8
-        v3cv392Z3d9/+NHoo2W2oAF89EEw2usVYAzgRw2at+uPHv1i09fLOl8U68Xv//zVa/quLfLaffjR
-        Lxl9tMiW2UU+e3JNH9/9cIp2h7aRopdF3a6z8otsOi+Wef9lQpj+zIANYUf9tPNpvmzrrFw3hPs3
-        xwfdjj8Ua6V95JvB2etApab05v9bhv4ib6+q+u3dpfw8W7Z5fZ5NI4Pfvb9LqA+MX77skWAQOjWm
-        1/9fSoTX+XRdF+31AIjtZXNB+A9QQr+9iRRhH/QCwfh/GzlW60lZTM9eHs9mBKaJ8MR2sSLUhyjB
-        Xw4SogedGocK7knWFFP6VFXbq/yCxp2VRJD/N1JLxVz/7L+8fUlTT6PRwQ19PUivDnxqSq//v4UI
-        r9uqJmNzt5Gfx9NptV627mW8e7mYFdnFQ9YUHSJ0v+4RYQA+NQ1Z5nWbLWdZPQuNovmU6PLR22IJ
-        wihAakP9D1CR3s8uGoL+S75JerJD8ub489dRQhqjwSb/Luiync1m20DE+RIEO/t0du/Bw0+zfP/e
-        vfsPH0527t/PHtyb7M+yT6c7hLnS4+sD6E1BgBk1CAmvfkdId/0QZP+GnREeF8a0kYgqMsbyyluG
-        GoSmN/VX9NW62SNUf9gzfROSSuDux4Pz04FHTSPDpPcBhuaPfu7SF+yBQ/SmdZ6RbNBH2bJcV8uL
-        33Nhu5hWcHTmBX25u3dvn37/fagDgqoKaVXn2/m7ommL5cU2oC6qWXFe5DP6blJN6INVVX30jUoT
-        k4XGEGcEVZbG6Dr/Q94z5DzYe0AYxggt3/RoPQiXGkeo/XM24NDLkHfN0NRRiY1av7pp2CF0euH/
-        FUPv+RXynh0beyXRUfM3g4PuwaXGoQ68nb/yc0cZ1Qz6p/eW8T10HL3PB2nSgUhNIwOl9wkW6OTr
-        B2pgtcMPUSOo3e86EvwWXmIfZBdC7xEj/KJHjQGY1DTkD+OGhEbSfEoMsdE56ZHzG6fa768DeC/C
-        TaetfnT9afb2+hetsotZe68iNHXUww1+jghJ4x7w8r7/S/4ffCOf2osSAAA=
-    headers:
-      cache-control: [no-cache]
-      content-encoding: [gzip]
-      content-length: ['1070']
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 18 Apr 2018 16:57:25 GMT']
-      expires: ['-1']
-      pragma: [no-cache]
-      strict-transport-security: [max-age=31536000; includeSubDomains]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [833b537f-9a26-4ea1-84f1-c983365e04c1]
-      x-ms-ratelimit-remaining-subscription-reads: ['14998']
-      x-ms-request-id: [833b537f-9a26-4ea1-84f1-c983365e04c1]
-      x-ms-routing-request-id: ['WESTUS2:20180418T165726Z:833b537f-9a26-4ea1-84f1-c983365e04c1']
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: [application/json]
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/2.7.13 (Windows-10-10.0.16299) requests/2.18.4 msrest/0.4.27
-          msrest_azure/0.4.25 resourcemanagementclient/1.2.1 Azure-SDK-For-Python]
-      accept-language: [en-US]
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute?api-version=2017-05-10
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR8Xs
-        o0cf3W3Wk2ZaF6u2qJbN3Sx7ePDwwf5k+/5sL9venz082M4eHGTb9w72zu892L0/23mQ313V1WUx
-        y+vm7hfFtK6a6rwdn1SL1brNPxp9tMwWebPKpjlBj32frdt5VRc/yLjHjx597xd/lK1WZTHlD86A
-        1Kc7+afT2acPth9OD6bb+w/v724/nNybbu/dm+7dz/Z2P32YnROkuirzp/l5sSzsm/n+gwc72XSy
-        vfdgLyf8pwfbBw/O723v7p3v72ef7u7t7e1/9EtG/S6zezv3Dh7u59vnu7OD7f3s3oPtyfnuzvan
-        D7Ls0/v72c79h5/Gu3y4cy+bPiAUD7LZ/e39/H5Gb073tu/n+w/P9+/vZHv7u/EuDyafTs4PDrZ3
-        Z7tE60/3Pt2e7OzvbD/MHuw9zLOH96af3o93uX9/erD36YPp9sHOhN6cPPyUXtqnUe7enxycU7fT
-        6eyjX/J9ejdvqnU9zd9cr3Ihtf8JQcous6LMJkVZtNev87ah/spKcET7j06zpk2/ek0f62/pHv3+
-        3Zx/p99O8mVbZ6X88aKq23kafPS6otkOP5JWp+u6IgwUlv2Lezluiox+53dz74PvZKtsmaKJ/QNv
-        0x/H6wYdFJn51n1godCnT+rsB0UpH9Gf/DM9W84YukHS/A3Q9o+TbJnNMjMQ94F2x2194mhD+ow+
-        +er3sl3Sr/iefvu9qjr3Acrfpt2zOltOc/s1TWW2Kn6SRM5MzN7O7oPt3b3tnV1qzX/s3Nu+tyN/
-        fLq9c+D/sU9/bK/q/LLIr+yHrvn97Z1Pt3fBa/IH/W/XNpeuX9bVeVEqD5H84w9Fh7iIXuP+dx7S
-        a/wdwaK3ghamS/DllCaPma4AyI9OSEk0r5QzP6+r9cr88UV1mY9S/v61p6j8r1m2Omx9WdTtOiu/
-        yKbzYkld/Iirzd8Abf9QJtY27gPtjtv6xNGG9Bl9QqzMXcmv+J5+Ey7WdvZv0+7/51z9g2qZf0Fa
-        vlheCEjDdNQUJCW6MS3RDg0+4lHS/+999H0wsddcSURv0Ne3aA/yO367xQudqbjVOzyNYDrDutF3
-        iBDfpHiP0tfXTZsvjpumuFjmM/Pd2YxQJ6t1C/G/m79r8yXm7Eea4Eea4IehCb5JAbiZwV9PszL/
-        kfeGV+zfAG3/UGbWNu4D7Y7b+sTRhvQZfUIszV3Jr/iefhNu1nb2b9Pua3A3hRpdHmaWI4biP4i7
-        /t/N8rAFPzJ+RIhvUvY/3PhZ3fAjIwjoBknzN0DbP1QraBv3gXbHbX3iaEP6jD4h3cBdya/4nn4T
-        taDt7N+mXYcNiXecgPHEkIiRZvg5UxPvwVzh5z/isB9xmLYgjvpmOGyZt1dV/fZs2eb1OWUXf8Rj
-        /9/lMY8/iFke2m/ojwP/D2rp/qD/uT9+WFwXfv4jLqSfjtEUSfM3QNs/lOm0jftAu+O2PnG0IX1G
-        nxDrcVfyK76n34TrtJ3927T7/zUXrtYTWjk4e3k8m9EbzY+4jpA0fwO0/UOZTNu4D7Q7busTRxvS
-        Z/QJsRp3Jb/ie/pNuEzb2b9Nu6/NdbHZdzMazu7tofIfxII/qwbaonaXeKGWX+lt+zEQBL2FqPqb
-        Izl/qgSTP4TTgo+YvuFH0spyIMOyf3Evyn78LjjJfCAsiCb2D7xNfzj202/dBxYKffr/a378ufb3
-        LN/cvVy8Ln7wI91GSJq/Adr+oayjbdwH2h239YmjDekz+oQYiLuSX/E9/Sa8o+3s36bd1+Aljw+I
-        KX5IbFOvlyfVYpEtZz9inf+vs87mmV432cWP9AMhaf4GaPuHzqm2cR9od9zWJ442pM/oE5pZ7kp+
-        xff0m0yqtrN/m3Zfe5L5D5L+H5J+CJ3qH7HP/6/YZ/PUc9zUzAkovWU/BnCMSlDX39zA+FNFS/6Q
-        +Qw+4lGEH0krO88My/7Fvegk87uYL/OBTDSa2D/wNv3hJlm/dR9YKPTpz7dZN39800qD5upHAY1B
-        0vwN0PYPZQ9t4z7Q7ritTxxtSJ/RJ8Qk3JX8iu/pN+EPbWf/Nu2+WX5x3xArvB9r0J8tYfayKpbt
-        SVWW+VR4o8MnjDeobOYKhKHRM0V0FPQn/YHhd+abPxe2CJoy0PAjfpt/k/YhIO27M836DqPCvwcQ
-        3YzQb+YVYS7AtH9oI513BeE+0Lb6ueUbBmj/clypzd0H3BAEpE+FFRSU/Ztb0F9AxEL82nxCLTsL
-        ti9oXTe2rkp/xjjgrv/5j/hBQLgPtK1+bueLAdq/3PRrc/cBNwQB6VOZfwVl/+YW9BcQsRC/Pj9E
-        Zr7jQd6lLi6WVdMWU8rOtsXyojftGIaQUX9zROZPFS/5Q2Ys+IjHFH4krey8Miz7F/eis8zvgmLm
-        A5knNLF/4G36w5FZv3UfWCj0aYdv+KeltEHS/A3Q9g9lAm3jPtDuuK1PHG1In9EnHt/Rr/iefpM5
-        13b2b9PuNtO+D7+Bpv02M73I27qYPs3PiyWpB8D40USbvwHa/qHzqm3cB9odt/WJow3pM/qEZpe7
-        kl/xPf0mE6vt7N+m3YdOdDPP6nz2k1+cLWIpBaBgYAPFKHhSHzvkQjivoWdJTuqqaV5px5/X1Xpl
-        /viiusxHKX//ej1ppnWxQuf+1zETFGJ999Ig9P8R9C2Sd6mnhhh6wNn+evhHOpwVzdsedGYhMLwR
-        G/AodcPM6fWqnBqKHn8uEho0ZaDhR/w2/ybtQ0Dad0fi9B1GhX8PIDrhoN/MKyLngGn/0EYqggrC
-        faBt9XMrwgzQ/uUUhDZ3H3BDEJA+FalUUPZvbkF/AREL8TYiS+uuLLKBSeY/yHsPoj16/QfkqH2R
-        rVZsgB997xfbaaaZB9JENCYk2qHBRwyX/n9PmMVrrkjRG/T1LdrzwOyE3uKFzuBv9Q5TEXQ2zBJ9
-        hwhB0uTL7ZAD2yxJ6ubVj5xUBeE+0Lb6ueVYBmj/cgKgzd0H3BAEpE9FAhSU/Ztb0F9AxELsMAXN
-        5AdKxC0ZwU4+ebLNW5qCAT3MSGNYZm4wcCI8T4ZiTX/SHzyscDr5c5nnoCkDDT/it/k3aR8C0r5/
-        xBdfly8iHFCwA0HtfzTfRGD7gbbVz+18MED7l5tebe4+4IYgIH0q86ug7N/cgv4CIhbibeab3J1+
-        sMp/0HwHSa5w8r+GUiiri+NlVl5TfNtjEQxZSK6/uQnhT3UM8ofMbvARjz/8SFpZHmBY9i/uRTmC
-        3wV1zQcyp2hi/8Db9IebEv3WfWCh0KcdHuOfdlYMkuZvgLZ/KMNoG/eBdsdtfeJoQ/qMPvF4lH7F
-        9/Sb8Ie2s3+bdu/DIuwT1PlFgSFj5l63WYspfsWf5RRCfPRL/h+bJnU6/z8AAA==
-    headers:
-      cache-control: [no-cache]
-      content-encoding: [gzip]
-      content-length: ['2611']
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 18 Apr 2018 16:57:26 GMT']
-      expires: ['-1']
-      pragma: [no-cache]
-      strict-transport-security: [max-age=31536000; includeSubDomains]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-ms-correlation-request-id: [e3313a62-e4c3-4d01-b77f-7c2eee0ca48c]
-      x-ms-ratelimit-remaining-subscription-reads: ['14994']
-      x-ms-request-id: [e3313a62-e4c3-4d01-b77f-7c2eee0ca48c]
-      x-ms-routing-request-id: ['WESTUS2:20180418T165726Z:e3313a62-e4c3-4d01-b77f-7c2eee0ca48c']
-    status: {code: 200, message: OK}
-version: 1
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?api-version=2018-05-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "25127"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "date": [
+                        "Fri, 26 Apr 2019 18:08:59 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "expires": [
+                        "-1"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/elise-test/providers/microsoft.insights/alertrules/Failure Anomalies - functionshost",
+                                "name": "Failure Anomalies - functionshost",
+                                "type": "microsoft.insights/alertrules",
+                                "location": "eastus",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/elise-test/providers/microsoft.insights/components/functionshost": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/elise-test/providers/Microsoft.Web/serverFarms/functionshost",
+                                "name": "functionshost",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "linux",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_eastus",
+                                "name": "NetworkWatcher_eastus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_southcentralus",
+                                "name": "NetworkWatcher_southcentralus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_westus",
+                                "name": "NetworkWatcher_westus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "westus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverFarms/cctest-appserviceplan",
+                                "name": "cctest-appserviceplan",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "F1",
+                                    "tier": "Free",
+                                    "size": "F1",
+                                    "capacity": 0
+                                },
+                                "kind": "app",
+                                "location": "centralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_batch/providers/Microsoft.Batch/batchAccounts/cctest",
+                                "name": "cctest",
+                                "type": "Microsoft.Batch/batchAccounts",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
+                                "name": "cctestcdnprofile",
+                                "type": "Microsoft.Cdn/profiles",
+                                "sku": {
+                                    "name": "Standard_Microsoft"
+                                },
+                                "location": "centralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_cognitive-service/providers/Microsoft.CognitiveServices/accounts/cctest-cog-serv",
+                                "name": "cctest-cog-serv",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "sku": {
+                                    "name": "F0"
+                                },
+                                "kind": "TextTranslation",
+                                "location": "global"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_container_registry/providers/Microsoft.ContainerRegistry/registries/cctestcontainerregistry",
+                                "name": "cctestcontainerregistry",
+                                "type": "Microsoft.ContainerRegistry/registries",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "location": "westus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/availabilitySets/agent-availabilitySet-A61AD475",
+                                "name": "agent-availabilitySet-A61AD475",
+                                "type": "Microsoft.Compute/availabilitySets",
+                                "sku": {
+                                    "name": "Classic"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/availabilitySets/master-availabilityset-A61AD475",
+                                "name": "master-availabilityset-A61AD475",
+                                "type": "Microsoft.Compute/availabilitySets",
+                                "sku": {
+                                    "name": "Classic"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "name": "k8s-agent-A61AD475-0",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0",
+                                "name": "k8s-agent-A61AD475-0/cse0",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "name": "k8s-agent-A61AD475-1",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-1",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1",
+                                "name": "k8s-agent-A61AD475-1/cse1",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "name": "k8s-agent-A61AD475-2",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-2",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2",
+                                "name": "k8s-agent-A61AD475-2/cse2",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "name": "k8s-master-A61AD475-0",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-master-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "master",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0",
+                                "name": "k8s-master-A61AD475-0/cse0",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.ContainerService/containerServices/cctestacs",
+                                "name": "cctestacs",
+                                "type": "Microsoft.ContainerService/containerServices",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-A61AD475",
+                                "name": "k8s-master-internal-lb-A61AD475",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-A61AD475",
+                                "name": "k8s-master-lb-A61AD475",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0",
+                                "name": "k8s-agent-A61AD475-nic-0",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1",
+                                "name": "k8s-agent-A61AD475-nic-1",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2",
+                                "name": "k8s-agent-A61AD475-nic-2",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0",
+                                "name": "k8s-master-A61AD475-nic-0",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkSecurityGroups/k8s-master-A61AD475-nsg",
+                                "name": "k8s-master-A61AD475-nsg",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/publicIPAddresses/k8s-master-ip-cctestacsdnsmgmt-A61AD475",
+                                "name": "k8s-master-ip-cctestacsdnsmgmt-A61AD475",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-A61AD475-routetable",
+                                "name": "k8s-master-A61AD475-routetable",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-A61AD475",
+                                "name": "k8s-vnet-A61AD475",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/00usm2nughsm6poagnt0",
+                                "name": "00usm2nughsm6poagnt0",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/pvc2901814435001",
+                                "name": "pvc2901814435001",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "created-by": "azure-dd"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/pvc2901814435002",
+                                "name": "pvc2901814435002",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "created-by": "azure-dd"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/usm2nughsm6pomstr0",
+                                "name": "usm2nughsm6pomstr0",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb",
+                                "name": "cctestcosmosdb",
+                                "type": "Microsoft.DocumentDB/databaseAccounts",
+                                "kind": "MongoDB",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "defaultExperience": "MongoDB"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_datafactory/providers/Microsoft.DataFactory/factories/cctest-data-factory",
+                                "name": "cctest-data-factory",
+                                "type": "Microsoft.DataFactory/factories",
+                                "location": "eastus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_datalake/providers/Microsoft.DataLakeStore/accounts/cctestdatalake",
+                                "name": "cctestdatalake",
+                                "type": "Microsoft.DataLakeStore/accounts",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer",
+                                "name": "cctestdiagnostic_loadbalancer",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/publicIPAddresses/cctestdiagnostic_loadbalancer_public_ip",
+                                "name": "cctestdiagnostic_loadbalancer_public_ip",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_diagnostic-settings/providers/Microsoft.Storage/storageAccounts/diagnosticruwy74fd3rqea",
+                                "name": "diagnosticruwy74fd3rqea",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_disk/providers/Microsoft.Compute/disks/cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
+                                "name": "cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_disk/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c",
+                                "name": "cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/alertrules/Failure Anomalies - cloud-custodian-test",
+                                "name": "Failure Anomalies - cloud-custodian-test",
+                                "type": "microsoft.insights/alertrules",
+                                "location": "westus2",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test",
+                                "name": "cloud-custodian-test",
+                                "type": "microsoft.insights/components",
+                                "kind": "web",
+                                "location": "westus2",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest",
+                                "name": "cloudcustodiantest",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "westus2",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/serverFarms/cloud-custodian-test",
+                                "name": "cloud-custodian-test",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "B1",
+                                    "tier": "Basic",
+                                    "size": "B1",
+                                    "family": "B",
+                                    "capacity": 1
+                                },
+                                "kind": "linux",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test",
+                                "name": "cloud-custodian-test",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "functionapp,linux",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/custodian-test-app",
+                                "name": "custodian-test-app",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "functionapp,linux,container",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_iothub/providers/Microsoft.Devices/IotHubs/cctest-iothub",
+                                "name": "cctest-iothub",
+                                "type": "Microsoft.Devices/IotHubs",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "capacity": 1
+                                },
+                                "location": "westus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1asdf",
+                                "name": "cckeyvault1asdf",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
+                                "name": "cckeyvault2kme24fgeaqvqk",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_load-balancer/providers/Microsoft.Network/loadBalancers/cctestloadbalancer",
+                                "name": "cctestloadbalancer",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_load-balancer/providers/Microsoft.Network/publicIPAddresses/cctestloadbalancer_public_ip",
+                                "name": "cctestloadbalancer_public_ip",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_network_interface/providers/Microsoft.Network/networkInterfaces/cctestnic",
+                                "name": "cctestnic",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_network_interface/providers/Microsoft.Network/virtualNetworks/cctestvnetnic",
+                                "name": "cctestvnetnic",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_networksecuritygroup/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg",
+                                "name": "c7n-nsg",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_redis/providers/Microsoft.Cache/Redis/cctestredis",
+                                "name": "cctestredis",
+                                "type": "Microsoft.Cache/Redis",
+                                "location": "centralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/routeTables/cctestroutetable",
+                                "name": "cctestroutetable",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "westus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/virtualNetworks/ccroutetablevnet",
+                                "name": "ccroutetablevnet",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "westus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "name": "cctestsqlserverj6y6cbbtaphs4",
+                                "type": "Microsoft.Sql/servers",
+                                "kind": "v12.0",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb",
+                                "name": "cctestsqlserverj6y6cbbtaphs4/cctestdb",
+                                "type": "Microsoft.Sql/servers/databases",
+                                "sku": {
+                                    "name": "P1",
+                                    "tier": "Premium"
+                                },
+                                "kind": "v12.0,user",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/master",
+                                "name": "cctestsqlserverj6y6cbbtaphs4/master",
+                                "type": "Microsoft.Sql/servers/databases",
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Network/virtualNetworks/cctstoragevnet1",
+                                "name": "cctstoragevnet1",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Network/virtualNetworks/cctstoragevnet2",
+                                "name": "cctstoragevnet2",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
+                                "name": "cctstoragey6akyqpagdt3o",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790",
+                                "name": "cctestvm_disk2_56efd8d3574f403c8693d834542ae790",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "managedBy": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215",
+                                "name": "cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "managedBy": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "name": "cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                                    "CreatorEmail": "Unknown"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic",
+                                "name": "myVMNic",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/publicIPAddresses/myPublicIP",
+                                "name": "myPublicIP",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/virtualNetworks/MyVNET",
+                                "name": "MyVNET",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
+                                "name": "45mqcga7pkswisalinuxvm",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vmss/providers/Microsoft.Compute/virtualMachineScaleSets/cctestvmss",
+                                "name": "cctestvmss",
+                                "type": "Microsoft.Compute/virtualMachineScaleSets",
+                                "sku": {
+                                    "name": "Standard_DS1_v2",
+                                    "tier": "Standard",
+                                    "capacity": 2
+                                },
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vmss/providers/Microsoft.Network/virtualNetworks/cctestvmssVnet",
+                                "name": "cctestvmssVnet",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/microsoft.insights/alertrules/Failure Anomalies - cctestwebapp",
+                                "name": "Failure Anomalies - cctestwebapp",
+                                "type": "microsoft.insights/alertrules",
+                                "location": "eastus",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/microsoft.insights/components/cctestwebapp": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/microsoft.insights/components/cctestwebapp",
+                                "name": "cctestwebapp",
+                                "type": "microsoft.insights/components",
+                                "kind": "web",
+                                "location": "eastus",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/anzoloch-test-api/providers/Microsoft.Web/sites/anzoloch-test-api": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/Microsoft.Web/serverFarms/ccctestServicePlanesk72p3i6bibv6",
+                                "name": "ccctestServicePlanesk72p3i6bibv6",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "app",
+                                "location": "centralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/Microsoft.Web/sites/cctestwebapp",
+                                "name": "cctestwebapp",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "api",
+                                "location": "centralus",
+                                "tags": {
+                                    "hidden-related:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourcegroups/anzoloch-test-api/providers/Microsoft.Web/serverfarms/ServicePlane63a2834-992c": "empty"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/wesyao-test-kv/providers/Microsoft.KeyVault/vaults/wesyao-kv",
+                                "name": "wesyao-kv",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "westus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights?api-version=2018-05-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "13354"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "date": [
+                        "Fri, 26 Apr 2019 18:09:03 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "expires": [
+                        "-1"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/microsoft.insights",
+                        "namespace": "microsoft.insights",
+                        "authorizations": [
+                            {
+                                "applicationId": "6bccf540-eb86-4037-af03-7fa058c2db75",
+                                "roleDefinitionId": "89dcede2-9219-403a-9723-d3c6473f9472"
+                            },
+                            {
+                                "applicationId": "11c174dc-1945-4a9a-a36b-c79a0f246b9b",
+                                "roleDefinitionId": "dd9d4347-f397-45f2-b538-85f21c90037b"
+                            },
+                            {
+                                "applicationId": "035f9e1d-4f00-4419-bf50-bf2d87eb4878",
+                                "roleDefinitionId": "323795fe-ba3d-4f5a-ad42-afb4e1ea9485"
+                            },
+                            {
+                                "applicationId": "f5c26e74-f226-4ae8-85f0-b4af0080ac9e",
+                                "roleDefinitionId": "529d7ae6-e892-4d43-809d-8547aeb90643"
+                            },
+                            {
+                                "applicationId": "b503eb83-1222-4dcc-b116-b98ed5216e05",
+                                "roleDefinitionId": "68699c37-c689-44d4-9248-494b782d46ae"
+                            },
+                            {
+                                "applicationId": "ca7f3f0b-7d91-482c-8e09-c5d840d0eac5",
+                                "roleDefinitionId": "5d5a2e56-9835-44aa-93db-d2f19e155438"
+                            },
+                            {
+                                "applicationId": "3af5a1e8-2459-45cb-8683-bcd6cccbcc13",
+                                "roleDefinitionId": "b1309299-720d-4159-9897-6158a61aee41"
+                            },
+                            {
+                                "applicationId": "6a0a243c-0886-468a-a4c2-eff52c7445da",
+                                "roleDefinitionId": "d2eda64b-c5e6-4930-8642-2d80ecd7c2e2"
+                            },
+                            {
+                                "applicationId": "707be275-6b9d-4ee7-88f9-c0c2bd646e0f",
+                                "roleDefinitionId": "fa027d90-6ba0-4c33-9a54-59edaf2327e7"
+                            }
+                        ],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "components",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2",
+                                    "UK South",
+                                    "Canada Central",
+                                    "Central India",
+                                    "Japan East",
+                                    "Australia East",
+                                    "Korea Central",
+                                    "France Central",
+                                    "East US 2",
+                                    "East Asia"
+                                ],
+                                "apiVersions": [
+                                    "2018-05-01-preview",
+                                    "2015-05-01",
+                                    "2014-12-01-preview",
+                                    "2014-08-01",
+                                    "2014-04-01"
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "components/query",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2",
+                                    "UK South",
+                                    "Central India",
+                                    "Canada Central",
+                                    "Japan East",
+                                    "Australia East",
+                                    "Korea Central",
+                                    "France Central",
+                                    "East US 2",
+                                    "East Asia"
+                                ],
+                                "apiVersions": [
+                                    "2018-04-20"
+                                ]
+                            },
+                            {
+                                "resourceType": "components/metrics",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2",
+                                    "UK South",
+                                    "Central India",
+                                    "Canada Central",
+                                    "Japan East",
+                                    "Australia East",
+                                    "Korea Central",
+                                    "France Central",
+                                    "East US 2",
+                                    "East Asia"
+                                ],
+                                "apiVersions": [
+                                    "2018-04-20",
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "components/events",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2",
+                                    "UK South",
+                                    "Central India",
+                                    "Canada Central",
+                                    "Japan East",
+                                    "Australia East",
+                                    "Korea Central",
+                                    "France Central",
+                                    "East US 2",
+                                    "East Asia"
+                                ],
+                                "apiVersions": [
+                                    "2018-04-20"
+                                ]
+                            },
+                            {
+                                "resourceType": "webtests",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2",
+                                    "UK South",
+                                    "Central India",
+                                    "Canada Central",
+                                    "Japan East",
+                                    "Australia East",
+                                    "Korea Central",
+                                    "France Central",
+                                    "East US 2",
+                                    "East Asia"
+                                ],
+                                "apiVersions": [
+                                    "2018-05-01-preview",
+                                    "2015-05-01",
+                                    "2014-08-01",
+                                    "2014-04-01"
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "queries",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2",
+                                    "Central India",
+                                    "Canada Central",
+                                    "UK South"
+                                ],
+                                "apiVersions": [
+                                    "2015-05-01",
+                                    "2014-08-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "scheduledqueryrules",
+                                "locations": [
+                                    "West Central US",
+                                    "East US",
+                                    "West Europe",
+                                    "Central India",
+                                    "Canada Central",
+                                    "Australia Southeast",
+                                    "Japan East",
+                                    "Southeast Asia",
+                                    "UK South",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West US 2",
+                                    "Australia Central",
+                                    "Australia East",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US",
+                                    "East US 2",
+                                    "East Asia",
+                                    "West US"
+                                ],
+                                "apiVersions": [
+                                    "2018-04-16",
+                                    "2017-09-01-preview"
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "components/pricingPlans",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2"
+                                ],
+                                "apiVersions": [
+                                    "2017-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "migrateToNewPricingModel",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2"
+                                ],
+                                "apiVersions": [
+                                    "2017-10-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-10-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "rollbackToLegacyPricingModel",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2"
+                                ],
+                                "apiVersions": [
+                                    "2017-10-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-10-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "listMigrationdate",
+                                "locations": [
+                                    "East US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "Southeast Asia",
+                                    "West US 2"
+                                ],
+                                "apiVersions": [
+                                    "2017-10-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-10-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "logprofiles",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2016-03-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2016-03-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "migratealertrules",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "metricalerts",
+                                "locations": [
+                                    "Global"
+                                ],
+                                "apiVersions": [
+                                    "2018-03-01",
+                                    "2017-09-01-preview"
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "alertrules",
+                                "locations": [
+                                    "West US",
+                                    "East US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "UK South",
+                                    "UK West",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "West Central US",
+                                    "West US 2",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "France Central"
+                                ],
+                                "apiVersions": [
+                                    "2016-03-01",
+                                    "2015-04-01",
+                                    "2014-04-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2016-03-01"
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "autoscalesettings",
+                                "locations": [
+                                    "West US",
+                                    "East US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "UK South",
+                                    "UK West",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "West Central US",
+                                    "West US 2",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "France Central"
+                                ],
+                                "apiVersions": [
+                                    "2015-04-01",
+                                    "2014-04-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2015-04-01"
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "eventtypes",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2017-03-01-preview",
+                                    "2016-09-01-preview",
+                                    "2015-04-01",
+                                    "2014-11-01",
+                                    "2014-04-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2015-04-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "locations",
+                                "locations": [
+                                    "East US"
+                                ],
+                                "apiVersions": [
+                                    "2015-04-01",
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operationResults",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2015-04-01",
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "vmInsightsOnboardingStatuses",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-11-27-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2015-04-01",
+                                    "2014-06-01",
+                                    "2014-04-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2015-04-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "automatedExportSettings",
+                                "locations": [
+                                    "West US",
+                                    "East US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "UK South",
+                                    "UK West",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "West Central US",
+                                    "West US 2",
+                                    "Korea South",
+                                    "Korea Central"
+                                ],
+                                "apiVersions": [
+                                    "2015-04-01",
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "diagnosticSettings",
+                                "locations": [
+                                    "West US",
+                                    "East US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "UK South",
+                                    "UK West",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "West Central US",
+                                    "West US 2",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "France Central"
+                                ],
+                                "apiVersions": [
+                                    "2017-05-01-preview",
+                                    "2016-09-01",
+                                    "2015-07-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2016-09-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "diagnosticSettingsCategories",
+                                "locations": [
+                                    "West US",
+                                    "East US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "UK South",
+                                    "UK West",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "West Central US",
+                                    "West US 2",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "France Central"
+                                ],
+                                "apiVersions": [
+                                    "2017-05-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "extendedDiagnosticSettings",
+                                "locations": [
+                                    "West US",
+                                    "East US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "UK South",
+                                    "UK West",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "West Central US",
+                                    "West US 2",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "France Central"
+                                ],
+                                "apiVersions": [
+                                    "2017-02-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-02-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "metricDefinitions",
+                                "locations": [
+                                    "East US",
+                                    "West US",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "North Europe",
+                                    "West US 2",
+                                    "West Central US",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "UK South",
+                                    "UK West",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-01-01",
+                                    "2017-12-01-preview",
+                                    "2017-09-01-preview",
+                                    "2017-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-01-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "logDefinitions",
+                                "locations": [
+                                    "West US",
+                                    "East US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "UK South",
+                                    "UK West",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "West Central US",
+                                    "West US 2",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "France Central"
+                                ],
+                                "apiVersions": [
+                                    "2015-07-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2015-07-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "eventCategories",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2015-04-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2015-04-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "metrics",
+                                "locations": [
+                                    "East US",
+                                    "West US",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "North Europe",
+                                    "West US 2",
+                                    "West Central US",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "UK South",
+                                    "UK West",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-01-01",
+                                    "2017-12-01-preview",
+                                    "2017-09-01-preview",
+                                    "2017-05-01-preview",
+                                    "2016-09-01",
+                                    "2016-06-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-01-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "metricNamespaces",
+                                "locations": [
+                                    "East US",
+                                    "West US",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "North Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Canada East",
+                                    "Canada Central",
+                                    "Central US",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "North Europe",
+                                    "West US 2",
+                                    "West Central US",
+                                    "Korea South",
+                                    "Korea Central",
+                                    "UK South",
+                                    "UK West",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-01-01",
+                                    "2017-12-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "actiongroups",
+                                "locations": [
+                                    "Global"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-09-01",
+                                    "2018-03-01",
+                                    "2017-04-01",
+                                    "2017-03-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-04-01"
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "activityLogAlerts",
+                                "locations": [
+                                    "Global"
+                                ],
+                                "apiVersions": [
+                                    "2017-04-01",
+                                    "2017-03-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-04-01"
+                                    }
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "baseline",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-09-01",
+                                    "2017-11-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "calculatebaseline",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-09-01",
+                                    "2017-11-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "workbooks",
+                                "locations": [
+                                    "West Europe",
+                                    "South Central US",
+                                    "East US",
+                                    "North Europe",
+                                    "Southeast Asia",
+                                    "West US 2",
+                                    "West Central US",
+                                    "Japan East",
+                                    "Australia East",
+                                    "Korea Central",
+                                    "France Central",
+                                    "East US 2",
+                                    "East Asia"
+                                ],
+                                "apiVersions": [],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "myWorkbooks",
+                                "locations": [
+                                    "West Central US",
+                                    "West Europe",
+                                    "South Central US",
+                                    "East US",
+                                    "North Europe",
+                                    "Southeast Asia",
+                                    "West US 2"
+                                ],
+                                "apiVersions": [
+                                    "2016-06-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "logs",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central"
+                                ],
+                                "apiVersions": [
+                                    "2018-08-01-preview",
+                                    "2018-03-01-preview"
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered"
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,154 +1,837 @@
-interactions:
-- request:
-    body: null
-    headers:
-      Accept: [application/json]
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python/3.7.0 (Windows-10-10.0.17134-SP0) msrest/0.6.1 msrest_azure/0.5.0
-          computemanagementclient/4.3.1 Azure-SDK-For-Python]
-      accept-language: [en-US]
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2018-10-01
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
-        uc4/evS9X/zRqq5Wed0WefPRI/p8cTb76NFHu/cf3p9Ndve3Z9n+3vb+/fOD7cn57qfbD/KD3fzh
-        w+nOQT77aPTRPKtnV1mdv6yr86IkeADwuvgB/fbRk6wppr//8c5Hv2T0UdNWdXbhNysW9Per/Dyv
-        8+WUP1mtJ2XRzPOa3j3JltWymGYl9VGdUyP67KvJetmuX+f1Jf1JIN+u6cPdT8c7++Od7edvXtNn
-        9E1TVEv6vMzavGnRddU8LZq36KBq3lyvqKuPnhfL9TtqvswW+HM6RdvLxe//JTf9/Xd//yyfTWcH
-        D+59Otmb7e/cf/hw7+E0v3e+dy9/cG9nf/KQ3p3WOXXx5aqV/p7V1eIMQ8JX2XReLC/o01d5Nvtu
-        XbT4dJEt6esZegAyBah8t1lPmmldMJTmbpY9PHj4YH+yfX+2l23vzx4ebGcPDrLtewd75/ce7N6f
-        7TzI79Z5U63raf55Xa1XzV2g/vtfLu7SLF4WMxr/3S+KaV011Xk7PqkWq3Wb351Rn83drzHMX0L0
-        m2VthvbEHcQs5ZpGu9MnHbrY+/0PHhLXHDzcybN7n+4ToIeE+cHk3t6DvXuf7p5n+0SGDt1OF6v2
-        Gh9bmr2olv/vIhf+vMXQfskv+T5Rq2o8Hp8KwPqFEOtysX9/8YumF9mD1dvmqqBBZrNFsfyqyWsl
-        J3pc05/0VQkePamW58XFus4wYEAkXLJJmb/MmuaqqmfH63aeL1sSFGlwnpVNTlg0OZG5xYwBp2Xe
-        UuO3HmL6ydmSkDvPppB8mtsfBo1fSM93exjcXVz/5BcviulHTMZZkV0sq4ZG5tNzUlXtU/cNPsqX
-        oAch3tbrnAYueuaruqChzNt21Ty6ezegepMxZS8X40lZTcbTqs7HV8VyVl01Y0LqLs3jCCrxsoAm
-        IZZ83RK/ErTX6+k0z2fUFzVoRZG4cRneuSzqdp2VXzA7E11pIiszOx8Rldr5lCaszso1vmuzCx4F
-        KEa/UxP8JqqZBjOd57M1hv5Rtfxs64vtr0YHdw5JHcrvu/RH+4PPVi01pZd3qRm/uUt/n0DKqvp0
-        kRUlfT77dH8yzXZ3th8cPCBtvjv7dPvh/Qf3tu/t5rvT/ezhw9nOAb21qvPt/F1BxF1ebAPeermo
-        ZsV5QYPufLsXfksk+aa4583p6ze//09+EeWeASpbWSUsVZLsJ79kRJYlZuEOHk5n03vT8+3zvV2i
-        yWTn/vZkN/uUEJwd7E7O93amswcEb5OFI9ZYzuj73//pXvP7X96jvgwDeq2/SUP3QWbup9eL1aR6
-        59T/wfnu3sGn96b37u3v788m9w5ouu7dOz/fn3z6MP/0/j16ldQI9fAlTyeBeG8rp+Q4nk4rGpPi
-        Zcj2+vXT3//5Kwzom+Kd4xdPf5/t49enG5mHdCip9/enBhEZr2LuP3/y0aN7O/jAM47QW5vUv/ZI
-        w+2q/WxZrisiJSkLTNn7an1Vfc0cbZm5pr9Xfg2U6M+spY8/ujuvFvld7efumNrezQhKVdNgZr//
-        W7QefUQ/ntJ4qDl9v103WXpMz5N7L36QnexeT/dO6a/jp8c/cfyEfj45/omn5XVTPvky/0WXDz7/
-        an5v9fm3f+r5lz/97e9c72TF7M3vs/P63pPVwcOvpt85ffDmBw9+8Pusf/rFye699dX9+eWTe+uH
-        0xflT9/7zk995/TlVzvPF59+9Xvt3f/ud3/v7/7EF7/X7PLbz64vv3v9e/8+1z/5U9/+9Onn9Ref
-        PH1+8dMPv1p894sXP/j825/v3n/yZra6/53d05989/on936v09n6dLmcFt9uH/xer9vd9d1pvn7y
-        +2T7P7X38EX23e88f9h+9cnvVf/0T8zP2y/mFz94/ub3XnySTX+ievHt77zZOVgfF0TxRbV/cjbf
-        f31v+nu9Onh3MPt9vvvt14v1559effXuk+VP/cR37v/U/Lunb17PX8zf0DgPvprt7j5/9vKk/fQn
-        rn+vp9+ZnVXl773MXvz08vj1d86mv/flYj5/8OL+ZP7Vavfgdfb65bu317/Xd3/i97771au70+Nv
-        L4+/unv85u4v+s68qVbL2dlP/fRXX37107/3/OW5GEBmYAj5T35xfEGTLbNMX3imnRipLKur03dt
-        vkTTL0nJMUvQt9qaLBpxzA/P9JNgX29nTR4VwGHbr6LxkGIFDP4btf5AiTACzA8y+Wak1PE3SLBb
-        aayuuVNy3c3NzBOc46fPq4ti+ayqRe3D7v2/DUmZrstFRmRtGpprclzEJNwIjtRT6RypKzJ662aP
-        PiTHhybkF9P8EF6kEymYIL5QqK+vmzZfHDdNcbGkScQkF6QkVlnJHsDOwXSW7+3Ntg/29nYoxr2X
-        b0/2d/PtLL+//3Av+3Tn/AAvEfrZsuU3HuydPzw4mJxvH3x6vkt+VHa+/XA3m2zvzR5MZzu7u7PJ
-        /gOiPOFCje/+3BKeMFfzYj4ASxAg0hIdVyh/eJ6dP9w/J9TIAdqnsGZ7Mtm7v723s/Nw+iDfvfdw
-        7/au0Ou93/9yj/oy0ui13uwK2ZF9V2Tzad68basVdWwcI/1ie3eHPhS3qG72t2lM9PctnSKFQS+E
-        1NkmjeCcgQfkDRw8OPg0+zTb2f90mk0ozJtR0mN/tpMfTPc/pddJDVM/X/LsEpj/t7tGBHdYMxtW
-        IkfDuUbvSREiN14HP8A92t17gE/InwAA4rbb+kfolsY97CPR95jBnpfEAwMLBCZzpEaCnKZqQW2n
-        X60IKbA/viWU/v9sUEHLg0/vk6Yl1GEB1XZ66P/sWlVyRYmUuXK3yt7vf1IWmB/oYxoUKE3SQqxP
-        YkIisCbrYIyuKnI3ZMOpHaVHsL5x83B/9uDBvd3dBxIb7uekFbPJzi5p/MneZOfT6b39XQTNxCv/
-        XzQPYA3CXqXL/3DQTOzvUmYw29vbnlLWkKiSn29ns4P97d37ew/PP51ku3tTZEZvaSZ2v6aZ+CFG
-        zITr9eVi1ynBg/v5Dk3Sp3v5ven+Dv1Ov832H+ztzPJslk/BQ6RMqIcveVYJxDdjFl7W+aJYL34W
-        TMLuRt6BQpd270cGoi5exaTDFrx3qKw90lj7ZmB2bQzBz3awrD39KFz+f3O4nKpj8HsuLPcSM/2+
-        pMbAZMzckPzAJ6Av/t9v9eOSOWzy8Q7JjJdE5/cxIlI6pHhJ25ACXn/z1rWbbY7OCPr7psgDuxcn
-        z8AADHEIZ0+P4INf8v1f8v8AkFlqQwwdAAA=
-    headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Length: ['2534']
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Tue, 13 Nov 2018 16:00:47 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [93c5d5c3-edf4-4336-9181-9e451c6763bf]
-      x-ms-original-request-ids: [6cda6345-39c2-4b73-9dda-7a620c6a3800, 11502c8c-f87c-443b-84d5-f53e7293b609]
-      x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [93c5d5c3-edf4-4336-9181-9e451c6763bf]
-      x-ms-routing-request-id: ['WESTUS2:20181113T160048Z:93c5d5c3-edf4-4336-9181-9e451c6763bf']
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: [application/json]
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python/3.7.0 (Windows-10-10.0.17134-SP0) msrest/0.6.1 msrest_azure/0.5.0
-          computemanagementclient/4.3.1 Azure-SDK-For-Python]
-      accept-language: [en-US]
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2018-10-01
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
-        uc4/evS9X/zRqq5Wed0WefPRI/p8cTb76NFHu/cf3p9Ndve3Z9n+3vb+/fOD7cn57qfbD/KD3fzh
-        w+nOQT77aPTRPKtnV1mdv6yr86IkeADwuvgB/fbRk6wppr//8c5Hv2T0UdNWdXbhNysW9Per/Dyv
-        8+WUP1mtJ2XRzPOa3j3JltWymGYl9VGdUyP67KvJetmuX+f1Jf1JIN+u6cPdT8c7++Od7edvXtNn
-        9E1TVEv6vMzavGnRddU8LZq36KBq3lyvqKuPnhfL9TtqvswW+HM6RdvLxe//JTf9/Xd//yyfTWcH
-        D+59Otmb7e/cf/hw7+E0v3e+dy9/cG9nf/KQ3p3WOXXx5aqV/p7V1eIMQ8JX2XReLC/o01d5Nvtu
-        XbT4dJEt6esZegAyBah8t1lPmmldMJTmbpY9PHj4YH+yfX+2l23vzx4ebGcPDrLtewd75/ce7N6f
-        7TzI79Z5U63raf55Xa1XzV2g/vtfLu7SLF4WMxr/3S+KaV011Xk7PqkWq3Wb351Rn83drzHMX0L0
-        m2VthvbEHcQs5ZpGu9MnHbrY+/0PHhLXHDzcybN7n+4ToIeE+cHk3t6DvXuf7p5n+0SGDt1OF6v2
-        Gh9bmr2olv/vIhf+vMXQfskv+T5Rq2o8Hp8KwPqFEOtysX9/8YumF9mD1dvmqqBBZrNFsfyqyWsl
-        J3pc05/0VQkePamW58XFus4wYEAkXLJJmb/MmuaqqmfH63aeL1sSFGlwnpVNTlg0OZG5xYwBp2Xe
-        UuO3HmL6ydmSkDvPppB8mtsfBo1fSM93exjcXVz/5BcviulHTMZZkV0sq4ZG5tNzUlXtU/cNPsqX
-        oAch3tbrnAYueuaruqChzNt21Ty6ezegepMxZS8X40lZTcbTqs7HV8VyVl01Y0LqLs3jCCrxsoAm
-        IZZ83RK/ErTX6+k0z2fUFzVoRZG4cRneuSzqdp2VXzA7E11pIiszOx8Rldr5lCaszso1vmuzCx4F
-        KEa/UxP8JqqZBjOd57M1hv5Rtfxs64vtr0YHdw5JHcrvu/RH+4PPVi01pZd3qRm/uUt/n0DKqvp0
-        kRUlfT77dH8yzXZ3th8cPCBtvjv7dPvh/Qf3tu/t5rvT/ezhw9nOAb21qvPt/F1BxF1ebAPeermo
-        ZsV5QYPufLsXfksk+aa4583p6ze//09+EeWeASpbWSUsVZLsJ79kRJYlZuEOHk5n03vT8+3zvV2i
-        yWTn/vZkN/uUEJwd7E7O93amswcEb5OFI9ZYzuj73//pXvP7X96jvgwDeq2/SUP3QWbup9eL1aR6
-        59T/wfnu3sGn96b37u3v788m9w5ouu7dOz/fn3z6MP/0/j16ldQI9fAlTyeBeG8rp+Q4nk4rGpPi
-        Zcj2+vXT3//5Kwzom+Kd4xdPf5/t49enG5mHdCip9/enBhEZr2LuP3/y0aN7O/jAM47QW5vUv/ZI
-        w+2q/WxZrisiJSkLTNn7an1Vfc0cbZm5pr9Xfg2U6M+spY8/ujuvFvld7efumNrezQhKVdNgZr//
-        W7QefUQ/ntJ4qDl9v103WXpMz5N7L36QnexeT/dO6a/jp8c/cfyEfj45/omn5XVTPvky/0WXDz7/
-        an5v9fm3f+r5lz/97e9c72TF7M3vs/P63pPVwcOvpt85ffDmBw9+8Pusf/rFye699dX9+eWTe+uH
-        0xflT9/7zk995/TlVzvPF59+9Xvt3f/ud3/v7/7EF7/X7PLbz64vv3v9e/8+1z/5U9/+9Onn9Ref
-        PH1+8dMPv1p894sXP/j825/v3n/yZra6/53d05989/on936v09n6dLmcFt9uH/xer9vd9d1pvn7y
-        +2T7P7X38EX23e88f9h+9cnvVf/0T8zP2y/mFz94/ub3XnySTX+ievHt77zZOVgfF0TxRbV/cjbf
-        f31v+nu9Onh3MPt9vvvt14v1559effXuk+VP/cR37v/U/Lunb17PX8zf0DgPvprt7j5/9vKk/fQn
-        rn+vp9+ZnVXl773MXvz08vj1d86mv/flYj5/8OL+ZP7Vavfgdfb65bu317/Xd3/i97771au70+Nv
-        L4+/unv85u4v+s68qVbL2dlP/fRXX37107/3/OW5GEBmYAj5T35xfEGTLbNMX3imnRipLKur03dt
-        vkTTL0nJMUvQt9qaLBpxzA/P9JNgX29nTR4VwGHbr6LxkGIFDP4btf5AiTACzA8y+Wak1PE3SLBb
-        aayuuVNy3c3NzBOc46fPq4ti+ayqRe3D7v2/DUmZrstFRmRtGpprclzEJNwIjtRT6RypKzJ662aP
-        PiTHhybkF9P8EF6kEymYIL5QqK+vmzZfHDdNcbGkScQkF6QkVlnJHsDOwXSW7+3Ntg/29nYoxr2X
-        b0/2d/PtLL+//3Av+3Tn/AAvEfrZsuU3HuydPzw4mJxvH3x6vkt+VHa+/XA3m2zvzR5MZzu7u7PJ
-        /gOiPOFCje/+3BKeMFfzYj4ASxAg0hIdVyh/eJ6dP9w/J9TIAdqnsGZ7Mtm7v723s/Nw+iDfvfdw
-        7/au0Ou93/9yj/oy0ui13uwK2ZF9V2Tzad68basVdWwcI/1ie3eHPhS3qG72t2lM9PctnSKFQS+E
-        1NkmjeCcgQfkDRw8OPg0+zTb2f90mk0ozJtR0mN/tpMfTPc/pddJDVM/X/LsEpj/t7tGBHdYMxtW
-        IkfDuUbvSREiN14HP8A92t17gE/InwAA4rbb+kfolsY97CPR95jBnpfEAwMLBCZzpEaCnKZqQW2n
-        X60IKbA/viWU/v9sUEHLg0/vk6Yl1GEB1XZ66P/sWlVyRYmUuXK3yt7vf1IWmB/oYxoUKE3SQqxP
-        YkIisCbrYIyuKnI3ZMOpHaVHsL5x83B/9uDBvd3dBxIb7uekFbPJzi5p/MneZOfT6b39XQTNxCv/
-        XzQPYA3CXqXL/3DQTOzvUmYw29vbnlLWkKiSn29ns4P97d37ew/PP51ku3tTZEZvaSZ2v6aZ+CFG
-        zITr9eVi1ynBg/v5Dk3Sp3v5ven+Dv1Ov832H+ztzPJslk/BQ6RMqIcveVYJxDdjFl7W+aJYL34W
-        TMLuRt6BQpd270cGoi5exaTDFrx3qKw90lj7ZmB2bQzBz3awrD39KFz+f3O4nKpj8HsuLPcSM/2+
-        pMbAZMzckPzAJ6Av/t9v9eOSOWzy8Q7JjJdE5/cxIlI6pHhJ25ACXn/z1rWbbY7OCPr7psgDuxcn
-        z8AADHEIZ0+P4INf8v1f8v8AkFlqQwwdAAA=
-    headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Length: ['2534']
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Tue, 13 Nov 2018 16:00:49 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [e838dec6-2c9c-47e1-aab0-c633dd5ff619]
-      x-ms-original-request-ids: [220a26ce-b42a-412c-bff4-523ae1e0ef68, e90d7c5b-2cfc-454f-a9dc-8309d36e6cb9]
-      x-ms-ratelimit-remaining-subscription-reads: ['11999']
-      x-ms-request-id: [e838dec6-2c9c-47e1-aab0-c633dd5ff619]
-      x-ms-routing-request-id: ['WESTUS2:20181113T160049Z:e838dec6-2c9c-47e1-aab0-c633dd5ff619']
-    status: {code: 200, message: OK}
-version: 1
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "date": [
+                        "Fri, 26 Apr 2019 18:07:25 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;105,Microsoft.Compute/HighCostGet30Min;595"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "transfer-encoding": [
+                        "chunked"
+                    ],
+                    "content-length": [
+                        "14759"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "vmId": "814966a3-72e9-4606-a087-dfdbfa9fc24b",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-agent-A61AD475-0-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://00usm2nughsm6poagnt0.blob.core.windows.net/osdisk/k8s-agent-A61AD475-0-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-agent-A61AD475-0",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "name": "k8s-agent-A61AD475-0"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "de77098d-d5e5-4959-87f7-deb81d90f95b",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-agent-A61AD475-1-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://00usm2nughsm6poagnt0.blob.core.windows.net/osdisk/k8s-agent-A61AD475-1-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-agent-A61AD475-1",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-1",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "name": "k8s-agent-A61AD475-1"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "be6ad948-1465-497e-9755-fbb6a73a29e9",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-agent-A61AD475-2-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://00usm2nughsm6poagnt0.blob.core.windows.net/osdisk/k8s-agent-A61AD475-2-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-agent-A61AD475-2",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-2",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "name": "k8s-agent-A61AD475-2"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "3e88b117-904e-4e47-abdd-ec3b5df6ed78",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-master-A61AD475-0-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://usm2nughsm6pomstr0.blob.core.windows.net/vhds/k8s-master-A61AD475-0-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "k8s-master-A61AD475-0-etcddisk",
+                                                "createOption": "Empty",
+                                                "vhd": {
+                                                    "uri": "https://usm2nughsm6pomstr0.blob.core.windows.net/vhds/k8s-master-A61AD475-0-etcddisk.vhd"
+                                                },
+                                                "caching": "None",
+                                                "diskSizeGB": 128,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-master-A61AD475-0",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-master-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "master",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "name": "k8s-master-A61AD475-0"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "c8947067-0781-4f86-8d67-627ee703fcdc",
+                                    "hardwareProfile": {
+                                        "vmSize": "Basic_A0"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_56efd8d3574f403c8693d834542ae790",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vm45mqcga7pkswi",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                                    "CreatorEmail": "Unknown"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "name": "cctestvm"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "date": [
+                        "Fri, 26 Apr 2019 18:07:34 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;104,Microsoft.Compute/HighCostGet30Min;594"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "transfer-encoding": [
+                        "chunked"
+                    ],
+                    "content-length": [
+                        "14759"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "vmId": "814966a3-72e9-4606-a087-dfdbfa9fc24b",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-agent-A61AD475-0-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://00usm2nughsm6poagnt0.blob.core.windows.net/osdisk/k8s-agent-A61AD475-0-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-agent-A61AD475-0",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "name": "k8s-agent-A61AD475-0"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "de77098d-d5e5-4959-87f7-deb81d90f95b",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-agent-A61AD475-1-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://00usm2nughsm6poagnt0.blob.core.windows.net/osdisk/k8s-agent-A61AD475-1-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-agent-A61AD475-1",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-1",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "name": "k8s-agent-A61AD475-1"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "be6ad948-1465-497e-9755-fbb6a73a29e9",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-agent-A61AD475-2-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://00usm2nughsm6poagnt0.blob.core.windows.net/osdisk/k8s-agent-A61AD475-2-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-agent-A61AD475-2",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-2",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "name": "k8s-agent-A61AD475-2"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "3e88b117-904e-4e47-abdd-ec3b5df6ed78",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04-LTS",
+                                            "version": "16.04.201708151"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "k8s-master-A61AD475-0-osdisk",
+                                            "createOption": "FromImage",
+                                            "vhd": {
+                                                "uri": "https://usm2nughsm6pomstr0.blob.core.windows.net/vhds/k8s-master-A61AD475-0-osdisk.vhd"
+                                            },
+                                            "caching": "ReadWrite",
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "k8s-master-A61AD475-0-etcddisk",
+                                                "createOption": "Empty",
+                                                "vhd": {
+                                                    "uri": "https://usm2nughsm6pomstr0.blob.core.windows.net/vhds/k8s-master-A61AD475-0-etcddisk.vhd"
+                                                },
+                                                "caching": "None",
+                                                "diskSizeGB": 128,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "k8s-master-A61AD475-0",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
+                                    }
+                                ],
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-master-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "master",
+                                    "resourceNameSuffix": "A61AD475"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "name": "k8s-master-A61AD475-0"
+                            },
+                            {
+                                "properties": {
+                                    "vmId": "c8947067-0781-4f86-8d67-627ee703fcdc",
+                                    "hardwareProfile": {
+                                        "vmSize": "Basic_A0"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_56efd8d3574f403c8693d834542ae790",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vm45mqcga7pkswi",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                                    "CreatorEmail": "Unknown"
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "name": "cctestvm"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

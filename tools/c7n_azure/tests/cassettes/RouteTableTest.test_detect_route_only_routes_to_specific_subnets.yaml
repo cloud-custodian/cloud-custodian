@@ -1,71 +1,144 @@
-interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
-        networkmanagementclient/2.6.0 Azure-SDK-For-Python
-      accept-language:
-      - en-US
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/routeTables?api-version=2018-12-01
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
-        uc4/evS9X/zRMlvQLx9Np23etHW1bvM2m5T5R6OPihl9frdZT5ppXazaolo2d2cHDx6en+9Ptg8m
-        s4fb+/cPDrYfTiY72/d3872Dh/fzvf37n96t86Za19P8cwK3au4C8O9Pv7b5NoPezpaz7ctl3t5d
-        1dVlMcvr5u4XxbSumuq8Hb/I26uqfnuXX3iD9s3dCHL0ywWh9927v+9HD7OHD7J8L99+ML2fE04P
-        Pt2e7H16sL17P5vO9g92Pv00n/y+H9E77fUKQ93YFzUrq2mG0VLTK+p2jc8I01VetwU1ePSL8ddl
-        0VCTYnnxus1aQH29nk7zfJbPqLUlwJppuD8jRO49/HR772A22d6/tzvZntyf7Wyfzx7uzKbTnZ37
-        B+f01qxogMKTi9Ur4POSuswuFJPzrGxyAowvCIXvfX/0UbOeEA3xxy/+OZ6qy6Ju11mpf2K6GARD
-        4JcJMfqBL9CB/LX70S/5/i/5JSPLgG8Pmu1F1rR5vX3vyYPTg0+f7m47MESeb2qMy6KZzrPrZpuG
-        tMjbeb5utoHWxiHSq4ZD7t6IKf1iePPB9Hz24GA63d6ZPdzb3p9NiKQ704fbD3cPZvv7e7Msn+Rf
-        kzdzQuEb4M3ppw+zg3t727MHkweE4P172we7WbZ98OnBg9lkmuU7+/fprffhzeiUTh7kB5/Odrd3
-        CBh3fPf/9TMpTcNW/jCo1XtPM2H2HnOVzWY05OZlnZ8X7+i73Z3x3v7+eG+8c3dvn75f5u/ab1er
-        N8I7PylieLxalUW2nIITtcHZ6lggUSuGQf+/f398/6NfcjvGk98bah7MbXaRL1tHk13q8P+DUxsZ
-        BTX6uZnZ3W9gZnfG+zRR3+C8gtf/vz+vGAU1+rmZ13vfyLx+w/K6R939f39eMQpq9HMzrzQr38C8
-        fkoT9X7z+rPk/n2tWex6f5gjeH12Hu8SYvS3fCO/0wh+yS/5/i/5fwBfSzRPiAwAAA==
-    headers:
-      Cache-Control:
-      - no-cache
-      Content-Encoding:
-      - gzip
-      Content-Length:
-      - '847'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 17 Apr 2019 22:24:53 GMT
-      Expires:
-      - '-1'
-      Pragma:
-      - no-cache
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Vary:
-      - Accept-Encoding
-      X-Content-Type-Options:
-      - nosniff
-      x-ms-correlation-request-id:
-      - 6afc4f36-d719-4583-a26b-937be7d39147
-      x-ms-original-request-ids:
-      - 537af3f3-e50a-429a-888b-ce64f3b760bb
-      - 718658d6-7f11-4f40-a9c9-d13773cf059b
-      x-ms-ratelimit-remaining-subscription-reads:
-      - '11999'
-      x-ms-request-id:
-      - 6afc4f36-d719-4583-a26b-937be7d39147
-      x-ms-routing-request-id:
-      - WESTUS2:20190417T222453Z:6afc4f36-d719-4583-a26b-937be7d39147
-    status:
-      code: 200
-      message: OK
-version: 1
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/routeTables?api-version=2018-12-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "3198"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "date": [
+                        "Fri, 26 Apr 2019 18:09:00 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "18475f30-a0db-43ce-8232-35c0335a1816",
+                        "2784001f-994a-486c-bf6d-4a3af7a18af5"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "expires": [
+                        "-1"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestroutetable",
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/routeTables/cctestroutetable",
+                                "etag": "W/\"6a4570b7-0ab2-4c17-bc5e-fb0531b39541\"",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "westus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "1d790e86-1caa-409a-8cba-e22ee0e402d0",
+                                    "disableBgpRoutePropagation": false,
+                                    "routes": [],
+                                    "subnets": [
+                                        {
+                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/virtualNetworks/ccroutetablevnet/subnets/cctestsubnet1"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "k8s-master-A61AD475-routetable",
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-A61AD475-routetable",
+                                "etag": "W/\"9c995170-f447-4482-9202-8d56487871f2\"",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "3727c7b7-05a9-4069-b1dd-aa9e15101e3c",
+                                    "disableBgpRoutePropagation": false,
+                                    "routes": [
+                                        {
+                                            "name": "k8s-agent-a61ad475-2",
+                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-A61AD475-routetable/routes/k8s-agent-a61ad475-2",
+                                            "etag": "W/\"9c995170-f447-4482-9202-8d56487871f2\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.2.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.0.6"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        },
+                                        {
+                                            "name": "k8s-agent-a61ad475-0",
+                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-A61AD475-routetable/routes/k8s-agent-a61ad475-0",
+                                            "etag": "W/\"9c995170-f447-4482-9202-8d56487871f2\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.3.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.0.5"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        },
+                                        {
+                                            "name": "k8s-master-a61ad475-0",
+                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-A61AD475-routetable/routes/k8s-master-a61ad475-0",
+                                            "etag": "W/\"9c995170-f447-4482-9202-8d56487871f2\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.1.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.255.5"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        },
+                                        {
+                                            "name": "k8s-agent-a61ad475-1",
+                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-A61AD475-routetable/routes/k8s-agent-a61ad475-1",
+                                            "etag": "W/\"9c995170-f447-4482-9202-8d56487871f2\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.0.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.0.4"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        }
+                                    ],
+                                    "subnets": [
+                                        {
+                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-A61AD475/subnets/k8s-subnet"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

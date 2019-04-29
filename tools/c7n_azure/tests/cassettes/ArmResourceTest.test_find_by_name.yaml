@@ -1,118 +1,786 @@
-interactions:
-- request:
-    body: null
-    headers:
-      Accept: [application/json]
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      User-Agent: [python/3.6.3 (Linux-4.9.93-linuxkit-aufs-x86_64-with-centos-7.5.1804-Core)
-          requests/2.19.1 msrest/0.5.4 msrest_azure/0.5.0 resourcemanagementclient/2.0.0
-          Azure-SDK-For-Python]
-      accept-language: [en-US]
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?api-version=2018-05-01
-  response:
-    body:
-      string: !!binary |
-        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
-    headers:
-      Cache-Control: [no-cache]
-      Content-Encoding: [gzip]
-      Content-Length: ['4778']
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 10 Sep 2018 19:52:50 GMT']
-      Expires: ['-1']
-      Pragma: [no-cache]
-      Strict-Transport-Security: [max-age=31536000; includeSubDomains]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      x-ms-correlation-request-id: [07259144-3192-4bb0-848b-a02a324a8802]
-      x-ms-ratelimit-remaining-subscription-reads: ['11995']
-      x-ms-request-id: [07259144-3192-4bb0-848b-a02a324a8802]
-      x-ms-routing-request-id: ['WESTUS2:20180910T195250Z:07259144-3192-4bb0-848b-a02a324a8802']
-    status: {code: 200, message: OK}
-version: 1
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?api-version=2018-05-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "25127"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "date": [
+                        "Fri, 26 Apr 2019 18:07:29 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "expires": [
+                        "-1"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/elise-test/providers/microsoft.insights/alertrules/Failure Anomalies - functionshost",
+                                "name": "Failure Anomalies - functionshost",
+                                "type": "microsoft.insights/alertrules",
+                                "location": "eastus",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/elise-test/providers/microsoft.insights/components/functionshost": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/elise-test/providers/Microsoft.Web/serverFarms/functionshost",
+                                "name": "functionshost",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "linux",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_eastus",
+                                "name": "NetworkWatcher_eastus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_southcentralus",
+                                "name": "NetworkWatcher_southcentralus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_westus",
+                                "name": "NetworkWatcher_westus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "westus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverFarms/cctest-appserviceplan",
+                                "name": "cctest-appserviceplan",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "F1",
+                                    "tier": "Free",
+                                    "size": "F1",
+                                    "capacity": 0
+                                },
+                                "kind": "app",
+                                "location": "centralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_batch/providers/Microsoft.Batch/batchAccounts/cctest",
+                                "name": "cctest",
+                                "type": "Microsoft.Batch/batchAccounts",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
+                                "name": "cctestcdnprofile",
+                                "type": "Microsoft.Cdn/profiles",
+                                "sku": {
+                                    "name": "Standard_Microsoft"
+                                },
+                                "location": "centralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_cognitive-service/providers/Microsoft.CognitiveServices/accounts/cctest-cog-serv",
+                                "name": "cctest-cog-serv",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "sku": {
+                                    "name": "F0"
+                                },
+                                "kind": "TextTranslation",
+                                "location": "global"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_container_registry/providers/Microsoft.ContainerRegistry/registries/cctestcontainerregistry",
+                                "name": "cctestcontainerregistry",
+                                "type": "Microsoft.ContainerRegistry/registries",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "location": "westus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/availabilitySets/agent-availabilitySet-A61AD475",
+                                "name": "agent-availabilitySet-A61AD475",
+                                "type": "Microsoft.Compute/availabilitySets",
+                                "sku": {
+                                    "name": "Classic"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/availabilitySets/master-availabilityset-A61AD475",
+                                "name": "master-availabilityset-A61AD475",
+                                "type": "Microsoft.Compute/availabilitySets",
+                                "sku": {
+                                    "name": "Classic"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "name": "k8s-agent-A61AD475-0",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0",
+                                "name": "k8s-agent-A61AD475-0/cse0",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "name": "k8s-agent-A61AD475-1",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-1",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1",
+                                "name": "k8s-agent-A61AD475-1/cse1",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "name": "k8s-agent-A61AD475-2",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-agent-A61AD475-2",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "agent",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2",
+                                "name": "k8s-agent-A61AD475-2/cse2",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "name": "k8s-master-A61AD475-0",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "creationSource": "acs-k8s-master-A61AD475-0",
+                                    "orchestrator": "Kubernetes:1.7.7",
+                                    "poolName": "master",
+                                    "resourceNameSuffix": "A61AD475"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0",
+                                "name": "k8s-master-A61AD475-0/cse0",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.ContainerService/containerServices/cctestacs",
+                                "name": "cctestacs",
+                                "type": "Microsoft.ContainerService/containerServices",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-A61AD475",
+                                "name": "k8s-master-internal-lb-A61AD475",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-A61AD475",
+                                "name": "k8s-master-lb-A61AD475",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0",
+                                "name": "k8s-agent-A61AD475-nic-0",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1",
+                                "name": "k8s-agent-A61AD475-nic-1",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2",
+                                "name": "k8s-agent-A61AD475-nic-2",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0",
+                                "name": "k8s-master-A61AD475-nic-0",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkSecurityGroups/k8s-master-A61AD475-nsg",
+                                "name": "k8s-master-A61AD475-nsg",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/publicIPAddresses/k8s-master-ip-cctestacsdnsmgmt-A61AD475",
+                                "name": "k8s-master-ip-cctestacsdnsmgmt-A61AD475",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-A61AD475-routetable",
+                                "name": "k8s-master-A61AD475-routetable",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-A61AD475",
+                                "name": "k8s-vnet-A61AD475",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/00usm2nughsm6poagnt0",
+                                "name": "00usm2nughsm6poagnt0",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/pvc2901814435001",
+                                "name": "pvc2901814435001",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Premium_LRS",
+                                    "tier": "Premium"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "created-by": "azure-dd"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/pvc2901814435002",
+                                "name": "pvc2901814435002",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "created-by": "azure-dd"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Storage/storageAccounts/usm2nughsm6pomstr0",
+                                "name": "usm2nughsm6pomstr0",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb",
+                                "name": "cctestcosmosdb",
+                                "type": "Microsoft.DocumentDB/databaseAccounts",
+                                "kind": "MongoDB",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "defaultExperience": "MongoDB"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_datafactory/providers/Microsoft.DataFactory/factories/cctest-data-factory",
+                                "name": "cctest-data-factory",
+                                "type": "Microsoft.DataFactory/factories",
+                                "location": "eastus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_datalake/providers/Microsoft.DataLakeStore/accounts/cctestdatalake",
+                                "name": "cctestdatalake",
+                                "type": "Microsoft.DataLakeStore/accounts",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer",
+                                "name": "cctestdiagnostic_loadbalancer",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/publicIPAddresses/cctestdiagnostic_loadbalancer_public_ip",
+                                "name": "cctestdiagnostic_loadbalancer_public_ip",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_diagnostic-settings/providers/Microsoft.Storage/storageAccounts/diagnosticruwy74fd3rqea",
+                                "name": "diagnosticruwy74fd3rqea",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_disk/providers/Microsoft.Compute/disks/cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
+                                "name": "cctestvm_disk2_a9097edcfa664ff48c8e88e87d72003e",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_disk/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c",
+                                "name": "cctestvm_OsDisk_1_81338ced63fa4855b8a5f3e2bab5213c",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/alertrules/Failure Anomalies - cloud-custodian-test",
+                                "name": "Failure Anomalies - cloud-custodian-test",
+                                "type": "microsoft.insights/alertrules",
+                                "location": "westus2",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test",
+                                "name": "cloud-custodian-test",
+                                "type": "microsoft.insights/components",
+                                "kind": "web",
+                                "location": "westus2",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest",
+                                "name": "cloudcustodiantest",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "westus2",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/serverFarms/cloud-custodian-test",
+                                "name": "cloud-custodian-test",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "B1",
+                                    "tier": "Basic",
+                                    "size": "B1",
+                                    "family": "B",
+                                    "capacity": 1
+                                },
+                                "kind": "linux",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test",
+                                "name": "cloud-custodian-test",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "functionapp,linux",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/custodian-test-app",
+                                "name": "custodian-test-app",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "functionapp,linux,container",
+                                "location": "westus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_iothub/providers/Microsoft.Devices/IotHubs/cctest-iothub",
+                                "name": "cctest-iothub",
+                                "type": "Microsoft.Devices/IotHubs",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "capacity": 1
+                                },
+                                "location": "westus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1asdf",
+                                "name": "cckeyvault1asdf",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
+                                "name": "cckeyvault2kme24fgeaqvqk",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_load-balancer/providers/Microsoft.Network/loadBalancers/cctestloadbalancer",
+                                "name": "cctestloadbalancer",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_load-balancer/providers/Microsoft.Network/publicIPAddresses/cctestloadbalancer_public_ip",
+                                "name": "cctestloadbalancer_public_ip",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_network_interface/providers/Microsoft.Network/networkInterfaces/cctestnic",
+                                "name": "cctestnic",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_network_interface/providers/Microsoft.Network/virtualNetworks/cctestvnetnic",
+                                "name": "cctestvnetnic",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_networksecuritygroup/providers/Microsoft.Network/networkSecurityGroups/c7n-nsg",
+                                "name": "c7n-nsg",
+                                "type": "Microsoft.Network/networkSecurityGroups",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_redis/providers/Microsoft.Cache/Redis/cctestredis",
+                                "name": "cctestredis",
+                                "type": "Microsoft.Cache/Redis",
+                                "location": "centralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/routeTables/cctestroutetable",
+                                "name": "cctestroutetable",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "westus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/virtualNetworks/ccroutetablevnet",
+                                "name": "ccroutetablevnet",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "westus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "name": "cctestsqlserverj6y6cbbtaphs4",
+                                "type": "Microsoft.Sql/servers",
+                                "kind": "v12.0",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb",
+                                "name": "cctestsqlserverj6y6cbbtaphs4/cctestdb",
+                                "type": "Microsoft.Sql/servers/databases",
+                                "sku": {
+                                    "name": "P1",
+                                    "tier": "Premium"
+                                },
+                                "kind": "v12.0,user",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/master",
+                                "name": "cctestsqlserverj6y6cbbtaphs4/master",
+                                "type": "Microsoft.Sql/servers/databases",
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "location": "eastus2"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Network/virtualNetworks/cctstoragevnet1",
+                                "name": "cctstoragevnet1",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Network/virtualNetworks/cctstoragevnet2",
+                                "name": "cctstoragevnet2",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
+                                "name": "cctstoragey6akyqpagdt3o",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790",
+                                "name": "cctestvm_disk2_56efd8d3574f403c8693d834542ae790",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "managedBy": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215",
+                                "name": "cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "managedBy": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "name": "cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                                    "CreatorEmail": "Unknown"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic",
+                                "name": "myVMNic",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/publicIPAddresses/myPublicIP",
+                                "name": "myPublicIP",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                },
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/virtualNetworks/MyVNET",
+                                "name": "MyVNET",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
+                                "name": "45mqcga7pkswisalinuxvm",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vmss/providers/Microsoft.Compute/virtualMachineScaleSets/cctestvmss",
+                                "name": "cctestvmss",
+                                "type": "Microsoft.Compute/virtualMachineScaleSets",
+                                "sku": {
+                                    "name": "Standard_DS1_v2",
+                                    "tier": "Standard",
+                                    "capacity": 2
+                                },
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vmss/providers/Microsoft.Network/virtualNetworks/cctestvmssVnet",
+                                "name": "cctestvmssVnet",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/microsoft.insights/alertrules/Failure Anomalies - cctestwebapp",
+                                "name": "Failure Anomalies - cctestwebapp",
+                                "type": "microsoft.insights/alertrules",
+                                "location": "eastus",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/microsoft.insights/components/cctestwebapp": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/microsoft.insights/components/cctestwebapp",
+                                "name": "cctestwebapp",
+                                "type": "microsoft.insights/components",
+                                "kind": "web",
+                                "location": "eastus",
+                                "tags": {
+                                    "hidden-link:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/anzoloch-test-api/providers/Microsoft.Web/sites/anzoloch-test-api": "Resource"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/Microsoft.Web/serverFarms/ccctestServicePlanesk72p3i6bibv6",
+                                "name": "ccctestServicePlanesk72p3i6bibv6",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "app",
+                                "location": "centralus"
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_webapp/providers/Microsoft.Web/sites/cctestwebapp",
+                                "name": "cctestwebapp",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "api",
+                                "location": "centralus",
+                                "tags": {
+                                    "hidden-related:/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourcegroups/anzoloch-test-api/providers/Microsoft.Web/serverfarms/ServicePlane63a2834-992c": "empty"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/wesyao-test-kv/providers/Microsoft.KeyVault/vaults/wesyao-kv",
+                                "name": "wesyao-kv",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "westus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

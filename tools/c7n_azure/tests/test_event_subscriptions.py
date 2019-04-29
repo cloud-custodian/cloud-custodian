@@ -33,7 +33,7 @@ class AzureEventSubscriptionsTest(BaseTest):
             resource_id=account.id, queue_name=queue_name)
         AzureEventSubscription.create(event_sub_destination,
                                       self.event_sub_name,
-                                      DEFAULT_SUBSCRIPTION_ID)
+                                      self.session.get_subscription_id())
 
     def test_event_subscription_schema_validate(self):
         with self.sign_out_patch():
