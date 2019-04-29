@@ -201,9 +201,9 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
         })
 
         resources = p.run()
-        db = next((r for r in resources if r.get('name') == 'cctestdb'), None)
+        db = next((r for r in resources if r.get('name') == 'cclongtermretentiondb'), None)
         self.assertIsNotNone(db)
-        self.assertEqual(db.get('name'), 'cctestdb')
+        self.assertEqual(db.get('name'), 'cclongtermretentiondb')
 
     def test_filter_database_with_yearly_backup_retention_more_than_18_months(self):
 
@@ -224,3 +224,54 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
         resources = p.run()
         db = next((r for r in resources if r.get('name') == 'cctestdb'), None)
         self.assertIsNone(db)
+
+    def test_find_database_with_long_term_policy_using_filter_or_operator(self):
+
+        p = self.load_policy({
+            'name': 'test-find-database-with-long-term-policy-using-filter-or-operator',
+            'resource': 'azure.sqldatabase',
+            'filters': [
+                {
+                    'or': [
+                        {
+                            'type': 'long-term-backup-retention-policy',
+                            'backup-type': 'monthly',
+                            'op': 'gte',
+                            'retention-period': 12,
+                            'retention-period-units': 'months'
+                        },
+                        {
+                            'type': 'long-term-backup-retention-policy',
+                            'backup-type': 'monthly',
+                            'op': 'gte',
+                            'retention-period': 1,
+                            'retention-period-units': 'year'
+                        },
+                    ]
+                }
+            ]
+        })
+
+        resources = p.run()
+        db = next((r for r in resources if r.get('name') == 'cclongtermretentiondb'), None)
+        self.assertIsNotNone(db)
+        self.assertEqual(db.get('name'), 'cclongtermretentiondb')
+
+    def test_filter_database_with_retention_period_unit_mismatch(self):
+
+        p = self.load_policy({
+            'name': 'test-filter-database-with-retention-period-unit-mismatch',
+            'resource': 'azure.sqldatabase',
+            'filters': [
+                {
+                    'type': 'long-term-backup-retention-policy',
+                    'backup-type': 'weekly',
+                    'op': 'eq',
+                    'retention-period': 2,
+                    'retention-period-units': 'weeks'
+                }
+            ]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)

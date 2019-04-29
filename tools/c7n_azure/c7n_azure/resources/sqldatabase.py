@@ -14,13 +14,12 @@
 
 import logging
 import enum
-import isodate
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
 from c7n_azure.query import ChildResourceQuery
 from c7n_azure.filters import scalar_ops
 from c7n.filters import Filter
-from c7n_azure.utils import RetentionPeriodHelper, ResourceIdParser, ThreadHelper
+from c7n_azure.utils import RetentionPeriod, ResourceIdParser, ThreadHelper
 from c7n.utils import type_schema
 from msrestazure.azure_exceptions import CloudError
 
@@ -88,7 +87,7 @@ class BackupRetentionPolicyFilter(Filter):
         if retention_policy is None:
             return self._perform_op(0, self.retention_limit)
         retention = self.get_retention_from_policy(retention_policy)
-        return self._perform_op(retention, self.retention_limit)
+        return retention is not None and self._perform_op(retention, self.retention_limit)
 
     def _get_backup_retention_policy(self, i, get_operation):
         resource_group_name = i['resourceGroup']
@@ -201,32 +200,36 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
             'backup-type': {'enum': list([str(t) for t in BackupType])},
             'retention-period': {'type': 'number'},
             'retention-period-units': {
-                'enum': list([str(u) for u in RetentionPeriodHelper.RetentionPeriodUnits])
+                'enum': list([str(u) for u in RetentionPeriod.Units])
             }
         }
     )
 
     def __init__(self, data, manager=None):
         retention_period = data.get('retention-period')
-        retention_period_units = RetentionPeriodHelper.RetentionPeriodUnits[
+        self.retention_period_units = RetentionPeriod.Units[
             data.get('retention-period-units')]
-        retention_limit = RetentionPeriodHelper.period_to_duration_limit(
-            retention_period, retention_period_units)
 
         super(LongTermBackupRetentionPolicyFilter, self).__init__(
-            'backup_long_term_retention_policies', retention_limit, data, manager)
+            'backup_long_term_retention_policies', retention_period, data, manager)
         self.backup_type = self.data.get('backup-type')
 
     def get_retention_from_policy(self, retention_policy):
         if self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.weekly.value:
-            actual_retention_days_iso8601 = retention_policy.weekly_retention
+            actual_retention_iso8601 = retention_policy.weekly_retention
         elif self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.monthly.value:
-            actual_retention_days_iso8601 = retention_policy.monthly_retention
+            actual_retention_iso8601 = retention_policy.monthly_retention
         elif self.backup_type == LongTermBackupRetentionPolicyFilter.BackupType.yearly.value:
-            actual_retention_days_iso8601 = retention_policy.yearly_retention
+            actual_retention_iso8601 = retention_policy.yearly_retention
         else:
             raise ValueError("Unknown backup-type: {}".format(self.backup_type))
 
-        actual_duration = isodate.parse_duration(actual_retention_days_iso8601)
-        actual_duration = RetentionPeriodHelper.normalize_duration(actual_duration)
+        try:
+            actual_duration, actual_duration_units = RetentionPeriod.parse_iso8601_retention_period(
+                actual_retention_iso8601)
+        except ValueError:
+            return None
+
+        if actual_duration_units.iso8601_symbol != self.retention_period_units.iso8601_symbol:
+            return None
         return actual_duration

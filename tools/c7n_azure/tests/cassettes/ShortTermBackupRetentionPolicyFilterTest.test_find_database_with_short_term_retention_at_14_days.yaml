@@ -34,7 +34,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 20:35:06 GMT
+      - Mon, 29 Apr 2019 21:29:32 GMT
       Expires:
       - '-1'
       Pragma:
@@ -50,13 +50,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 66d619f6-4d10-4148-9029-16b3a7ab1a9f
+      - 9b3bf5d0-b414-4ebf-b5f3-eda2c541fcc7
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11980'
+      - '11979'
       x-ms-request-id:
-      - 0824c7a3-de93-4d8b-b801-507e6f78e2cf
+      - 4301f71e-648b-4793-8347-ef4192dd3b7e
       x-ms-routing-request-id:
-      - WESTUS2:20190425T203506Z:66d619f6-4d10-4148-9029-16b3a7ab1a9f
+      - WESTUS2:20190429T212933Z:9b3bf5d0-b414-4ebf-b5f3-eda2c541fcc7
     status:
       code: 200
       message: OK
@@ -81,19 +81,22 @@ interactions:
       string: !!binary |
         H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
         VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
-        uc4/evS9X/xR83b90aNf/NEyW9DfH72s80WxXnw0+qgt8jr4YJqtsmnRXn/0aHfv/i8ZffS2WM6o
-        weXu3nhntG6o9eijVV2t8ppebQBzWpVl1hbVkpq9/onnv/9z+mO5+/t/ni/zOit//5OXu7//ydnv
-        f/yaXlxk714XP8ifXLd4dW93/8H+wb1P9w9GHzVt1q7ps4++XJbFMqe2s6zNJlmTn6H7Tw/29h7e
-        39vfPniY5dv7e3u729mD3YPtg+zhdLp/bzrZyXfpnWmdU+fV8mnWYph7O7sPt3f2t/fuvdk9eLS/
-        92jnwXjv03s/hZbrus6X7eu8viym+ZeTn86nbXGZv1D6AFid/6J13rT5bFOjWX6erUuCM62Ws6y+
-        fl5NGQP6fkrwiQA0KuqOBlNWFye3J9UPqmX+Kp+tCeqy/ejReVY2+eijPKtLInv7iv5f1Xl8nPce
-        3dsf7+3wOIkgs9fTrESz02U2KfOZfvoqX5XFNDup1oC/SzgqSb4epxCrlG7sedbQdO5RqwLTd7dZ
-        T5ppXazwdXN3dvDg4fn5/mT7YDJ7uL1//+Bg++FksrN9fzffO3h4P9/bv//p3TpvqnU9zT+vq/Wq
-        uUsc0/7+zS8iKtSXeX2XWPCymOV1c/eLYlpXTXXejl//ovKufN3cnU7xgm3/tlqu7326vqQJrffv
-        GtYyzWYTQlQH7H3SXq/wSbwDC+OjXzLqitfra2IbkEhpZv92JNshegWi1Zg2i2yZXeSzJ9To/2V0
-        I+To9W9C8u+RAO/t3d9/sLdzo+jfO9idPny4/3D7YHefRH/3fLp98Gmeb08fnH863XvwcO/h5Jze
-        2Sz6O4/2Px3fe8AiYficBhiRapkrcO5N8u9a/pCVAI3UyvTTohkWaiKuGez78ycx6P8HBXpBeNKY
-        rDjbv28rzN//Jf8PxcpFczcHAAA=
+        uc4/evS9X/xR83b90aNf/NEyW9DfH71us+Usq2cfjT5qi7wOP5lmq2xatNcfPdrd+SWjj94Wyxk1
+        uNzdG++M1g21Hn20qqtVXtOrDYBOq7LM2qJaUrPXP/H8939Ofyx3f//P82VeZ+Xvf/Jy9/c/Ofv9
+        j1/Ti4vs3eviB/mT6xav7n16sH/v/v79T3d2dkYfNW3WrunTj75clsUyp9azrM0mWZOfAYHpw73s
+        /r3dT7ez3ez+9v7OvXvb2SQ/387P852HezvZ3oO9+/TOtM6p+2r5NGsx0r2d3YfbO/vbew/f7O08
+        uv/w0c7O+N69Bz+Fluu6zpft67y+LKb5l5OfzqdtcZm/UBLtUJM6/0XrvGnz2aZGs/w8W5cEZ1qB
+        hNfPqyljQN9PCT6RgEZF3dFgyuri5PbE+kG1zF/lszVBXbYfPTrPyiYffZRndUmEb1/R/6s6j4xz
+        99HOAQ11fLCHYRI9Zq+nWYlWT4smm5Q5Zhkfv8pXZTHNTqo14NMUGJJ8TWYhbind4POsofnco0Zt
+        dkHz+ovp6wIzebdZT5ppXazQsLk7O3jw8Px8f7J9MJk93N6/f3Cw/XAy2dm+v5vvHTy8n+8Rg9yt
+        86Za19P887par5q7xD7t79/8IiJIfZnXd4kfL4tZXjd3vyimddVU5+349S8q78rXzd3pFC/Y9m+r
+        5frep+tLmtt6/67hMjQrq+VFm9eLOm+JDoTebEL4KyGGvm6vV/g63rWF/tEvGXXF8GWdL4r1AiCE
+        sO4Dj65794lwP5tSuLv/YP/g3qf7BzfK4KcHe3sP7+/tbx88zPLt/b293e3swe7B9kH2cDrdvzed
+        7OS79M6QDN57s3vwaH/v0c6D8d6n98CchuGIWBHxeglgN8kgN/p/lwzKOO89urc/3tvhcRJBrBCe
+        LodlcJdwVJJ8PU4hVomK4P/bBQ/NWJh0wN4nX1u8Xl8T24BESjP7tyNZz8A1ps0iW2YX+ewJNfp/
+        Gd0IOXr9m5D8eyTAe3v39x/ske6/QfTvHexOHz7cf7h9sLtPor97Pt0++DTPt6cPzj+d7j14uPdw
+        ck7vbBb9nUf7n47vPWCRMHxOA4xItcwVOPcm+Xctf8hKgEZqZfrrGVbGnF6hiRzkT2LQ/w8K9ILw
+        pDFZcbZ/31aYv/9L/h8N/qd5vgoAAA==
     headers:
       Cache-Control:
       - no-cache
@@ -102,7 +105,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 20:35:09 GMT
+      - Mon, 29 Apr 2019 21:29:27 GMT
       Expires:
       - '-1'
       Pragma:
@@ -118,13 +121,73 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - d3fc20b4-2f02-4226-b3b1-b1fb987d6cbd
+      - bb8dd1a8-bb2b-4167-9b1d-eb1f1a082a4c
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11988'
+      - '11983'
       x-ms-request-id:
-      - 3064b057-f9c6-4b64-b5b5-2eb0ee4d0dd2
+      - 719d4008-00cd-4110-b025-8ec523699a93
       x-ms-routing-request-id:
-      - WESTUS2:20190425T203510Z:d3fc20b4-2f02-4226-b3b1-b1fb987d6cbd
+      - WESTUS2:20190429T212927Z:bb8dd1a8-bb2b-4167-9b1d-eb1f1a082a4c
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cclongtermretentiondb/backupShortTermRetentionPolicies/default?api-version=2017-10-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
+        WuV1W+TNR49+8Ud13ubLtqiWT7Nr+uDe/V8y+qiYffToo7vNetJM62KFL5u7s4MHD8/P9yfbB5PZ
+        w+39+wcH2w8nk53t+7v53sHD+/ne/v1P79Z5U63raf55Xa1Xzd02b9rfv/lFZZPXl3l9lzq+LGZ5
+        3dz9opjWVVOdt+PXv6i8K183d6dTvGDbv62W63ufri/XeVPv351lbTbJmhzNymp50eb1wuI+m9yd
+        ZNO369XreVW3b+irV+arl1VZTGmsd2f5ebYu249GHy2zRU4DdB+01yt8EMfKdXxTFx/9kv8HjO6I
+        Jl0BAAA=
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 29 Apr 2019 21:29:24 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - 34dc06ed-0f8d-487b-9735-97a3cfcb2819
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11984'
+      x-ms-request-id:
+      - ac756d22-5c31-481c-acc5-76dc115ebee9
+      x-ms-routing-request-id:
+      - WESTUS2:20190429T212925Z:34dc06ed-0f8d-487b-9735-97a3cfcb2819
     status:
       code: 200
       message: OK
@@ -161,7 +224,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 20:35:05 GMT
+      - Mon, 29 Apr 2019 21:29:26 GMT
       Expires:
       - '-1'
       Pragma:
@@ -177,13 +240,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 2883a8c5-df31-44d8-9a27-e579376dcaa5
+      - bd44b375-fa37-4b50-8424-027587a23bf3
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11988'
+      - '11984'
       x-ms-request-id:
-      - e57b15d7-7182-448e-9954-70ee954bbe62
+      - 5723132a-5365-40a6-95d3-96f43d9f0443
       x-ms-routing-request-id:
-      - WESTUS2:20190425T203506Z:2883a8c5-df31-44d8-9a27-e579376dcaa5
+      - WESTUS2:20190429T212927Z:bd44b375-fa37-4b50-8424-027587a23bf3
     status:
       code: 200
       message: OK
@@ -217,7 +280,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 25 Apr 2019 20:35:04 GMT
+      - Mon, 29 Apr 2019 21:29:36 GMT
       Expires:
       - '-1'
       Pragma:
@@ -229,13 +292,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 33aabd12-47dc-453c-abd3-a9b76b62397f
+      - f64a26bd-64aa-4820-97ef-9557b1b3fb57
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11980'
+      - '11986'
       x-ms-request-id:
-      - 87bfe49c-30d1-41ba-92fb-66b9daabeb99
+      - f9123a5d-362c-4ecf-bf53-845a60259edd
       x-ms-routing-request-id:
-      - WESTUS2:20190425T203504Z:33aabd12-47dc-453c-abd3-a9b76b62397f
+      - WESTUS2:20190429T212937Z:f64a26bd-64aa-4820-97ef-9557b1b3fb57
     status:
       code: 404
       message: Not Found

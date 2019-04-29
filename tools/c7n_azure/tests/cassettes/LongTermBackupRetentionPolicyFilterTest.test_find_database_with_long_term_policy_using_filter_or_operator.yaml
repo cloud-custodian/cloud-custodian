@@ -50,13 +50,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - e7e39045-84f7-457a-a822-0fdbe104757d
+      - 4a7273da-d66b-4284-90e5-1b7820e1404d
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11987'
+      - '11999'
       x-ms-request-id:
-      - d1c1c492-c3e5-4590-a7ba-62b947444a4f
+      - e2d0cbd4-bfdb-4112-bcf0-0337663f68b5
       x-ms-routing-request-id:
-      - WESTUS2:20190429T212929Z:e7e39045-84f7-457a-a822-0fdbe104757d
+      - WESTUS2:20190429T212928Z:4a7273da-d66b-4284-90e5-1b7820e1404d
     status:
       code: 200
       message: OK
@@ -105,7 +105,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 29 Apr 2019 21:29:28 GMT
+      - Mon, 29 Apr 2019 21:29:46 GMT
       Expires:
       - '-1'
       Pragma:
@@ -121,13 +121,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 272471a9-1116-46d2-a7fe-2e920c3f7f80
+      - 0e02493a-0808-4ee0-bee7-d56077a41e53
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11989'
+      - '11985'
       x-ms-request-id:
-      - 8b1503f0-00d9-4932-b84e-8b6853bba4d4
+      - 12402715-3d25-4d3f-93c1-15da1b91e923
       x-ms-routing-request-id:
-      - WESTUS2:20190429T212929Z:272471a9-1116-46d2-a7fe-2e920c3f7f80
+      - WESTUS2:20190429T212946Z:0e02493a-0808-4ee0-bee7-d56077a41e53
     status:
       code: 200
       message: OK
@@ -165,7 +165,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 29 Apr 2019 21:29:30 GMT
+      - Mon, 29 Apr 2019 21:29:29 GMT
       Expires:
       - '-1'
       Pragma:
@@ -181,13 +181,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - e886bef9-b8d9-4223-b0bc-e874cec084dd
+      - 765c4ba6-0fd3-4f1d-8d7b-30186462e69d
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11985'
+      - '11968'
       x-ms-request-id:
-      - 503dc326-36f8-45e1-8a3e-98e8c2759b49
+      - 90736c25-3499-42ab-ba9b-a580d69e1a98
       x-ms-routing-request-id:
-      - WESTUS2:20190429T212930Z:e886bef9-b8d9-4223-b0bc-e874cec084dd
+      - WESTUS2:20190429T212930Z:765c4ba6-0fd3-4f1d-8d7b-30186462e69d
     status:
       code: 200
       message: OK
@@ -225,7 +225,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 29 Apr 2019 21:29:31 GMT
+      - Mon, 29 Apr 2019 21:29:34 GMT
       Expires:
       - '-1'
       Pragma:
@@ -241,13 +241,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 81da10f6-68f6-4ac5-a83c-db53e5c03ffe
+      - ab507790-8291-4396-ba9f-2a0bb8c873a8
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11994'
+      - '11963'
       x-ms-request-id:
-      - 9625c13a-c799-4b8a-bc22-5aca26c77180
+      - 55d65e76-ffa9-4024-a35b-e53a4c25bcbd
       x-ms-routing-request-id:
-      - WESTUS2:20190429T212931Z:81da10f6-68f6-4ac5-a83c-db53e5c03ffe
+      - WESTUS2:20190429T212935Z:ab507790-8291-4396-ba9f-2a0bb8c873a8
     status:
       code: 200
       message: OK
@@ -285,7 +285,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 29 Apr 2019 21:29:29 GMT
+      - Mon, 29 Apr 2019 21:29:34 GMT
       Expires:
       - '-1'
       Pragma:
@@ -301,13 +301,193 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 0e5d5984-92fa-4a4f-9be5-4cb822230955
+      - 1a8ea019-b22d-4f23-9888-d1fcb3f1a027
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11991'
+      - '11986'
       x-ms-request-id:
-      - 7652f0fe-e2e3-49e8-97bf-cc78a4ec6f06
+      - ebc2422b-e3e9-4791-bd87-22248acfcde6
       x-ms-routing-request-id:
-      - WESTUS2:20190429T212930Z:0e5d5984-92fa-4a4f-9be5-4cb822230955
+      - WESTUS2:20190429T212934Z:1a8ea019-b22d-4f23-9888-d1fcb3f1a027
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cclongtermretentiondb/backupLongTermRetentionPolicies/default?api-version=2017-03-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
+        WuV1W+TNR49+8UdXef62vH6Vt/myLarlR48+ern7xUejjxbVsp13v9jDN9d5Vne+eLPzmr4AqC/P
+        fx/6+qNHO79k9FExo+/uNutJM62LFdo2d2cHDx6en+9Ptg8ms4fb+/cPDrYfTiY72/d3872Dh/fz
+        vf37n96t86Za19P887par5q7bd60v3/zi8omry/z+i7hf1nM8rq5+0UxraumOm/Hr39ReVe+bu5O
+        p3jBtn9bLdf3Pl1frvOm3r87y9pskjU5mpXV8qLN60VthjKb3J1k07fr1XP65g19Ywf5siqLKVHs
+        7iw/z9ZlS6NdZoucxuc+aK9X+CCOlOv3hh4++iX/D1aXMZmiAQAA
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 29 Apr 2019 21:29:38 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - d992394a-3abb-43a9-b90a-03e938d756d8
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11974'
+      x-ms-request-id:
+      - f80be4b0-674c-49a8-9131-b85f1dd12f1c
+      x-ms-routing-request-id:
+      - WESTUS2:20190429T212938Z:d992394a-3abb-43a9-b90a-03e938d756d8
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cctestdb/backupLongTermRetentionPolicies/default?api-version=2017-03-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
+        WuV1W+TNR49+8UdXef62vH6Vt/myLarlR48+erm7//Sj0UeLatnOO9/c+4K+uM6zuvP53u9DnwPS
+        l+e/D3370aO9nV8y+qiY0Xd3m/WkmdbFCm2bu7ODBw/Pz/cn2weT2cPt/fsHB9sPJ5Od7fu7+d7B
+        w/v53v79T+/WeVOt62n+eV2tV83dNm/a37/5RWWT15d5fZfwvyxmed3c/aKY1lVTnbfj17+ovCtf
+        N3enU7xg27+tlut7n64v13lT79+dZW02yZrcNJtN7k6y6dv16nm1vHiT1ws7rpdVWUyJSHdn+Xm2
+        Llsa4TJb5DQk90F7vcIHcTxcVzf08NEv+X8A6/6dGpUBAAA=
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 29 Apr 2019 21:29:42 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - f332ffe2-bd51-42b5-8f57-6054c5efe3be
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11972'
+      x-ms-request-id:
+      - 1a53a82d-6d8b-4a49-80ea-116a393b2491
+      x-ms-routing-request-id:
+      - WESTUS2:20190429T212943Z:f332ffe2-bd51-42b5-8f57-6054c5efe3be
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
+        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      accept-language:
+      - en-US
+    method: GET
+    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupLongTermRetentionPolicies/default?api-version=2017-03-01-preview
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
+        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
+        WuV1W+TNR49+8UdXef62vH6Vt/myLarlR48+evlm5/VHo48W1bKdR7+5zrM6+gVgfXn++9DXHz3a
+        +SWjj4oZfXe3WU+aaV2s0La5Ozt48PD8fH+yfTCZPdzev39wsP1wMtnZvr+b7x08vJ/v7d//9G6d
+        N9W6nuaf19V61dxt86b9/ZtfVDZ5fZnXd2kAl8Usr5u7XxTTumqq83b8+heVd+Xr5u50ihds+7fV
+        cn3v0/XlOm/q/buzrM0mWZM3dxdZ0xK0STZ9u149r5YXb/J6YUf1siqLKdHo7iw/z9ZlS8NbZouc
+        BuQ+aK9X+CCOhevohh4++iX/D0HF8c2UAQAA
+    headers:
+      Cache-Control:
+      - no-cache
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 29 Apr 2019 21:29:35 GMT
+      Expires:
+      - '-1'
+      Pragma:
+      - no-cache
+      Server:
+      - Microsoft-HTTPAPI/2.0
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      x-ms-correlation-request-id:
+      - 3618862b-7e32-448d-910d-19228f6aa06a
+      x-ms-ratelimit-remaining-subscription-reads:
+      - '11973'
+      x-ms-request-id:
+      - 542de6b1-bc19-4dbc-b0b3-a754259962b7
+      x-ms-routing-request-id:
+      - WESTUS2:20190429T212935Z:3618862b-7e32-448d-910d-19228f6aa06a
     status:
       code: 200
       message: OK
